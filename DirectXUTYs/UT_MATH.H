@@ -16,12 +16,6 @@
 #ifndef DISABLE_UT_MATH
 
 
-// C++ 対策 //
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 // ヘッダファイル //
 #include <windows.h>
 
@@ -61,12 +55,6 @@ WORD __fastcall rnd(void);
 
 // デバッグ用(後で消すこと) //
 //extern DWORD random_ref;
-
-
-// C++ 対策 //
-#ifdef __cplusplus
-}
-#endif
 
 
 // 使用禁止かな //

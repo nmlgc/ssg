@@ -15,12 +15,6 @@
 
 
 
-// C++ 対策 //
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 #include <windows.h>
 #include <mmsystem.h>
 //#pragma comment(lib,"winmm.lib")
@@ -144,12 +138,6 @@ extern BYTE			Mid_PanpodTable[16];			// パンポット
 extern BYTE			Mid_ExpressionTable[16];		// エクスプレッション
 extern BYTE			Mid_VolumeTable[16];			// ボリューム
 extern DWORD		Mid_PlayTime;
-
-
-// C++ 対策 //
-#ifdef __cplusplus
-}
-#endif
 
 
 #endif

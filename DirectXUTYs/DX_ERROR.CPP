@@ -31,7 +31,7 @@ extern void ErrInsert(char *s)
 	if(temp==NULL) return;
 
 	// 文字列の追加 //
-	temp->s = LocalAlloc(LPTR,sizeof(char)*(strlen(s)+2));
+	temp->s = reinterpret_cast<char *>(LocalAlloc(LPTR,sizeof(char)*(strlen(s)+2)));
 	if(temp->s==NULL){
 		LocalFree(temp);
 		return;

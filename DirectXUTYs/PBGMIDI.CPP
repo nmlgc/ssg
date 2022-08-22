@@ -200,7 +200,7 @@ void Mid_Volume(BYTE volume)
 
 	mh.dwFlags        = 0;
 	mh.dwOffset       = 0;
-	mh.lpData         = msg;
+	mh.lpData         = reinterpret_cast<LPSTR>(msg);
 	mh.dwBufferLength = mh.dwBytesRecorded = 8;
 	midiOutPrepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
 	midiOutLongMsg(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
@@ -258,7 +258,7 @@ void Mid_GMReset(void)
 	mh.dwOffset       = 0;
 	mh.dwBufferLength = mh.dwBytesRecorded = 11;
 
-	mh.lpData         = msg;
+	mh.lpData         = reinterpret_cast<LPSTR>(msg);
 	mh.dwBufferLength = mh.dwBytesRecorded = 6;
 	midiOutPrepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
 	midiOutLongMsg(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
@@ -571,7 +571,7 @@ static void Mid_Parse(MID_TRACK *track)
 			if(st1 == 0xf0){			// エクスクルーシブ
 				MIDIHDR mh;
 				countwork         = GetWaitCount(&(track->work));
-				mh.lpData         = LocalAlloc(LPTR,countwork+1);
+				mh.lpData         = reinterpret_cast<LPSTR>(LocalAlloc(LPTR,countwork+1));
 				mh.lpData[0]      = (BYTE)0xf0;
 				mh.dwFlags        = mh.dwOffset = 0;
 				mh.dwBufferLength = mh.dwBytesRecorded = countwork+1;
@@ -683,7 +683,7 @@ char *Mid_GetTitle(void)
 		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
 			if(p[0]==0xff && p[1]==0x01){
 				memcpy(temp,p+3,p[2]);
-				return p+3;
+				return reinterpret_cast<char *>(p+3);
 			}
 			p++;
 		}

@@ -10,7 +10,7 @@
 #include <time.h>
 
 #include "CALC.H"
-#include "..\\Gian07SrcFiles\\GIAN.H"
+#include "../Gian07SrcFiles/GIAN.H"
 
 // ログファイル名(定義しない場合、ログを出力しない) //
 #define SCL_LOGFILENAME	"SCL_LOG.TXT"

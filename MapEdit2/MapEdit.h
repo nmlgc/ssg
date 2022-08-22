@@ -10,7 +10,7 @@
 #pragma message(PBGWIN_MAPEDIT_H)
 
 #include "PBGUTY_X.h"
-#include "..\\Gian07SrcFiles\\SCROLL.h"
+#include "../Gian07SrcFiles/SCROLL.h"
 
 
 // グラフィック関連定数 //

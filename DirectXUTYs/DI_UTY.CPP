@@ -4,7 +4,7 @@
 /*                                                                           */
 
 #include "DI_UTY.H"
-//#include "..\GIAN_MAIN\GIAN.H"
+//#include "../GIAN_MAIN/GIAN.H"
 #pragma message(PBGWIN_DI_UTY_H)
 
 //#pragma optimize("",off)

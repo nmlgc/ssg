@@ -5,7 +5,7 @@
 
 #include "CALC.H"
 #include "ECLCDEF.H"
-#include "..\\Gian07SrcFiles\\GIAN.H"
+#include "../Gian07SrcFiles/GIAN.H"
 
 /*                                                                                               *
  * [座標指定上の注意]                                                                            *

@@ -33,7 +33,7 @@
 
 
 // ヘッダファイルのバージョンを表示する //
-#pragma message("-----["PBGWIN_DX_TYPE_H " / " __TIMESTAMP__ "]-----")
+#pragma message("-----[" PBGWIN_DX_TYPE_H " / " __TIMESTAMP__ "]-----")
 
 #if   DIRECTDRAW_VERSION == 0x0700
 	#pragma message("      DirectDraw  : Version 7.00")

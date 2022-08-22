@@ -76,14 +76,14 @@ long __fastcall cosl(BYTE deg,int length)
 // length*256/(SIN(deg)>0 ? SIN(deg) : 256) //
 long __fastcall sinDiv(BYTE deg, int length)
 {
-	register int sind = sinm(deg);
+	int sind = sinm(deg);
 	return (length<<8) / (sind>0 ? sind : 256);
 }
 
 // length*256/(COS(deg)>0 ? COS(deg) : 256) //
 long __fastcall cosDiv(BYTE deg, int length)
 {
-	register int cosd = cosm(deg);
+	int cosd = cosm(deg);
 	return (length<<8) / (cosd>0 ? cosd : 256);
 }
 

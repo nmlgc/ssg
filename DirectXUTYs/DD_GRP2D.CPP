@@ -173,7 +173,7 @@ FVOID _2DBox(int x1,int y1,int x2,int y2)
 // 円 //
 FVOID _2DCircle(int x,int y,int r)
 {
-	register int dx,dy;
+	int dx,dy;
 	int s;
 	BYTE c = (BYTE)Col2D&0xff;
 
@@ -205,7 +205,7 @@ FVOID _2DCircle(int x,int y,int r)
 FVOID _2DCircleF(int x,int y,int r)
 {
 
-	register int si,di;
+	int si,di;
 	int s;
 	//static int	pmin[480],pmax[480];
 	//int			ymin,ymax;

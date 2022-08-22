@@ -193,8 +193,8 @@ FVOID ReplaySave(void)
 	out = FilStartW(buf, BD_FILE_WRITE, FileHead.n);
 	if(NULL == out) return;
 
-	fwrite(&FileHead,sizeof(PBG_FILEHEAD),1,out->p.file);
-	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->p.file);
+	fwrite(&FileHead,sizeof(PBG_FILEHEAD),1,out->file);
+	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->file);
 
 	in = BitMemCreate((BYTE *)&DemoInfo, BD_MEMORY_READ, sizeof(DEMOPLAY_INFO));
 	Compress(in, out, 0);

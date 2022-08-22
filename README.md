@@ -13,13 +13,23 @@ You'll therefore need the following:
 2. [Tup](https://gittup.org/tup/) in the latest Windows version.\
    Place `tup.exe` and its DLLs somewhere in your `PATH`.
 
-3. Your favorite code editor.
+3. Your favorite code editor.\
+   A ready-to-use configuration for Visual Studio Code is part of this repository. Make sure to install the default recommended C++ extensions when asked.
 
 To build:
 
 1. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
 2. Navigate to the checkout directory of this repository.
-3. Invoke `tup` in your way of choice.
+3. Invoke `tup` in your way of choice:
+   * If you use Visual Studio Code, open the editor from this command-line environment:
+
+     ```batch
+     code .
+     ```
+
+     Then, you can run the build task with the default `Ctrl-Shift-B` keybinding.
+
+   * Or you can always run `tup` directly from this shell.
 
 The binary will be put into the `bin/` subdirectory, where you can also place the game's original data files.
 
@@ -34,6 +44,10 @@ CONFIG_RELEASE=n # deactivates Release mode if present
 ## Debugging
 
 .PDB files are generated for Debug and Release builds, so you should get symbol support with any Windows debugger.
+
+### Visual Studio Code
+
+Select between Debug and Release modes in the *Run and Debug* menu (`Ctrl-Shift-D` by default), and start debugging with the ▶ button or its keybinding.
 
 ### Visual Studio IDE
 

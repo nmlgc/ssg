@@ -1,0 +1,13 @@
+{
+	"configurations": [
+		{
+			"name": "MSVC 2022, 32-bit",
+			"includePath": [
+				"${workspaceFolder}/**"
+			],
+			"cppStandard": "c++23",
+			"intelliSenseMode": "windows-msvc-x86"
+		}
+	],
+	"version": 4
+}

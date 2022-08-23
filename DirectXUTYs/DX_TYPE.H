@@ -23,7 +23,8 @@
 // 使用するライブラリ //
 #pragma comment(lib,"dxguid.lib") // needed for DirectDraw and Direct3D
 #pragma comment(lib,"ddraw.lib")
-#pragma comment(lib,"d3dim.lib")
+#pragma comment(lib,"gdi32.lib")
+#pragma comment(lib,"user32.lib")
 #pragma comment(lib,"winmm.lib")
 
 

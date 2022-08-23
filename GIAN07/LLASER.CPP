@@ -85,7 +85,7 @@ extern void LLaserOpen(ENEMY_DATA *e,BYTE id)
 		lp = LLaser+i;
 		if((lp->e==e) && (lp->EnemyID==id || id==ECLCST_LLASERALL) && lp->flag!=LLF_DISABLE){
 			lp->flag = LLF_OPEN;
-			SndPlayEX(2,lp->x,DSBPLAY_LOOPING);
+			SndPlayEX(2,lp->x,true);
 		}
 	}
 }

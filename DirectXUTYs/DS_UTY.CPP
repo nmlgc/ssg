@@ -3,12 +3,36 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <dsound.h>
 #include "DS_UTY.h"
-#include <stdio.h>
 #pragma message(PBGWIN_DS_UTY_H)
+
+#pragma comment(lib,"dsound.lib")
+
+#if   DIRECTSOUND_VERSION == 0x0700
+	#pragma message("      DirectSound : Version 7.00")
+#elif DIRECTSOUND_VERSION == 0x0600
+	#pragma message("      DirectSound : Version 6.00")
+#elif DIRECTSOUND_VERSION == 0x0500
+	#pragma message("      DirectSound : Version 5.00")
+#elif DIRECTSOUND_VERSION == 0x0300
+	#pragma message("      DirectSound : Version 3.00")
+#else
+	#pragma message("      DirectSound : Version <= 6.00???")
+#endif
 
 //#pragma optimize("",off)
 
+typedef struct tagSE_STRUCT{
+	BYTE				*data;		//
+	DWORD				size;		//
+	int					max;		//
+	int					now;		//
+	IDirectSoundBuffer	*buf[1];	//
+} SE_STRUCT,*LPSE_STRUCT;
+
+
+FBOOL SndFillBuffer(IDirectSoundBuffer *ds,BYTE *data,DWORD size);
 
 // サウンド停止用補助関数 //
 static void _Snd_Stop(LPSE_STRUCT se,int no);
@@ -212,7 +236,7 @@ FVOID SndPlay(BYTE id)
 	se->now = (se->now+1)%(se->max);
 }
 
-FVOID SndPlayEX(BYTE id,int x,DWORD flag)
+FVOID SndPlayEX(BYTE id,int x,bool loop)
 {
 	HRESULT	dsrval;
 	DWORD	st;
@@ -229,7 +253,7 @@ FVOID SndPlayEX(BYTE id,int x,DWORD flag)
 	if((st&DSBSTATUS_PLAYING)==DSBSTATUS_PLAYING) _Snd_Stop(se,se->now);
 
 	se->buf[se->now]->SetPan(pan);
-	se->buf[se->now]->Play(0,0,flag);
+	se->buf[se->now]->Play(0,0,loop ? DSBPLAY_LOOPING : 0);
 	se->now = (se->now+1)%(se->max);
 }
 

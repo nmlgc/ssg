@@ -276,7 +276,7 @@ static void enemy_set(void)
 				switch(cmd[1]){
 				case(SEFC_WARN):
 					//effect_set(0,0,EFC_WARNBOSS,GameStage);
-					SndPlayEX(8,GX_MID,DSBPLAY_LOOPING);
+					SndPlayEX(8,GX_MID,true);
 					WarningEffectSet();
 					//StringEffect3(GameStage);
 				break;

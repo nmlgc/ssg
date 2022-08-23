@@ -76,15 +76,6 @@ typedef struct tagWAVEHEAD_FACT{
 #pragma pack(pop, PBG_WAVEHEAD_PACK)
 
 
-typedef struct tagSE_STRUCT{
-	BYTE				*data;		//
-	DWORD				size;		//
-	int					max;		//
-	int					now;		//
-	IDirectSoundBuffer	*buf[1];	//
-} SE_STRUCT,*LPSE_STRUCT;
-
-
 // 初期化など //
 FBOOL SndInit(HWND hWnd,int x_mid=SND_XMID_DEFAULT);
 FVOID SndCleanup(void);
@@ -95,12 +86,11 @@ FBOOL SndWAVLoadP(BIT_DEVICE *in,DWORD n,BYTE id,int max);
 
 // 再生＆停止 //
 FVOID SndPlay(BYTE id);
-FVOID SndPlayEX(BYTE id,int x,DWORD flag);
+FVOID SndPlayEX(BYTE id,int x,bool loop);
 FVOID SndStop(BYTE id);
 FVOID SndStopAll(void);
 
 // 補助 //
-FBOOL SndFillBuffer(IDirectSoundBuffer *ds,BYTE *data,DWORD size);
 FVOID SndRelease(BYTE id);
 FBOOL SndRestore(void);
 

@@ -3,12 +3,31 @@
 /*                                                                           */
 /*                                                                           */
 
+#define DIRECTINPUT_VERSION 0x0700
+
+#include <dinput.h>
 #include "DI_UTY.H"
 //#include "../GIAN_MAIN/GIAN.H"
 #pragma message(PBGWIN_DI_UTY_H)
 
+#pragma comment(lib,"dinput.lib")
+
+#if   DIRECTINPUT_VERSION == 0x0700
+	#pragma message("      DirectInput : Version 7.00")
+#elif DIRECTINPUT_VERSION == 0x0600
+	#pragma message("      DirectInput : Version 6.00")
+#elif DIRECTINPUT_VERSION == 0x0500
+	#pragma message("      DirectInput : Version 5.00")
+#elif DIRECTINPUT_VERSION == 0x0300
+	#pragma message("      DirectInput : Version 3.00")
+#endif
+
 //#pragma optimize("",off)
 
+typedef struct tagINPUT_OBJ{
+	LPDIRECTINPUT			pdi;
+	LPDIRECTINPUTDEVICE		pdev;
+} INPUT_OBJ;
 
 // グローバル変数(Private)の実体 //
 INPUT_OBJ			InputObj;

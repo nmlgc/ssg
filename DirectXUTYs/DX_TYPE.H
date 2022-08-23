@@ -19,16 +19,14 @@
 #include <ddraw.h>
 #include <d3d.h>
 #include <dsound.h>
-#include <dinput.h>
 #include <stdio.h>
 
 
 // 使用するライブラリ //
-#pragma comment(lib,"dxguid.lib")
+#pragma comment(lib,"dxguid.lib") // needed for DirectDraw and Direct3D
 #pragma comment(lib,"ddraw.lib")
 #pragma comment(lib,"d3dim.lib")
 #pragma comment(lib,"dsound.lib")
-#pragma comment(lib,"dinput.lib")
 #pragma comment(lib,"winmm.lib")
 
 
@@ -55,16 +53,6 @@
 	#pragma message("      DirectSound : Version 3.00")
 #else
 	#pragma message("      DirectSound : Version <= 6.00???")
-#endif
-
-#if   DIRECTINPUT_VERSION == 0x0700
-	#pragma message("      DirectInput : Version 7.00")
-#elif DIRECTINPUT_VERSION == 0x0600
-	#pragma message("      DirectInput : Version 6.00")
-#elif DIRECTINPUT_VERSION == 0x0500
-	#pragma message("      DirectInput : Version 5.00")
-#elif DIRECTINPUT_VERSION == 0x0300
-	#pragma message("      DirectInput : Version 3.00")
 #endif
 
 #pragma message("------------------------------")

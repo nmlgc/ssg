@@ -56,11 +56,6 @@ typedef struct tagInputConfig{
 	BOOL	bIsUsed[256];		// 多重定義防止用
 } InputConfig;
 
-typedef struct tagINPUT_OBJ{
-	LPDIRECTINPUT			pdi;
-	LPDIRECTINPUTDEVICE		pdev;
-} INPUT_OBJ;
-
 
 // グローバル変数(Public) //
 extern WORD Key_Data;

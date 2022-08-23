@@ -22,7 +22,6 @@
  */
 
 
-#include <windows.h>
 #include "PBGUTY_X.h"
 
 

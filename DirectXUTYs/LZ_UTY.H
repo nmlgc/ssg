@@ -34,23 +34,28 @@ enum BIT_DEVICE_FILE_MODE {
 	BD_FILE_WRITE,
 };
 
+struct PACKFILE_WRITE;
+
 struct BIT_DEVICE {
-	FILE *file;
 	char rack;
 	uint8_t mask;
 
 	uint8_t GetBit();
 	uint32_t GetBits(unsigned int bitcount);
-	void Compress(BIT_DEVICE *out,fil_no_t filno) const;
+	void Compress(PACKFILE_WRITE &out,fil_no_t filno) const;
 	void PutBit(uint8_t bit);
 	void PutBits(uint32_t bits,unsigned int bitcount);
 	void PutChar(char c);
+};
 
+struct PACKFILE_READ {
 	uint8_t *MemExpand(fil_no_t filno) const;
-	void WriteHead() const;
+};
 
-	void BitDevRelease();
-	void FilEnd();
+struct PACKFILE_WRITE {
+	FILE *file;
+
+	void WriteHead() const;
 };
 
 extern PBG_FILEHEAD FileHead;
@@ -59,5 +64,5 @@ extern PBG_FILEINFO *FileInfo;
 BIT_DEVICE *BitFilCreate(const char *s,BIT_DEVICE_FILE_MODE mode);
 BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size);
 
-BIT_DEVICE *FilStartR(const char *s);
-BIT_DEVICE *FilStartW(const char *s,fil_no_t filecount);
+PACKFILE_READ *FilStartR(const char *s);
+PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filno);

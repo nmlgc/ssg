@@ -139,7 +139,7 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 	return TRUE;
 }
 
-FBOOL SndWAVLoadP(BIT_DEVICE *in,DWORD n,BYTE id,int max)
+FBOOL SndWAVLoadP(PACKFILE_READ *in,DWORD n,BYTE id,int max)
 {
 	BYTE			*data;
 	WAVEHEAD		*wh;

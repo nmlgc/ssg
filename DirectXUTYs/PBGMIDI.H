@@ -113,7 +113,7 @@ void Mid_Pan(char pan);						// 全てのチャンネルのパンを変更する
 BOOL Mid_ChgDev(char pos);					// 出力デバイスを変更する
 
 BOOL Mid_Load(char *filename);				// 普通のＭＩＤＩファイルをロードする
-BOOL PMid_Load(BIT_DEVICE *in,DWORD n);		// 圧縮ＭＩＤＩファイルをロードする
+BOOL PMid_Load(PACKFILE_READ *in,DWORD n);		// 圧縮ＭＩＤＩファイルをロードする
 
 void Mid_LoopFunc(DWORD time);				// 一定間隔ループを自前で生成して再生するとき使用
 char *Mid_GetTitle(void);					// この曲のお名前は？

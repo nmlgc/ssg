@@ -18,7 +18,7 @@ uint32_t BIT_DEVICE::GetBits(unsigned int bitcount)
 	return 0;
 }
 
-void BIT_DEVICE::Compress(BIT_DEVICE *out,fil_no_t filno) const
+void BIT_DEVICE::Compress(PACKFILE_WRITE &out,fil_no_t filno) const
 {
 }
 
@@ -34,12 +34,12 @@ void BIT_DEVICE::PutChar(char c)
 {
 }
 
-uint8_t *BIT_DEVICE::MemExpand(fil_no_t filno) const
+uint8_t *PACKFILE_READ::MemExpand(fil_no_t fileno) const
 {
 	return nullptr;
 }
 
-void BIT_DEVICE::WriteHead() const
+void PACKFILE_WRITE::WriteHead() const
 {
 }
 
@@ -53,20 +53,16 @@ BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size)
 	return nullptr;
 }
 
-void BIT_DEVICE::BitDevRelease()
-{
-}
-
-BIT_DEVICE *FilStartR(const char *s)
+PACKFILE_READ *FilStartR(const char *s)
 {
 	return nullptr;
 }
 
+<<<<<<< HEAD
 BIT_DEVICE *FilStartW(const char *s,fil_no_t filecount)
+=======
+PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filecount)
+>>>>>>> 03b1516 ([LZ] Distinguish between bit device and read/write packfile types)
 {
 	return nullptr;
-}
-
-void BIT_DEVICE::FilEnd()
-{
 }

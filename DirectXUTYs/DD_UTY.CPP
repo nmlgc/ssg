@@ -472,7 +472,7 @@ FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }
 
-FBOOL GrpBMPLoadP(BIT_DEVICE *in,DWORD n,BYTE surf_id)
+FBOOL GrpBMPLoadP(PACKFILE_READ *in,DWORD n,BYTE surf_id)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 

@@ -75,17 +75,15 @@ FVOID DemoplaySave(void)
 // デモプレイデータをロードする //
 FBOOL DemoplayLoad(int stage)
 {
-	BIT_DEVICE		*in;
 	BYTE			*temp,*p;
 
 	// ファイルを開く //
-	in=FilStartR("ENEMY.DAT");
+	auto in=FilStartR("ENEMY.DAT");
 	if(in == NULL) return FALSE;
 
 	// 展開 //
 	temp = in->MemExpand(stage-1+18);
 	if(temp == NULL) return FALSE;
-	in->FilEnd();
 
 	p = temp;
 	memcpy(&DemoInfo,p,sizeof(DEMOPLAY_INFO));
@@ -170,7 +168,7 @@ FVOID ReplayRecord(WORD key)
 // リプレイデータをファイルに書き込む //
 FVOID ReplaySave(void)
 {
-	BIT_DEVICE		*in, *out;
+	BIT_DEVICE		*in;
 	char			buf[100];
 
 	if(!DemoplaySaveEnable) return;
@@ -190,29 +188,25 @@ FVOID ReplaySave(void)
 	FileHead.n    = 2;
 	FileHead.sum  = 0;
 
-	out = FilStartW(buf,FileHead.n);
+	auto out = FilStartW(buf,FileHead.n);
 	if(NULL == out) return;
 
 	fwrite(&FileHead,sizeof(PBG_FILEHEAD),1,out->file);
 	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->file);
 
 	in = BitMemCreateR((BYTE *)&DemoInfo,sizeof(DEMOPLAY_INFO));
-	in->Compress(out, 0);
-	in->BitDevRelease();
+	in->Compress(*out, 0);
 
 	in = BitMemCreateR((BYTE *)DemoBuffer,sizeof(WORD) * DemoInfo.DataSize);
-	in->Compress(out, 1);
-	in->BitDevRelease();
+	in->Compress(*out, 1);
 
 	out->WriteHead();
-	out->FilEnd();
 }
 
 
 // リプレイデータをロードする //
 FBOOL ReplayLoad(int stage)
 {
-	BIT_DEVICE		*in;
 	BYTE			*temp;
 	char			buf[100];
 
@@ -220,28 +214,23 @@ FBOOL ReplayLoad(int stage)
 	if(GameStage == GRAPH_ID_EXSTAGE) strcpy(buf, "秋霜りぷEx.DAT");
 	else                              sprintf(buf, "秋霜りぷ%d.DAT", stage);
 
-	in = FilStartR(buf);
+	auto in = FilStartR(buf);
 	if(NULL == in) return FALSE;
 
 	// ヘッダの格納先は０番である //
 	temp = in->MemExpand( 0);
-	if(NULL == temp){
-		in->FilEnd();
-		return FALSE;
-	}
+	if(NULL == temp) return FALSE;
 	memcpy(&DemoInfo, temp, sizeof(DEMOPLAY_INFO));
 	LocalFree(temp);
 
 	// データの格納先は１番ですね //
 	temp = in->MemExpand( 1);
 	if(NULL == temp){
-		in->FilEnd();
 		return FALSE;
 	}
 	memcpy(DemoBuffer, temp, sizeof(WORD)*DemoInfo.DataSize);
 	LocalFree(temp);
 
-	in->FilEnd();
 
 	DemoBufPtr = 0;
 	DemoplayLoadEnable = TRUE;

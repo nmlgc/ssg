@@ -180,7 +180,6 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 		_SaveSC(ScoreData->Extra,   bd);
 
 		if(bd->mask != 0x80) bd->PutChar(bd->rack);
-		bd->BitDevRelease();
 	}
 	else{
 		ReleaseScoreData();
@@ -217,8 +216,6 @@ static BOOL LoadScoreData(void)
 			bInit = TRUE;
 			break;
 		}
-
-		bd->BitDevRelease();
 	}
 
 	if(!bInit){

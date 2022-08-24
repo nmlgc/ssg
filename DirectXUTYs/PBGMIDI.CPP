@@ -338,7 +338,7 @@ BOOL Mid_Load(char *filename)
 	return TRUE;
 }
 
-BOOL PMid_Load(BIT_DEVICE *in,DWORD n)
+BOOL PMid_Load(PACKFILE_READ *in,DWORD n)
 {
 	BYTE				*data,*dp;
 	MID_FILEST			*midhead;

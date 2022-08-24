@@ -824,7 +824,6 @@ static FVOID ScrollCmdStg3Star(void)
 // マップデータをロードする(BMP含む) //
 FBOOL ScrollInit(void)
 {
-	//BIT_DEVICE			*in;
 	ScrollSaveHeader	*LayerInfo;
 	int					i;
 	static BOOL			bInitialized = FALSE;
@@ -839,7 +838,7 @@ FBOOL ScrollInit(void)
 
 /*
 	// 読み込みの準備 //
-	in = FilStartR("GIAN_MAP.DAT");
+	auto in = FilStartR("GIAN_MAP.DAT");
 	if(in==NULL) return FALSE;
 
 	// もしすでにロードが行われていた場合、メモリを解放する //
@@ -853,7 +852,6 @@ FBOOL ScrollInit(void)
 	// 解凍を行う(後で、ステージを考慮したものに変更すること) //
 	ScrollInfo.DataHead = in->MemExpand(0);
 	if(ScrollInfo.DataHead==NULL) return FALSE;
-	in->FilEnd();
 */
 	// 標準のスクロールスピード(マップエディタと同じ) //
 	ScrollInfo.ScrollSpeed = TIME_PER_FRAME;					// 標準のスクロール速度

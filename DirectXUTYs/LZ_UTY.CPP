@@ -8,38 +8,38 @@
 PBG_FILEHEAD FileHead;
 PBG_FILEINFO *FileInfo;
 
-uint8_t GetBit(BIT_DEVICE *bd)
+uint8_t BIT_DEVICE::GetBit()
 {
 	return false;
 }
 
-uint32_t GetBits(BIT_DEVICE *bd,unsigned int bitcount)
+uint32_t BIT_DEVICE::GetBits(unsigned int bitcount)
 {
 	return 0;
 }
 
-void Compress(const BIT_DEVICE *in,BIT_DEVICE *out,fil_no_t filno)
+void BIT_DEVICE::Compress(BIT_DEVICE *out,fil_no_t filno) const
 {
 }
 
-void PutBit(BIT_DEVICE *bd,uint8_t bit)
+void BIT_DEVICE::PutBit(uint8_t bit)
 {
 }
 
-void PutBits(BIT_DEVICE *bd,uint32_t bits,unsigned int bitcount)
+void BIT_DEVICE::PutBits(uint32_t bits,unsigned int bitcount)
 {
 }
 
-void PutChar(char c,BIT_DEVICE *bd)
+void BIT_DEVICE::PutChar(char c)
 {
 }
 
-uint8_t *MemExpand(const BIT_DEVICE *in,fil_no_t filno)
+uint8_t *BIT_DEVICE::MemExpand(fil_no_t filno) const
 {
 	return nullptr;
 }
 
-void WriteHead(BIT_DEVICE *in)
+void BIT_DEVICE::WriteHead() const
 {
 }
 
@@ -53,7 +53,7 @@ BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size)
 	return nullptr;
 }
 
-void BitDevRelease(BIT_DEVICE *bd)
+void BIT_DEVICE::BitDevRelease()
 {
 }
 
@@ -67,6 +67,6 @@ BIT_DEVICE *FilStartW(const char *s,fil_no_t filecount)
 	return nullptr;
 }
 
-void FilEnd(BIT_DEVICE *bd)
+void BIT_DEVICE::FilEnd()
 {
 }

@@ -107,7 +107,7 @@ BOOL LoadGraph(int stage)
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,19+4,SURFACE_ID_MUSIC))		return FALSE;
-		FilEnd(in);
+		in->FilEnd();
 
 		return TRUE;
 	}
@@ -118,7 +118,7 @@ BOOL LoadGraph(int stage)
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,20+4,SURFACE_ID_MUSIC))		return FALSE;
 		//LoadPaletteFromMusic();
-		FilEnd(in);
+		in->FilEnd();
 
 		return TRUE;
 	}
@@ -128,7 +128,7 @@ BOOL LoadGraph(int stage)
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,21+4,SURFACE_ID_NAMEREG))	return FALSE;
-		FilEnd(in);
+		in->FilEnd();
 
 		return TRUE;
 	}
@@ -140,7 +140,7 @@ BOOL LoadGraph(int stage)
 		GrpGetPalette(SProjectPalette);
 
 		//if(!GrpBMPLoadP(in,21+4,SURFACE_ID_NAMEREG))	return FALSE;
-		FilEnd(in);
+		in->FilEnd();
 
 		return TRUE;
 	}
@@ -178,7 +178,7 @@ BOOL LoadGraph(int stage)
 
 		if(!GrpBMPLoadP(in, 0, SURFACE_ID_MAPCHIP))		return FALSE;
 
-		FilEnd(in);
+		in->FilEnd();
 
 		return TRUE;
 	}
@@ -197,7 +197,7 @@ BOOL LoadGraph(int stage)
 		// 諸事情により、ここにいるのです //
 		if(!GrpBMPLoadP(in,      26,SURFACE_ID_BOMBER))	return FALSE;
 
-		FilEnd(in);
+		in->FilEnd();
 		return TRUE;
 	}
 
@@ -209,7 +209,7 @@ BOOL LoadGraph(int stage)
 		if(!GrpBMPLoadP(in, 29, SURFACE_ID_ENEMY))		return FALSE;
 		GrpGetPalette(EnemyPalette);
 
-		FilEnd(in);
+		in->FilEnd();
 		return TRUE;
 	}
 
@@ -221,7 +221,7 @@ BOOL LoadGraph(int stage)
 		if(!GrpBMPLoadP(in, 30, SURFACE_ID_ENEMY))		return FALSE;
 		GrpGetPalette(EnemyPalette);
 
-		FilEnd(in);
+		in->FilEnd();
 		return TRUE;
 	}
 
@@ -241,7 +241,7 @@ BOOL LoadGraph(int stage)
 	// 諸事情により、ここにいるのです //
 	if(!GrpBMPLoadP(in,      26,SURFACE_ID_BOMBER))		return FALSE;
 
-	FilEnd(in);
+	in->FilEnd();
 
 	return TRUE;
 }
@@ -256,7 +256,7 @@ BOOL LoadFace(BYTE SurfaceID,BYTE FileNo)
 	in = FilStartR("GRAPH.DAT");
 	if(in==NULL) return FALSE;
 	if(!GrpBMPLoadP(in,13+FileNo,SURFACE_ID_FACE0+SurfaceID))		return FALSE;
-	FilEnd(in);
+	in->FilEnd();
 
 	// パレットを保存する //
 	GrpGetPalette(FaceData[SurfaceID].pal);
@@ -343,28 +343,28 @@ BOOL LoadStageData(BYTE stage)
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		if((ECL_Head=MemExpand(in, 24))==NULL)				return FALSE;	// ECL Load
-		if((SCL_Head=MemExpand(in, 25))==NULL)				return FALSE;	// SCL Load
-		if((ScrollInfo.DataHead=MemExpand(in, 26))==NULL)	return FALSE;	// MapData Load
+		if((ECL_Head=in->MemExpand( 24))==NULL)				return FALSE;	// ECL Load
+		if((SCL_Head=in->MemExpand( 25))==NULL)				return FALSE;	// SCL Load
+		if((ScrollInfo.DataHead=in->MemExpand( 26))==NULL)	return FALSE;	// MapData Load
 	}
 	else if(stage == GRAPH_ID_ENDING){
-		if((SCL_Head=MemExpand(in, 47))==NULL) return FALSE;	// SCL Load
+		if((SCL_Head=in->MemExpand( 47))==NULL) return FALSE;	// SCL Load
 
 		SCL_Now   = SCL_Head;
 		GameCount = 0;
-		FilEnd(in);
+		in->FilEnd();
 		return TRUE;
 	}
 	else{
 		// 各データをロードする //
 		if(stage<1 || stage>STAGE_MAX)								return FALSE;
-		if((ECL_Head=MemExpand(in,stage+0-1))==NULL)				return FALSE;	// ECL Load
-		if((SCL_Head=MemExpand(in,stage+6-1))==NULL)				return FALSE;	// SCL Load
-		if((ScrollInfo.DataHead=MemExpand(in,stage+12-1))==NULL)	return FALSE;	// MapData Load
+		if((ECL_Head=in->MemExpand(stage+0-1))==NULL)				return FALSE;	// ECL Load
+		if((SCL_Head=in->MemExpand(stage+6-1))==NULL)				return FALSE;	// SCL Load
+		if((ScrollInfo.DataHead=in->MemExpand(stage+12-1))==NULL)	return FALSE;	// MapData Load
 	}
 
 	// ファイルを閉じる //
-	FilEnd(in);
+	in->FilEnd();
 
 	// スクロール用変数の初期化 //
 	if(!ScrollInit()) return FALSE;
@@ -919,7 +919,7 @@ extern BOOL LoadMusic(int no)
 	if(in==NULL) return FALSE;
 	flag = PMid_Load(in,no);
 	MusicNum = FileHead.n;
-	FilEnd(in);
+	in->FilEnd();
 
 	return flag;
 }
@@ -954,11 +954,11 @@ BOOL LoadSound(void)
 		if(!SndWAVLoadP(in,SOUND_ID_TAMEFAST, SOUND_ID_TAMEFAST, SNDMAX_TAMEFAST))	break;
 		if(!SndWAVLoadP(in,SOUND_ID_WARP, SOUND_ID_WARP, SNDMAX_WARP))	break;
 
-		FilEnd(in);
+		in->FilEnd();
 		return TRUE;
 	}
 
-	FilEnd(in);
+	in->FilEnd();
 	return FALSE;
 }
 
@@ -973,8 +973,8 @@ extern BOOL LoadMusicRoomComment(int no)
 	if(no < 0 || no > 19) return FALSE;
 
 	if((in=FilStartR("ENEMY.DAT"))==NULL) return FALSE;
-	if((temp=MemExpand(in, 27+no))==NULL) return FALSE;
-	FilEnd(in);
+	if((temp=in->MemExpand(27+no))==NULL) return FALSE;
+	in->FilEnd();
 
 	for(i=0; i<19*2; i++){
 		MTitleBuffer[i] = (BYTE)temp[i];

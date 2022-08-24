@@ -160,7 +160,7 @@ FBOOL SndWAVLoadP(BIT_DEVICE *in,DWORD n,BYTE id,int max)
 	if(p == NULL) return FALSE;
 
 	// データを解凍して読み込む //
-	if((data=MemExpand(in,n))==NULL) return FALSE;
+	if((data=in->MemExpand(n))==NULL) return FALSE;
 	wh  = (WAVEHEAD *)data;
 	whf = (WAVEHEAD_FACT *)data;
 

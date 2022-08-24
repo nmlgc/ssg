@@ -38,25 +38,26 @@ struct BIT_DEVICE {
 	FILE *file;
 	char rack;
 	uint8_t mask;
+
+	uint8_t GetBit();
+	uint32_t GetBits(unsigned int bitcount);
+	void Compress(BIT_DEVICE *out,fil_no_t filno) const;
+	void PutBit(uint8_t bit);
+	void PutBits(uint32_t bits,unsigned int bitcount);
+	void PutChar(char c);
+
+	uint8_t *MemExpand(fil_no_t filno) const;
+	void WriteHead() const;
+
+	void BitDevRelease();
+	void FilEnd();
 };
 
 extern PBG_FILEHEAD FileHead;
 extern PBG_FILEINFO *FileInfo;
 
-uint8_t GetBit(BIT_DEVICE *bd);
-uint32_t GetBits(BIT_DEVICE *bd,unsigned int bitcount);
-void Compress(const BIT_DEVICE *in,BIT_DEVICE *out,fil_no_t filno);
-void PutBit(BIT_DEVICE *bd,uint8_t bit);
-void PutBits(BIT_DEVICE *bd,uint32_t bits,unsigned int bitcount);
-void PutChar(char c,BIT_DEVICE *bd);
-
-uint8_t *MemExpand(const BIT_DEVICE *in,fil_no_t filno);
-void WriteHead(BIT_DEVICE *in);
-
 BIT_DEVICE *BitFilCreate(const char *s,BIT_DEVICE_FILE_MODE mode);
 BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size);
-void BitDevRelease(BIT_DEVICE *bd);
 
 BIT_DEVICE *FilStartR(const char *s);
 BIT_DEVICE *FilStartW(const char *s,fil_no_t filecount);
-void FilEnd(BIT_DEVICE *bd);

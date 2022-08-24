@@ -851,9 +851,9 @@ FBOOL ScrollInit(void)
 	else if(!InitScrollInfo()) return FALSE;
 
 	// 解凍を行う(後で、ステージを考慮したものに変更すること) //
-	ScrollInfo.DataHead = MemExpand(in,0);
+	ScrollInfo.DataHead = in->MemExpand(0);
 	if(ScrollInfo.DataHead==NULL) return FALSE;
-	FilEnd(in);
+	in->FilEnd();
 */
 	// 標準のスクロールスピード(マップエディタと同じ) //
 	ScrollInfo.ScrollSpeed = TIME_PER_FRAME;					// 標準のスクロール速度

@@ -83,9 +83,9 @@ FBOOL DemoplayLoad(int stage)
 	if(in == NULL) return FALSE;
 
 	// 展開 //
-	temp = MemExpand(in,stage-1+18);
+	temp = in->MemExpand(stage-1+18);
 	if(temp == NULL) return FALSE;
-	FilEnd(in);
+	in->FilEnd();
 
 	p = temp;
 	memcpy(&DemoInfo,p,sizeof(DEMOPLAY_INFO));
@@ -197,15 +197,15 @@ FVOID ReplaySave(void)
 	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->file);
 
 	in = BitMemCreateR((BYTE *)&DemoInfo,sizeof(DEMOPLAY_INFO));
-	Compress(in, out, 0);
-	BitDevRelease(in);
+	in->Compress(out, 0);
+	in->BitDevRelease();
 
 	in = BitMemCreateR((BYTE *)DemoBuffer,sizeof(WORD) * DemoInfo.DataSize);
-	Compress(in, out, 1);
-	BitDevRelease(in);
+	in->Compress(out, 1);
+	in->BitDevRelease();
 
-	WriteHead(out);
-	FilEnd(out);
+	out->WriteHead();
+	out->FilEnd();
 }
 
 
@@ -224,24 +224,24 @@ FBOOL ReplayLoad(int stage)
 	if(NULL == in) return FALSE;
 
 	// ヘッダの格納先は０番である //
-	temp = MemExpand(in, 0);
+	temp = in->MemExpand( 0);
 	if(NULL == temp){
-		FilEnd(in);
+		in->FilEnd();
 		return FALSE;
 	}
 	memcpy(&DemoInfo, temp, sizeof(DEMOPLAY_INFO));
 	LocalFree(temp);
 
 	// データの格納先は１番ですね //
-	temp = MemExpand(in, 1);
+	temp = in->MemExpand( 1);
 	if(NULL == temp){
-		FilEnd(in);
+		in->FilEnd();
 		return FALSE;
 	}
 	memcpy(DemoBuffer, temp, sizeof(WORD)*DemoInfo.DataSize);
 	LocalFree(temp);
 
-	FilEnd(in);
+	in->FilEnd();
 
 	DemoBufPtr = 0;
 	DemoplayLoadEnable = TRUE;

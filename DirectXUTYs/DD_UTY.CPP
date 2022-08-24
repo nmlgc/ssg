@@ -479,7 +479,7 @@ FBOOL GrpBMPLoadP(BIT_DEVICE *in,DWORD n,BYTE surf_id)
 	// 以前に何かがロードされていたら解放する //
 	GrpBMFree(surf_id);
 
-	if((DxSurf[surf_id].img=MemExpand(in,n))==NULL) return FALSE;
+	if((DxSurf[surf_id].img=in->MemExpand(n))==NULL) return FALSE;
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }

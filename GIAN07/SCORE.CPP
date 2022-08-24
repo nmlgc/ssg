@@ -179,8 +179,8 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 		_SaveSC(ScoreData->Lunatic, bd);
 		_SaveSC(ScoreData->Extra,   bd);
 
-		if(bd->mask != 0x80) PutChar(bd->rack, bd);
-		BitDevRelease(bd);
+		if(bd->mask != 0x80) bd->PutChar(bd->rack);
+		bd->BitDevRelease();
 	}
 	else{
 		ReleaseScoreData();
@@ -218,7 +218,7 @@ static BOOL LoadScoreData(void)
 			break;
 		}
 
-		BitDevRelease(bd);
+		bd->BitDevRelease();
 	}
 
 	if(!bInit){
@@ -293,40 +293,40 @@ static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE *bd)
 
 	for(i=0; i<NR_RANK_MAX; i++){
 		CheckSum = 0;
-		if(flag != GetBit(bd)) return FALSE;
-		else                   flag = 1-flag;
+		if(flag != bd->GetBit()) return FALSE;
+		else                     flag = 1-flag;
 
 		// 名前を獲得する //
 		for(j=0; j<NR_NAME_LEN; j++){
 			NData[i].Name[j] = _xGet8(bd, &Mask);
 			CheckSum += NData[i].Name[j];
 		}
-		if(flag != GetBit(bd)) return FALSE;
-		else                   flag = 1-flag;
+		if(flag != bd->GetBit()) return FALSE;
+		else                     flag = 1-flag;
 
 		// 得点を獲得する //
 		NData[i].Score = _xGet64(bd, &Mask);
 		CheckSum += NData[i].Score;
-		if(flag != GetBit(bd)) return FALSE;
-		else                   flag = 1-flag;
+		if(flag != bd->GetBit()) return FALSE;
+		else                     flag = 1-flag;
 
 		// かすりを獲得する //
 		NData[i].Evade = _xGet32(bd, &Mask);
 		CheckSum += NData[i].Evade;
-		if(flag != GetBit(bd)) return FALSE;
-		else                   flag = 1-flag;
+		if(flag != bd->GetBit()) return FALSE;
+		else                     flag = 1-flag;
 
 		// ステージを獲得する //
 		NData[i].Stage = _xGet8(bd, &Mask);
 		CheckSum += NData[i].Stage;
-		if(flag != GetBit(bd)) return FALSE;
-		else                   flag = 1-flag;
+		if(flag != bd->GetBit()) return FALSE;
+		else                     flag = 1-flag;
 
 		// ウエポンを獲得する //
 		NData[i].Weapon = _xGet8(bd, &Mask);
 		CheckSum += NData[i].Weapon;
-		if(flag != GetBit(bd)) return FALSE;
-		else                   flag = 1-flag;
+		if(flag != bd->GetBit()) return FALSE;
+		else                     flag = 1-flag;
 
 		// チェックサム比較 //
 		if(CheckSum != _xGet64(bd, &Mask)) return FALSE;
@@ -344,34 +344,34 @@ static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE *bd)
 
 	for(i=0; i<NR_RANK_MAX; i++){
 		CheckSum = 0;
-		PutBit(bd, flag); flag = 1-flag;	// ビット挿入
+		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 名前を出力する //
 		for(j=0; j<NR_NAME_LEN; j++){
 			CheckSum += NData[i].Name[j];
 			_xPut8(bd, NData[i].Name[j], &Mask);
 		}
-		PutBit(bd, flag); flag = 1-flag;	// ビット挿入
+		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 得点を出力する //
 		CheckSum += NData[i].Score;
 		_xPut64(bd, NData[i].Score, &Mask);
-		PutBit(bd, flag); flag = 1-flag;	// ビット挿入
+		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// かすりを出力する //
 		CheckSum += NData[i].Evade;
 		_xPut32(bd, NData[i].Evade, &Mask);
-		PutBit(bd, flag); flag = 1-flag;	// ビット挿入
+		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ステージを出力する //
 		CheckSum += NData[i].Stage;
 		_xPut8(bd, NData[i].Stage, &Mask);
-		PutBit(bd, flag); flag = 1-flag;	// ビット挿入
+		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ウエポンを出力する //
 		CheckSum += NData[i].Weapon;
 		_xPut8(bd, NData[i].Weapon, &Mask);
-		PutBit(bd, flag); flag = 1-flag;	// ビット挿入
+		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// チェックサムを出力する //
 		_xPut64(bd, CheckSum, &Mask);
@@ -405,14 +405,14 @@ static void _xPut8( BIT_DEVICE *bd, BYTE data, DWORDLONG *ExMask)
 
 	data += (BYTE)(*ExMask);
 
-	PutBits(bd, (DWORD)data, 8);
+	bd->PutBits((DWORD)data, 8);
 }
 
 static BYTE _xGet8( BIT_DEVICE *bd, DWORDLONG *ExMask)
 {
 	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
 
-	return (BYTE)GetBits(bd, 8) - (BYTE)(*ExMask);
+	return (BYTE)bd->GetBits(8) - (BYTE)(*ExMask);
 }
 
 static void _xPut32(BIT_DEVICE *bd, DWORD data, DWORDLONG *ExMask)
@@ -423,8 +423,8 @@ static void _xPut32(BIT_DEVICE *bd, DWORD data, DWORDLONG *ExMask)
 
 	temp.data32 = data + (DWORD)(*ExMask);
 
-	PutBits(bd, (DWORD)temp.d1, 16);
-	PutBits(bd, (DWORD)temp.d2, 16);
+	bd->PutBits((DWORD)temp.d1, 16);
+	bd->PutBits((DWORD)temp.d2, 16);
 }
 
 static DWORD _xGet32(BIT_DEVICE *bd, DWORDLONG *ExMask)
@@ -433,8 +433,8 @@ static DWORD _xGet32(BIT_DEVICE *bd, DWORDLONG *ExMask)
 
 	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
 
-	temp.d1 = (WORD)GetBits(bd, 16);
-	temp.d2 = (WORD)GetBits(bd, 16);
+	temp.d1 = (WORD)bd->GetBits(16);
+	temp.d2 = (WORD)bd->GetBits(16);
 
 	return temp.data32 - (DWORD)(*ExMask);
 }
@@ -447,10 +447,10 @@ static void _xPut64(BIT_DEVICE *bd, DWORDLONG data, DWORDLONG *ExMask)
 
 	temp.data64 = data + (DWORDLONG)(*ExMask);
 
-	PutBits(bd, (DWORD)temp.d1, 16);
-	PutBits(bd, (DWORD)temp.d2, 16);
-	PutBits(bd, (DWORD)temp.d3, 16);
-	PutBits(bd, (DWORD)temp.d4, 16);
+	bd->PutBits((DWORD)temp.d1, 16);
+	bd->PutBits((DWORD)temp.d2, 16);
+	bd->PutBits((DWORD)temp.d3, 16);
+	bd->PutBits((DWORD)temp.d4, 16);
 }
 
 static DWORDLONG _xGet64(BIT_DEVICE *bd, DWORDLONG *ExMask)
@@ -459,10 +459,10 @@ static DWORDLONG _xGet64(BIT_DEVICE *bd, DWORDLONG *ExMask)
 
 	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
 
-	temp.d1 = (WORD)GetBits(bd, 16);
-	temp.d2 = (WORD)GetBits(bd, 16);
-	temp.d3 = (WORD)GetBits(bd, 16);
-	temp.d4 = (WORD)GetBits(bd, 16);
+	temp.d1 = (WORD)bd->GetBits(16);
+	temp.d2 = (WORD)bd->GetBits(16);
+	temp.d3 = (WORD)bd->GetBits(16);
+	temp.d4 = (WORD)bd->GetBits(16);
 
 	return temp.data64 - (DWORDLONG)(*ExMask);
 }

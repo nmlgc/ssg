@@ -350,7 +350,7 @@ BOOL PMid_Load(BIT_DEVICE *in,DWORD n)
 
 	Mid_Free();
 
-	if((data=MemExpand(in,n))==NULL) return FALSE;
+	if((data=in->MemExpand(n))==NULL) return FALSE;
 	midhead = (MID_FILEST *)data;
 	//fread(&midhead,sizeof(MID_FILEST),1,fp);
 	if(midhead->MThd!=mmioFOURCC('M','T','h','d')){

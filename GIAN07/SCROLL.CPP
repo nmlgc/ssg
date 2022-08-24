@@ -839,7 +839,7 @@ FBOOL ScrollInit(void)
 
 /*
 	// 読み込みの準備 //
-	in = FilStartR("GIAN_MAP.DAT",BD_FILE_READ);
+	in = FilStartR("GIAN_MAP.DAT");
 	if(in==NULL) return FALSE;
 
 	// もしすでにロードが行われていた場合、メモリを解放する //

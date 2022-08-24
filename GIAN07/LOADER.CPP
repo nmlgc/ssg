@@ -103,7 +103,7 @@ BOOL LoadGraph(int stage)
 
 	// 音楽室用 //
 	if(stage==GRAPH_ID_MUSICROOM){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,19+4,SURFACE_ID_MUSIC))		return FALSE;
@@ -113,7 +113,7 @@ BOOL LoadGraph(int stage)
 	}
 	// タイトル画面用 //
 	if(stage==GRAPH_ID_TITLE){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,20+4,SURFACE_ID_MUSIC))		return FALSE;
@@ -124,7 +124,7 @@ BOOL LoadGraph(int stage)
 	}
 	// お名前登録画面用 //
 	if(stage==GRAPH_ID_NAMEREGIST){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,21+4,SURFACE_ID_NAMEREG))	return FALSE;
@@ -134,7 +134,7 @@ BOOL LoadGraph(int stage)
 	}
 	// 西方Ｐｒｏｊｅｃｔ表示用 //
 	if(stage==GRAPH_ID_SPROJECT){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,31,SURFACE_ID_SPROJECT))		return FALSE;
 		GrpGetPalette(SProjectPalette);
@@ -146,7 +146,7 @@ BOOL LoadGraph(int stage)
 	}
 	// エンディング全画像ロード(パレット含む) //
 	if(stage==GRAPH_ID_ENDING){
-		in = FilStartR("GRAPH2.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH2.DAT");
 		if(in==NULL) return FALSE;
 
 		SetRect(&src, 0, 0, 320, 240);
@@ -186,7 +186,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 		if(!GrpBMPLoadP(in,    0, SURFACE_ID_SYSTEM))	return FALSE;
 		if(!GrpBMPLoadP(in, 27+1, SURFACE_ID_ENEMY))	return FALSE;
@@ -203,7 +203,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージボス用(1) //
 	if(stage == GRAPH_ID_EXBOSS1){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 
 		if(!GrpBMPLoadP(in, 29, SURFACE_ID_ENEMY))		return FALSE;
@@ -215,7 +215,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージボス用(2) //
 	if(stage == GRAPH_ID_EXBOSS2){
-		in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+		in = FilStartR("GRAPH.DAT");
 		if(in==NULL) return FALSE;
 
 		if(!GrpBMPLoadP(in, 30, SURFACE_ID_ENEMY))		return FALSE;
@@ -228,7 +228,7 @@ BOOL LoadGraph(int stage)
 	if(stage<0 || stage>STAGE_MAX) return FALSE;
 
 	// マップチップのロードは後で変換すること //
-	in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+	in = FilStartR("GRAPH.DAT");
 	if(in==NULL) return FALSE;
 	if(!GrpBMPLoadP(in,       0,SURFACE_ID_SYSTEM))		return FALSE;
 	if(!GrpBMPLoadP(in,stage+ 0,SURFACE_ID_ENEMY))		return FALSE;
@@ -253,7 +253,7 @@ BOOL LoadFace(BYTE SurfaceID,BYTE FileNo)
 
 	if(SurfaceID<0 || SurfaceID>=SURFACE_MAX) return FALSE;
 
-	in = FilStartR("GRAPH.DAT",BD_FILE_READ);
+	in = FilStartR("GRAPH.DAT");
 	if(in==NULL) return FALSE;
 	if(!GrpBMPLoadP(in,13+FileNo,SURFACE_ID_FACE0+SurfaceID))		return FALSE;
 	FilEnd(in);
@@ -339,7 +339,7 @@ BOOL LoadStageData(BYTE stage)
 	SCL_Now = ECL_Head = SCL_Head = NULL;
 	ScrollInfo.DataHead = NULL;
 
-	if((in=FilStartR("ENEMY.DAT",BD_FILE_READ))==NULL) return FALSE;
+	if((in=FilStartR("ENEMY.DAT"))==NULL) return FALSE;
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
@@ -915,7 +915,7 @@ extern BOOL LoadMusic(int no)
 	BIT_DEVICE *in;
 	BOOL flag;
 
-	in = FilStartR("MUSIC.DAT",BD_FILE_READ);
+	in = FilStartR("MUSIC.DAT");
 	if(in==NULL) return FALSE;
 	flag = PMid_Load(in,no);
 	MusicNum = FileHead.n;
@@ -929,7 +929,7 @@ BOOL LoadSound(void)
 {
 	BIT_DEVICE *in;
 
-	in = FilStartR("SOUND.DAT",BD_FILE_READ);
+	in = FilStartR("SOUND.DAT");
 	if(in==NULL) return FALSE;
 
 	while(1){
@@ -972,7 +972,7 @@ extern BOOL LoadMusicRoomComment(int no)
 
 	if(no < 0 || no > 19) return FALSE;
 
-	if((in=FilStartR("ENEMY.DAT",BD_FILE_READ))==NULL) return FALSE;
+	if((in=FilStartR("ENEMY.DAT"))==NULL) return FALSE;
 	if((temp=MemExpand(in, 27+no))==NULL) return FALSE;
 	FilEnd(in);
 

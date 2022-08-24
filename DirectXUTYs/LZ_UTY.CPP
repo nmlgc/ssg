@@ -48,7 +48,7 @@ BIT_DEVICE *BitFilCreate(const char *s,BIT_DEVICE_FILE_MODE mode)
 	return nullptr;
 }
 
-BIT_DEVICE *BitMemCreate(uint8_t *mem,BIT_DEVICE_MEMORY_MODE mode,size_t size)
+BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size)
 {
 	return nullptr;
 }
@@ -57,12 +57,12 @@ void BitDevRelease(BIT_DEVICE *bd)
 {
 }
 
-BIT_DEVICE *FilStartR(const char *s,BIT_DEVICE_FILE_MODE mode)
+BIT_DEVICE *FilStartR(const char *s)
 {
 	return nullptr;
 }
 
-BIT_DEVICE *FilStartW(const char *s,BIT_DEVICE_FILE_MODE mode,fil_no_t filecount)
+BIT_DEVICE *FilStartW(const char *s,fil_no_t filecount)
 {
 	return nullptr;
 }

@@ -79,7 +79,7 @@ FBOOL DemoplayLoad(int stage)
 	BYTE			*temp,*p;
 
 	// ファイルを開く //
-	in=FilStartR("ENEMY.DAT",BD_FILE_READ);
+	in=FilStartR("ENEMY.DAT");
 	if(in == NULL) return FALSE;
 
 	// 展開 //
@@ -190,17 +190,17 @@ FVOID ReplaySave(void)
 	FileHead.n    = 2;
 	FileHead.sum  = 0;
 
-	out = FilStartW(buf, BD_FILE_WRITE, FileHead.n);
+	out = FilStartW(buf,FileHead.n);
 	if(NULL == out) return;
 
 	fwrite(&FileHead,sizeof(PBG_FILEHEAD),1,out->file);
 	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->file);
 
-	in = BitMemCreate((BYTE *)&DemoInfo, BD_MEMORY_READ, sizeof(DEMOPLAY_INFO));
+	in = BitMemCreateR((BYTE *)&DemoInfo,sizeof(DEMOPLAY_INFO));
 	Compress(in, out, 0);
 	BitDevRelease(in);
 
-	in = BitMemCreate((BYTE *)DemoBuffer, BD_MEMORY_READ, sizeof(WORD) * DemoInfo.DataSize);
+	in = BitMemCreateR((BYTE *)DemoBuffer,sizeof(WORD) * DemoInfo.DataSize);
 	Compress(in, out, 1);
 	BitDevRelease(in);
 
@@ -220,7 +220,7 @@ FBOOL ReplayLoad(int stage)
 	if(GameStage == GRAPH_ID_EXSTAGE) strcpy(buf, "秋霜りぷEx.DAT");
 	else                              sprintf(buf, "秋霜りぷ%d.DAT", stage);
 
-	in = FilStartR(buf, BD_FILE_READ);
+	in = FilStartR(buf);
 	if(NULL == in) return FALSE;
 
 	// ヘッダの格納先は０番である //

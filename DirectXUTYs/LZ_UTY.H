@@ -34,10 +34,6 @@ enum BIT_DEVICE_FILE_MODE {
 	BD_FILE_WRITE,
 };
 
-enum BIT_DEVICE_MEMORY_MODE {
-	BD_MEMORY_READ
-};
-
 struct BIT_DEVICE {
 	FILE *file;
 	char rack;
@@ -58,9 +54,9 @@ uint8_t *MemExpand(const BIT_DEVICE *in,fil_no_t filno);
 void WriteHead(BIT_DEVICE *in);
 
 BIT_DEVICE *BitFilCreate(const char *s,BIT_DEVICE_FILE_MODE mode);
-BIT_DEVICE *BitMemCreate(uint8_t *mem,BIT_DEVICE_MEMORY_MODE mode,size_t size);
+BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size);
 void BitDevRelease(BIT_DEVICE *bd);
 
-BIT_DEVICE *FilStartR(const char *s,BIT_DEVICE_FILE_MODE mode);
-BIT_DEVICE *FilStartW(const char *s,BIT_DEVICE_FILE_MODE mode,fil_no_t filecount);
+BIT_DEVICE *FilStartR(const char *s);
+BIT_DEVICE *FilStartW(const char *s,fil_no_t filecount);
 void FilEnd(BIT_DEVICE *bd);

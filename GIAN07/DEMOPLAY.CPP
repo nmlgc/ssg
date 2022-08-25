@@ -168,7 +168,7 @@ FVOID ReplayRecord(WORD key)
 // リプレイデータをファイルに書き込む //
 FVOID ReplaySave(void)
 {
-	BIT_DEVICE		*in;
+	BIT_DEVICE_READ		*in;
 	char			buf[100];
 
 	if(!DemoplaySaveEnable) return;

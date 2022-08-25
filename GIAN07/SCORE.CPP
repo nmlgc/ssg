@@ -23,18 +23,18 @@ static BOOL ReleaseScoreData(void);			// スコアデータを解放する
 static NR_NAME_DATA *SetNDataPtr(BYTE Dif);	// 難易度でポインタを振り分ける
 static BOOL SetDefaultScoreData(void);		// スコアデータ初期値をセット
 
-static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE *bd);
-static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE *bd);
-static BOOL _LoadExBit(BIT_DEVICE *bd, BYTE *flags);
-static BOOL _SaveExBit(BIT_DEVICE *bd, BYTE flags);
+static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ *bd);
+static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE *bd);
+static BOOL _LoadExBit(BIT_DEVICE_READ *bd, BYTE *flags);
+static BOOL _SaveExBit(BIT_DEVICE_WRITE *bd, BYTE flags);
 
-static BYTE      _xGet8( BIT_DEVICE *bd, DWORDLONG *ExMask);
-static DWORD     _xGet32(BIT_DEVICE *bd, DWORDLONG *ExMask);
-static DWORDLONG _xGet64(BIT_DEVICE *bd, DWORDLONG *ExMask);
+static BYTE      _xGet8( BIT_DEVICE_READ *bd, DWORDLONG *ExMask);
+static DWORD     _xGet32(BIT_DEVICE_READ *bd, DWORDLONG *ExMask);
+static DWORDLONG _xGet64(BIT_DEVICE_READ *bd, DWORDLONG *ExMask);
 
-static void _xPut8( BIT_DEVICE *bd, BYTE  data,    DWORDLONG *ExMask);
-static void _xPut32(BIT_DEVICE *bd, DWORD data,    DWORDLONG *ExMask);
-static void _xPut64(BIT_DEVICE *bd, DWORDLONG data,DWORDLONG *ExMask);
+static void _xPut8( BIT_DEVICE_WRITE *bd, BYTE  data,    DWORDLONG *ExMask);
+static void _xPut32(BIT_DEVICE_WRITE *bd, DWORD data,    DWORDLONG *ExMask);
+static void _xPut64(BIT_DEVICE_WRITE *bd, DWORDLONG data,DWORDLONG *ExMask);
 
 
 
@@ -146,7 +146,6 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 	int				Rank;
 	int				i;
 	NR_NAME_DATA	*temp;
-	BIT_DEVICE		*bd;
 
 	// スコアデータを読み込む //
 	Rank = IsHighScore(NData, Dif);
@@ -171,7 +170,7 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 	temp[Rank-1] = *NData;
 
 	// 実際にファイルに出力 //
-	bd = BitFilCreate(ScoreFileName, BD_FILE_WRITE);
+	auto bd = BitFilCreateW(ScoreFileName);
 	if(bd != NULL){
 		_SaveSC(ScoreData->Easy,    bd);
 		_SaveSC(ScoreData->Normal,  bd);
@@ -194,7 +193,6 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 // スコアデータを読み込む //
 static BOOL LoadScoreData(void)
 {
-	BIT_DEVICE		*bd;
 	BOOL			bInit = FALSE;
 
 	// すでにロード済みの場合(これは失敗にしない) //
@@ -204,7 +202,7 @@ static BOOL LoadScoreData(void)
 	if(ScoreData == NULL) return FALSE;
 
 	// ビット読み込みモードでファイルを開く //
-	bd = BitFilCreate(ScoreFileName, BD_FILE_READ);
+	auto bd = BitFilCreateR(ScoreFileName);
 	if(bd != NULL){
 		while(1){
 			if(!_LoadSC(ScoreData->Easy,    bd)) break;
@@ -281,7 +279,7 @@ static BOOL SetDefaultScoreData(void)
 	return TRUE;
 }
 
-static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE *bd)
+static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ *bd)
 {
 	int			i,j;
 	DWORDLONG	CheckSum = 0;
@@ -332,7 +330,7 @@ static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE *bd)
 	return TRUE;
 }
 
-static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE *bd)
+static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE *bd)
 {
 	int			i,j;
 	DWORDLONG	CheckSum = 0;
@@ -396,7 +394,7 @@ typedef union tagWORD32{
 	};
 } WORD32;
 
-static void _xPut8( BIT_DEVICE *bd, BYTE data, DWORDLONG *ExMask)
+static void _xPut8( BIT_DEVICE_WRITE *bd, BYTE data, DWORDLONG *ExMask)
 {
 	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
 
@@ -405,14 +403,14 @@ static void _xPut8( BIT_DEVICE *bd, BYTE data, DWORDLONG *ExMask)
 	bd->PutBits((DWORD)data, 8);
 }
 
-static BYTE _xGet8( BIT_DEVICE *bd, DWORDLONG *ExMask)
+static BYTE _xGet8( BIT_DEVICE_READ *bd, DWORDLONG *ExMask)
 {
 	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
 
 	return (BYTE)bd->GetBits(8) - (BYTE)(*ExMask);
 }
 
-static void _xPut32(BIT_DEVICE *bd, DWORD data, DWORDLONG *ExMask)
+static void _xPut32(BIT_DEVICE_WRITE *bd, DWORD data, DWORDLONG *ExMask)
 {
 	WORD32		temp;
 
@@ -424,7 +422,7 @@ static void _xPut32(BIT_DEVICE *bd, DWORD data, DWORDLONG *ExMask)
 	bd->PutBits((DWORD)temp.d2, 16);
 }
 
-static DWORD _xGet32(BIT_DEVICE *bd, DWORDLONG *ExMask)
+static DWORD _xGet32(BIT_DEVICE_READ *bd, DWORDLONG *ExMask)
 {
 	WORD32		temp;
 
@@ -436,7 +434,7 @@ static DWORD _xGet32(BIT_DEVICE *bd, DWORDLONG *ExMask)
 	return temp.data32 - (DWORD)(*ExMask);
 }
 
-static void _xPut64(BIT_DEVICE *bd, DWORDLONG data, DWORDLONG *ExMask)
+static void _xPut64(BIT_DEVICE_WRITE *bd, DWORDLONG data, DWORDLONG *ExMask)
 {
 	WORD64		temp;
 
@@ -450,7 +448,7 @@ static void _xPut64(BIT_DEVICE *bd, DWORDLONG data, DWORDLONG *ExMask)
 	bd->PutBits((DWORD)temp.d4, 16);
 }
 
-static DWORDLONG _xGet64(BIT_DEVICE *bd, DWORDLONG *ExMask)
+static DWORDLONG _xGet64(BIT_DEVICE_READ *bd, DWORDLONG *ExMask)
 {
 	WORD64		temp;
 

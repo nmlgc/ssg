@@ -29,20 +29,18 @@ struct PBG_FILEINFO {
 };
 // ------
 
-enum BIT_DEVICE_FILE_MODE {
-	BD_FILE_READ,
-	BD_FILE_WRITE,
-};
-
 struct PACKFILE_WRITE;
 
-struct BIT_DEVICE {
-	char rack;
-	uint8_t mask;
-
+struct BIT_DEVICE_READ {
 	uint8_t GetBit();
 	uint32_t GetBits(unsigned int bitcount);
 	void Compress(PACKFILE_WRITE &out,fil_no_t filno) const;
+};
+
+struct BIT_DEVICE_WRITE {
+	char rack;
+	uint8_t mask;
+
 	void PutBit(uint8_t bit);
 	void PutBits(uint32_t bits,unsigned int bitcount);
 	void PutChar(char c);
@@ -61,8 +59,9 @@ struct PACKFILE_WRITE {
 extern PBG_FILEHEAD FileHead;
 extern PBG_FILEINFO *FileInfo;
 
-BIT_DEVICE *BitFilCreate(const char *s,BIT_DEVICE_FILE_MODE mode);
-BIT_DEVICE *BitMemCreateR(uint8_t *mem,size_t size);
+BIT_DEVICE_READ *BitFilCreateR(const char *s);
+BIT_DEVICE_WRITE *BitFilCreateW(const char *s);
+BIT_DEVICE_READ *BitMemCreateR(uint8_t *mem,size_t size);
 
 PACKFILE_READ *FilStartR(const char *s);
 PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filno);

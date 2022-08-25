@@ -8,6 +8,52 @@
 #pragma message(PBGWIN_D3_TEX_H)
 
 
+// ヘッダファイル //
+#include "DX_TYPE.h"
+
+
+// 構造体 //
+typedef struct tagDXTEXTURE{
+	D3DTEXTUREHANDLE	hTexture;
+	GRP					surf;
+	BYTE				*img;
+} DXTEXTURE;
+
+
+// グローバル変数 //
+extern DXTEXTURE DxTex[TEXTURE_MAX];
+
+
+IINT TexGetWidth(BYTE *img)
+{
+	BITMAPFILEHEADER		*BMP_file;
+	BITMAPINFOHEADER		*BMP_info;
+	int						width,temp;
+
+	BMP_file = (BITMAPFILEHEADER *)img;
+	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);
+
+	width = (BMP_info->biWidth+3)&(~3);		// DWORD に揃える(いらないか...)
+	for(temp=1;temp<width;temp<<=1);		// Power of 2 なサイズを作る
+
+	return min(temp,256);		// 大きすぎると扱えないので...
+}
+
+IINT TexGetHeight(BYTE *img)
+{
+	BITMAPFILEHEADER		*BMP_file;
+	BITMAPINFOHEADER		*BMP_info;
+	int						height,temp;
+
+	BMP_file = (BITMAPFILEHEADER *)img;
+	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);
+
+	height = (BMP_info->biHeight);
+	for(temp=1;temp<height;temp<<=1);		// Power of 2 なサイズを作る
+
+	return min(temp,256);		// 大きすぎると扱えないので...
+}
+
 // 列挙用コールバック関数 //
 static HRESULT CALLBACK TextureEnum(DDSURFACEDESC *ddsd,VOID *param);
 

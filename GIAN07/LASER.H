@@ -47,6 +47,7 @@
 
 
 ////レーザーコマンド定数////
+#undef LC_ALL // There's a locale macro with the same name...
 #define LC_WAY		0x00	// 扇状発射
 #define LC_ALL		0x01	// 全方向発射
 #define LC_RND		0x02	// 基本角セット有りランダム

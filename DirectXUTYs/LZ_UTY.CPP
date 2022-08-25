@@ -4,9 +4,36 @@
  */
 
 #include "LZ_UTY.H"
+#include <filesystem>
 
 PBG_FILEHEAD FileHead;
 PBG_FILEINFO *FileInfo;
+
+std::optional<FILE_BUFFER> FilBufferCreateR(const char *s)
+{
+	auto fp = fopen(s, "rb");
+	if(!fp) {
+		return std::nullopt;
+	}
+
+	auto size64 = _filelengthi64(fileno(fp));
+	if(size64 > std::numeric_limits<fil_size_t>::max()) {
+		return std::nullopt;
+	}
+	const fil_size_t size = size64;
+
+	auto buf = BYTE_BUFFER_OWNED{ new (std::nothrow) uint8_t[size] };
+	if(!buf) {
+		return std::nullopt;
+	}
+
+	if(fread(buf.get(), size, 1, fp) != 1) {
+		return std::nullopt;
+	}
+	fclose(fp);
+
+	return FILE_BUFFER{ std::move(buf), size };
+}
 
 uint8_t BIT_DEVICE_READ::GetBit()
 {
@@ -70,9 +97,13 @@ void PACKFILE_WRITE::WriteHead() const
 {
 }
 
-BIT_DEVICE_READ *BitFilCreateR(const char *s)
+std::optional<BIT_FILE_READ> BitFilCreateR(const char *s)
 {
-	return nullptr;
+	auto maybe_file = FilBufferCreateR(s);
+	if(!maybe_file) {
+		return std::nullopt;
+	}
+	return std::make_optional<BIT_FILE_READ>(std::move(maybe_file.value()));
 }
 
 BIT_DEVICE_WRITE *BitFilCreateW(const char *s)

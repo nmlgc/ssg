@@ -6,10 +6,12 @@
 #pragma once
 
 #include <array>
+#include <memory>
 #include <optional>
 #include <span>
 
 using BYTE_BUFFER_BORROWED = std::span<const uint8_t>;
+using BYTE_BUFFER_OWNED = std::unique_ptr<uint8_t[]>;
 
 // Format
 // ------
@@ -72,6 +74,20 @@ struct BIT_DEVICE_WRITE {
 	void PutChar(char c);
 };
 
+struct FILE_BUFFER {
+	BYTE_BUFFER_OWNED buffer;
+	fil_size_t size;
+};
+
+struct BIT_FILE_READ : public BIT_DEVICE_READ {
+	const FILE_BUFFER file;
+
+	BIT_FILE_READ(FILE_BUFFER &&file) :
+		BIT_DEVICE_READ(file.buffer.get(),file.size),
+		file(std::move(file)) {
+	}
+};
+
 struct PACKFILE_READ {
 	uint8_t *MemExpand(fil_no_t filno) const;
 };
@@ -85,7 +101,7 @@ struct PACKFILE_WRITE {
 extern PBG_FILEHEAD FileHead;
 extern PBG_FILEINFO *FileInfo;
 
-BIT_DEVICE_READ *BitFilCreateR(const char *s);
+std::optional<BIT_FILE_READ> BitFilCreateR(const char *s);
 BIT_DEVICE_WRITE *BitFilCreateW(const char *s);
 
 PACKFILE_READ *FilStartR(const char *s);

@@ -6,7 +6,10 @@
 #pragma once
 
 #include <array>
-#include <stdint.h>
+#include <optional>
+#include <span>
+
+using BYTE_BUFFER_BORROWED = std::span<const uint8_t>;
 
 // Format
 // ------
@@ -31,9 +34,32 @@ struct PBG_FILEINFO {
 
 struct PACKFILE_WRITE;
 
-struct BIT_DEVICE_READ {
+class BIT_DEVICE_READ {
+	struct {
+		size_t byte = 0;
+		uint8_t bit = 0;
+
+		void operator +=(unsigned int bitcount) {
+			bit += bitcount;
+			byte += (bit / 8);
+			bit %= 8;
+		}
+	} cursor;
+
+public:
+	const BYTE_BUFFER_BORROWED buffer;
+
+	BIT_DEVICE_READ(const void* mem,size_t size) :
+		buffer({ reinterpret_cast<const uint8_t *>(mem), size }) {
+	}
+
+	// Returns 0xFF if we're at the end of the stream.
 	uint8_t GetBit();
+
+	// Returns 0xFFFFFFFF if we're at the end of the stream. Supports a maximum
+	// of 24 bits.
 	uint32_t GetBits(unsigned int bitcount);
+
 	void Compress(PACKFILE_WRITE &out,fil_no_t filno) const;
 };
 
@@ -61,7 +87,6 @@ extern PBG_FILEINFO *FileInfo;
 
 BIT_DEVICE_READ *BitFilCreateR(const char *s);
 BIT_DEVICE_WRITE *BitFilCreateW(const char *s);
-BIT_DEVICE_READ *BitMemCreateR(uint8_t *mem,size_t size);
 
 PACKFILE_READ *FilStartR(const char *s);
 PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filno);

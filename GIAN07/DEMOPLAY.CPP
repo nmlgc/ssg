@@ -168,7 +168,6 @@ FVOID ReplayRecord(WORD key)
 // リプレイデータをファイルに書き込む //
 FVOID ReplaySave(void)
 {
-	BIT_DEVICE_READ		*in;
 	char			buf[100];
 
 	if(!DemoplaySaveEnable) return;
@@ -194,11 +193,12 @@ FVOID ReplaySave(void)
 	fwrite(&FileHead,sizeof(PBG_FILEHEAD),1,out->file);
 	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->file);
 
-	in = BitMemCreateR((BYTE *)&DemoInfo,sizeof(DEMOPLAY_INFO));
-	in->Compress(*out, 0);
-
-	in = BitMemCreateR((BYTE *)DemoBuffer,sizeof(WORD) * DemoInfo.DataSize);
-	in->Compress(*out, 1);
+	BIT_DEVICE_READ{ &DemoInfo, sizeof(DEMOPLAY_INFO) }.Compress(
+		*out, 0
+	);
+	BIT_DEVICE_READ{ DemoBuffer, (sizeof(WORD) * DemoInfo.DataSize) }.Compress(
+		*out, 1
+	);
 
 	out->WriteHead();
 }

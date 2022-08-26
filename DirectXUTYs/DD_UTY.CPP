@@ -460,13 +460,13 @@ FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
 	if(fp==NULL) return FALSE;
 
 	size = filelength(fileno(fp));
-	DxSurf[surf_id].img = (BYTE *)LocalAlloc(LPTR,size);
+	DxSurf[surf_id].img = BYTE_BUFFER_OWNED{ new (std::nothrow) uint8_t[size] };
 	if(DxSurf[surf_id].img==NULL){
 		fclose(fp);
 		return FALSE;
 	}
 
-	fread(DxSurf[surf_id].img,1,size,fp);
+	fread(DxSurf[surf_id].img.get(),1,size,fp);
 	fclose(fp);
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
@@ -489,7 +489,6 @@ FBOOL GrpBMFree(BYTE surf_id)
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	if(DxSurf[surf_id].img){
-		LocalFree(DxSurf[surf_id].img);
 		DxSurf[surf_id].img = NULL;
 	}
 
@@ -754,7 +753,7 @@ static BOOL GrpBMLoadMemory(DXSURFACE *surf)
 	HBITMAP					hbmp;
 
 
-	BMP_file = (BITMAPFILEHEADER *)surf->img;
+	BMP_file = (BITMAPFILEHEADER *)surf->img.get();
 	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);
 	pal      = (RGBQUAD          *)((BMP_info) +   1);
 	image    = (BYTE             *)((pal)      + 256);

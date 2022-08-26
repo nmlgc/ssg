@@ -340,7 +340,8 @@ BOOL Mid_Load(char *filename)
 
 BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
 {
-	BYTE				*data,*dp;
+	BYTE_BUFFER_OWNED		data;
+	BYTE				*dp;
 	MID_FILEST			*midhead;
 	MID_MAINST			*midmain;
 	MID_TRACKST			*midtrack;
@@ -351,15 +352,14 @@ BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
 	Mid_Free();
 
 	if((data=in.MemExpand(n))==NULL) return FALSE;
-	midhead = (MID_FILEST *)data;
+	midhead = (MID_FILEST *)data.get();
 	//fread(&midhead,sizeof(MID_FILEST),1,fp);
 	if(midhead->MThd!=mmioFOURCC('M','T','h','d')){
-		LocalFree(data);
 		return FALSE;
 	}
 
 	size = ConvDWord(midhead->size);
-	midmain = (MID_MAINST *)((BYTE *)data+sizeof(MID_FILEST));
+	midmain = (MID_MAINST *)((BYTE *)data.get()+sizeof(MID_FILEST));
 	//fread(midmain,size,1,fp);
 	Mid_Data.format   = ConvWord(midmain->format);
 	Mid_Data.track    = ConvWord(midmain->track);
@@ -370,7 +370,7 @@ BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
 
 	ZeroMemory(Mid_Data.data,sizeof(MID_TRACK)*Mid_Data.track);
 
-	dp = (BYTE *)(data+sizeof(MID_FILEST)+size);
+	dp = (BYTE *)(data.get()+sizeof(MID_FILEST)+size);
 	for(i=0;i<Mid_Data.track;i++){
 		midtrack = (MID_TRACKST *)dp;
 		dp+=sizeof(MID_TRACKST);
@@ -384,7 +384,6 @@ BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
 		dp+=pt->size;
 	}
 
-	LocalFree(data);
 	Mid_Init();
 
 	return TRUE;

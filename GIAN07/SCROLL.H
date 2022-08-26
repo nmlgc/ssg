@@ -63,7 +63,7 @@ typedef WORD	PBGMAP;		// マップパーツ格納用の型
 typedef struct tagScrollInfo{
 //	GRP		lpMapOffs;					// マップパーツデータ(Graphic)の格納先
 
-	BYTE	*DataHead;					// マップデータのヘッダ
+	BYTE_BUFFER_OWNED	DataHead;					// マップデータのヘッダ
 
 	PBGMAP	*LayerHead[LAYER_MAX];		// 各レイヤーのヘッダ
 	PBGMAP	*LayerPtr[LAYER_MAX];		// 現在のレイヤーのポインタ

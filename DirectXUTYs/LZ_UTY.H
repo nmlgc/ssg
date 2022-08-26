@@ -51,6 +51,10 @@ class BIT_DEVICE_READ {
 public:
 	const BYTE_BUFFER_BORROWED buffer;
 
+	BIT_DEVICE_READ(const BYTE_BUFFER_BORROWED buffer) :
+		buffer(buffer) {
+	}
+
 	BIT_DEVICE_READ(const void* mem,size_t size) :
 		buffer({ reinterpret_cast<const uint8_t *>(mem), size }) {
 	}
@@ -99,7 +103,7 @@ struct PACKFILE_READ {
 		info(info) {
 	}
 
-	uint8_t *MemExpand(fil_no_t filno) const;
+	BYTE_BUFFER_OWNED MemExpand(fil_no_t filno) const;
 };
 
 struct PACKFILE_WRITE {

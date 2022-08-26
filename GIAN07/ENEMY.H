@@ -114,8 +114,9 @@ typedef struct{
 
 //// 敵変数 ////
 extern ENEMY_DATA	Enemy[ENEMY_MAX];
-extern BYTE			*ECL_Head;
-extern BYTE			*SCL_Head,*SCL_Now;
+extern BYTE_BUFFER_OWNED	ECL_Head;
+extern BYTE_BUFFER_OWNED	SCL_Head;
+extern uint8_t			*SCL_Now;
 extern WORD			EnemyInd[ENEMY_MAX];
 extern WORD			EnemyNow;
 extern ANIME_DATA	Anime[ANIME_MAX];

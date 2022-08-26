@@ -141,7 +141,7 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 
 FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
 {
-	BYTE			*data;
+	BYTE_BUFFER_OWNED	buffer;
 	WAVEHEAD		*wh;
 	WAVEHEAD_FACT	*whf;
 	LPSE_STRUCT		p;
@@ -160,7 +160,8 @@ FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
 	if(p == NULL) return FALSE;
 
 	// データを解凍して読み込む //
-	if((data=in.MemExpand(n))==NULL) return FALSE;
+	if(!(buffer=in.MemExpand(n))) return FALSE;
+	const auto& data = buffer.get();
 	wh  = (WAVEHEAD *)data;
 	whf = (WAVEHEAD_FACT *)data;
 
@@ -210,8 +211,6 @@ FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
 			if(!SndFillBuffer(p->buf[i],p->data,p->size)) return FALSE;
 		}
 	}
-
-	LocalFree(data);
 
 	return TRUE;
 }

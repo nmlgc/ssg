@@ -65,7 +65,7 @@ typedef struct tagDXOBJECT{
 
 typedef struct tagDXSURFACE{
 	GRP			surf;			// DirectDraw OffscreenSurface (NULLなら未使用)
-	BYTE		*img;			// BMP イメージを一時的に保存 (NULL ならロードはまだ)
+	BYTE_BUFFER_OWNED	img;			// BMP イメージを一時的に保存 (NULL ならロードはまだ)
 	int			width;
 	int			height;
 } DXSURFACE;

@@ -323,10 +323,9 @@ BOOL LoadStageData(BYTE stage)
 	int				i;
 
 	// メモリを解放だ！ //
-	if(ECL_Head!=NULL)				LocalFree(ECL_Head);
-	if(SCL_Head!=NULL)				LocalFree(SCL_Head);
-	if(ScrollInfo.DataHead!=NULL)	LocalFree(ScrollInfo.DataHead);
-	SCL_Now = ECL_Head = SCL_Head = NULL;
+	SCL_Now = nullptr;
+	ECL_Head = nullptr;
+	SCL_Head = nullptr;
 	ScrollInfo.DataHead = NULL;
 
 	auto maybe_in=FilStartR("ENEMY.DAT");
@@ -342,7 +341,7 @@ BOOL LoadStageData(BYTE stage)
 	else if(stage == GRAPH_ID_ENDING){
 		if((SCL_Head=in.MemExpand( 47))==NULL) return FALSE;	// SCL Load
 
-		SCL_Now   = SCL_Head;
+		SCL_Now   = SCL_Head.get();
 		GameCount = 0;
 		return TRUE;
 	}
@@ -358,7 +357,7 @@ BOOL LoadStageData(BYTE stage)
 	if(!ScrollInit()) return FALSE;
 
 	// 各変数の初期化 //
-	SCL_Now   = SCL_Head;
+	SCL_Now   = SCL_Head.get();
 	GameCount = 0;
 
 	// アニメーションの準備 //
@@ -949,13 +948,13 @@ BOOL LoadSound(void)
 extern BOOL LoadMusicRoomComment(int no)
 {
 	int				i, j;
-	BYTE			*temp;
+	BYTE_BUFFER_OWNED	temp;
 
 	if(no < 0 || no > 19) return FALSE;
 
 	const auto in=FilStartR("ENEMY.DAT");
 	if(!in) return FALSE;
-	if((temp=in.value().MemExpand(27+no))==NULL) return FALSE;
+	if(!(temp=in.value().MemExpand(27+no))) return FALSE;
 
 	for(i=0; i<19*2; i++){
 		MTitleBuffer[i] = (BYTE)temp[i];
@@ -968,8 +967,6 @@ extern BOOL LoadMusicRoomComment(int no)
 		}
 		MCommentBuffer[i][19*2] = '\0';
 	}
-
-	LocalFree(temp);
 
 	return TRUE;
 }

@@ -855,7 +855,7 @@ FBOOL ScrollInit(void)
 */
 	// 標準のスクロールスピード(マップエディタと同じ) //
 	ScrollInfo.ScrollSpeed = TIME_PER_FRAME;					// 標準のスクロール速度
-	ScrollInfo.NumLayer    = *(DWORD *)ScrollInfo.DataHead;		// レイヤーの数
+	ScrollInfo.NumLayer    = *(DWORD *)ScrollInfo.DataHead.get();		// レイヤーの数
 	ScrollInfo.Count       = 0;					// スクロール用カウンタ
 	ScrollInfo.InfStart    = 0;					// 無限ループ開始時刻
 	ScrollInfo.State       = SST_NORMAL;		// 状態(デフォルトの標準で..)
@@ -871,10 +871,10 @@ FBOOL ScrollInit(void)
 	}
 
 	// レイヤー情報のロード(長さからループ用変数を調整すること) //
-	LayerInfo = (ScrollSaveHeader *)(ScrollInfo.DataHead + sizeof(DWORD));
+	LayerInfo = (ScrollSaveHeader *)(ScrollInfo.DataHead.get() + sizeof(DWORD));
 	for(i=0;i<ScrollInfo.NumLayer;i++){
-		ScrollInfo.LayerHead[i]  = (PBGMAP *)(ScrollInfo.DataHead+LayerInfo[i].Address);	// 先頭
-		ScrollInfo.LayerPtr[i]   = (PBGMAP *)(ScrollInfo.DataHead+LayerInfo[i].Address);	// 現在
+		ScrollInfo.LayerHead[i]  = (PBGMAP *)(ScrollInfo.DataHead.get()+LayerInfo[i].Address);	// 先頭
+		ScrollInfo.LayerPtr[i]   = (PBGMAP *)(ScrollInfo.DataHead.get()+LayerInfo[i].Address);	// 現在
 		ScrollInfo.LayerWait[i]  = LayerInfo[i].ScrollWait;		// レイヤーの重み
 		ScrollInfo.LayerCount[i] = 0;
 		ScrollInfo.LayerDy[i]    = 0;

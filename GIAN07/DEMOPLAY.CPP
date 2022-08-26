@@ -75,7 +75,8 @@ FVOID DemoplaySave(void)
 // デモプレイデータをロードする //
 FBOOL DemoplayLoad(int stage)
 {
-	BYTE			*temp,*p;
+	BYTE_BUFFER_OWNED temp;
+	uint8_t *p;
 
 	// ファイルを開く //
 	auto maybe_in=FilStartR("ENEMY.DAT");
@@ -86,13 +87,11 @@ FBOOL DemoplayLoad(int stage)
 	temp = in.MemExpand(stage-1+18);
 	if(temp == NULL) return FALSE;
 
-	p = temp;
+	p = temp.get();
 	memcpy(&DemoInfo,p,sizeof(DEMOPLAY_INFO));
 
-	p = temp + sizeof(DEMOPLAY_INFO);
+	p = temp.get() + sizeof(DEMOPLAY_INFO);
 	memcpy(DemoBuffer,p,sizeof(WORD)*DemoInfo.DataSize);
-
-	LocalFree(temp);
 
 	DemoBufPtr = 0;
 	DemoplayLoadEnable = TRUE;
@@ -208,7 +207,7 @@ FVOID ReplaySave(void)
 // リプレイデータをロードする //
 FBOOL ReplayLoad(int stage)
 {
-	BYTE			*temp;
+	BYTE_BUFFER_OWNED	temp;
 	char			buf[100];
 
 	// ファイル名を確定 //
@@ -222,16 +221,14 @@ FBOOL ReplayLoad(int stage)
 	// ヘッダの格納先は０番である //
 	temp = in.MemExpand( 0);
 	if(NULL == temp) return FALSE;
-	memcpy(&DemoInfo, temp, sizeof(DEMOPLAY_INFO));
-	LocalFree(temp);
+	memcpy(&DemoInfo, temp.get(), sizeof(DEMOPLAY_INFO));
 
 	// データの格納先は１番ですね //
 	temp = in.MemExpand( 1);
 	if(NULL == temp){
 		return FALSE;
 	}
-	memcpy(DemoBuffer, temp, sizeof(WORD)*DemoInfo.DataSize);
-	LocalFree(temp);
+	memcpy(DemoBuffer, temp.get(), sizeof(WORD)*DemoInfo.DataSize);
 
 
 	DemoBufPtr = 0;

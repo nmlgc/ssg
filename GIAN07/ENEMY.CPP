@@ -31,8 +31,8 @@
 
 
 // 変数の実体 //
-BYTE		*ECL_Head = NULL;
-BYTE		*SCL_Head = NULL;
+BYTE_BUFFER_OWNED		ECL_Head = nullptr;
+BYTE_BUFFER_OWNED		SCL_Head = nullptr;
 BYTE		*SCL_Now  = NULL;
 ENEMY_DATA	Enemy[ENEMY_MAX];
 WORD		EnemyInd[ENEMY_MAX];
@@ -675,7 +675,7 @@ void parse_ECL(ENEMY_DATA *e)
 	// こんなところにＧＯＴＯ用ラベルが！！ //
 	ECL_HEAD:
 		bRetFlag = TRUE;
-		cmd = ECL_Head+(e->cmd);
+		cmd = ECL_Head.get()+(e->cmd);
 
 
 	switch(*cmd){

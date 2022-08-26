@@ -10,6 +10,12 @@
 PBG_FILEHEAD FileHead;
 PBG_FILEINFO *FileInfo;
 
+constexpr auto LZSS_DICT_BITS = 13;
+constexpr auto LZSS_SEQ_BITS = 4;
+constexpr auto LZSS_SEQ_MIN = 3;
+constexpr auto LZSS_DICT_MASK = ((1 << LZSS_DICT_BITS) - 1);
+constexpr auto LZSS_SEQ_MAX = (LZSS_SEQ_MIN + ((1 << LZSS_SEQ_BITS) - 1));
+
 std::optional<FILE_BUFFER> FilBufferCreateR(const char *s)
 {
 	auto fp = fopen(s, "rb");
@@ -127,9 +133,50 @@ void BIT_DEVICE_WRITE::PutChar(char c)
 {
 }
 
-uint8_t *PACKFILE_READ::MemExpand(fil_no_t fileno) const
+BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 {
-	return nullptr;
+	const auto maybe_compressed = FilFileGetCompressed(packfile, info, filno);
+	if(!maybe_compressed) {
+		return nullptr;
+	}
+
+	BYTE_BUFFER_OWNED uncompressed(
+		new (std::nothrow) uint8_t[info[filno].size_uncompressed]
+	);
+	if(!uncompressed) {
+		return nullptr;
+	}
+
+	// Textbook LZSS.
+	std::array<uint8_t, (1 << LZSS_DICT_BITS)> dict;
+	fil_size_t out_i = 0;
+
+	auto output = [&uncompressed, &dict, &out_i](uint8_t literal) {
+		uncompressed.get()[out_i] = literal;
+		dict[out_i & LZSS_DICT_MASK] = literal;
+		out_i++;
+	};
+
+	BIT_DEVICE_READ device = { maybe_compressed.value() };
+	while(out_i < info[filno].size_uncompressed) {
+		bool is_literal = device.GetBit();
+		if(is_literal) {
+			output(device.GetBits(8));
+		} else {
+			auto seq_offset = device.GetBits(LZSS_DICT_BITS);
+			if(seq_offset == 0) {
+				break;
+			} else {
+				seq_offset--;
+			}
+			auto seq_length = (device.GetBits(LZSS_SEQ_BITS) + LZSS_SEQ_MIN);
+			for(decltype(seq_length) i = 0; i < seq_length; i++) {
+				output(dict[seq_offset++ & LZSS_DICT_MASK]);
+			}
+		}
+	}
+
+	return std::move(uncompressed);
 }
 
 void PACKFILE_WRITE::WriteHead() const

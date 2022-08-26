@@ -119,7 +119,7 @@ FBOOL GrpReleaseSurface(BYTE surf_id);						// Surface の削除(BMPは変更せ
 
 // ＢＭＰファイルロード //
 FBOOL GrpBMPLoad(char *filename,BYTE surf_id);				// BMP->Surface
-FBOOL GrpBMPLoadP(PACKFILE_READ *in,DWORD n,BYTE surf_id);		// (圧)BMP->Surface
+FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id);		// (圧)BMP->Surface
 FBOOL GrpBMFree(BYTE surf_id);								// SurfaceからBMPだけ切り離す
 
 extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);	// ビット深度によりカラーキーをセットする

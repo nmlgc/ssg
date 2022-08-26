@@ -338,7 +338,7 @@ BOOL Mid_Load(char *filename)
 	return TRUE;
 }
 
-BOOL PMid_Load(PACKFILE_READ *in,DWORD n)
+BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
 {
 	BYTE				*data,*dp;
 	MID_FILEST			*midhead;
@@ -350,7 +350,7 @@ BOOL PMid_Load(PACKFILE_READ *in,DWORD n)
 
 	Mid_Free();
 
-	if((data=in->MemExpand(n))==NULL) return FALSE;
+	if((data=in.MemExpand(n))==NULL) return FALSE;
 	midhead = (MID_FILEST *)data;
 	//fread(&midhead,sizeof(MID_FILEST),1,fp);
 	if(midhead->MThd!=mmioFOURCC('M','T','h','d')){

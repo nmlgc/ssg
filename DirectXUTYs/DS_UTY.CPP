@@ -139,7 +139,7 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 	return TRUE;
 }
 
-FBOOL SndWAVLoadP(PACKFILE_READ *in,DWORD n,BYTE id,int max)
+FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
 {
 	BYTE			*data;
 	WAVEHEAD		*wh;
@@ -160,7 +160,7 @@ FBOOL SndWAVLoadP(PACKFILE_READ *in,DWORD n,BYTE id,int max)
 	if(p == NULL) return FALSE;
 
 	// データを解凍して読み込む //
-	if((data=in->MemExpand(n))==NULL) return FALSE;
+	if((data=in.MemExpand(n))==NULL) return FALSE;
 	wh  = (WAVEHEAD *)data;
 	whf = (WAVEHEAD_FACT *)data;
 

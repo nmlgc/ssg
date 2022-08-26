@@ -82,7 +82,7 @@ FVOID SndCleanup(void);
 
 // ＷＡＶファイルロード(ある制限があるが...) //
 FBOOL SndWAVLoad(char *filename,BYTE id,int max);				// 後でエラーを吐くようにする
-FBOOL SndWAVLoadP(PACKFILE_READ *in,DWORD n,BYTE id,int max);
+FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max);
 
 // 再生＆停止 //
 FVOID SndPlay(BYTE id);

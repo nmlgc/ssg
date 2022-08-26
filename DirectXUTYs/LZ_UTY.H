@@ -89,6 +89,16 @@ struct BIT_FILE_READ : public BIT_DEVICE_READ {
 };
 
 struct PACKFILE_READ {
+	const FILE_BUFFER packfile;
+	const std::span<const PBG_FILEINFO> info;
+
+	PACKFILE_READ(
+		FILE_BUFFER &&packfile, const std::span<const PBG_FILEINFO> info
+	) :
+		packfile(std::move(packfile)),
+		info(info) {
+	}
+
 	uint8_t *MemExpand(fil_no_t filno) const;
 };
 
@@ -104,5 +114,5 @@ extern PBG_FILEINFO *FileInfo;
 std::optional<BIT_FILE_READ> BitFilCreateR(const char *s);
 BIT_DEVICE_WRITE *BitFilCreateW(const char *s);
 
-PACKFILE_READ *FilStartR(const char *s);
+std::optional<PACKFILE_READ> FilStartR(const char *s);
 PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filno);

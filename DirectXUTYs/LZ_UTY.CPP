@@ -4,7 +4,8 @@
  */
 
 #include "LZ_UTY.H"
-#include <filesystem>
+#include <io.h>
+#include <numeric>
 
 PBG_FILEHEAD FileHead;
 PBG_FILEINFO *FileInfo;
@@ -33,6 +34,44 @@ std::optional<FILE_BUFFER> FilBufferCreateR(const char *s)
 	fclose(fp);
 
 	return FILE_BUFFER{ std::move(buf), size };
+}
+
+template <typename Container> fil_checksum_t FilChecksumAddFile(
+	fil_checksum_t &current_total,
+	fil_size_t offset,
+	fil_size_t size_uncompressed,
+	const Container &compressed
+)
+{
+	auto ret = std::accumulate(
+		compressed.begin(), compressed.end(), fil_checksum_t{ 0 }
+	);
+	current_total += ret;
+	current_total += size_uncompressed;
+	current_total += offset;
+	return ret;
+}
+
+std::optional<BYTE_BUFFER_BORROWED> FilFileGetCompressed(
+	const FILE_BUFFER& packfile,
+	const std::span<const PBG_FILEINFO> info,
+	fil_no_t filno
+)
+{
+	if(filno >= info.size()) {
+		return std::nullopt;
+	}
+	const auto start = info[filno].offset;
+	const auto end = ((filno == (info.size() - 1))
+		? packfile.size
+		: info[filno + 1].offset
+	);
+	if((start >= packfile.size) || (end > packfile.size)) {
+		return std::nullopt;
+	}
+	return BYTE_BUFFER_BORROWED{
+		(packfile.buffer.get() + start), (end - start)
+	};
 }
 
 uint8_t BIT_DEVICE_READ::GetBit()
@@ -111,9 +150,62 @@ BIT_DEVICE_WRITE *BitFilCreateW(const char *s)
 	return nullptr;
 }
 
-PACKFILE_READ *FilStartR(const char *s)
+std::optional<PACKFILE_READ> FilStartR(const char *s)
 {
-	return nullptr;
+	auto maybe_packfile = FilBufferCreateR(s);
+	if(!maybe_packfile) {
+		return std::nullopt;
+	}
+	auto& packfile = maybe_packfile.value();
+
+	// PBG_FILEHEAD
+	size_t byte_start = 0;
+	size_t byte_end = sizeof(PBG_FILEHEAD);
+	if(packfile.size < byte_end) {
+		return std::nullopt;
+	}
+	const auto& head = *reinterpret_cast<PBG_FILEHEAD *>(
+		(packfile.buffer.get() + byte_start)
+	);
+	if(head.name != PBG_HEADNAME) {
+		return std::nullopt;
+	}
+
+	// PBG_FILEINFO
+	byte_start = byte_end;
+	byte_end = (byte_start + (head.n * sizeof(PBG_FILEINFO)));
+	if(packfile.size < byte_end) {
+		return std::nullopt;
+	}
+
+	const auto* info_start = (packfile.buffer.get() + byte_start);
+	decltype(PACKFILE_READ::info) info = {
+		reinterpret_cast<const PBG_FILEINFO *>(info_start), head.n
+	};
+	const BYTE_BUFFER_BORROWED info_bytes = { info_start, info.size_bytes() };
+
+	// Checksums
+	fil_checksum_t total_checksum = 0;
+	for(fil_no_t i = 0; i < info.size(); i++) {
+		const auto maybe_compressed = FilFileGetCompressed(packfile, info, i);
+		if(!maybe_compressed) {
+			return std::nullopt;
+		}
+		const auto checksum = FilChecksumAddFile(
+			total_checksum,
+			info[i].offset,
+			info[i].size_uncompressed,
+			maybe_compressed.value()
+		);
+		if(checksum != info[i].checksum_compressed) {
+			return std::nullopt;
+		}
+	}
+	if(total_checksum != head.sum) {
+		return std::nullopt;
+	}
+
+	return std::make_optional<PACKFILE_READ>(std::move(packfile), info);
 }
 
 PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filecount)

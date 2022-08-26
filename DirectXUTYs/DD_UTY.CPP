@@ -472,14 +472,14 @@ FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }
 
-FBOOL GrpBMPLoadP(PACKFILE_READ *in,DWORD n,BYTE surf_id)
+FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	// 以前に何かがロードされていたら解放する //
 	GrpBMFree(surf_id);
 
-	if((DxSurf[surf_id].img=in->MemExpand(n))==NULL) return FALSE;
+	if((DxSurf[surf_id].img=in.MemExpand(n))==NULL) return FALSE;
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }

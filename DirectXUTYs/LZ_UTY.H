@@ -77,6 +77,7 @@ struct BIT_DEVICE_WRITE {
 
 	void PutBit(uint8_t bit);
 	void PutBits(uint32_t bits,unsigned int bitcount);
+	bool Write(const char *s) const;
 };
 
 struct FILE_BUFFER {
@@ -117,7 +118,6 @@ extern PBG_FILEHEAD FileHead;
 extern PBG_FILEINFO *FileInfo;
 
 std::optional<BIT_FILE_READ> BitFilCreateR(const char *s);
-BIT_DEVICE_WRITE *BitFilCreateW(const char *s);
 
 std::optional<PACKFILE_READ> FilStartR(const char *s);
 PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filno);

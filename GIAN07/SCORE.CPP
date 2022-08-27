@@ -24,17 +24,17 @@ static NR_NAME_DATA *SetNDataPtr(BYTE Dif);	// 難易度でポインタを振り
 static BOOL SetDefaultScoreData(void);		// スコアデータ初期値をセット
 
 static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ &bd);
-static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE *bd);
+static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE &bd);
 static BOOL _LoadExBit(BIT_DEVICE_READ *bd, BYTE *flags);
-static BOOL _SaveExBit(BIT_DEVICE_WRITE *bd, BYTE flags);
+static BOOL _SaveExBit(BIT_DEVICE_WRITE &bd, BYTE flags);
 
 static BYTE      _xGet8( BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
 static DWORD     _xGet32(BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
 static DWORDLONG _xGet64(BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
 
-static void _xPut8( BIT_DEVICE_WRITE *bd, BYTE  data,    DWORDLONG *ExMask);
-static void _xPut32(BIT_DEVICE_WRITE *bd, DWORD data,    DWORDLONG *ExMask);
-static void _xPut64(BIT_DEVICE_WRITE *bd, DWORDLONG data,DWORDLONG *ExMask);
+static void _xPut8( BIT_DEVICE_WRITE &bd, BYTE  data,    DWORDLONG *ExMask);
+static void _xPut32(BIT_DEVICE_WRITE &bd, DWORD data,    DWORDLONG *ExMask);
+static void _xPut64(BIT_DEVICE_WRITE &bd, DWORDLONG data,DWORDLONG *ExMask);
 
 
 
@@ -170,21 +170,15 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 	temp[Rank-1] = *NData;
 
 	// 実際にファイルに出力 //
-	auto bd = BitFilCreateW(ScoreFileName);
-	if(bd != NULL){
-		_SaveSC(ScoreData->Easy,    bd);
-		_SaveSC(ScoreData->Normal,  bd);
-		_SaveSC(ScoreData->Hard,    bd);
-		_SaveSC(ScoreData->Lunatic, bd);
-		_SaveSC(ScoreData->Extra,   bd);
-	}
-	else{
-		ReleaseScoreData();
-		return FALSE;
-	}
-
+	BIT_DEVICE_WRITE bd;
+	_SaveSC(ScoreData->Easy,    bd);
+	_SaveSC(ScoreData->Normal,  bd);
+	_SaveSC(ScoreData->Hard,    bd);
+	_SaveSC(ScoreData->Lunatic, bd);
+	_SaveSC(ScoreData->Extra,   bd);
 	ReleaseScoreData();
-	return TRUE;
+
+	return bd.Write(ScoreFileName);
 }
 
 
@@ -329,7 +323,7 @@ static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ &bd)
 	return TRUE;
 }
 
-static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE *bd)
+static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE &bd)
 {
 	int			i,j;
 	DWORDLONG	CheckSum = 0;
@@ -338,34 +332,34 @@ static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE *bd)
 
 	for(i=0; i<NR_RANK_MAX; i++){
 		CheckSum = 0;
-		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
+		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 名前を出力する //
 		for(j=0; j<NR_NAME_LEN; j++){
 			CheckSum += NData[i].Name[j];
 			_xPut8(bd, NData[i].Name[j], &Mask);
 		}
-		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
+		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 得点を出力する //
 		CheckSum += NData[i].Score;
 		_xPut64(bd, NData[i].Score, &Mask);
-		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
+		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// かすりを出力する //
 		CheckSum += NData[i].Evade;
 		_xPut32(bd, NData[i].Evade, &Mask);
-		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
+		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ステージを出力する //
 		CheckSum += NData[i].Stage;
 		_xPut8(bd, NData[i].Stage, &Mask);
-		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
+		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ウエポンを出力する //
 		CheckSum += NData[i].Weapon;
 		_xPut8(bd, NData[i].Weapon, &Mask);
-		bd->PutBit(flag); flag = 1-flag;	// ビット挿入
+		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// チェックサムを出力する //
 		_xPut64(bd, CheckSum, &Mask);
@@ -393,13 +387,13 @@ typedef union tagWORD32{
 	};
 } WORD32;
 
-static void _xPut8( BIT_DEVICE_WRITE *bd, BYTE data, DWORDLONG *ExMask)
+static void _xPut8( BIT_DEVICE_WRITE &bd, BYTE data, DWORDLONG *ExMask)
 {
 	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
 
 	data += (BYTE)(*ExMask);
 
-	bd->PutBits((DWORD)data, 8);
+	bd.PutBits((DWORD)data, 8);
 }
 
 static BYTE _xGet8( BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
@@ -409,7 +403,7 @@ static BYTE _xGet8( BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
 	return (BYTE)bd.GetBits(8) - (BYTE)(*ExMask);
 }
 
-static void _xPut32(BIT_DEVICE_WRITE *bd, DWORD data, DWORDLONG *ExMask)
+static void _xPut32(BIT_DEVICE_WRITE &bd, DWORD data, DWORDLONG *ExMask)
 {
 	WORD32		temp;
 
@@ -417,8 +411,8 @@ static void _xPut32(BIT_DEVICE_WRITE *bd, DWORD data, DWORDLONG *ExMask)
 
 	temp.data32 = data + (DWORD)(*ExMask);
 
-	bd->PutBits((DWORD)temp.d1, 16);
-	bd->PutBits((DWORD)temp.d2, 16);
+	bd.PutBits((DWORD)temp.d1, 16);
+	bd.PutBits((DWORD)temp.d2, 16);
 }
 
 static DWORD _xGet32(BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
@@ -433,7 +427,7 @@ static DWORD _xGet32(BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
 	return temp.data32 - (DWORD)(*ExMask);
 }
 
-static void _xPut64(BIT_DEVICE_WRITE *bd, DWORDLONG data, DWORDLONG *ExMask)
+static void _xPut64(BIT_DEVICE_WRITE &bd, DWORDLONG data, DWORDLONG *ExMask)
 {
 	WORD64		temp;
 
@@ -441,10 +435,10 @@ static void _xPut64(BIT_DEVICE_WRITE *bd, DWORDLONG data, DWORDLONG *ExMask)
 
 	temp.data64 = data + (DWORDLONG)(*ExMask);
 
-	bd->PutBits((DWORD)temp.d1, 16);
-	bd->PutBits((DWORD)temp.d2, 16);
-	bd->PutBits((DWORD)temp.d3, 16);
-	bd->PutBits((DWORD)temp.d4, 16);
+	bd.PutBits((DWORD)temp.d1, 16);
+	bd.PutBits((DWORD)temp.d2, 16);
+	bd.PutBits((DWORD)temp.d3, 16);
+	bd.PutBits((DWORD)temp.d4, 16);
 }
 
 static DWORDLONG _xGet64(BIT_DEVICE_READ &bd, DWORDLONG *ExMask)

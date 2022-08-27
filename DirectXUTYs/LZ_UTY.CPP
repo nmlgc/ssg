@@ -123,14 +123,21 @@ void BIT_DEVICE_READ::Compress(PACKFILE_WRITE &out,fil_no_t filno) const
 
 void BIT_DEVICE_WRITE::PutBit(uint8_t bit)
 {
+	auto& byte = ((bit_cursor == 0)
+		? buffer.emplace_back(0x00)
+		: buffer.back()
+	);
+	byte |= ((bit & 1) << (7 - bit_cursor));
+	bit_cursor++;
 }
 
 void BIT_DEVICE_WRITE::PutBits(uint32_t bits,unsigned int bitcount)
 {
-}
-
-void BIT_DEVICE_WRITE::PutChar(char c)
-{
+	uint32_t mask = (1 << (bitcount - 1));
+	for(decltype(bitcount) i = 0; i < bitcount; i++) {
+		PutBit((bits & mask) != 0);
+		mask >>= 1;
+	}
 }
 
 BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const

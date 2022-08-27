@@ -177,8 +177,6 @@ BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 		_SaveSC(ScoreData->Hard,    bd);
 		_SaveSC(ScoreData->Lunatic, bd);
 		_SaveSC(ScoreData->Extra,   bd);
-
-		if(bd->mask != 0x80) bd->PutChar(bd->rack);
 	}
 	else{
 		ReleaseScoreData();

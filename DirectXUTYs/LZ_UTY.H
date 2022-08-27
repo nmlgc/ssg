@@ -9,9 +9,11 @@
 #include <memory>
 #include <optional>
 #include <span>
+#include <vector>
 
 using BYTE_BUFFER_BORROWED = std::span<const uint8_t>;
 using BYTE_BUFFER_OWNED = std::unique_ptr<uint8_t[]>;
+using BYTE_BUFFER_GROWABLE = std::vector<uint8_t>;
 
 // Format
 // ------
@@ -70,12 +72,11 @@ public:
 };
 
 struct BIT_DEVICE_WRITE {
-	char rack;
-	uint8_t mask;
+	BYTE_BUFFER_GROWABLE buffer;
+	uint8_t bit_cursor:3 = 0;
 
 	void PutBit(uint8_t bit);
 	void PutBits(uint32_t bits,unsigned int bitcount);
-	void PutChar(char c);
 };
 
 struct FILE_BUFFER {

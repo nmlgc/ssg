@@ -7,9 +7,6 @@
 #include <io.h>
 #include <numeric>
 
-PBG_FILEHEAD FileHead;
-PBG_FILEINFO *FileInfo;
-
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;
 constexpr auto LZSS_SEQ_MIN = 3;
@@ -117,10 +114,6 @@ uint32_t BIT_DEVICE_READ::GetBits(unsigned int bitcount)
 	return (window >> (32 - bitcount));
 }
 
-void BIT_DEVICE_READ::Compress(PACKFILE_WRITE &out,fil_no_t filno) const
-{
-}
-
 void BIT_DEVICE_WRITE::PutBit(uint8_t bit)
 {
 	auto& byte = ((bit_cursor == 0)
@@ -199,8 +192,104 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 	return std::move(uncompressed);
 }
 
-void PACKFILE_WRITE::WriteHead() const
+BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)
 {
+	constexpr auto DICT_WINDOW = ((1 << LZSS_DICT_BITS) - LZSS_SEQ_MAX);
+
+	BIT_DEVICE_WRITE device;
+	fil_size_t in_i = 0;
+
+	while(in_i < buffer.size()) {
+		unsigned int seq_offset = 0;
+		unsigned int seq_length = 0;
+		unsigned int dict_i = ((in_i > DICT_WINDOW) ? (in_i - DICT_WINDOW) : 1);
+		while((dict_i < in_i) && (seq_length < LZSS_SEQ_MAX)) {
+			unsigned int length_new = 0;
+			while(length_new < LZSS_SEQ_MAX) {
+				if((in_i + length_new) >= buffer.size()) {
+					break;
+				}
+				if(buffer[dict_i + length_new] != buffer[in_i + length_new]) {
+					break;
+				}
+				length_new++;
+			}
+			if((length_new > seq_length)) {
+				// ([seq_offset] == LZSS_DICT_MASK) would cause the in-file
+				// offset to overflow back to 0, which is interpreted as the
+				// "sentinel offset" that causes the original game to stop
+				// decompressing.
+				// (That's why offsets are 1-based to begin with.)
+				if((dict_i & LZSS_DICT_MASK) != LZSS_DICT_MASK) {
+					seq_length = length_new;
+					seq_offset = dict_i;
+				}
+			}
+			dict_i++;
+		}
+		if(seq_length < LZSS_SEQ_MIN) {
+			auto literal = buffer[in_i];
+			device.PutBit(true);
+			device.PutBits(literal, 8);
+			in_i++;
+		} else {
+			device.PutBit(false);
+			device.PutBits((seq_offset + 1), LZSS_DICT_BITS);
+			device.PutBits((seq_length - LZSS_SEQ_MIN), LZSS_SEQ_BITS);
+			in_i += seq_length;
+		}
+	}
+
+	// Write the sentinel offset
+	device.PutBit(false);
+	device.PutBits(0, LZSS_DICT_BITS);
+
+	return device.buffer;
+}
+
+bool PACKFILE_WRITE::Write(const char *s) const
+{
+	PBG_FILEHEAD head = { .n = files.size() };
+	std::vector<PBG_FILEINFO> info(files.size());
+
+	auto write_header = [&head, &info](FILE *fp) {
+		return (
+			(fwrite(&head, sizeof(head), 1, fp) != 1) ||
+			(fwrite(info.data(), (info.size() * sizeof(info[0])), 1, fp) != 1)
+		);
+	};
+
+	auto fp = fopen(s, "wb");
+	if(!fp) {
+		return false;
+	}
+
+	// Write temporary header
+	if(write_header(fp)) {
+		return false;
+	}
+
+	// Compress and write files
+	for(fil_no_t i = 0; i < files.size(); i++) {
+		auto compressed = Compress(files[i]);
+
+		info[i].offset = ftell(fp);
+		info[i].size_uncompressed = files[i].size();
+		info[i].checksum_compressed = FilChecksumAddFile(
+			head.sum, info[i].offset, info[i].size_uncompressed, compressed
+		);
+		if(fwrite(compressed.data(), compressed.size(), 1, fp) != 1) {
+			return false;
+		}
+	}
+
+	// Write real header
+	rewind(fp);
+	if(write_header(fp)) {
+		return false;
+	}
+	fclose(fp);
+	return true;
 }
 
 std::optional<BIT_FILE_READ> BitFilCreateR(const char *s)
@@ -268,9 +357,4 @@ std::optional<PACKFILE_READ> FilStartR(const char *s)
 	}
 
 	return std::make_optional<PACKFILE_READ>(std::move(packfile), info);
-}
-
-PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filecount)
-{
-	return nullptr;
 }

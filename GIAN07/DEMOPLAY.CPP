@@ -182,25 +182,12 @@ FVOID ReplaySave(void)
 	if(GameStage == GRAPH_ID_EXSTAGE) strcpy(buf, "秋霜りぷEx.DAT");
 	else                              sprintf(buf, "秋霜りぷ%d.DAT", GameStage);
 
-	// 仮ヘッダね //
-	FileHead.name = PBG_HEADNAME;
-	FileHead.n    = 2;
-	FileHead.sum  = 0;
-
-	auto out = FilStartW(buf,FileHead.n);
-	if(NULL == out) return;
-
-	fwrite(&FileHead,sizeof(PBG_FILEHEAD),1,out->file);
-	fwrite(FileInfo,sizeof(PBG_FILEINFO),FileHead.n,out->file);
-
-	BIT_DEVICE_READ{ &DemoInfo, sizeof(DEMOPLAY_INFO) }.Compress(
-		*out, 0
-	);
-	BIT_DEVICE_READ{ DemoBuffer, (sizeof(WORD) * DemoInfo.DataSize) }.Compress(
-		*out, 1
-	);
-
-	out->WriteHead();
+	const auto demo_size = (sizeof(WORD) * DemoInfo.DataSize);
+	PACKFILE_WRITE out = { {
+		{ reinterpret_cast<uint8_t *>(&DemoInfo), sizeof(DEMOPLAY_INFO) },
+		{ reinterpret_cast<uint8_t *>(DemoBuffer), demo_size }
+	} };
+	out.Write(buf);
 }
 
 

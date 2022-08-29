@@ -36,8 +36,6 @@ struct PBG_FILEINFO {
 };
 // ------
 
-struct PACKFILE_WRITE;
-
 class BIT_DEVICE_READ {
 	struct {
 		size_t byte = 0;
@@ -67,8 +65,6 @@ public:
 	// Returns 0xFFFFFFFF if we're at the end of the stream. Supports a maximum
 	// of 24 bits.
 	uint32_t GetBits(unsigned int bitcount);
-
-	void Compress(PACKFILE_WRITE &out,fil_no_t filno) const;
 };
 
 struct BIT_DEVICE_WRITE {
@@ -109,15 +105,10 @@ struct PACKFILE_READ {
 };
 
 struct PACKFILE_WRITE {
-	FILE *file;
+	std::vector<BYTE_BUFFER_BORROWED> files;
 
-	void WriteHead() const;
+	bool Write(const char *s) const;
 };
 
-extern PBG_FILEHEAD FileHead;
-extern PBG_FILEINFO *FileInfo;
-
 std::optional<BIT_FILE_READ> BitFilCreateR(const char *s);
-
 std::optional<PACKFILE_READ> FilStartR(const char *s);
-PACKFILE_WRITE *FilStartW(const char *s,fil_no_t filno);

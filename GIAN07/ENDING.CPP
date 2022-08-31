@@ -45,7 +45,7 @@ EndingStTask	EStfTask;
 EndingText		EText;
 
 // フォント情報格納用ね //
-ExtraFontInfo	*pFontInfo[6];
+ExtraFontInfo	*pFontInfo[7];
 ExtraFontInfo	*pMember[7];
 
 // フラッシュの状態 //
@@ -143,7 +143,7 @@ FVOID EndingCleanup()
 {
 	int		i;
 
-	for(i=0; i<6; i++){
+	for(i=0; i<7; i++){
 		DeleteExtraFont(pFontInfo[i]);
 	}
 

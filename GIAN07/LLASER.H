@@ -14,8 +14,6 @@
 //            : 発射しているレーザーの何番目か、に変更された
 
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
 #include "ENEMY.h"
 
 

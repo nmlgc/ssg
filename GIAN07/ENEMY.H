@@ -20,9 +20,6 @@
  *
  */
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
 #include "ECL.H"
 #include "TAMA.H"
 #include "LASER.H"

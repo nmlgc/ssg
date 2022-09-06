@@ -27,10 +27,6 @@
  */
 
 
-#include <windows.h>
-
-
-
 ////レーザー定数////
 #define LASER_MAX			1000			// レーザーの最大発生本数
 #define RT_MAX				10				// 反射物の最大個数

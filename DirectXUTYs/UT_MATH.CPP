@@ -10,8 +10,8 @@
 #define RANDH	0x015a
 #define RANDL	0x4e35
 
-static DWORD random_seed; // 乱数のたね //
-//DWORD random_ref;
+static uint32_t random_seed; // 乱数のたね //
+//uint32_t random_ref;
 
 
 ////ｓｉｎテーブル(ｃｏｓを含む)////
@@ -61,33 +61,33 @@ static const char ATAN256[]={
 };
 
 
-long __fastcall sinl(BYTE deg,int length)
+long __fastcall sinl(uint8_t deg,int length)
 {
 	//return ((long)sinm(deg)*length)/256;
 	return ((long)sinm(deg)*length)>>8;
 }
 
-long __fastcall cosl(BYTE deg,int length)
+long __fastcall cosl(uint8_t deg,int length)
 {
 	//return ((long)cosm(deg)*length)/256;
 	return ((long)cosm(deg)*length)>>8;
 }
 
 // length*256/(SIN(deg)>0 ? SIN(deg) : 256) //
-long __fastcall sinDiv(BYTE deg, int length)
+long __fastcall sinDiv(uint8_t deg, int length)
 {
 	int sind = sinm(deg);
 	return (length<<8) / (sind>0 ? sind : 256);
 }
 
 // length*256/(COS(deg)>0 ? COS(deg) : 256) //
-long __fastcall cosDiv(BYTE deg, int length)
+long __fastcall cosDiv(uint8_t deg, int length)
 {
 	int cosd = cosm(deg);
 	return (length<<8) / (cosd>0 ? cosd : 256);
 }
 
-BYTE __stdcall atan8(int x,int y)
+uint8_t __stdcall atan8(int x,int y)
 {
 	_asm{
 			PUSH	ESI
@@ -160,7 +160,7 @@ BYTE __stdcall atan8(int x,int y)
 	}
 }
 
-void __fastcall rnd_seed_set(DWORD val)
+void __fastcall rnd_seed_set(uint32_t val)
 {
 	random_seed = val;
 }
@@ -191,7 +191,7 @@ int isqrt(int s)
 	}
 }
 
-WORD __fastcall rnd(void)
+uint16_t __fastcall rnd(void)
 {
 	_asm{
 		MOV	AX,RANDL

@@ -17,7 +17,7 @@
 
 
 // ヘッダファイル //
-#include <windows.h>
+#include <stdint.h>
 
 
 // マクロ //
@@ -36,12 +36,12 @@ extern const signed int *COS256;
 
 
 // 三角関数2 //
-long __fastcall sinl(BYTE deg,int length);	// SIN(deg)*length/256
-long __fastcall cosl(BYTE deg,int length);	// COS(deg)*length/256
-long __fastcall sinDiv(BYTE deg, int length);	// length*256/(SIN(deg)>0 ? SIN(deg) : 256)
-long __fastcall cosDiv(BYTE deg, int length);	// length*256/(COS(deg)>0 ? COS(deg) : 256)
+long __fastcall sinl(uint8_t deg,int length);	// SIN(deg)*length/256
+long __fastcall cosl(uint8_t deg,int length);	// COS(deg)*length/256
+long __fastcall sinDiv(uint8_t deg, int length);	// length*256/(SIN(deg)>0 ? SIN(deg) : 256)
+long __fastcall cosDiv(uint8_t deg, int length);	// length*256/(COS(deg)>0 ? COS(deg) : 256)
 
-BYTE __stdcall atan8(int x,int y);				// ３２ビット版です
+uint8_t __stdcall atan8(int x,int y);				// ３２ビット版です
 
 
 // 平方根(整数版) //
@@ -49,12 +49,12 @@ int isqrt(int s);
 
 
 // 乱数 //
-void __fastcall rnd_seed_set(DWORD val);
-WORD __fastcall rnd(void);
+void __fastcall rnd_seed_set(uint32_t val);
+uint16_t __fastcall rnd(void);
 
 
 // デバッグ用(後で消すこと) //
-//extern DWORD random_ref;
+//extern uint32_t random_ref;
 
 
 // 使用禁止かな //

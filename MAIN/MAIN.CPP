@@ -10,7 +10,7 @@ void XMain(void);
 BOOL XInit(void);
 void XCleanup(void);
 
-long FAR PASCAL WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 static BOOL AppInit(HINSTANCE hInstance,int nCmdShow);
 static void AppCleanup(void);
 
@@ -24,7 +24,7 @@ BOOL	bMouseVisible;
 DWORD	WaitTime;
 
 
-int PASCAL WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
+int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
 {
 	MSG			msg;
 	HWND		old_gian;
@@ -77,7 +77,7 @@ int PASCAL WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,i
 }
 
 
-long FAR PASCAL WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
+long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	PAINTSTRUCT		ps;
 	HDC				hdc;

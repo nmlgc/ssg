@@ -17,7 +17,7 @@
 
 
 // 関数 //
-int  pascal Grp_PClip(POINT *dest,POINT *src,int n);		// ポリゴン用クリッピング
+int  __stdcall Grp_PClip(POINT *dest,POINT *src,int n);		// ポリゴン用クリッピング
 
 
 #define OUTCODE_X		0x03

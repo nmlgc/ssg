@@ -10,7 +10,7 @@ FRAGMENT_DATA	Fragment[FRAGMENT_MAX];		// 破片データ管理用構造体
 int				FragmentPtr = 0;			// 次に破片データを挿入する位置
 
 
-static void pascal _FDraw(FRAGMENT_DATA *f);
+static void __stdcall _FDraw(FRAGMENT_DATA *f);
 
 
 void fragment_set(int x,int y,BYTE cmd)
@@ -150,7 +150,7 @@ void fragment_setup(void)
 	FragmentPtr = 0;
 }
 
-static void pascal _FDraw(FRAGMENT_DATA *f)
+static void __stdcall _FDraw(FRAGMENT_DATA *f)
 {
 	int		x,y;
 	RECT	src;

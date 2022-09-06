@@ -45,9 +45,9 @@ extern BOOL SetColorKey(DXSURFACE *surf);
 static BOOL CreateZbuffer(XD3DENUM *D3De);
 
 // 列挙用コールバック関数群 //
-static BOOL FAR PASCAL DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDName,LPVOID lpContext);
-static HRESULT FAR PASCAL DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR lpdeviceName,LPD3DDEVICEDESC lpHWDesc,LPD3DDEVICEDESC lpHELDesc,LPVOID lpContext);
-static HRESULT FAR PASCAL ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo);
+static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDName,LPVOID lpContext);
+static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR lpdeviceName,LPD3DDEVICEDESC lpHWDesc,LPD3DDEVICEDESC lpHELDesc,LPVOID lpContext);
+static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo);
 
 // デバイスが求める性能を持っているか //
 static BOOL ConfirmDevice3D(LPD3DDEVICEDESC lpDesc);
@@ -837,7 +837,7 @@ static BOOL CreateZbuffer(XD3DENUM *D3De)
 	return TRUE;
 }
 
-static BOOL FAR PASCAL DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDName,LPVOID lpContext)
+static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDName,LPVOID lpContext)
 {
 	HRESULT			dxret;
 	LPDIRECTDRAW	lpDD  = NULL;
@@ -877,7 +877,7 @@ static BOOL FAR PASCAL DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDName,L
 	return DDENUMRET_OK;
 }
 
-static HRESULT FAR PASCAL DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR lpdeviceName,
+static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR lpdeviceName,
 						LPD3DDEVICEDESC lpHWDesc,LPD3DDEVICEDESC lpHELDesc,LPVOID lpContext)
 {
 	BOOL		hw_flag;
@@ -945,7 +945,7 @@ static BOOL ConfirmDevice3D(LPD3DDEVICEDESC lpDesc)
 	return TRUE;
 }
 
-static HRESULT FAR PASCAL ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
+static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 {
 	XDDRAWENUM		*xenum = (XDDRAWENUM *)pInfo;
 	int				color;

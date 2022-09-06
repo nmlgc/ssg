@@ -87,7 +87,7 @@ long __fastcall cosDiv(BYTE deg, int length)
 	return (length<<8) / (cosd>0 ? cosd : 256);
 }
 
-BYTE pascal atan8(int x,int y)
+BYTE __stdcall atan8(int x,int y)
 {
 	_asm{
 			PUSH	ESI

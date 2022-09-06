@@ -41,7 +41,7 @@ long __fastcall cosl(BYTE deg,int length);	// COS(deg)*length/256
 long __fastcall sinDiv(BYTE deg, int length);	// length*256/(SIN(deg)>0 ? SIN(deg) : 256)
 long __fastcall cosDiv(BYTE deg, int length);	// length*256/(COS(deg)>0 ? COS(deg) : 256)
 
-BYTE pascal atan8(int x,int y);				// ３２ビット版です
+BYTE __stdcall atan8(int x,int y);				// ３２ビット版です
 
 
 // 平方根(整数版) //

@@ -52,14 +52,14 @@
 // 型 //
 typedef	LPDIRECTDRAWSURFACE	GRP;
 
-#define PVOID	void pascal
-#define PBOOL	BOOL pascal
-#define PGRP	GRP  pascal
-#define PINT	int  pascal
+#define PVOID	void __stdcall
+#define PBOOL	BOOL __stdcall
+#define PGRP	GRP  __stdcall
+#define PINT	int  __stdcall
 
-#define PVOIDFN(fn)		void (pascal fn)
-#define PBOOLFN(fn)		BOOL (pascal fn)
-#define PGRPFN(fn)		GRP  (pascal fn)
+#define PVOIDFN(fn)		void (__stdcall fn)
+#define PBOOLFN(fn)		BOOL (__stdcall fn)
+#define PGRPFN(fn)		GRP  (__stdcall fn)
 
 #define FVOID	void __fastcall
 #define FBOOL	BOOL __fastcall

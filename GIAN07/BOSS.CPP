@@ -3,9 +3,9 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "BOSS.h"
+#include "BOSS.H"
 #include "EnemyExCtrl.h"
-#include "../DirectXUTYs/DD_GRP3D.h"
+#include "../DirectXUTYs/DD_GRP3D.H"
 
 
 // 公開グローバル //

@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "Score.h"
+#include "SCORE.H"
 
 //#define PBG_MASK_VALUE		((DWORDLONG)0x342d3a4de92c68ba)
 //#define PBG_MASK_VALUE		((DWORDLONG)0xe92cd3a4d8ba6342)

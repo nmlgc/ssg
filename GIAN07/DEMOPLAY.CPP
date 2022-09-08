@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DemoPlay.h"
+#include "DEMOPLAY.H"
 
 
 BOOL			DemoplaySaveEnable = FALSE;		// デモプレイのセーブが動作しているか

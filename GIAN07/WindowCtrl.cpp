@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "WINDOWCTRL.h"
+#include "WindowCtrl.h"
 
 
 

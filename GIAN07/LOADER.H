@@ -7,8 +7,8 @@
 #define PBGWIN_LOADER_H		"LOADER : Version 0.10 : Update 2000/02/18"
 //#pragma message(PBGWIN_LOADER_H)
 
-#include "GIAN.h"
-#include "Lens.h"
+#include "GIAN.H"
+#include "LENS.H"
 
 
 ///// [ 定数 ] /////

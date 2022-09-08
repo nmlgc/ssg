@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "CALC.h"
+#include "Calc.h"
 
 /*
  * [新機能]

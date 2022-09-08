@@ -8,7 +8,7 @@
 #define PBGWIN_HOMINGL_H		"HOMINGL : Ver 0.01 : Updata 2000/09/04"
 //#pragma message(PBGWIN_HOMINGL_H)
 
-#include "GIAN.h"
+#include "GIAN.H"
 
 
 

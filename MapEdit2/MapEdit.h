@@ -9,8 +9,8 @@
 #define PBGWIN_MAPEDIT_H	"MapEdit : "MAPEDIT2_VERSION" Update 2000/02/01"
 #pragma message(PBGWIN_MAPEDIT_H)
 
-#include "PBGUTY_X.h"
-#include "../Gian07SrcFiles/SCROLL.h"
+#include "PBGUTY_X.H"
+#include "../Gian07SrcFiles/SCROLL.H"
 
 
 // グラフィック関連定数 //

@@ -3,7 +3,7 @@
  *
  */
 
-#include "BombEfc.h"
+#include "BOMBEFC.H"
 
 
 BombEfcCtrl		BombEfc[EXBOMB_MAX];

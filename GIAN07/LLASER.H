@@ -14,7 +14,7 @@
 //            : 発射しているレーザーの何番目か、に変更された
 
 
-#include "ENEMY.h"
+#include "ENEMY.H"
 
 
 

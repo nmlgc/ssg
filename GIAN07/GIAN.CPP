@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "GIAN.h"
+#include "GIAN.H"
 #include <time.h>
 
 

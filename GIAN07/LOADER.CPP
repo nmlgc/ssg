@@ -3,8 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "LOADER.h"
-#include "Lens.h"
+#include "LOADER.H"
+#include "LENS.H"
 
 
 // グローバル変数 //

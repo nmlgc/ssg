@@ -19,11 +19,11 @@
 #endif
 */
 
-#include "DD_UTY.h"				// DDraw & D3D
-#include "DS_UTY.h"				// DSound
-#include "DI_UTY.h"				// DInput
-#include "UT_MATH.h"			// 整数用数学関数
-#include "PBGMIDI.h"			// MIDI 操作
+#include "DD_UTY.H"				// DDraw & D3D
+#include "DS_UTY.H"				// DSound
+#include "DI_UTY.H"				// DInput
+#include "UT_MATH.H"			// 整数用数学関数
+#include "PBGMIDI.H"			// MIDI 操作
 
 
 #ifdef _DEBUG

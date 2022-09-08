@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "UT_MATH.h"
+#include "UT_MATH.H"
 #pragma message(PBGWIN_UT_MATH_H)
 
 

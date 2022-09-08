@@ -12,7 +12,7 @@
 
 
 // ヘッダファイル //
-#include "PBGUTY_X.h"
+#include "PBGUTY_X.H"
 
 
 // 関数 //

@@ -11,7 +11,7 @@
 
 
 #include "TYPE.H"
-#include "CALC.H"
+#include "Calc.h"
 #include "PBG_FILE.H"
 
 #include "ECL.H"

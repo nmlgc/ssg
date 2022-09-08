@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "Effect3D.h"
+#include "EFFECT3D.H"
 
 #define TRIANGLE_MAX		50
 #define CIRCLE_MAX			40

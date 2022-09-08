@@ -3,14 +3,14 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DD_UTY.h"
-#include "D3_TEX.h"
+#include "DD_UTY.H"
+#include "D3_TEX.H"
 #include <io.h>
 #pragma message(PBGWIN_D3_TEX_H)
 
 
 // ヘッダファイル //
-#include "DX_TYPE.h"
+#include "DX_TYPE.H"
 
 
 // 構造体 //

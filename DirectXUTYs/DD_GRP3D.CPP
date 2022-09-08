@@ -3,9 +3,9 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DD_UTY.h"
-#include "DD_GRP3D.h"
-#include "UT_MATH.h"
+#include "DD_UTY.H"
+#include "DD_GRP3D.H"
+#include "UT_MATH.H"
 #pragma message(PBGWIN_DD_GRP3D_H)
 
 

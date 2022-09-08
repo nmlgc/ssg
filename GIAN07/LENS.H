@@ -7,7 +7,7 @@
 #define PBGWIN_LENS_H		"LENS_EFC : Version 0.01 : Update 2000/09/18"
 #pragma message(PBGWIN_LENS_H)
 
-#include "PBGUTY_X.h"
+#include "PBGUTY_X.H"
 
 
 

@@ -6,7 +6,7 @@
 #define DIRECTSOUND_VERSION 0x0700
 
 #include <dsound.h>
-#include "DS_UTY.h"
+#include "DS_UTY.H"
 #pragma message(PBGWIN_DS_UTY_H)
 
 #pragma comment(lib,"dsound.lib")

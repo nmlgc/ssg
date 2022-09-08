@@ -7,7 +7,7 @@
 #define PBGWIN_MAID_H		"めいど : Version 0.01 : Update 2000/02/17"
 //#pragma message(PBGWIN_MAID_H)
 
-#include "Gian.h"
+#include "GIAN.H"
 
 
 

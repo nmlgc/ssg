@@ -22,9 +22,9 @@
 
 
 // ヘッダファイル //
-#include "DX_TYPE.h"					// 型＆マクロ
-#include "DX_ERROR.h"					// エラー処理用関数
-#include "LZ_UTY.h"						// 圧縮管理用
+#include "DX_TYPE.H"					// 型＆マクロ
+#include "DX_ERROR.H"					// エラー処理用関数
+#include "LZ_UTY.H"						// 圧縮管理用
 #include "MtoB.h"						// スクリーンキャプチャー
 
 

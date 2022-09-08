@@ -18,7 +18,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 //#pragma comment(lib,"winmm.lib")
-#include "LZ_UTY.h"
+#include "LZ_UTY.H"
 
 
 #define MIDFN_NOPLAY	0x00	// 再生しない

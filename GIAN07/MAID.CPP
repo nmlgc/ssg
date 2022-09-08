@@ -3,8 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "Maid.h"
-#include "DD_GRP3D.h"
+#include "MAID.H"
+#include "DD_GRP3D.H"
 
 
 MAID			Viv;					// 麗しきメイドさん構造体

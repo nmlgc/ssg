@@ -3,7 +3,7 @@
  *
  */
 
-#include "Ending.h"
+#include "ENDING.H"
 
 
 typedef struct tagEndingGrpInfo {

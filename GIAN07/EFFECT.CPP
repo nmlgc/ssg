@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "EFFECT.h"
+#include "EFFECT.H"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];
@@ -706,7 +706,7 @@ FVOID ObjectLockDraw(void)
 
 
 
-#include "DD_GRP3D.h"
+#include "DD_GRP3D.H"
 // スペアナ描画 //
 FVOID GrpDrawSpect(int x,int y)
 {

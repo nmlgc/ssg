@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "FONTUTY.h"
+#include "FONTUTY.H"
 
 // ヒミツの関数 //
 void __FillExpoint(EXPOINT *p, int x, int y, int w, int h);

@@ -3,9 +3,9 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DD_UTY.h"
-#include "DD_GRP2D.h"					// ２Ｄ用描画関数(公開しないこと)
-#include "DD_GRP3D.h"					// ３Ｄ用描画関数(公開しないこと)
+#include "DD_UTY.H"
+#include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
+#include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
 #include <stdio.h>
 #include <io.h>
 #pragma message(PBGWIN_DD_UTY_H)

@@ -21,36 +21,36 @@
 
 
 ///// [Include Files] /////
-#include "PBGUTY_X.h"			// DirectX & その他の関数統合
-#include "ExDef.h"				// 色々な定義
-#include "WINDOWSYS.h"			// ウィンドウシステム本体
-#include "WINDOWCTRL.h"			// ウィンドウ定義
-#include "FONTUTY.h"			// フォント管理(GrpPut系,CrateFont系)
+#include "PBGUTY_X.H"			// DirectX & その他の関数統合
+#include "EXDEF.H"				// 色々な定義
+#include "WindowSys.h"			// ウィンドウシステム本体
+#include "WindowCtrl.h"			// ウィンドウ定義
+#include "FONTUTY.H"			// フォント管理(GrpPut系,CrateFont系)
 
-#include "ECL.h"				// ＥＣＬ定義ファイル
-#include "SCL.h"				// ＳＣＬ定義ファイル
-#include "ENEMY.h"				// 敵の移動処理など
-#include "BOSS.h"				// ボスの定義＆ボス用エフェクトなど
+#include "ECL.H"				// ＥＣＬ定義ファイル
+#include "SCL.H"				// ＳＣＬ定義ファイル
+#include "ENEMY.H"				// 敵の移動処理など
+#include "BOSS.H"				// ボスの定義＆ボス用エフェクトなど
 //#include "EnemyExCtrl.h"		// 特殊動作処理
 
-#include "PrankCtrl.h"			// プレイランク管理
-#include "GAMEMAIN.h"			// メインのルーチン切り替え処理
-#include "EFFECT.h"				// 主にテキストベースのエフェクト処理
-#include "EFFECT3D.h"			// ３Ｄエフェクト
-#include "FRAGMENT.h"			// 破片系エフェクト処理
-#include "BOMBEFC.h"			// 爆発エフェクト処理
-#include "TAMA.h"				// 敵弾処理
-#include "LASER.h"				// 短いレーザー＆リフレクトレーザー処理
-#include "LLASER.h"				// なが～いレーザーの処理
-#include "HOMINGL.h"			// ホーミングレーザーの処理
-#include "MAIDTAMA.h"			// 自機ショットの処理
-#include "MAID.h"				// その名の通り
-#include "SCROLL.h"				// 背景スクロール＆ＳＣＬ管理
-#include "LOADER.h"				// 各種ローダー
+#include "PRankCtrl.h"			// プレイランク管理
+#include "GAMEMAIN.H"			// メインのルーチン切り替え処理
+#include "EFFECT.H"				// 主にテキストベースのエフェクト処理
+#include "EFFECT3D.H"			// ３Ｄエフェクト
+#include "FRAGMENT.H"			// 破片系エフェクト処理
+#include "BOMBEFC.H"			// 爆発エフェクト処理
+#include "TAMA.H"				// 敵弾処理
+#include "LASER.H"				// 短いレーザー＆リフレクトレーザー処理
+#include "LLASER.H"				// なが～いレーザーの処理
+#include "HOMINGL.H"			// ホーミングレーザーの処理
+#include "MAIDTAMA.H"			// 自機ショットの処理
+#include "MAID.H"				// その名の通り
+#include "SCROLL.H"				// 背景スクロール＆ＳＣＬ管理
+#include "LOADER.H"				// 各種ローダー
 
-#include "Item.h"				// アイテム処理
+#include "ITEM.H"				// アイテム処理
 
-#include "Score.h"
+#include "SCORE.H"
 
 
 ///// [ 定数 ] /////
@@ -237,7 +237,7 @@ _inline void BltSetRect(RECT *rc,int x1,int y1,int x2,int y2)
 
 
 //// 諸事情につき... ////
-#include "DemoPlay.h"			// デモプレイ処理
+#include "DEMOPLAY.H"			// デモプレイ処理
 
 
 #endif

@@ -16,8 +16,8 @@
 
 
 ///// [Include Files] /////
-#include "Gian.h"
-#include "Ending.h"
+#include "GIAN.H"
+#include "ENDING.H"
 
 
 

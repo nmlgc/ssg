@@ -3,8 +3,8 @@
 #include <conio.h>
 #include <time.h>
 
-#include "CALC.H"
-#include "ECLCDEF.H"
+#include "Calc.h"
+#include "Eclcdef.h"
 #include "../Gian07SrcFiles/GIAN.H"
 
 /*                                                                                               *

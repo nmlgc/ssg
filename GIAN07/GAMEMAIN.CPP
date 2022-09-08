@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "GAMEMAIN.h"
+#include "GAMEMAIN.H"
 
 
 extern HWND hWndMain;

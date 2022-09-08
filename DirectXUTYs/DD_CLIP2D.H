@@ -13,7 +13,7 @@
 
 
 // ヘッダファイル //
-#include "DX_TYPE.h"
+#include "DX_TYPE.H"
 
 
 // 関数 //

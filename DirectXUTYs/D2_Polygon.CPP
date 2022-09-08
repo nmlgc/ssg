@@ -3,8 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "D2_Polygon.h"
-#include "DD_CLIP2D.h"
+#include "D2_Polygon.H"
+#include "DD_CLIP2D.H"
 
 
 static LINE_WORK TZOID_A,TZOID_B;

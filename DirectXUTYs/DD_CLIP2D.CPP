@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DD_CLIP2D.h"
+#include "DD_CLIP2D.H"
 #pragma message(PBGWIN_DD_CLIP2D_H)
 
 

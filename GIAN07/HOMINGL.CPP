@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "HomingL.h"
+#include "HOMINGL.H"
 
 #define HOMINGL_WIDTH	(8*64)
 

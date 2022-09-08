@@ -9,7 +9,7 @@
 #include <conio.h>
 #include <time.h>
 
-#include "CALC.H"
+#include "Calc.h"
 #include "../Gian07SrcFiles/GIAN.H"
 
 // ログファイル名(定義しない場合、ログを出力しない) //

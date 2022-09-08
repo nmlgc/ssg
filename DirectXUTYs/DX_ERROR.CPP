@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DX_ERROR.h"
+#include "DX_ERROR.H"
 #include <time.h>
 #pragma message(PBGWIN_DX_ERROR_H)
 

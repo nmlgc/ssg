@@ -3,8 +3,8 @@
  *
  */
 
+#include "platform/file.h"
 #include "LZ_UTY.H"
-#include <io.h>
 #include <numeric>
 
 constexpr auto LZSS_DICT_BITS = 13;
@@ -12,32 +12,6 @@ constexpr auto LZSS_SEQ_BITS = 4;
 constexpr auto LZSS_SEQ_MIN = 3;
 constexpr auto LZSS_DICT_MASK = ((1 << LZSS_DICT_BITS) - 1);
 constexpr auto LZSS_SEQ_MAX = (LZSS_SEQ_MIN + ((1 << LZSS_SEQ_BITS) - 1));
-
-std::optional<BYTE_BUFFER_OWNED> FilBufferCreateR(const char *s)
-{
-	auto fp = fopen(s, "rb");
-	if(!fp) {
-		return std::nullopt;
-	}
-
-	auto size64 = _filelengthi64(fileno(fp));
-	if(size64 > std::numeric_limits<fil_size_t>::max()) {
-		return std::nullopt;
-	}
-	const fil_size_t size = size64;
-
-	auto buf = BYTE_BUFFER_OWNED{ size };
-	if(!buf) {
-		return std::nullopt;
-	}
-
-	if(fread(buf.get(), size, 1, fp) != 1) {
-		return std::nullopt;
-	}
-	fclose(fp);
-
-	return std::move(buf);
-}
 
 template <typename Container> fil_checksum_t FilChecksumAddFile(
 	fil_checksum_t &current_total,
@@ -290,7 +264,7 @@ bool PACKFILE_WRITE::Write(const char *s) const
 
 std::optional<BIT_FILE_READ> BitFilCreateR(const char *s)
 {
-	auto maybe_file = FilBufferCreateR(s);
+	auto maybe_file = FileLoad(s);
 	if(!maybe_file) {
 		return std::nullopt;
 	}
@@ -299,7 +273,7 @@ std::optional<BIT_FILE_READ> BitFilCreateR(const char *s)
 
 std::optional<PACKFILE_READ> FilStartR(const char *s)
 {
-	auto maybe_packfile = FilBufferCreateR(s);
+	auto maybe_packfile = FileLoad(s);
 	if(!maybe_packfile) {
 		return std::nullopt;
 	}

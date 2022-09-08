@@ -3,11 +3,11 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "platform/file.h"
 #include "DD_UTY.H"
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
 #include <stdio.h>
-#include <io.h>
 #pragma message(PBGWIN_DD_UTY_H)
 
 
@@ -447,26 +447,10 @@ FBOOL GrpReleaseSurface(BYTE surf_id)
 
 FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
 {
-	FILE	*fp;
-	size_t	size;
-
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	// 以前に何かがロードされていたら解放する //
-	GrpBMFree(surf_id);
-
-	fp = fopen(filename,"rb");
-	if(fp==NULL) return FALSE;
-
-	size = filelength(fileno(fp));
-	DxSurf[surf_id].img = BYTE_BUFFER_OWNED{ size };
-	if(DxSurf[surf_id].img==NULL){
-		fclose(fp);
-		return FALSE;
-	}
-
-	fread(DxSurf[surf_id].img.get(),1,size,fp);
-	fclose(fp);
+	DxSurf[surf_id].img = FileLoad(filename);
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }
@@ -476,9 +460,7 @@ FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id)
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	// 以前に何かがロードされていたら解放する //
-	GrpBMFree(surf_id);
-
-	if((DxSurf[surf_id].img=in.MemExpand(n))==NULL) return FALSE;
+	DxSurf[surf_id].img=in.MemExpand(n);
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }
@@ -751,6 +733,10 @@ static BOOL GrpBMLoadMemory(DXSURFACE *surf)
 	HDC						hdc,hdcmem;
 	HBITMAP					hbmp;
 
+
+	if(!surf->img) {
+		return false;
+	}
 
 	BMP_file = (BITMAPFILEHEADER *)surf->img.get();
 	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);

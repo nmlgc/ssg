@@ -5,7 +5,7 @@
 
 #include "DD_UTY.H"
 #include "D3_TEX.H"
-#include <io.h>
+#include "platform/file.h"
 #pragma message(PBGWIN_D3_TEX_H)
 
 
@@ -17,7 +17,6 @@
 typedef struct tagDXTEXTURE{
 	D3DTEXTUREHANDLE	hTexture;
 	GRP					surf;
-	BYTE				*img;
 } DXTEXTURE;
 
 
@@ -94,8 +93,6 @@ FBOOL TexCreateTexture(char *filename,DWORD txid)
 	HRESULT				dxret;
 	DXTEXTURE			*p;
 	GRP					temp = NULL;
-	FILE				*fp  = NULL;
-	long				size;
 	int					width,height;
 	LPDIRECT3DTEXTURE2	DevTexture = NULL;
 	LPDIRECT3DTEXTURE2	MemTexture = NULL;
@@ -109,23 +106,16 @@ FBOOL TexCreateTexture(char *filename,DWORD txid)
 		if(p->surf) throw("作成済み");
 
 		// ＢＭＰイメージをメモリに送る //
-		fp = fopen(filename,"rb");
-		if(fp==NULL) throw("ファイルにゃい");
+		const auto img = FileLoad(filename);
+		if(!img) throw("ファイルにゃい");
 
-		size = filelength(fileno(fp));
-		p->img = (BYTE *)LocalAlloc(LPTR,size);
-		if(p->img==NULL) throw("メモリ足りん");
-
-		fread(p->img,1,size,fp);
-		fclose(fp);
-
-		width  = TexGetWidth(p->img);
-		height = TexGetHeight(p->img);
+		width  = TexGetWidth(img.get());
+		height = TexGetHeight(img.get());
 
 		// 作業用 Surface //
 		temp = CreateTexSurface(width,height,DDSCAPS_SYSTEMMEMORY);
 		if(temp==0) throw("CTexSurf");
-		if(!BMP2SysMem(temp,p->img)) throw("BMP->MEM");
+		if(!BMP2SysMem(temp,img.get())) throw("BMP->MEM");
 
 		// テクスチャ用 Surface //
 		p->surf = CreateTexSurface(width,height,DDSCAPS_VIDEOMEMORY);
@@ -153,8 +143,6 @@ FBOOL TexCreateTexture(char *filename,DWORD txid)
 		RELEASE(DevTexture);
 		RELEASE(temp);
 		RELEASE(p->surf);
-		if(p->img) LocalFree(p->img);
-		if(fp) fclose(fp);
 
 		DebugOut(error);
 		return FALSE;
@@ -169,7 +157,6 @@ FVOID TexReleaseTexture(DWORD txid)
 
 	p = &DxTex[txid];
 
-	LocalFree(p->img);		// イメージ解放
 	RELEASE(p->surf);		// テクスチャ用Surface 解放
 	p->hTexture = NULL;		// ハンドルを使用不能にする(というか上の奴ですでに使用できない)
 }

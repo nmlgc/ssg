@@ -2,7 +2,6 @@ BASE = {
 	cflags = (
 		"/std:c++latest " ..
 		"/IDirectXUTYs " ..
-		"/DDIRECTSOUND_VERSION=0x0700 " ..
 		"/EHsc " ..
 		"/source-charset:utf-8 " ..
 		"/execution-charset:shift-jis "

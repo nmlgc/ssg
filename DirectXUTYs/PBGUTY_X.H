@@ -19,7 +19,6 @@
 #endif
 */
 
-#include "DX_TYPE.h"			// 型を定義
 #include "DD_UTY.h"				// DDraw & D3D
 #include "DS_UTY.h"				// DSound
 #include "DI_UTY.h"				// DInput

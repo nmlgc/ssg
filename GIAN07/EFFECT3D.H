@@ -15,7 +15,6 @@
 
 
 ///// [ヘッダファイル] /////
-#include "PBGUTY_X.h"
 #include "Gian.h"
 
 

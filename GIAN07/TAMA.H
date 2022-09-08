@@ -22,10 +22,6 @@
  */
 
 
-#include "PBGUTY_X.h"
-
-
-
 ////弾定数////
 #define TAMA_MAX	(801*3)		// 弾の最大発生数
 #define TAMA_EVADE	1			// 弾のかすり値

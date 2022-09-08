@@ -118,7 +118,7 @@ void Key_End(void)
 	char	buf[100];
 
 	sprintf(buf,"Dev:%x  DI:%x",InputObj.pdev,InputObj.pdi);
-	ErrInsert(buf);
+	DebugOut(buf);
 */
 	if(InputObj.pdev){
 		InputObj.pdev->Unacquire();

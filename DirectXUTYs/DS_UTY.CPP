@@ -58,7 +58,7 @@ FBOOL SndInit(HWND hWnd,int x_mid)
 		SndXMID = x_mid;
 	}
 	catch(char *error){
-		ErrInsert(error);
+		DebugOut(error);
 		SndCleanup();
 		return FALSE;
 	}
@@ -122,12 +122,12 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 
 	dsrval = Snd_DS->CreateSoundBuffer(&dsBD,&p->buf[0],NULL);
 	if(dsrval != DS_OK){
-		ErrInsert("CreateSoundBuffer に失敗");
+		DebugOut("CreateSoundBuffer に失敗");
 		return FALSE;
 	}
 
 	if(!SndFillBuffer(p->buf[0],p->data,p->size)){
-		ErrInsert("SndFillBuffer に失敗 (PBGUTY_X.LIB)");
+		DebugOut("SndFillBuffer に失敗 (PBGUTY_X.LIB)");
 		return FALSE;
 	}
 
@@ -198,12 +198,12 @@ FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
 
 	dsrval = Snd_DS->CreateSoundBuffer(&dsBD,&p->buf[0],NULL);
 	if(dsrval != DS_OK){
-		ErrInsert("CreateSoundBuffer に失敗");
+		DebugOut("CreateSoundBuffer に失敗");
 		return FALSE;
 	}
 
 	if(!SndFillBuffer(p->buf[0],p->data,p->size)){
-		ErrInsert("SndFillBuffer に失敗 (PBGUTY_X.LIB)");
+		DebugOut("SndFillBuffer に失敗 (PBGUTY_X.LIB)");
 		return FALSE;
 	}
 

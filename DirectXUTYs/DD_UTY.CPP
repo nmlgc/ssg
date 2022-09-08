@@ -103,14 +103,14 @@ FBOOL GrpEnum(HWND hWnd)
 		SetDummyFunc();
 	}
 	catch(char *error){
-		ErrInsert(error);
+		DebugOut(error);
 		return FALSE;
 	}
 
 	DxObj.hWnd = hWnd;
 
 #ifdef _DEBUG
-	ErrInsert("正常に列挙できたの");
+	DebugOut("正常に列挙できたの");
 #endif
 
 	return TRUE;
@@ -191,7 +191,7 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp)
 		throw(TRUE);
 	}
 	catch(char *error){
-		ErrInsert(error);
+		DebugOut(error);
 		GrpCleanup();
 		return FALSE;
 	}
@@ -255,7 +255,7 @@ FBOOL GrpInitEmu8(void)
 		DxObj.Bpp = 8;
 	}
 	catch(char *error){
-		ErrInsert(error);
+		DebugOut(error);
 		GrpCleanup();
 		return FALSE;
 	}

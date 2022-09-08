@@ -422,7 +422,7 @@ static FVOID BitSTDRoll(void)
 //			else        bit->Angle+=(ExSpeed-1);
 //			char	buf[100];
 //			sprintf(buf, "dir = %d    ExSpeed = %d", dir, ExSpeed);
-//			ErrInsert(buf);
+//			DebugOut(buf);
 		}
 		else if(dir < 0){
 			if(dir < -2) dir = -2;
@@ -433,7 +433,7 @@ static FVOID BitSTDRoll(void)
 //			else         bit->Angle-=(ExSpeed-1);
 //			char	buf[100];
 //			sprintf(buf, "dir = %d    ExSpeed = %d", dir, ExSpeed);
-//			ErrInsert(buf);
+//			DebugOut(buf);
 		}
 
 		// 力による影響を反映する //

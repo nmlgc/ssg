@@ -204,7 +204,6 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 
 
 	DebugSetup("ErrLOG2.txt");
-	ErrSetup();
 
 	// キーボード(JoyPad)入力を受け付ける //
 	Key_Start(hInstance,hWndMain);
@@ -232,7 +231,6 @@ static void AppCleanup(void)
 	Key_End();
 
 	ShowCursor(TRUE);
-	ErrCleanup();
 }
 
 BOOL XInit(void)

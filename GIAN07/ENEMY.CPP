@@ -1725,7 +1725,7 @@ void parse_ECL(ENEMY_DATA *e)
 				case(ECLCST_ENEMY_D):	e->d = (BYTE)dwTemp;	break;		// 敵の角度
 
 				default:
-					ErrInsert("ナゾのレジスタ指定++");
+					DebugOut("ナゾのレジスタ指定++");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1739,7 +1739,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1753,7 +1753,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1767,7 +1767,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1781,7 +1781,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしいに
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1795,7 +1795,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしいに
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1828,7 +1828,7 @@ void parse_ECL(ENEMY_DATA *e)
 					break;
 
 				default:	// レジスタ指定がおかしい
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1842,7 +1842,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					ErrInsert("ナゾのレジスタ指定");
+					DebugOut("ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;

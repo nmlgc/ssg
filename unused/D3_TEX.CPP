@@ -156,7 +156,7 @@ FBOOL TexCreateTexture(char *filename,DWORD txid)
 		if(p->img) LocalFree(p->img);
 		if(fp) fclose(fp);
 
-		ErrInsert(error);
+		DebugOut(error);
 		return FALSE;
 	}
 

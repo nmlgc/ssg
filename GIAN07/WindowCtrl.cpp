@@ -534,7 +534,7 @@ static BOOL SndFnWAVE(WORD key)
 			//extern INPUT_OBJ InputObj;
 			//char buf[100];
 			//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-			//ErrInsert(buf);
+			//DebugOut(buf);
 
 			if(ConfigDat.SoundFlags&SNDF_WAVE_ENABLE){
 				ConfigDat.SoundFlags &= (~SNDF_WAVE_ENABLE);
@@ -550,7 +550,7 @@ static BOOL SndFnWAVE(WORD key)
 				}
 			}
 			//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-			//ErrInsert(buf);
+			//DebugOut(buf);
 		break;
 	}
 

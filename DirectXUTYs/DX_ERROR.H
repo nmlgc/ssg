@@ -13,22 +13,7 @@
 // 1999/11/20 : 作成開始
 
 
-// ヘッダファイル //
-#include "DX_TYPE.H"
-
-
-
-// 構造体＆共用体 //
-typedef struct _error{
-	char			*s;			// エラー文字列
-	struct _error	*next;		// 次のエラー
-} ERROR_DATA;
-
-
 // 関数プロトタイプ宣言 //
-extern void ErrSetup(void);				// エラー用バッファの初期化
-extern void ErrInsert(const char *s);			// エラー文字列を追加
-extern void ErrCleanup(void);			// エラー文字列出力＆メモリ解放
 extern void DebugSetup(const char *filename);	// エラー出力準備(->LogFile)
 extern void DebugCleanup(void);			// エラー吐き出し用ファイルを閉じる
 extern void DebugOut(const char *s);			// デバッグメッセージ吐き出し

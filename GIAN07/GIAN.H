@@ -21,7 +21,7 @@
 
 
 ///// [Include Files] /////
-#include "PBGUTY_X.H"			// DirectX & その他の関数統合
+#include "DirectXUTYs/PBGUTY_X.H"			// DirectX & その他の関数統合
 #include "EXDEF.H"				// 色々な定義
 #include "WindowSys.h"			// ウィンドウシステム本体
 #include "WindowCtrl.h"			// ウィンドウ定義

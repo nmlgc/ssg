@@ -706,7 +706,7 @@ FVOID ObjectLockDraw(void)
 
 
 
-#include "DD_GRP3D.H"
+#include "DirectXUTYs/DD_GRP3D.H"
 // スペアナ描画 //
 FVOID GrpDrawSpect(int x,int y)
 {

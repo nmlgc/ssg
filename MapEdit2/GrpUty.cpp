@@ -5,7 +5,7 @@
 
 #include "MapEdit.h"
 #include "GrpUty.h"
-#include "DD_GRP3D.H"
+#include "DirectXUTYs/DD_GRP3D.H"
 
 
 void GrpPuts(char *s,int x,int y)

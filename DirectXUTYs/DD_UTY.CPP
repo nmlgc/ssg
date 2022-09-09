@@ -459,7 +459,7 @@ FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
 	if(fp==NULL) return FALSE;
 
 	size = filelength(fileno(fp));
-	DxSurf[surf_id].img = BYTE_BUFFER_OWNED{ new (std::nothrow) uint8_t[size] };
+	DxSurf[surf_id].img = BYTE_BUFFER_OWNED{ size };
 	if(DxSurf[surf_id].img==NULL){
 		fclose(fp);
 		return FALSE;
@@ -488,7 +488,7 @@ FBOOL GrpBMFree(BYTE surf_id)
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	if(DxSurf[surf_id].img){
-		DxSurf[surf_id].img = NULL;
+		DxSurf[surf_id].img = nullptr;
 	}
 
 	return TRUE;

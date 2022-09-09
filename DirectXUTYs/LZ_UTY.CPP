@@ -13,7 +13,7 @@ constexpr auto LZSS_SEQ_MIN = 3;
 constexpr auto LZSS_DICT_MASK = ((1 << LZSS_DICT_BITS) - 1);
 constexpr auto LZSS_SEQ_MAX = (LZSS_SEQ_MIN + ((1 << LZSS_SEQ_BITS) - 1));
 
-std::optional<FILE_BUFFER> FilBufferCreateR(const char *s)
+std::optional<BYTE_BUFFER_OWNED> FilBufferCreateR(const char *s)
 {
 	auto fp = fopen(s, "rb");
 	if(!fp) {
@@ -26,7 +26,7 @@ std::optional<FILE_BUFFER> FilBufferCreateR(const char *s)
 	}
 	const fil_size_t size = size64;
 
-	auto buf = BYTE_BUFFER_OWNED{ new (std::nothrow) uint8_t[size] };
+	auto buf = BYTE_BUFFER_OWNED{ size };
 	if(!buf) {
 		return std::nullopt;
 	}
@@ -36,7 +36,7 @@ std::optional<FILE_BUFFER> FilBufferCreateR(const char *s)
 	}
 	fclose(fp);
 
-	return FILE_BUFFER{ std::move(buf), size };
+	return std::move(buf);
 }
 
 template <typename Container> fil_checksum_t FilChecksumAddFile(
@@ -56,7 +56,7 @@ template <typename Container> fil_checksum_t FilChecksumAddFile(
 }
 
 std::optional<BYTE_BUFFER_BORROWED> FilFileGetCompressed(
-	const FILE_BUFFER& packfile,
+	const BYTE_BUFFER_OWNED& packfile,
 	const std::span<const PBG_FILEINFO> info,
 	fil_no_t filno
 )
@@ -66,15 +66,13 @@ std::optional<BYTE_BUFFER_BORROWED> FilFileGetCompressed(
 	}
 	const auto start = info[filno].offset;
 	const auto end = ((filno == (info.size() - 1))
-		? packfile.size
+		? packfile.size()
 		: info[filno + 1].offset
 	);
-	if((start >= packfile.size) || (end > packfile.size)) {
+	if((start >= packfile.size()) || (end > packfile.size())) {
 		return std::nullopt;
 	}
-	return BYTE_BUFFER_BORROWED{
-		(packfile.buffer.get() + start), (end - start)
-	};
+	return BYTE_BUFFER_BORROWED{ (packfile.get() + start), (end - start) };
 }
 
 uint8_t BIT_DEVICE_READ::GetBit()
@@ -153,9 +151,7 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 		return nullptr;
 	}
 
-	BYTE_BUFFER_OWNED uncompressed(
-		new (std::nothrow) uint8_t[info[filno].size_uncompressed]
-	);
+	BYTE_BUFFER_OWNED uncompressed = { info[filno].size_uncompressed };
 	if(!uncompressed) {
 		return nullptr;
 	}
@@ -312,11 +308,11 @@ std::optional<PACKFILE_READ> FilStartR(const char *s)
 	// PBG_FILEHEAD
 	size_t byte_start = 0;
 	size_t byte_end = sizeof(PBG_FILEHEAD);
-	if(packfile.size < byte_end) {
+	if(packfile.size() < byte_end) {
 		return std::nullopt;
 	}
 	const auto& head = *reinterpret_cast<PBG_FILEHEAD *>(
-		(packfile.buffer.get() + byte_start)
+		(packfile.get() + byte_start)
 	);
 	if(head.name != PBG_HEADNAME) {
 		return std::nullopt;
@@ -325,11 +321,11 @@ std::optional<PACKFILE_READ> FilStartR(const char *s)
 	// PBG_FILEINFO
 	byte_start = byte_end;
 	byte_end = (byte_start + (head.n * sizeof(PBG_FILEINFO)));
-	if(packfile.size < byte_end) {
+	if(packfile.size() < byte_end) {
 		return std::nullopt;
 	}
 
-	const auto* info_start = (packfile.buffer.get() + byte_start);
+	const auto* info_start = (packfile.get() + byte_start);
 	decltype(PACKFILE_READ::info) info = {
 		reinterpret_cast<const PBG_FILEINFO *>(info_start), head.n
 	};

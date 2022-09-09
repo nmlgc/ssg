@@ -326,7 +326,7 @@ BOOL LoadStageData(BYTE stage)
 	SCL_Now = nullptr;
 	ECL_Head = nullptr;
 	SCL_Head = nullptr;
-	ScrollInfo.DataHead = NULL;
+	ScrollInfo.DataHead = nullptr;
 
 	auto maybe_in=FilStartR("ENEMY.DAT");
 	if(!maybe_in) return FALSE;

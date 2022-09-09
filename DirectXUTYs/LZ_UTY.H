@@ -70,26 +70,21 @@ struct BIT_DEVICE_WRITE {
 	bool Write(const char *s) const;
 };
 
-struct FILE_BUFFER {
-	BYTE_BUFFER_OWNED buffer;
-	fil_size_t size;
-};
-
 struct BIT_FILE_READ : public BIT_DEVICE_READ {
-	const FILE_BUFFER file;
+	const BYTE_BUFFER_OWNED file;
 
-	BIT_FILE_READ(FILE_BUFFER &&file) :
-		BIT_DEVICE_READ(file.buffer.get(),file.size),
+	BIT_FILE_READ(BYTE_BUFFER_OWNED &&file) :
+		BIT_DEVICE_READ(file.get(),file.size()),
 		file(std::move(file)) {
 	}
 };
 
 struct PACKFILE_READ {
-	const FILE_BUFFER packfile;
+	const BYTE_BUFFER_OWNED packfile;
 	const std::span<const PBG_FILEINFO> info;
 
 	PACKFILE_READ(
-		FILE_BUFFER &&packfile, const std::span<const PBG_FILEINFO> info
+		BYTE_BUFFER_OWNED &&packfile, const std::span<const PBG_FILEINFO> info
 	) :
 		packfile(std::move(packfile)),
 		info(info) {

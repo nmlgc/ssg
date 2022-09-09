@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #define PBGMIDI_SOURCE_COMPILE
+#include "platform/file.h"
 #include "PBGMIDI.H"
 #pragma message(PBGWIN_PBGMIDI_H)
 
@@ -293,100 +294,70 @@ BOOL Mid_ChgDev(char pos)
 	return FALSE;
 }
 
-BOOL Mid_Load(char *filename)
+bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 {
-	FILE				*fp;
-	MID_FILEST			midhead;
-	MID_MAINST			*midmain;
 	MID_TRACKST			midtrack;
-	MID_TRACK			*pt;
-	DWORD				size;
-	int					i;
 
 	Mid_Free();
-	if((fp=fopen(filename,"rb"))==NULL) return FALSE;
-	fread(&midhead,sizeof(MID_FILEST),1,fp);
-	if(midhead.MThd!=mmioFOURCC('M','T','h','d')){
-		fclose(fp);
-		return FALSE;
+
+	auto cursor = buffer.cursor();
+	const auto maybe_midhead = cursor.next<MID_FILEST>();
+	if(!maybe_midhead) {
+		return false;
+	}
+	const auto& midhead = maybe_midhead.value()[0];
+
+	if(midhead.MThd != mmioFOURCC('M','T','h','d')) {
+		return false;
 	}
 
-	size = ConvDWord(midhead.size);
-	midmain = (MID_MAINST *)LocalAlloc(LPTR,size);
-	fread(midmain,size,1,fp);
-	Mid_Data.format   = ConvWord(midmain->format);
-	Mid_Data.track    = ConvWord(midmain->track);
-	Mid_Data.timebase = ConvWord(midmain->timebase);
+	const auto maybe_midmain = cursor.next<MID_MAINST>();
+	if(!maybe_midmain) {
+		return false;
+	}
+	const auto midmain = maybe_midmain.value()[0];
+
+	Mid_Data.format   = ConvWord(midmain.format);
+	Mid_Data.track    = ConvWord(midmain.track);
+	Mid_Data.timebase = ConvWord(midmain.timebase);
 	Mid_Data.tempo    = 1000000;
-	LocalFree(midmain);
 
 	Mid_Data.data = (MID_TRACK *)LocalAlloc(LPTR,sizeof(MID_TRACK)*Mid_Data.track);
 	ZeroMemory(Mid_Data.data,sizeof(MID_TRACK)*Mid_Data.track);
 
-	for(i=0;i<Mid_Data.track;i++){
-		fread(&midtrack,sizeof(MID_TRACKST),1,fp);
-		pt = &(Mid_Data.data[i]);
-		pt->size = ConvDWord(midtrack.size);
-		pt->data = (BYTE *)LocalAlloc(LPTR,pt->size);
-		pt->play = TRUE;
-		fread(pt->data,pt->size,1,fp);
+	for(int i = 0; i < Mid_Data.track; i++){
+		const auto maybe_midtrack = cursor.next<MID_TRACKST>();
+		if(!maybe_midtrack) {
+			return false;
+		}
+		const auto midtrack = maybe_midtrack.value()[0];
+
+		auto& pt = Mid_Data.data[i];
+		pt.size = ConvDWord(midtrack.size);
+		pt.data = (BYTE *)LocalAlloc(LPTR,pt.size);
+		pt.play = TRUE;
+
+		const auto maybe_data = cursor.next<uint8_t>(pt.size);
+		if(!maybe_data) {
+			return false;
+		}
+		const auto data = maybe_data.value();
+
+		memcpy(pt.data, data.data(), data.size_bytes());
 	}
 
-	fclose(fp);
 	Mid_Init();
+	return true;
+}
 
-	return TRUE;
+BOOL Mid_Load(char *filename)
+{
+	return Mid_Load(FileLoad(filename));
 }
 
 BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
 {
-	BYTE_BUFFER_OWNED		data;
-	BYTE				*dp;
-	MID_FILEST			*midhead;
-	MID_MAINST			*midmain;
-	MID_TRACKST			*midtrack;
-	MID_TRACK			*pt;
-	DWORD				size;
-	int					i;
-
-	Mid_Free();
-
-	if((data=in.MemExpand(n))==NULL) return FALSE;
-	midhead = (MID_FILEST *)data.get();
-	//fread(&midhead,sizeof(MID_FILEST),1,fp);
-	if(midhead->MThd!=mmioFOURCC('M','T','h','d')){
-		return FALSE;
-	}
-
-	size = ConvDWord(midhead->size);
-	midmain = (MID_MAINST *)((BYTE *)data.get()+sizeof(MID_FILEST));
-	//fread(midmain,size,1,fp);
-	Mid_Data.format   = ConvWord(midmain->format);
-	Mid_Data.track    = ConvWord(midmain->track);
-	Mid_Data.timebase = ConvWord(midmain->timebase);
-	Mid_Data.tempo    = 1000000;
-
-	Mid_Data.data = (MID_TRACK *)LocalAlloc(LPTR,sizeof(MID_TRACK)*Mid_Data.track);
-
-	ZeroMemory(Mid_Data.data,sizeof(MID_TRACK)*Mid_Data.track);
-
-	dp = (BYTE *)(data.get()+sizeof(MID_FILEST)+size);
-	for(i=0;i<Mid_Data.track;i++){
-		midtrack = (MID_TRACKST *)dp;
-		dp+=sizeof(MID_TRACKST);
-		//fread(&midtrack,sizeof(MID_TRACKST),1,fp);
-		pt = &(Mid_Data.data[i]);
-		pt->size = ConvDWord(midtrack->size);
-		pt->data = (BYTE *)LocalAlloc(LPTR,pt->size);
-		pt->play = TRUE;
-		//fread(pt->data,pt->size,1,fp);
-		memcpy(pt->data,dp,pt->size);
-		dp+=pt->size;
-	}
-
-	Mid_Init();
-
-	return TRUE;
+	return Mid_Load(in.MemExpand(n));
 }
 
 static BOOL Mid_Init(void)

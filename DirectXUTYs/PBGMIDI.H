@@ -112,6 +112,7 @@ void Mid_FadeOut(BYTE speed);				// フェードアウト(数字が大きいほ�
 void Mid_Pan(char pan);						// 全てのチャンネルのパンを変更する(無駄関数)
 BOOL Mid_ChgDev(char pos);					// 出力デバイスを変更する
 
+bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 BOOL Mid_Load(char *filename);				// 普通のＭＩＤＩファイルをロードする
 BOOL PMid_Load(const PACKFILE_READ &in,DWORD n);		// 圧縮ＭＩＤＩファイルをロードする
 

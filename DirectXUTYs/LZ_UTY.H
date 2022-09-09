@@ -99,5 +99,5 @@ struct PACKFILE_WRITE {
 	bool Write(const char *s) const;
 };
 
-std::optional<BIT_FILE_READ> BitFilCreateR(const char *s);
+BIT_FILE_READ BitFilCreateR(const char *s);
 std::optional<PACKFILE_READ> FilStartR(const char *s);

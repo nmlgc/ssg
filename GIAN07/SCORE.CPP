@@ -194,19 +194,16 @@ static BOOL LoadScoreData(void)
 	if(ScoreData == NULL) return FALSE;
 
 	// ビット読み込みモードでファイルを開く //
-	auto maybe_bd = BitFilCreateR(ScoreFileName);
-	if(maybe_bd.has_value()){
-		auto& bd = maybe_bd.value();
-		while(1){
-			if(!_LoadSC(ScoreData->Easy,    bd)) break;
-			if(!_LoadSC(ScoreData->Normal,  bd)) break;
-			if(!_LoadSC(ScoreData->Hard,    bd)) break;
-			if(!_LoadSC(ScoreData->Lunatic, bd)) break;
-			if(!_LoadSC(ScoreData->Extra,   bd)) break;
+	auto bd = BitFilCreateR(ScoreFileName);
+	while(1){
+		if(!_LoadSC(ScoreData->Easy,    bd)) break;
+		if(!_LoadSC(ScoreData->Normal,  bd)) break;
+		if(!_LoadSC(ScoreData->Hard,    bd)) break;
+		if(!_LoadSC(ScoreData->Lunatic, bd)) break;
+		if(!_LoadSC(ScoreData->Extra,   bd)) break;
 
-			bInit = TRUE;
-			break;
-		}
+		bInit = TRUE;
+		break;
 	}
 
 	if(!bInit){

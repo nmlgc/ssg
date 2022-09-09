@@ -262,22 +262,17 @@ bool PACKFILE_WRITE::Write(const char *s) const
 	return true;
 }
 
-std::optional<BIT_FILE_READ> BitFilCreateR(const char *s)
+BIT_FILE_READ BitFilCreateR(const char *s)
 {
-	auto maybe_file = FileLoad(s);
-	if(!maybe_file) {
-		return std::nullopt;
-	}
-	return std::make_optional<BIT_FILE_READ>(std::move(maybe_file.value()));
+	return { FileLoad(s) };
 }
 
 std::optional<PACKFILE_READ> FilStartR(const char *s)
 {
-	auto maybe_packfile = FileLoad(s);
-	if(!maybe_packfile) {
+	auto packfile = FileLoad(s);
+	if(!packfile) {
 		return std::nullopt;
 	}
-	auto& packfile = maybe_packfile.value();
 
 	// PBG_FILEHEAD
 	size_t byte_start = 0;

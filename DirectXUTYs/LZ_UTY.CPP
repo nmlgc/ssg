@@ -6,7 +6,6 @@
 #include "platform/file.h"
 #include "LZ_UTY.H"
 #include <numeric>
-#include <optional>
 
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;
@@ -271,35 +270,24 @@ BIT_FILE_READ BitFilCreateR(const char *s)
 PACKFILE_READ FilStartR(const char *s)
 {
 	auto packfile = FileLoad(s);
-	if(!packfile) {
-		return {};
-	}
+	auto packfile_cursor = packfile.cursor();
 
 	// PBG_FILEHEAD
-	size_t byte_start = 0;
-	size_t byte_end = sizeof(PBG_FILEHEAD);
-	if(packfile.size() < byte_end) {
+	const auto maybe_head = packfile_cursor.next<PBG_FILEHEAD>();
+	if(!maybe_head) {
 		return {};
 	}
-	const auto& head = *reinterpret_cast<PBG_FILEHEAD *>(
-		(packfile.get() + byte_start)
-	);
+	const auto& head = maybe_head.value()[0];
 	if(head.name != PBG_HEADNAME) {
 		return {};
 	}
 
 	// PBG_FILEINFO
-	byte_start = byte_end;
-	byte_end = (byte_start + (head.n * sizeof(PBG_FILEINFO)));
-	if(packfile.size() < byte_end) {
+	const auto maybe_info = packfile_cursor.next<PBG_FILEINFO>(head.n);
+	if(!maybe_info) {
 		return {};
 	}
-
-	const auto* info_start = (packfile.get() + byte_start);
-	decltype(PACKFILE_READ::info) info = {
-		reinterpret_cast<const PBG_FILEINFO *>(info_start), head.n
-	};
-	const BYTE_BUFFER_BORROWED info_bytes = { info_start, info.size_bytes() };
+	const auto& info = maybe_info.value();
 
 	// Checksums
 	fil_checksum_t total_checksum = 0;

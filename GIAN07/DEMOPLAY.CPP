@@ -75,21 +75,27 @@ FVOID DemoplaySave(void)
 // デモプレイデータをロードする //
 FBOOL DemoplayLoad(int stage)
 {
-	BYTE_BUFFER_OWNED temp;
-	uint8_t *p;
-
 	// ファイルを開く //
 	const auto in = FilStartR("ENEMY.DAT");
 
 	// 展開 //
-	temp = in.MemExpand(stage-1+18);
-	if(temp == NULL) return FALSE;
-
-	p = temp.get();
-	memcpy(&DemoInfo,p,sizeof(DEMOPLAY_INFO));
-
-	p = temp.get() + sizeof(DEMOPLAY_INFO);
-	memcpy(DemoBuffer,p,sizeof(WORD)*DemoInfo.DataSize);
+	const auto temp = in.MemExpand(stage-1+18);
+	auto temp_cursor = temp.cursor();
+	{
+		const auto maybe_info = temp_cursor.next<DEMOPLAY_INFO>();
+		if(!maybe_info) {
+			return false;
+		}
+		DemoInfo = maybe_info.value()[0];
+	}
+	{
+		const auto maybe_inputs = temp_cursor.next<uint16_t>(DemoInfo.DataSize);
+		if(!maybe_inputs) {
+			return false;
+		}
+		const auto& inputs = maybe_inputs.value();
+		memcpy(DemoBuffer, inputs.data(), inputs.size_bytes());
+	}
 
 	DemoBufPtr = 0;
 	DemoplayLoadEnable = TRUE;

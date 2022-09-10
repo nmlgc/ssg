@@ -445,35 +445,24 @@ FBOOL GrpReleaseSurface(BYTE surf_id)
 	return TRUE;
 }
 
-FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
+bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	// 以前に何かがロードされていたら解放する //
-	DxSurf[surf_id].img = FileLoad(filename);
+	DxSurf[surf_id].img = std::move(buffer);
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
+}
+
+FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
+{
+	return GrpBMPLoad(FileLoad(filename), surf_id);
 }
 
 FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id)
 {
-	if(surf_id>=SURFACE_MAX) return FALSE;
-
-	// 以前に何かがロードされていたら解放する //
-	DxSurf[surf_id].img=in.MemExpand(n);
-
-	return GrpBMLoadMemory(&DxSurf[surf_id]);
-}
-
-FBOOL GrpBMFree(BYTE surf_id)
-{
-	if(surf_id>=SURFACE_MAX) return FALSE;
-
-	if(DxSurf[surf_id].img){
-		DxSurf[surf_id].img = nullptr;
-	}
-
-	return TRUE;
+	return GrpBMPLoad(in.MemExpand(n), surf_id);
 }
 
 FVOID GrpCls(void)

@@ -117,9 +117,9 @@ FGRP  GrpCreateSurface(int width,int height,BYTE surf_id);	// Surface の作成(
 FBOOL GrpReleaseSurface(BYTE surf_id);						// Surface の削除(BMPは変更せず)
 
 // ＢＭＰファイルロード //
+bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
 FBOOL GrpBMPLoad(char *filename,BYTE surf_id);				// BMP->Surface
 FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id);		// (圧)BMP->Surface
-FBOOL GrpBMFree(BYTE surf_id);								// SurfaceからBMPだけ切り離す
 
 extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);	// ビット深度によりカラーキーをセットする
 extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds);		// ある Surface を初期化する

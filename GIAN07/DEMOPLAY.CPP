@@ -79,9 +79,7 @@ FBOOL DemoplayLoad(int stage)
 	uint8_t *p;
 
 	// ファイルを開く //
-	auto maybe_in=FilStartR("ENEMY.DAT");
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR("ENEMY.DAT");
 
 	// 展開 //
 	temp = in.MemExpand(stage-1+18);
@@ -201,9 +199,7 @@ FBOOL ReplayLoad(int stage)
 	if(GameStage == GRAPH_ID_EXSTAGE) strcpy(buf, "秋霜りぷEx.DAT");
 	else                              sprintf(buf, "秋霜りぷ%d.DAT", stage);
 
-	auto maybe_in = FilStartR(buf);
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR(buf);
 
 	// ヘッダの格納先は０番である //
 	temp = in.MemExpand( 0);

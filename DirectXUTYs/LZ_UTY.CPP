@@ -6,6 +6,7 @@
 #include "platform/file.h"
 #include "LZ_UTY.H"
 #include <numeric>
+#include <optional>
 
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;
@@ -267,31 +268,31 @@ BIT_FILE_READ BitFilCreateR(const char *s)
 	return { FileLoad(s) };
 }
 
-std::optional<PACKFILE_READ> FilStartR(const char *s)
+PACKFILE_READ FilStartR(const char *s)
 {
 	auto packfile = FileLoad(s);
 	if(!packfile) {
-		return std::nullopt;
+		return {};
 	}
 
 	// PBG_FILEHEAD
 	size_t byte_start = 0;
 	size_t byte_end = sizeof(PBG_FILEHEAD);
 	if(packfile.size() < byte_end) {
-		return std::nullopt;
+		return {};
 	}
 	const auto& head = *reinterpret_cast<PBG_FILEHEAD *>(
 		(packfile.get() + byte_start)
 	);
 	if(head.name != PBG_HEADNAME) {
-		return std::nullopt;
+		return {};
 	}
 
 	// PBG_FILEINFO
 	byte_start = byte_end;
 	byte_end = (byte_start + (head.n * sizeof(PBG_FILEINFO)));
 	if(packfile.size() < byte_end) {
-		return std::nullopt;
+		return {};
 	}
 
 	const auto* info_start = (packfile.get() + byte_start);
@@ -305,7 +306,7 @@ std::optional<PACKFILE_READ> FilStartR(const char *s)
 	for(fil_no_t i = 0; i < info.size(); i++) {
 		const auto maybe_compressed = FilFileGetCompressed(packfile, info, i);
 		if(!maybe_compressed) {
-			return std::nullopt;
+			return {};
 		}
 		const auto checksum = FilChecksumAddFile(
 			total_checksum,
@@ -314,12 +315,12 @@ std::optional<PACKFILE_READ> FilStartR(const char *s)
 			maybe_compressed.value()
 		);
 		if(checksum != info[i].checksum_compressed) {
-			return std::nullopt;
+			return {};
 		}
 	}
 	if(total_checksum != head.sum) {
-		return std::nullopt;
+		return {};
 	}
 
-	return std::make_optional<PACKFILE_READ>(std::move(packfile), info);
+	return { std::move(packfile), info };
 }

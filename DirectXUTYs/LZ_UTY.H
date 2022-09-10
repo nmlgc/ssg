@@ -7,7 +7,6 @@
 
 #include "platform/buffer.h"
 #include <array>
-#include <optional>
 
 // Format
 // ------
@@ -83,6 +82,9 @@ struct PACKFILE_READ {
 	const BYTE_BUFFER_OWNED packfile;
 	const std::span<const PBG_FILEINFO> info;
 
+	PACKFILE_READ(std::nullptr_t null = nullptr) {
+	}
+
 	PACKFILE_READ(
 		BYTE_BUFFER_OWNED &&packfile, const std::span<const PBG_FILEINFO> info
 	) :
@@ -100,4 +102,4 @@ struct PACKFILE_WRITE {
 };
 
 BIT_FILE_READ BitFilCreateR(const char *s);
-std::optional<PACKFILE_READ> FilStartR(const char *s);
+PACKFILE_READ FilStartR(const char *s);

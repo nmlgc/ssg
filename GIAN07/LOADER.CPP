@@ -102,18 +102,14 @@ BOOL LoadGraph(int stage)
 
 	// 音楽室用 //
 	if(stage==GRAPH_ID_MUSICROOM){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,19+4,SURFACE_ID_MUSIC))		return FALSE;
 		return TRUE;
 	}
 	// タイトル画面用 //
 	if(stage==GRAPH_ID_TITLE){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,20+4,SURFACE_ID_MUSIC))		return FALSE;
 		//LoadPaletteFromMusic();
@@ -121,18 +117,14 @@ BOOL LoadGraph(int stage)
 	}
 	// お名前登録画面用 //
 	if(stage==GRAPH_ID_NAMEREGIST){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!GrpBMPLoadP(in,21+4,SURFACE_ID_NAMEREG))	return FALSE;
 		return TRUE;
 	}
 	// 西方Ｐｒｏｊｅｃｔ表示用 //
 	if(stage==GRAPH_ID_SPROJECT){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in,31,SURFACE_ID_SPROJECT))		return FALSE;
 		GrpGetPalette(SProjectPalette);
 
@@ -141,9 +133,7 @@ BOOL LoadGraph(int stage)
 	}
 	// エンディング全画像ロード(パレット含む) //
 	if(stage==GRAPH_ID_ENDING){
-		auto maybe_in = FilStartR("GRAPH2.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
+		const auto in = FilStartR("GRAPH2.DAT");
 
 		SetRect(&src, 0, 0, 320, 240);
 		for(i=0; i<6; i++){
@@ -180,9 +170,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in,    0, SURFACE_ID_SYSTEM))	return FALSE;
 		if(!GrpBMPLoadP(in, 27+1, SURFACE_ID_ENEMY))	return FALSE;
 		GrpGetPalette(EnemyPalette);
@@ -197,10 +185,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージボス用(1) //
 	if(stage == GRAPH_ID_EXBOSS1){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
-
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in, 29, SURFACE_ID_ENEMY))		return FALSE;
 		GrpGetPalette(EnemyPalette);
 
@@ -209,10 +194,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージボス用(2) //
 	if(stage == GRAPH_ID_EXBOSS2){
-		auto maybe_in = FilStartR("GRAPH.DAT");
-		if(!maybe_in) return FALSE;
-		const auto& in = maybe_in.value();
-
+		const auto in = FilStartR("GRAPH.DAT");
 		if(!GrpBMPLoadP(in, 30, SURFACE_ID_ENEMY))		return FALSE;
 		GrpGetPalette(EnemyPalette);
 
@@ -222,9 +204,7 @@ BOOL LoadGraph(int stage)
 	if(stage<0 || stage>STAGE_MAX) return FALSE;
 
 	// マップチップのロードは後で変換すること //
-	auto maybe_in = FilStartR("GRAPH.DAT");
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR("GRAPH.DAT");
 	if(!GrpBMPLoadP(in,       0,SURFACE_ID_SYSTEM))		return FALSE;
 	if(!GrpBMPLoadP(in,stage+ 0,SURFACE_ID_ENEMY))		return FALSE;
 	GrpGetPalette(EnemyPalette);
@@ -244,9 +224,7 @@ BOOL LoadFace(BYTE SurfaceID,BYTE FileNo)
 {
 	if(SurfaceID<0 || SurfaceID>=SURFACE_MAX) return FALSE;
 
-	auto maybe_in = FilStartR("GRAPH.DAT");
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR("GRAPH.DAT");
 	if(!GrpBMPLoadP(in,13+FileNo,SURFACE_ID_FACE0+SurfaceID))		return FALSE;
 
 	// パレットを保存する //
@@ -328,9 +306,7 @@ BOOL LoadStageData(BYTE stage)
 	SCL_Head = nullptr;
 	ScrollInfo.DataHead = nullptr;
 
-	auto maybe_in=FilStartR("ENEMY.DAT");
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR("ENEMY.DAT");
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
@@ -901,9 +877,7 @@ extern BOOL LoadMusic(int no)
 {
 	BOOL flag;
 
-	auto maybe_in = FilStartR("MUSIC.DAT");
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR("MUSIC.DAT");
 	flag = PMid_Load(in,no);
 	MusicNum = in.info.size();
 
@@ -913,9 +887,7 @@ extern BOOL LoadMusic(int no)
 // 全てのSoundデータをロードする //
 BOOL LoadSound(void)
 {
-	auto maybe_in = FilStartR("SOUND.DAT");
-	if(!maybe_in) return FALSE;
-	const auto& in = maybe_in.value();
+	const auto in = FilStartR("SOUND.DAT");
 
 	while(1){
 		if(!SndWAVLoadP(in,SOUND_ID_KEBARI  ,SOUND_ID_KEBARI  ,SNDMAX_KEBARI  )) break;
@@ -953,8 +925,7 @@ extern BOOL LoadMusicRoomComment(int no)
 	if(no < 0 || no > 19) return FALSE;
 
 	const auto in=FilStartR("ENEMY.DAT");
-	if(!in) return FALSE;
-	if(!(temp=in.value().MemExpand(27+no))) return FALSE;
+	if(!(temp=in.MemExpand(27+no))) return FALSE;
 
 	for(i=0; i<19*2; i++){
 		MTitleBuffer[i] = (BYTE)temp[i];

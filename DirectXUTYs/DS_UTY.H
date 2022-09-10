@@ -81,6 +81,7 @@ FBOOL SndInit(HWND hWnd,int x_mid=SND_XMID_DEFAULT);
 FVOID SndCleanup(void);
 
 // ＷＡＶファイルロード(ある制限があるが...) //
+bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max);
 FBOOL SndWAVLoad(char *filename,BYTE id,int max);				// 後でエラーを吐くようにする
 FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max);
 

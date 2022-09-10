@@ -6,6 +6,7 @@
 #define DIRECTSOUND_VERSION 0x0700
 
 #include <dsound.h>
+#include "platform/file.h"
 #include "DS_UTY.H"
 #pragma message(PBGWIN_DS_UTY_H)
 
@@ -82,10 +83,8 @@ FVOID SndCleanup(void)
 	RELEASE(Snd_DS);
 }
 
-FBOOL SndWAVLoad(char *filename,BYTE id,int max)
+bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)
 {
-	WAVEHEAD		wh;
-	FILE			*fp;
 	LPSE_STRUCT		p;
 	HRESULT			dsrval;
 	DSBUFFERDESC	dsBD;
@@ -101,24 +100,44 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 	*se = p = (LPSE_STRUCT)LocalAlloc(LPTR,sizeof(SE_STRUCT)+(max-1)*sizeof(IDirectSoundBuffer *));
 	if(p == NULL) return FALSE;
 
+	// データを解凍して読み込む //
+	auto cursor = buffer.cursor();
+	const auto maybe_whf = cursor.next<WAVEHEAD_FACT>();
+	if(!maybe_whf) {
+		return false;
+	}
 
-	// 読み込みは後で圧縮対応にするので今のところはちょっと手抜き //
-	if((fp=fopen(filename,"rb"))==NULL) return FALSE;
+	const auto [datalen, tag] = [&cursor](const WAVEHEAD_FACT& whf) {
+		if(whf.FACT != MAKEFOURCC('f','a','c','t')) {
+			static_assert(sizeof(WAVEHEAD_FACT) >= sizeof(WAVEHEAD));
+			const auto& wh = reinterpret_cast<const WAVEHEAD &>(whf);
+			cursor.cursor = sizeof(wh);
 
-	fread(&wh,sizeof(WAVEHEAD),1,fp);				// ヘッダ読み込み
-	p->data = (BYTE *)LocalAlloc(LPTR,wh.DataLen);	// データ用メモリ確保
-	fread(p->data,wh.DataLen,1,fp);					// データ読み込み
-	fclose(fp);										// ファイルクローズ
+			// C cast because we also need to cast away constness here… grr.
+			return std::pair{ wh.DataLen, (WAVEFORMATEX *)(&wh.tag) };
+		}
+		cursor.cursor = sizeof(whf);
+		return std::pair{ whf.DataLen, (WAVEFORMATEX *)(&whf.tag) };
+	}(maybe_whf.value()[0]);
+
+	const auto maybe_data = cursor.next<uint8_t>(datalen);
+	if(!maybe_data) {
+		return false;
+	}
+	const auto& data = maybe_data.value();
+
+	p->data = (BYTE *)LocalAlloc(LPTR,datalen);
+	memcpy(p->data, data.data(), data.size_bytes());
 
 	p->max  = max;
 	p->now  = 0;
-	p->size = wh.DataLen;
+	p->size = datalen;
 
-	dsBD.dwBufferBytes = wh.DataLen;
+	dsBD.dwBufferBytes = datalen;
 	dsBD.dwFlags       = DSBCAPS_STATIC|DSBCAPS_CTRLDEFAULT|DSBCAPS_GETCURRENTPOSITION2;
 	dsBD.dwReserved    = 0;
 	dsBD.dwSize        = sizeof(DSBUFFERDESC);
-	dsBD.lpwfxFormat   = (LPWAVEFORMATEX)&wh.tag;
+	dsBD.lpwfxFormat   = tag;
 
 	dsrval = Snd_DS->CreateSoundBuffer(&dsBD,&p->buf[0],NULL);
 	if(dsrval != DS_OK){
@@ -141,80 +160,14 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 	return TRUE;
 }
 
+FBOOL SndWAVLoad(char *filename,BYTE id,int max)
+{
+	return SndWAVLoad(FileLoad(filename), id, max);
+}
+
 FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
 {
-	BYTE_BUFFER_OWNED	buffer;
-	WAVEHEAD		*wh;
-	WAVEHEAD_FACT	*whf;
-	LPSE_STRUCT		p;
-	HRESULT			dsrval;
-	DSBUFFERDESC	dsBD;
-	int				i;
-	LPSE_STRUCT		*se;
-
-	if(Snd_DS==NULL) return FALSE;
-
-	if(id>=SND_OBJ_MAX) return FALSE;
-	se = &Snd_OBJ[id];
-
-	// SE_STRUCT 用のメモリを確保する //
-	*se = p = (LPSE_STRUCT)LocalAlloc(LPTR,sizeof(SE_STRUCT)+(max-1)*sizeof(IDirectSoundBuffer *));
-	if(p == NULL) return FALSE;
-
-	// データを解凍して読み込む //
-	if(!(buffer=in.MemExpand(n))) return FALSE;
-	const auto& data = buffer.get();
-	wh  = (WAVEHEAD *)data;
-	whf = (WAVEHEAD_FACT *)data;
-
-	if(whf->FACT != MAKEFOURCC('f','a','c','t')){
-		p->data = (BYTE *)LocalAlloc(LPTR,wh->DataLen);
-		memcpy(p->data,data+sizeof(WAVEHEAD),wh->DataLen);
-
-		p->max  = max;
-		p->now  = 0;
-		p->size = wh->DataLen;
-
-		dsBD.dwBufferBytes = wh->DataLen;
-		dsBD.dwFlags       = DSBCAPS_STATIC|DSBCAPS_CTRLDEFAULT|DSBCAPS_GETCURRENTPOSITION2;
-		dsBD.dwReserved    = 0;
-		dsBD.dwSize        = sizeof(DSBUFFERDESC);
-		dsBD.lpwfxFormat   = (LPWAVEFORMATEX)&wh->tag;
-	}
-	else{
-		p->data = (BYTE *)LocalAlloc(LPTR,whf->DataLen);
-		memcpy(p->data,data+sizeof(WAVEHEAD_FACT),whf->DataLen);
-
-		p->max  = max;
-		p->now  = 0;
-		p->size = whf->DataLen;
-
-		dsBD.dwBufferBytes = whf->DataLen;
-		dsBD.dwFlags       = DSBCAPS_STATIC|DSBCAPS_CTRLDEFAULT|DSBCAPS_GETCURRENTPOSITION2;
-		dsBD.dwReserved    = 0;
-		dsBD.dwSize        = sizeof(DSBUFFERDESC);
-		dsBD.lpwfxFormat   = (LPWAVEFORMATEX)&whf->tag;
-	}
-
-	dsrval = Snd_DS->CreateSoundBuffer(&dsBD,&p->buf[0],NULL);
-	if(dsrval != DS_OK){
-		DebugOut("CreateSoundBuffer に失敗");
-		return FALSE;
-	}
-
-	if(!SndFillBuffer(p->buf[0],p->data,p->size)){
-		DebugOut("SndFillBuffer に失敗 (PBGUTY_X.LIB)");
-		return FALSE;
-	}
-
-	for(i=1;i<max;i++){
-		dsrval = Snd_DS->DuplicateSoundBuffer(p->buf[0],&p->buf[i]);
-		if(dsrval != DS_OK){
-			if(!SndFillBuffer(p->buf[i],p->data,p->size)) return FALSE;
-		}
-	}
-
-	return TRUE;
+	return SndWAVLoad(in.MemExpand(n), id, max);
 }
 
 FVOID SndPlay(BYTE id)

@@ -25,7 +25,6 @@
 #include "DX_TYPE.h"					// 型＆マクロ
 #include "DX_ERROR.h"					// エラー処理用関数
 #include "LZ_UTY.h"						// 圧縮管理用
-#include "D3_TEX.h"						// テクスチャ管理
 #include "MtoB.h"						// スクリーンキャプチャー
 
 

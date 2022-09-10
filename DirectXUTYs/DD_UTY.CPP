@@ -6,7 +6,6 @@
 #include "DD_UTY.h"
 #include "DD_GRP2D.h"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.h"					// ３Ｄ用描画関数(公開しないこと)
-#include "D3_TEX.h"
 #include <stdio.h>
 #include <io.h>
 #pragma message(PBGWIN_DD_UTY_H)

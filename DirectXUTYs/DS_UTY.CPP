@@ -165,11 +165,6 @@ FBOOL SndWAVLoad(char *filename,BYTE id,int max)
 	return SndWAVLoad(FileLoad(filename), id, max);
 }
 
-FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max)
-{
-	return SndWAVLoad(in.MemExpand(n), id, max);
-}
-
 FVOID SndPlay(BYTE id)
 {
 	HRESULT	dsrval;

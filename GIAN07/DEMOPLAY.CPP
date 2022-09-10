@@ -3,6 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "LZ_UTY.H"
 #include "DEMOPLAY.H"
 
 

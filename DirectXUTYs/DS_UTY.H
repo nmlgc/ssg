@@ -13,7 +13,6 @@
 // ヘッダファイル //
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
-#include "LZ_UTY.H"						// 圧縮管理用
 
 
 // 定数＆マクロ //
@@ -83,7 +82,6 @@ FVOID SndCleanup(void);
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max);
 FBOOL SndWAVLoad(char *filename,BYTE id,int max);				// 後でエラーを吐くようにする
-FBOOL SndWAVLoadP(const PACKFILE_READ &in,DWORD n,BYTE id,int max);
 
 // 再生＆停止 //
 FVOID SndPlay(BYTE id);

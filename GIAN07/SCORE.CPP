@@ -3,6 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "LZ_UTY.H"
 #include "SCORE.H"
 
 //#define PBG_MASK_VALUE		((DWORDLONG)0x342d3a4de92c68ba)

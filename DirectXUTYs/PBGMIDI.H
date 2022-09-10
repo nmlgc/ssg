@@ -18,7 +18,6 @@
 #include <windows.h>
 #include <mmsystem.h>
 //#pragma comment(lib,"winmm.lib")
-#include "LZ_UTY.H"
 
 
 #define MIDFN_NOPLAY	0x00	// 再生しない
@@ -114,7 +113,6 @@ BOOL Mid_ChgDev(char pos);					// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 BOOL Mid_Load(char *filename);				// 普通のＭＩＤＩファイルをロードする
-BOOL PMid_Load(const PACKFILE_READ &in,DWORD n);		// 圧縮ＭＩＤＩファイルをロードする
 
 void Mid_LoopFunc(DWORD time);				// 一定間隔ループを自前で生成して再生するとき使用
 char *Mid_GetTitle(void);					// この曲のお名前は？

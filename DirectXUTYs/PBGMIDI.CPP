@@ -355,11 +355,6 @@ BOOL Mid_Load(char *filename)
 	return Mid_Load(FileLoad(filename));
 }
 
-BOOL PMid_Load(const PACKFILE_READ &in,DWORD n)
-{
-	return Mid_Load(in.MemExpand(n));
-}
-
 static BOOL Mid_Init(void)
 {
 	MID_TRACK	*p;

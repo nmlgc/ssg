@@ -3,8 +3,28 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "LZ_UTY.H"
 #include "LOADER.H"
 #include "LENS.H"
+
+
+// Packfile loading //
+bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
+{
+	return GrpBMPLoad(in.MemExpand(filno), surf_id);
+}
+
+bool PMid_Load(const PACKFILE_READ &in, fil_no_t filno)
+{
+	return Mid_Load(in.MemExpand(filno));
+}
+
+bool SndWAVLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
+{
+	return SndWAVLoad(in.MemExpand(filno), id, max);
+}
+
+
 
 
 // グローバル変数 //

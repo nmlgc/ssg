@@ -460,11 +460,6 @@ FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
 	return GrpBMPLoad(FileLoad(filename), surf_id);
 }
 
-FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id)
-{
-	return GrpBMPLoad(in.MemExpand(n), surf_id);
-}
-
 FVOID GrpCls(void)
 {
 	DDBLTFX		ddbltfx;

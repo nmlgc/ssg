@@ -22,9 +22,9 @@
 
 
 // ヘッダファイル //
+#include "platform/buffer.h"
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
-#include "LZ_UTY.H"						// 圧縮管理用
 #include "MtoB.h"						// スクリーンキャプチャー
 
 
@@ -119,7 +119,6 @@ FBOOL GrpReleaseSurface(BYTE surf_id);						// Surface の削除(BMPは変更せ
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
 FBOOL GrpBMPLoad(char *filename,BYTE surf_id);				// BMP->Surface
-FBOOL GrpBMPLoadP(const PACKFILE_READ &in,DWORD n,BYTE surf_id);		// (圧)BMP->Surface
 
 extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);	// ビット深度によりカラーキーをセットする
 extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds);		// ある Surface を初期化する

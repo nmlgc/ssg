@@ -961,7 +961,7 @@ extern BOOL LoadMusicRoomComment(int no)
 	}
 	MTitleBuffer[19*2] = '\0';
 
-	for(i=0; i<20; i++){
+	for(i=0; i<12; i++){
 		for(j=0; j<19*2; j++){
 			MCommentBuffer[i][j] = (BYTE)temp[(i+1)*19*2 + j];
 		}

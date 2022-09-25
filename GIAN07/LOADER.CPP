@@ -24,6 +24,26 @@ bool SndWAVLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
 	return SndWAVLoad(in.MemExpand(filno), id, max);
 }
 
+// Packfile cache //
+// -------------- //
+// Caching every .DAT file is not only tedious due to the data structures
+// involved, but also wrong because replays exist and can be overwritten during
+// the lifespan of a process. Since we only actively need these two (plus
+// MUSIC.DAT, which needs to be accessible inside LoadMusic()), we can gain
+// enough of a load time reduction just by writing two wrapper functions.
+
+BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno)
+{
+	static const auto in = FilStartR("ENEMY.DAT");
+	return in.MemExpand(filno);
+}
+
+BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
+{
+	static const auto in = FilStartR("GRAPH.DAT");
+	return GrpBMPLoadP(in, filno, surf_id);
+}
+// -------------- //
 
 
 
@@ -122,33 +142,29 @@ BOOL LoadGraph(int stage)
 
 	// 音楽室用 //
 	if(stage==GRAPH_ID_MUSICROOM){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
-		if(!GrpBMPLoadP(in,19+4,SURFACE_ID_MUSIC))		return FALSE;
+		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
+		if(!DATGraphLoad(19+4,SURFACE_ID_MUSIC))		return FALSE;
 		return TRUE;
 	}
 	// タイトル画面用 //
 	if(stage==GRAPH_ID_TITLE){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
-		if(!GrpBMPLoadP(in,20+4,SURFACE_ID_MUSIC))		return FALSE;
+		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
+		if(!DATGraphLoad(20+4,SURFACE_ID_MUSIC))		return FALSE;
 		//LoadPaletteFromMusic();
 		return TRUE;
 	}
 	// お名前登録画面用 //
 	if(stage==GRAPH_ID_NAMEREGIST){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in,0,SURFACE_ID_SYSTEM))		return FALSE;
-		if(!GrpBMPLoadP(in,21+4,SURFACE_ID_NAMEREG))	return FALSE;
+		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
+		if(!DATGraphLoad(21+4,SURFACE_ID_NAMEREG))	return FALSE;
 		return TRUE;
 	}
 	// 西方Ｐｒｏｊｅｃｔ表示用 //
 	if(stage==GRAPH_ID_SPROJECT){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in,31,SURFACE_ID_SPROJECT))		return FALSE;
+		if(!DATGraphLoad(31,SURFACE_ID_SPROJECT))		return FALSE;
 		GrpGetPalette(SProjectPalette);
 
-		//if(!GrpBMPLoadP(in,21+4,SURFACE_ID_NAMEREG))	return FALSE;
+		//if(!DATGraphLoad(21+4,SURFACE_ID_NAMEREG))	return FALSE;
 		return TRUE;
 	}
 	// エンディング全画像ロード(パレット含む) //
@@ -182,7 +198,7 @@ BOOL LoadGraph(int stage)
 			}
 		}
 
-		if(!GrpBMPLoadP(in, 0, SURFACE_ID_MAPCHIP))		return FALSE;
+		if(!DATGraphLoad(0, SURFACE_ID_MAPCHIP))		return FALSE;
 
 		return TRUE;
 	}
@@ -190,23 +206,21 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in,    0, SURFACE_ID_SYSTEM))	return FALSE;
-		if(!GrpBMPLoadP(in, 27+1, SURFACE_ID_ENEMY))	return FALSE;
+		if(!DATGraphLoad(   0, SURFACE_ID_SYSTEM))	return FALSE;
+		if(!DATGraphLoad(27+1, SURFACE_ID_ENEMY))	return FALSE;
 		GrpGetPalette(EnemyPalette);
 
-		if(!GrpBMPLoadP(in,   27, SURFACE_ID_MAPCHIP))	return FALSE;
+		if(!DATGraphLoad(  27, SURFACE_ID_MAPCHIP))	return FALSE;
 
 		// 諸事情により、ここにいるのです //
-		if(!GrpBMPLoadP(in,      26,SURFACE_ID_BOMBER))	return FALSE;
+		if(!DATGraphLoad(     26,SURFACE_ID_BOMBER))	return FALSE;
 
 		return TRUE;
 	}
 
 	// エキストラステージボス用(1) //
 	if(stage == GRAPH_ID_EXBOSS1){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in, 29, SURFACE_ID_ENEMY))		return FALSE;
+		if(!DATGraphLoad(29, SURFACE_ID_ENEMY))		return FALSE;
 		GrpGetPalette(EnemyPalette);
 
 		return TRUE;
@@ -214,8 +228,7 @@ BOOL LoadGraph(int stage)
 
 	// エキストラステージボス用(2) //
 	if(stage == GRAPH_ID_EXBOSS2){
-		const auto in = FilStartR("GRAPH.DAT");
-		if(!GrpBMPLoadP(in, 30, SURFACE_ID_ENEMY))		return FALSE;
+		if(!DATGraphLoad(30, SURFACE_ID_ENEMY))		return FALSE;
 		GrpGetPalette(EnemyPalette);
 
 		return TRUE;
@@ -224,17 +237,16 @@ BOOL LoadGraph(int stage)
 	if(stage<0 || stage>STAGE_MAX) return FALSE;
 
 	// マップチップのロードは後で変換すること //
-	const auto in = FilStartR("GRAPH.DAT");
-	if(!GrpBMPLoadP(in,       0,SURFACE_ID_SYSTEM))		return FALSE;
-	if(!GrpBMPLoadP(in,stage+ 0,SURFACE_ID_ENEMY))		return FALSE;
+	if(!DATGraphLoad(       0,SURFACE_ID_SYSTEM))		return FALSE;
+	if(!DATGraphLoad(stage+ 0,SURFACE_ID_ENEMY))		return FALSE;
 	GrpGetPalette(EnemyPalette);
 
 	//DWORD MapChipID[6] = {7,7,8,9,10,11};	// 本当は STAGE_MAX とすべき
 	DWORD MapChipID[STAGE_MAX] = {7,8,9,10,11,12};
-	if(!GrpBMPLoadP(in,MapChipID[stage-1],SURFACE_ID_MAPCHIP))	return FALSE;
+	if(!DATGraphLoad(MapChipID[stage-1],SURFACE_ID_MAPCHIP))	return FALSE;
 
 	// 諸事情により、ここにいるのです //
-	if(!GrpBMPLoadP(in,      26,SURFACE_ID_BOMBER))		return FALSE;
+	if(!DATGraphLoad(     26,SURFACE_ID_BOMBER))		return FALSE;
 
 	return TRUE;
 }
@@ -244,8 +256,7 @@ BOOL LoadFace(BYTE SurfaceID,BYTE FileNo)
 {
 	if(SurfaceID<0 || SurfaceID>=SURFACE_MAX) return FALSE;
 
-	const auto in = FilStartR("GRAPH.DAT");
-	if(!GrpBMPLoadP(in,13+FileNo,SURFACE_ID_FACE0+SurfaceID))		return FALSE;
+	if(!DATGraphLoad(13+FileNo,SURFACE_ID_FACE0+SurfaceID))		return FALSE;
 
 	// パレットを保存する //
 	GrpGetPalette(FaceData[SurfaceID].pal);
@@ -326,16 +337,14 @@ BOOL LoadStageData(BYTE stage)
 	SCL_Head = nullptr;
 	ScrollInfo.DataHead = nullptr;
 
-	const auto in = FilStartR("ENEMY.DAT");
-
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		if((ECL_Head=in.MemExpand( 24))==NULL)				return FALSE;	// ECL Load
-		if((SCL_Head=in.MemExpand( 25))==NULL)				return FALSE;	// SCL Load
-		if((ScrollInfo.DataHead=in.MemExpand( 26))==NULL)	return FALSE;	// MapData Load
+		if((ECL_Head=DATEnemyLoad( 24))==NULL)				return FALSE;	// ECL Load
+		if((SCL_Head=DATEnemyLoad( 25))==NULL)				return FALSE;	// SCL Load
+		if((ScrollInfo.DataHead=DATEnemyLoad( 26))==NULL)	return FALSE;	// MapData Load
 	}
 	else if(stage == GRAPH_ID_ENDING){
-		if((SCL_Head=in.MemExpand( 47))==NULL) return FALSE;	// SCL Load
+		if((SCL_Head=DATEnemyLoad( 47))==NULL) return FALSE;	// SCL Load
 
 		SCL_Now   = SCL_Head.get();
 		GameCount = 0;
@@ -344,9 +353,9 @@ BOOL LoadStageData(BYTE stage)
 	else{
 		// 各データをロードする //
 		if(stage<1 || stage>STAGE_MAX)								return FALSE;
-		if((ECL_Head=in.MemExpand(stage+0-1))==NULL)				return FALSE;	// ECL Load
-		if((SCL_Head=in.MemExpand(stage+6-1))==NULL)				return FALSE;	// SCL Load
-		if((ScrollInfo.DataHead=in.MemExpand(stage+12-1))==NULL)	return FALSE;	// MapData Load
+		if((ECL_Head=DATEnemyLoad(stage+0-1))==NULL)				return FALSE;	// ECL Load
+		if((SCL_Head=DATEnemyLoad(stage+6-1))==NULL)				return FALSE;	// SCL Load
+		if((ScrollInfo.DataHead=DATEnemyLoad(stage+12-1))==NULL)	return FALSE;	// MapData Load
 	}
 
 	// スクロール用変数の初期化 //
@@ -897,7 +906,7 @@ extern BOOL LoadMusic(int no)
 {
 	BOOL flag;
 
-	const auto in = FilStartR("MUSIC.DAT");
+	static const auto in = FilStartR("MUSIC.DAT");
 	flag = PMid_Load(in,no);
 	MusicNum = in.info.size();
 
@@ -944,8 +953,7 @@ extern BOOL LoadMusicRoomComment(int no)
 
 	if(no < 0 || no > 19) return FALSE;
 
-	const auto in=FilStartR("ENEMY.DAT");
-	if(!(temp=in.MemExpand(27+no))) return FALSE;
+	if(!(temp=DATEnemyLoad(27+no))) return FALSE;
 
 	for(i=0; i<19*2; i++){
 		MTitleBuffer[i] = (BYTE)temp[i];

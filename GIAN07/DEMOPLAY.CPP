@@ -76,11 +76,11 @@ FVOID DemoplaySave(void)
 // デモプレイデータをロードする //
 FBOOL DemoplayLoad(int stage)
 {
-	// ファイルを開く //
-	const auto in = FilStartR("ENEMY.DAT");
+	// Not too pretty… //
+	BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno);
 
 	// 展開 //
-	const auto temp = in.MemExpand(stage-1+18);
+	const auto temp = DATEnemyLoad(stage-1+18);
 	auto temp_cursor = temp.cursor();
 	{
 		const auto maybe_info = temp_cursor.next<DEMOPLAY_INFO>();

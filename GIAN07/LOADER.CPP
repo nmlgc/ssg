@@ -198,7 +198,7 @@ BOOL LoadGraph(int stage)
 			}
 		}
 
-		if(!DATGraphLoad(0, SURFACE_ID_MAPCHIP))		return FALSE;
+		if(!GrpBMPLoadP(in, 0, SURFACE_ID_MAPCHIP))		return FALSE;
 
 		return TRUE;
 	}

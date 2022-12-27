@@ -389,7 +389,6 @@ static BOOL DifFnDemo(WORD key)
 
 static BOOL GrpFnChgDevice(WORD key)
 {
-	XDDRAWENUM		*pXDD;
 	int				flag = 0;
 
 	switch(key){
@@ -403,32 +402,21 @@ static BOOL GrpFnChgDevice(WORD key)
 			if(DxEnumNow<=1) break;
 
 			// 次のデバイスへ //
-			ConfigDat.DeviceID = (ConfigDat.DeviceID + (BYTE)DxEnumNow + flag) % (BYTE)DxEnumNow;
+			auto device_id_new = (ConfigDat.DeviceID + (BYTE)DxEnumNow + flag) % (BYTE)DxEnumNow;
+			auto& pXDD = DxEnum[device_id_new];
 
-			// このデバイスでは１６ビットがサポートされていない場合               //
-			// もしくは、このデバイスでは、８ビットがサポートされていない場合     //
-			// ここで、１６ビットデバイスはハードウェアのみなのでこれで多分ＯＫ？ //
-			//  ↑最初に検索されたデバイスについてだけ調べるため                  //
-			pXDD = &DxEnum[ConfigDat.DeviceID];
-			if(ConfigDat.BitDepth==16 && pXDD->D3D->b16Bit==FALSE){
-				if(pXDD->b8Bit) ConfigDat.BitDepth = 8;
-				else{
-					// 元のデバイスに戻して、このswitchから抜ける //
-					ConfigDat.DeviceID=(ConfigDat.DeviceID+(BYTE)DxEnumNow-flag)%(BYTE)DxEnumNow;
+			// Change bit depth to a supported one, if necessary //
+			if(!pXDD.BitDepthSupported(ConfigDat.BitDepth)) {
+				auto bitdepth_new = ((ConfigDat.BitDepth == 8) ? 16 : 8);
+				if(!pXDD.BitDepthSupported(bitdepth_new)) {
 					break;
 				}
+				ConfigDat.BitDepth = bitdepth_new;
 			}
-			else if(ConfigDat.BitDepth==8  && pXDD->b8Bit==FALSE){
-				if(pXDD->b16Bit) ConfigDat.BitDepth = 16;
-				else{
-					// 元のデバイスに戻して、このswitchから抜ける //
-					ConfigDat.DeviceID=(ConfigDat.DeviceID+(BYTE)DxEnumNow-flag)%(BYTE)DxEnumNow;
-					break;
-				}
-			}
+			ConfigDat.DeviceID = device_id_new;
 
 			// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
-			GrpInit(pXDD->lpDDGuid,pXDD->D3D,ConfigDat.BitDepth);
+			GrpInit(pXDD.lpDDGuid,pXDD.D3D,ConfigDat.BitDepth);
 			InitSurface();
 			//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 		break;
@@ -461,26 +449,27 @@ static BOOL GrpFnSkip(WORD key)
 
 static BOOL GrpFnBpp(WORD key)
 {
-	XDDRAWENUM		*pXDD;
-
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
 		return FALSE;
 
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			pXDD = &DxEnum[ConfigDat.DeviceID];
-			if(ConfigDat.BitDepth==8 && pXDD->D3D->b16Bit)	ConfigDat.BitDepth = 16;
-			else if(ConfigDat.BitDepth==16 && pXDD->b8Bit)	ConfigDat.BitDepth = 8;
-			else break;
+		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT): {
+			auto& pXDD = DxEnum[ConfigDat.DeviceID];
+			auto bitdepth_new = ((ConfigDat.BitDepth == 8) ? 16 : 8);
+			if(!pXDD.BitDepthSupported(bitdepth_new)) {
+				break;
+			}
+			ConfigDat.BitDepth = bitdepth_new;
 
 			// この部分に本当ならエラーチェックが必要 //
-			GrpInit(pXDD->lpDDGuid,pXDD->D3D,ConfigDat.BitDepth);
+			GrpInit(pXDD.lpDDGuid,pXDD.D3D,ConfigDat.BitDepth);
 			InitSurface();
 			//GrpSetPalette(DxObj.pe);
 			LoadPaletteFromMusic();
 
 			//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 		break;
+		}
 	}
 
 	SetGrpItem();

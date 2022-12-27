@@ -72,13 +72,7 @@ extern void ConfigLoad(void)
 		if(ConfigDat.PlayerStock<0) break;
 		if(ConfigDat.BombStock>3) break;
 
-		// ここでは、ビット深度が８か１６である事を保証する //
-		// まずあり得ないことだが、ビデオカードが８ビットをサポートしていない //
-		// 場合のチェックも行い、起動ができなくなる事を防ぐ。                 //
-		if(ConfigDat.BitDepth!=8 && ConfigDat.BitDepth!=16) break;
-		if(ConfigDat.BitDepth== 8 && DxEnum[ConfigDat.DeviceID].b8Bit ==FALSE) break;		// 256
-		if(ConfigDat.BitDepth==16 && DxEnum[ConfigDat.DeviceID].b16Bit==FALSE) break;		// 2D
-		if(ConfigDat.BitDepth==16 && DxEnum[ConfigDat.DeviceID].D3D->b16Bit==FALSE) break;	// 3D
+		if(DxEnum[ConfigDat.DeviceID].BitDepthSupported(ConfigDat.BitDepth) == false) break;
 
 		if(ConfigDat.DrawMode>3) break;
 		if(ConfigDat.GameLevel>3) break;

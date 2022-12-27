@@ -89,6 +89,15 @@ typedef struct tagDDRAWENUM{
 	BOOL		b16Bit;					// この DD_DEVICE が 16Bit に対応しているか
 	BOOL		b24Bit;					// この DD_DEVICE が 24Bit に対応しているか
 	BOOL		b32Bit;					// この DD_DEVICE が 32Bit に対応しているか
+
+	// Only looks at the first D3D device?
+	bool BitDepthSupported(uint8_t bpp) const {
+		switch(bpp) {
+		case  8:	return b8Bit;
+		case 16:	return (b16Bit && D3D->b16Bit);
+		default:	return false;
+		}
+	}
 } XDDRAWENUM;
 
 

@@ -102,8 +102,6 @@ extern DWORD		DxEnumNow;
 // 初期化など //
 FBOOL GrpEnum(HWND hWnd);								// 使用できるデバイスを列挙する
 FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp);
-FBOOL GrpInitEmu8(void);								// 「えみゅ」で８ビット初期化
-FBOOL GrpInitW(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp);
 FVOID GrpCleanup(void);									// いつも通りに(ただし失敗したら異常終了)
 FVOID GrpSetClip(int sx,int sy,int ex,int ey);			// 3DViewportが生きていたらそちらもセット
 FBOOL GrpRestore(void);									// ロード済みのSurfaceを修復

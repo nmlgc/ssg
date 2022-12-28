@@ -438,7 +438,7 @@ void DeleteExtraFont(ExtraFontInfo *pFont)
 
 
 // フォント描画 //
-void DrawExtraFont(ExtraFontInfo *pFont, int ox, int oy, int t)
+void DrawExtraFont(ExtraFontInfo *pFont, int ox, int oy, int t, int radius_max)
 {
 	int		i;
 	int		x, y;
@@ -468,92 +468,15 @@ void DrawExtraFont(ExtraFontInfo *pFont, int ox, int oy, int t)
 	if(DxObj.Bpp == 16){
 		for(i=0; i<pFont->DataSize; i++, pData++){
 			if(t){
-				//x = ox + pData->x;
-				//y = oy + pData->y;
-
 				//d  = pData->d + (pData->l * (sinl(t-64,128)+128)) / 64;
 				d  = pData->d + (sinl(t-64, 64)+64) * (pData->l) / 32;
-				l1 = (pData->l+60) * cosl(t, 200) / (200) - 60;
-				l2 = (pData->l-10) * cosl(t, 200) / (200) + 10;
+				l1 = (pData->l+60) * cosm(t) / 256 - 60;
+				l2 = (pData->l-10) * cosm(t) / 256 + 10;
 
-				x = ox + cosl(d, min(100, abs(l1)) );
-				y = oy + sinl(d, min(100, abs(l2)) );
-			}
-			else{
-				x = ox + pData->x;
-				y = oy + pData->y;
-			}
-			if(x < 0 || x > 639 || y < 0 || y > 399) continue;
-
-			*(WORD *)(&pByte[x*2 + y * Pitch]) = pData->c.Word;
-		}
-	}
-	else{
-		for(i=0; i<pFont->DataSize; i++, pData++){
-			if(t){
-				//x = ox + pData->x;
-				//y = oy + pData->y;
-
-				//d  = pData->d + (pData->l * (sinl(t-64,128)+128)) / 64;
-				d  = pData->d + (sinl(t-64, 64)+64) * (pData->l) / 32;
-				l1 = (pData->l+60) * cosl(t, 200) / (200) - 60;
-				l2 = (pData->l-10) * cosl(t, 200) / (200) + 10;
-
-				x = ox + cosl(d, min(100, abs(l1)) );
-				y = oy + sinl(d, min(100, abs(l2)) );
-			}
-			else{
-				x = ox + pData->x;
-				y = oy + pData->y;
-			}
-			if(x < 0 || x > 639 || y < 0 || y > 399) continue;
-
-			pByte[x + y * Pitch] = pData->c.Byte;
-		}
-	}
-
-	DxObj.Back->Unlock(NULL);
-}
-
-
-// フォント描画 //
-void DrawExtraFont2(ExtraFontInfo *pFont, int ox, int oy, int t)
-{
-	int		i;
-	int		x, y;
-
-	BYTE	d;
-	int		l1, l2;
-
-	DDSURFACEDESC		ddsd;
-	HRESULT				ddret;
-	DWORD				Pitch;
-
-	BYTE		*pByte;
-	EXPOINT		*pData;
-
-	if(pFont == NULL) return;
-
-
-	memset(&ddsd,0,sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(ddsd);
-	ddret = DxObj.Back->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL);
-	if(ddret != DD_OK) return;
-
-	Pitch  = ddsd.lPitch;
-	pData  = pFont->Data;
-	pByte  = (BYTE *)ddsd.lpSurface;
-
-	if(DxObj.Bpp == 16){
-		for(i=0; i<pFont->DataSize; i++, pData++){
-			if(t){
-				//x = ox + pData->x;
-				//y = oy + pData->y;
-
-				//d  = pData->d + (pData->l * (sinl(t-64,128)+128)) / 64;
-				d  = pData->d + (sinl(t-64, 64)+64) * (pData->l) / 32;
-				l1 = (pData->l+60) * cosl(-t, 256) / (256) - 60;
-				l2 = (pData->l-10) * cosl(-t, 256) / (256) + 10;
+				if(radius_max){
+					l1 = min(radius_max, abs(l1));
+					l2 = min(radius_max, abs(l2));
+				}
 
 				x = ox + cosl(d, l1);
 				y = oy + sinl(d, l2);
@@ -570,13 +493,15 @@ void DrawExtraFont2(ExtraFontInfo *pFont, int ox, int oy, int t)
 	else{
 		for(i=0; i<pFont->DataSize; i++, pData++){
 			if(t){
-				//x = ox + pData->x;
-				//y = oy + pData->y;
-
 				//d  = pData->d + (pData->l * (sinl(t-64,128)+128)) / 64;
 				d  = pData->d + (sinl(t-64, 64)+64) * (pData->l) / 32;
-				l1 = (pData->l+60) * cosl(t, 256) / (256) - 60;
-				l2 = (pData->l-10) * cosl(t, 256) / (256) + 10;
+				l1 = (pData->l+60) * cosm(t) / 256 - 60;
+				l2 = (pData->l-10) * cosm(t) / 256 + 10;
+
+				if(radius_max){
+					l1 = min(radius_max, abs(l1));
+					l2 = min(radius_max, abs(l2));
+				}
 
 				x = ox + cosl(d, l1);
 				y = oy + sinl(d, l2);

@@ -63,8 +63,12 @@ extern FVOID DrawGrdFont(GRP surf,char *s);		// グラデーション付きフ�
 
 ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc);			// フォント生成
 void DeleteExtraFont(ExtraFontInfo *pFont);							// フォント削除
-void DrawExtraFont(ExtraFontInfo *pFont, int ox, int oy, int t);	// フォント描画
-void DrawExtraFont2(ExtraFontInfo *pFont, int ox, int oy, int t);	// フォント描画
+
+// Renders [pFont] to the back buffer at the given left/top position. Setting
+// [t] renders the [t]th frame of a double-spiral moiré animation instead; in
+// that case, [radius_max] can be used to restrict this animation to the given
+// radius in the center of [pFont], which won't render any pixels outside.
+void DrawExtraFont(ExtraFontInfo *pFont, int ox, int oy, int t = 0, int radius_max = 0);
 
 
 #endif

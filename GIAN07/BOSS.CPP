@@ -384,7 +384,7 @@ FVOID BossHPG_Draw(void)
 			x1 = BOSSHPG_END_X+3 + (BossHPG.Next*30*8)/BossHPG.Max;
 			x2 = BOSSHPG_END_X+3 + (BossHPG.Now *30*8)/BossHPG.Max;
 
-			if(DxObj.Bpp == 16){
+			if(DxObj.PixelFormat.IsChanneled()){
 				if(x1<x2){
 					Src[1].x = BOSSHPG_END_X+3;		Src[1].y = 16+3;
 					Src[0].x = x1;					Src[0].y = 16+3;

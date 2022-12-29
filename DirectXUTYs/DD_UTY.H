@@ -27,6 +27,7 @@
 #include "DX_ERROR.H"					// エラー処理用関数
 #include "MtoB.h"						// スクリーンキャプチャー
 #include <array>
+#include <variant>
 
 
 // 定数＆マクロ //
@@ -39,8 +40,20 @@
 
 #define RGB256(r,g,b)	((r)+(g)*6+(b)*36+0x14)
 
-// Bit depths //
-// ---------- //
+// Bit depths and pixel formats //
+// ---------------------------- //
+
+// (We don't really care about the value of whatever variant type this holds,
+// just about the type itself.)
+struct PIXELFORMAT : public std::variant<uint8_t, uint16_t> {
+	bool IsPalettized() const {
+		return std::holds_alternative<uint8_t>(*this);
+	}
+
+	bool IsChanneled() const {
+		return !IsPalettized();
+	}
+};
 
 class BITDEPTHS {
 protected:
@@ -77,6 +90,16 @@ public:
 
 		uint8_t value() const {
 			return bpp;
+		}
+
+		// Adding std::monostate to PIXELFORMAT would just make it awful to
+		// use.
+		std::optional<PIXELFORMAT> pixel_format() const {
+			switch(bpp) {
+			case  8:	return std::make_optional<PIXELFORMAT>(uint8_t{});
+			case 16:	return std::make_optional<PIXELFORMAT>(uint16_t{});
+			default:	return std::nullopt;
+			}
 		}
 
 		// Cycles through all supported bit depths.
@@ -125,6 +148,7 @@ typedef struct tagDXOBJECT{
 
 	PALETTEENTRY			pe[256];	// パレットの初期値
 
+	PIXELFORMAT PixelFormat;
 	DWORD					Bpp;			// 色数(なぜ３２ビット？)
 	HWND					hWnd;			// ウィンドウハンドル
 	BOOL					bWndMode;		// ウィンドウモードか？

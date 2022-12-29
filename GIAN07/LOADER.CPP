@@ -268,7 +268,7 @@ void LoadPaletteFromMusic(void)
 {
 	LPDIRECTDRAWPALETTE		lpdp;
 
-	if(DxObj.Bpp != 8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 	if(!GrEnemy) return;
 	if(GrEnemy->GetPalette(&lpdp) != DD_OK) return;
 
@@ -283,7 +283,7 @@ void LoadPaletteFromMap(void)
 {
 	LPDIRECTDRAWPALETTE		lpdp;
 
-	if(DxObj.Bpp != 8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 	if(!GrMap) return;
 	if(GrMap->GetPalette(&lpdp) != DD_OK) return;
 /*
@@ -302,13 +302,13 @@ void LoadPaletteFromMap(void)
 // 敵のパレットにする
 extern void LoadPaletteFromEnemy(void)
 {
-	if(DxObj.Bpp != 8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 	GrpSetPalette(EnemyPalette);
 	return;
 /*
 	LPDIRECTDRAWPALETTE		lpdp;
 
-	if(DxObj.Bpp != 8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 	if(!GrMap) return;
 	if(GrEnemy->GetPalette(&lpdp) != DD_OK) return;
 /*
@@ -979,7 +979,7 @@ extern void EnterBombPalette(void)
 
 	bIsBombPalette = TRUE;
 
-	if(DxObj.Bpp != 8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 	if(!GrBomber) return;
 	if(GrBomber->GetPalette(&lpdp) != DD_OK) return;
 

@@ -704,7 +704,7 @@ FVOID SProjectProc(void)
 		GrpBlt(&rc,320-320/2,240+40,GrMap);
 
 		if(timer < 64){
-			if(DxObj.Bpp == 16){
+			if(DxObj.PixelFormat.IsChanneled()){
 				GrpLock();
 				GrpSetAlpha((255-timer)*4, ALPHA_NORM);
 				GrpSetColor(0,0,0);
@@ -716,7 +716,7 @@ FVOID SProjectProc(void)
 			}
 		}
 		else if(timer > 192){
-			if(DxObj.Bpp == 16){
+			if(DxObj.PixelFormat.IsChanneled()){
 				GrpLock();
 				GrpSetAlpha(timer*4, ALPHA_NORM);
 				GrpSetColor(0,0,0);
@@ -1506,14 +1506,14 @@ FVOID GameDraw(void)
 
 	MaidDraw();
 
-	if(DxObj.Bpp==8) LLaserDraw();
+	if(DxObj.PixelFormat.IsPalettized()) LLaserDraw();
 
 	ObjectLockDraw();
 
 	fragment_draw();
 	ItemDraw();
 
-	if(DxObj.Bpp==16) LLaserDraw();
+	if(DxObj.PixelFormat.IsChanneled()) LLaserDraw();
 
 	HLaserDraw();
 	laser_draw();

@@ -74,7 +74,7 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.Bpp==16){
+				if(DxObj.PixelFormat.IsChanneled()){
 					GrpSetColor(0,0,5);
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
@@ -100,7 +100,7 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.Bpp==16){
+				if(DxObj.PixelFormat.IsChanneled()){
 					GrpSetColor(0,0,5);
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
@@ -114,7 +114,7 @@ void LaserBombDraw(void)
 					GrpPolygon(p,4);
 				}
 			}
-			if(DxObj.Bpp==16) break;
+			if(DxObj.PixelFormat.IsChanneled()) break;
 		}
 	}
 	else if(LaserDeg<150){
@@ -132,7 +132,7 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.Bpp==16){
+				if(DxObj.PixelFormat.IsChanneled()){
 					GrpSetColor(0,0,5);
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
@@ -154,7 +154,7 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.Bpp==16){
+				if(DxObj.PixelFormat.IsChanneled()){
 					GrpSetColor(0,0,5);
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
@@ -164,7 +164,7 @@ void LaserBombDraw(void)
 					GrpPolygon(p,4);
 				}
 			}
-			if(DxObj.Bpp==16) break;
+			if(DxObj.PixelFormat.IsChanneled()) break;
 		}
 	}
 

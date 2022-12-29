@@ -87,7 +87,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	p = CWinSearchActive(ws);
 
 	// 半透明ＢＯＸの描画 //
-	alpha = (DxObj.Bpp==8) ? 64+32 : 128;
+	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 128;
 
 	GrpLock();
 	GrpSetAlpha(alpha,ALPHA_NORM);
@@ -262,7 +262,7 @@ void MWinDraw(void)
 
 	// 半透明部の描画 //
 	GrpLock();
-	alpha = (DxObj.Bpp==8) ? 64+32 : 110;
+	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 110;
 	GrpSetAlpha(alpha,ALPHA_NORM);
 	GrpSetColor(0,0,3);//0,0,3
 	GrpBoxA(x+4,y+4,x+w-4,y+h-4);

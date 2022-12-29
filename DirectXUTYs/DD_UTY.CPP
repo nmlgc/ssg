@@ -126,7 +126,12 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
 //	D3DMATERIALHANDLE	hmat;
 
 	if(DxObj.hWnd==NULL) return FALSE;
-	if(!bitdepth) return false;
+
+	const auto maybe_pixel_format = bitdepth.pixel_format();
+	if(!maybe_pixel_format) {
+		return false;
+	}
+	const auto pixel_format = maybe_pixel_format.value();
 
 	GrpCleanup();
 	ZEROMEM(ddsd);
@@ -166,7 +171,8 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
 
 		// 2Dの初期化はここでおしまい //
 		DxObj.Bpp = bitdepth.value();
-		if(DxObj.Bpp==8) throw(TRUE);
+		DxObj.PixelFormat = pixel_format;
+		if(DxObj.PixelFormat.IsPalettized()) throw(TRUE);
 
 		// Direct3D Object の取得 //
 		dxret = DxObj.DD->QueryInterface(IID_IDirect3D2,(void **)&DxObj.D3);
@@ -197,7 +203,7 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
 		return FALSE;
 	}
 	catch(BOOL flag){
-		if(bitdepth.value()==8) {
+		if(pixel_format.IsPalettized()) {
 			_2DSetup();
 		} else {
 			_3DSetup();
@@ -313,7 +319,7 @@ FVOID GrpGetPalette(PALETTEENTRY *pal)
 	int		i;
 
 	// ８Ｂｉｔモード以外では、何もしないでリターンする //
-	if(DxObj.Bpp!=8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 
 	for(i=0;i<256;i++){
 		pal[i] = DxObj.pe[i];
@@ -326,7 +332,7 @@ FVOID GrpSetPalette(PALETTEENTRY *pal)
 	int			i;
 
 	// ８Ｂｉｔモード以外では、何もしないでリターンする //
-	if(DxObj.Bpp!=8) return;
+	if(DxObj.PixelFormat.IsChanneled()) return;
 
 	// 強制的に色をセットしてしまう //
 	pal[0].peRed   = 0;
@@ -406,7 +412,7 @@ FVOID GrpCls(void)
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
-	ddbltfx.dwFillColor = (DxObj.Bpp==8) ? RGB256(0,0,0) : 0;
+	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()) ? RGB256(0,0,0) : 0;
 
 	for(;;){
 		ddrval = DxObj.Back->Blt(NULL,NULL,NULL,DDBLT_COLORFILL,&ddbltfx);
@@ -459,7 +465,7 @@ extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds)
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
-	ddbltfx.dwFillColor = (DxObj.Bpp==8) ? RGB256(0,0,0) : 0;
+	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()) ? RGB256(0,0,0) : 0;
 
 	for(;;){
 		ddrval = lpds->Blt(NULL,NULL,NULL,DDBLT_COLORFILL,&ddbltfx);
@@ -486,7 +492,7 @@ static FVOID GrpFlipFS(void)
 		PutSurfaceToBmp(DxObj.Back);
 
 	// パレットを変更する必要があれば、変更だ //
-	if(DxObj.bNeedChgPal && DxObj.Bpp==8){
+	if(DxObj.bNeedChgPal && DxObj.PixelFormat.IsPalettized()){
 		DxObj.Back->SetPalette(DxObj.Pal);		// 裏画面にパレットをセットする
 		DxObj.bNeedChgPal = FALSE;
 	}
@@ -673,7 +679,7 @@ static BOOL GrpBMLoadMemory(DXSURFACE *surf)
 	width  = (BMP_info->biWidth+3)&(~3);
 	height = BMP_info->biHeight;
 
-	if(DxObj.Bpp==8){
+	if(DxObj.PixelFormat.IsPalettized()){
 		for(i=0;i<256;i++){
 			DxObj.pe[i].peRed   = pal[i].rgbRed;
 			DxObj.pe[i].peGreen = pal[i].rgbGreen;

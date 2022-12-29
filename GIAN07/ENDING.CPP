@@ -183,8 +183,8 @@ FVOID EndingProc(void)
 FVOID EndingDraw(void)
 {
 	// 画面消去 //
-	if(DxObj.Bpp == 8) GrpClsEx(NULL, 255);
-	else               GrpClsEx(NULL, RGB(0,0,0));
+	DWORD cls_col = (DxObj.PixelFormat.IsPalettized() ? 255 : RGB(0,0,0));
+	GrpClsEx(NULL, cls_col);
 
 	// それぞれのグラフィックを描画するで //
 	DrawGrpInfo();
@@ -375,7 +375,7 @@ void DrawFadeInfo()
 	WORD			a;
 
 	// フェードアウト関連
-	if(DxObj.Bpp == 8){
+	if(DxObj.PixelFormat.IsPalettized()){
 		if(FlashState){
 			FlashPaletteGrp(temp_pal, EGrpInfo.target->pal, FlashState);
 			GrpSetPalette(temp_pal);

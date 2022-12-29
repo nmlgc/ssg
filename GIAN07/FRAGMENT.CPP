@@ -206,7 +206,7 @@ static void __stdcall _FDraw(FRAGMENT_DATA *f)
 		break;
 
 		case(FRG_FATCIRCLE):
-			if(DxObj.Bpp==16){
+			if(DxObj.PixelFormat.IsChanneled()){
 				GrpLock();
 				GrpSetColor(4,0,0);
 				GrpSetAlpha(128,ALPHA_ONE);

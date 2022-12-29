@@ -226,7 +226,7 @@ FVOID HLaserDraw(void)
 	FVOIDFN(*AlphaPolygon)(POINT *p,int n);
 	//FVOIDFN(*AlphaCircle)(int x, int y, int r);
 
-	if(DxObj.Bpp==16){
+	if(DxObj.PixelFormat.IsChanneled()){
 		AlphaPolygon = GrpPolygonA;
 		//AlphaCircle  = GrpCircleA;
 		GrpSetColor(1,2,5);
@@ -251,8 +251,11 @@ FVOID HLaserDraw(void)
 		src[1].x = (p->x - cosl(p->d-64, w))>>6;
 		src[1].y = (p->y - sinl(p->d-64, w))>>6;
 
-		if(DxObj.Bpp == 16)	_CircleA16(p->x, p->y, w, p->d);
-		else				GrpCircleF(p->x>>6, p->y>>6, w>>6);
+		if(DxObj.PixelFormat.IsChanneled()) {
+			_CircleA16(p->x, p->y, w, p->d);
+		} else {
+			GrpCircleF(p->x>>6, p->y>>6, w>>6);
+		}
 
 		for(i=0; i< HLASER_LEN-1; i++){
 			//temp    = p;
@@ -272,9 +275,12 @@ FVOID HLaserDraw(void)
 			if(w>64*2)	w -= 64;
 		}
 	}
-	
-	if(DxObj.Bpp == 16) GrpSetColor(3,4,5);
-	else                GrpSetColor(5,5,5);
+
+	if(DxObj.PixelFormat.IsChanneled()) {
+		GrpSetColor(3,4,5);
+	} else {
+		GrpSetColor(5,5,5);
+	}
 
 	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
 		w = HOMINGL_WIDTH/2;
@@ -287,8 +293,11 @@ FVOID HLaserDraw(void)
 		src[1].y = (p->y - sinl(p->d-64, w))>>6;
 
 		//AlphaCircle(p->x>>6, p->y>>6, w>>6);
-		if(DxObj.Bpp == 16)	_CircleA16(p->x, p->y, w, p->d);
-		else				GrpCircleF(p->x>>6, p->y>>6, w>>6);
+		if(DxObj.PixelFormat.IsChanneled()) {
+			_CircleA16(p->x, p->y, w, p->d);
+		} else {
+			GrpCircleF(p->x>>6, p->y>>6, w>>6);
+		}
 
 		for(i=0; i< HLASER_LEN-1; i++){
 			//temp    = p;

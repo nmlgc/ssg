@@ -770,7 +770,7 @@ FVOID GrpDrawSpect(int x,int y)
 
 	GrpLock();
 
-	if(DxObj.Bpp==16){
+	if(DxObj.PixelFormat.IsChanneled()){
 		for(i=0;i<128+8+8;i++){
 			//WORD c2 = 0;	//5
 			GrpGrdLineEx(i+x,y-ftable[i]*2,y);

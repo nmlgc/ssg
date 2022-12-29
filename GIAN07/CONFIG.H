@@ -50,9 +50,11 @@ typedef struct tagCONFIG_DATA{
 	BYTE	PadCancel;
 
 	BYTE	ExtraStgFlags;	// エキストラステージ判定用フラグ
-	DWORD	CheckSum;
+	uint32_t	CheckSum;
 
 	BYTE	StageSelect;	// ワケ有りでここにいるのです(チェックサムの範囲外)
+
+	uint32_t CheckSumCalculate() const;
 } CONFIG_DATA;
 
 extern CONFIG_DATA ConfigDat;

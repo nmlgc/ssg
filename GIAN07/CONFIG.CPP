@@ -8,6 +8,27 @@
 #include "CONFIG.H"
 #include "LEVEL.H"
 
+///// Methods /////
+uint32_t CONFIG_DATA::CheckSumCalculate() const
+{
+	uint32_t ret = 0;
+	ret += (BitDepth.value() << 1);
+	ret += (BombStock << 3);
+	ret += (DeviceID << 2);
+	ret += (DrawMode << 6);
+	ret += (ExtraStgFlags << 5);
+	ret += (GameLevel << 2);
+	ret += (GraphFlags << 1);
+	ret += (InputFlags << 3);
+	ret += (PadBomb << 6);
+	ret += (PadCancel << 3);
+	ret += (PadShift << 1);
+	ret += (PadTama << 4);
+	ret += (PlayerStock << 5);
+	ret += (SoundFlags << 2);
+	return ret;
+}
+
 ///// [グローバル変数] /////
 CONFIG_DATA ConfigDat;
 #ifdef PBG_DEBUG
@@ -72,7 +93,6 @@ static void DebugInit(void)
 extern void ConfigLoad(void)
 {
 	FILE		*fp;
-	DWORD		tmp;
 
 #ifdef PBG_DEBUG
 	DebugInit();
@@ -85,22 +105,7 @@ extern void ConfigLoad(void)
 		fread(&ConfigDat,sizeof(CONFIG_DATA),1,fp);
 		fclose(fp);
 
-		tmp = 0;
-		tmp += (ConfigDat.BitDepth.value() << 1);
-		tmp += (ConfigDat.BombStock << 3);
-		tmp += (ConfigDat.DeviceID << 2);
-		tmp += (ConfigDat.DrawMode << 6);
-		tmp += (ConfigDat.ExtraStgFlags << 5);
-		tmp += (ConfigDat.GameLevel << 2);
-		tmp += (ConfigDat.GraphFlags << 1);
-		tmp += (ConfigDat.InputFlags << 3);
-		tmp += (ConfigDat.PadBomb << 6);
-		tmp += (ConfigDat.PadCancel << 3);
-		tmp += (ConfigDat.PadShift << 1);
-		tmp += (ConfigDat.PadTama << 4);
-		tmp += (ConfigDat.PlayerStock << 5);
-		tmp += (ConfigDat.SoundFlags << 2);
-		if(tmp != ConfigDat.CheckSum) break;
+		if(ConfigDat.CheckSumCalculate() != ConfigDat.CheckSum) break;
 
 		// 列挙したデバイス数と比較して異常ならここで修正する //
 		// ここに来た場合は、ファイルが壊れているかビデオカードが抜かれたかの //
@@ -141,27 +146,11 @@ extern void ConfigLoad(void)
 extern void ConfigSave(void)
 {
 	FILE		*fp;
-	BYTE		*p;
-	DWORD		sum;
 
 	fp = fopen("秋霜CFG.DAT","wb");
 	if(fp==NULL) return;
 
-	ConfigDat.CheckSum = 0;
-	ConfigDat.CheckSum += (ConfigDat.BitDepth.value() << 1);
-	ConfigDat.CheckSum += (ConfigDat.BombStock << 3);
-	ConfigDat.CheckSum += (ConfigDat.DeviceID << 2);
-	ConfigDat.CheckSum += (ConfigDat.DrawMode << 6);
-	ConfigDat.CheckSum += (ConfigDat.ExtraStgFlags << 5);
-	ConfigDat.CheckSum += (ConfigDat.GameLevel << 2);
-	ConfigDat.CheckSum += (ConfigDat.GraphFlags << 1);
-	ConfigDat.CheckSum += (ConfigDat.InputFlags << 3);
-	ConfigDat.CheckSum += (ConfigDat.PadBomb << 6);
-	ConfigDat.CheckSum += (ConfigDat.PadCancel << 3);
-	ConfigDat.CheckSum += (ConfigDat.PadShift << 1);
-	ConfigDat.CheckSum += (ConfigDat.PadTama << 4);
-	ConfigDat.CheckSum += (ConfigDat.PlayerStock << 5);
-	ConfigDat.CheckSum += (ConfigDat.SoundFlags << 2);
+	ConfigDat.CheckSum = ConfigDat.CheckSumCalculate();
 
 	fwrite(&ConfigDat,sizeof(CONFIG_DATA),1,fp);
 	fclose(fp);

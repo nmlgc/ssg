@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "GAMEMAIN.H"
+#include "LENS.H"
 
 
 extern HWND hWndMain;

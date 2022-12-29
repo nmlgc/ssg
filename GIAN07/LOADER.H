@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_LOADER_H)
 
 #include "GIAN.H"
-#include "LENS.H"
 
 
 ///// [ 定数 ] /////
@@ -138,8 +137,6 @@ extern DWORD		MusicNum;			// 曲数
 
 extern char MCommentBuffer[12][50];
 extern char MTitleBuffer[50];
-
-extern LensInfo *Lens;
 
 extern PALETTEENTRY SProjectPalette[256];
 

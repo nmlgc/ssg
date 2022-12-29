@@ -24,6 +24,8 @@ typedef struct tagLensInfo {
 	//BYTE		gID;		// SurfaceID (DD_UTY の関数に対する)
 } LensInfo;
 
+extern LensInfo *Lens;
+
 
 
 ///// [ 関数 ] /////

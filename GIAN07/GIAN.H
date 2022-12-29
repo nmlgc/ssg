@@ -102,14 +102,6 @@
 #define STG_RNDXY	0				// 配置する座標がランダムの時の値...(なんだかよう分からん)
 
 
-// 難易度 ＆ オプション設定 //
-#define GAME_EASY		0			// 難易度：Ｅａｓｙ
-#define GAME_NORMAL		1			// 難易度：Ｎｏｒｍａｌ
-#define GAME_HARD		2			// 難易度：Ｈａｒｄ
-#define GAME_LUNATIC	3			// 難易度：Ｌｕｎａｔｉｃ
-#define GAME_EXTRA		4			// Ｅｘｔｒａ時...
-
-
 // スコア //
 #define SCORE_NAME		9			// スコア用の最大文字列長(NULL含む)
 

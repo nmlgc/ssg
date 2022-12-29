@@ -5,6 +5,7 @@
 
 #include "GAMEMAIN.H"
 #include "LENS.H"
+#include "LEVEL.H"
 
 
 extern HWND hWndMain;

@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "PRankCtrl.h"
+#include "LEVEL.H"
 
 PlayRankInfo	PlayRank;
 

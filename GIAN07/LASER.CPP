@@ -5,6 +5,7 @@
 
 #include "GIAN.H"
 #include "DirectXUTYs/DD_GRP3D.H"
+#include "LEVEL.H"
 
 
 /*

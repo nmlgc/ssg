@@ -5,6 +5,7 @@
 
 #include "GIAN.H"
 #include "ECL_LEN.H"
+#include "LEVEL.H"
 
 /*
  * ECLコマンドのアドレス更新には ECL_CmdLen[ECLコマンド定数] を使用する

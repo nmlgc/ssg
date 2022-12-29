@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "SCROLL.H"
+#include "LEVEL.H"
 
 
 

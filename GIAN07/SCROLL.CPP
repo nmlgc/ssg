@@ -4,6 +4,8 @@
 /*                                                                           */
 
 #include "SCROLL.H"
+#include "CONFIG.H"
+#include "DEMOPLAY.H"
 #include "LEVEL.H"
 
 

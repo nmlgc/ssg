@@ -4,6 +4,8 @@
 /*                                                                           */
 
 #include "GAMEMAIN.H"
+#include "CONFIG.H"
+#include "DEMOPLAY.H"
 #include "LENS.H"
 #include "LEVEL.H"
 

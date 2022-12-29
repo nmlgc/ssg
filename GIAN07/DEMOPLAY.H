@@ -7,6 +7,7 @@
 #define PBGWIN_DEMOPLAY_H		"DEMOPLAY : Version 0.02 : Update 2000/04/01"
 //#pragma message(PBGWIN_DEMOPLAY_H)
 
+#include "CONFIG.H"
 #include "GIAN.H"
 
 

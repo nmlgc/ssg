@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "WindowCtrl.h"
+#include "CONFIG.H"
 
 
 

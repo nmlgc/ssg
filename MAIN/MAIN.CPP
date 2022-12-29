@@ -1,4 +1,5 @@
 #include "../GIAN07/GIAN.H"
+#include "../GIAN07/CONFIG.H"
 #include <direct.h>
 
 extern const char *APP_CLASS = "GIAN07";

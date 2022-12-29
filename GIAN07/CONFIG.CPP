@@ -36,7 +36,7 @@ CONFIG_DATA ConfigDat;
 #endif
 
 ///// [ 関数(非公開) ] /////
-static void ConfigInit(void)
+static void ConfigInit(const std::span<const XDDRAWENUM> dxenum)
 {
 	// 難易度関連 //
 	ConfigDat.BombStock   = 2;
@@ -45,7 +45,7 @@ static void ConfigInit(void)
 
 	// グラフィック関連 //
 	ConfigDat.DeviceID   = 0;
-	ConfigDat.BitDepth   = DxEnum[ConfigDat.DeviceID].BitDepthBest();
+	ConfigDat.BitDepth   = dxenum[ConfigDat.DeviceID].BitDepthBest();
 	ConfigDat.DrawMode   = 1;		// 60Fps Mode
 	ConfigDat.GraphFlags = 0;
 
@@ -90,7 +90,7 @@ static void DebugInit(void)
 #endif
 
 // コンフィグの内容を初期化する //
-extern void ConfigLoad(void)
+extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 {
 	FILE		*fp;
 
@@ -110,13 +110,13 @@ extern void ConfigLoad(void)
 		// 列挙したデバイス数と比較して異常ならここで修正する //
 		// ここに来た場合は、ファイルが壊れているかビデオカードが抜かれたかの //
 		// どちらかなので、強制的に break しない。                            //
-		if(ConfigDat.DeviceID>=DxEnumNow) ConfigDat.DeviceID = 0;
+		if(ConfigDat.DeviceID >= dxenum.size()) ConfigDat.DeviceID = 0;
 
 		if(ConfigDat.PlayerStock>6) break;
 		if(ConfigDat.PlayerStock<0) break;
 		if(ConfigDat.BombStock>3) break;
 
-		if(DxEnum[ConfigDat.DeviceID].BitDepthSupported(ConfigDat.BitDepth) == false) break;
+		if(dxenum[ConfigDat.DeviceID].BitDepthSupported(ConfigDat.BitDepth) == false) break;
 
 		if(ConfigDat.DrawMode>3) break;
 		if(ConfigDat.GameLevel>3) break;
@@ -139,7 +139,7 @@ extern void ConfigLoad(void)
 		return;
 	}
 
-	ConfigInit();
+	ConfigInit(dxenum);
 }
 
 // コンフィグの内容を保存する //

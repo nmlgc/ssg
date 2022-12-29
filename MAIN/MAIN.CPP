@@ -239,7 +239,7 @@ BOOL XInit(void)
 	XDDRAWENUM		*pXDD;
 
 	// コンフィグをロードする //
-	ConfigLoad();
+	ConfigLoad({ DxEnum, DxEnumNow });
 
 	Key_PadConfig2(ConfigDat.PadTama,   KEY_TAMA);
 	Key_PadConfig2(ConfigDat.PadBomb,   KEY_BOMB);

@@ -116,7 +116,7 @@ FBOOL GrpEnum(HWND hWnd)
 	return TRUE;
 }
 
-FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp)
+FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
 {
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
@@ -126,6 +126,7 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp)
 //	D3DMATERIALHANDLE	hmat;
 
 	if(DxObj.hWnd==NULL) return FALSE;
+	if(!bitdepth) return false;
 
 	GrpCleanup();
 	ZEROMEM(ddsd);
@@ -144,7 +145,7 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp)
 		if(dxret!=DD_OK) throw("SetCooperativeLevel に失敗");
 
 		// ディスプレイモードのセット //
-		dxret = DxObj.DD->SetDisplayMode(640,480,Bpp,0,0);
+		dxret = DxObj.DD->SetDisplayMode(640,480,bitdepth.value(),0,0);
 		if(dxret!=DD_OK) throw("SetDisplayMode に失敗");
 
 		// プライマリ＆バックサーフェスの作成 //
@@ -164,8 +165,8 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp)
 		GrpFlip = GrpFlipFS;
 
 		// 2Dの初期化はここでおしまい //
-		DxObj.Bpp = Bpp;
-		if(Bpp==8) throw(TRUE);
+		DxObj.Bpp = bitdepth.value();
+		if(DxObj.Bpp==8) throw(TRUE);
 
 		// Direct3D Object の取得 //
 		dxret = DxObj.DD->QueryInterface(IID_IDirect3D2,(void **)&DxObj.D3);
@@ -196,8 +197,11 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp)
 		return FALSE;
 	}
 	catch(BOOL flag){
-		if(Bpp==8) _2DSetup();
-		else       _3DSetup();
+		if(bitdepth.value()==8) {
+			_2DSetup();
+		} else {
+			_3DSetup();
+		}
 
 		GrpSetClip(0,0,640,480);
 		return flag;

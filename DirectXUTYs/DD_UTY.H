@@ -26,6 +26,7 @@
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
 #include "MtoB.h"						// スクリーンキャプチャー
+#include <array>
 
 
 // 定数＆マクロ //
@@ -38,6 +39,74 @@
 
 #define RGB256(r,g,b)	((r)+(g)*6+(b)*36+0x14)
 
+// Bit depths //
+// ---------- //
+
+class BITDEPTHS {
+protected:
+	// Since this class is directly serialized, an enum would be actively
+	// harmful here.
+	using ARRAY = std::array<uint8_t, 2>;
+
+	// Sorted from the lowest to the highest one.
+	constexpr static const ARRAY SUPPORTED = { 8, 16 };
+	static_assert(SUPPORTED[0] < SUPPORTED[1]);
+
+public:
+	class BITDEPTH {
+		uint8_t bpp;
+
+		ARRAY::const_iterator find() const {
+			return std::ranges::find(SUPPORTED, bpp);
+		}
+
+	public:
+		constexpr BITDEPTH() :
+			bpp(0) {
+		}
+		constexpr BITDEPTH(const BITDEPTH& other) = default;
+		constexpr BITDEPTH& operator=(const BITDEPTH& other) = default;
+
+		constexpr BITDEPTH(ARRAY::const_iterator it) :
+			bpp((it >= SUPPORTED.end()) ? 0 : *it) {
+		}
+
+		explicit operator bool() const {
+			return (find() != SUPPORTED.end());
+		}
+
+		uint8_t value() const {
+			return bpp;
+		}
+
+		// Cycles through all supported bit depths.
+		BITDEPTH cycle(bool reverse) const {
+			const auto it = find();
+			// Visual Studio raises a debug exception if an iterator is
+			// decremented past begin()...
+			if(it == SUPPORTED.end()) {
+				return {};
+			} else if(reverse && (it == SUPPORTED.begin())) {
+				return (SUPPORTED.end() - 1);
+			} else if(!reverse && (it == (SUPPORTED.end() - 1))) {
+				return SUPPORTED.begin();
+			}
+			return (it + (reverse ? -1 : +1));
+		}
+	};
+
+	static_assert(
+		sizeof(BITDEPTH) == sizeof(uint8_t),
+		"The BITDEPTH class is serialized and must be exactly 1 byte large."
+	);
+
+	constexpr static BITDEPTH find_if(auto pred) {
+		return std::ranges::find_if(SUPPORTED, pred);
+	}
+};
+
+using BITDEPTH = BITDEPTHS::BITDEPTH;
+// ---------- //
 
 // 構造体 //
 typedef struct tagDXOBJECT{
@@ -98,6 +167,16 @@ typedef struct tagDDRAWENUM{
 		default:	return false;
 		}
 	}
+
+	bool BitDepthSupported(const BITDEPTH& bitdepth) const {
+		return BitDepthSupported(bitdepth.value());
+	}
+
+	auto BitDepthBest() const {
+		return BITDEPTHS::find_if([this](auto bpp) {
+			return BitDepthSupported(bpp);
+		});
+	}
 } XDDRAWENUM;
 
 
@@ -110,7 +189,7 @@ extern DWORD		DxEnumNow;
 
 // 初期化など //
 FBOOL GrpEnum(HWND hWnd);								// 使用できるデバイスを列挙する
-FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BYTE Bpp);
+FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth);
 FVOID GrpCleanup(void);									// いつも通りに(ただし失敗したら異常終了)
 FVOID GrpSetClip(int sx,int sy,int ex,int ey);			// 3DViewportが生きていたらそちらもセット
 FBOOL GrpRestore(void);									// ロード済みのSurfaceを修復

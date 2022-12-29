@@ -155,7 +155,7 @@ typedef struct tagCONFIG_DATA{
 	BYTE	BombStock;		// 初期ボム数
 
 	BYTE	DeviceID;		// 何番目のデバイスか
-	BYTE	BitDepth;		// ビット深度
+	BITDEPTH	BitDepth;		// ビット深度
 	BYTE	DrawMode;		// 描画スキップの設定
 
 	BYTE	GraphFlags;		// グラフィックに関するフラグ

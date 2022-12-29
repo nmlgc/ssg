@@ -47,7 +47,7 @@ extern void ConfigLoad(void)
 		fclose(fp);
 
 		tmp = 0;
-		tmp += (ConfigDat.BitDepth << 1);
+		tmp += (ConfigDat.BitDepth.value() << 1);
 		tmp += (ConfigDat.BombStock << 3);
 		tmp += (ConfigDat.DeviceID << 2);
 		tmp += (ConfigDat.DrawMode << 6);
@@ -109,7 +109,7 @@ extern void ConfigSave(void)
 	if(fp==NULL) return;
 
 	ConfigDat.CheckSum = 0;
-	ConfigDat.CheckSum += (ConfigDat.BitDepth << 1);
+	ConfigDat.CheckSum += (ConfigDat.BitDepth.value() << 1);
 	ConfigDat.CheckSum += (ConfigDat.BombStock << 3);
 	ConfigDat.CheckSum += (ConfigDat.DeviceID << 2);
 	ConfigDat.CheckSum += (ConfigDat.DrawMode << 6);
@@ -159,7 +159,7 @@ extern FVOID OutputDebugMsg(void)
 	sprintf(buf,"%03d Fps",fps);
 	GrpPut16(0,0,buf);
 
-	sprintf(buf,"%2dBppMode",ConfigDat.BitDepth);
+	sprintf(buf,"%2dBppMode",ConfigDat.BitDepth.value());
 	GrpPut16(0,32,buf);
 	//sprintf(buf,"%s",DItem[ConfigDat.GameLevel]);
 	//GrpPut16(0,50,buf);
@@ -282,7 +282,7 @@ static void ConfigInit(void)
 
 	// グラフィック関連 //
 	ConfigDat.DeviceID   = 0;
-	ConfigDat.BitDepth   = 8;
+	ConfigDat.BitDepth   = DxEnum[ConfigDat.DeviceID].BitDepthBest();
 	ConfigDat.DrawMode   = 1;		// 60Fps Mode
 	ConfigDat.GraphFlags = 0;
 

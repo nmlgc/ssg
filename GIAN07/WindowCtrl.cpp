@@ -407,8 +407,8 @@ static BOOL GrpFnChgDevice(WORD key)
 
 			// Change bit depth to a supported one, if necessary //
 			if(!pXDD.BitDepthSupported(ConfigDat.BitDepth)) {
-				auto bitdepth_new = ((ConfigDat.BitDepth == 8) ? 16 : 8);
-				if(!pXDD.BitDepthSupported(bitdepth_new)) {
+				auto bitdepth_new = pXDD.BitDepthBest();
+				if(!bitdepth_new) {
 					break;
 				}
 				ConfigDat.BitDepth = bitdepth_new;
@@ -455,7 +455,7 @@ static BOOL GrpFnBpp(WORD key)
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT): {
 			auto& pXDD = DxEnum[ConfigDat.DeviceID];
-			auto bitdepth_new = ((ConfigDat.BitDepth == 8) ? 16 : 8);
+			const auto bitdepth_new = ConfigDat.BitDepth.cycle(key == KEY_LEFT);
 			if(!pXDD.BitDepthSupported(bitdepth_new)) {
 				break;
 			}
@@ -976,7 +976,7 @@ static void SetGrpItem(void)
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
 	sprintf(GrpTitle[0],"Device   [%.7s]",DxEnum[ConfigDat.DeviceID].name);
 	sprintf(GrpTitle[1],"DrawMode [ %s ]",DMode[ConfigDat.DrawMode]);
-	sprintf(GrpTitle[2],"BitDepth [ %dBit ]",ConfigDat.BitDepth);
+	sprintf(GrpTitle[2],"BitDepth [ %dBit ]",ConfigDat.BitDepth.value());
 #undef SetFlagsMacro
 
 	if(ConfigDat.GraphFlags & GRPF_MSG_DISABLE)

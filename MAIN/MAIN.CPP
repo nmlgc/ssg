@@ -65,7 +65,7 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 		else if(bIsActive){
 			// １フレーム進める //
 			tempdw = timeGetTime();
-			if(tempdw-WaitTime>=16 || ConfigDat.DrawMode==0){
+			if(tempdw-WaitTime>=16 || ConfigDat.FPSDivisor==0){
 				GameMain();
 				WaitTime = tempdw;
 			}

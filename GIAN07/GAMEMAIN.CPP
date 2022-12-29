@@ -1566,9 +1566,9 @@ FVOID GameDraw(void)
 
 FBOOL IsDraw(void)
 {
-	if(ConfigDat.DrawMode){
+	if(ConfigDat.FPSDivisor){
 		DrawCount++;
-		if(DrawCount%ConfigDat.DrawMode) return FALSE;
+		if(DrawCount%ConfigDat.FPSDivisor) return FALSE;
 	}
 
 	return TRUE;

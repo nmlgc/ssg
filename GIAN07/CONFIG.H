@@ -36,7 +36,10 @@ typedef struct tagCONFIG_DATA{
 
 	BYTE	DeviceID;		// 何番目のデバイスか
 	BITDEPTH	BitDepth;		// ビット深度
-	BYTE	DrawMode;		// 描画スキップの設定
+
+	// Target frame rate = 60 / [FPSDivisor]. 0 disables any frame rate
+	// limitation.
+	BYTE	FPSDivisor;
 
 	BYTE	GraphFlags;		// グラフィックに関するフラグ
 	BYTE	SoundFlags;		// サウンド・ＭＩＤＩ関連のフラグ

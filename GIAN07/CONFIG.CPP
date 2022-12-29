@@ -15,7 +15,7 @@ uint32_t CONFIG_DATA::CheckSumCalculate() const
 	ret += (BitDepth.value() << 1);
 	ret += (BombStock << 3);
 	ret += (DeviceID << 2);
-	ret += (DrawMode << 6);
+	ret += (FPSDivisor << 6);
 	ret += (ExtraStgFlags << 5);
 	ret += (GameLevel << 2);
 	ret += (GraphFlags << 1);
@@ -46,7 +46,7 @@ static void ConfigInit(const std::span<const XDDRAWENUM> dxenum)
 	// グラフィック関連 //
 	ConfigDat.DeviceID   = 0;
 	ConfigDat.BitDepth   = dxenum[ConfigDat.DeviceID].BitDepthBest();
-	ConfigDat.DrawMode   = 1;		// 60Fps Mode
+	ConfigDat.FPSDivisor = 1;		// 60Fps Mode
 	ConfigDat.GraphFlags = 0;
 
 	// サウンド・ＭＩＤＩ関連 //
@@ -118,7 +118,7 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 
 		if(dxenum[ConfigDat.DeviceID].BitDepthSupported(ConfigDat.BitDepth) == false) break;
 
-		if(ConfigDat.DrawMode>3) break;
+		if(ConfigDat.FPSDivisor>3) break;
 		if(ConfigDat.GameLevel>3) break;
 		if(ConfigDat.GraphFlags&GRPF_MASK) break;
 

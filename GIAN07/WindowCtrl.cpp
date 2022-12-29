@@ -435,11 +435,11 @@ static BOOL GrpFnSkip(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.DrawMode = (ConfigDat.DrawMode+1)%4;
+			ConfigDat.FPSDivisor = (ConfigDat.FPSDivisor+1)%4;
 		break;
 
 		case(KEY_LEFT):
-			ConfigDat.DrawMode = (ConfigDat.DrawMode+3)%4;
+			ConfigDat.FPSDivisor = (ConfigDat.FPSDivisor+3)%4;
 		break;
 	}
 
@@ -976,7 +976,7 @@ static void SetGrpItem(void)
 
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
 	sprintf(GrpTitle[0],"Device   [%.7s]",DxEnum[ConfigDat.DeviceID].name);
-	sprintf(GrpTitle[1],"DrawMode [ %s ]",DMode[ConfigDat.DrawMode]);
+	sprintf(GrpTitle[1],"DrawMode [ %s ]",DMode[ConfigDat.FPSDivisor]);
 	sprintf(GrpTitle[2],"BitDepth [ %dBit ]",ConfigDat.BitDepth.value());
 #undef SetFlagsMacro
 

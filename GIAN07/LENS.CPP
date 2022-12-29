@@ -8,9 +8,6 @@
 
 
 // 秘密の関数 //
-static FVOID __DrawLensBall_8(LensInfo *LInfo, int x, int y);
-static FVOID __DrawLensBall_16(LensInfo *LInfo, int x, int y);
-
 static BYTE *__LSurfLock(LensInfo *LInfo);
 static FVOID __LSurfUnlock(LensInfo *LInfo);
 
@@ -145,88 +142,13 @@ extern LensInfo *GrpCreateLensBall(int r, int m, GRP Surface)
 
 
 // GrpLock() 系関数 : レンズボールを描画する //
-static FVOID __DrawLensBall_8(LensInfo *LInfo, int x, int y)
+extern FVOID GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 {
-	DWORD	Height,Width;
-	DWORD	*Table;			// テーブル参照用
-
-	BYTE	*Src;		// ８ビット用＆１６ビット用兼用
-	BYTE	*Dest;
-	BYTE	*p;			// 上に同じ...
-
-	HRESULT		ddrval;
-	RECT		src;
+	RECT	src;
 
 	SetRect(&src, x-LInfo->r, y-LInfo->r, x+LInfo->r, y+LInfo->r);
 	for(;;){
-		ddrval = LInfo->gTemp->BltFast(0, 0,DxObj.Back,&src,DDBLTFAST_NOCOLORKEY);
-		if(ddrval == DD_OK){
-			break;
-		}
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-			return;
-		}
-		if(ddrval != DDERR_WASSTILLDRAWING){
-			return;
-		}
-	}
-
-	// (x,y) が中心になるように補正する //
-	x -= LInfo->r;
-	y -= LInfo->r;
-
-	if(x<0 || y<0 || x+LInfo->Height>639 || y+LInfo->Height>479) return;
-
-	if(!__BackSurfLock()) return;
-//	GrpLock();
-//	if(Grp_Vram == NULL) return;
-
-	Src = __LSurfLock(LInfo);
-	if(Src == NULL){
-		__BackSurfUnlock();
-		return;
-	}
-
-	Table = LInfo->Data;
-	Dest  = (__GrpBack + x*sizeof(BYTE) + (y * __GrpPitch));
-	//Dest  = Grp_Vram + x + Grp_AddrY[y];
-
-	for(Height=0; Height<LInfo->Height; Height++){
-		Width = *Table;						Table++;	// 幅
-		p     = (BYTE *)(Dest + (*Table));	Table++;	// 初期シフト値
-
-		while(Width--){
-			*p = *(BYTE *)(Src + (*Table));
-			p++;
-			Table++;
-		}
-
-		Dest += __GrpPitch;
-	}
-
-	__LSurfUnlock(LInfo);
-	__BackSurfUnlock();
-	//GrpUnlock();
-}
-
-
-// GrpLock() 系関数 : レンズボールを描画する //
-static FVOID __DrawLensBall_16(LensInfo *LInfo, int x, int y)
-{
-	DWORD	Height,Width;
-	DWORD	*Table;			// テーブル参照用
-
-	BYTE	*Src;		// ８ビット用＆１６ビット用兼用
-	BYTE	*Dest;
-	WORD	*p;			// 上に同じ...
-
-	HRESULT		ddrval;
-	RECT		src;
-
-	SetRect(&src, x-LInfo->r, y-LInfo->r, x+LInfo->r, y+LInfo->r);
-	for(;;){
-		ddrval = LInfo->gTemp->BltFast(0, 0,DxObj.Back,&src,DDBLTFAST_NOCOLORKEY);
+		auto ddrval = LInfo->gTemp->BltFast(0, 0,DxObj.Back,&src,DDBLTFAST_NOCOLORKEY);
 		if(ddrval == DD_OK){
 			break;
 		}
@@ -250,40 +172,49 @@ static FVOID __DrawLensBall_16(LensInfo *LInfo, int x, int y)
 //	GrpLock();
 //	if(Grp_Vram == NULL) return;
 
-	Src = __LSurfLock(LInfo);
+	auto* Src = __LSurfLock(LInfo);
 	if(Src == NULL){
 		__BackSurfUnlock();
 		return;
 	}
 
-	Table = LInfo->Data;
-	Dest  = (__GrpBack + x*sizeof(WORD) + (y * __GrpPitch));
-	//Dest  = Grp_Vram + x + Grp_AddrY[y];
+	auto* Table = LInfo->Data; // テーブル参照用
+	if(DxObj.Bpp == 16) {
+		auto* Dest = (__GrpBack + x*sizeof(WORD) + (y * __GrpPitch));
+		//Dest  = Grp_Vram + x + Grp_AddrY[y];
 
-	for(Height=0; Height<LInfo->Height; Height++){
-		Width = *Table;						Table++;	// 幅
-		p     = (WORD *)(Dest + (*Table));	Table++;	// 初期シフト値
+		for(decltype(LInfo->Height) row = 0; row < LInfo->Height; row++){
+			auto Width = *Table;                	Table++;	// 幅
+			auto* p = (WORD *)(Dest + (*Table));	Table++;	// 初期シフト値
 
-		while(Width--){
-			*p = *(WORD *)(Src + (*Table));
-			p++;
-			Table++;
+			while(Width--){
+				*p = *(WORD *)(Src + (*Table));
+				p++;
+				Table++;
+			}
+			Dest += __GrpPitch;
 		}
+	} else {
+		auto* Dest = (__GrpBack + x*sizeof(BYTE) + (y * __GrpPitch));
+		//Dest  = Grp_Vram + x + Grp_AddrY[y];
 
-		Dest += __GrpPitch;
+		for(decltype(LInfo->Height) row = 0; row < LInfo->Height; row++){
+			auto Width = *Table;                	Table++;	// 幅
+			auto* p = (BYTE *)(Dest + (*Table));	Table++;	// 初期シフト値
+
+			while(Width--){
+				*p = *(BYTE *)(Src + (*Table));
+				p++;
+				Table++;
+			}
+
+			Dest += __GrpPitch;
+		}
 	}
 
 	__LSurfUnlock(LInfo);
 	__BackSurfUnlock();
 	//GrpUnlock();
-}
-
-
-// GrpLock() 系関数 : レンズボールを描画する //
-extern FVOID GrpDrawLensBall(LensInfo *LInfo, int x, int y)
-{
-	if(DxObj.Bpp == 16) __DrawLensBall_16(LInfo, x, y);
-	else                __DrawLensBall_8(LInfo, x, y);
 }
 
 

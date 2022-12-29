@@ -46,6 +46,9 @@
 // (We don't really care about the value of whatever variant type this holds,
 // just about the type itself.)
 struct PIXELFORMAT : public std::variant<uint8_t, uint16_t> {
+	// Not worth auto-generating at all.
+	using LARGEST = uint16_t;
+
 	bool IsPalettized() const {
 		return std::holds_alternative<uint8_t>(*this);
 	}
@@ -149,7 +152,6 @@ typedef struct tagDXOBJECT{
 	PALETTEENTRY			pe[256];	// パレットの初期値
 
 	PIXELFORMAT PixelFormat;
-	DWORD					Bpp;			// 色数(なぜ３２ビット？)
 	HWND					hWnd;			// ウィンドウハンドル
 	BOOL					bWndMode;		// ウィンドウモードか？
 	BOOL					bNeedChgPal;	// パレットを変更する必要があるか

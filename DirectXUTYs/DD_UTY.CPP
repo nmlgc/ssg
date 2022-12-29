@@ -170,7 +170,6 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
 		GrpFlip = GrpFlipFS;
 
 		// 2Dの初期化はここでおしまい //
-		DxObj.Bpp = bitdepth.value();
 		DxObj.PixelFormat = pixel_format;
 		if(DxObj.PixelFormat.IsPalettized()) throw(TRUE);
 
@@ -601,25 +600,22 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 	DDSURFACEDESC			ddsd;
 	HRESULT					dxval;
 	DDCOLORKEY				key;
-	DWORD					temp;
-	void					*ptr;
 
 	// Lock する //
 	ZEROMEM(ddsd);ddsd.dwSize = sizeof(ddsd);
 	if(lpds->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL)!=DD_OK) return FALSE;
-	ptr = ddsd.lpSurface;
 
 	// はじっこの色獲得＆カラーキー準備 //
-	switch(DxObj.Bpp){
-		case(8):	temp = *(BYTE  *)ptr;	break;
-		case(16):	temp = *(WORD  *)ptr;	break;
-		case(32):	temp = *(DWORD *)ptr;	break;
-
-		case(24):
+	DWORD temp = std::visit([&ddsd](auto pixel) {
+		if(sizeof(decltype(pixel)) == 3) {
 			// これでいいのか？ //
-			temp = (*(BYTE *)ptr) + ((*(BYTE *)ptr+1)<<8) + ((*(BYTE *)ptr+2)<<16);
-		break;
-	}
+			auto* bytes = reinterpret_cast<uint8_t *>(ddsd.lpSurface);
+			return (
+				bytes[0] + (DWORD{ bytes[1] } << 8) + (DWORD{ bytes[2] } << 16)
+			);
+		}
+		return DWORD{ *reinterpret_cast<decltype(pixel) *>(ddsd.lpSurface) };
+	}, DxObj.PixelFormat);
 
 	// Unlock する //
 	dxval = lpds->Unlock(NULL);

@@ -30,6 +30,7 @@ static BYTE *__LSurfLock(LensInfo *LInfo)
 	ddret = LInfo->gTemp->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL);
 	if(ddret != DD_OK) return NULL;
 
+	// The pitch can be different from (width * BPP) here!
 	LInfo->gPitch = ddsd.lPitch;
 
 	return (BYTE *)ddsd.lpSurface;
@@ -74,12 +75,14 @@ extern LensInfo *GrpCreateLensBall(int r, int m, GRP Surface)
 	DWORD		DataSize;
 	DWORD		Diameter;
 	DWORD		Pitch;
-	BYTE		BitWeight;
 	int			s,dx,z,r2,w;
 	int			i;
 
-	if(DxObj.Bpp == 16) BitWeight = 2;
-	else                BitWeight = 1;
+	// Since the surface pitch can be different than its with, [Table] will
+	// still contain byte offsets, regardless of our main pixel format.
+	const auto BitWeight = std::visit([](auto pixel) {
+		return sizeof(pixel);
+	}, DxObj.PixelFormat);
 
 	if(r <= 0) return NULL;		// 半径がおかしい
 	if(r <= m) return NULL;		// 出っ張りは半径より小さくせよ！
@@ -178,39 +181,20 @@ extern FVOID GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 		return;
 	}
 
-	auto* Table = LInfo->Data; // テーブル参照用
-	if(DxObj.Bpp == 16) {
-		auto* Dest = (__GrpBack + x*sizeof(WORD) + (y * __GrpPitch));
-		//Dest  = Grp_Vram + x + Grp_AddrY[y];
+	std::visit([&LInfo, &x, &y, &Src](auto pixel) {
+		auto* Table = LInfo->Data; // テーブル参照用
+		auto* Dest = &__GrpBack[(y * __GrpPitch) + (x * sizeof(pixel))];
 
-		for(decltype(LInfo->Height) row = 0; row < LInfo->Height; row++){
-			auto Width = *Table;                	Table++;	// 幅
-			auto* p = (WORD *)(Dest + (*Table));	Table++;	// 初期シフト値
+		for(decltype(LInfo->Height) row = 0; row < LInfo->Height; row++) {
+			auto Width = *(Table++);
+			auto* p = reinterpret_cast<decltype(pixel) *>(Dest + *(Table++));
 
 			while(Width--){
-				*p = *(WORD *)(Src + (*Table));
-				p++;
-				Table++;
+				*(p++) = *reinterpret_cast<decltype(pixel) *>(&Src[*(Table++)]);
 			}
 			Dest += __GrpPitch;
 		}
-	} else {
-		auto* Dest = (__GrpBack + x*sizeof(BYTE) + (y * __GrpPitch));
-		//Dest  = Grp_Vram + x + Grp_AddrY[y];
-
-		for(decltype(LInfo->Height) row = 0; row < LInfo->Height; row++){
-			auto Width = *Table;                	Table++;	// 幅
-			auto* p = (BYTE *)(Dest + (*Table));	Table++;	// 初期シフト値
-
-			while(Width--){
-				*p = *(BYTE *)(Src + (*Table));
-				p++;
-				Table++;
-			}
-
-			Dest += __GrpPitch;
-		}
-	}
+	}, DxObj.PixelFormat);
 
 	__LSurfUnlock(LInfo);
 	__BackSurfUnlock();

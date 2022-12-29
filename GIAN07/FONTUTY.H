@@ -20,17 +20,12 @@
 
 
 
-typedef union tagEXPIXEL {
-	BYTE		Byte;
-	WORD		Word;
-} EXPIXEL;
-
 typedef struct tagEXPOINT {
 	int		x, y;		// 元座標(中心からの相対座標)
 	int		l;			// 極座標における長さ
 	BYTE	d;			// 極座標における角度
 
-	EXPIXEL	c;			// 色情報
+	PIXELFORMAT::LARGEST	c;			// 色情報
 } EXPOINT;
 
 typedef struct tagExtraFontInfo {

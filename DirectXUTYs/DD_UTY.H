@@ -45,9 +45,9 @@
 
 // (We don't really care about the value of whatever variant type this holds,
 // just about the type itself.)
-struct PIXELFORMAT : public std::variant<uint8_t, uint16_t> {
+struct PIXELFORMAT : public std::variant<uint8_t, uint16_t, uint32_t> {
 	// Not worth auto-generating at all.
-	using LARGEST = uint16_t;
+	using LARGEST = uint32_t;
 
 	bool IsPalettized() const {
 		return std::holds_alternative<uint8_t>(*this);
@@ -62,11 +62,12 @@ class BITDEPTHS {
 protected:
 	// Since this class is directly serialized, an enum would be actively
 	// harmful here.
-	using ARRAY = std::array<uint8_t, 2>;
+	using ARRAY = std::array<uint8_t, 3>;
 
 	// Sorted from the lowest to the highest one.
-	constexpr static const ARRAY SUPPORTED = { 8, 16 };
+	constexpr static const ARRAY SUPPORTED = { 8, 16, 32 };
 	static_assert(SUPPORTED[0] < SUPPORTED[1]);
+	static_assert(SUPPORTED[1] < SUPPORTED[2]);
 
 public:
 	class BITDEPTH {
@@ -101,6 +102,7 @@ public:
 			switch(bpp) {
 			case  8:	return std::make_optional<PIXELFORMAT>(uint8_t{});
 			case 16:	return std::make_optional<PIXELFORMAT>(uint16_t{});
+			case 32:	return std::make_optional<PIXELFORMAT>(uint32_t{});
 			default:	return std::nullopt;
 			}
 		}
@@ -190,6 +192,7 @@ typedef struct tagDDRAWENUM{
 		switch(bpp) {
 		case  8:	return b8Bit;
 		case 16:	return (b16Bit && D3D->b16Bit);
+		case 32:	return (b32Bit && D3D->b32Bit);
 		default:	return false;
 		}
 	}

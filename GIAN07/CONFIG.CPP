@@ -5,8 +5,13 @@
 
 #pragma once
 
+#include "platform/file.h"
 #include "CONFIG.H"
 #include "LEVEL.H"
+
+///// Constants /////
+constexpr auto CFG_FN = "秋霜CFG.DAT";
+constexpr auto DBG_FN = "秋霜DBG.DAT";
 
 ///// Methods /////
 uint32_t CONFIG_DATA::CheckSumCalculate() const
@@ -73,18 +78,14 @@ static void ConfigInit(const std::span<const XDDRAWENUM> dxenum)
 #ifdef PBG_DEBUG
 static void DebugInit(void)
 {
-	FILE	*fp;
-
-	fp = fopen("秋霜DBG.DAT","rb");
-	if(fp==NULL){
+	const auto maybe_loaded = FileLoad<DEBUG_DATA>(DBG_FN);
+	if(!maybe_loaded) {
 		DebugDat.Hit        = TRUE;
 		DebugDat.MsgDisplay = TRUE;
 		DebugDat.DemoSave   = FALSE;
 		DebugDat.StgSelect  = 1;
-	}
-	else{
-		fread(&DebugDat,sizeof(DEBUG_DATA),1,fp);
-		fclose(fp);
+	} else {
+		DebugDat = maybe_loaded.value();
 	}
 }
 #endif
@@ -92,18 +93,19 @@ static void DebugInit(void)
 // コンフィグの内容を初期化する //
 extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 {
-	FILE		*fp;
-
 #ifdef PBG_DEBUG
 	DebugInit();
 #endif
+	if(dxenum.size() == 0) {
+		return;
+	}
 
 	while(1){
-		fp = fopen("秋霜CFG.DAT","rb");
-		if(fp==NULL) break;
-
-		fread(&ConfigDat,sizeof(CONFIG_DATA),1,fp);
-		fclose(fp);
+		const auto maybe_loaded = FileLoad<CONFIG_DATA>(CFG_FN);
+		if(!maybe_loaded) {
+			break;
+		}
+		ConfigDat = maybe_loaded.value();
 
 		if(ConfigDat.CheckSumCalculate() != ConfigDat.CheckSum) break;
 
@@ -147,7 +149,7 @@ extern void ConfigSave(void)
 {
 	FILE		*fp;
 
-	fp = fopen("秋霜CFG.DAT","wb");
+	fp = fopen(CFG_FN, "wb");
 	if(fp==NULL) return;
 
 	ConfigDat.CheckSum = ConfigDat.CheckSumCalculate();
@@ -156,7 +158,7 @@ extern void ConfigSave(void)
 	fclose(fp);
 
 #ifdef PBG_DEBUG
-	fp = fopen("秋霜DBG.DAT","wb");
+	fp = fopen(DBG_FN, "wb");
 	if(fp==NULL) return;
 	fwrite(&DebugDat,sizeof(DEBUG_DATA),1,fp);
 	fclose(fp);

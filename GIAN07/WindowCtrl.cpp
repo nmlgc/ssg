@@ -5,6 +5,7 @@
 
 #include "WindowCtrl.h"
 #include "CONFIG.H"
+#include "LEVEL.H"
 
 
 
@@ -52,12 +53,12 @@ static BOOL ContinueFnNo(WORD key);
 
 static BOOL ScoreFn(WORD key);
 
-static void SetDifItem(void);
-static void SetGrpItem(void);
+static bool SetDifItem(void);
+static bool SetGrpItem(void);
 static void SetSndItem(void);
 static void SetInpItem(void);
 static void SetIKeyItem(void);
-static void SetCfgRepItem(void);
+static bool SetCfgRepItem(void);
 
 static BOOL RFnStg1(WORD key);
 static BOOL RFnStg2(WORD key);
@@ -66,6 +67,26 @@ static BOOL RFnStg4(WORD key);
 static BOOL RFnStg5(WORD key);
 static BOOL RFnStg6(WORD key);
 static BOOL RFnStgEx(WORD key);
+
+static bool RingFN(bool onchange(void), BYTE& var, WORD key, BYTE min, BYTE max)
+{
+	switch(key) {
+	case(KEY_BOMB):
+	case(KEY_ESC):
+		return false;
+
+	case(KEY_RETURN):
+	case(KEY_TAMA):
+	case(KEY_RIGHT):
+		var = ((var == max) ? min : (var + 1));
+		break;
+
+	case(KEY_LEFT):
+		var = ((var == min) ? max : (var - 1));
+		break;
+	}
+	return onchange();
+}
 
 
 
@@ -256,62 +277,19 @@ void InitContinueWindow(void)
 
 static BOOL DifFnPlayerStock(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.PlayerStock = (ConfigDat.PlayerStock+1)%5;
-		break;
-
-		case(KEY_LEFT):
-			ConfigDat.PlayerStock = (ConfigDat.PlayerStock+4)%5;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return RingFN(SetDifItem, ConfigDat.PlayerStock, key, 0, 4);
 }
 
 static BOOL DifFnBombStock(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.BombStock = (ConfigDat.BombStock+1)%3;
-		break;
-
-		case(KEY_LEFT):
-			ConfigDat.BombStock = (ConfigDat.BombStock+2)%3;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return RingFN(SetDifItem, ConfigDat.BombStock, key, 0, 2);
 }
 
 static BOOL DifFnDifficulty(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.GameLevel = (ConfigDat.GameLevel+1)%4;
-		break;
-
-		case(KEY_LEFT):
-			ConfigDat.GameLevel = (ConfigDat.GameLevel+3)%4;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return RingFN(
+		SetDifItem, ConfigDat.GameLevel, key, GAME_EASY, GAME_LUNATIC
+	);
 }
 
 #ifdef PBG_DEBUG
@@ -334,22 +312,7 @@ static BOOL DifFnMsgDisplay(WORD key)
 
 static BOOL DifFnStgSelect(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			DebugDat.StgSelect = 1 + (DebugDat.StgSelect)%STAGE_MAX;
-		break;
-
-		case(KEY_LEFT):
-			DebugDat.StgSelect = 1 + (DebugDat.StgSelect+STAGE_MAX-2)%STAGE_MAX;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return RingFN(SetDifItem, DebugDat.StgSelect, key, 1, STAGE_MAX);
 }
 
 static BOOL DifFnHit(WORD key)
@@ -430,22 +393,7 @@ static BOOL GrpFnChgDevice(WORD key)
 
 static BOOL GrpFnSkip(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.FPSDivisor = (ConfigDat.FPSDivisor+1)%4;
-		break;
-
-		case(KEY_LEFT):
-			ConfigDat.FPSDivisor = (ConfigDat.FPSDivisor+3)%4;
-		break;
-	}
-
-	SetGrpItem();
-
-	return TRUE;
+	return RingFN(SetGrpItem, ConfigDat.FPSDivisor, key, 0, 3);
 }
 
 static BOOL GrpFnBpp(WORD key)
@@ -895,22 +843,7 @@ static BOOL InpFnKeyCancel(WORD key)
 
 static BOOL CfgRepStgSelect(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.StageSelect = 1 + ConfigDat.StageSelect % 6;
-		break;
-
-		case(KEY_LEFT):
-			ConfigDat.StageSelect = 1 + (ConfigDat.StageSelect+4) % 6;
-		break;
-	}
-
-	SetCfgRepItem();
-
-	return TRUE;
+	return RingFN(SetCfgRepItem, ConfigDat.StageSelect, key, 1, STAGE_MAX);
 }
 
 
@@ -932,7 +865,7 @@ static BOOL CfgRepSave(WORD key)
 }
 
 
-static void SetCfgRepItem(void)
+static bool SetCfgRepItem(void)
 {
 	const char *SWItem[2]  = {"[ O N ]","[O F F]"};
 
@@ -944,10 +877,11 @@ static void SetCfgRepItem(void)
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", SWItem[0]);
 		sprintf(CfgRepTitle[1], "StageSelect [  %d  ]", ConfigDat.StageSelect);
 	}
+	return true;
 }
 
 
-static void SetDifItem(void)
+static bool SetDifItem(void)
 {
 	const char *DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic"};
 	const char *SWItem[2]  = {"[ O N ]","[O F F]"};
@@ -966,9 +900,10 @@ static void SetDifItem(void)
 	sprintf(DifTitle[6],"Hit       %s",SWItem[DebugDat.Hit ? 0 : 1]);
 	sprintf(DifTitle[7],"DemoSave  %s",SWItem[DebugDat.DemoSave ? 0 : 1]);
 #endif
+	return true;
 }
 
-static void SetGrpItem(void)
+static bool SetGrpItem(void)
 {
 	const char	*UorD[3]  = {"上のほう","下のほう","描画せず"};
 	const char	*DMode[4] = {"おまけ","60Fps","30Fps","20Fps"};
@@ -986,6 +921,7 @@ static void SetGrpItem(void)
 		i = (ConfigDat.GraphFlags&GRPF_WINDOW_UPPER) ? 0 : 1;
 
 	sprintf(GrpTitle[3],"MsgWindow[%s]", UorD[i]);
+	return true;
 }
 
 static void SetSndItem(void)

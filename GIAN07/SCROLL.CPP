@@ -337,7 +337,7 @@ static void enemy_set(void)
 				}
 				if(DemoplayLoadEnable) return;
 
-				if(GameStage == 6) GameStage = 7;
+				if(GameStage == STAGE_MAX) GameStage = 7;
 				if(ConfigDat.GameLevel != GAME_EASY){
 					switch(Viv.weapon){
 						case(0):	ConfigDat.ExtraStgFlags |= 1;	break;

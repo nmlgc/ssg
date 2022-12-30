@@ -277,12 +277,12 @@ void InitContinueWindow(void)
 
 static BOOL DifFnPlayerStock(WORD key)
 {
-	return RingFN(SetDifItem, ConfigDat.PlayerStock, key, 0, 4);
+	return RingFN(SetDifItem, ConfigDat.PlayerStock, key, 0, STOCK_PLAYER_MAX);
 }
 
 static BOOL DifFnBombStock(WORD key)
 {
-	return RingFN(SetDifItem, ConfigDat.BombStock, key, 0, 2);
+	return RingFN(SetDifItem, ConfigDat.BombStock, key, 0, STOCK_BOMB_MAX);
 }
 
 static BOOL DifFnDifficulty(WORD key)
@@ -393,7 +393,7 @@ static BOOL GrpFnChgDevice(WORD key)
 
 static BOOL GrpFnSkip(WORD key)
 {
-	return RingFN(SetGrpItem, ConfigDat.FPSDivisor, key, 0, 3);
+	return RingFN(SetGrpItem, ConfigDat.FPSDivisor, key, 0, FPS_DIVISOR_MAX);
 }
 
 static BOOL GrpFnBpp(WORD key)

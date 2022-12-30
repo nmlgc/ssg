@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "LZ_UTY.H"
+#include "CONFIG.H"
 #include "LOADER.H"
 #include "LENS.H"
 

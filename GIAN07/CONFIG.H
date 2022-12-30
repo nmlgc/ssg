@@ -26,6 +26,11 @@
 #define DBGF_DISPLAYINFO		0x01		// デバッグ情報を出力する
 #define DBGF_HIT_ON				0x02		// 当たり判定が有効
 
+// Limits //
+constexpr const auto STOCK_PLAYER_MAX = 4;
+constexpr const auto STOCK_BOMB_MAX = 2;
+constexpr const auto FPS_DIVISOR_MAX = 3;
+constexpr const auto STAGE_MAX = 6; // ステージ数
 
 
 // オプション保持用構造体 //

@@ -114,14 +114,14 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 		// どちらかなので、強制的に break しない。                            //
 		if(ConfigDat.DeviceID >= dxenum.size()) ConfigDat.DeviceID = 0;
 
-		if(ConfigDat.PlayerStock>6) break;
-		if(ConfigDat.PlayerStock<0) break;
-		if(ConfigDat.BombStock>3) break;
+		// Quirk: Off by 2 and 1, respectively?!
+		if(ConfigDat.PlayerStock > (STOCK_PLAYER_MAX + 2)) break;
+		if(ConfigDat.BombStock > (STOCK_BOMB_MAX + 1)) break;
 
 		if(dxenum[ConfigDat.DeviceID].BitDepthSupported(ConfigDat.BitDepth) == false) break;
 
-		if(ConfigDat.FPSDivisor>3) break;
-		if(ConfigDat.GameLevel>3) break;
+		if(ConfigDat.FPSDivisor > FPS_DIVISOR_MAX) break;
+		if(ConfigDat.GameLevel > GAME_LUNATIC) break;
 		if(ConfigDat.GraphFlags&GRPF_MASK) break;
 
 		if(ConfigDat.SoundFlags&SNDF_MASK) break;
@@ -130,13 +130,14 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 
 		if(ConfigDat.DebugFlags&DBGF_MASK) break;
 
+		// 32 is the WinMM joy button limit //
 		if(ConfigDat.PadTama   > 32) break;
 		if(ConfigDat.PadBomb   > 32) break;
 		if(ConfigDat.PadShift  > 32) break;
 		if(ConfigDat.PadCancel > 32) break;
 
 		// これだけは、特別扱い //
-		if(ConfigDat.StageSelect > 6) ConfigDat.StageSelect = 0;
+		if(ConfigDat.StageSelect > STAGE_MAX) ConfigDat.StageSelect = 0;
 
 		return;
 	}

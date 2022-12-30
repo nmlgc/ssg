@@ -3,6 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "platform/file.h"
 #include "LZ_UTY.H"
 #include "DEMOPLAY.H"
 
@@ -53,21 +54,20 @@ FVOID DemoplayRecord(WORD key)
 // デモプレイデータをファイルに書き込む //
 FVOID DemoplaySave(void)
 {
-	char		buf[100];
-	FILE		*fp;
+	char fn[100];
 
 	if(!DemoplaySaveEnable) return;
 
 	DemoBuffer[DemoBufPtr] = KEY_ESC;
 	DemoInfo.DataSize = DemoBufPtr+1;
 
-	sprintf(buf,"STG%dDemo.DAT",GameStage);
-	fp = fopen(buf,"wb");
-	if(fp==NULL) return;
+	sprintf(fn,"STG%dDemo.DAT",GameStage);
 
-	fwrite(&DemoInfo,sizeof(DEMOPLAY_INFO),1,fp);
-	fwrite(DemoBuffer,sizeof(WORD)*(DemoBufPtr+1),1,fp);
-	fclose(fp);
+	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {
+		DemoInfo,
+		std::span<WORD>{ DemoBuffer, (DemoBufPtr + 1) },
+	};
+	FileWrite(fn, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
 
 	DemoplaySaveEnable = FALSE;
 }

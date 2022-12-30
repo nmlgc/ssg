@@ -171,20 +171,10 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
-	FILE		*fp;
-
-	fp = fopen(CFG_FN, "wb");
-	if(fp==NULL) return;
-
 	ConfigDat.CheckSum = ConfigDat.CheckSumCalculate();
-
-	fwrite(&ConfigDat,sizeof(CONFIG_DATA),1,fp);
-	fclose(fp);
+	FileWrite(CFG_FN, ConfigDat);
 
 #ifdef PBG_DEBUG
-	fp = fopen(DBG_FN, "wb");
-	if(fp==NULL) return;
-	fwrite(&DebugDat,sizeof(DEBUG_DATA),1,fp);
-	fclose(fp);
+	FileWrite(DBG_FN, DebugDat);
 #endif
 }

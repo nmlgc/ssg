@@ -29,3 +29,13 @@ template <SERIALIZABLE T> std::optional<T> FileLoad(const char *s) {
 BYTE_BUFFER_OWNED FileLoad(
 	const char *s, size_t size_limit = (std::numeric_limits<size_t>::max)()
 );
+
+// Saves the given sequence of buffers to the file with the given name,
+// overwriting the file if it already exists. Returns `true` on success.
+bool FileWrite(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs);
+
+// Saves the given buffer to the file with the given name, overwriting the file
+// if it already exists. Returns `true` on success.
+static bool FileWrite(const char *s, const BYTE_BUFFER_BORROWED buf) {
+	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
+}

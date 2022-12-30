@@ -107,15 +107,7 @@ void BIT_DEVICE_WRITE::PutBits(uint32_t bits,unsigned int bitcount)
 
 bool BIT_DEVICE_WRITE::Write(const char *s) const
 {
-	auto fp = fopen(s, "wb");
-	if(!fp) {
-		return false;
-	}
-	if(fwrite(buffer.data(), buffer.size(), 1, fp) != 1) {
-		return false;
-	}
-	fclose(fp);
-	return true;
+	return FileWrite(s, buffer);
 }
 
 BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const

@@ -336,6 +336,7 @@ void DrawTextInfo()
 
 	if(DxObj.Back->GetDC(&hdc) == DD_OK){
 		SetBkMode(hdc, TRANSPARENT);
+		auto oldfont = SelectObject(hdc, WinGrpInfo.NormalFont);
 
 		SetTextColor(hdc, RGB(128, 128, 128));
 		for(i=0; i<EText.NumText; i++){
@@ -350,6 +351,7 @@ void DrawTextInfo()
 			TextOut(hdc, dx+20, 360-10+i*25, EText.Text[i], strlen(EText.Text[i]));
 		}
 
+		SelectObject(hdc, oldfont);
 		DxObj.Back->ReleaseDC(hdc);
 	}
 }

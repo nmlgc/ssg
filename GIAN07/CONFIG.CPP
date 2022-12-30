@@ -40,41 +40,6 @@ CONFIG_DATA ConfigDat;
 	DEBUG_DATA DebugDat;
 #endif
 
-///// [ 関数(非公開) ] /////
-static void ConfigInit(const std::span<const XDDRAWENUM> dxenum)
-{
-	// 難易度関連 //
-	ConfigDat.BombStock   = 2;
-	ConfigDat.GameLevel   = GAME_NORMAL;
-	ConfigDat.PlayerStock = 2;
-
-	// グラフィック関連 //
-	ConfigDat.DeviceID   = 0;
-	ConfigDat.BitDepth   = dxenum[ConfigDat.DeviceID].BitDepthBest();
-	ConfigDat.FPSDivisor = 1;		// 60Fps Mode
-	ConfigDat.GraphFlags = 0;
-
-	// サウンド・ＭＩＤＩ関連 //
-	ConfigDat.SoundFlags = SNDF_WAVE_ENABLE|SNDF_MIDI_ENABLE;
-
-	// 入力関連 //
-	ConfigDat.InputFlags = INPF_Z_MSKIP_ENABLE;
-
-	// デバッグ関連 //
-	ConfigDat.DebugFlags = 0;
-
-	// パッド関連 //
-	ConfigDat.PadTama   = 1;
-	ConfigDat.PadBomb   = 2;
-	ConfigDat.PadShift  = 0;
-	ConfigDat.PadCancel = 0;
-
-	ConfigDat.ExtraStgFlags = 0;
-
-	// その他 //
-	ConfigDat.StageSelect = 0;
-}
-
 #ifdef PBG_DEBUG
 static void DebugInit(void)
 {
@@ -100,49 +65,107 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 		return;
 	}
 
-	while(1){
-		const auto maybe_loaded = FileLoad<CONFIG_DATA>(CFG_FN);
-		if(!maybe_loaded) {
-			break;
-		}
-		ConfigDat = maybe_loaded.value();
+	// Default settings
+	ConfigDat = {
+		// 難易度関連 //
+		.GameLevel   = GAME_NORMAL,
+		.PlayerStock = 2,
+		.BombStock   = 2,
 
-		if(ConfigDat.CheckSumCalculate() != ConfigDat.CheckSum) break;
+		// グラフィック関連 //
+		// The fact that the default bit depth is hardware-dependent is most of
+		// the reason why we initialize this here rather than using default
+		// initializers within the struct itself.
+		.DeviceID   = 0,
+		.BitDepth   = dxenum[0].BitDepthBest(),
+		.FPSDivisor = 1, // 60Fps Mode
+		.GraphFlags = 0,
 
-		// 列挙したデバイス数と比較して異常ならここで修正する //
-		// ここに来た場合は、ファイルが壊れているかビデオカードが抜かれたかの //
-		// どちらかなので、強制的に break しない。                            //
-		if(ConfigDat.DeviceID >= dxenum.size()) ConfigDat.DeviceID = 0;
+		// サウンド・ＭＩＤＩ関連 //
+		.SoundFlags = (SNDF_WAVE_ENABLE | SNDF_MIDI_ENABLE),
 
-		// Quirk: Off by 2 and 1, respectively?!
-		if(ConfigDat.PlayerStock > (STOCK_PLAYER_MAX + 2)) break;
-		if(ConfigDat.BombStock > (STOCK_BOMB_MAX + 1)) break;
+		// 入力関連 //
+		.InputFlags = INPF_Z_MSKIP_ENABLE,
 
-		if(dxenum[ConfigDat.DeviceID].BitDepthSupported(ConfigDat.BitDepth) == false) break;
+		// デバッグ関連 //
+		.DebugFlags = 0,
 
-		if(ConfigDat.FPSDivisor > FPS_DIVISOR_MAX) break;
-		if(ConfigDat.GameLevel > GAME_LUNATIC) break;
-		if(ConfigDat.GraphFlags&GRPF_MASK) break;
+		// パッド関連 //
+		.PadTama   = 1,
+		.PadBomb   = 2,
+		.PadShift  = 0,
+		.PadCancel = 0,
 
-		if(ConfigDat.SoundFlags&SNDF_MASK) break;
+		.ExtraStgFlags = 0,
 
-		if(ConfigDat.InputFlags&INPF_MASK) break;
+		// その他 //
+		.StageSelect = 0,
+	};
 
-		if(ConfigDat.DebugFlags&DBGF_MASK) break;
-
-		// 32 is the WinMM joy button limit //
-		if(ConfigDat.PadTama   > 32) break;
-		if(ConfigDat.PadBomb   > 32) break;
-		if(ConfigDat.PadShift  > 32) break;
-		if(ConfigDat.PadCancel > 32) break;
-
-		// これだけは、特別扱い //
-		if(ConfigDat.StageSelect > STAGE_MAX) ConfigDat.StageSelect = 0;
-
+	const auto maybe_loaded = FileLoad<CONFIG_DATA>(CFG_FN);
+	if(!maybe_loaded) {
 		return;
 	}
+	const auto& loaded = maybe_loaded.value();
 
-	ConfigInit(dxenum);
+	if(loaded.CheckSumCalculate() != loaded.CheckSum) {
+		return;
+	};
+
+	if(loaded.DeviceID < dxenum.size()) {
+		ConfigDat.DeviceID = loaded.DeviceID;
+	}
+
+	// Quirk: Off by 2 and 1, respectively?!
+	if(loaded.PlayerStock <= (STOCK_PLAYER_MAX + 2)) {
+		ConfigDat.PlayerStock = loaded.PlayerStock;
+	}
+	if(loaded.BombStock <= (STOCK_BOMB_MAX + 1)) {
+		ConfigDat.BombStock = loaded.BombStock;
+	}
+
+	if(dxenum[loaded.DeviceID].BitDepthSupported(loaded.BitDepth)) {
+		ConfigDat.BitDepth = loaded.BitDepth;
+	}
+
+	if(loaded.FPSDivisor <= FPS_DIVISOR_MAX) {
+		ConfigDat.FPSDivisor = loaded.FPSDivisor;
+	}
+	if(loaded.GameLevel <= GAME_LUNATIC) {
+		ConfigDat.GameLevel = loaded.GameLevel;
+	}
+
+	if(!(loaded.GraphFlags & GRPF_MASK)) {
+		ConfigDat.GraphFlags = loaded.GraphFlags;
+	}
+	if(!(loaded.SoundFlags & SNDF_MASK)) {
+		ConfigDat.SoundFlags = loaded.SoundFlags;
+	}
+	if(!(loaded.InputFlags & INPF_MASK)) {
+		ConfigDat.InputFlags = loaded.InputFlags;
+	}
+	if(!(loaded.DebugFlags & DBGF_MASK)) {
+		ConfigDat.DebugFlags = loaded.DebugFlags;
+	}
+
+	// 32 is the WinMM joy button limit //
+	if(loaded.PadTama   <= 32) {
+		ConfigDat.PadTama = loaded.PadTama;
+	}
+	if(loaded.PadBomb   <= 32) {
+		ConfigDat.PadBomb = loaded.PadBomb;
+	}
+	if(loaded.PadShift  <= 32) {
+		ConfigDat.PadShift = loaded.PadShift;
+	}
+	if(loaded.PadCancel <= 32) {
+		ConfigDat.PadCancel = loaded.PadCancel;
+	}
+	ConfigDat.ExtraStgFlags = loaded.ExtraStgFlags;
+
+	if(loaded.StageSelect <= STAGE_MAX) {
+		ConfigDat.StageSelect = loaded.StageSelect;
+	}
 }
 
 // コンフィグの内容を保存する //

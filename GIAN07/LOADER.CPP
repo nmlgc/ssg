@@ -35,13 +35,13 @@ bool SndWAVLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
 
 BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno)
 {
-	static const auto in = FilStartR("ENEMY.DAT");
+	static const auto in = FilStartR(_PATH("ENEMY.DAT"));
 	return in.MemExpand(filno);
 }
 
 BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
 {
-	static const auto in = FilStartR("GRAPH.DAT");
+	static const auto in = FilStartR(_PATH("GRAPH.DAT"));
 	return GrpBMPLoadP(in, filno, surf_id);
 }
 // -------------- //
@@ -170,7 +170,7 @@ BOOL LoadGraph(int stage)
 	}
 	// エンディング全画像ロード(パレット含む) //
 	if(stage==GRAPH_ID_ENDING){
-		const auto in = FilStartR("GRAPH2.DAT");
+		const auto in = FilStartR(_PATH("GRAPH2.DAT"));
 
 		SetRect(&src, 0, 0, 320, 240);
 		for(i=0; i<6; i++){
@@ -907,7 +907,7 @@ extern BOOL LoadMusic(int no)
 {
 	BOOL flag;
 
-	static const auto in = FilStartR("MUSIC.DAT");
+	static const auto in = FilStartR(_PATH("MUSIC.DAT"));
 	flag = PMid_Load(in,no);
 	MusicNum = in.info.size();
 
@@ -917,7 +917,7 @@ extern BOOL LoadMusic(int no)
 // 全てのSoundデータをロードする //
 BOOL LoadSound(void)
 {
-	const auto in = FilStartR("SOUND.DAT");
+	const auto in = FilStartR(_PATH("SOUND.DAT"));
 
 	while(1){
 		if(!SndWAVLoadP(in,SOUND_ID_KEBARI  ,SOUND_ID_KEBARI  ,SNDMAX_KEBARI  )) break;

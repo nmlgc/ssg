@@ -19,6 +19,17 @@ CONFIG_DATA		ConfigTemp;						// コンフィグのデータ一時保存用
 
 
 
+PATH_STRING ReplayFN(uint8_t stage)
+{
+	if(stage == GRAPH_ID_EXSTAGE) {
+		return PATH_STRING{ _PATH("秋霜りぷEx.DAT") };
+	}
+
+	auto ret = PATH_STRING{ _PATH("秋霜りぷ_.DAT") };
+	ret[ret.size() - 5] = ('0' + GameStage);
+	return ret;
+}
+
 // デモプレイデータの準備 //
 FVOID DemoplayInit(void)
 {
@@ -54,14 +65,13 @@ FVOID DemoplayRecord(WORD key)
 // デモプレイデータをファイルに書き込む //
 FVOID DemoplaySave(void)
 {
-	char fn[100];
-
 	if(!DemoplaySaveEnable) return;
 
 	DemoBuffer[DemoBufPtr] = KEY_ESC;
 	DemoInfo.DataSize = DemoBufPtr+1;
 
-	sprintf(fn,"STG%dDemo.DAT",GameStage);
+	PATH_CODEPOINT fn[] = _PATH("STG_Demo.DAT");
+	fn[3] = ('0' + GameStage);
 
 	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {
 		DemoInfo,
@@ -183,16 +193,14 @@ FVOID ReplaySave(void)
 	DemoBuffer[DemoBufPtr] = KEY_ESC;
 	DemoInfo.DataSize = DemoBufPtr+1;
 
-	// ファイル名を確定 //
-	if(GameStage == GRAPH_ID_EXSTAGE) strcpy(buf, "秋霜りぷEx.DAT");
-	else                              sprintf(buf, "秋霜りぷ%d.DAT", GameStage);
-
 	const auto demo_size = (sizeof(WORD) * DemoInfo.DataSize);
 	PACKFILE_WRITE out = { {
 		DemoInfo,
 		std::span<WORD>{ DemoBuffer, demo_size },
 	} };
-	out.Write(buf);
+
+	const auto fn = ReplayFN(GameStage);
+	out.Write(fn.c_str());
 }
 
 
@@ -200,13 +208,9 @@ FVOID ReplaySave(void)
 FBOOL ReplayLoad(int stage)
 {
 	BYTE_BUFFER_OWNED	temp;
-	char			buf[100];
 
-	// ファイル名を確定 //
-	if(GameStage == GRAPH_ID_EXSTAGE) strcpy(buf, "秋霜りぷEx.DAT");
-	else                              sprintf(buf, "秋霜りぷ%d.DAT", stage);
-
-	const auto in = FilStartR(buf);
+	const auto fn = ReplayFN(GameStage);
+	const auto in = FilStartR(fn.c_str());
 
 	// ヘッダの格納先は０番である //
 	temp = in.MemExpand( 0);

@@ -15,6 +15,7 @@
 
 
 
+#include "platform/unicode.h"
 #include <windows.h>
 #include <mmsystem.h>
 //#pragma comment(lib,"winmm.lib")
@@ -112,7 +113,7 @@ void Mid_Pan(char pan);						// 全てのチャンネルのパンを変更する
 BOOL Mid_ChgDev(char pos);					// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
-BOOL Mid_Load(char *filename);				// 普通のＭＩＤＩファイルをロードする
+BOOL Mid_Load(const PATH_LITERAL filename);				// 普通のＭＩＤＩファイルをロードする
 
 void Mid_LoopFunc(DWORD time);				// 一定間隔ループを自前で生成して再生するとき使用
 char *Mid_GetTitle(void);					// この曲のお名前は？

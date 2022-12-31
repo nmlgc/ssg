@@ -105,7 +105,7 @@ void BIT_DEVICE_WRITE::PutBits(uint32_t bits,unsigned int bitcount)
 	}
 }
 
-bool BIT_DEVICE_WRITE::Write(const char *s) const
+bool BIT_DEVICE_WRITE::Write(const PATH_LITERAL s) const
 {
 	return FileWrite(s, buffer);
 }
@@ -209,7 +209,7 @@ BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)
 	return device.buffer;
 }
 
-bool PACKFILE_WRITE::Write(const char *s) const
+bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
 {
 	PBG_FILEHEAD head = { .n = files.size() };
 	std::vector<PBG_FILEINFO> info(files.size());
@@ -251,12 +251,12 @@ bool PACKFILE_WRITE::Write(const char *s) const
 	return (stream->Seek(0, SEEK_WHENCE::BEGIN) && write_header(*stream));
 }
 
-BIT_FILE_READ BitFilCreateR(const char *s)
+BIT_FILE_READ BitFilCreateR(const PATH_LITERAL s)
 {
 	return { FileLoad(s) };
 }
 
-PACKFILE_READ FilStartR(const char *s)
+PACKFILE_READ FilStartR(const PATH_LITERAL s)
 {
 	auto packfile = FileLoad(s);
 	auto packfile_cursor = packfile.cursor();

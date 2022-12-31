@@ -204,7 +204,7 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 	DeleteMenu(hMenu,SC_SIZE    ,MF_BYCOMMAND);
 
 
-	DebugSetup("ErrLOG2.txt");
+	DebugSetup();
 
 	// キーボード(JoyPad)入力を受け付ける //
 	Key_Start(hInstance,hWndMain);

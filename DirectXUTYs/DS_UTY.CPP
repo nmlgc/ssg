@@ -160,7 +160,7 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)
 	return TRUE;
 }
 
-FBOOL SndWAVLoad(char *filename,BYTE id,int max)
+FBOOL SndWAVLoad(const PATH_LITERAL filename,BYTE id,int max)
 {
 	return SndWAVLoad(FileLoad(filename), id, max);
 }

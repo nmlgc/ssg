@@ -10,8 +10,8 @@
 #include "LEVEL.H"
 
 ///// Constants /////
-constexpr auto CFG_FN = "秋霜CFG.DAT";
-constexpr auto DBG_FN = "秋霜DBG.DAT";
+constexpr auto CFG_FN = _PATH("秋霜CFG.DAT");
+constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
 
 ///// Methods /////
 uint32_t CONFIG_DATA::CheckSumCalculate() const

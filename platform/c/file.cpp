@@ -34,12 +34,12 @@ static bool WriteAndClose(
 	return (!fclose(fp) && ret);
 }
 
-size_t FileLoadInplace(std::span<uint8_t> buf, const char *s)
+size_t FileLoadInplace(std::span<uint8_t> buf, const PATH_LITERAL s)
 {
 	return LoadInplace(buf, fopen(s, "rb"));
 }
 
-BYTE_BUFFER_OWNED FileLoad(const char *s, size_t size_limit)
+BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
 {
 	auto fp = fopen(s, "rb");
 	if(!fp) {
@@ -64,12 +64,14 @@ BYTE_BUFFER_OWNED FileLoad(const char *s, size_t size_limit)
 	return std::move(buf);
 }
 
-bool FileWrite(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs)
+bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 {
 	return WriteAndClose(fopen(s, "wb"), bufs);
 }
 
-bool FileAppend(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs)
+bool FileAppend(
+	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
+)
 {
 	auto fp = fopen(s, "ab");
 	return (
@@ -123,7 +125,7 @@ public:
 	};
 };
 
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const char *s)
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const PATH_LITERAL s)
 {
 	return std::unique_ptr<FILE_STREAM_C>(new (std::nothrow) FILE_STREAM_C(
 		fopen(s, "wb")

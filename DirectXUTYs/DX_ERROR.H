@@ -15,7 +15,7 @@
 
 
 // 関数プロトタイプ宣言 //
-extern void DebugSetup(const char *filename);	// エラー出力準備(->LogFile)
+extern void DebugSetup(void);	// エラー出力準備(->LogFile)
 extern void DebugCleanup(void);	// エラー吐き出し用ファイルを閉じる
 extern void DebugOut(std::string_view s);	// デバッグメッセージ吐き出し
 

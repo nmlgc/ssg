@@ -350,7 +350,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	return true;
 }
 
-BOOL Mid_Load(char *filename)
+BOOL Mid_Load(const PATH_LITERAL filename)
 {
 	return Mid_Load(FileLoad(filename));
 }

@@ -23,6 +23,7 @@
 
 // ヘッダファイル //
 #include "platform/buffer.h"
+#include "platform/unicode.h"
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
 #include "MtoB.h"						// スクリーンキャプチャー
@@ -233,7 +234,7 @@ FBOOL GrpReleaseSurface(BYTE surf_id);						// Surface の削除(BMPは変更せ
 
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
-FBOOL GrpBMPLoad(char *filename,BYTE surf_id);				// BMP->Surface
+FBOOL GrpBMPLoad(const PATH_LITERAL &filename,BYTE surf_id);				// BMP->Surface
 
 extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);	// ビット深度によりカラーキーをセットする
 extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds);		// ある Surface を初期化する

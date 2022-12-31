@@ -11,16 +11,15 @@
 
 
 // グローバル変数 //
-static char			ErrorOut[1000];
+constexpr auto ErrorOut = _PATH("ErrLOG2.TXT");
+static bool ErrorActive = false;
 
 
-extern void DebugSetup(const char *filename)
+extern void DebugSetup()
 {
 	std::array<char, 9> date; // size defined by ABI
 	std::array<char, 9> time; // size defined by ABI
 	std::array<char, 64> str;
-
-	strcpy(ErrorOut,filename);
 
 	_strdate(date.data());
 	_strtime(time.data());
@@ -31,18 +30,22 @@ extern void DebugSetup(const char *filename)
 	if(len <= 0) {
 		return;
 	}
-	FileAppend(filename,
+	FileAppend(ErrorOut,
 		std::span<char>{ str.data(), static_cast<size_t>(len) }
 	);
+	ErrorActive = true;
 }
 
 extern void DebugCleanup(void)
 {
-	strcpy(ErrorOut,"");
+	ErrorActive = false;
 }
 
 extern void DebugOut(std::string_view s)
 {
+	if(!ErrorActive) {
+		return;
+	}
 	const std::array<BYTE_BUFFER_BORROWED, 3> bufs = {
 		std::string_view{ "Error : " }, s, std::string_view{ "\n" },
 	};

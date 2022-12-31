@@ -399,7 +399,7 @@ bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }
 
-FBOOL GrpBMPLoad(char *filename,BYTE surf_id)
+FBOOL GrpBMPLoad(const PATH_LITERAL filename,BYTE surf_id)
 {
 	return GrpBMPLoad(FileLoad(filename), surf_id);
 }

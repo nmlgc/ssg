@@ -2,8 +2,8 @@
 #include "../GIAN07/CONFIG.H"
 #include <direct.h>
 
-extern const char *APP_CLASS = "GIAN07";
-extern const char *APP_NAME  = "秋霜玉";
+extern constexpr auto APP_CLASS = _UNICODE("GIAN07");
+extern constexpr auto APP_NAME = _UNICODE("秋霜玉");
 
 
 // プロトタイプ宣言 //
@@ -32,9 +32,9 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 	DWORD		tempdw;
 
 	// 他のところで起動していたらそいつをRestoreする //
-	if(old_gian=FindWindow(APP_CLASS,NULL)){
+	if(old_gian=FindWindowW(APP_CLASS,NULL)){
 		SetForegroundWindow(old_gian);
-		SendMessage(old_gian,WM_SYSCOMMAND,SC_RESTORE,0);
+		SendMessageW(old_gian,WM_SYSCOMMAND,SC_RESTORE,0);
 		return FALSE;
 	}
 
@@ -55,12 +55,12 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 	}
 
 	while(1){
-		if(PeekMessage(&msg,NULL,0,0,PM_NOREMOVE)){
-			if(!GetMessage(&msg,NULL,0,0)){
+		if(PeekMessageW(&msg,NULL,0,0,PM_NOREMOVE)){
+			if(!GetMessageW(&msg,NULL,0,0)){
 				return msg.wParam;
 			}
 			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			DispatchMessageW(&msg);
 		}
 		else if(bIsActive){
 			// １フレーム進める //
@@ -154,12 +154,12 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 		break;
 	}
 
-	return DefWindowProc(hWnd,message,wParam,lParam);
+	return DefWindowProcW(hWnd,message,wParam,lParam);
 }
 
 static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 {
-	WNDCLASS	wc;
+	WNDCLASSW	wc;
 	HMENU		hMenu;
 
 	wc.style			= CS_DBLCLKS;							//
@@ -173,11 +173,11 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 	wc.lpszMenuName		= 0;									// 後で変更
 	wc.lpszClassName	= APP_CLASS;							//
 
-	if(!RegisterClass(&wc)){
+	if(!RegisterClassW(&wc)){
 		return FALSE;
 	}
 
-	hWndMain = CreateWindowEx(
+	hWndMain = CreateWindowExW(
 		0,												//
 		APP_CLASS,										//
 		APP_NAME,										//

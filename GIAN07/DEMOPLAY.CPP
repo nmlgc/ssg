@@ -189,8 +189,8 @@ FVOID ReplaySave(void)
 
 	const auto demo_size = (sizeof(WORD) * DemoInfo.DataSize);
 	PACKFILE_WRITE out = { {
-		{ reinterpret_cast<uint8_t *>(&DemoInfo), sizeof(DEMOPLAY_INFO) },
-		{ reinterpret_cast<uint8_t *>(DemoBuffer), demo_size }
+		DemoInfo,
+		std::span<WORD>{ DemoBuffer, demo_size },
 	} };
 	out.Write(buf);
 }

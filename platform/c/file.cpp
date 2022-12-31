@@ -68,3 +68,55 @@ bool FileWrite(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 {
 	return WriteAndClose(fopen(s, "wb"), bufs);
 }
+
+// Streams
+// -------
+
+struct FILE_STREAM_C : public FILE_STREAM_WRITE {
+	FILE* fp;
+
+public:
+	FILE_STREAM_C(FILE* fp) :
+		fp(fp) {
+	}
+
+	~FILE_STREAM_C() {
+		if(fp) {
+			fclose(fp);
+		}
+	}
+
+	explicit operator bool() override {
+		return (fp != nullptr);
+	};
+
+	bool Seek(int64_t offset, SEEK_WHENCE whence) override {
+		int origin;
+		switch(whence) {
+		case SEEK_WHENCE::BEGIN:  	origin = SEEK_SET;	break;
+		case SEEK_WHENCE::CURRENT:	origin = SEEK_CUR;	break;
+		case SEEK_WHENCE::END:    	origin = SEEK_END;	break;
+		}
+		return !_fseeki64(fp, offset, origin);
+	};
+
+	std::optional<int64_t> Tell() override {
+		auto ret = _ftelli64(fp);
+		if(ret == -1) {
+			return std::nullopt;
+		}
+		return ret;
+	};
+
+	bool Write(BYTE_BUFFER_BORROWED buf) override {
+		return (fwrite(buf.data(), buf.size(), 1, fp) == 1);
+	};
+};
+
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const char *s)
+{
+	return std::unique_ptr<FILE_STREAM_C>(new (std::nothrow) FILE_STREAM_C(
+		fopen(s, "wb")
+	));
+}
+// -------

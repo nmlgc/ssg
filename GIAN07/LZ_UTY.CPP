@@ -214,20 +214,17 @@ bool PACKFILE_WRITE::Write(const char *s) const
 	PBG_FILEHEAD head = { .n = files.size() };
 	std::vector<PBG_FILEINFO> info(files.size());
 
-	auto write_header = [&head, &info](FILE *fp) {
-		return (
-			(fwrite(&head, sizeof(head), 1, fp) != 1) ||
-			(fwrite(info.data(), (info.size() * sizeof(info[0])), 1, fp) != 1)
-		);
+	auto write_header = [&head, &info](FILE_STREAM_WRITE &stream) {
+		return (stream.Write(head) && stream.Write(info));
 	};
 
-	auto fp = fopen(s, "wb");
-	if(!fp) {
+	auto stream = FileStreamWrite(s);
+	if(!stream) {
 		return false;
 	}
 
 	// Write temporary header
-	if(write_header(fp)) {
+	if(!write_header(*stream)) {
 		return false;
 	}
 
@@ -235,23 +232,23 @@ bool PACKFILE_WRITE::Write(const char *s) const
 	for(fil_no_t i = 0; i < files.size(); i++) {
 		auto compressed = Compress(files[i]);
 
-		info[i].offset = ftell(fp);
+		const auto maybe_offset = stream->Tell();
+		if(!maybe_offset) {
+			return false;
+		}
+
+		info[i].offset = maybe_offset.value();
 		info[i].size_uncompressed = files[i].size();
 		info[i].checksum_compressed = FilChecksumAddFile(
 			head.sum, info[i].offset, info[i].size_uncompressed, compressed
 		);
-		if(fwrite(compressed.data(), compressed.size(), 1, fp) != 1) {
+		if(!stream->Write(compressed)) {
 			return false;
 		}
 	}
 
 	// Write real header
-	rewind(fp);
-	if(write_header(fp)) {
-		return false;
-	}
-	fclose(fp);
-	return true;
+	return (stream->Seek(0, SEEK_WHENCE::BEGIN) && write_header(*stream));
 }
 
 BIT_FILE_READ BitFilCreateR(const char *s)

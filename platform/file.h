@@ -39,3 +39,40 @@ bool FileWrite(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs);
 static bool FileWrite(const char *s, const BYTE_BUFFER_BORROWED buf) {
 	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
 }
+
+// Appends the given sequence of buffers to the end of the given file. Returns
+// `true` on success.
+bool FileAppend(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs);
+
+// Appends the given buffer to the end of the given file. Returns `true` on
+// success.
+static bool FileAppend(const char *s, const BYTE_BUFFER_BORROWED buf) {
+	return FileAppend(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
+}
+
+// Streams
+// -------
+
+enum class SEEK_WHENCE {
+	BEGIN, CURRENT, END
+};
+
+struct FILE_STREAM {
+	virtual ~FILE_STREAM() {};
+	virtual explicit operator bool() = 0;
+};
+
+struct FILE_STREAM_SEEK : FILE_STREAM {
+	// Returns `true` if the seek was successful.
+	[[nodiscard]] virtual bool Seek(int64_t offset, SEEK_WHENCE whence) = 0;
+
+	virtual std::optional<int64_t> Tell() = 0;
+};
+
+struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {
+	// Retuns `true` if the buffer was written successfully.
+	[[nodiscard]] virtual bool Write(BYTE_BUFFER_BORROWED buf) = 0;
+};
+
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const char *s);
+// -------

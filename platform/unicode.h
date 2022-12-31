@@ -5,7 +5,11 @@
 
 #pragma once
 
+#ifdef WIN32
+	#include "platform/windows/unicode.h"
+#else
 	#include "platform/c/unicode.h"
+#endif
 
 using UNICODE_CODEPOINT = UNICODE_STRING::value_type;
 

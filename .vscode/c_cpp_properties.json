@@ -6,7 +6,10 @@
 				"${workspaceFolder}/**"
 			],
 			"cppStandard": "c++23",
-			"intelliSenseMode": "windows-msvc-x86"
+			"intelliSenseMode": "windows-msvc-x86",
+			"defines": [
+				"WIN32"
+			]
 		}
 	],
 	"version": 4

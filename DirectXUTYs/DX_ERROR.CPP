@@ -3,9 +3,9 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "platform/file.h"
 #include "DX_ERROR.H"
-#include <stdio.h>
-#include <string.h>
+#include <array>
 #include <time.h>
 #pragma message(PBGWIN_DX_ERROR_H)
 
@@ -16,35 +16,35 @@ static char			ErrorOut[1000];
 
 extern void DebugSetup(const char *filename)
 {
-	char buf[1000];
-	FILE *fp;
+	std::array<char, 9> date; // size defined by ABI
+	std::array<char, 9> time; // size defined by ABI
+	std::array<char, 64> str;
 
-	//if(ErrorFP) return;
 	strcpy(ErrorOut,filename);
 
-	fp = fopen(ErrorOut,"a");
-	if(fp==NULL) return;
-	fseek(fp,0,SEEK_END);
-	_strdate(buf);
-	fprintf(fp,"[%s]",buf);
-	_strtime(buf);
-	fprintf(fp,"[%s]\n",buf);
-	fclose(fp);
+	_strdate(date.data());
+	_strtime(time.data());
+	auto len = snprintf(
+		str.data(), str.size(), "[%s][%s]\n", date.data(), time.data()
+	);
+
+	if(len <= 0) {
+		return;
+	}
+	FileAppend(filename,
+		std::span<char>{ str.data(), static_cast<size_t>(len) }
+	);
 }
 
 extern void DebugCleanup(void)
 {
 	strcpy(ErrorOut,"");
-	//if(ErrorFP!=NULL) fclose(ErrorFP);
-	//ErrorFP=NULL;
 }
 
-extern void DebugOut(const char *s)
+extern void DebugOut(std::string_view s)
 {
-	FILE *fp;
-	fp= fopen(ErrorOut,"a");
-	if(fp==NULL) return;
-	fseek(fp,0,SEEK_END);
-	fprintf(fp,"Error : %s\n",s);
-	fclose(fp);
+	const std::array<BYTE_BUFFER_BORROWED, 3> bufs = {
+		std::string_view{ "Error : " }, s, std::string_view{ "\n" },
+	};
+	FileAppend(ErrorOut, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
 }

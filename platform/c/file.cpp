@@ -69,6 +69,16 @@ bool FileWrite(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 	return WriteAndClose(fopen(s, "wb"), bufs);
 }
 
+bool FileAppend(const char *s, std::span<const BYTE_BUFFER_BORROWED> bufs)
+{
+	auto fp = fopen(s, "ab");
+	return (
+		fp &&
+		!fseek(fp, 0, SEEK_END) &&
+		WriteAndClose(std::move(fp), bufs)
+	);
+}
+
 // Streams
 // -------
 

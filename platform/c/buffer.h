@@ -8,6 +8,7 @@
 #include <memory>
 #include <optional>
 #include <span>
+#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -35,6 +36,10 @@ struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 
 	template <SERIALIZABLE T> BYTE_BUFFER_BORROWED(const std::vector<T>& val) :
 		BYTE_BUFFER_BORROWED(std::span<const T>{ val.data(), val.size() }) {
+	}
+
+	BYTE_BUFFER_BORROWED(const std::string_view str) :
+		span({ reinterpret_cast<const uint8_t *>(str.data()), str.length() }) {
 	}
 };
 

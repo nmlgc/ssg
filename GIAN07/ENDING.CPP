@@ -52,12 +52,6 @@ ExtraFontInfo	*pMember[7];
 DWORD FlashState = 0;
 
 
-// グラフィックのフェードアウト用関数 //
-void FadeoutPaletteGrp(PALETTEENTRY *Dest, PALETTEENTRY *Src, BYTE a);
-
-// スタッフ名のフェードアウト用関数 //
-void FadeoutPaletteStf(PALETTEENTRY *Dest, PALETTEENTRY *Src, BYTE a);
-
 void UpdateGrpInfo();		// グラフィックの更新(内部データ)
 void UpdateStfInfo();		// スタッフの更新(内部データ)
 
@@ -72,7 +66,7 @@ void EndingCleanup();	// おしまい処理
 void EndingSCLDecode();	// エンディング用 SCL のデコード
 
 
-void EndingSetFixedColors(PALETTEENTRY* pal)
+void EndingSetFixedColors(PALETTE& pal)
 {
 	pal[255] = { 0x00, 0x00, 0x00 };
 	pal[199] = { 0xFF, 0xFF, 0xFF };
@@ -84,7 +78,7 @@ void EndingSetFixedColors(PALETTEENTRY* pal)
 // エンディングまわりの初期化 //
 bool EndingInit(void)
 {
-	PALETTEENTRY	pal[256];
+	PALETTE	pal;
 
 	RECT	src[7] = {
 		{0, 0,160, 24}, {0, 24,104, 48}, {0, 48,160, 72},
@@ -199,36 +193,17 @@ void EndingDraw(void)
 
 
 // グラフィックのフェードアウト用関数 //
-void FadeoutPaletteGrp(PALETTEENTRY *Dest, PALETTEENTRY *Src, BYTE a)
+void FadeoutPaletteGrp(PALETTE& Dest, const PALETTE& Src, uint8_t a)
 {
-	int				i;
-
-	for(i=0; i<200; i++){
-		Dest[i].peRed   = ((WORD)Src[i].peRed   * a) / 255;
-		Dest[i].peGreen = ((WORD)Src[i].peGreen * a) / 255;
-		Dest[i].peBlue  = ((WORD)Src[i].peBlue  * a) / 255;
-	}
-	for(i=200; i<255; i++){
-		Dest[i] = Src[i];
-	}
+	Dest = Src.Fade(a, 0, 199);
 	EndingSetFixedColors(Dest);
 }
 
 
 // スタッフ名のフェードアウト用関数 //
-void FadeoutPaletteStf(PALETTEENTRY *Dest, PALETTEENTRY *Src, BYTE a)
+void FadeoutPaletteStf(PALETTE& Dest, const PALETTE &Src, uint8_t a)
 {
-	int				i;
-
-	// 注意：最終パレットは密かに？へんこうしないど //
-	for(i=0; i<200; i++){
-		Dest[i] = Src[i];
-	}
-	for(i=200; i<255; i++){
-		Dest[i].peRed   = ((WORD)Src[i].peRed   * a) / 255;
-		Dest[i].peGreen = ((WORD)Src[i].peGreen * a) / 255;
-		Dest[i].peBlue  = ((WORD)Src[i].peBlue  * a) / 255;
-	}
+	Dest = Src.Fade(a, 200, 255);
 	EndingSetFixedColors(Dest);
 }
 
@@ -335,15 +310,13 @@ void DrawTextInfo()
 }
 
 
-void FlashPaletteGrp(PALETTEENTRY *dest, PALETTEENTRY *pal, DWORD a)
+void FlashPaletteGrp(PALETTE& dest, const PALETTE& pal, DWORD a)
 {
-	int		i;
-
-	if(a > 256) a = a - 256;
-	for(i=0; i<256; i++){
-		dest[i].peRed   = min(256, (256*(256-a) + (WORD)pal[i].peRed   * a) / 256);
-		dest[i].peGreen = min(256, (256*(256-a) + (WORD)pal[i].peGreen * a) / 256);
-		dest[i].peBlue  = min(256, (256*(256-a) + (WORD)pal[i].peBlue  * a) / 256);
+	const uint16_t a16 = ((a > 256) ? (a - 256): a);
+	for(int i = 0; i < dest.size(); i++){
+		dest[i].r = min(256, (256 * (256 - a) + (pal[i].r * a16)) / 256);
+		dest[i].g = min(256, (256 * (256 - a) + (pal[i].g * a16)) / 256);
+		dest[i].b = min(256, (256 * (256 - a) + (pal[i].b * a16)) / 256);
 	}
 }
 
@@ -351,7 +324,7 @@ void FlashPaletteGrp(PALETTEENTRY *dest, PALETTEENTRY *pal, DWORD a)
 // フェードＩＯ情報の反映 //
 void DrawFadeInfo()
 {
-	PALETTEENTRY	temp_pal[256];
+	PALETTE	temp_pal;
 	WORD			a;
 
 	// フェードアウト関連
@@ -366,7 +339,7 @@ void DrawFadeInfo()
 			GrpSetPalette(temp_pal);
 		}
 		else{
-			memset(temp_pal, 0, sizeof(temp_pal));
+			temp_pal = { 0 };
 			EndingSetFixedColors(temp_pal);
 			GrpSetPalette(temp_pal);
 		}

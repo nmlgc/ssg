@@ -57,7 +57,7 @@ static void GrpFlipWnd(void);
 
 
 // グローバル変数 //
-DXOBJECT		DxObj;
+GRAPHICS_DDRAW	DxObj;
 DXSURFACE		DxSurf[SURFACE_MAX];
 XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
 DWORD			DxEnumNow;
@@ -308,37 +308,38 @@ void GrpSetRestoreHook(bool(*func)(void))
 	else           RestoreHookFn = func;
 }
 
-// 現在のパレットを取得する(ただの代入なのでこの関数を使うまでも無いかもしれないね) //
-void GrpGetPalette(PALETTEENTRY *pal)
+std::span<PALETTEENTRY> GRAPHICS_DDRAW::PaletteForDDraw()
 {
-	int		i;
-
-	// ８Ｂｉｔモード以外では、何もしないでリターンする //
-	if(DxObj.PixelFormat.IsChanneled()) return;
-
-	for(i=0;i<256;i++){
-		pal[i] = DxObj.pe[i];
-	}
+	// Verify that PALETTEENTRY and RGBA are identical.
+	using COLOR = decltype(Palette)::value_type;
+	static_assert(sizeof(COLOR) == sizeof(PALETTEENTRY));
+	static_assert(offsetof(COLOR, r) == offsetof(PALETTEENTRY, peRed));
+	static_assert(offsetof(COLOR, g) == offsetof(PALETTEENTRY, peGreen));
+	static_assert(offsetof(COLOR, b) == offsetof(PALETTEENTRY, peBlue));
+	static_assert(offsetof(COLOR, a) == offsetof(PALETTEENTRY, peFlags));
+	return { reinterpret_cast<PALETTEENTRY *>(Palette.data()), Palette.size() };
 }
 
-// 現在のパレットを変更する //
-void GrpSetPalette(PALETTEENTRY *pal)
+// 現在のパレットを取得する(ただの代入なのでこの関数を使うまでも無いかもしれないね) //
+void GrpGetPalette(PALETTE& pal)
 {
-	int			i;
-
 	// ８Ｂｉｔモード以外では、何もしないでリターンする //
 	if(DxObj.PixelFormat.IsChanneled()) return;
 
-	// 強制的に色をセットしてしまう //
-	pal[0].peRed   = 0;
-	pal[0].peGreen = 0;
-	pal[0].peBlue  = 0;
+	pal = DxObj.Palette;
+}
 
-	for(i=0;i<256;i++){
-		DxObj.pe[i] = pal[i];
-	}
+void GrpSetPalette(const PALETTE& pal)
+{
+	// ８Ｂｉｔモード以外では、何もしないでリターンする //
+	if(DxObj.PixelFormat.IsChanneled()) return;
 
-	DxObj.Pal->SetEntries(0,0,256,pal);		// パレットを変更
+	DxObj.Palette = pal;
+	DxObj.Palette[0] = { 0, 0, 0 };	// 強制的に色をセットしてしまう //
+
+	// パレットを変更
+	auto p = DxObj.PaletteForDDraw();
+	DxObj.Pal->SetEntries(0, 0, p.size(), p.data());
 	DxObj.bNeedChgPal = TRUE;
 
 	DisableAlphaTable();
@@ -660,7 +661,6 @@ static BOOL GrpBMLoadMemory(DXSURFACE *surf)
 	BITMAPFILEHEADER		*BMP_file;
 	BITMAPINFOHEADER		*BMP_info;
 	RGBQUAD					*pal;
-	int						i,width,height;
 	BYTE					*image;
 	HDC						hdc,hdcmem;
 	HBITMAP					hbmp;
@@ -679,25 +679,29 @@ static BOOL GrpBMLoadMemory(DXSURFACE *surf)
 	if(BMP_file->bfType != MAKEWORD('B','M')) return FALSE;
 	if(BMP_info->biBitCount != 8) return FALSE;
 
-	width  = (BMP_info->biWidth+3)&(~3);
-	height = BMP_info->biHeight;
+	const int width  = ((BMP_info->biWidth + 3) & ~3);
+	const int height = BMP_info->biHeight;
 
 	if(DxObj.PixelFormat.IsPalettized()){
-		for(i=0;i<256;i++){
-			DxObj.pe[i].peRed   = pal[i].rgbRed;
-			DxObj.pe[i].peGreen = pal[i].rgbGreen;
-			DxObj.pe[i].peBlue  = pal[i].rgbBlue;
-			DxObj.pe[i].peFlags = 0;
-		}
+		// Yup, we must mutate the .BMP palette in addition to the DirectDraw
+		// palette, since we pass it via [BMP_info] into CreateDIBitmap()
+		// below. Not doing that will turn the black parts of Marisa's sprite
+		// transparent.
+		pal[0] = { 0, 0, 0 }; // 例外的な処理 //
 
-		// 例外的な処理 //
-		DxObj.pe[0].peRed   = pal[0].rgbRed   = 0;
-		DxObj.pe[0].peGreen = pal[0].rgbGreen = 0;
-		DxObj.pe[0].peBlue  = pal[0].rgbBlue  = 0;
+		for(size_t i = 0; i < DxObj.Palette.size(); i++) {
+			const auto& bgr = pal[i];
+			DxObj.Palette[i] = {bgr.rgbRed, bgr.rgbGreen, bgr.rgbBlue };
+		}
 
 		if(DxObj.Pal) DxObj.Pal->Release();
 
-		ddrval = DxObj.DD->CreatePalette(DDPCAPS_8BIT|DDPCAPS_ALLOW256,DxObj.pe,&DxObj.Pal,NULL);
+		ddrval = DxObj.DD->CreatePalette(
+			(DDPCAPS_8BIT | DDPCAPS_ALLOW256),
+			DxObj.PaletteForDDraw().data(),
+			&DxObj.Pal,
+			nullptr
+		);
 		if(ddrval!=DD_OK) return FALSE;
 		surf->surf->SetPalette(DxObj.Pal);
 		DxObj.Prim->SetPalette(DxObj.Pal);

@@ -22,6 +22,7 @@
 
 
 // ヘッダファイル //
+#include "game/graphics.h"
 #include "platform/buffer.h"
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
@@ -137,7 +138,7 @@ using BITDEPTH = BITDEPTHS::BITDEPTH;
 // ---------- //
 
 // 構造体 //
-typedef struct tagDXOBJECT{
+struct GRAPHICS_DDRAW {
 	LPDIRECTDRAW2			DD;			// DirectDraw Object
 	LPDIRECT3D2				D3;			// Direct3D Object
 	LPDIRECT3DDEVICE2		D3Dev;		// Direct3D Device
@@ -149,12 +150,15 @@ typedef struct tagDXOBJECT{
 	IDirectDrawSurface*	Back;	// 裏画面
 	IDirectDrawSurface*	Zbuf;	// Ｚバッファ
 
-	PALETTEENTRY			pe[256];	// パレットの初期値
+	PALETTE	Palette;
 
 	PIXELFORMAT PixelFormat;
 	HWND					hWnd;			// ウィンドウハンドル
 	BOOL					bNeedChgPal;	// パレットを変更する必要があるか
-} DXOBJECT;
+
+	// TODO: Remove once the loader no longer needs it.
+	std::span<PALETTEENTRY> PaletteForDDraw();
+};
 
 typedef struct tagDXSURFACE{
 	GRP			surf;			// DirectDraw OffscreenSurface (NULLなら未使用)
@@ -207,7 +211,7 @@ typedef struct tagDDRAWENUM{
 
 
 // グローバル変数 //
-extern DXOBJECT		DxObj;
+extern GRAPHICS_DDRAW	DxObj;
 extern DXSURFACE	DxSurf[SURFACE_MAX];
 extern XDDRAWENUM	DxEnum[XDDRAWENUM_MAX];
 extern DWORD		DxEnumNow;
@@ -220,8 +224,8 @@ void GrpCleanup(void);	// いつも通りに(ただし失敗したら異常終�
 void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
 bool GrpRestore(void);	// ロード済みのSurfaceを修復
 
-void GrpGetPalette(PALETTEENTRY *pal);	// 現在のパレットを取得する
-void GrpSetPalette(PALETTEENTRY *pal);	// 現在のパレットを変更する
+void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
+void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // オフスクリーン Surface 作成 //

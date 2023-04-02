@@ -3,6 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "game/graphics.h"
 #include "LZ_UTY.H"
 #include "CONFIG.H"
 #include "LOADER.H"
@@ -73,8 +74,8 @@ static BOOL			bIsBombPalette = FALSE;
 static PALETTEENTRY	tempPalette[256];
 */
 
-static PALETTEENTRY EnemyPalette[256];
-PALETTEENTRY SProjectPalette[256];
+static PALETTE EnemyPalette;
+PALETTE SProjectPalette;
 
 
 
@@ -272,8 +273,9 @@ void LoadPaletteFromMusic(void)
 	if(!GrEnemy) return;
 	if(GrEnemy->GetPalette(&lpdp) != DD_OK) return;
 
-	lpdp->GetEntries(0,0,256,DxObj.pe);
-	GrpSetPalette(DxObj.pe);
+	auto p = DxObj.PaletteForDDraw();
+	lpdp->GetEntries(0, 0, p.size(), p.data());
+	GrpSetPalette(DxObj.Palette);
 
 	lpdp->Release();
 }
@@ -292,8 +294,9 @@ void LoadPaletteFromMap(void)
 	}
 	else{
 */
-		lpdp->GetEntries(0,0,256,DxObj.pe);
-		GrpSetPalette(DxObj.pe);
+		auto p = DxObj.PaletteForDDraw();
+		lpdp->GetEntries(0, 0, p.size(), p.data());
+		GrpSetPalette(DxObj.Palette);
 //	}
 
 	lpdp->Release();

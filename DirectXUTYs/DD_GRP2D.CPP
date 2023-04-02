@@ -411,18 +411,18 @@ static void _2DUpdateAlphaTable(void)
 			}
 			// 可変パレットに対する処理 //
 			for(pal=0;pal<20;pal++){
-				r = ((WORD)DxObj.pe[pal].peRed   * 5) / 255;
-				g = ((WORD)DxObj.pe[pal].peGreen * 5) / 255;
-				b = ((WORD)DxObj.pe[pal].peBlue  * 5) / 255;
+				r = ((WORD)DxObj.Palette[pal].r * 5) / 255;
+				g = ((WORD)DxObj.Palette[pal].g * 5) / 255;
+				b = ((WORD)DxObj.Palette[pal].b * 5) / 255;
 				i = (Col2D_R + r)>5 ? 5 : Col2D_R;
 				j = (Col2D_G + g)>5 ? 5 : Col2D_G;
 				k = (Col2D_B + b)>5 ? 5 : Col2D_B;
 				AlphaTable[pal] = RGB256(i,j,k);
 			}
 			for(pal=236;pal<256;pal++){
-				r = ((WORD)DxObj.pe[pal].peRed   * 5) / 255;
-				g = ((WORD)DxObj.pe[pal].peGreen * 5) / 255;
-				b = ((WORD)DxObj.pe[pal].peBlue  * 5) / 255;
+				r = ((WORD)DxObj.Palette[pal].r * 5) / 255;
+				g = ((WORD)DxObj.Palette[pal].g * 5) / 255;
+				b = ((WORD)DxObj.Palette[pal].b * 5) / 255;
 				i = (Col2D_R + r)>5 ? 5 : Col2D_R;
 				j = (Col2D_G + g)>5 ? 5 : Col2D_G;
 				k = (Col2D_B + b)>5 ? 5 : Col2D_B;
@@ -445,18 +445,18 @@ static void _2DUpdateAlphaTable(void)
 			}
 			// 可変パレットに対する処理 //
 			for(pal=0;pal<20;pal++){
-				r = ((WORD)DxObj.pe[pal].peRed   * 5) / 255;
-				g = ((WORD)DxObj.pe[pal].peGreen * 5) / 255;
-				b = ((WORD)DxObj.pe[pal].peBlue  * 5) / 255;
+				r = ((WORD)DxObj.Palette[pal].r * 5) / 255;
+				g = ((WORD)DxObj.Palette[pal].g * 5) / 255;
+				b = ((WORD)DxObj.Palette[pal].b * 5) / 255;
 				i = (Col2D_R*Col2D_A + r*(255-Col2D_A))>>8;		if(i>6) i=5;
 				j = (Col2D_G*Col2D_A + g*(255-Col2D_A))>>8;		if(j>6) j=5;
 				k = (Col2D_B*Col2D_A + b*(255-Col2D_A))>>8;		if(k>6) k=5;
 				AlphaTable[pal] = RGB256(i,j,k);
 			}
 			for(pal=236;pal<256;pal++){
-				r = ((WORD)DxObj.pe[pal].peRed   * 5) / 255;
-				g = ((WORD)DxObj.pe[pal].peGreen * 5) / 255;
-				b = ((WORD)DxObj.pe[pal].peBlue  * 5) / 255;
+				r = ((WORD)DxObj.Palette[pal].r * 5) / 255;
+				g = ((WORD)DxObj.Palette[pal].g * 5) / 255;
+				b = ((WORD)DxObj.Palette[pal].b * 5) / 255;
 				i = (Col2D_R*Col2D_A + r*(255-Col2D_A))>>8;		if(i>6) i=5;
 				j = (Col2D_G*Col2D_A + g*(255-Col2D_A))>>8;		if(j>6) j=5;
 				k = (Col2D_B*Col2D_A + b*(255-Col2D_A))>>8;		if(k>6) k=5;

@@ -669,18 +669,9 @@ bool DemoInit(void)
 	return TRUE;
 }
 
-void FadeoutPalette(PALETTEENTRY *Src, BYTE a)
+void FadeoutPalette(const PALETTE& Src, uint8_t a)
 {
-	int				i;
-	PALETTEENTRY	temp[256];
-
-	for(i=0; i<256; i++){
-		temp[i].peRed   = ((WORD)Src[i].peRed   * a) / 255;
-		temp[i].peGreen = ((WORD)Src[i].peGreen * a) / 255;
-		temp[i].peBlue  = ((WORD)Src[i].peBlue  * a) / 255;
-	}
-
-	GrpSetPalette(temp);
+	GrpSetPalette(Src.Fade(a));
 }
 
 // 西方Ｐｒｏｊｅｃｔ表示動作部 //

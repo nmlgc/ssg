@@ -88,14 +88,14 @@
 
 typedef struct tagFACE_DATA{
 	GRP					GrSurf;			// 顔グラ用 Surface へのポインタ
-	PALETTEENTRY		pal[256];		// 顔グラ用パレット
+	PALETTE	pal;	// 顔グラ用パレット
 } FACE_DATA;
 
 // エンディングのグラフィック管理用 //
 typedef struct tagENDING_GRP{
 	GRP					GrSurf;			// Surface
 	RECT				rcTarget;		// 矩形の範囲
-	PALETTEENTRY		pal[256];		// パレット
+	PALETTE	pal;	// パレット
 } ENDING_GRP;
 
 
@@ -138,7 +138,7 @@ extern DWORD		MusicNum;			// 曲数
 extern char MCommentBuffer[12][50];
 extern char MTitleBuffer[50];
 
-extern PALETTEENTRY SProjectPalette[256];
+extern PALETTE SProjectPalette;
 
 extern ENDING_GRP	EndingGrp[6];
 

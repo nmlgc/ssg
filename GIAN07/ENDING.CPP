@@ -72,6 +72,14 @@ FVOID EndingCleanup();	// おしまい処理
 FVOID EndingSCLDecode();	// エンディング用 SCL のデコード
 
 
+void EndingSetFixedColors(PALETTEENTRY* pal)
+{
+	pal[255] = { 0x00, 0x00, 0x00 };
+	pal[199] = { 0xFF, 0xFF, 0xFF };
+	pal[198] = { 0x80, 0x80, 0x80 };
+}
+
+
 
 // エンディングまわりの初期化 //
 FBOOL EndingInit(void)
@@ -103,15 +111,7 @@ FBOOL EndingInit(void)
 
 
 	GrpGetPalette(pal);
-	pal[255].peRed   = 0;
-	pal[255].peGreen = 0;
-	pal[255].peBlue  = 0;
-	pal[199].peRed   = 255;
-	pal[199].peGreen = 255;
-	pal[199].peBlue  = 255;
-	pal[198].peRed   = 128;
-	pal[198].peGreen = 128;
-	pal[198].peBlue  = 128;
+	EndingSetFixedColors(pal);
 	GrpSetPalette(pal);
 
 
@@ -211,18 +211,7 @@ void FadeoutPaletteGrp(PALETTEENTRY *Dest, PALETTEENTRY *Src, BYTE a)
 	for(i=200; i<255; i++){
 		Dest[i] = Src[i];
 	}
-
-	Dest[255].peRed   = 0;
-	Dest[255].peGreen = 0;
-	Dest[255].peBlue  = 0;
-
-	Dest[199].peRed   = 255;
-	Dest[199].peGreen = 255;
-	Dest[199].peBlue  = 255;
-
-	Dest[198].peRed   = 128;
-	Dest[198].peGreen = 128;
-	Dest[198].peBlue  = 128;
+	EndingSetFixedColors(Dest);
 }
 
 
@@ -240,18 +229,7 @@ void FadeoutPaletteStf(PALETTEENTRY *Dest, PALETTEENTRY *Src, BYTE a)
 		Dest[i].peGreen = ((WORD)Src[i].peGreen * a) / 255;
 		Dest[i].peBlue  = ((WORD)Src[i].peBlue  * a) / 255;
 	}
-
-	Dest[255].peRed   = 0;
-	Dest[255].peGreen = 0;
-	Dest[255].peBlue  = 0;
-
-	Dest[199].peRed   = 255;
-	Dest[199].peGreen = 255;
-	Dest[199].peBlue  = 255;
-
-	Dest[198].peRed   = 128;
-	Dest[198].peGreen = 128;
-	Dest[198].peBlue  = 128;
+	EndingSetFixedColors(Dest);
 }
 
 
@@ -389,12 +367,7 @@ void DrawFadeInfo()
 		}
 		else{
 			memset(temp_pal, 0, sizeof(temp_pal));
-			temp_pal[199].peRed   = 255;
-			temp_pal[199].peGreen = 255;
-			temp_pal[199].peBlue  = 255;
-			temp_pal[198].peRed   = 128;
-			temp_pal[198].peGreen = 128;
-			temp_pal[198].peBlue  = 128;
+			EndingSetFixedColors(temp_pal);
 			GrpSetPalette(temp_pal);
 		}
 	}

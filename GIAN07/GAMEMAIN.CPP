@@ -30,40 +30,40 @@ MAID		VivTemp;
 BOOL IsDemoplay = FALSE;
 
 
-FVOID TitleProc(void);
-FVOID WeaponSelectProc(void);	// 装備選択
-FVOID GameProc(void);
-FVOID GameOverProc0(void);		// ゲームオーバー出現用
-FVOID GameOverProc(void);		// ゲームオーバー
-FVOID PauseProc(void);
-FVOID MusicRoomProc(void);		// 音楽室
-FVOID DemoProc(void);			// デモプレイ
-FVOID NameRegistProc(void);		// お名前入力
+void TitleProc(void);
+void WeaponSelectProc(void);	// 装備選択
+void GameProc(void);
+void GameOverProc0(void);	// ゲームオーバー出現用
+void GameOverProc(void);	// ゲームオーバー
+void PauseProc(void);
+void MusicRoomProc(void);	// 音楽室
+void DemoProc(void);	// デモプレイ
+void NameRegistProc(void);	// お名前入力
 
-FVOID ReplayProc(void);
+void ReplayProc(void);
 
 
-FBOOL SProjectInit(void);	// 西方Ｐｒｏｊｅｃｔ初期化部
-FVOID SProjectProc(void);	// 西方Ｐｒｏｊｅｃｔ表示動作部
+bool SProjectInit(void);	// 西方Ｐｒｏｊｅｃｔ初期化部
+void SProjectProc(void);	// 西方Ｐｒｏｊｅｃｔ表示動作部
 
-FVOID ScoreNameProc(void);
+void ScoreNameProc(void);
 
-FVOID GameSTD_Init(void);		// ゲームを立ち上げる際に必ず行う初期化関数群
-FBOOL DemoInit(void);			// デモプレイの初期化を行う
+void GameSTD_Init(void);	// ゲームを立ち上げる際に必ず行う初期化関数群
+bool DemoInit(void);	// デモプレイの初期化を行う
 
-FVOID GameDraw(void);
-FVOID GameMove(void);
-FBOOL IsDraw(void);
+void GameDraw(void);
+void GameMove(void);
+bool IsDraw(void);
 
-FVOID ScoreDraw(void);		// スコアの描画
+void ScoreDraw(void);	// スコアの描画
 
-FVOIDFN(*GameMain)(void) = TitleProc;
+void(*GameMain)(void) = TitleProc;
 
 
 
 
 // スコアネーム表示の準備を行う //
-extern FBOOL ScoreNameInit(void)
+extern bool ScoreNameInit(void)
 {
 	if(GameStage == GRAPH_ID_EXSTAGE) CurrentDif = GAME_EXTRA;
 	else                              CurrentDif = ConfigDat.GameLevel;
@@ -91,7 +91,7 @@ extern FBOOL ScoreNameInit(void)
 }
 
 // スコアネームの表示 //
-FVOID ScoreNameProc(void)
+void ScoreNameProc(void)
 {
 	static const char *ExString[5] = {"Easy","Normal","Hard","Lunatic","Extra"};
 
@@ -125,7 +125,7 @@ FVOID ScoreNameProc(void)
 }
 
 // スコアの描画 //
-FVOID ScoreDraw(void)
+void ScoreDraw(void)
 {
 	int		i,gx,gy,v;
 	RECT	src;
@@ -223,7 +223,7 @@ char GetAddr2Char(int x, int y)
 }
 
 // お名前入力 //
-FVOID NameRegistProc(void)
+void NameRegistProc(void)
 {
 	// <- DemoInit() を修正するのだぞ
 	RECT	src = {0,0,400,64};
@@ -384,7 +384,7 @@ FVOID NameRegistProc(void)
 }
 
 // お名前入力の初期化 //
-FBOOL NameRegistInit(BOOL bNeedChgMusic)
+bool NameRegistInit(bool bNeedChgMusic)
 {
 	int		i;
 	BYTE	Level;
@@ -429,7 +429,7 @@ FBOOL NameRegistInit(BOOL bNeedChgMusic)
 }
 
 // ゲームを立ち上げる際に必ず行う初期化関数群 //
-FVOID GameSTD_Init(void)
+void GameSTD_Init(void)
 {
 	MWinForceClose();
 	//GrpCls();
@@ -465,7 +465,7 @@ FVOID GameSTD_Init(void)
 
 
 // ゲームの初期化をする //
-extern FBOOL GameInit(void)
+extern bool GameInit(void)
 {
 	GrpCls();
 	GrpFlip();
@@ -487,7 +487,7 @@ extern FBOOL GameInit(void)
 }
 
 // エキストラステージを始める //
-extern FBOOL GameExstgInit(void)
+extern bool GameExstgInit(void)
 {
 	GrpCls();
 	GrpFlip();
@@ -513,7 +513,7 @@ extern FBOOL GameExstgInit(void)
 }
 
 // 次のステージに移行する //
-extern FBOOL GameNextStage(void)
+extern bool GameNextStage(void)
 {
 #ifdef PBG_DEBUG
 	DemoplaySave();
@@ -543,7 +543,7 @@ extern FBOOL GameNextStage(void)
 
 
 // リプレイ用の初期化を行う //
-extern FBOOL GameReplayInit(int Stage)
+extern bool GameReplayInit(int Stage)
 {
 	MaidSet();
 
@@ -584,7 +584,7 @@ extern FBOOL GameReplayInit(int Stage)
 	return TRUE;
 }
 
-FVOID ReplayProc(void)
+void ReplayProc(void)
 {
 	static BYTE ExTimer;
 	RECT	rc;
@@ -630,7 +630,7 @@ FVOID ReplayProc(void)
 
 
 // デモプレイの初期化を行う //
-FBOOL DemoInit(void)
+bool DemoInit(void)
 {
 //	return NameRegistInit();
 
@@ -684,7 +684,7 @@ void FadeoutPalette(PALETTEENTRY *Src, BYTE a)
 }
 
 // 西方Ｐｒｏｊｅｃｔ表示動作部 //
-FVOID SProjectProc(void)
+void SProjectProc(void)
 {
 	static WORD timer = 0;
 
@@ -743,7 +743,7 @@ FVOID SProjectProc(void)
 
 
 // 西方Ｐｒｏｊｅｃｔ表示の初期化 //
-FBOOL SProjectInit(void)
+bool SProjectInit(void)
 {
 	if(!LoadGraph(GRAPH_ID_SPROJECT)){
 		DebugOut("GRAPH.DAT が破壊されています");
@@ -757,7 +757,7 @@ FBOOL SProjectInit(void)
 
 
 // 音楽室の初期化をする //
-extern FBOOL MusicRoomInit(void)
+extern bool MusicRoomInit(void)
 {
 	MWinForceClose();
 	GrpCls();
@@ -800,13 +800,13 @@ extern FBOOL MusicRoomInit(void)
 }
 
 // ゲームを再開する(ESC 抜けから) //
-extern FVOID GameRestart(void)
+extern void GameRestart(void)
 {
 	GameMain = GameProc;
 }
 
 // ゲームから抜ける //
-extern FBOOL GameExit(BOOL bNeedChgMusic)
+extern bool GameExit(bool bNeedChgMusic)
 {
 	RECT	rc;
 
@@ -852,7 +852,7 @@ extern FBOOL GameExit(BOOL bNeedChgMusic)
 }
 
 // ゲームオーバーの前処理
-extern FVOID GameOverInit(void)
+extern void GameOverInit(void)
 {
 	StringEffect3();
 
@@ -862,7 +862,7 @@ extern FVOID GameOverInit(void)
 }
 
 // コンティニューを行う場合
-extern FVOID GameContinue(void)
+extern void GameContinue(void)
 {
 	Viv.evade_sum = 0;
 	Viv.left      = ConfigDat.PlayerStock;
@@ -877,7 +877,7 @@ extern FVOID GameContinue(void)
 	}
 }
 
-FVOID GameProc(void)
+void GameProc(void)
 {
 	Key_Read();
 
@@ -926,7 +926,7 @@ FVOID GameProc(void)
 }
 
 // ゲームオーバー出現用
-FVOID GameOverProc0(void)
+void GameOverProc0(void)
 {
 	GameOverTimer--;
 
@@ -965,7 +965,7 @@ FVOID GameOverProc0(void)
 }
 
 // ゲームオーバー
-FVOID GameOverProc(void)
+void GameOverProc(void)
 {
 	Key_Read();
 	CWinMove(&ContinueWindow);
@@ -988,7 +988,7 @@ FVOID GameOverProc(void)
 }
 
 // デモプレイ
-FVOID DemoProc(void)
+void DemoProc(void)
 {
 	static BYTE ExTimer;
 
@@ -1025,7 +1025,7 @@ FVOID DemoProc(void)
 }
 
 // 装備選択 //
-FVOID WeaponSelectProc(void)
+void WeaponSelectProc(void)
 {
 	RECT	src[4],rc;
 	int		i,x,y;
@@ -1244,7 +1244,7 @@ FVOID WeaponSelectProc(void)
 }
 
 
-FVOID TitleProc(void)
+void TitleProc(void)
 {
 	RECT	src = {0,0,640,396};
 	//RECT	src = {0,0,350,403};
@@ -1301,7 +1301,7 @@ FVOID TitleProc(void)
 	}
 }
 
-FVOID PauseProc(void)
+void PauseProc(void)
 {
 	RECT	rc;
 
@@ -1323,7 +1323,7 @@ FVOID PauseProc(void)
 }
 
 // 音楽室 //
-FVOID MusicRoomProc(void)
+void MusicRoomProc(void)
 {
 	RECT	src;
 	HDC		hdc;
@@ -1459,7 +1459,7 @@ _inline XAdd(DWORD old,int id)
 */
 
 
-FVOID GameMove(void)
+void GameMove(void)
 {
 	MWinMove();
 
@@ -1487,7 +1487,7 @@ FVOID GameMove(void)
 }
 
 
-FVOID GameDraw(void)
+void GameDraw(void)
 {
 //	RECT	rc;
 
@@ -1564,7 +1564,7 @@ FVOID GameDraw(void)
 */
 }
 
-FBOOL IsDraw(void)
+bool IsDraw(void)
 {
 	if(ConfigDat.FPSDivisor){
 		DrawCount++;

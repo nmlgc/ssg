@@ -36,10 +36,10 @@
 
 
 ///// [ 関数 ] /////
-FVOID MaidTamaSet(void);		// たま発射！！
-FVOID MaidTamaMove(void);		// 弾移動＆ヒットチェック
-FVOID MaidTamaDraw(void);		// ナニな弾描画
-FVOID MaidTamaIndSet(void);		// 弾ハッシュテーブル初期化
+void MaidTamaSet(void);	// たま発射！！
+void MaidTamaMove(void);	// 弾移動＆ヒットチェック
+void MaidTamaDraw(void);	// ナニな弾描画
+void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化
 
 
 

@@ -160,7 +160,7 @@ extern void InitECLInterrupt(ENEMY_DATA *e);	// 割り込みベクタの初期�
 
 
 // Vivit ナナメレーザーの当たり判定 //
-IBOOL LaserHITCHK(ENEMY_DATA *e, int ox, int oy, BYTE d)
+inline bool LaserHITCHK(ENEMY_DATA *e, int ox, int oy, uint8_t d)
 {
 	int		tx,ty,l,w;
 	int		chkw;

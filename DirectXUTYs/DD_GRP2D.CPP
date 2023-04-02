@@ -36,14 +36,14 @@ BYTE				ATableRef = 0;					// αテーブル格納先
 
 
 // ２Ｄ用関数(補助) //
-static PVOID _2DGrpHline(int x1,int x2,int y);		// 横ラインを引く
-static PVOID _2DGrpCHline(int x1,int x2,int y);		// 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り)
-static PVOID _2DGrpHlineA(int x1,int x2,int y);		// α横ラインを引く
-static PVOID _2DUpdateAlphaTable(void);				// αテーブルを更新する
+static void _2DGrpHline(int x1, int x2, int y);	// 横ラインを引く
+static void _2DGrpCHline(int x1, int x2, int y);	// 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り)
+static void _2DGrpHlineA(int x1, int x2, int y);	// α横ラインを引く
+static void _2DUpdateAlphaTable(void);	// αテーブルを更新する
 
 
 // 描画系関数ポインタをセットする //
-FVOID _2DSetup(void)
+void _2DSetup(void)
 {
 	int i;
 
@@ -71,7 +71,7 @@ FVOID _2DSetup(void)
 }
 
 // 画面描画の準備をする //
-FVOID _2DLock(void)
+void _2DLock(void)
 {
 	DDSURFACEDESC	ddsd;
 
@@ -84,7 +84,7 @@ FVOID _2DLock(void)
 }
 
 // 画面描画を完了する //
-FVOID _2DUnlock(void)
+void _2DUnlock(void)
 {
 	DxObj.Back->Unlock(NULL);
 	Grp_Vram  = NULL;
@@ -92,7 +92,7 @@ FVOID _2DUnlock(void)
 }
 
 // 色セット //
-FVOID _2DSetColor(BYTE r,BYTE g,BYTE b)
+void _2DSetColor(uint8_t r, uint8_t g, uint8_t b)
 {
 	DWORD temp;
 
@@ -107,7 +107,7 @@ FVOID _2DSetColor(BYTE r,BYTE g,BYTE b)
 }
 
 // αセット //
-FVOID _2DSetAlpha(BYTE a,BYTE mode)
+void _2DSetAlpha(uint8_t a, uint8_t mode)
 {
 	Col2D_A    = a;
 	Col2D_Mode = mode;
@@ -116,7 +116,7 @@ FVOID _2DSetAlpha(BYTE a,BYTE mode)
 }
 
 // 直線 //
-FVOID _2DLine(int x1,int y1,int x2,int y2)
+void _2DLine(int x1, int y1, int x2, int y2)
 {
 	int sx,sy,dx,dy,s,i;
 	BYTE c = (BYTE)Col2D&0xff;	// ここでは１ビットずつの書き込みとなるので
@@ -159,7 +159,7 @@ FVOID _2DLine(int x1,int y1,int x2,int y2)
 }
 
 // 長方形 //
-FVOID _2DBox(int x1,int y1,int x2,int y2)
+void _2DBox(int x1, int y1, int x2, int y2)
 {
 	int i;
 
@@ -170,7 +170,7 @@ FVOID _2DBox(int x1,int y1,int x2,int y2)
 }
 
 // 円 //
-FVOID _2DCircle(int x,int y,int r)
+void _2DCircle(int x, int y, int r)
 {
 	int dx,dy;
 	int s;
@@ -201,7 +201,7 @@ FVOID _2DCircle(int x,int y,int r)
 }
 
 // 円塗りつぶし //
-FVOID _2DCircleF(int x,int y,int r)
+void _2DCircleF(int x, int y, int r)
 {
 
 	int si,di;
@@ -228,7 +228,7 @@ FVOID _2DCircleF(int x,int y,int r)
 }
 
 // α長方形 //
-FVOID _2DBoxA(int x1,int y1,int x2,int y2)
+void _2DBoxA(int x1, int y1, int x2, int y2)
 {
 	int i;
 
@@ -243,21 +243,21 @@ FVOID _2DBoxA(int x1,int y1,int x2,int y2)
 }
 
 // α円塗りつぶし //
-FVOID _2DCircleA(int x,int y,int r)
+void _2DCircleA(int x, int y, int r)
 {
 	// 工事中につき、少々お待ち下さい... //
 	if(AlphaFlag) _2DUpdateAlphaTable();
 }
 
 // αポリゴン塗りつぶし //
-FVOID _2DPolygonA(POINT *p,int n)
+void _2DPolygonA(POINT *p, int n)
 {
 	// 工事中につき、少々お待ち下さい... //
 	if(AlphaFlag) _2DUpdateAlphaTable();
 }
 
 // 横ラインを引く //
-static PVOID _2DGrpHline(int x1,int x2,int y)
+static void _2DGrpHline(int x1, int x2, int y)
 {
 	_asm{
 		PUSH EDI			// EDI 保存
@@ -293,7 +293,7 @@ HL_END:
 }
 
 // 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り) //
-static PVOID _2DGrpCHline(int x1,int x2,int y)
+static void _2DGrpCHline(int x1, int x2, int y)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 	int		temp;
@@ -315,7 +315,7 @@ static PVOID _2DGrpCHline(int x1,int x2,int y)
 }
 
 // α横ラインを引く //
-static PVOID _2DGrpHlineA(int x1,int x2,int y)
+static void _2DGrpHlineA(int x1, int x2, int y)
 {
 	union{
 		DWORDLONG	dq;
@@ -367,7 +367,7 @@ static PVOID _2DGrpHlineA(int x1,int x2,int y)
 }
 
 // αテーブルを更新する //
-static PVOID _2DUpdateAlphaTable(void)
+static void _2DUpdateAlphaTable(void)
 {
 	int		r,g,b,i,j,k,pal;
 	DWORD	chk;
@@ -467,7 +467,7 @@ static PVOID _2DUpdateAlphaTable(void)
 	}
 }
 
-FVOID DisableAlphaTable(void)
+void DisableAlphaTable(void)
 {
 	int		i;
 

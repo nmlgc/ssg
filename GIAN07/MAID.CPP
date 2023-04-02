@@ -472,13 +472,13 @@ extern void MaidDead(void)
 }
 
 // かすりゲージを上昇させる(エフェクトはメイド中心) //
-extern FVOID evade_add(BYTE n)
+extern void evade_add(uint8_t n)
 {
 	evade_addEx(Viv.x,Viv.y,n);
 }
 
 // 指定座標からエフェクト発生＆ゲージ上昇 //
-extern FVOID evade_addEx(int x,int y,BYTE n)
+extern void evade_addEx(int x, int y, uint8_t n)
 {
 	int		i;
 

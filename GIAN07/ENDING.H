@@ -21,9 +21,9 @@
 
 
 /***** [関数プロトタイプ] *****/
-FBOOL EndingInit(void);		// エンディングまわりの初期化
-FVOID EndingProc(void);		// エンディング状態推移用プロシージャ
-FVOID EndingDraw(void);		// エンディング時の描画処理
+bool EndingInit(void);	// エンディングまわりの初期化
+void EndingProc(void);	// エンディング状態推移用プロシージャ
+void EndingDraw(void);	// エンディング時の描画処理
 
 
 

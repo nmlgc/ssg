@@ -87,8 +87,8 @@ extern void MaidSet(void);			// 初期化
 extern void MaidNextStage(void);	// 次のステージの準備
 extern void MaidDead(void);			// 死す
 
-extern FVOID evade_add(BYTE n);						// かすりゲージを上昇させる
-//extern FVOID evade_addEx(int x,int y,BYTE n);		// かすりゲージを上昇させる
+extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
+//extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
 
 extern void score_add(int sc);		// スコアを上昇させる
 
@@ -102,7 +102,7 @@ extern DWORD		EvadeRate[256];			// かすり得点レート
 
 
 
-IVOID PowerUp(BYTE damage)
+inline void PowerUp(uint8_t damage)
 {
 	// ダメージの分だけ加算する //
 	Viv.exp2 += damage;
@@ -121,19 +121,19 @@ IVOID PowerUp(BYTE damage)
 	}
 }
 
-IBYTE GetRightLaserDeg(BYTE LaserDeg, int i)
+inline uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i)
 {
 	if(LaserDeg < 58) return 64+48 - LaserDeg*3 + i*(64-LaserDeg)/2;
 	else              return 64+48 - 58*3 + i*(64-min(62,LaserDeg))/2;
 }
 
-IBYTE GetLeftLaserDeg(BYTE LaserDeg, int i)
+inline uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i)
 {
 	if(LaserDeg < 58) return 64-48 + LaserDeg*3 + i*(64-LaserDeg)/2;
 	else              return 64-48 + 58*3 + i*(64-min(62,LaserDeg))/2;
 }
 
-IBYTE GetLaserDeg(void)
+inline uint8_t GetLaserDeg(void)
 {
 	return ((120-Viv.bomb_time)*3)/2;
 }

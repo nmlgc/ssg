@@ -27,23 +27,23 @@ typedef struct tagDEMOPLAY_INFO{
 
 
 ///// [ 関数 ] /////
-FVOID DemoplayInit(void);			// デモプレイデータの準備
-FVOID DemoplayRecord(WORD key);		// デモプレイデータを保存する
-FVOID DemoplaySave(void);			// デモプレイデータをファイルに書き込む
+void DemoplayInit(void);	// デモプレイデータの準備
+void DemoplayRecord(uint16_t key);	// デモプレイデータを保存する
+void DemoplaySave(void);	// デモプレイデータをファイルに書き込む
 
-FBOOL DemoplayLoad(int stage);		// デモプレイデータをロードする
-FWORD DemoplayMove(void);			// Key_Data を返す
-FVOID DemoplayLoadCleanup(void);		// デモプレイロードの事後処理
+bool DemoplayLoad(int stage);	// デモプレイデータをロードする
+uint16_t DemoplayMove(void);	// Key_Data を返す
+void DemoplayLoadCleanup(void);	// デモプレイロードの事後処理
 
 
 // 要望に付き、追加するのだ //
-FVOID ReplayInit(void);			// リプレイデータの準備
-FVOID ReplayRecord(WORD key);	// リプレイデータを保存する
-FVOID ReplaySave(void);			// リプレイデータをファイルに書き込む
+void ReplayInit(void);	// リプレイデータの準備
+void ReplayRecord(uint16_t key);	// リプレイデータを保存する
+void ReplaySave(void);	// リプレイデータをファイルに書き込む
 
-FBOOL ReplayLoad(int stage);	// リプレイデータをロードする
-FWORD ReplayMove(void);			// Key_Data を返す
-FVOID ReplayLoadCleanup(void);	// リプレイデータロードの事後処理
+bool ReplayLoad(int stage);	// リプレイデータをロードする
+uint16_t ReplayMove(void);	// Key_Data を返す
+void ReplayLoadCleanup(void);	// リプレイデータロードの事後処理
 
 
 

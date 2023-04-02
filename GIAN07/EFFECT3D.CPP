@@ -103,12 +103,12 @@ LineList3D LList_Warning[8] = {
 WireFrame3D Warning = {LList_Warning,8};
 
 
-static FVOID RollPoint(Point3D *p,BYTE dx,BYTE dy,BYTE dz);
-static FVOID __Draw3DCube(Cube3D *c);		// 汎用３Ｄキューブ描画
+static void RollPoint(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
+static void __Draw3DCube(Cube3D *c);	// 汎用３Ｄキューブ描画
 
 
 
-FVOID InitWarning(void)
+void InitWarning(void)
 {
 	static BOOL		bInitialized = FALSE;
 
@@ -118,7 +118,7 @@ FVOID InitWarning(void)
 	bInitialized = TRUE;
 }
 
-FVOID DrawWarning(void)
+void DrawWarning(void)
 {
 	RECT src = {0,152+16,384,232+16};
 	extern GRP GrTama;
@@ -173,7 +173,7 @@ FVOID DrawWarning(void)
 	}
 }
 
-FVOID MoveWarningR(char count)
+void MoveWarningR(char count)
 {
 	int		i;
 
@@ -188,7 +188,7 @@ FVOID MoveWarningR(char count)
 	MoveLineList3D(&Warning);
 }
 
-FVOID MoveWarning(BYTE count)
+void MoveWarning(uint8_t count)
 {
 	int		i;
 
@@ -201,7 +201,7 @@ FVOID MoveWarning(BYTE count)
 	MoveLineList3D(&Warning);
 }
 
-FVOID InitLineList3D(WireFrame3D *w)
+void InitLineList3D(WireFrame3D *w)
 {
 	int		i,j;
 
@@ -214,7 +214,7 @@ FVOID InitLineList3D(WireFrame3D *w)
 	}
 }
 
-FVOID MoveLineList3D(WireFrame3D *w)
+void MoveLineList3D(WireFrame3D *w)
 {
 	Point3D		temp;
 	int			i,j;
@@ -245,7 +245,7 @@ FVOID MoveLineList3D(WireFrame3D *w)
 	}
 }
 
-FVOID DrawLineList3D(WireFrame3D *w)
+void DrawLineList3D(WireFrame3D *w)
 {
 	int		i,j;
 	int		x1,y1,x2,y2;
@@ -262,7 +262,7 @@ FVOID DrawLineList3D(WireFrame3D *w)
 }
 
 
-FVOID InitTriangle(void)
+void InitTriangle(void)
 {
 	int		i;
 
@@ -310,7 +310,7 @@ FVOID InitTriangle(void)
 	}
 }
 
-FVOID MoveTriangle(void)
+void MoveTriangle(void)
 {
 	int		i,j;
 	Point3D	temp;
@@ -331,7 +331,7 @@ FVOID MoveTriangle(void)
 	}
 }
 
-FVOID DrawTriangle(void)
+void DrawTriangle(void)
 {
 	int		i;
 	POINT	*p;
@@ -351,7 +351,7 @@ FVOID DrawTriangle(void)
 	GrpUnlock();
 }
 
-static FVOID RollPoint(Point3D *p,BYTE dx,BYTE dy,BYTE dz)
+static void RollPoint(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 {
 	Point3D		temp;
 
@@ -372,7 +372,7 @@ static FVOID RollPoint(Point3D *p,BYTE dx,BYTE dy,BYTE dz)
 }
 
 
-FVOID InitCircle(void)
+void InitCircle(void)
 {
 	int		i;
 
@@ -385,7 +385,7 @@ FVOID InitCircle(void)
 	}
 }
 
-FVOID MoveCircle(void)
+void MoveCircle(void)
 {
 	int		i;
 
@@ -394,7 +394,7 @@ FVOID MoveCircle(void)
 	}
 }
 
-FVOID DrawCircle(void)
+void DrawCircle(void)
 {
 	int		i,j;
 	int		x,y,l;
@@ -443,7 +443,7 @@ FVOID DrawCircle(void)
 }
 
 
-FVOID Init3DCube(void)
+void Init3DCube(void)
 {
 	int		i;
 
@@ -465,7 +465,7 @@ FVOID Init3DCube(void)
 }
 
 
-FVOID Draw3DCube(void)
+void Draw3DCube(void)
 {
 	int		i;
 	RECT	rc;
@@ -481,7 +481,7 @@ FVOID Draw3DCube(void)
 }
 
 
-FVOID Move3DCube(void)
+void Move3DCube(void)
 {
 	int				i;
 	int				l,d2;
@@ -521,7 +521,7 @@ FVOID Move3DCube(void)
 
 
 // 汎用３Ｄキューブ描画 //
-static FVOID __Draw3DCube(Cube3D *c)
+static void __Draw3DCube(Cube3D *c)
 {
 	// ３Ｄで透過色付きorアルファ比較ポリゴンを使えばもっともっと早いのだが... //
 	// ８ビット対応のため、まぁ仕方が無いか... //
@@ -601,7 +601,7 @@ static FVOID __Draw3DCube(Cube3D *c)
 }
 
 
-FVOID InitEffectFakeECL(void)
+void InitEffectFakeECL(void)
 {
 	int		i,v;
 	BYTE	d;
@@ -624,7 +624,7 @@ FVOID InitEffectFakeECL(void)
 	}
 }
 
-FVOID MoveEffectFakeECL(void)
+void MoveEffectFakeECL(void)
 {
 	int		i,v;
 	BYTE	d;
@@ -650,7 +650,7 @@ FVOID MoveEffectFakeECL(void)
 	}
 }
 
-FVOID DrawEffectFakeECL(void)
+void DrawEffectFakeECL(void)
 {
 	RECT	src;
 	int		i,j;
@@ -691,7 +691,7 @@ FVOID DrawEffectFakeECL(void)
 
 /*
 // ３面の雲の初期化を行う //
-FVOID InitStg3Cloud(void)
+void InitStg3Cloud(void)
 {
 	Cloud2D		*p;		//Cloud[CLOUD_MAX];
 	int			i;
@@ -712,7 +712,7 @@ FVOID InitStg3Cloud(void)
 
 
 // ３面の雲を動作させる //
-FVOID MoveStg3Cloud(void)
+void MoveStg3Cloud(void)
 {
 	Cloud2D		*p;		//Cloud[CLOUD_MAX];
 	int			i;
@@ -737,7 +737,7 @@ FVOID MoveStg3Cloud(void)
 
 
 // ３面の雲を描画する //
-FVOID DrawStg3Cloud(void)
+void DrawStg3Cloud(void)
 {
 #define _RsetMacro(x, y, w, h)		{(x), (y), ((x)+(w)), ((y)+(h))}
 	static RECT Data[6] = {
@@ -776,7 +776,7 @@ FVOID DrawStg3Cloud(void)
 }
 */
 
-FVOID InitStg4Rock(void)
+void InitStg4Rock(void)
 {
 	int		i;
 	int		id = 2;
@@ -809,7 +809,7 @@ FVOID InitStg4Rock(void)
 }
 
 
-FVOID MoveStg4Rock(void)
+void MoveStg4Rock(void)
 {
 	int		i, y;
 	int		dy = 500*64/4;
@@ -924,7 +924,7 @@ FVOID MoveStg4Rock(void)
 }
 
 
-FVOID DrawStg4Rock(void)
+void DrawStg4Rock(void)
 {
 	static RECT src[3] ={{0, 224, 80, 288},{0, 288, 48, 336},{48, 288, 80, 320}};
 	static int dx[3] = {80/2, 48/2, 32/2};
@@ -944,7 +944,7 @@ FVOID DrawStg4Rock(void)
 }
 
 
-FVOID SendCmdStg4Rock(BYTE Cmd, BYTE Param)
+void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 {
 	int		i;
 	Rock3D	*p = Rock;
@@ -1015,7 +1015,7 @@ Stg6Star	S6Star[S3STAR_MAX];		// 兼用モノなのだ
 
 
 // ６面ラスター初期化 //
-FVOID InitStg6Raster()
+void InitStg6Raster()
 {
 	int		i;
 
@@ -1037,7 +1037,7 @@ FVOID InitStg6Raster()
 
 
 // ６面ラスター動作 //
-FVOID MoveStg6Raster()
+void MoveStg6Raster()
 {
 	int		i;
 
@@ -1068,7 +1068,7 @@ FVOID MoveStg6Raster()
 
 
 // ６面ラスター描画 //
-FVOID DrawStg6Raster()
+void DrawStg6Raster()
 {
 	static RECT Target[3] = {
 		{608, 272, 640, 352}, {592, 160, 640, 272}, {576, 0, 640, 160},
@@ -1099,7 +1099,7 @@ FVOID DrawStg6Raster()
 
 
 // ３面高速星初期化 //
-FVOID InitStg3Star()
+void InitStg3Star()
 {
 	int		i;
 
@@ -1112,7 +1112,7 @@ FVOID InitStg3Star()
 
 
 // ３面高速星動作 //
-FVOID MoveStg3Star()
+void MoveStg3Star()
 {
 	int		i;
 
@@ -1129,7 +1129,7 @@ FVOID MoveStg3Star()
 
 
 // ３面高速星描画 //
-FVOID DrawStg3Star()
+void DrawStg3Star()
 {
 	int		i;
 	RECT	src;

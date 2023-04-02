@@ -21,7 +21,7 @@ BYTE			GameStage;
 #ifdef PBG_DEBUG
 #include <time.h>
 // デバッグ情報を出力する //
-extern FVOID OutputDebugMsg(void)
+extern void OutputDebugMsg(void)
 {
 	static DWORD	fps,count;
 	static DWORD	time,temp;
@@ -101,7 +101,7 @@ extern FVOID OutputDebugMsg(void)
 }
 #endif
 
-extern FVOID StdStatusOutput(void)
+extern void StdStatusOutput(void)
 {
 	static DWORD	fps,count;
 	static DWORD	time,temp;
@@ -148,7 +148,7 @@ extern FVOID StdStatusOutput(void)
 	GrpPut16(640-128,460,buf);
 }
 
-extern FVOID swap16(WORD *a,WORD *b)
+extern void swap16(uint16_t *a, uint16_t *b)
 {
 	WORD temp = *a;
 

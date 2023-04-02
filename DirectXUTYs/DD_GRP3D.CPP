@@ -17,7 +17,7 @@ D3DTLVERTEX		work[100];							// 頂点用ワークエリア
 
 
 // 描画系関数ポインタをセットする //
-FVOID _3DSetup(void)
+void _3DSetup(void)
 {
 	GrpLock     = _3DLock;
 	GrpUnlock   = _3DUnlock;
@@ -36,7 +36,7 @@ FVOID _3DSetup(void)
 }
 
 // 画面描画の準備をする //
-FVOID _3DLock(void)
+void _3DLock(void)
 {
 	D3DRECT			d3drc = {0,0,640,480};
 	HRESULT			dxret;
@@ -62,7 +62,7 @@ FVOID _3DLock(void)
 }
 
 // 画面描画を完了する //
-FVOID _3DUnlock(void)
+void _3DUnlock(void)
 {
 	// 描き込み終了 //
 	DxObj.D3Dev->EndScene();
@@ -70,7 +70,7 @@ FVOID _3DUnlock(void)
 }
 
 // 色セット //
-FVOID _3DSetColor(BYTE r,BYTE g,BYTE b)
+void _3DSetColor(uint8_t r, uint8_t g, uint8_t b)
 {
 	Col3D_R = (r>5) ? 250 : r*50;
 	Col3D_G = (g>5) ? 250 : g*50;
@@ -78,7 +78,7 @@ FVOID _3DSetColor(BYTE r,BYTE g,BYTE b)
 }
 
 // αセット //
-FVOID _3DSetAlpha(BYTE a,BYTE mode)
+void _3DSetAlpha(uint8_t a, uint8_t mode)
 {
 	Col3D_A = a;
 
@@ -96,7 +96,7 @@ FVOID _3DSetAlpha(BYTE a,BYTE mode)
 }
 
 // 直線 //
-FVOID _3DLine(int x1,int y1,int x2,int y2)
+void _3DLine(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 
@@ -107,7 +107,7 @@ FVOID _3DLine(int x1,int y1,int x2,int y2)
 }
 
 // 長方形 //
-FVOID _3DBox(int x1,int y1,int x2,int y2)
+void _3DBox(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 
@@ -120,7 +120,7 @@ FVOID _3DBox(int x1,int y1,int x2,int y2)
 }
 
 // 円 //
-FVOID _3DCircle(int x,int y,int r)
+void _3DCircle(int x, int y, int r)
 {
 	int		i;
 
@@ -134,7 +134,7 @@ FVOID _3DCircle(int x,int y,int r)
 }
 
 // 円塗りつぶし //
-FVOID _3DCircleF(int x,int y,int r)
+void _3DCircleF(int x, int y, int r)
 {
 	int		i;
 
@@ -148,7 +148,7 @@ FVOID _3DCircleF(int x,int y,int r)
 }
 
 // ポリゴン塗りつぶし //
-FVOID _3DPolygon(POINT *p,int n)
+void _3DPolygon(POINT *p, int n)
 {
 	int i;
 
@@ -162,7 +162,7 @@ FVOID _3DPolygon(POINT *p,int n)
 }
 
 // α長方形 //
-FVOID _3DBoxA(int x1,int y1,int x2,int y2)
+void _3DBoxA(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 
@@ -179,7 +179,7 @@ FVOID _3DBoxA(int x1,int y1,int x2,int y2)
 }
 
 // α円塗りつぶし //
-FVOID _3DCircleA(int x,int y,int r)
+void _3DCircleA(int x, int y, int r)
 {
 	int		i;
 
@@ -196,7 +196,7 @@ FVOID _3DCircleA(int x,int y,int r)
 }
 
 // αポリゴン塗りつぶし //
-FVOID _3DPolygonA(POINT *p,int n)
+void _3DPolygonA(POINT *p, int n)
 {
 	int i;
 
@@ -214,7 +214,7 @@ FVOID _3DPolygonA(POINT *p,int n)
 }
 
 // 太い半透明円描画 //
-FVOID _3DFatCircleA(int x,int y,int r,int w)
+void _3DFatCircleA(int x, int y, int r, int w)
 {
 	int		i;
 	int		lx,ly;
@@ -238,7 +238,7 @@ FVOID _3DFatCircleA(int x,int y,int r,int w)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-FVOID GrpGrdRect(POINT *p)
+void GrpGrdRect(POINT *p)
 {
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGB_MAKE(255,255,255);
@@ -262,7 +262,7 @@ FVOID GrpGrdRect(POINT *p)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-FVOID GrpGrdRectA(POINT *p)
+void GrpGrdRectA(POINT *p)
 {
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGBA_MAKE(255,255,255,Col3D_A);
@@ -286,7 +286,7 @@ FVOID GrpGrdRectA(POINT *p)
 }
 
 // グラデーション付きポリゴン(レーザー用？) //
-FVOID GrpGrdPolygon(POINT *p,int n)
+void GrpGrdPolygon(POINT *p, int n)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //
@@ -305,7 +305,7 @@ FVOID GrpGrdPolygon(POINT *p,int n)
 	AlphaEnable(FALSE);
 }
 
-FVOID GrpGrdLineEx(int x,int y1,int y2)
+void GrpGrdLineEx(int x, int y1, int y2)
 {
 	DWORD	c1,c2;
 
@@ -324,7 +324,7 @@ FVOID GrpGrdLineEx(int x,int y1,int y2)
 	//AlphaEnable(FALSE);
 }
 
-FVOID GrpTexBox(int x1,int y1,int x2,int y2)
+void GrpTexBox(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 
@@ -336,7 +336,7 @@ FVOID GrpTexBox(int x1,int y1,int x2,int y2)
 	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,4,D3DDP_WAIT);
 }
 
-FVOID GrpTexBoxEx(POINT *p)
+void GrpTexBoxEx(POINT *p)
 {
 	int i;
 

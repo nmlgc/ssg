@@ -12,7 +12,7 @@ PlayRankInfo	PlayRank;
 
 
 // 難易度の許容範囲内でプレイランクを増減する
-FVOID PlayRankAdd(int n)
+void PlayRankAdd(int n)
 {
 	// イージー 　　　0 ～ 24
 	// ノーマル　　　16 ～ 40
@@ -73,7 +73,7 @@ FVOID PlayRankAdd(int n)
 
 
 // 現在の難易度に応じてプレイランクを初期化
-FVOID PlayRankReset(void)
+void PlayRankReset(void)
 {
 	PlayRank.GameLevel = ConfigDat.GameLevel;
 

@@ -96,20 +96,20 @@ typedef struct tagBIT_DATA {
 
 
 ///// [ 関数 ] /////
-FVOID SnakyInit(void);								// 蛇型の敵配列の初期化
-FVOID SnakySet(BOSS_DATA *b,int len,DWORD TailID);	// 蛇型の敵をセットする
-FVOID SnakyMove(void);								// 蛇型の敵の移動処理
-FVOID SnakyDelete(BOSS_DATA *b);					// 蛇型の敵を殺す
+void SnakyInit(void);	// 蛇型の敵配列の初期化
+void SnakySet(BOSS_DATA *b, int len, uint32_t TailID);	// 蛇型の敵をセットする
+void SnakyMove(void);	// 蛇型の敵の移動処理
+void SnakyDelete(BOSS_DATA *b);	// 蛇型の敵を殺す
 
-FVOID BitInit(void);									// ビット配列の初期化
-FVOID BitSet(BOSS_DATA *b, BYTE NumBits, DWORD BitID);	// ビットをセットする
-FVOID BitMove(void);									// ビットを動作させる
-FVOID BitDelete(void);									// ビットを消滅させる
-FVOID BitLineDraw(void);								// ビット間のラインを描画する
-FVOID BitSelectAttack(DWORD BitID);						// 攻撃パターンをセットor変更
-FVOID BitLaserCommand(BYTE Command);					// レーザー系命令を発行
-FVOID BitSendCommand(BYTE Command, int Param);			// ビット命令を送信
-FINT  BitGetNum(void);									// 現在のビット数を取得する
+void BitInit(void);	// ビット配列の初期化
+void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID);	// ビットをセットする
+void BitMove(void);	// ビットを動作させる
+void BitDelete(void);	// ビットを消滅させる
+void BitLineDraw(void);	// ビット間のラインを描画する
+void BitSelectAttack(uint32_t BitID);	// 攻撃パターンをセットor変更
+void BitLaserCommand(uint8_t Command);	// レーザー系命令を発行
+void BitSendCommand(uint8_t Command, int Param);	// ビット命令を送信
+int  BitGetNum(void);	// 現在のビット数を取得する
 
 
 

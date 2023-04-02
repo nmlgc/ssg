@@ -17,7 +17,7 @@ static void Indsort(WORD *ind,WORD *now);
 
 
 // アイテムを発生させる //
-FVOID ItemSet(int x,int y,BYTE type)
+void ItemSet(int x, int y, uint8_t type)
 {
 	ITEM_DATA	*ip;
 	BYTE		deg;
@@ -52,7 +52,7 @@ FVOID ItemSet(int x,int y,BYTE type)
 }
 
 // アイテムを動かす //
-FVOID ItemMove(void)
+void ItemMove(void)
 {
 	ITEM_DATA		*ip;
 	int				i,tx,ty,l;
@@ -114,7 +114,7 @@ FVOID ItemMove(void)
 }
 
 // アイテムを描画する //
-FVOID ItemDraw(void)
+void ItemDraw(void)
 {
 	ITEM_DATA		*ip;
 	int				i,j,x,y;
@@ -172,7 +172,7 @@ FVOID ItemDraw(void)
 }
 
 // アイテム配列の初期化 //
-FVOID ItemIndSet(void)
+void ItemIndSet(void)
 {
 	int i;
 

@@ -97,7 +97,7 @@ static BYTE MaidBombTime[4] =
 
 
 // たま発射！！ //
-FVOID MaidTamaSet(void)
+void MaidTamaSet(void)
 {
 	// この関数では、前回の発射状態 (Viv_St) を参照して、発射可能であるならば //
 	// 発射し、そうでなければ、単にリターンする。                             //
@@ -145,7 +145,7 @@ FVOID MaidTamaSet(void)
 }
 
 // 弾移動＆ヒットチェック //
-FVOID MaidTamaMove(void)
+void MaidTamaMove(void)
 {
 	// この関数では、TAMA.cpp の敵弾の移動処理を使用する。もちろん、         //
 	// 当たり判定については、敵に対してのものとする事！！                    //
@@ -200,7 +200,7 @@ FVOID MaidTamaMove(void)
 }
 
 // ナニな弾描画 //
-FVOID MaidTamaDraw(void)
+void MaidTamaDraw(void)
 {
 	// ここでは、さすがにTAMA.cpp 内の関数を使用するわけにはいかないので、 //
 	// 独自に描画ルーチンを展開する。                                      //
@@ -269,7 +269,7 @@ FVOID MaidTamaDraw(void)
 }
 
 // 弾ハッシュテーブル初期化 //
-FVOID MaidTamaIndSet(void)
+void MaidTamaIndSet(void)
 {
 	int		i;
 
@@ -348,7 +348,7 @@ static void Indsort(WORD *ind,WORD *now)
 #define IsMainShot(t)	((t)==MAID_MAIN_SHOT||(t)==MAID_MAIN_SHOT*2||(t)==MAID_MAIN_SHOT*3)
 #define IsSubShot(t)	( ((t)==0 || (t)==MAID_SUB_SHOT) && Viv.bomb_time==0)
 
-IVOID MLaserSet(WORD time)
+void MLaserSet(uint16_t time)
 {
 	if(Viv.bomb_time || Viv.muteki>MAID_MOVE_DISABLE_TIME){
 		Viv.lay_time = 0;

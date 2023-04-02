@@ -9,10 +9,10 @@
 
 // 秘密の関数 //
 static BYTE *__LSurfLock(LensInfo *LInfo);
-static FVOID __LSurfUnlock(LensInfo *LInfo);
+static void __LSurfUnlock(LensInfo *LInfo);
 
-static FBOOL __BackSurfLock(void);
-static FVOID __BackSurfUnlock(void);
+static bool __BackSurfLock(void);
+static void __BackSurfUnlock(void);
 
 static BYTE		*__GrpBack = NULL;
 static DWORD	__GrpPitch = 0;
@@ -38,13 +38,13 @@ static BYTE *__LSurfLock(LensInfo *LInfo)
 
 
 // LInfo->gTemp に対して、->Unlock() を行う //
-static FVOID __LSurfUnlock(LensInfo *LInfo)
+static void __LSurfUnlock(LensInfo *LInfo)
 {
 	LInfo->gTemp->Unlock(NULL);
 }
 
 
-static FBOOL __BackSurfLock(void)
+static bool __BackSurfLock(void)
 {
 	DDSURFACEDESC	ddsd;
 	HRESULT			ddret;
@@ -61,7 +61,7 @@ static FBOOL __BackSurfLock(void)
 }
 
 
-static FVOID __BackSurfUnlock(void)
+static void __BackSurfUnlock(void)
 {
 	DxObj.Back->Unlock(NULL);
 }
@@ -145,7 +145,7 @@ extern LensInfo *GrpCreateLensBall(int r, int m, GRP Surface)
 
 
 // GrpLock() 系関数 : レンズボールを描画する //
-extern FVOID GrpDrawLensBall(LensInfo *LInfo, int x, int y)
+extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 {
 	RECT	src;
 
@@ -203,7 +203,7 @@ extern FVOID GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 
 
 // レンズボール用データを破棄する //
-extern FVOID GrpReleaseLensBall(LensInfo *LInfo)
+extern void GrpReleaseLensBall(LensInfo *LInfo)
 {
 	if(LInfo == NULL) return;
 

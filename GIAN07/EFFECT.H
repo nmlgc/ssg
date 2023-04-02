@@ -93,39 +93,39 @@ typedef struct tagSCREENEFC_INFO{
 
 
 ///// [ 関数 ] /////
-FVOID SEffectInit(void);								// エフェクトの初期化を行う
-FVOID StringEffect(int x,int y,const char *s);				// 文字列系エフェクト(上に表示する奴)
-FVOID StringEffect2(int x,int y,DWORD point);			// 得点表示エフェクト
-FVOID StringEffect3(void);								// ゲームオーバーの表示
-FVOID SetMusicTitle(int y,char *s);						// 曲名の表示
+void SEffectInit(void);	// エフェクトの初期化を行う
+void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
+void StringEffect2(int x, int y, uint32_t point);	// 得点表示エフェクト
+void StringEffect3(void);	// ゲームオーバーの表示
+void SetMusicTitle(int y, char *s);	// 曲名の表示
 
-FVOID SEffectMove(void);		// エフェクトを動かす(仕様変更の可能性があります)
-FVOID SEffectDraw(void);		// エフェクトを描画する(仕様変更の可能性があります)
+void SEffectMove(void);	// エフェクトを動かす(仕様変更の可能性があります)
+void SEffectDraw(void);	// エフェクトを描画する(仕様変更の可能性があります)
 
-FVOID CEffectInit(void);						// 円エフェクトの初期化
-FVOID CEffectMove(void);						// 円エフェクトを動かす
-FVOID CEffectDraw(void);						// 円エフェクトを描画する
-FVOID CEffectSet(int x,int y,BYTE type);		// 円エフェクトをセットする
+void CEffectInit(void);	// 円エフェクトの初期化
+void CEffectMove(void);	// 円エフェクトを動かす
+void CEffectDraw(void);	// 円エフェクトを描画する
+void CEffectSet(int x, int y, uint8_t type);	// 円エフェクトをセットする
 
-FVOID ScreenEffectInit(void);			// 画面全体に対するエフェクトの初期化
-FVOID ScreenEffectSet(BYTE cmd);		// 画面全体に対するエフェクトをセットする
-FVOID ScreenEffectMove(void);			// 画面全体に対するエフェクトを動かす
-FVOID ScreenEffectDraw(void);			// 画面全体に対するエフェクトを描画する
+void ScreenEffectInit(void);	// 画面全体に対するエフェクトの初期化
+void ScreenEffectSet(uint8_t cmd);	// 画面全体に対するエフェクトをセットする
+void ScreenEffectMove(void);	// 画面全体に対するエフェクトを動かす
+void ScreenEffectDraw(void);	// 画面全体に対するエフェクトを描画する
 
-FVOID WarningEffectInit(void);		// ワーニングの初期化
-FVOID WarningEffectSet(void);		// ワーニング発動！！
-FVOID WarningEffectMove(void);		// ワーニングの動作
-FVOID WarningEffectDraw(void);		// ワーニングの描画
+void WarningEffectInit(void);	// ワーニングの初期化
+void WarningEffectSet(void);	// ワーニング発動！！
+void WarningEffectMove(void);	// ワーニングの動作
+void WarningEffectDraw(void);	// ワーニングの描画
 
-FBOOL SEffectRestore(void);		// エフェクト用 Restore 処理
+bool SEffectRestore(void);	// エフェクト用 Restore 処理
 
-FVOID ObjectLockOnInit(void);							// ロックオン配列を初期化
-FVOID ObjectLockOn(int *x,int *y,int wx64,int hx64);	// 何かをロックオンする
-FVOID ObjectLockMove(void);								// ロックオンアニメーション動作
-FVOID ObjectLockDraw(void);								// ロックオン枠描画
+void ObjectLockOnInit(void);	// ロックオン配列を初期化
+void ObjectLockOn(int *x, int *y, int wx64, int hx64);	// 何かをロックオンする
+void ObjectLockMove(void);	// ロックオンアニメーション動作
+void ObjectLockDraw(void);	// ロックオン枠描画
 
-FVOID GrpDrawSpect(int x,int y);			// スペアナ描画
-FVOID GrpDrawNote(void);					// 押されているところを表示
+void GrpDrawSpect(int x, int y);	// スペアナ描画
+void GrpDrawNote(void);	// 押されているところを表示
 
 
 

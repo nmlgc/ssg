@@ -19,13 +19,13 @@ HLaserData		FreeHL;			// 解放済みホーミングレーザー
 
 
 ///// [マクロ] /////
-IINT HLASER_GETNEXT(int current)
+int HLASER_GETNEXT(int current)
 {
 	// 後で mod -> and に変更すること //
 	return (current + HLASER_LEN*HLASER_SECTION - 1)%(HLASER_LEN*HLASER_SECTION);
 }
 
-IINT HLASER_GETPREV(int current, int n)
+int HLASER_GETPREV(int current, int n)
 {
 	// 後で mod -> and に変更すること //
 	return (current + n)%(HLASER_LEN*HLASER_SECTION);
@@ -34,7 +34,7 @@ IINT HLASER_GETPREV(int current, int n)
 
 
 // ホーミングレーザーの初期化を行う //
-FVOID HLaserInit(void)
+void HLaserInit(void)
 {
 	int		i;
 
@@ -52,7 +52,7 @@ FVOID HLaserInit(void)
 
 
 // ホーミングレーザーをセットする //
-FVOID HLaserSet(HLaserInfo *hinfo)
+void HLaserSet(HLaserInfo *hinfo)
 {
 	int			i,j;
 	BYTE		deg;
@@ -93,7 +93,7 @@ FVOID HLaserSet(HLaserInfo *hinfo)
 
 
 // ホーミングレーザーを動作させる //
-FVOID HLaserMove(void)
+void HLaserMove(void)
 {
 	HLaserData	*hl;
 	HLaserData	*temp;
@@ -200,7 +200,7 @@ FVOID HLaserMove(void)
 	}
 }
 
-FVOID _CircleA16(int x,int y, int r, BYTE d)
+void _CircleA16(int x, int y, int r, uint8_t d)
 {
 	POINT		src[9+1];
 	int			i,j;
@@ -217,14 +217,14 @@ FVOID _CircleA16(int x,int y, int r, BYTE d)
 }
 
 // ホーミングレーザーを描画する //
-FVOID HLaserDraw(void)
+void HLaserDraw(void)
 {
 	HLaserData	*hl;
 	int			i,w,current;
 	DegPoint	*p;
 	POINT		src[4];
-	FVOIDFN(*AlphaPolygon)(POINT *p,int n);
-	//FVOIDFN(*AlphaCircle)(int x, int y, int r);
+	void(*AlphaPolygon)(POINT *p, int n);
+	//void(*AlphaCircle)(int x, int y, int r);
 
 	if(DxObj.PixelFormat.IsChanneled()){
 		AlphaPolygon = GrpPolygonA;
@@ -324,7 +324,7 @@ FVOID HLaserDraw(void)
 
 
 // ホーミングレーザーに消去エフェクトをセット //
-FVOID HLaserClear(void)
+void HLaserClear(void)
 {
 //	HLaserData	*hl;
 

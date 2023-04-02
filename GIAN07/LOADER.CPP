@@ -79,9 +79,9 @@ PALETTEENTRY SProjectPalette[256];
 
 
 // 秘密の関数 //
-static FVOID SetAnimeRect(ANIME_DATA *anm,int x, int y, int w, int h);
-static FVOID SetAnimeRect2(ANIME_DATA *anm,int x1, int y1, int x2, int y2);
-static FVOID SetAnimeTH(ANIME_DATA *anm, int x, int y, int n);
+static void SetAnimeRect(ANIME_DATA *anm, int x, int y, int w, int h);
+static void SetAnimeRect2(ANIME_DATA *anm, int x1, int y1, int x2, int y2);
+static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n);
 
 
 // Surface を作成する //
@@ -866,7 +866,7 @@ BOOL LoadStageData(BYTE stage)
 }
 
 // １パターンのグラフィックをアニメとして定義する //
-static FVOID SetAnimeRect(ANIME_DATA *anm,int x, int y, int w, int h)
+static void SetAnimeRect(ANIME_DATA *anm,int x, int y, int w, int h)
 {
 	anm->width  = w;
 	anm->height = h;
@@ -877,7 +877,7 @@ static FVOID SetAnimeRect(ANIME_DATA *anm,int x, int y, int w, int h)
 }
 
 // １パターンのグラフィックをアニメとして定義する //
-static FVOID SetAnimeRect2(ANIME_DATA *anm,int x1, int y1, int x2, int y2)
+static void SetAnimeRect2(ANIME_DATA *anm,int x1, int y1, int x2, int y2)
 {
 	anm->width  = x2-x1;
 	anm->height = y2-y1;
@@ -887,7 +887,7 @@ static FVOID SetAnimeRect2(ANIME_DATA *anm,int x1, int y1, int x2, int y2)
 	SetRect(anm->ptn+0, x1, y1, x2, y2);
 }
 
-static FVOID SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
+static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
 {
 	int		i;
 

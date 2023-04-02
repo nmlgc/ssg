@@ -12,15 +12,15 @@
 
 
 // 図形描画関数に対するダミー関数 //
-static FVOID DM_V(void);
-static FVOID DM_BBBB(BYTE a,BYTE b,BYTE c,BYTE d);
-static FVOID DM_BBB(BYTE a,BYTE b,BYTE c);
-static FVOID DM_BB(BYTE a,BYTE b);
-static FVOID DM_III(int a,int b,int c);
-static FVOID DM_IIII(int a,int b,int c,int d);
-static FVOID DM_PI(POINT *p,int n);
-static FBOOL DM_RESTORE(void);
-static PVOID DM_GRPBLT(RECT *src,int x,int y,GRP surf);
+static void DM_V(void);
+static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static void DM_BBB(uint8_t a, uint8_t b, uint8_t c);
+static void DM_BB(uint8_t a, uint8_t b);
+static void DM_III(int a, int b, int c);
+static void DM_IIII(int a, int b, int c, int d);
+static void DM_PI(POINT *p, int n);
+static bool DM_RESTORE(void);
+static void DM_GRPBLT(RECT *src, int x, int y, GRP surf);
 
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
@@ -30,7 +30,7 @@ int CLIP_Y_MAX = 479;
 
 // キャプチャーを行うか(->MtoB) //
 BOOL CaptureFlag = FALSE;
-PVOID STD_GrpBlt(RECT *src,int x,int y,GRP surf);
+void STD_GrpBlt(RECT *src, int x, int y, GRP surf);
 
 
 // オフスクリーン Surface を Restore し、ＢＭＰがあれば読み直す //
@@ -56,8 +56,8 @@ static void SetDummyFunc(void);
 
 
 // フリップ用関数 //
-static FVOID GrpFlipFS(void);
-static FVOID GrpFlipWnd(void);
+static void GrpFlipFS(void);
+static void GrpFlipWnd(void);
 
 
 // グローバル変数 //
@@ -67,26 +67,26 @@ XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
 DWORD			DxEnumNow;
 
 // 図形描画用関数ポインタの実体 //
-FVOIDFN(*GrpFlip)(void)                            = DM_V;
-FVOIDFN(*GrpLock)(void)                            = DM_V;
-FVOIDFN(*GrpUnlock)(void)                          = DM_V;
-FVOIDFN(*GrpSetColor)(BYTE r,BYTE g,BYTE b)        = DM_BBB;
-FVOIDFN(*GrpSetAlpha)(BYTE a,BYTE mode)            = DM_BB;
-FVOIDFN(*GrpLine)(int x1,int y1,int x2,int y2)     = DM_IIII;
-FVOIDFN(*GrpBox)(int x1,int y1,int x2,int y2)      = DM_IIII;
-FVOIDFN(*GrpCircle)(int x,int y,int r)             = DM_III;
-FVOIDFN(*GrpCircleF)(int x,int y,int r)            = DM_III;
-FVOIDFN(*GrpPolygon)(POINT *p,int n)               = DM_PI;
-FVOIDFN(*GrpBoxA)(int x1,int y1,int x2,int y2)     = DM_IIII;
-FVOIDFN(*GrpCircleA)(int x,int y,int r)            = DM_III;
-FVOIDFN(*GrpPolygonA)(POINT *p,int n)              = DM_PI;
-FVOIDFN(*GrpFatCircleA)(int x,int y,int r,int w)   = DM_IIII;
-PVOIDFN(*GrpBlt)(RECT *src,int x,int y,GRP surf)   = STD_GrpBlt;
+void(*GrpFlip)(void)                                = DM_V;
+void(*GrpLock)(void)                                = DM_V;
+void(*GrpUnlock)(void)                              = DM_V;
+void(*GrpSetColor)(uint8_t r, uint8_t g, uint8_t b) = DM_BBB;
+void(*GrpSetAlpha)(uint8_t a, uint8_t mode)         = DM_BB;
+void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
+void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
+void(*GrpCircle)(int x, int y, int r)               = DM_III;
+void(*GrpCircleF)(int x, int y, int r)              = DM_III;
+void(*GrpPolygon)(POINT *p, int n)                  = DM_PI;
+void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
+void(*GrpCircleA)(int x, int y, int r)              = DM_III;
+void(*GrpPolygonA)(POINT *p, int n)                 = DM_PI;
+void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
+void(*GrpBlt)(RECT *src, int x, int y, GRP surf)    = STD_GrpBlt;
 
-static FBOOLFN(*RestoreHookFn)(void) = DM_RESTORE;		// Restore の事後処理用関数
+static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
 
-FBOOL GrpEnum(HWND hWnd)
+bool GrpEnum(HWND hWnd)
 {
 	HRESULT		dxret;
 
@@ -115,7 +115,7 @@ FBOOL GrpEnum(HWND hWnd)
 	return TRUE;
 }
 
-FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
+bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth)
 {
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
@@ -214,7 +214,7 @@ FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth)
 	return FALSE;
 }
 
-FVOID GrpCleanup(void)
+void GrpCleanup(void)
 {
 	int		i;
 
@@ -241,7 +241,7 @@ FVOID GrpCleanup(void)
 }
 
 // クリッピング枠を取得する //
-FVOID GrpGetClip(RECT *dest)
+void GrpGetClip(RECT *dest)
 {
 	dest->left   = CLIP_X_MIN;
 	dest->top    = CLIP_Y_MIN;
@@ -250,7 +250,7 @@ FVOID GrpGetClip(RECT *dest)
 	dest->bottom = CLIP_Y_MAX;
 }
 
-FVOID GrpSetClip(int sx,int sy,int ex,int ey)
+void GrpSetClip(int sx, int sy, int ex, int ey)
 {
 	D3DVIEWPORT2		view;
 
@@ -278,7 +278,7 @@ FVOID GrpSetClip(int sx,int sy,int ex,int ey)
 	}
 }
 
-FBOOL GrpRestore(void)
+bool GrpRestore(void)
 {
 	HRESULT		dxval;
 	int			i;
@@ -304,7 +304,7 @@ FBOOL GrpRestore(void)
 }
 
 // Restore の事後処理フック //
-FVOID GrpSetRestoreHook(FBOOLFN(*func)(void))
+void GrpSetRestoreHook(bool(*func)(void))
 {
 	// 安全対策(上を見れば分かるように、NULLチェックがないので...)
 	if(func==NULL) RestoreHookFn = DM_RESTORE;
@@ -312,7 +312,7 @@ FVOID GrpSetRestoreHook(FBOOLFN(*func)(void))
 }
 
 // 現在のパレットを取得する(ただの代入なのでこの関数を使うまでも無いかもしれないね) //
-FVOID GrpGetPalette(PALETTEENTRY *pal)
+void GrpGetPalette(PALETTEENTRY *pal)
 {
 	int		i;
 
@@ -325,7 +325,7 @@ FVOID GrpGetPalette(PALETTEENTRY *pal)
 }
 
 // 現在のパレットを変更する //
-FVOID GrpSetPalette(PALETTEENTRY *pal)
+void GrpSetPalette(PALETTEENTRY *pal)
 {
 	int			i;
 
@@ -347,7 +347,7 @@ FVOID GrpSetPalette(PALETTEENTRY *pal)
 	DisableAlphaTable();
 }
 
-FGRP GrpCreateSurface(int width,int height,BYTE surf_id)
+GRP GrpCreateSurface(int width,int height,BYTE surf_id)
 {
 	HRESULT				dxval;
 	DDSURFACEDESC		ddsd;
@@ -380,7 +380,7 @@ FGRP GrpCreateSurface(int width,int height,BYTE surf_id)
 	return DxSurf[surf_id].surf;
 }
 
-FBOOL GrpReleaseSurface(BYTE surf_id)
+bool GrpReleaseSurface(uint8_t surf_id)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 	RELEASE(DxSurf[surf_id].surf);
@@ -398,12 +398,12 @@ bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
 }
 
-FBOOL GrpBMPLoad(const PATH_LITERAL filename,BYTE surf_id)
+bool GrpBMPLoad(const PATH_LITERAL filename, uint8_t surf_id)
 {
 	return GrpBMPLoad(FileLoad(filename), surf_id);
 }
 
-FVOID GrpCls(void)
+void GrpCls(void)
 {
 	DDBLTFX		ddbltfx;
 	HRESULT		ddrval;
@@ -430,7 +430,7 @@ FVOID GrpCls(void)
 
 
 // 直接番号指定で矩形内を塗りつぶす //
-FVOID GrpClsEx(RECT *Target, DWORD col)
+void GrpClsEx(RECT *Target, DWORD col)
 {
 	DDBLTFX		ddbltfx;
 	HRESULT		ddrval;
@@ -481,7 +481,7 @@ extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds)
 	}
 }
 
-static FVOID GrpFlipFS(void)
+static void GrpFlipFS(void)
 {
 	HRESULT		ddrval;
 
@@ -510,7 +510,7 @@ static FVOID GrpFlipFS(void)
 	}
 }
 
-static FVOID GrpFlipWnd(void)
+static void GrpFlipWnd(void)
 {
 	HRESULT		ddrval;
 
@@ -534,13 +534,13 @@ static FVOID GrpFlipWnd(void)
 }
 
 // クリッピングを行うか？ //
-FVOID GrpBltEnable(BOOL flag)
+void GrpBltEnable(bool flag)
 {
 	if(flag == TRUE)	GrpBlt = STD_GrpBlt;
 	else				GrpBlt = DM_GRPBLT;
 }
 
-PBOOL GrpClip(RECT *src,int *x,int *y)
+bool GrpClip(RECT *src, int *x, int *y)
 {
 	int w = src->right - src->left - 1;
 	int h = src->bottom - src->top - 1;
@@ -573,7 +573,7 @@ PBOOL GrpClip(RECT *src,int *x,int *y)
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
-PVOID STD_GrpBlt(RECT *src,int x,int y,GRP surf)
+void STD_GrpBlt(RECT *src, int x, int y, GRP surf)
 {
 	HRESULT		ddrval;
 
@@ -895,18 +895,18 @@ static void SetDummyFunc(void)
 }
 
 // ダミー関数の実体(かなり手抜き...) //
-static FVOID DM_V(void){}
-static FVOID DM_BBBB(BYTE a,BYTE b,BYTE c,BYTE d){};
-static FVOID DM_BBB(BYTE a,BYTE b,BYTE c){}
-static FVOID DM_BB(BYTE a,BYTE b){}
-static FVOID DM_III(int a,int b,int c){}
-static FVOID DM_IIII(int a,int b,int c,int d){}
-static FVOID DM_PI(POINT *p,int n){}
+static void DM_V(void) {}
+static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d){};
+static void DM_BBB(uint8_t a, uint8_t b, uint8_t c) {}
+static void DM_BB(uint8_t a, uint8_t b) {}
+static void DM_III(int a, int b, int c) {}
+static void DM_IIII(int a, int b, int c, int d) {}
+static void DM_PI(POINT *p, int n) {}
 
-static FBOOL DM_RESTORE(void)
+static bool DM_RESTORE(void)
 {
 	// ダミー関数は確実に成功する //
 	return TRUE;
 }
 
-static PVOID DM_GRPBLT(RECT *src,int x,int y,GRP surf){}
+static void DM_GRPBLT(RECT *src, int x, int y, GRP surf) {}

@@ -67,9 +67,9 @@ void DrawTextInfo();	// テキストの描画
 
 void DrawFadeInfo();	// フェードＩＯ情報の反映
 
-FVOID EndingCleanup();	// おしまい処理
+void EndingCleanup();	// おしまい処理
 
-FVOID EndingSCLDecode();	// エンディング用 SCL のデコード
+void EndingSCLDecode();	// エンディング用 SCL のデコード
 
 
 void EndingSetFixedColors(PALETTEENTRY* pal)
@@ -82,7 +82,7 @@ void EndingSetFixedColors(PALETTEENTRY* pal)
 
 
 // エンディングまわりの初期化 //
-FBOOL EndingInit(void)
+bool EndingInit(void)
 {
 	PALETTEENTRY	pal[256];
 
@@ -139,7 +139,7 @@ FBOOL EndingInit(void)
 
 
 // おしまい処理 //
-FVOID EndingCleanup()
+void EndingCleanup()
 {
 	int		i;
 
@@ -154,7 +154,7 @@ FVOID EndingCleanup()
 
 
 // エンディング状態推移用プロシージャ //
-FVOID EndingProc(void)
+void EndingProc(void)
 {/*
 	Key_Read();
 
@@ -164,7 +164,7 @@ FVOID EndingProc(void)
 		return;
 	}
 */
-	extern FBOOL IsDraw();
+	extern bool IsDraw();
 
 	if(FlashState) FlashState -= 32;
 
@@ -180,7 +180,7 @@ FVOID EndingProc(void)
 
 
 // エンディング時の描画処理 //
-FVOID EndingDraw(void)
+void EndingDraw(void)
 {
 	// 画面消去 //
 	DWORD cls_col = (DxObj.PixelFormat.IsPalettized() ? 255 : RGB(0,0,0));
@@ -401,7 +401,7 @@ void DrawFadeInfo()
 
 
 // エンディング用 SCL のデコード //
-FVOID EndingSCLDecode()
+void EndingSCLDecode()
 {
 	BOOL		bFlag = TRUE;
 	BYTE		*cmd;

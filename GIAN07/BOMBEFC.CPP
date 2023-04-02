@@ -9,14 +9,14 @@
 BombEfcCtrl		BombEfc[EXBOMB_MAX];
 
 // 秘密の関数 //
-FVOID _ExBombSTDInit(BombEfcCtrl *p);
-FVOID _ExBombSTDDraw(BombEfcCtrl *p);
-FVOID _ExBombSTDMove(BombEfcCtrl *p);
+void _ExBombSTDInit(BombEfcCtrl *p);
+void _ExBombSTDDraw(BombEfcCtrl *p);
+void _ExBombSTDMove(BombEfcCtrl *p);
 
 
 
 // 爆発系エフェクトの初期化 //
-FVOID ExBombEfcInit(void)
+void ExBombEfcInit(void)
 {
 	int				i;
 
@@ -27,7 +27,7 @@ FVOID ExBombEfcInit(void)
 
 
 // 爆発系エフェクトをセットする //
-FVOID ExBombEfcSet(int x, int y, BYTE type)
+void ExBombEfcSet(int x, int y, uint8_t type)
 {
 	int				i;
 	BombEfcCtrl		*p;
@@ -59,7 +59,7 @@ FVOID ExBombEfcSet(int x, int y, BYTE type)
 
 
 // 爆発系エフェクトを描画する
-FVOID ExBombEfcDraw(void)
+void ExBombEfcDraw(void)
 {
 	int				i;
 
@@ -76,7 +76,7 @@ FVOID ExBombEfcDraw(void)
 
 
 // 爆発系エフェクトを動作させる
-FVOID ExBombEfcMove(void)
+void ExBombEfcMove(void)
 {
 	int				i;
 
@@ -96,7 +96,7 @@ FVOID ExBombEfcMove(void)
 }
 
 
-FVOID _ExBombSTDInit(BombEfcCtrl *p)
+void _ExBombSTDInit(BombEfcCtrl *p)
 {
 	int			i, x, y;
 	SpObj		*target;
@@ -113,7 +113,7 @@ FVOID _ExBombSTDInit(BombEfcCtrl *p)
 }
 
 
-FVOID _ExBombSTDDraw(BombEfcCtrl *p)
+void _ExBombSTDDraw(BombEfcCtrl *p)
 {
 	int			i, x, y, dx;
 	SpObj		*target;
@@ -133,7 +133,7 @@ FVOID _ExBombSTDDraw(BombEfcCtrl *p)
 }
 
 
-FVOID _ExBombSTDMove(BombEfcCtrl *p)
+void _ExBombSTDMove(BombEfcCtrl *p)
 {
 	int			i, j, x, y, v, rv;
 	DWORD		t;

@@ -31,25 +31,25 @@ extern BOOL IsDemoplay;
 
 
 ///// [関数] /////
-extern FVOIDFN(*GameMain)(void);		// ゲーム進行用関数ポインタ(WinMainからコールする)
+extern void(*GameMain)(void);	// ゲーム進行用関数ポインタ(WinMainからコールする)
 
-extern FBOOL GameInit(void);			// ゲームの初期化をする
-extern FVOID GameRestart(void);			// ゲームを再開する(ESC 抜けから)
-extern FBOOL GameExit(BOOL bNeedChgMusic = TRUE);	// ゲームから抜ける
-extern FVOID GameOverInit(void);		// ゲームオーバーの前処理
-extern FVOID GameContinue(void);		// コンティニューを行う場合
+extern bool GameInit(void);	// ゲームの初期化をする
+extern void GameRestart(void);	// ゲームを再開する(ESC 抜けから)
+extern bool GameExit(bool bNeedChgMusic = true);	// ゲームから抜ける
+extern void GameOverInit(void);	// ゲームオーバーの前処理
+extern void GameContinue(void);	// コンティニューを行う場合
 
-extern FBOOL GameReplayInit(int Stage);	// リプレイ用の初期化を行う
+extern bool GameReplayInit(int Stage);	// リプレイ用の初期化を行う
 
-extern FBOOL SProjectInit(void);		// 西方Ｐｒｏｊｅｃｔ表示の初期化
+extern bool SProjectInit(void);	// 西方Ｐｒｏｊｅｃｔ表示の初期化
 
-extern FBOOL GameExstgInit(void);		// エキストラステージを始める
+extern bool GameExstgInit(void);	// エキストラステージを始める
 
-extern FBOOL NameRegistInit(BOOL bNeedChgMusic);	// お名前入力の初期化
-extern FBOOL ScoreNameInit(void);		// お名前表示画面
+extern bool NameRegistInit(bool bNeedChgMusic);	// お名前入力の初期化
+extern bool ScoreNameInit(void);	// お名前表示画面
 
-extern FBOOL GameNextStage(void);		// 次のステージに移行する
+extern bool GameNextStage(void);	// 次のステージに移行する
 
-extern FBOOL MusicRoomInit(void);		// 音楽室の初期化をする
+extern bool MusicRoomInit(void);	// 音楽室の初期化をする
 
 #endif

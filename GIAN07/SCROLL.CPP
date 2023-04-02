@@ -21,21 +21,21 @@ static void InitMapChipRect(void);		// スクロールに関する情報の初�
 static PBGMAP *ScNextLine(PBGMAP *p);		// 次の行にＧＯ！！
 static PBGMAP *ScBeforeLine(PBGMAP *p);		// 前の行にＧＯ！！
 
-static FVOID ScrollCmdDummy(void);			// 特殊スクロール無し
-static FVOID ScrollCmdStg2Boss(void);		// ２面ボスのスクロール
-static FVOID ScrollCmdRasterOpen(void);		// ラスタースクロールオープン
-static FVOID ScrollCmdRasterClose(void);	// ラスタースクロールクローズ
-static FVOID ScrollCmdStg3Boss(void);		// ゲイツ雲
+static void ScrollCmdDummy(void);	// 特殊スクロール無し
+static void ScrollCmdStg2Boss(void);	// ２面ボスのスクロール
+static void ScrollCmdRasterOpen(void);	// ラスタースクロールオープン
+static void ScrollCmdRasterClose(void);	// ラスタースクロールクローズ
+static void ScrollCmdStg3Boss(void);	// ゲイツ雲
 
-static FVOID ScrollCmdStg6Cube(void);		// ６面の３Ｄキューう゛
-static FVOID ScrollCmdStg6RndEcl(void);		// ６面のランダムＥＣＬ列
-static FVOID ScrollCmdStg6Raster(void);		// ６面ラスター
+static void ScrollCmdStg6Cube(void);	// ６面の３Ｄキューう゛
+static void ScrollCmdStg6RndEcl(void);	// ６面のランダムＥＣＬ列
+static void ScrollCmdStg6Raster(void);	// ６面ラスター
 
-static FVOID ScrollCmdStg3Star(void);		// ３面高速星
+static void ScrollCmdStg3Star(void);	// ３面高速星
 
-static FVOID Stg3BossMapDraw(void);			// ゲイツ雲描画
+static void Stg3BossMapDraw(void);	// ゲイツ雲描画
 
-static FVOID ScrollCmdStg4Rock(void);				// ４面岩
+static void ScrollCmdStg4Rock(void);	// ４面岩
 
 
 
@@ -52,7 +52,7 @@ static FVOID ScrollCmdStg4Rock(void);				// ４面岩
 
 
 // 背景を動かす(１フレーム分) //
-FVOID ScrollMove(void)
+void ScrollMove(void)
 {
 	int			i;
 
@@ -518,7 +518,7 @@ static void ExDraw(void)
 */
 
 // 背景を描画する //
-FVOID ScrollDraw(void)
+void ScrollDraw(void)
 {
 	PBGMAP	*p;
 	RECT	src;
@@ -594,7 +594,7 @@ FVOID ScrollDraw(void)
 }
 
 // スクロールスピードを変更する(引数:(1)スクロール速度) //
-FVOID ScrollSpeed(int speed)
+void ScrollSpeed(int speed)
 {
 	//if(speed<0) speed = 0;		// 逆方向スクロール禁止！！
 
@@ -602,7 +602,7 @@ FVOID ScrollSpeed(int speed)
 }
 
 // ＳＣＬ用コマンド実行関数(引数:(1)スクロールコマンド) //
-FVOID ScrollCommand(BYTE cmd)
+void ScrollCommand(uint8_t cmd)
 {
 	switch(cmd){
 		case(SCMD_QUAKE):		// 振動エフェクト
@@ -676,13 +676,13 @@ FVOID ScrollCommand(BYTE cmd)
 }
 
 // 特殊スクロール無し //
-static FVOID ScrollCmdDummy(void)
+static void ScrollCmdDummy(void)
 {
 	// 何もしないよぉ... //
 }
 
 // ２面ボスのスクロール //
-static FVOID ScrollCmdStg2Boss(void)
+static void ScrollCmdStg2Boss(void)
 {
 /*
 	SSP	-810	TR	10			SSP	-630	TR	10
@@ -729,7 +729,7 @@ static FVOID ScrollCmdStg2Boss(void)
 }
 
 // ラスタースクロールオープン //
-static FVOID ScrollCmdRasterOpen(void)
+static void ScrollCmdRasterOpen(void)
 {
 	int		i,j;
 
@@ -744,7 +744,7 @@ static FVOID ScrollCmdRasterOpen(void)
 }
 
 // ラスタースクロールクローズ //
-static FVOID ScrollCmdRasterClose(void)
+static void ScrollCmdRasterClose(void)
 {
 	int		i,j;
 
@@ -763,14 +763,14 @@ static FVOID ScrollCmdRasterClose(void)
 }
 
 // ゲイツ雲 //
-static FVOID ScrollCmdStg3Boss(void)
+static void ScrollCmdStg3Boss(void)
 {
 	ScrollInfo.ExCount = (ScrollInfo.ExCount+200)%208;
 //	MoveStg3Cloud();
 }
 
 // ゲイツ雲描画 //
-static FVOID Stg3BossMapDraw(void)
+static void Stg3BossMapDraw(void)
 {
 	int		x,y;
 	RECT	src;
@@ -788,31 +788,31 @@ static FVOID Stg3BossMapDraw(void)
 
 
 // ６面の３Ｄキューう゛ //
-static FVOID ScrollCmdStg6Cube(void)
+static void ScrollCmdStg6Cube(void)
 {
 	Move3DCube();
 }
 
 // ６面のランダムＥＣＬ列 //
-static FVOID ScrollCmdStg6RndEcl(void)
+static void ScrollCmdStg6RndEcl(void)
 {
 	MoveEffectFakeECL();
 }
 
 // ６面ラスター //
-static FVOID ScrollCmdStg6Raster(void)
+static void ScrollCmdStg6Raster(void)
 {
 	MoveStg6Raster();
 }
 
 // ４面岩 //
-static FVOID ScrollCmdStg4Rock(void)
+static void ScrollCmdStg4Rock(void)
 {
 	MoveStg4Rock();
 }
 
 // ３面高速星 //
-static FVOID ScrollCmdStg3Star(void)
+static void ScrollCmdStg3Star(void)
 {
 	ScrollInfo.ExCount++;
 
@@ -825,7 +825,7 @@ static FVOID ScrollCmdStg3Star(void)
 
 
 // マップデータをロードする(BMP含む) //
-FBOOL ScrollInit(void)
+bool ScrollInit(void)
 {
 	ScrollSaveHeader	*LayerInfo;
 	int					i;

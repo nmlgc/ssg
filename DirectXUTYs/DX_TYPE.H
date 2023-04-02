@@ -52,41 +52,4 @@
 // 型 //
 typedef	LPDIRECTDRAWSURFACE	GRP;
 
-#define PVOID	void __stdcall
-#define PBOOL	BOOL __stdcall
-#define PGRP	GRP  __stdcall
-#define PINT	int  __stdcall
-
-#define PVOIDFN(fn)		void (__stdcall fn)
-#define PBOOLFN(fn)		BOOL (__stdcall fn)
-#define PGRPFN(fn)		GRP  (__stdcall fn)
-
-#define FVOID	void __fastcall
-#define FBOOL	BOOL __fastcall
-#define FGRP	GRP  __fastcall
-
-#define FCHAR	char	__fastcall
-#define FINT	int		__fastcall
-#define FSHORT	short	__fastcall
-
-#define FBYTE	BYTE	__fastcall
-#define FWORD	WORD	__fastcall
-#define FDWORD	DWORD	__fastcall
-
-#define FVOIDFN(fn)		void (__fastcall fn)
-#define FBOOLFN(fn)		BOOL (__fastcall fn)
-#define FGRPFN(fn)		GRP  (__fastcall fn)
-
-#define IVOID	__inline void
-#define IBOOL	__inline BOOL
-#define IGRP	__inline GRP
-#define IINT	__inline INT
-#define IBYTE	__inline BYTE
-#define IWORD	__inline WORD
-#define IDWORD	__inline DWORD
-
-#define FIVOID	__forceinline void
-#define FIBOOL	__forceinline BOOL
-#define FIGRP	__forceinline GRP
-
 #endif

@@ -9,12 +9,12 @@
 
 static LINE_WORK TZOID_A,TZOID_B;
 
-static FINT DrawTrapezoid(int y,int dy);		// 台形の描画
+static int DrawTrapezoid(int y, int dy);	// 台形の描画
 
 
 
 // ポリゴンの描画 //
-FVOID _2DPolygon(POINT *p,int n)
+void _2DPolygon(POINT *p, int n)
 {
 	int		i,j,dy;
 	int		nLeft,nRight;
@@ -107,7 +107,7 @@ extern DWORD			Col2D;
 
 
 // 横ラインを引く //
-static PVOID GrpHLineX(int x1,int x2,int y)
+static void GrpHLineX(int x1, int x2, int y)
 {
 	int temp;
 	if(x1>x2) temp = x1,x1 = x2,x2 = temp;
@@ -152,7 +152,7 @@ HL_END:
 }
 
 // 台形の描画 //
-FINT DrawTrapezoid(int y,int dy)
+int DrawTrapezoid(int y, int dy)
 {
 	int		left_x = TZOID_A.x;
 	int		det_x  = TZOID_B.x;// - left_x;

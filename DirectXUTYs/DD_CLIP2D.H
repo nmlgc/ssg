@@ -14,6 +14,7 @@
 
 // ヘッダファイル //
 #include "DX_TYPE.H"
+#include <stdint.h>
 
 
 // 関数 //
@@ -30,7 +31,7 @@ int  __stdcall Grp_PClip(POINT *dest,POINT *src,int n);		// ポリゴン用ク�
 
 
 // アウトコードを取得する //
-IBYTE GetLineOutcode(int x,int y)
+inline uint8_t GetLineOutcode(int x, int y)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 	BYTE	temp = OUTCODE_LEFT|OUTCODE_BOTTOM;
@@ -49,7 +50,7 @@ IBYTE GetLineOutcode(int x,int y)
 }
 
 // 実際にクリッピングを行う //
-IBOOL GrpLineCut(int *x1,int *y1,int *x2,int *y2,BYTE outcode)
+inline bool GrpLineCut(int *x1, int *y1, int *x2, int *y2, uint8_t outcode)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 	int		temp;
@@ -87,7 +88,7 @@ IBOOL GrpLineCut(int *x1,int *y1,int *x2,int *y2,BYTE outcode)
 
 // ReturnValue == TRUE  : 完全に範囲内もしくはクリッピングが正常に行われた //
 // ReturnValue == FALSE : 完全に範囲外
-IBOOL GrpLineClip(int *x1,int *y1,int *x2,int *y2)
+inline bool GrpLineClip(int *x1, int *y1, int *x2, int *y2)
 {
 	BYTE	Outcode1,Outcode2;
 

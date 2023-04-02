@@ -84,7 +84,7 @@ typedef struct tagScrollInfo{
 	BYTE	RasterWidth;		// ラスタースクロールにおける振幅
 	BYTE	RasterDeg;			// ラスタースクロール用の角度
 
-	FVOIDFN(*ExCmd)(void);		// 特殊コマンド
+	void(*ExCmd)(void);	// 特殊コマンド
 	DWORD	ExCount;			// 特殊コマンド用カウンタ
 } SCROLL_INFO;
 
@@ -103,13 +103,13 @@ typedef struct tagSCL_INFO{
 
 
 ///// [ 関数 ] /////
-FVOID ScrollMove(void);				// 背景を動かす(１フレーム分)
-FVOID ScrollDraw(void);				// 背景を描画する
+void ScrollMove(void);	// 背景を動かす(１フレーム分)
+void ScrollDraw(void);	// 背景を描画する
 
-FVOID ScrollSpeed(int speed);		// スクロールスピードを変更する(引数:(1)スクロール速度)
-FVOID ScrollCommand(BYTE cmd);		// ＳＣＬ用コマンド実行関数(引数:(1)スクロールコマンド)
+void ScrollSpeed(int speed);	// スクロールスピードを変更する(引数:(1)スクロール速度)
+void ScrollCommand(uint8_t cmd);	// ＳＣＬ用コマンド実行関数(引数:(1)スクロールコマンド)
 
-FBOOL ScrollInit(void);				// マップデータを初期化する
+bool ScrollInit(void);	// マップデータを初期化する
 
 
 

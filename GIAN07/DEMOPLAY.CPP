@@ -31,7 +31,7 @@ PATH_STRING ReplayFN(uint8_t stage)
 }
 
 // デモプレイデータの準備 //
-FVOID DemoplayInit(void)
+void DemoplayInit(void)
 {
 	// 乱数の準備 //
 	DemoInfo.RndSeed = (DWORD)(rnd()+1)*(DWORD)(rnd()+1);
@@ -47,7 +47,7 @@ FVOID DemoplayInit(void)
 
 
 // デモプレイデータを保存する //
-FVOID DemoplayRecord(WORD key)
+void DemoplayRecord(uint16_t key)
 {
 	if(!DemoplaySaveEnable) return;
 
@@ -63,7 +63,7 @@ FVOID DemoplayRecord(WORD key)
 
 
 // デモプレイデータをファイルに書き込む //
-FVOID DemoplaySave(void)
+void DemoplaySave(void)
 {
 	if(!DemoplaySaveEnable) return;
 
@@ -84,7 +84,7 @@ FVOID DemoplaySave(void)
 
 
 // デモプレイデータをロードする //
-FBOOL DemoplayLoad(int stage)
+bool DemoplayLoad(int stage)
 {
 	// Not too pretty… //
 	BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno);
@@ -132,7 +132,7 @@ FBOOL DemoplayLoad(int stage)
 
 
 // Key_Data を返す //
-FWORD DemoplayMove(void)
+uint16_t DemoplayMove(void)
 {
 	DWORD ptr;
 
@@ -150,7 +150,7 @@ FWORD DemoplayMove(void)
 
 
 // デモプレイロードの事後処理 //
-FVOID DemoplayLoadCleanup(void)
+void DemoplayLoadCleanup(void)
 {
 	ConfigDat          = ConfigTemp;
 	DemoplayLoadEnable = FALSE;
@@ -158,7 +158,7 @@ FVOID DemoplayLoadCleanup(void)
 
 
 // リプレイデータの準備 //
-FVOID ReplayInit(void)
+void ReplayInit(void)
 {
 	// これは同じ //
 	DemoplayInit();
@@ -166,7 +166,7 @@ FVOID ReplayInit(void)
 
 
 // リプレイデータを保存する //
-FVOID ReplayRecord(WORD key)
+void ReplayRecord(uint16_t key)
 {
 	if(!DemoplaySaveEnable) return;
 
@@ -181,7 +181,7 @@ FVOID ReplayRecord(WORD key)
 
 
 // リプレイデータをファイルに書き込む //
-FVOID ReplaySave(void)
+void ReplaySave(void)
 {
 	char			buf[100];
 
@@ -205,7 +205,7 @@ FVOID ReplaySave(void)
 
 
 // リプレイデータをロードする //
-FBOOL ReplayLoad(int stage)
+bool ReplayLoad(int stage)
 {
 	BYTE_BUFFER_OWNED	temp;
 
@@ -251,7 +251,7 @@ FBOOL ReplayLoad(int stage)
 
 
 // Key_Data を返す //
-FWORD ReplayMove(void)
+uint16_t ReplayMove(void)
 {
 	DWORD	ptr;
 
@@ -271,7 +271,7 @@ FWORD ReplayMove(void)
 
 
 // リプレイデータロードの事後処理 //
-FVOID ReplayLoadCleanup(void)
+void ReplayLoadCleanup(void)
 {
 	ConfigDat = ConfigTemp;
 	DemoplayLoadEnable = FALSE;

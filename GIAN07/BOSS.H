@@ -51,7 +51,7 @@ typedef struct tagBOSS_DATA{
 	ENEMY_DATA		Edat;					// 標準の敵データ(実体であることに注意)
 	EXHITCHK		*Hit;					// 特殊当たり判定(NULL なら使用しない)
 
-	FVOIDFN(*ExMove)(tagBOSS_DATA *);		// 特殊移動用関数
+	void(*ExMove)(tagBOSS_DATA *);	// 特殊移動用関数
 
 	DWORD			ExCount;		// ある状態におけるカウンタ(推移時にゼロ初期化)
 	BYTE			ExState;		// 特殊状態
@@ -72,29 +72,29 @@ typedef struct tagBOSSHPG_INFO{
 
 
 ///// [ 関数 ] /////
-FVOID BossDataInit(void);					// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
-FVOID BossSet(int x,int y,DWORD BossID);	// ボスをセットする(For SCL)
-FVOID BossSetEx(int x,int y,DWORD BossID);	// ボスをセットする(For ECL)
-FVOID BossMove(void);						// ボスを動かす
-FVOID BossDraw(void);						// ボスを描画する
+void BossDataInit(void);	// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
+void BossSet(int x, int y, uint32_t BossID);	// ボスをセットする(For SCL)
+void BossSetEx(int x, int y, uint32_t BossID);	// ボスをセットする(For ECL)
+void BossMove(void);	// ボスを動かす
+void BossDraw(void);	// ボスを描画する
 
-FVOID BossClearCmd(void);					// ボス用・敵弾クリアの前処理関数
-FINT  BossGetBitLeft(void);					// 残りビット数を返す
+void BossClearCmd(void);	// ボス用・敵弾クリアの前処理関数
+int  BossGetBitLeft(void);	// 残りビット数を返す
 
-FVOID BossKillAll(void);					// 現在出現しているボス全てのＨＰを０にする
-FBOOL BossDamage(int x,int y,int damage);	// ボスにダメージを与える
-FBOOL BossDamage2(int x,int y,int damage);	// ボスにダメージを与える(ｙ上方向無限Ver)
-FVOID BossDamage3(int x,int y,BYTE d);		// ボスにダメージを与える(ナナメレーザー)
-FVOID BossDamage4(int damage);				// ボスにダメージを与える(すべての敵)
+void BossKillAll(void);	// 現在出現しているボス全てのＨＰを０にする
+bool BossDamage(int x, int y, int damage);	// ボスにダメージを与える
+bool BossDamage2(int x, int y, int damage);	// ボスにダメージを与える(ｙ上方向無限Ver)
+void BossDamage3(int x, int y, uint8_t d);	// ボスにダメージを与える(ナナメレーザー)
+void BossDamage4(int damage);	// ボスにダメージを与える(すべての敵)
 
-FVOID BossHPG_Draw(void);					// ボスの体力ゲージを描画する
+void BossHPG_Draw(void);	// ボスの体力ゲージを描画する
 
-FDWORD GetBossHPSum(void);					// ボスの体力の総和を求める
+uint32_t GetBossHPSum(void);	// ボスの体力の総和を求める
 
-FVOID BossINT(ENEMY_DATA *e,BYTE IntID);			// ボス用割り込み処理
-FVOID BossBitAttack(ENEMY_DATA *e, DWORD AtkID);	// ビット攻撃アドレス指定
-FVOID BossBitLaser(ENEMY_DATA *e, BYTE LaserCmd);	// ビットにレーザーコマンドセット
-FVOID BossBitCommand(ENEMY_DATA *e, BYTE Cmd, int Param);	// ビット命令送信
+void BossINT(ENEMY_DATA *e, uint8_t IntID);	// ボス用割り込み処理
+void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID);	// ビット攻撃アドレス指定
+void BossBitLaser(ENEMY_DATA *e, uint8_t LaserCmd);	// ビットにレーザーコマンドセット
+void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param);	// ビット命令送信
 
 
 ///// [ 変数 ] /////

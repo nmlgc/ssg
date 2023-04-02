@@ -34,10 +34,10 @@ extern LensInfo *Lens;
 extern LensInfo *GrpCreateLensBall(int r, int m, GRP id);
 
 // GrpLock() 系関数 : レンズボールを描画する //
-extern FVOID GrpDrawLensBall(LensInfo *LInfo, int x, int y);
+extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y);
 
 // レンズボール用データを破棄する //
-extern FVOID GrpReleaseLensBall(LensInfo *LInfo);
+extern void GrpReleaseLensBall(LensInfo *LInfo);
 
 
 

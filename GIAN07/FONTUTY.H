@@ -41,20 +41,20 @@ typedef struct tagExtraFontInfo {
 
 
 ///// [ 関数 ] /////
-extern FVOID GrpPut16(int x,int y,const char *s);		// 16x16 透過フォントで文字列出力(高速)
-extern FVOID GrpPut16c(int x,int y,char *s);	// 16x16 透過フォントで文字列出力(ｸﾘｯﾋﾟﾝｸﾞ有)
-extern FVOID GrpPut16c2(int x,int y,char *s);	// 上と同じだが、ｘ移動幅が１６
-extern FVOID GrpPutc(int x,int y,char c);		// 16x16 透過フォントで文字出力(ｸﾘｯﾋﾟﾝｸﾞ有)
-extern FVOID GrpPut57(int x,int y,char *s);		// 05x07 べた貼りフォント
-extern FVOID GrpPut7B(int x,int y,char *s);		// 07x11 音楽室用フォント
-extern FVOID GrpPutScore(int x,int y,char *s);	// 得点アイテムのスコアを描画
+extern void GrpPut16(int x, int y, const char *s);	// 16x16 透過フォントで文字列出力(高速)
+extern void GrpPut16c(int x, int y, char *s);	// 16x16 透過フォントで文字列出力(ｸﾘｯﾋﾟﾝｸﾞ有)
+extern void GrpPut16c2(int x, int y, char *s);	// 上と同じだが、ｘ移動幅が１６
+extern void GrpPutc(int x, int y, char c);	// 16x16 透過フォントで文字出力(ｸﾘｯﾋﾟﾝｸﾞ有)
+extern void GrpPut57(int x, int y, char *s);	// 05x07 べた貼りフォント
+extern void GrpPut7B(int x, int y, char *s);	// 07x11 音楽室用フォント
+extern void GrpPutScore(int x, int y, char *s);	// 得点アイテムのスコアを描画
 
-extern FVOID GrpPutMidNum(int x,int y,int n);	// MIDI 用フォントを描画する
+extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画する
 
-extern FVOID InitFonts(void);					// フォントをセットする
-extern FVOID CleanupFont(void);					// フォントを解放する
+extern void InitFonts(void);	// フォントをセットする
+extern void CleanupFont(void);	// フォントを解放する
 
-extern FVOID DrawGrdFont(GRP surf,char *s);		// グラデーション付きフォントを描画する
+extern void DrawGrdFont(GRP surf, char *s);	// グラデーション付きフォントを描画する
 
 ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc);			// フォント生成
 void DeleteExtraFont(ExtraFontInfo *pFont);							// フォント削除

@@ -139,11 +139,11 @@ extern BYTE			GameStage;
 
 
 #ifdef PBG_DEBUG
-extern FVOID OutputDebugMsg(void);	// デバッグ情報を出力する
+extern void OutputDebugMsg(void);	// デバッグ情報を出力する
 #endif
 
-extern FVOID StdStatusOutput(void);
-extern FVOID swap16(WORD *a,WORD *b);
+extern void StdStatusOutput(void);
+extern void swap16(uint16_t *a, uint16_t *b);
 
 
 

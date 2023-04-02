@@ -14,12 +14,12 @@ SCREENEFC_INFO		ScreenInfo;
 static char			MTitleBuf[300] = "";
 
 
-extern FVOID CircleFadeOut(int x,int y,int r);
+extern void CircleFadeOut(int x, int y, int r);
 
 
 
 // 円エフェクトの初期化 //
-FVOID CEffectInit(void)
+void CEffectInit(void)
 {
 	int		i;
 
@@ -28,7 +28,7 @@ FVOID CEffectInit(void)
 }
 
 // 円エフェクトを動かす //
-FVOID CEffectMove(void)
+void CEffectMove(void)
 {
 	int					i;
 	CIRCLE_EFC_DATA		*ce;
@@ -63,7 +63,7 @@ FVOID CEffectMove(void)
 }
 
 // 円エフェクトを描画する //
-FVOID CEffectDraw(void)
+void CEffectDraw(void)
 {
 	int					i, j, k, r;
 	int					x1, x2, y1, y2;
@@ -114,7 +114,7 @@ FVOID CEffectDraw(void)
 }
 
 // 円エフェクトをセットする //
-FVOID CEffectSet(int x,int y,BYTE type)
+void CEffectSet(int x, int y, uint8_t type)
 {
 	int					i;
 	CIRCLE_EFC_DATA		*ce = NULL;
@@ -154,7 +154,7 @@ FVOID CEffectSet(int x,int y,BYTE type)
 }
 
 // エフェクトの初期化を行う //
-FVOID SEffectInit(void)
+void SEffectInit(void)
 {
 	int		i;
 
@@ -165,7 +165,7 @@ FVOID SEffectInit(void)
 }
 
 // 文字列系エフェクト //
-FVOID StringEffect(int x,int y,const char *s)
+void StringEffect(int x, int y, const char *s)
 {
 	int		i,j,len;
 
@@ -186,7 +186,7 @@ FVOID StringEffect(int x,int y,const char *s)
 }
 
 // 得点表示エフェクト //
-FVOID StringEffect2(int x,int y,DWORD point)
+void StringEffect2(int x, int y, uint32_t point)
 {
 	int		i;
 
@@ -205,7 +205,7 @@ FVOID StringEffect2(int x,int y,DWORD point)
 }
 
 // ゲームオーバーの表示 //
-FVOID StringEffect3(void)
+void StringEffect3(void)
 {
 	int		i;
 
@@ -223,7 +223,7 @@ FVOID StringEffect3(void)
 }
 
 // 曲名の表示 //
-FVOID SetMusicTitle(int y,char *s)
+void SetMusicTitle(int y, char *s)
 {
 	int			n,len;
 	int			x;
@@ -253,7 +253,7 @@ FVOID SetMusicTitle(int y,char *s)
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
-FVOID SEffectMove(void)
+void SEffectMove(void)
 {
 	int				i;
 	SEFFECT_DATA	*e;
@@ -341,7 +341,7 @@ FVOID SEffectMove(void)
 }
 
 // エフェクトを描画する(仕様変更の可能性があります) //
-FVOID SEffectDraw(void)
+void SEffectDraw(void)
 {
 	int				i,j,k;
 	int				x,y;
@@ -445,7 +445,7 @@ FVOID SEffectDraw(void)
 }
 
 // エフェクト用 Restore 処理 //
-FBOOL SEffectRestore(void)
+bool SEffectRestore(void)
 {
 	if(GrMTitle==NULL) return FALSE;
 
@@ -456,7 +456,7 @@ FBOOL SEffectRestore(void)
 }
 
 // 画面全体に対するエフェクトの初期化 //
-FVOID ScreenEffectInit(void)
+void ScreenEffectInit(void)
 {
 	ScreenInfo.cmd   = SCNEFC_NONE;
 	ScreenInfo.count = 0;
@@ -465,7 +465,7 @@ FVOID ScreenEffectInit(void)
 }
 
 // 画面全体に対するエフェクトをセットする //
-FVOID ScreenEffectSet(BYTE cmd)
+void ScreenEffectSet(uint8_t cmd)
 {
 	//if(ScreenInfo.cmd != SCNEFC_NONE) return;
 
@@ -488,7 +488,7 @@ FVOID ScreenEffectSet(BYTE cmd)
 }
 
 // 画面全体に対するエフェクトを動かす //
-FVOID ScreenEffectMove(void)
+void ScreenEffectMove(void)
 {
 	switch(ScreenInfo.cmd){
 		case(SCNEFC_CFADEIN):	// 円形フェードイン
@@ -524,7 +524,7 @@ FVOID ScreenEffectMove(void)
 }
 
 // 画面全体に対するエフェクトを描画する //
-FVOID ScreenEffectDraw(void)
+void ScreenEffectDraw(void)
 {
 	int		i, j;
 	RECT	src;
@@ -562,7 +562,7 @@ FVOID ScreenEffectDraw(void)
 }
 
 // 円形フェードサポート関数 //
-extern FVOID CircleFadeOut(int x,int y,int r)
+extern void CircleFadeOut(int x, int y, int r)
 {
 	RECT	src;
 	int		i,j,temp;
@@ -604,7 +604,7 @@ extern FVOID CircleFadeOut(int x,int y,int r)
 }
 
 // ロックオン配列を初期化 //
-FVOID ObjectLockOnInit(void)
+void ObjectLockOnInit(void)
 {
 	int		i;
 
@@ -615,7 +615,7 @@ FVOID ObjectLockOnInit(void)
 }
 
 // 何かをロックオンする //
-FVOID ObjectLockOn(int *x,int *y,int wx64,int hx64)
+void ObjectLockOn(int *x, int *y, int wx64, int hx64)
 {
 	LOCKON_INFO		*l;
 	int				i;
@@ -642,7 +642,7 @@ FVOID ObjectLockOn(int *x,int *y,int wx64,int hx64)
 }
 
 // ロックオンアニメーション動作 //
-FVOID ObjectLockMove(void)
+void ObjectLockMove(void)
 {
 	LOCKON_INFO		*l;
 	int				i;
@@ -679,7 +679,7 @@ FVOID ObjectLockMove(void)
 }
 
 // ロックオン枠描画 //
-FVOID ObjectLockDraw(void)
+void ObjectLockDraw(void)
 {
 	LOCKON_INFO		*l;
 	int				i;
@@ -708,7 +708,7 @@ FVOID ObjectLockDraw(void)
 
 #include "DirectXUTYs/DD_GRP3D.H"
 // スペアナ描画 //
-FVOID GrpDrawSpect(int x,int y)
+void GrpDrawSpect(int x, int y)
 {
 	int		i,j,temp,temp2;
 	WORD	ftable[128+8+8],ftable2[128];
@@ -788,7 +788,7 @@ FVOID GrpDrawSpect(int x,int y)
 }
 
 // 押されているところを表示 //
-FVOID GrpDrawNote(void)
+void GrpDrawNote(void)
 {
 	// 0123456789ab (Mod c)
 	// o#o#oo#o#o#o
@@ -896,13 +896,13 @@ BOOL bEnableWarnEfc = FALSE;
 WORD WarnEfcTime = 0;
 
 // ワーニングの初期化 //
-FVOID WarningEffectInit(void)
+void WarningEffectInit(void)
 {
 	bEnableWarnEfc = FALSE;
 }
 
 // ワーニングの発動！！ //
-FVOID WarningEffectSet(void)
+void WarningEffectSet(void)
 {
 	bEnableWarnEfc = TRUE;
 	WarnEfcTime    = 0;
@@ -910,7 +910,7 @@ FVOID WarningEffectSet(void)
 }
 
 // ワーニングの動作 //
-FVOID WarningEffectMove(void)
+void WarningEffectMove(void)
 {
 	if(!bEnableWarnEfc) return;
 
@@ -925,7 +925,7 @@ FVOID WarningEffectMove(void)
 }
 
 // ワーニングの描画 //
-FVOID WarningEffectDraw(void)
+void WarningEffectDraw(void)
 {
 	int		r;
 

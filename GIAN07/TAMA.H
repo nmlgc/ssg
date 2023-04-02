@@ -193,9 +193,9 @@ void __fastcall tamaEmove(TAMA_DATA *t);			// 弾の "Effect" による移動を
 
 
 //// かすり用マクロ ////
-extern FVOID evade_addEx(int x,int y,BYTE n);		// かすりゲージを上昇させる
+extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
 
-IVOID TamaEvadeAdd(TAMA_DATA *t)
+inline void TamaEvadeAdd(TAMA_DATA *t)
 {
 	if(t->flag&TF_EVADE) evade_addEx(t->x,t->y,0);
 	else{

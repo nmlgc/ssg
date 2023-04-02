@@ -218,61 +218,60 @@ extern DWORD		DxEnumNow;
 
 
 // 初期化など //
-FBOOL GrpEnum(HWND hWnd);								// 使用できるデバイスを列挙する
-FBOOL GrpInit(LPGUID DDG,XD3DENUM *D3De,BITDEPTH bitdepth);
-FVOID GrpCleanup(void);									// いつも通りに(ただし失敗したら異常終了)
-FVOID GrpSetClip(int sx,int sy,int ex,int ey);			// 3DViewportが生きていたらそちらもセット
-FBOOL GrpRestore(void);									// ロード済みのSurfaceを修復
+bool GrpEnum(HWND hWnd);	// 使用できるデバイスを列挙する
+bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth);
+void GrpCleanup(void);	// いつも通りに(ただし失敗したら異常終了)
+void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
+bool GrpRestore(void);	// ロード済みのSurfaceを修復
 
-FVOID GrpGetPalette(PALETTEENTRY *pal);					// 現在のパレットを取得する
-FVOID GrpSetPalette(PALETTEENTRY *pal);					// 現在のパレットを変更する
-FVOID GrpSetRestoreHook(FBOOLFN(*func)(void));			// Restore の事後処理フック
+void GrpGetPalette(PALETTEENTRY *pal);	// 現在のパレットを取得する
+void GrpSetPalette(PALETTEENTRY *pal);	// 現在のパレットを変更する
+void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // オフスクリーン Surface 作成 //
-FGRP  GrpCreateSurface(int width,int height,BYTE surf_id);	// Surface の作成(BMPリロード有り)
-FBOOL GrpReleaseSurface(BYTE surf_id);						// Surface の削除(BMPは変更せず)
+GRP  GrpCreateSurface(int width,int height,BYTE surf_id);	// Surface の作成(BMPリロード有り)
+bool GrpReleaseSurface(uint8_t surf_id);	// Surface の削除(BMPは変更せず)
 
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
-FBOOL GrpBMPLoad(const PATH_LITERAL &filename,BYTE surf_id);				// BMP->Surface
+bool GrpBMPLoad(const PATH_LITERAL &filename, uint8_t surf_id);	// BMP->Surface
 
 extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);	// ビット深度によりカラーキーをセットする
 extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds);		// ある Surface を初期化する
 
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
-FVOID GrpCls(void);							// 指定色で塗りつぶしをかける(クリッピング無効)
-FVOID GrpClsEx(RECT *Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
+void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
+void GrpClsEx(RECT *Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
 
-extern FVOIDFN(*GrpFlip)(void);								// ウィンドウモード時の動作に注意
-extern FVOIDFN(*GrpLock)(void);								// 図形描画の準備をする
-extern FVOIDFN(*GrpUnlock)(void);							// 図形描画を完了する
+extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
+extern void (*GrpLock)(void);	// 図形描画の準備をする
+extern void (*GrpUnlock)(void);	// 図形描画を完了する
 
-extern FVOIDFN(*GrpSetColor)(BYTE r,BYTE g,BYTE b);			// 色セット
-extern FVOIDFN(*GrpSetAlpha)(BYTE a,BYTE mode);				// αセット
+extern void (*GrpSetColor)(uint8_t r, uint8_t g, uint8_t b);	// 色セット
+extern void (*GrpSetAlpha)(uint8_t a, uint8_t mode);	// αセット
 
-extern FVOIDFN(*GrpLine)(int x1,int y1,int x2,int y2);		// 直線
-extern FVOIDFN(*GrpBox)(int x1,int y1,int x2,int y2);		// 長方形
-extern FVOIDFN(*GrpCircle)(int x,int y,int r);				// 円
-extern FVOIDFN(*GrpCircleF)(int x,int y,int r);				// 円塗りつぶし
-extern FVOIDFN(*GrpPolygon)(POINT *p,int n);				// ポリゴン塗りつぶし
+extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
+extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形
+extern void (*GrpCircle)(int x, int y, int r);	// 円
+extern void (*GrpCircleF)(int x, int y, int r);	// 円塗りつぶし
+extern void (*GrpPolygon)(POINT *p, int n);	// ポリゴン塗りつぶし
 
-extern FVOIDFN(*GrpBoxA)(int x1,int y1,int x2,int y2);		// α長方形
-extern FVOIDFN(*GrpCircleA)(int x,int y,int r);				// α円塗りつぶし
-extern FVOIDFN(*GrpPolygonA)(POINT *p,int n);				// αポリゴン塗りつぶし
+extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
+extern void (*GrpCircleA)(int x, int y, int r);	// α円塗りつぶし
+extern void (*GrpPolygonA)(POINT *p, int n);	// αポリゴン塗りつぶし
 
-extern FVOIDFN(*GrpFatCircleA)(int x,int y,int r,int w);	// 太い円を描く
+extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 
-extern PVOIDFN(*GrpBlt)(RECT *src,int x,int y,GRP surf);	// ビットマップ転送(WithClip)
+extern void (*GrpBlt)(RECT *src, int x, int y, GRP surf);	// ビットマップ転送(WithClip)
 
-extern FVOID GrpBltEnable(BOOL flag);						// 描画を行うか？
-extern PBOOL GrpClip(RECT *src,int *x,int *y);				// クリッピングをかける
-extern FVOID GrpGetClip(RECT *dest);						// クリッピング枠を取得する
-
+extern void GrpBltEnable(bool flag);	// 描画を行うか？
+extern bool GrpClip(RECT *src, int *x, int *y);	// クリッピングをかける
+extern void GrpGetClip(RECT *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-IVOID GrpBltX(RECT *src,int x,int y,GRP surf)
+inline void GrpBltX(RECT *src, int x, int y, GRP surf)
 {
 	HRESULT		ddrval;
 
@@ -294,7 +293,7 @@ IVOID GrpBltX(RECT *src,int x,int y,GRP surf)
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-IVOID GrpBltXC(RECT *src,int x,int y,GRP surf)
+inline void GrpBltXC(RECT *src, int x, int y, GRP surf)
 {
 	HRESULT		ddrval;
 

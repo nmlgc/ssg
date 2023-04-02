@@ -37,10 +37,10 @@ typedef struct tagBombEfcCtrl {
 
 
 /***** [関数プロトタイプ] *****/
-FVOID ExBombEfcInit(void);						// 爆発系エフェクトの初期化
-FVOID ExBombEfcSet(int x, int y, BYTE type);	// 爆発系エフェクトをセットする
-FVOID ExBombEfcDraw(void);						// 爆発系エフェクトを描画する
-FVOID ExBombEfcMove(void);						// 爆発系エフェクトを動作させる
+void ExBombEfcInit(void);	// 爆発系エフェクトの初期化
+void ExBombEfcSet(int x, int y, uint8_t type);	// 爆発系エフェクトをセットする
+void ExBombEfcDraw(void);	// 爆発系エフェクトを描画する
+void ExBombEfcMove(void);	// 爆発系エフェクトを動作させる
 
 
 

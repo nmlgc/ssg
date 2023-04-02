@@ -12,13 +12,13 @@ SNAKYMOVE_DATA	SnakeData[SNAKE_MAX];
 BIT_DATA		BitData;
 
 
-static FVOID BitSTDRoll(void);			// 基本的なビット回転処理
-static FVOID BitSTDRad(void);			// 基本的な半径処理
+static void BitSTDRoll(void);	// 基本的なビット回転処理
+static void BitSTDRad(void);	// 基本的な半径処理
 
 
 
 // 蛇型の敵配列の初期化 //
-FVOID SnakyInit(void)
+void SnakyInit(void)
 {
 	int		i;
 
@@ -30,7 +30,7 @@ FVOID SnakyInit(void)
 }
 
 // 蛇型の敵をセットする //
-FVOID SnakySet(BOSS_DATA *b,int len,DWORD TailID)
+void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 {
 	int				i;
 	SNAKYMOVE_DATA	*s;
@@ -74,7 +74,7 @@ FVOID SnakySet(BOSS_DATA *b,int len,DWORD TailID)
 }
 
 // 蛇型の敵の移動処理 //
-FVOID SnakyMove(void)
+void SnakyMove(void)
 {
 	int				i,j;
 	SNAKYMOVE_DATA	*s;
@@ -104,7 +104,7 @@ FVOID SnakyMove(void)
 }
 
 // 蛇型の敵を殺す
-FVOID SnakyDelete(BOSS_DATA *b)
+void SnakyDelete(BOSS_DATA *b)
 {
 	int				i;
 	SNAKYMOVE_DATA	*s;
@@ -136,7 +136,7 @@ FVOID SnakyDelete(BOSS_DATA *b)
 
 
 // ビット配列の初期化 //
-FVOID BitInit(void)
+void BitInit(void)
 {
 	int			i;
 
@@ -170,7 +170,7 @@ FVOID BitInit(void)
 
 
 // ビットをセットする //
-FVOID BitSet(BOSS_DATA *b, BYTE NumBits, DWORD BitID)
+void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 {
 	static const BYTE BitHPTable[BIT_MAX] =
 	{1, 4, 2, 5, 3, 6};
@@ -235,7 +235,7 @@ FVOID BitSet(BOSS_DATA *b, BYTE NumBits, DWORD BitID)
 
 
 // ビットを動作させる //
-FVOID BitMove(void)
+void BitMove(void)
 {
 	int				i, j;
 	DWORD			damage;
@@ -345,7 +345,7 @@ FVOID BitMove(void)
 
 
 // 基本的な半径処理
-static FVOID BitSTDRad(void)
+static void BitSTDRad(void)
 {
 	if(BitData.Length > BitData.FinalLength){
 		BitData.Length -= 64*2;
@@ -363,7 +363,7 @@ static FVOID BitSTDRad(void)
 
 
 // 基本的なビット回転処理 //
-static FVOID BitSTDRoll(void)
+static void BitSTDRoll(void)
 {
 	int			i, ox, oy;
 	int			n, l;
@@ -471,7 +471,7 @@ static FVOID BitSTDRoll(void)
 }
 
 // ビットを消滅させる //
-FVOID BitDelete(void)
+void BitDelete(void)
 {
 	int				i;
 	ENEMY_DATA		*e;
@@ -497,7 +497,7 @@ FVOID BitDelete(void)
 
 
 // ビット間のラインを描画する //
-FVOID BitLineDraw(void)
+void BitLineDraw(void)
 {
 	int				i, j, n;
 	int				x1, x2, y1, y2;
@@ -533,7 +533,7 @@ FVOID BitLineDraw(void)
 
 
 // 攻撃パターンをセットor変更 //
-FVOID BitSelectAttack(DWORD BitID)
+void BitSelectAttack(uint32_t BitID)
 {
 	DWORD		n;
 	int			i;
@@ -546,7 +546,7 @@ FVOID BitSelectAttack(DWORD BitID)
 }
 
 // レーザー系命令を発行 //
-FVOID BitLaserCommand(BYTE Command)
+void BitLaserCommand(uint8_t Command)
 {
 	int				i;
 	ENEMY_DATA		*e;
@@ -616,7 +616,7 @@ FVOID BitLaserCommand(BYTE Command)
 
 
 // ビット命令を送信 //
-FVOID BitSendCommand(BYTE Command, int Param)
+void BitSendCommand(uint8_t Command, int Param)
 {
 	switch(Command){
 		case(BITCMD_CHGSPD):		// 回転速度を変更する
@@ -650,7 +650,7 @@ FVOID BitSendCommand(BYTE Command, int Param)
 
 
 // 現在のビット数を取得する //
-FINT BitGetNum(void)
+int BitGetNum(void)
 {
 	if(BitData.State == BITCMD_DISABLE) return 0;
 	return BitData.NumBits;

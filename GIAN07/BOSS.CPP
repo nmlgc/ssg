@@ -19,18 +19,18 @@ BOSSHPG_INFO	BossHPG;			// 体力ゲージ保持用
 
 
 // 秘密の関数 //
-static FVOID BossHPG_Open(DWORD max);		// ボスの体力ゲージをオープンする
-static FVOID BossHPG_Move(DWORD now);		// ボスの体力ゲージを増減する
-static FVOID BossHPG_Close(void);			// ボスの体力ゲージをクローズする
-static FVOID BossHPG_Update(DWORD next);	// ボスの体力ゲージを上昇させる
+static void BossHPG_Open(uint32_t max);	// ボスの体力ゲージをオープンする
+static void BossHPG_Move(uint32_t now);	// ボスの体力ゲージを増減する
+static void BossHPG_Close(void);	// ボスの体力ゲージをクローズする
+static void BossHPG_Update(uint32_t next);	// ボスの体力ゲージを上昇させる
 
 static int PutBoss(int x,int y,DWORD id);	// ボスをセットする
-static FVOID BossSTDMove(BOSS_DATA *b);		// ノーマルECL互換の移動
+static void BossSTDMove(BOSS_DATA *b);	// ノーマルECL互換の移動
 
 
 
 // ボスデータ配列を初期化する(中断、ステージクリア時に使用) //
-FVOID BossDataInit(void)
+void BossDataInit(void)
 {
 	int			i;
 
@@ -58,7 +58,7 @@ FVOID BossDataInit(void)
 }
 
 // ボスをセットする //
-FVOID BossSet(int x,int y,DWORD BossID)
+void BossSet(int x, int y, uint32_t BossID)
 {
 	int		i,n;
 	DWORD	HP_Sum = 0;
@@ -87,7 +87,7 @@ FVOID BossSet(int x,int y,DWORD BossID)
 
 
 // ボスをセットする(ＥＣＬ用) //
-FVOID BossSetEx(int x,int y,DWORD BossID)
+void BossSetEx(int x, int y, uint32_t BossID)
 {
 	int		i,n;
 	DWORD	HP_Sum = 0;
@@ -116,7 +116,7 @@ FVOID BossSetEx(int x,int y,DWORD BossID)
 
 
 // ボスを動かす //
-FVOID BossMove(void)
+void BossMove(void)
 {
 	int				i;
 	DWORD			HP_Sum = 0;
@@ -157,7 +157,7 @@ FVOID BossMove(void)
 }
 
 // ボスを描画する
-FVOID BossDraw(void)
+void BossDraw(void)
 {
 	int			i,j,x,y;
 	int			w,h,t;
@@ -248,14 +248,14 @@ FVOID BossDraw(void)
 
 
 // ボス用・敵弾クリアの前処理関数 //
-FVOID BossClearCmd(void)
+void BossClearCmd(void)
 {
 	BitDelete();
 }
 
 
 // ボスの体力ゲージをオープンする //
-static FVOID BossHPG_Open(DWORD max)
+static void BossHPG_Open(uint32_t max)
 {
 	int		i;
 
@@ -275,7 +275,7 @@ static FVOID BossHPG_Open(DWORD max)
 
 
 // ボスの体力ゲージを上昇させる //
-static FVOID BossHPG_Update(DWORD next)
+static void BossHPG_Update(uint32_t next)
 {
 //	BossHPG.Max  = max;		// 最大値
 //	BossHPG.Now  = 0;		// 最初のエフェクトで上昇して行くので
@@ -287,7 +287,7 @@ static FVOID BossHPG_Update(DWORD next)
 
 
 // ボスの体力ゲージを増減する //
-static FVOID BossHPG_Move(DWORD now)
+static void BossHPG_Move(uint32_t now)
 {
 	int		i;
 	int		ChkCount = 0;
@@ -353,14 +353,14 @@ static FVOID BossHPG_Move(DWORD now)
 }
 
 // ボスの体力ゲージをクローズする //
-static FVOID BossHPG_Close(void)
+static void BossHPG_Close(void)
 {
 	// 後で変更のこと //
 	BossHPG.State = BHPG_CLOSE;
 }
 
 // ボスの体力ゲージを描画する //
-FVOID BossHPG_Draw(void)
+void BossHPG_Draw(void)
 {
 	RECT	src;
 	int		i,x1,x2;
@@ -435,7 +435,7 @@ FVOID BossHPG_Draw(void)
 }
 
 // 現在出現しているボス全てのＨＰを０にする //
-FVOID BossKillAll(void)
+void BossKillAll(void)
 {
 	// 破壊後の破片放出などの処理は、ダメージを与えて破壊するのと同等の関数を //
 	// 使用するが、当然のごとく、得点＆経験値？は入手できない                 //
@@ -465,7 +465,7 @@ FVOID BossKillAll(void)
 }
 
 // ボスにダメージを与える //
-FBOOL BossDamage(int x,int y,int damage)
+bool BossDamage(int x, int y, int damage)
 {
 	int				i;
 	BOSS_DATA		*b;
@@ -535,7 +535,7 @@ FBOOL BossDamage(int x,int y,int damage)
 }
 
 // ボスにダメージを与える(ｙ上方向無限Ver) //
-FBOOL BossDamage2(int x,int y,int damage)
+bool BossDamage2(int x, int y, int damage)
 {
 	int				i;
 	BOSS_DATA		*b;
@@ -604,7 +604,7 @@ FBOOL BossDamage2(int x,int y,int damage)
 }
 
 // ボスにダメージを与える(ナナメレーザー) //
-FVOID BossDamage3(int x,int y,BYTE d)
+void BossDamage3(int x, int y, uint8_t d)
 {
 	int				i;
 	BOSS_DATA		*b;
@@ -672,7 +672,7 @@ FVOID BossDamage3(int x,int y,BYTE d)
 
 
 // ボスにダメージを与える(すべての敵)
-FVOID BossDamage4(int damage)
+void BossDamage4(int damage)
 {
 	int				i;
 	BOSS_DATA		*b;
@@ -830,7 +830,7 @@ static int PutBoss(int x,int y,DWORD id)
 }
 
 // ノーマルECL互換の移動 //
-static FVOID BossSTDMove(BOSS_DATA *b)
+static void BossSTDMove(BOSS_DATA *b)
 {
 	ENEMY_DATA	*e = &(b->Edat);
 
@@ -857,7 +857,7 @@ static FVOID BossSTDMove(BOSS_DATA *b)
 }
 
 // ボスの体力の総和を求める //
-FDWORD GetBossHPSum(void)
+uint32_t GetBossHPSum(void)
 {
 	int				i;
 	DWORD			HP_Sum = 0;
@@ -876,7 +876,7 @@ FDWORD GetBossHPSum(void)
 }
 
 // ボス用割り込み処理 //
-FVOID BossINT(ENEMY_DATA *e,BYTE IntID)
+void BossINT(ENEMY_DATA *e, uint8_t IntID)
 {
 	int			i;
 	BOSS_DATA	*b;
@@ -923,7 +923,7 @@ FVOID BossINT(ENEMY_DATA *e,BYTE IntID)
 
 
 // ビット攻撃アドレス指定 //
-FVOID BossBitAttack(ENEMY_DATA *e, DWORD AtkID)
+void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
 {
 	int			i;
 	BOSS_DATA	*b;
@@ -938,7 +938,7 @@ FVOID BossBitAttack(ENEMY_DATA *e, DWORD AtkID)
 }
 
 // ビットにレーザーコマンドセット //
-FVOID BossBitLaser(ENEMY_DATA *e, BYTE LaserCmd)
+void BossBitLaser(ENEMY_DATA *e, uint8_t LaserCmd)
 {
 	int			i;
 	BOSS_DATA	*b;
@@ -953,7 +953,7 @@ FVOID BossBitLaser(ENEMY_DATA *e, BYTE LaserCmd)
 }
 
 // ビット命令送信 //
-FVOID BossBitCommand(ENEMY_DATA *e, BYTE Cmd, int Param)
+void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param)
 {
 	int			i;
 	BOSS_DATA	*b;
@@ -969,7 +969,7 @@ FVOID BossBitCommand(ENEMY_DATA *e, BYTE Cmd, int Param)
 
 
 // 残りビット数を返す //
-FINT BossGetBitLeft(void)
+int BossGetBitLeft(void)
 {
 	return BitGetNum();
 }

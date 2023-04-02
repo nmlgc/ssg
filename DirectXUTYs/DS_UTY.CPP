@@ -35,7 +35,7 @@ typedef struct tagSE_STRUCT{
 } SE_STRUCT,*LPSE_STRUCT;
 
 
-FBOOL SndFillBuffer(IDirectSoundBuffer *ds,BYTE *data,DWORD size);
+bool SndFillBuffer(IDirectSoundBuffer *ds, uint8_t *data, size_t size);
 
 // サウンド停止用補助関数 //
 static void _Snd_Stop(LPSE_STRUCT se,int no);
@@ -45,7 +45,7 @@ LPSE_STRUCT				Snd_OBJ[SND_OBJ_MAX];
 int						SndXMID = SND_XMID_DEFAULT;
 
 
-FBOOL SndInit(HWND hWnd,int x_mid)
+bool SndInit(HWND hWnd, int x_mid)
 {
 	HRESULT		dsrval;
 
@@ -67,7 +67,7 @@ FBOOL SndInit(HWND hWnd,int x_mid)
 	return TRUE;
 }
 
-FVOID SndCleanup(void)
+void SndCleanup(void)
 {
 	int		i;
 
@@ -160,12 +160,12 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)
 	return TRUE;
 }
 
-FBOOL SndWAVLoad(const PATH_LITERAL filename,BYTE id,int max)
+bool SndWAVLoad(const PATH_LITERAL filename, uint8_t id, int max)
 {
 	return SndWAVLoad(FileLoad(filename), id, max);
 }
 
-FVOID SndPlay(BYTE id)
+void SndPlay(uint8_t id)
 {
 	HRESULT	dsrval;
 	DWORD	st;
@@ -185,7 +185,7 @@ FVOID SndPlay(BYTE id)
 	se->now = (se->now+1)%(se->max);
 }
 
-FVOID SndPlayEX(BYTE id,int x,bool loop)
+void SndPlayEX(uint8_t id, int x, bool loop)
 {
 	HRESULT	dsrval;
 	DWORD	st;
@@ -206,7 +206,7 @@ FVOID SndPlayEX(BYTE id,int x,bool loop)
 	se->now = (se->now+1)%(se->max);
 }
 
-FVOID SndStop(BYTE id)
+void SndStop(uint8_t id)
 {
 	int i;
 	LPSE_STRUCT se;
@@ -223,14 +223,14 @@ FVOID SndStop(BYTE id)
 	}
 }
 
-FVOID SndStopAll(void)
+void SndStopAll(void)
 {
 	int i;
 
 	for(i=0;i<SND_OBJ_MAX;i++) SndStop(i);
 }
 
-FBOOL SndFillBuffer(IDirectSoundBuffer *ds,BYTE *data,DWORD size)
+bool SndFillBuffer(IDirectSoundBuffer *ds, uint8_t *data, size_t size)
 {
 	LPVOID	pMem1,pMem2;
 	DWORD	dwSize1,dwSize2;
@@ -250,7 +250,7 @@ FBOOL SndFillBuffer(IDirectSoundBuffer *ds,BYTE *data,DWORD size)
 	return TRUE;
 }
 
-FVOID SndRelease(BYTE id)
+void SndRelease(uint8_t id)
 {
 	int i;
 	LPSE_STRUCT se;
@@ -273,7 +273,7 @@ FVOID SndRelease(BYTE id)
 	LocalFree(se);
 }
 
-FBOOL SndRestore(void)
+bool SndRestore(void)
 {
 	return FALSE;
 }

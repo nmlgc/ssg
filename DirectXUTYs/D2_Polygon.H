@@ -12,10 +12,6 @@
 
 
 
-//// [ヘッダファイル] ////
-#include "PBGUTY_X.H"
-
-
 //// [構造体] ////
 
 typedef struct tagLINE_WORK{
@@ -30,7 +26,7 @@ typedef struct tagLINE_WORK{
 //// [インライン関数] ////
 
 // DDA 構造体のセット //
-IVOID SetLineWork(LINE_WORK *w,int x1,int x2,int dy)
+inline void SetLineWork(LINE_WORK *w, int x1, int x2, int dy)
 {
 	int		x,dlx,s,d;
 

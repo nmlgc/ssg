@@ -38,11 +38,11 @@ typedef struct tagITEM_DATA{
 
 
 ///// [ 関数 ] /////
-FVOID ItemSet(int x,int y,BYTE type);		// アイテムを発生させる
-FVOID ItemMove(void);						// アイテムを動かす
-FVOID ItemDraw(void);						// アイテムを描画する
+void ItemSet(int x, int y, uint8_t type);	// アイテムを発生させる
+void ItemMove(void);	// アイテムを動かす
+void ItemDraw(void);	// アイテムを描画する
 
-FVOID ItemIndSet(void);						// アイテム配列の初期化
+void ItemIndSet(void);	// アイテム配列の初期化
 
 
 

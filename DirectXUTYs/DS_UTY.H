@@ -77,22 +77,22 @@ typedef struct tagWAVEHEAD_FACT{
 
 
 // 初期化など //
-FBOOL SndInit(HWND hWnd,int x_mid=SND_XMID_DEFAULT);
-FVOID SndCleanup(void);
+bool SndInit(HWND hWnd, int x_mid = SND_XMID_DEFAULT);
+void SndCleanup(void);
 
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max);
-FBOOL SndWAVLoad(const PATH_LITERAL filename,BYTE id,int max);				// 後でエラーを吐くようにする
+bool SndWAVLoad(const PATH_LITERAL filename, uint8_t id, int max);	// 後でエラーを吐くようにする
 
 // 再生＆停止 //
-FVOID SndPlay(BYTE id);
-FVOID SndPlayEX(BYTE id,int x,bool loop);
-FVOID SndStop(BYTE id);
-FVOID SndStopAll(void);
+void SndPlay(uint8_t id);
+void SndPlayEX(uint8_t id, int x, bool loop);
+void SndStop(uint8_t id);
+void SndStopAll(void);
 
 // 補助 //
-FVOID SndRelease(BYTE id);
-FBOOL SndRestore(void);
+void SndRelease(uint8_t id);
+bool SndRestore(void);
 
 
 // グローバル変数 //

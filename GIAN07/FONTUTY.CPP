@@ -11,7 +11,7 @@ void __FillExpoint(EXPOINT *p, int x, int y, int w, int h);
 
 
 // 16x16 透過フォントで文字列出力(高速) //
-extern FVOID GrpPut16(int x,int y,const char *s)
+extern void GrpPut16(int x, int y, const char *s)
 {
 	RECT	src;
 	int		sx,tx,ty;
@@ -56,7 +56,7 @@ extern FVOID GrpPut16(int x,int y,const char *s)
 }
 
 // 16x16 透過フォントで文字列出力(高速) //
-extern FVOID GrpPut16c(int x,int y,char *s)
+extern void GrpPut16c(int x, int y, char *s)
 {
 	RECT	src;
 	int		sx,tx,ty;
@@ -101,7 +101,7 @@ extern FVOID GrpPut16c(int x,int y,char *s)
 }
 
 // 上と同じだが、ｘ移動幅が１６ //
-extern FVOID GrpPut16c2(int x,int y,char *s)
+extern void GrpPut16c2(int x, int y, char *s)
 {
 	RECT	src;
 	int		sx,tx,ty;
@@ -146,7 +146,7 @@ extern FVOID GrpPut16c2(int x,int y,char *s)
 }
 
 // 16x16 透過フォントで文字出力(クリッピング有) //
-extern FVOID GrpPutc(int x,int y,char c)
+extern void GrpPutc(int x, int y, char c)
 {
 	RECT	src;
 
@@ -179,7 +179,7 @@ extern FVOID GrpPutc(int x,int y,char c)
 }
 
 // 05x07 べた貼りフォント //
-extern FVOID GrpPut57(int x,int y,char *s)
+extern void GrpPut57(int x, int y, char *s)
 {
 	RECT	src;
 	int		sx,tx,ty;
@@ -201,7 +201,7 @@ extern FVOID GrpPut57(int x,int y,char *s)
 }
 
 // 07x11 音楽室用フォント
-extern FVOID GrpPut7B(int x,int y,char *s)
+extern void GrpPut7B(int x, int y, char *s)
 {
 	RECT	src;
 	int		sx,tx,ty;
@@ -229,7 +229,7 @@ extern FVOID GrpPut7B(int x,int y,char *s)
 }
 
 // 得点アイテムのスコアを描画 //
-extern FVOID GrpPutScore(int x,int y,char *s)
+extern void GrpPutScore(int x, int y, char *s)
 {
 	RECT	src;
 	int		sx,tx,ty;
@@ -251,7 +251,7 @@ extern FVOID GrpPutScore(int x,int y,char *s)
 }
 
 // MIDI 用フォントを描画する //
-extern FVOID GrpPutMidNum(int x,int y,int n)
+extern void GrpPutMidNum(int x, int y, int n)
 {
 	char	buf[10];
 	int		i;
@@ -273,7 +273,7 @@ extern FVOID GrpPutMidNum(int x,int y,int n)
 }
 
 // フォントをセットする //
-extern FVOID InitFonts(void)
+extern void InitFonts(void)
 {
 	// でかいフォント //
 	WinGrpInfo.LargeFont = CreateFont(24,12,0,0,500,FALSE,0,0,SHIFTJIS_CHARSET,
@@ -289,7 +289,7 @@ extern FVOID InitFonts(void)
 }
 
 // フォントを解放する //
-extern FVOID CleanupFont(void)
+extern void CleanupFont(void)
 {
 	if(WinGrpInfo.LargeFont)	DeleteObject(WinGrpInfo.LargeFont);
 	if(WinGrpInfo.NormalFont)	DeleteObject(WinGrpInfo.NormalFont);
@@ -297,7 +297,7 @@ extern FVOID CleanupFont(void)
 }
 
 // グラデーション付きフォントを描画する //
-extern FVOID DrawGrdFont(GRP surf,char *s)
+extern void DrawGrdFont(GRP surf, char *s)
 {
 	HDC			hdc;
 	HFONT		oldfont;

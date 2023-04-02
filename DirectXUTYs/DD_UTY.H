@@ -265,8 +265,6 @@ extern FVOIDFN(*GrpFatCircleA)(int x,int y,int r,int w);	// 太い円を描く
 
 extern PVOIDFN(*GrpBlt)(RECT *src,int x,int y,GRP surf);	// ビットマップ転送(WithClip)
 
-//extern FVOIDFN(*GrpSetGamma)(BYTE r,BYTE g,BYTE b,BYTE a);	// ガンマコントロール
-
 extern FVOID GrpBltEnable(BOOL flag);						// 描画を行うか？
 extern PBOOL GrpClip(RECT *src,int *x,int *y);				// クリッピングをかける
 extern FVOID GrpGetClip(RECT *dest);						// クリッピング枠を取得する

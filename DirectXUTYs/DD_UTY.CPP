@@ -81,7 +81,6 @@ FVOIDFN(*GrpBoxA)(int x1,int y1,int x2,int y2)     = DM_IIII;
 FVOIDFN(*GrpCircleA)(int x,int y,int r)            = DM_III;
 FVOIDFN(*GrpPolygonA)(POINT *p,int n)              = DM_PI;
 FVOIDFN(*GrpFatCircleA)(int x,int y,int r,int w)   = DM_IIII;
-//FVOIDFN(*GrpSetGamma)(BYTE r,BYTE g,BYTE b,BYTE a) = DM_BBBB;
 PVOIDFN(*GrpBlt)(RECT *src,int x,int y,GRP surf)   = STD_GrpBlt;
 
 static FBOOLFN(*RestoreHookFn)(void) = DM_RESTORE;		// Restore の事後処理用関数
@@ -893,7 +892,6 @@ static void SetDummyFunc(void)
 	GrpPolygonA = DM_PI;
 
 	GrpFatCircleA = DM_IIII;
-	//GrpSetGamma = DM_BBBB;
 }
 
 // ダミー関数の実体(かなり手抜き...) //

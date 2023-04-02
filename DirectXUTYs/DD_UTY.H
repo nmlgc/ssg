@@ -142,10 +142,8 @@ typedef struct tagDXOBJECT{
 	LPDIRECT3D2				D3;			// Direct3D Object
 	LPDIRECT3DDEVICE2		D3Dev;		// Direct3D Device
 	LPDIRECT3DVIEWPORT2		View;		// Direct3D Viewport
-	LPDIRECT3DMATERIAL2		Mat;		// Direct3D Material
 
 	LPDIRECTDRAWPALETTE		Pal;		// パレット(8Bitのときだけ)
-	LPDIRECTDRAWCLIPPER		Clip;		// クリッパー(WindowModeのみ)
 
 	GRP						Prim;		// 表画面
 	GRP						Back;		// 裏画面
@@ -155,7 +153,6 @@ typedef struct tagDXOBJECT{
 
 	PIXELFORMAT PixelFormat;
 	HWND					hWnd;			// ウィンドウハンドル
-	BOOL					bWndMode;		// ウィンドウモードか？
 	BOOL					bNeedChgPal;	// パレットを変更する必要があるか
 } DXOBJECT;
 

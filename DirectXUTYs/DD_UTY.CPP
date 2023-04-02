@@ -217,13 +217,11 @@ void GrpCleanup(void)
 {
 	int		i;
 
-	RELEASE(DxObj.Mat);
 	RELEASE(DxObj.View);
 	RELEASE(DxObj.D3Dev);
 	RELEASE(DxObj.D3);
 	RELEASE(DxObj.Zbuf);
 
-	RELEASE(DxObj.Clip);
 	RELEASE(DxObj.Pal);
 
 	// ここではSurfaceのBMPを解放しないことに注意 //

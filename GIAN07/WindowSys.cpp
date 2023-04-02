@@ -248,7 +248,6 @@ void MWinDraw(void)
 	HDC		hdc;
 	BYTE	alpha;
 	RECT	src;
-	GRP		GrFace;
 
 	int		x = MsgWindow.NowSize.left;		// ウィンドウ左上Ｘ
 	int		y = MsgWindow.NowSize.top;		// ウィンドウ左上Ｙ
@@ -293,7 +292,7 @@ void MWinDraw(void)
 	DrawWindowFrame(x,y,w,h);
 
 	// お顔をかきましょう(表示を要請されている場合にだけ) //
-	GrFace = FaceData[MsgWindow.FaceID/FACE_NUMX].GrSurf;
+	auto* GrFace = FaceData[MsgWindow.FaceID/FACE_NUMX].GrSurf;
 	switch(MsgWindow.FaceState){
 		case(MFACE_WAIT):
 			oy = MsgWindow.MaxSize.bottom - 100;

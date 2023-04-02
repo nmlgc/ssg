@@ -24,6 +24,7 @@
 // ヘッダファイル //
 #include "game/graphics.h"
 #include "platform/buffer.h"
+#include "platform/windows/surface_ddraw.h"
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
 #include "MtoB.h"						// スクリーンキャプチャー
@@ -160,13 +161,6 @@ struct GRAPHICS_DDRAW {
 	std::span<PALETTEENTRY> PaletteForDDraw();
 };
 
-typedef struct tagDXSURFACE{
-	GRP			surf;			// DirectDraw OffscreenSurface (NULLなら未使用)
-	BYTE_BUFFER_OWNED	img;			// BMP イメージを一時的に保存 (NULL ならロードはまだ)
-	int			width;
-	int			height;
-} DXSURFACE;
-
 typedef struct tagD3DENUM{
 	LPGUID		lpGuid;					// GUID
 	char		*name;					// お名前
@@ -212,7 +206,7 @@ typedef struct tagDDRAWENUM{
 
 // グローバル変数 //
 extern GRAPHICS_DDRAW	DxObj;
-extern DXSURFACE	DxSurf[SURFACE_MAX];
+extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 extern XDDRAWENUM	DxEnum[XDDRAWENUM_MAX];
 extern DWORD		DxEnumNow;
 
@@ -229,7 +223,7 @@ void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // オフスクリーン Surface 作成 //
-GRP  GrpCreateSurface(int width,int height,BYTE surf_id);	// Surface の作成(BMPリロード有り)
+SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id);	// Surface の作成(BMPリロード有り)
 
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
@@ -261,17 +255,17 @@ extern void (*GrpPolygonA)(POINT *p, int n);	// αポリゴン塗りつぶし
 
 extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 
-extern void (*GrpBlt)(RECT *src, int x, int y, GRP surf);	// ビットマップ転送(WithClip)
+extern void (*GrpBlt)(RECT *src, int x, int y, SURFACE_DDRAW* surf);	// ビットマップ転送(WithClip)
 
 extern bool GrpClip(RECT *src, int *x, int *y);	// クリッピングをかける
 extern void GrpGetClip(RECT *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltX(RECT *src, int x, int y, GRP surf);
+void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltXC(RECT *src, int x, int y, GRP surf);
+void GrpBltXC(RECT *src, int x, int y, SURFACE_DDRAW* surf);
 
 #endif

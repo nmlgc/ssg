@@ -87,13 +87,13 @@
 
 
 typedef struct tagFACE_DATA{
-	GRP					GrSurf;			// 顔グラ用 Surface へのポインタ
+	SURFACE_DDRAW*	GrSurf;	// 顔グラ用 Surface へのポインタ
 	PALETTE	pal;	// 顔グラ用パレット
 } FACE_DATA;
 
 // エンディングのグラフィック管理用 //
 typedef struct tagENDING_GRP{
-	GRP					GrSurf;			// Surface
+	SURFACE_DDRAW*	GrSurf;	// Surface
 	RECT				rcTarget;		// 矩形の範囲
 	PALETTE	pal;	// パレット
 } ENDING_GRP;
@@ -124,12 +124,12 @@ extern void LeaveBombPalette(void);		// ボム用パレット属性を外す
 */
 
 //// [ 変数 ] ////
-extern GRP			GrTama;				// システム用
-extern GRP			GrEnemy;			// 敵(雑魚＆ボス)用
-extern GRP			GrMap;				// 背景用
-extern GRP			GrMTitle;			// 曲のタイトル加工用
-extern GRP			GrBomber;			// ボム用グラフィック用
-extern GRP			GrLens;				// レンズエフェクト用
+extern SURFACE_DDRAW*	GrTama;	// システム用
+extern SURFACE_DDRAW*	GrEnemy;	// 敵(雑魚＆ボス)用
+extern SURFACE_DDRAW*	GrMap;	// 背景用
+extern SURFACE_DDRAW*	GrMTitle;	// 曲のタイトル加工用
+extern SURFACE_DDRAW*	GrBomber;	// ボム用グラフィック用
+extern SURFACE_DDRAW*	GrLens;	// レンズエフェクト用
 
 extern FACE_DATA	FaceData[FACE_MAX];	// 顔グラ用
 

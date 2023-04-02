@@ -54,9 +54,9 @@ extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画�
 extern void InitFonts(void);	// フォントをセットする
 extern void CleanupFont(void);	// フォントを解放する
 
-extern void DrawGrdFont(GRP surf, char *s);	// グラデーション付きフォントを描画する
+extern void DrawGrdFont(SURFACE_DDRAW* surf, char *s);	// グラデーション付きフォントを描画する
 
-ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc);			// フォント生成
+ExtraFontInfo *CreateExtraFont(SURFACE_DDRAW* Surface, RECT *pSrc);	// フォント生成
 void DeleteExtraFont(ExtraFontInfo *pFont);							// フォント削除
 
 // Renders [pFont] to the back buffer at the given left/top position. Setting

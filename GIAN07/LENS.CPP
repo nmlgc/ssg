@@ -23,11 +23,10 @@ static DWORD	__GrpPitch = 0;
 static BYTE *__LSurfLock(LensInfo *LInfo)
 {
 	DDSURFACEDESC	ddsd;
-	HRESULT			ddret;
 
 	memset(&ddsd,0,sizeof(DDSURFACEDESC));
 	ddsd.dwSize = sizeof(ddsd);
-	ddret = LInfo->gTemp->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL);
+	auto ddret = LInfo->gTemp->surf->Lock(nullptr, &ddsd, DDLOCK_WAIT, nullptr);
 	if(ddret != DD_OK) return NULL;
 
 	// The pitch can be different from (width * BPP) here!
@@ -40,7 +39,7 @@ static BYTE *__LSurfLock(LensInfo *LInfo)
 // LInfo->gTemp に対して、->Unlock() を行う //
 static void __LSurfUnlock(LensInfo *LInfo)
 {
-	LInfo->gTemp->Unlock(NULL);
+	LInfo->gTemp->surf->Unlock(nullptr);
 }
 
 
@@ -68,7 +67,7 @@ static void __BackSurfUnlock(void)
 
 
 // 半径:r  出っ張り:m  のレンズを作成 //
-LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, GRP Surface)
+LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
 {
 	LensInfo	*NewLens;
 	DWORD		*Table;
@@ -98,7 +97,7 @@ LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, GRP Surface)
 		return NULL;
 	}
 
-	NewLens->gTemp = Surface;
+	NewLens->gTemp = surf;
 
 	NewLens->r      = r;
 	NewLens->Height = Diameter;
@@ -149,7 +148,9 @@ extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 		(x - LInfo->r), (y - LInfo->r), (x + LInfo->r), (y + LInfo->r)
 	};
 	for(;;){
-		auto ddrval = LInfo->gTemp->BltFast(0, 0,DxObj.Back,&src,DDBLTFAST_NOCOLORKEY);
+		auto ddrval = LInfo->gTemp->surf->BltFast(
+			0, 0, DxObj.Back, &src, DDBLTFAST_NOCOLORKEY
+		);
 		if(ddrval == DD_OK){
 			break;
 		}

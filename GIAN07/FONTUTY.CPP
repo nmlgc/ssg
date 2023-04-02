@@ -230,7 +230,7 @@ extern void CleanupFont(void)
 }
 
 // グラデーション付きフォントを描画する //
-extern void DrawGrdFont(GRP surf, char *s)
+extern void DrawGrdFont(SURFACE_DDRAW* surf, char *s)
 {
 	HDC			hdc;
 	HFONT		oldfont;
@@ -240,7 +240,7 @@ extern void DrawGrdFont(GRP surf, char *s)
 
 	len = strlen(s)*16;
 
-	surf->GetDC(&hdc);
+	surf->surf->GetDC(&hdc);
 
 	// ここら辺は、一種の常套手段か？ //
 	old = GetPixel(hdc,0,0);
@@ -266,12 +266,12 @@ extern void DrawGrdFont(GRP surf, char *s)
 	}
 
 	SelectObject(hdc,oldfont);
-	surf->ReleaseDC(hdc);
+	surf->surf->ReleaseDC(hdc);
 }
 
 
 // フォント生成 //
-ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc)
+ExtraFontInfo *CreateExtraFont(SURFACE_DDRAW* Surface, RECT *pSrc)
 {
 	ExtraFontInfo		*pInfo;
 	int					MaxSize;
@@ -279,7 +279,6 @@ ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc)
 	void				*Target;
 
 	DDSURFACEDESC		ddsd;
-	HRESULT				ddret;
 
 	// 俺様メモリの確保ぉ //
 	pInfo = (ExtraFontInfo *)LocalAlloc(LPTR, sizeof(ExtraFontInfo));
@@ -300,7 +299,7 @@ ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc)
 
 	memset(&ddsd,0,sizeof(DDSURFACEDESC));
 	ddsd.dwSize = sizeof(ddsd);
-	ddret = Surface->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL);
+	auto ddret = Surface->surf->Lock(nullptr, &ddsd, DDLOCK_WAIT, nullptr);
 	if(ddret != DD_OK){
 		DeleteExtraFont(pInfo);
 		return NULL;
@@ -327,7 +326,7 @@ ExtraFontInfo *CreateExtraFont(GRP Surface, RECT *pSrc)
 		}
 	}, DxObj.PixelFormat);
 
-	Surface->Unlock(NULL);
+	Surface->surf->Unlock(nullptr);
 
 	return pInfo;
 }

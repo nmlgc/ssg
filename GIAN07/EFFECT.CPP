@@ -248,8 +248,9 @@ void SetMusicTitle(int y, char *s)
 	SEffect[n].vx   = len*16;
 	SEffect[n].vy   = 16;
 
-	GrpOffsClear(GrMTitle);GrpSetColorKey(GrMTitle);
-	DrawGrdFont(GrMTitle,MTitleBuf);
+	GrpOffsClear(GrMTitle->surf);
+	GrpSetColorKey(GrMTitle->surf);
+	DrawGrdFont(GrMTitle, MTitleBuf);
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
@@ -449,7 +450,8 @@ bool SEffectRestore(void)
 {
 	if(GrMTitle==NULL) return FALSE;
 
-	GrpOffsClear(GrMTitle);GrpSetColorKey(GrMTitle);
+	GrpOffsClear(GrMTitle->surf);
+	GrpSetColorKey(GrMTitle->surf);
 	DrawGrdFont(GrMTitle,MTitleBuf);
 
 	return TRUE;

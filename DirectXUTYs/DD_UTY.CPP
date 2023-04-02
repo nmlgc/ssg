@@ -19,7 +19,7 @@ static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
 static void DM_PI(POINT *p, int n);
 static bool DM_RESTORE(void);
-static void DM_GRPBLT(RECT *src, int x, int y, GRP surf);
+static void DM_GRPBLT(RECT *src, int x, int y, SURFACE_DDRAW* surf);
 
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
@@ -29,12 +29,12 @@ int CLIP_Y_MAX = 479;
 
 // キャプチャーを行うか(->MtoB) //
 BOOL CaptureFlag = FALSE;
-void STD_GrpBlt(RECT *src, int x, int y, GRP surf);
+void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf);
 
 
 // オフスクリーン Surface を Restore し、ＢＭＰがあれば読み直す //
-static BOOL OffsRestore(DXSURFACE *surf);
-static BOOL GrpBMLoadMemory(DXSURFACE *surf);
+static BOOL OffsRestore(SURFACE_DDRAW *surf);
+static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf);
 
 // Ｚバッファを必要なら生成し、接続する //
 static BOOL CreateZbuffer(XD3DENUM *D3De);
@@ -58,7 +58,7 @@ static void GrpFlipWnd(void);
 
 // グローバル変数 //
 GRAPHICS_DDRAW	DxObj;
-DXSURFACE		DxSurf[SURFACE_MAX];
+SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
 DWORD			DxEnumNow;
 
@@ -77,7 +77,7 @@ void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpCircleA)(int x, int y, int r)              = DM_III;
 void(*GrpPolygonA)(POINT *p, int n)                 = DM_PI;
 void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
-void(*GrpBlt)(RECT *src, int x, int y, GRP surf)    = STD_GrpBlt;
+void(*GrpBlt)(RECT *src, int x, int y, SURFACE_DDRAW* surf) = STD_GrpBlt;
 
 static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
@@ -345,7 +345,7 @@ void GrpSetPalette(const PALETTE& pal)
 	DisableAlphaTable();
 }
 
-GRP GrpCreateSurface(int width,int height,BYTE surf_id)
+SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id)
 {
 	HRESULT				dxval;
 	DDSURFACEDESC		ddsd;
@@ -370,10 +370,8 @@ GRP GrpCreateSurface(int width,int height,BYTE surf_id)
 		DxSurf[surf_id].height = height;
 		OffsRestore(&DxSurf[surf_id]);	// メモリから再読み込み or ゼロクリア
 	}
-	else
-		DxSurf[surf_id].surf = NULL;
 
-	return DxSurf[surf_id].surf;
+	return &DxSurf[surf_id];
 }
 
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
@@ -547,12 +545,14 @@ bool GrpClip(RECT *src, int *x, int *y)
 	return TRUE;
 }
 
-void GrpBltX(RECT *src, int x, int y, GRP surf)
+void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
 	HRESULT		ddrval;
 
 	for(;;){
-		ddrval = DxObj.Back->BltFast(x, y, surf, src, DDBLTFAST_SRCCOLORKEY);
+		ddrval = DxObj.Back->BltFast(
+			x, y, surf->surf, src, DDBLTFAST_SRCCOLORKEY
+		);
 		if(ddrval == DD_OK){
 			break;
 		}
@@ -566,12 +566,14 @@ void GrpBltX(RECT *src, int x, int y, GRP surf)
 	}
 }
 
-void GrpBltXC(RECT *src, int x, int y, GRP surf)
+void GrpBltXC(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
 	HRESULT		ddrval;
 
 	for(;;){
-		ddrval = DxObj.Back->BltFast(x, y, surf, src, DDBLTFAST_NOCOLORKEY);
+		ddrval = DxObj.Back->BltFast(
+			x, y, surf->surf, src, DDBLTFAST_NOCOLORKEY
+		);
 		if(ddrval == DD_OK){
 			break;
 		}
@@ -587,7 +589,7 @@ void GrpBltXC(RECT *src, int x, int y, GRP surf)
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
-void STD_GrpBlt(RECT *src, int x, int y, GRP surf)
+void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
 	HRESULT		ddrval;
 
@@ -595,7 +597,9 @@ void STD_GrpBlt(RECT *src, int x, int y, GRP surf)
 	if(!GrpClip(src,&x,&y)) return;
 
 	for(;;){
-		ddrval = DxObj.Back->BltFast(x,y,surf,src,DDBLTFAST_SRCCOLORKEY);
+		ddrval = DxObj.Back->BltFast(
+			x, y, surf->surf, src, DDBLTFAST_SRCCOLORKEY
+		);
 		if(ddrval == DD_OK){
 			break;
 		}
@@ -641,7 +645,7 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 	else             return TRUE;
 }
 
-static BOOL OffsRestore(DXSURFACE *surf)
+static BOOL OffsRestore(SURFACE_DDRAW *surf)
 {
 	HRESULT		dxret;
 
@@ -655,7 +659,7 @@ static BOOL OffsRestore(DXSURFACE *surf)
 	return TRUE;
 }
 
-static BOOL GrpBMLoadMemory(DXSURFACE *surf)
+static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 {
 	HRESULT					ddrval;
 	BITMAPFILEHEADER		*BMP_file;
@@ -921,4 +925,4 @@ static bool DM_RESTORE(void)
 	return TRUE;
 }
 
-static void DM_GRPBLT(RECT *src, int x, int y, GRP surf) {}
+static void DM_GRPBLT(RECT *src, int x, int y, SURFACE_DDRAW* surf) {}

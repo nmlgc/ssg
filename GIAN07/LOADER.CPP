@@ -50,12 +50,12 @@ BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
 
 
 // グローバル変数 //
-GRP GrTama   = NULL;			// 弾など
-GRP GrEnemy  = NULL;			// 雑魚など
-GRP GrMap    = NULL;			// 背景
-GRP GrMTitle = NULL;			// 曲のタイトル加工用
-GRP GrBomber = NULL;			// ボム用グラフィック用
-GRP GrLens   = NULL;			// レンズエフェクト用
+SURFACE_DDRAW* GrTama   = nullptr;	// 弾など
+SURFACE_DDRAW* GrEnemy  = nullptr;	// 雑魚など
+SURFACE_DDRAW* GrMap    = nullptr;	// 背景
+SURFACE_DDRAW* GrMTitle = nullptr;	// 曲のタイトル加工用
+SURFACE_DDRAW* GrBomber = nullptr;	// ボム用グラフィック用
+SURFACE_DDRAW* GrLens   = nullptr;	// レンズエフェクト用
 
 LensInfo	*Lens = NULL;
 
@@ -185,7 +185,9 @@ BOOL LoadGraph(int stage)
 			x = EndingGrp[i].rcTarget.left;
 			y = EndingGrp[i].rcTarget.top;
 			for(;;){
-				ddrval = EndingGrp[i].GrSurf->BltFast(x,y,GrMap,&src,DDBLTFAST_NOCOLORKEY);
+				ddrval = EndingGrp[i].GrSurf->surf->BltFast(
+					x, y, GrMap->surf, &src, DDBLTFAST_NOCOLORKEY
+				);
 				if(ddrval == DD_OK){
 					break;
 				}
@@ -271,7 +273,7 @@ void LoadPaletteFromMusic(void)
 
 	if(DxObj.PixelFormat.IsChanneled()) return;
 	if(!GrEnemy) return;
-	if(GrEnemy->GetPalette(&lpdp) != DD_OK) return;
+	if(GrEnemy->surf->GetPalette(&lpdp) != DD_OK) return;
 
 	auto p = DxObj.PaletteForDDraw();
 	lpdp->GetEntries(0, 0, p.size(), p.data());
@@ -287,7 +289,7 @@ void LoadPaletteFromMap(void)
 
 	if(DxObj.PixelFormat.IsChanneled()) return;
 	if(!GrMap) return;
-	if(GrMap->GetPalette(&lpdp) != DD_OK) return;
+	if(GrMap->surf->GetPalette(&lpdp) != DD_OK) return;
 /*
 	if(bIsBombPalette){
 		lpdp->GetEntries(0, 0, 256, tempPalette);

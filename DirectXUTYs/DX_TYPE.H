@@ -48,8 +48,4 @@
 #define RELEASE(x)		if((x)!=NULL){(x)->Release();x=NULL;}
 #define ZEROMEM(x)		memset(&x,0,sizeof(x))
 
-
-// 型 //
-typedef	LPDIRECTDRAWSURFACE	GRP;
-
 #endif

@@ -337,7 +337,7 @@ extern void LLaserDraw(void)
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
 					*/
-					if(DxObj.D3){
+					if(DxObj.PixelFormat.IsChanneled()) {
 						//GrpSetColor(3,0,3);
 						GrpSetColor(Table16Bit[c][0], Table16Bit[c][1], Table16Bit[c][2]);
 						GrpSetAlpha(0,ALPHA_ONE);
@@ -359,7 +359,9 @@ extern void LLaserDraw(void)
 					GrpSetColor(Table8BitA[c][0], Table8BitA[c][1], Table8BitA[c][2]);
 					GrpPolygon(lp->p,4);
 				}
-				else if(DxObj.D3) break;
+				else if(DxObj.PixelFormat.IsChanneled()) {
+					break;
+				}
 
 				GrpCircleF(x,y,len);//(lp->w>>6)+4);
 

@@ -337,7 +337,7 @@ static void __fastcall SLdraw(LASER_DATA *lp)
 //	GrpSetAlpha(128,ALPHA_ONE);		// 2000/09/06 に削除
 	GrpSetColor(1,0,5);
 
-	if(DxObj.D3){
+	if(DxObj.PixelFormat.IsChanneled()) {
 		GrpGrdRect(lp->p);
 	}
 	else{

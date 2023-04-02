@@ -110,9 +110,8 @@ extern BOOL LoadMusic(int no);						// ｎ番目の曲をロードする
 extern BOOL LoadSound(void);						// 全ての Sound データをロードする
 extern BOOL LoadMusicRoomComment(int no);			// MusicRoom のコメントをロードする
 
-extern void LoadPaletteFromMap(void);		// 前後にある４０色をマップパーツのパレットにする
+extern void LoadPaletteFrom(SURFACE_DDRAW* surf);
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
-extern void LoadPaletteFromMusic(void);
 
 extern void CleanupLens(void);	//  レンズを破棄する
 

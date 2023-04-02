@@ -151,7 +151,7 @@ BOOL LoadGraph(int stage)
 	if(stage==GRAPH_ID_TITLE){
 		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
 		if(!DATGraphLoad(20+4,SURFACE_ID_MUSIC))		return FALSE;
-		//LoadPaletteFromMusic();
+		//LoadPaletteFrom(GrEnemy);
 		return TRUE;
 	}
 	// お名前登録画面用 //
@@ -267,39 +267,17 @@ BOOL LoadFace(BYTE SurfaceID,BYTE FileNo)
 	return TRUE;
 }
 
-void LoadPaletteFromMusic(void)
+void LoadPaletteFrom(SURFACE_DDRAW* surf)
 {
 	LPDIRECTDRAWPALETTE		lpdp;
 
 	if(DxObj.PixelFormat.IsChanneled()) return;
-	if(!GrEnemy) return;
-	if(GrEnemy->surf->GetPalette(&lpdp) != DD_OK) return;
+	if(!surf) return;
+	if(surf->surf->GetPalette(&lpdp) != DD_OK) return;
 
 	auto p = DxObj.PaletteForDDraw();
 	lpdp->GetEntries(0, 0, p.size(), p.data());
 	GrpSetPalette(DxObj.Palette);
-
-	lpdp->Release();
-}
-
-// 前後にある４０色をマップパーツのパレットにする //
-void LoadPaletteFromMap(void)
-{
-	LPDIRECTDRAWPALETTE		lpdp;
-
-	if(DxObj.PixelFormat.IsChanneled()) return;
-	if(!GrMap) return;
-	if(GrMap->surf->GetPalette(&lpdp) != DD_OK) return;
-/*
-	if(bIsBombPalette){
-		lpdp->GetEntries(0, 0, 256, tempPalette);
-	}
-	else{
-*/
-		auto p = DxObj.PaletteForDDraw();
-		lpdp->GetEntries(0, 0, p.size(), p.data());
-		GrpSetPalette(DxObj.Palette);
-//	}
 
 	lpdp->Release();
 }

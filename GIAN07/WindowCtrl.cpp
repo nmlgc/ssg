@@ -414,7 +414,7 @@ static BOOL GrpFnBpp(WORD key)
 			GrpInit(pXDD.lpDDGuid,pXDD.D3D,ConfigDat.BitDepth);
 			InitSurface();
 			//GrpSetPalette(DxObj.pe);
-			LoadPaletteFromMusic();
+			LoadPaletteFrom(GrEnemy);
 
 			//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 		break;

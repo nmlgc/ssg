@@ -362,7 +362,8 @@ static void enemy_set(void)
 			return;
 
 			case(SCL_MAPPALETTE):	// マップパーツ用Surface からパレットを
-				LoadPaletteFromMap();	// BitDeapth 判定は、関数側に任せる
+				// 前後にある４０色をマップパーツのパレットにする
+				LoadPaletteFrom(GrMap);	// BitDeapth 判定は、関数側に任せる
 				SCL_Now++;
 			break;
 

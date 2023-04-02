@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "DX_TYPE.H"
+struct IDirectDrawSurface;
 
 void GrpSetCaptureFilename(const char *s);
-void PutSurfaceToBmp(GRP surf);
+void PutSurfaceToBmp(IDirectDrawSurface* surf);

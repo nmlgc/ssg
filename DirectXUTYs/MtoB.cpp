@@ -9,6 +9,6 @@ void GrpSetCaptureFilename(const char *s)
 {
 }
 
-void PutSurfaceToBmp(GRP surf)
+void PutSurfaceToBmp(IDirectDrawSurface* surf)
 {
 }

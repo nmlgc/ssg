@@ -145,9 +145,9 @@ typedef struct tagDXOBJECT{
 
 	LPDIRECTDRAWPALETTE		Pal;		// パレット(8Bitのときだけ)
 
-	GRP						Prim;		// 表画面
-	GRP						Back;		// 裏画面
-	GRP						Zbuf;		// Ｚバッファ
+	IDirectDrawSurface*	Prim;	// 表画面
+	IDirectDrawSurface*	Back;	// 裏画面
+	IDirectDrawSurface*	Zbuf;	// Ｚバッファ
 
 	PALETTEENTRY			pe[256];	// パレットの初期値
 

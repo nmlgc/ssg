@@ -348,7 +348,7 @@ GRP GrpCreateSurface(int width,int height,BYTE surf_id)
 {
 	HRESULT				dxval;
 	DDSURFACEDESC		ddsd;
-	GRP					temp = NULL;
+	IDirectDrawSurface*	temp = nullptr;
 
 
 	if(surf_id>=SURFACE_MAX) return NULL;

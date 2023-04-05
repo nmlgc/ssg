@@ -212,17 +212,37 @@ extern void GrpPutMidNum(int x, int y, int n)
 // フォントをセットする //
 extern void InitFonts(void)
 {
+	LOGFONTW logfont = {
+		.lfEscapement = 0,
+		.lfOrientation = 0,
+		.lfItalic = false,
+		.lfUnderline = false,
+		.lfStrikeOut = false,
+		.lfCharSet = SHIFTJIS_CHARSET,
+		.lfOutPrecision = OUT_TT_ONLY_PRECIS,
+		.lfClipPrecision = CLIP_DEFAULT_PRECIS,
+		.lfQuality = PROOF_QUALITY,
+		.lfPitchAndFamily = FIXED_PITCH,
+		.lfFaceName = L"ＭＳ ゴシック"
+	};
+
 	// でかいフォント //
-	WinGrpInfo.LargeFont = CreateFont(24,12,0,0,500,FALSE,0,0,SHIFTJIS_CHARSET,
-		OUT_TT_ONLY_PRECIS,CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH,"ＭＳ ゴシック");
+	logfont.lfHeight = 24;
+	logfont.lfWidth = 12;
+	logfont.lfWeight = FW_MEDIUM;
+	WinGrpInfo.LargeFont = CreateFontIndirectW(&logfont);
 
 	// 並なフォント //
-	WinGrpInfo.NormalFont = CreateFont(16,8,0,0,400,FALSE,0,0,SHIFTJIS_CHARSET,
-		OUT_TT_ONLY_PRECIS,CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH,"ＭＳ ゴシック");
+	logfont.lfHeight = 16;
+	logfont.lfWidth = 8;
+	logfont.lfWeight = FW_NORMAL;
+	WinGrpInfo.NormalFont = CreateFontIndirectW(&logfont);
 
 	// ちっこいフォント //
-	WinGrpInfo.SmallFont = CreateFont(14,7,0,0,400,FALSE,0,0,SHIFTJIS_CHARSET,
-		OUT_TT_ONLY_PRECIS,CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH,"ＭＳ ゴシック");
+	logfont.lfHeight = 14;
+	logfont.lfWidth = 7;
+	logfont.lfWeight = FW_NORMAL;
+	WinGrpInfo.SmallFont = CreateFontIndirectW(&logfont);
 }
 
 // フォントを解放する //

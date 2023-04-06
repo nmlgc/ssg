@@ -666,9 +666,6 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 	BITMAPINFOHEADER		*BMP_info;
 	RGBQUAD					*pal;
 	BYTE					*image;
-	HDC						hdc,hdcmem;
-	HBITMAP					hbmp;
-
 
 	if(!surf->img) {
 		return false;
@@ -688,7 +685,7 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 
 	if(DxObj.PixelFormat.IsPalettized()){
 		// Yup, we must mutate the .BMP palette in addition to the DirectDraw
-		// palette, since we pass it via [BMP_info] into CreateDIBitmap()
+		// palette, since we pass it via [BMP_info] into CreateDIBSection()
 		// below. Not doing that will turn the black parts of Marisa's sprite
 		// transparent.
 		pal[0] = { 0, 0, 0 }; // 例外的な処理 //
@@ -712,19 +709,44 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 		DxObj.Back->SetPalette(DxObj.Pal);
 	}
 
-	// DIB から DC を作成 //
-	ddrval = surf->surf->GetDC(&hdc);
-	if(ddrval!=DD_OK) return FALSE;
-	hbmp   = CreateDIBitmap(hdc,BMP_info,CBM_INIT,image,(BITMAPINFO *)BMP_info,DIB_RGB_COLORS);
-	hdcmem = CreateCompatibleDC(hdc);
-	SelectObject(hdcmem,hbmp);
+	void* hbmp_bits = nullptr;
+	HBITMAP hbmp = CreateDIBSection(
+		GetDC(nullptr),
+		reinterpret_cast<const BITMAPINFO *>(BMP_info),
+		DIB_RGB_COLORS,
+		&hbmp_bits,
+		nullptr,
+		0
+	);
+	if(!hbmp) {
+		return false;
+	}
 
-	BitBlt(hdc,0,0,width,height,hdcmem,0,0,SRCCOPY);
+	// [BMP_info->biSizeImage] can be 0, so we have to manually calculate the
+	// actual size allocated by CreateDIBSection() by DWORD-aligning the row
+	// stride. We can't just take everything from [image] to the end of the
+	// buffer because nothing prevents the file from being larger than what
+	// CreateDIBSection() allocated. This actually happens with File 22 in
+	// GRAPH.DAT (Reimu's faceset).
+	const auto stride = (
+		(((BMP_info->biWidth * BMP_info->biBitCount) + 31u) & ~31) / 8u
+	);
+	memcpy(hbmp_bits, image, (stride * BMP_info->biHeight));
+
+	// DIB から DC を作成 //
+	HDC ddraw_dc;
+	ddrval = surf->surf->GetDC(&ddraw_dc);
+	if(ddrval!=DD_OK) return FALSE;
+
+	HDC img_dc = CreateCompatibleDC(ddraw_dc);
+	SelectObject(img_dc, hbmp);
+
+	BitBlt(ddraw_dc, 0, 0, stride, BMP_info->biHeight, img_dc, 0, 0, SRCCOPY);
+	DeleteObject(hbmp);
 
 	// 後始末 //
-	surf->surf->ReleaseDC(hdc);
-	DeleteDC(hdcmem);
-	DeleteObject(hbmp);
+	surf->surf->ReleaseDC(ddraw_dc);
+	DeleteDC(img_dc);
 
 	// カラーキーをセットする //
 	GrpSetColorKey(surf->surf);

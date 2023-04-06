@@ -664,8 +664,6 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 	HRESULT					ddrval;
 	BITMAPFILEHEADER		*BMP_file;
 	BITMAPINFOHEADER		*BMP_info;
-	RGBQUAD					*pal;
-	BYTE					*image;
 
 	if(!surf->img) {
 		return false;
@@ -673,40 +671,21 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 
 	BMP_file = (BITMAPFILEHEADER *)surf->img.get();
 	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);
-	pal      = (RGBQUAD          *)((BMP_info) +   1);
-	image    = (BYTE             *)((pal)      + 256);
+	auto* dib_pal = reinterpret_cast<RGBQUAD *>(BMP_info + 1);
+	const auto* image = (
+		reinterpret_cast<const std::byte *>(BMP_file) + BMP_file->bfOffBits
+	);
 
 	// ヘッダチェッカ //
 	if(BMP_file->bfType != MAKEWORD('B','M')) return FALSE;
 	if(BMP_info->biBitCount != 8) return FALSE;
-
-	const int width  = ((BMP_info->biWidth + 3) & ~3);
-	const int height = BMP_info->biHeight;
 
 	if(DxObj.PixelFormat.IsPalettized()){
 		// Yup, we must mutate the .BMP palette in addition to the DirectDraw
 		// palette, since we pass it via [BMP_info] into CreateDIBSection()
 		// below. Not doing that will turn the black parts of Marisa's sprite
 		// transparent.
-		pal[0] = { 0, 0, 0 }; // 例外的な処理 //
-
-		for(size_t i = 0; i < DxObj.Palette.size(); i++) {
-			const auto& bgr = pal[i];
-			DxObj.Palette[i] = {bgr.rgbRed, bgr.rgbGreen, bgr.rgbBlue };
-		}
-
-		if(DxObj.Pal) DxObj.Pal->Release();
-
-		ddrval = DxObj.DD->CreatePalette(
-			(DDPCAPS_8BIT | DDPCAPS_ALLOW256),
-			DxObj.PaletteForDDraw().data(),
-			&DxObj.Pal,
-			nullptr
-		);
-		if(ddrval!=DD_OK) return FALSE;
-		surf->surf->SetPalette(DxObj.Pal);
-		DxObj.Prim->SetPalette(DxObj.Pal);
-		DxObj.Back->SetPalette(DxObj.Pal);
+		dib_pal[0] = { 0, 0, 0 }; // 例外的な処理 //
 	}
 
 	void* hbmp_bits = nullptr;
@@ -733,13 +712,43 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 	);
 	memcpy(hbmp_bits, image, (stride * BMP_info->biHeight));
 
+	HDC img_dc = CreateCompatibleDC(GetDC(nullptr));
+	SelectObject(img_dc, hbmp);
+
+	// Set the palette first to ensure that the colors get mapped correctly
+	// when blitting the DIB to the DirectDraw surface.
+	if(DxObj.PixelFormat.IsPalettized()) {
+		std::array<RGBQUAD, DxObj.Palette.size()> pal;
+		if(GetDIBColorTable(img_dc, 0, pal.size(), pal.data()) == pal.size()) {
+			// Convert BGR to RGB...
+			for(size_t i = 0; i < DxObj.Palette.size(); i++) {
+				const auto& bgr = pal[i];
+				DxObj.Palette[i] = { bgr.rgbRed, bgr.rgbGreen, bgr.rgbBlue };
+			}
+
+			if(DxObj.Pal) {
+				DxObj.Pal->Release();
+			}
+
+			ddrval = DxObj.DD->CreatePalette(
+				(DDPCAPS_8BIT | DDPCAPS_ALLOW256),
+				DxObj.PaletteForDDraw().data(),
+				&DxObj.Pal,
+				nullptr
+			);
+			if(ddrval != DD_OK) {
+				return false;
+			}
+			DxObj.Prim->SetPalette(DxObj.Pal);
+			DxObj.Back->SetPalette(DxObj.Pal);
+			surf->surf->SetPalette(DxObj.Pal);
+		}
+	}
+
 	// DIB から DC を作成 //
 	HDC ddraw_dc;
 	ddrval = surf->surf->GetDC(&ddraw_dc);
 	if(ddrval!=DD_OK) return FALSE;
-
-	HDC img_dc = CreateCompatibleDC(ddraw_dc);
-	SelectObject(img_dc, hbmp);
 
 	BitBlt(ddraw_dc, 0, 0, stride, BMP_info->biHeight, img_dc, 0, 0, SRCCOPY);
 	DeleteObject(hbmp);

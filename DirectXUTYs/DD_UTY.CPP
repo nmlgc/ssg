@@ -36,9 +36,6 @@ void STD_GrpBlt(RECT *src, int x, int y, GRP surf);
 static BOOL OffsRestore(DXSURFACE *surf);
 static BOOL GrpBMLoadMemory(DXSURFACE *surf);
 
-// カラーキーをセットする DXSURFACE 用 //
-extern BOOL SetColorKey(DXSURFACE *surf);
-
 // Ｚバッファを必要なら生成し、接続する //
 static BOOL CreateZbuffer(XD3DENUM *D3De);
 
@@ -226,7 +223,7 @@ void GrpCleanup(void)
 
 	// ここではSurfaceのBMPを解放しないことに注意 //
 	for(i=0;i<SURFACE_MAX;i++){
-		GrpReleaseSurface(i);
+		RELEASE(DxSurf[i].surf);
 	}
 
 	RELEASE(DxObj.Back);
@@ -256,8 +253,11 @@ void GrpSetClip(int sx, int sy, int ex, int ey)
 	CLIP_X_MAX = (ex>639) ? 639 : ex;
 	CLIP_Y_MAX = (ey>479) ? 479 : ey;
 
-	if(CLIP_X_MIN==CLIP_X_MAX || CLIP_Y_MIN==CLIP_Y_MAX)	GrpBltEnable(FALSE);
-	else													GrpBltEnable(TRUE);
+	if ((CLIP_X_MIN == CLIP_X_MAX) || (CLIP_Y_MIN == CLIP_Y_MAX)) {
+		GrpBlt = DM_GRPBLT;
+	} else {
+		GrpBlt = STD_GrpBlt;
+	}
 
 	if(DxObj.View){
 		view.dwSize = sizeof(view);
@@ -375,14 +375,6 @@ GRP GrpCreateSurface(int width,int height,BYTE surf_id)
 		DxSurf[surf_id].surf = NULL;
 
 	return DxSurf[surf_id].surf;
-}
-
-bool GrpReleaseSurface(uint8_t surf_id)
-{
-	if(surf_id>=SURFACE_MAX) return FALSE;
-	RELEASE(DxSurf[surf_id].surf);
-
-	return TRUE;
 }
 
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
@@ -525,13 +517,6 @@ static void GrpFlipWnd(void)
 	}
 }
 
-// クリッピングを行うか？ //
-void GrpBltEnable(bool flag)
-{
-	if(flag == TRUE)	GrpBlt = STD_GrpBlt;
-	else				GrpBlt = DM_GRPBLT;
-}
-
 bool GrpClip(RECT *src, int *x, int *y)
 {
 	int w = src->right - src->left - 1;
@@ -619,11 +604,6 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 	else             return TRUE;
 }
 
-static BOOL SetColorKey(DXSURFACE *surf)
-{
-	return GrpSetColorKey(surf->surf);
-}
-
 static BOOL OffsRestore(DXSURFACE *surf)
 {
 	HRESULT		dxret;
@@ -703,7 +683,7 @@ static BOOL GrpBMLoadMemory(DXSURFACE *surf)
 	DeleteObject(hbmp);
 
 	// カラーキーをセットする //
-	SetColorKey(surf);
+	GrpSetColorKey(surf->surf);
 
 	DisableAlphaTable();
 

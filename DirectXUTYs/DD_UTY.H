@@ -226,7 +226,6 @@ void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // オフスクリーン Surface 作成 //
 GRP  GrpCreateSurface(int width,int height,BYTE surf_id);	// Surface の作成(BMPリロード有り)
-bool GrpReleaseSurface(uint8_t surf_id);	// Surface の削除(BMPは変更せず)
 
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
@@ -260,7 +259,6 @@ extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 
 extern void (*GrpBlt)(RECT *src, int x, int y, GRP surf);	// ビットマップ転送(WithClip)
 
-extern void GrpBltEnable(bool flag);	// 描画を行うか？
 extern bool GrpClip(RECT *src, int *x, int *y);	// クリッピングをかける
 extern void GrpGetClip(RECT *dest);	// クリッピング枠を取得する
 

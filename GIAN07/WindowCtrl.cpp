@@ -82,7 +82,7 @@ static bool RingFN(bool onchange(void), BYTE& var, WORD key, BYTE min, BYTE max)
 		break;
 
 	case(KEY_LEFT):
-		var = ((var == min) ? max : (var - 1));
+		var = ((var <= min) ? max : (var - 1));
 		break;
 	}
 	return onchange();

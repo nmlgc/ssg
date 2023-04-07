@@ -264,45 +264,10 @@ extern void GrpGetClip(RECT *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-inline void GrpBltX(RECT *src, int x, int y, GRP surf)
-{
-	HRESULT		ddrval;
-
-	for(;;){
-		ddrval = DxObj.Back->BltFast(x,y,surf,src,DDBLTFAST_SRCCOLORKEY);
-		if(ddrval == DD_OK){
-			break;
-		}
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-			return;
-		}
-		if(ddrval != DDERR_WASSTILLDRAWING){
-			return;
-		}
-	}
-}
-
+void GrpBltX(RECT *src, int x, int y, GRP surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-inline void GrpBltXC(RECT *src, int x, int y, GRP surf)
-{
-	HRESULT		ddrval;
-
-	for(;;){
-		ddrval = DxObj.Back->BltFast(x,y,surf,src,DDBLTFAST_NOCOLORKEY);
-		if(ddrval == DD_OK){
-			break;
-		}
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-			return;
-		}
-		if(ddrval != DDERR_WASSTILLDRAWING){
-			return;
-		}
-	}
-}
+void GrpBltXC(RECT *src, int x, int y, GRP surf);
 
 #endif

@@ -548,6 +548,44 @@ bool GrpClip(RECT *src, int *x, int *y)
 	return TRUE;
 }
 
+void GrpBltX(RECT *src, int x, int y, GRP surf)
+{
+	HRESULT		ddrval;
+
+	for(;;){
+		ddrval = DxObj.Back->BltFast(x, y, surf, src, DDBLTFAST_SRCCOLORKEY);
+		if(ddrval == DD_OK){
+			break;
+		}
+		if(ddrval == DDERR_SURFACELOST){
+			if(!GrpRestore())
+			return;
+		}
+		if(ddrval != DDERR_WASSTILLDRAWING){
+			return;
+		}
+	}
+}
+
+void GrpBltXC(RECT *src, int x, int y, GRP surf)
+{
+	HRESULT		ddrval;
+
+	for(;;){
+		ddrval = DxObj.Back->BltFast(x, y, surf, src, DDBLTFAST_NOCOLORKEY);
+		if(ddrval == DD_OK){
+			break;
+		}
+		if(ddrval == DDERR_SURFACELOST){
+			if(!GrpRestore())
+			return;
+		}
+		if(ddrval != DDERR_WASSTILLDRAWING){
+			return;
+		}
+	}
+}
+
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
 void STD_GrpBlt(RECT *src, int x, int y, GRP surf)

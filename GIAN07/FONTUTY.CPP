@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "FONTUTY.H"
+#include <ddraw.h>
 
 // ヒミツの関数 //
 void __FillExpoint(EXPOINT *p, int x, int y, int w, int h);

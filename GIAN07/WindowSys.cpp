@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "WindowSys.h"
+#include <ddraw.h>
 
 
 

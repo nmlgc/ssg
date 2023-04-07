@@ -6,6 +6,7 @@
 #include "DD_UTY.H"
 #include "DD_GRP3D.H"
 #include "UT_MATH.H"
+#include <d3d.h>
 #pragma message(PBGWIN_DD_GRP3D_H)
 
 

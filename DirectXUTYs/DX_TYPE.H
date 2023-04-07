@@ -16,7 +16,6 @@
 
 // ヘッダファイル //
 #include <windows.h>
-#include <d3d.h>
 #include <stdio.h>
 
 

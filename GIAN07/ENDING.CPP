@@ -4,6 +4,7 @@
  */
 
 #include "ENDING.H"
+#include <ddraw.h>
 
 
 typedef struct tagEndingGrpInfo {

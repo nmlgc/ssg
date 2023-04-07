@@ -8,6 +8,7 @@
 #include "CONFIG.H"
 #include "LOADER.H"
 #include "LENS.H"
+#include <ddraw.h>
 
 
 // Packfile loading //

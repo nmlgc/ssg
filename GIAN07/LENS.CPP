@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "LENS.H"
+#include <ddraw.h>
 
 
 

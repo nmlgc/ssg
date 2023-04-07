@@ -138,14 +138,22 @@ public:
 using BITDEPTH = BITDEPTHS::BITDEPTH;
 // ---------- //
 
+// Forward declarations //
+struct IDirectDraw2;
+struct IDirectDrawPalette;
+struct IDirectDrawSurface;
+struct IDirect3D2;
+struct IDirect3DDevice2;
+struct IDirect3DViewport2;
+
 // 構造体 //
 struct GRAPHICS_DDRAW {
-	LPDIRECTDRAW2			DD;			// DirectDraw Object
-	LPDIRECT3D2				D3;			// Direct3D Object
-	LPDIRECT3DDEVICE2		D3Dev;		// Direct3D Device
-	LPDIRECT3DVIEWPORT2		View;		// Direct3D Viewport
+	IDirectDraw2*	DD;	// DirectDraw Object
+	IDirect3D2*	D3;
+	IDirect3DDevice2*	D3Dev;
+	IDirect3DViewport2*	View;
 
-	LPDIRECTDRAWPALETTE		Pal;		// パレット(8Bitのときだけ)
+	IDirectDrawPalette*	Pal;	// パレット(8Bitのときだけ)
 
 	IDirectDrawSurface*	Prim;	// 表画面
 	IDirectDrawSurface*	Back;	// 裏画面
@@ -231,8 +239,8 @@ SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id);	// Surface
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
 
-extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);	// ビット深度によりカラーキーをセットする
-extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds);		// ある Surface を初期化する
+extern BOOL GrpSetColorKey(IDirectDrawSurface* lpds);	// ビット深度によりカラーキーをセットする
+extern void GrpOffsClear(IDirectDrawSurface* lpds);		// ある Surface を初期化する
 
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //

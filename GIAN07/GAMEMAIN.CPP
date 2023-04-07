@@ -8,6 +8,7 @@
 #include "DEMOPLAY.H"
 #include "LENS.H"
 #include "LEVEL.H"
+#include <ddraw.h>
 
 
 extern HWND hWndMain;

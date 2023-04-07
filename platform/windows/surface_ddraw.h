@@ -1,32 +1,15 @@
 /*
  *   2D surfaces via DirectDraw
  *
+ *   Based on GDI surfaces because DirectDraw surfaces need to be both
+ *   initialized and restored via BitBlt().
  */
 
-#include "platform/buffer.h"
-#include "game/surface.h"
+#include "platform/windows/surface_gdi.h"
 
 struct IDirectDrawSurface;
 
-// Only required for the HBITMAP type, which is basically void*.
-#include <windows.h>
-
-struct SURFACE_DDRAW : public SURFACE {
-	SURFACE_DDRAW();
-	SURFACE_DDRAW(const SURFACE_DDRAW&) = delete;
-	SURFACE_DDRAW& operator=(const SURFACE_DDRAW&) = delete;
-	~SURFACE_DDRAW();
-
-	// Source bitmap data, if any. Retained for regeneration of the DirectDraw
-	// surface if gets lost.
-	HBITMAP img = nullptr;
-
-	// Calls Delete() and reinitializes [img] with the contents of [buffer] if
-	// they are a valid .BMP.
-	bool LoadBMP(BYTE_BUFFER_OWNED buffer);
-
-	void Delete();
-
+struct SURFACE_DDRAW : public SURFACE_GDI {
 	IDirectDrawSurface* surf = nullptr;
 	int width;
 	int height;

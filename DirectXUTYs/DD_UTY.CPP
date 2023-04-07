@@ -641,7 +641,7 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 	else             return TRUE;
 }
 
-bool SURFACE_DDRAW::LoadBMP(BYTE_BUFFER_OWNED buffer)
+bool SURFACE_GDI::LoadBMP(BYTE_BUFFER_OWNED buffer)
 {
 	BITMAPFILEHEADER		*BMP_file;
 	BITMAPINFOHEADER		*BMP_info;

@@ -46,44 +46,4 @@ void GrpGrdPolygon(POINT *p, int n);	// グラデーション付きポリゴン(
 void GrpGrdLineEx(int x, int y1, int y2);	// スペアな用グラデーションライン
 
 
-// インライン関数 //
-inline void Set2DPoint(D3DTLVERTEX *tlv, int x, int y)
-{
-	extern BYTE	 Col3D_R,Col3D_G,Col3D_B,Col3D_A;
-
-	memset(tlv,0,sizeof(D3DTLVERTEX));
-
-	tlv->sx       = D3DVAL(x);
-	tlv->sy       = D3DVAL(y);
-	tlv->sz       = D3DVAL(0);
-	tlv->rhw      = D3DVAL(1);
-	tlv->color    = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
-	tlv->specular = RGB_MAKE(0,0,0);
-}
-
-inline void Set2DPointC(D3DTLVERTEX *tlv, int x, int y, D3DCOLOR c)
-{
-	memset(tlv,0,sizeof(D3DTLVERTEX));
-
-	tlv->sx       = D3DVAL(x);
-	tlv->sy       = D3DVAL(y);
-	tlv->sz       = D3DVAL(0);
-	tlv->rhw      = D3DVAL(1);
-	tlv->color    = c;
-	tlv->specular = RGB_MAKE(0,0,0);
-}
-
-inline bool AlphaEnable(bool flag)
-{
-	HRESULT dxret;
-
-	dxret = DxObj.D3Dev->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,flag);
-	if(dxret!=D3D_OK){
-		if(!GrpRestore()) return FALSE;
-	}
-
-	return TRUE;
-}
-
-
 #endif

@@ -78,6 +78,26 @@ void(*GrpBlt)(RECT *src, int x, int y, SURFACE_DDRAW* surf) = STD_GrpBlt;
 
 static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
+// Templating the functor avoids both the need for #including <functional> and
+// any potential runtime exceptions related to the call.
+void DDrawRetryUntilSuccessful(auto action)
+{
+	for(;;) {
+		HRESULT ddrval = action();
+		if(ddrval == DD_OK) {
+			break;
+		}
+		if(ddrval == DDERR_SURFACELOST) {
+			if(!GrpRestore()) {
+				return;
+			}
+		}
+		if(ddrval != DDERR_WASSTILLDRAWING) {
+			break;
+		}
+	}
+}
+
 
 bool GrpEnum(HWND hWnd)
 {
@@ -383,27 +403,9 @@ bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 
 void GrpCls(void)
 {
-	DDBLTFX		ddbltfx;
-	HRESULT		ddrval;
-
-	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
-	ddbltfx.dwSize      = sizeof(ddbltfx);
-	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()) ? RGB256(0,0,0) : 0;
-
-	for(;;){
-		ddrval = DxObj.Back->Blt(NULL,NULL,NULL,DDBLT_COLORFILL,&ddbltfx);
-
-		if(ddrval == DD_OK)
-			break;
-
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-				return;
-		}
-
-		if(ddrval != DDERR_WASSTILLDRAWING)
-			break;
-	}
+	return GrpClsEx(
+		nullptr, ((DxObj.PixelFormat.IsPalettized()) ? RGB256(0, 0, 0) : 0)
+	);
 }
 
 
@@ -411,58 +413,32 @@ void GrpCls(void)
 void GrpClsEx(RECT *Target, DWORD col)
 {
 	DDBLTFX		ddbltfx;
-	HRESULT		ddrval;
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
 	ddbltfx.dwFillColor = col;
-
-	for(;;){
-		ddrval = DxObj.Back->Blt(Target,NULL,NULL,DDBLT_COLORFILL,&ddbltfx);
-
-		if(ddrval == DD_OK)
-			break;
-
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-				return;
-		}
-
-		if(ddrval != DDERR_WASSTILLDRAWING)
-			break;
-	}
+	DDrawRetryUntilSuccessful([&] {
+		return DxObj.Back->Blt(
+			Target, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx
+		);
+	});
 }
 
 
 extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds)
 {
 	DDBLTFX		ddbltfx;
-	HRESULT		ddrval;
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
 	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()) ? RGB256(0,0,0) : 0;
-
-	for(;;){
-		ddrval = lpds->Blt(NULL,NULL,NULL,DDBLT_COLORFILL,&ddbltfx);
-
-		if(ddrval == DD_OK)
-			break;
-
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-				return;
-		}
-
-		if(ddrval != DDERR_WASSTILLDRAWING)
-			break;
-	}
+	DDrawRetryUntilSuccessful([&] {
+		return lpds->Blt(nullptr, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx);
+	});
 }
 
 static void GrpFlipFS(void)
 {
-	HRESULT		ddrval;
-
 	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //
 	if(CaptureFlag && (GetAsyncKeyState(VK_SNAPSHOT)&0x8000))
 		PutSurfaceToBmp(DxObj.Back);
@@ -472,43 +448,20 @@ static void GrpFlipFS(void)
 		DxObj.Back->SetPalette(DxObj.Pal);		// 裏画面にパレットをセットする
 		DxObj.bNeedChgPal = FALSE;
 	}
-
-	for(;;){
-		ddrval = DxObj.Prim->Flip(NULL,0);
-		if(ddrval == DD_OK)
-			break;
-
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-				return;
-		}
-
-		if(ddrval != DDERR_WASSTILLDRAWING)
-			break;
-	}
+	DDrawRetryUntilSuccessful([&] {
+		return DxObj.Prim->Flip(nullptr, 0);
+	});
 }
 
 static void GrpFlipWnd(void)
 {
-	HRESULT		ddrval;
-
 	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //
 	if(CaptureFlag && (GetAsyncKeyState(VK_SNAPSHOT)&0x8000))
 		PutSurfaceToBmp(DxObj.Back);
 
-	for(;;){
-		ddrval = DxObj.Prim->Blt(NULL,DxObj.Back,NULL,0,NULL);
-		if(ddrval == DD_OK)
-			break;
-
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-				return;
-		}
-
-		if(ddrval != DDERR_WASSTILLDRAWING)
-			break;
-	}
+	DDrawRetryUntilSuccessful([&] {
+		return DxObj.Prim->Blt(nullptr, DxObj.Back, nullptr, 0, nullptr);
+	});
 }
 
 bool GrpClip(RECT *src, int *x, int *y)
@@ -544,70 +497,27 @@ bool GrpClip(RECT *src, int *x, int *y)
 
 void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
-	HRESULT		ddrval;
-
-	for(;;){
-		ddrval = DxObj.Back->BltFast(
+	DDrawRetryUntilSuccessful([&] {
+		return DxObj.Back->BltFast(
 			x, y, surf->surf, src, DDBLTFAST_SRCCOLORKEY
 		);
-		if(ddrval == DD_OK){
-			break;
-		}
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-			return;
-		}
-		if(ddrval != DDERR_WASSTILLDRAWING){
-			return;
-		}
-	}
+	});
 }
 
 void GrpBltXC(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
-	HRESULT		ddrval;
-
-	for(;;){
-		ddrval = DxObj.Back->BltFast(
-			x, y, surf->surf, src, DDBLTFAST_NOCOLORKEY
-		);
-		if(ddrval == DD_OK){
-			break;
-		}
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-			return;
-		}
-		if(ddrval != DDERR_WASSTILLDRAWING){
-			return;
-		}
-	}
+	DDrawRetryUntilSuccessful([&] {
+		return DxObj.Back->BltFast(x, y, surf->surf, src, DDBLTFAST_NOCOLORKEY);
+	});
 }
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
 void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
-	HRESULT		ddrval;
-
 	// 完全に範囲外なら何もしない //
 	if(!GrpClip(src,&x,&y)) return;
-
-	for(;;){
-		ddrval = DxObj.Back->BltFast(
-			x, y, surf->surf, src, DDBLTFAST_SRCCOLORKEY
-		);
-		if(ddrval == DD_OK){
-			break;
-		}
-		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
-			return;
-		}
-		if(ddrval != DDERR_WASSTILLDRAWING){
-			return;
-		}
-	}
+	GrpBltX(src, x, y, surf);
 }
 extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 {

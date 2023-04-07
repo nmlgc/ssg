@@ -32,10 +32,6 @@ BOOL CaptureFlag = FALSE;
 void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf);
 
 
-// オフスクリーン Surface を Restore し、ＢＭＰがあれば読み直す //
-static BOOL OffsRestore(SURFACE_DDRAW *surf);
-static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf);
-
 // Ｚバッファを必要なら生成し、接続する //
 static BOOL CreateZbuffer(XD3DENUM *D3De);
 
@@ -294,7 +290,9 @@ bool GrpRestore(void)
 	}
 
 	for(i=0;i<SURFACE_MAX;i++){
-		if(!OffsRestore(&DxSurf[i])) return FALSE;
+		if(!DxObj.SurfaceRestore(DxSurf[i])) {
+			return false;
+		}
 	}
 
 	return RestoreHookFn();
@@ -368,7 +366,7 @@ SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id)
 		DxSurf[surf_id].surf   = temp;
 		DxSurf[surf_id].width  = width;
 		DxSurf[surf_id].height = height;
-		OffsRestore(&DxSurf[surf_id]);	// メモリから再読み込み or ゼロクリア
+		DxObj.SurfaceRestore(DxSurf[surf_id]);
 	}
 
 	return &DxSurf[surf_id];
@@ -378,10 +376,8 @@ bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
-	// 以前に何かがロードされていたら解放する //
-	DxSurf[surf_id].img = std::move(buffer);
-
-	return GrpBMLoadMemory(&DxSurf[surf_id]);
+	auto& surf = DxSurf[surf_id];
+	return (surf.LoadBMP(std::move(buffer)) && DxObj.SurfaceRestore(surf));
 }
 
 void GrpCls(void)
@@ -645,31 +641,16 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 	else             return TRUE;
 }
 
-static BOOL OffsRestore(SURFACE_DDRAW *surf)
+bool SURFACE_DDRAW::LoadBMP(BYTE_BUFFER_OWNED buffer)
 {
-	HRESULT		dxret;
-
-	if(surf->surf){
-		dxret = surf->surf->Restore();
-		if(dxret!=DD_OK) return FALSE;
-
-		if(surf->img) return GrpBMLoadMemory(surf);		// ＢＭＰがロードされている
-	}
-
-	return TRUE;
-}
-
-static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
-{
-	HRESULT					ddrval;
 	BITMAPFILEHEADER		*BMP_file;
 	BITMAPINFOHEADER		*BMP_info;
 
-	if(!surf->img) {
+	if(!buffer) {
 		return false;
 	}
 
-	BMP_file = (BITMAPFILEHEADER *)surf->img.get();
+	BMP_file = (BITMAPFILEHEADER *)buffer.get();
 	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);
 	auto* dib_pal = reinterpret_cast<RGBQUAD *>(BMP_info + 1);
 	const auto* image = (
@@ -688,8 +669,10 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 		dib_pal[0] = { 0, 0, 0 }; // 例外的な処理 //
 	}
 
+	Delete();
+
 	void* hbmp_bits = nullptr;
-	HBITMAP hbmp = CreateDIBSection(
+	img = CreateDIBSection(
 		GetDC(nullptr),
 		reinterpret_cast<const BITMAPINFO *>(BMP_info),
 		DIB_RGB_COLORS,
@@ -697,7 +680,7 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 		nullptr,
 		0
 	);
-	if(!hbmp) {
+	if(!img) {
 		return false;
 	}
 
@@ -712,8 +695,22 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 	);
 	memcpy(hbmp_bits, image, (stride * BMP_info->biHeight));
 
+	return true;
+}
+
+bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
+{
+	HRESULT ddrval;
+
+	if(!surf.surf || !surf.img) {
+		return true;
+	}
+	if(surf.surf->Restore() != DD_OK) {
+		return false;
+	}
+
 	HDC img_dc = CreateCompatibleDC(GetDC(nullptr));
-	SelectObject(img_dc, hbmp);
+	SelectObject(img_dc, surf.img);
 
 	// Set the palette first to ensure that the colors get mapped correctly
 	// when blitting the DIB to the DirectDraw surface.
@@ -741,24 +738,23 @@ static BOOL GrpBMLoadMemory(SURFACE_DDRAW *surf)
 			}
 			DxObj.Prim->SetPalette(DxObj.Pal);
 			DxObj.Back->SetPalette(DxObj.Pal);
-			surf->surf->SetPalette(DxObj.Pal);
+			surf.surf->SetPalette(DxObj.Pal);
 		}
 	}
 
 	// DIB から DC を作成 //
 	HDC ddraw_dc;
-	ddrval = surf->surf->GetDC(&ddraw_dc);
+	ddrval = surf.surf->GetDC(&ddraw_dc);
 	if(ddrval!=DD_OK) return FALSE;
 
-	BitBlt(ddraw_dc, 0, 0, stride, BMP_info->biHeight, img_dc, 0, 0, SRCCOPY);
-	DeleteObject(hbmp);
+	BitBlt(ddraw_dc, 0, 0, surf.width, surf.height, img_dc, 0, 0, SRCCOPY);
 
 	// 後始末 //
-	surf->surf->ReleaseDC(ddraw_dc);
+	surf.surf->ReleaseDC(ddraw_dc);
 	DeleteDC(img_dc);
 
 	// カラーキーをセットする //
-	GrpSetColorKey(surf->surf);
+	GrpSetColorKey(surf.surf);
 
 	DisableAlphaTable();
 

@@ -159,6 +159,9 @@ struct GRAPHICS_DDRAW {
 
 	// TODO: Remove once the loader no longer needs it.
 	std::span<PALETTEENTRY> PaletteForDDraw();
+
+	// Ensures that a DirectDraw surface matches its underlying image.
+	bool SurfaceRestore(SURFACE_DDRAW& surf);
 };
 
 typedef struct tagD3DENUM{

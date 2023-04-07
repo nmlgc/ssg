@@ -73,9 +73,4 @@ IVOID SetLineWork(LINE_WORK *w,int x1,int x2,int dy)
 
 
 
-//// [ 関数 ] ////
-FVOID DrawPolygon(POINT *p,int n);		// ポリゴンの描画
-
-
-
 #endif

@@ -12,9 +12,18 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-struct SURFACE_GDI : public SURFACE {
+class SURFACE_GDI : public SURFACE {
+private:
+	// Required for unselecting [img] prior to deleting it. Could have probably
+	// been `static`, but let's keep it correct for now.
+	HGDIOBJ stock_img;
+
+public:
 	// Source bitmap data, if any.
 	HBITMAP img = nullptr;
+
+	// Always has any valid [img] selected into it.
+	HDC dc;
 
 	SURFACE_GDI();
 	SURFACE_GDI(const SURFACE_GDI&) = delete;

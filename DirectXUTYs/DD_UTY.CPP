@@ -596,7 +596,7 @@ bool SURFACE_GDI::Load(BMP_OWNED bmp)
 
 	void* hbmp_bits = nullptr;
 	img = CreateDIBSection(
-		GetDC(nullptr),
+		dc,
 		reinterpret_cast<const BITMAPINFO *>(&bmp.info),
 		DIB_RGB_COLORS,
 		&hbmp_bits,
@@ -607,6 +607,7 @@ bool SURFACE_GDI::Load(BMP_OWNED bmp)
 		return false;
 	}
 	memcpy(hbmp_bits, bmp.pixels.data(), bmp.pixels.size_bytes());
+	stock_img = SelectObject(dc, img);
 	return true;
 }
 
@@ -621,14 +622,11 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 		return false;
 	}
 
-	HDC img_dc = CreateCompatibleDC(GetDC(nullptr));
-	SelectObject(img_dc, surf.img);
-
 	// Set the palette first to ensure that the colors get mapped correctly
 	// when blitting the DIB to the DirectDraw surface.
 	if(DxObj.PixelFormat.IsPalettized()) {
 		std::array<RGBQUAD, DxObj.Palette.size()> pal;
-		if(GetDIBColorTable(img_dc, 0, pal.size(), pal.data()) == pal.size()) {
+		if(GetDIBColorTable(surf.dc, 0, pal.size(), pal.data()) == pal.size()) {
 			// Convert BGR to RGB...
 			for(size_t i = 0; i < DxObj.Palette.size(); i++) {
 				const auto& bgr = pal[i];
@@ -659,11 +657,10 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	ddrval = surf.surf->GetDC(&ddraw_dc);
 	if(ddrval!=DD_OK) return FALSE;
 
-	BitBlt(ddraw_dc, 0, 0, surf.size.w, surf.size.h, img_dc, 0, 0, SRCCOPY);
+	BitBlt(ddraw_dc, 0, 0, surf.size.w, surf.size.h, surf.dc, 0, 0, SRCCOPY);
 
 	// 後始末 //
 	surf.surf->ReleaseDC(ddraw_dc);
-	DeleteDC(img_dc);
 
 	// カラーキーをセットする //
 	GrpSetColorKey(surf.surf);

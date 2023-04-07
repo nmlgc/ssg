@@ -352,7 +352,7 @@ SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id)
 
 
 	if(surf_id>=SURFACE_MAX) return NULL;
-	if(DxSurf[surf_id].surf) return NULL;
+	RELEASE(DxSurf[surf_id].surf);
 
 	ZEROMEM(ddsd);
 

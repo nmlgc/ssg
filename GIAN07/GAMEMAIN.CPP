@@ -159,7 +159,7 @@ void ScoreDraw(void)
 		gx = (ScoreString[i].x>>6) + 224;
 		gy = (ScoreString[i].y>>6) + 25;
 		if(ScoreString[i].Stage[0] == '7'){
-			SetRect(&src, 288, 88, 288+16, 88+8);
+			src = { 288, 88, (288 + 16), (88 + 8) };
 			GrpBlt(&src, gx, gy-1, GrTama);
 		}
 		else
@@ -362,7 +362,7 @@ void NameRegistProc(void)
 	ScoreDraw();
 
 	// 名前入力用文字列群 //
-	SetRect(&src,0,432,416,480);
+	src = { 0, 432, 416, 480 };
 	GrpBlt(&src,112,420,GrEnemy);
 
 	// カーソル //
@@ -808,8 +808,6 @@ extern void GameRestart(void)
 // ゲームから抜ける //
 extern bool GameExit(bool bNeedChgMusic)
 {
-	RECT	rc;
-
 	GrpCls();
 	GrpFlip();
 
@@ -830,7 +828,7 @@ extern bool GameExit(bool bNeedChgMusic)
 
 	//LoadFace(0,0);
 	MWinForceClose();
-	SetRect(&rc,128+8,400+16  +20  ,640-128-8,480);
+	RECT rc = { (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 };
 	MWinOpen(&rc);
 	//MWinFace(0);
 
@@ -1147,7 +1145,7 @@ void WeaponSelectProc(void)
 	if(IsDraw()){
 		GrpCls();
 
-		SetRect(&rc,0,264-8,224,296-24);
+		rc = { 0, (264 - 8), 224, (296 - 24) };
 		GrpBlt(&rc,320-112,20,GrTama);
 
 		BltSetRect(&rc,0,272,64,24);
@@ -1396,10 +1394,10 @@ void MusicRoomProc(void)
 
 	if(IsDraw()){
 		GrpCls();
-		SetRect(&src,0,0,640,392);
+		src = { 0,   0, 640, 392 };
 		GrpBlt(&src,0,0,GrEnemy);
 
-		SetRect(&src,0,392,640,432);
+		src = { 0, 392, 640, 432 };
 		GrpBlt(&src,8,410,GrEnemy);
 		//GrpDrawSpect(0,480);
 		GrpDrawSpect(352,128);

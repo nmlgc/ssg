@@ -137,7 +137,6 @@ BOOL LoadGraph(int stage)
 {
 	int			i, x, y;
 	HRESULT		ddrval;
-	RECT		src;
 
 //	bIsBombPalette = FALSE;
 
@@ -172,7 +171,7 @@ BOOL LoadGraph(int stage)
 	if(stage==GRAPH_ID_ENDING){
 		const auto in = FilStartR(_PATH("GRAPH2.DAT"));
 
-		SetRect(&src, 0, 0, 320, 240);
+		RECT src = { 0, 0, 320, 240 };
 		for(i=0; i<6; i++){
 			if(!GrpBMPLoadP(in,1+i,SURFACE_ID_MAPCHIP))		return FALSE;
 			GrpGetPalette(EndingGrp[i].pal);
@@ -480,15 +479,15 @@ BOOL LoadStageData(BYTE stage)
 			Anime[39].height = 56;
 			Anime[39].n      = 2;
 			Anime[39].mode   = ANM_NORM;
-			SetRect(Anime[39].ptn+0, 0,424,72  ,480);
-			SetRect(Anime[39].ptn+1,72,424,72*2,480);
+			Anime[39].ptn[0] = {  0, 424,  72     , 480 };
+			Anime[39].ptn[1] = { 72, 424, (72 * 2), 480 };
 
 			// 中ボスヒット //
 			Anime[40].width  = 72;
 			Anime[40].height = 56;
 			Anime[40].n      = 1;
 			Anime[40].mode   = ANM_NORM;
-			SetRect(Anime[40].ptn+0,72*2,424,72*3,480);
+			Anime[40].ptn[0] = { (72 * 2), 424, (72 * 3), 480 };
 
 			// レーザー発射物ヒット //
 			Anime[41].width  = 40;
@@ -514,8 +513,8 @@ BOOL LoadStageData(BYTE stage)
 			Anime[0].height = 56;
 			Anime[0].n      = 2;
 			Anime[0].mode   = ANM_NORM;
-			SetRect(Anime[0].ptn+0, 0,0,72  ,56);
-			SetRect(Anime[0].ptn+1,72,0,72*2,56);
+			Anime[0].ptn[0] = {  0, 0,  72     , 56 };
+			Anime[0].ptn[1] = { 72, 0, (72 * 2), 56 };
 
 			SetAnime32(0,56+ 0,1,16,ANM_DEG);
 			SetAnime32(0,56+32,2,16,ANM_DEG);
@@ -527,22 +526,22 @@ BOOL LoadStageData(BYTE stage)
 			Anime[5].height = 64;
 			Anime[5].n      = 1;
 			Anime[5].mode   = ANM_NORM;
-			SetRect(Anime[5].ptn+0,0,184,72,248);
+			Anime[5].ptn[0] = { 0, 184, 72, 248 };
 
 			// 中ボスフラッシュ用 //
 			Anime[6].width  = 72;
 			Anime[6].height = 56;
 			Anime[6].n      = 2;
 			Anime[6].mode   = ANM_NORM;
-			SetRect(Anime[6].ptn+0,72*2,0,72*3,56);
-			SetRect(Anime[6].ptn+1,72*3,0,72*4,56);
+			Anime[6].ptn[0] = { (72 * 2), 0, (72 * 3), 56 };
+			Anime[6].ptn[1] = { (72 * 3), 0, (72 * 4), 56 };
 
 			// ボスフラッシュ //
 			Anime[7].width  = 72;
 			Anime[7].height = 64;
 			Anime[7].n      = 1;
 			Anime[7].mode   = ANM_NORM;
-			SetRect(Anime[7].ptn+0,72,184,72*2,248);
+			Anime[7].ptn[0] = { 72, 184, (72 * 2), 248 };
 		break;
 
 		case(2):		// Ｓｔａｇｅ２のグラフィック矩形
@@ -556,55 +555,55 @@ BOOL LoadStageData(BYTE stage)
 			Anime[5].height = 48;
 			Anime[5].n      = 1;
 			Anime[5].mode   = ANM_NORM;
-			SetRect(Anime[5].ptn+0,0,160,112,208);
+			Anime[5].ptn[0] = {   0, 160, 112, 208 };
 
 			Anime[6].width  = 64;
 			Anime[6].height = 48;
 			Anime[6].n      = 1;
 			Anime[6].mode   = ANM_NORM;
-			SetRect(Anime[6].ptn+0,112,160,176,208);
+			Anime[6].ptn[0] = { 112, 160, 176, 208 };
 
 			// 中ボス //
 			Anime[7].width  = 64;
 			Anime[7].height = 64;
 			Anime[7].n      = 1;
 			Anime[7].mode   = ANM_NORM;
-			SetRect(Anime[7].ptn+0,0,208,64,272);
+			Anime[7].ptn[0] = {   0, 208,  64, 272 };
 
 			// ボス羽 //
 			Anime[8].width  = 112;
 			Anime[8].height = 48;
 			Anime[8].n      = 1;
 			Anime[8].mode   = ANM_NORM;
-			SetRect(Anime[8].ptn+0,176,160,288,208);
+			Anime[8].ptn[0] = { 176, 160, 288, 208 };
 
 			// ボス丸 //
 			Anime[9].width  = 64;
 			Anime[9].height = 48;
 			Anime[9].n      = 1;
 			Anime[9].mode   = ANM_NORM;
-			SetRect(Anime[9].ptn+0,288,160,352,208);
+			Anime[9].ptn[0] = { 288, 160, 352, 208 };
 
 			// ボスフラッシュ１ //
 			Anime[10].width  = 112;
 			Anime[10].height = 48;
 			Anime[10].n      = 1;
 			Anime[10].mode   = ANM_NORM;
-			SetRect(Anime[10].ptn+0,176,160+48,288,208+48);
+			Anime[10].ptn[0] = { 176, (160 + 48), 288, (208 + 48) };
 
 			// ボスフラッシュ２ //
 			Anime[11].width  = 64;
 			Anime[11].height = 48;
 			Anime[11].n      = 1;
 			Anime[11].mode   = ANM_NORM;
-			SetRect(Anime[11].ptn+0,288,160+48,352,208+48);
+			Anime[11].ptn[0] = { 288, (160 + 48), 352, (208 + 48) };
 
 			// 中ボスフラッシュ //
 			Anime[12].width  = 64;
 			Anime[12].height = 64;
 			Anime[12].n      = 1;
 			Anime[12].mode   = ANM_NORM;
-			SetRect(Anime[12].ptn+0,0+64,208,64+64,272);
+			Anime[12].ptn[0] = { (0 + 64), 208, (64 + 64), 272 };
 
 /*
 			// 羽モノ Left-I //
@@ -612,28 +611,28 @@ BOOL LoadStageData(BYTE stage)
 			Anime[10].height = 72;
 			Anime[10].n      = 1;
 			Anime[10].mode   = ANM_NORM;
-			SetRect(Anime[10].ptn+0,184,208,288,280);
+			Anime[10].ptn[0] = { 184, 208, 288, 280 };
 
 			// 羽モノ Right-I //
 			Anime[11].width  = 104;
 			Anime[11].height = 72;
 			Anime[11].n      = 1;
 			Anime[11].mode   = ANM_NORM;
-			SetRect(Anime[11].ptn+0,288,208,392,280);
+			Anime[11].ptn[0] = { 288, 208, 392, 280 };
 
 			// 羽モノ Left-0 //
 			Anime[12].width  = 88;
 			Anime[12].height = 80;
 			Anime[12].n      = 1;
 			Anime[12].mode   = ANM_NORM;
-			SetRect(Anime[12].ptn+0,200,280,288,360);
+			Anime[12].ptn[0] = { 200, 280, 288, 360 };
 
 			// 羽モノ Right-0 //
 			Anime[13].width  = 88;
 			Anime[13].height = 80;
 			Anime[13].n      = 1;
 			Anime[13].mode   = ANM_NORM;
-			SetRect(Anime[13].ptn+0,288,280,376,360);
+			Anime[13].ptn[0] = { 288, 280, 376, 360 };
 */
 			SetAnimeRect2(Anime+ 14,  0, 288, 159, 479);	// 雲
 			SetAnimeRect2(Anime+ 15,160, 384, 271, 479);	//
@@ -686,14 +685,14 @@ BOOL LoadStageData(BYTE stage)
 			Anime[10].height = 100;
 			Anime[10].n      = 1;
 			Anime[10].mode   = ANM_NORM;
-			SetRect(Anime[10].ptn+0, 444, 292, 640, 392);
+			Anime[10].ptn[0] = { 444, 292, 640, 392 };
 
 			// ボスフラッシュ
 			Anime[9].width  = 128;
 			Anime[9].height = 76;
 			Anime[9].n      = 1;
 			Anime[9].mode   = ANM_NORM;
-			SetRect(Anime[9].ptn+0, 512, 164, 640, 240);
+			Anime[9].ptn[0] = {  512, 164, 640, 240 };
 		/*	Anime[9].width  = 11*16;
 			Anime[9].height =  5*16 + 8;
 			Anime[9].n      = 1;
@@ -715,14 +714,14 @@ BOOL LoadStageData(BYTE stage)
 			Anime[6].height = (480-296);
 			Anime[6].n      = 1;
 			Anime[6].mode   = ANM_NORM;
-			SetRect(Anime[6].ptn+0,304,296,640,480);
+			Anime[6].ptn[0] = { 304, 296, 640, 480 };
 
 			// ボスのフラッシュ //
 			Anime[7].width  = (640-304-32);		// ここに注意
 			Anime[7].height = (480-296);
 			Anime[7].n      = 1;
 			Anime[7].mode   = ANM_NORM;
-			SetRect(Anime[7].ptn+0,0,296,304,480);
+			Anime[7].ptn[0] = {   0, 296, 304, 480 };
 		break;
 
 		case(5):	// ご主人様のステージ
@@ -751,7 +750,7 @@ BOOL LoadStageData(BYTE stage)
 			Anime[9].height = (480-256);
 			Anime[9].n      = 1;
 			Anime[9].mode   = ANM_NORM;
-			SetRect(Anime[9].ptn+0,304,256,640,480);
+			Anime[9].ptn[0] = { 304, 256, 640, 480 };
 		break;
 
 		case(6):
@@ -884,7 +883,7 @@ static void SetAnimeRect2(ANIME_DATA *anm,int x1, int y1, int x2, int y2)
 	anm->n      = 1;
 	anm->mode   = ANM_NORM;
 
-	SetRect(anm->ptn+0, x1, y1, x2, y2);
+	anm->ptn[0] = { x1, y1, x2, y2 };
 }
 
 static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)

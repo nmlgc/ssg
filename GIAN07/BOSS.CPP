@@ -215,18 +215,18 @@ void BossDraw(void)
 					if(t<0) t=0;
 					w = 64;
 					h = 92;
-					SetRect(&wing, 0, 176, 128, 360);
+					wing = {   0, 176, 128, 360 };
 					GrpBlt(&wing, x-w-t, y-h, GrEnemy);
-					SetRect(&wing, 128, 176, 256, 360);
+					wing = { 128, 176, 256, 360 };
 					GrpBlt(&wing, x-w+t, y-h, GrEnemy);
 				break;
 
 				case(BEXST_WING02):
 					w = 44;
 					h = 52;
-					SetRect(&wing, 552, 0, 640, 104);
+					wing = { 552,   0, 640, 104 };
 					GrpBlt(&wing, x-w-50, y-h, GrEnemy);
-					SetRect(&wing, 552, 104, 640, 208);
+					wing = { 552, 104, 640, 208 };
 					GrpBlt(&wing, x-w+50, y-h, GrEnemy);
 				break;
 			}
@@ -369,7 +369,7 @@ void BossHPG_Draw(void)
 		case(BHPG_OPEN1):case(BHPG_CLOSE):
 			// エフェクト付き枠の描画 //
 			for(i=0;i<BOSSHPG_HEIGHT;i++){
-				SetRect(&src,0,104+i,BOSSHPG_WIDTH,104+i+1);
+				src = { 0, (104 + i), BOSSHPG_WIDTH, (104 + i + 1) };
 				GrpBlt(&src,BossHPG.XTemp[i],16+i,GrTama);
 			}
 		break;
@@ -424,7 +424,7 @@ void BossHPG_Draw(void)
 			GrpUnlock();
 
 			// 枠の描画 //
-			SetRect(&src,0,104,BOSSHPG_WIDTH,128);
+			src = { 0, 104, BOSSHPG_WIDTH, 128 };
 			GrpBlt(&src,BOSSHPG_END_X,16,GrTama);
 		break;
 

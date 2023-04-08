@@ -406,7 +406,7 @@ void SEffectDraw(void)
 			case(SEFC_MTITLE3):
 				degx = (BYTE)(64*2 - e->time);
 				for(j=0;j<e->vx;j++){
-					SetRect(&src,j,0,j+1,e->vy);
+					src = { j, 0, (j + 1), e->vy };
 					temp = sinl(degx,100);
 					for(k=0;k<2;k++){
 						GrpBlt(&src,(e->x>>6)+sinl(degx+j/2,temp)+j+k,(e->y>>6)-sinl(degx+j,degx/*40*/),GrMTitle);
@@ -417,7 +417,7 @@ void SEffectDraw(void)
 			case(SEFC_MTITLE1):
 				degx = (BYTE)e->time;
 				for(j=0;j<e->vx;j++){
-					SetRect(&src,j,0,j+1,e->vy);
+					src = { j, 0, (j + 1), e->vy };
 					temp = sinl(degx,160);
 					for(k=0;k<2;k++){
 						GrpBlt(&src,(e->x>>6)+sinl(degx+j/2,temp)+j+k,(e->y>>6)-sinl(degx+j,degx/*40*/),GrMTitle);
@@ -434,7 +434,7 @@ void SEffectDraw(void)
 					GrpBoxA((e->x>>6)+temp-16,(e->y>>6)+j,(X_MAX-16)-temp,(e->y>>6)+j+1);
 				}
 				GrpUnlock();
-				SetRect(&src,0,0,e->vx,e->vy);
+				src = { 0, 0, e->vx, e->vy };
 				GrpBlt(&src,e->x>>6,e->y>>6,GrMTitle);
 			break;
 
@@ -589,7 +589,7 @@ extern void CircleFadeOut(int x, int y, int r)
 	}
 
 	if(r != 0){
-		SetRect(&src,x-r,y-r,x+r,y+r);
+		src = { (x - r), (y - r), (x + r), (y + r) };
 		if(src.left  < X_MIN) src.left  = X_MIN;
 		if(src.right < X_MIN) src.right = X_MIN;
 		if(src.left  > X_MAX) src.left  = X_MAX;
@@ -688,17 +688,17 @@ void ObjectLockDraw(void)
 	for(i=0;i<LOCKON_MAX;i++){
 		l = LockInfo + i;
 		if(l->state!=LOCKON_NONE){
-			SetRect(&temp,208,80,272,96);
+			temp = { 208, 80, 272, 96 };
 			GrpBlt(&temp,((*(l->x))>>6)-8,((*(l->y))>>6)-8,GrTama);
 
-			SetRect(&temp,280,88,288,96);
+			temp = { 280, 88, 288, 96 };
 			GrpBlt(&temp,((*(l->x)-l->width)>>6)-4,((*(l->y)-l->height)>>6)-4,GrTama);
-			SetRect(&temp,272,80,280,88);
+			temp = { 272, 80, 280, 88 };
 			GrpBlt(&temp,((*(l->x)+l->width)>>6)-4,((*(l->y)+l->height)>>6)-4,GrTama);
 
-			SetRect(&temp,280,80,288,88);
+			temp = { 280, 80, 288, 88 };
 			GrpBlt(&temp,((*(l->x)-l->width)>>6)-4,((*(l->y)+l->height)>>6)-4,GrTama);
-			SetRect(&temp,272,88,280,96);
+			temp = { 272, 88, 280, 96 };
 			GrpBlt(&temp,((*(l->x)+l->width)>>6)-4,((*(l->y)-l->height)>>6)-4,GrTama);
 		}
 	}

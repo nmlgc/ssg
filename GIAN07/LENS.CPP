@@ -145,9 +145,9 @@ LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, GRP Surface)
 // GrpLock() 系関数 : レンズボールを描画する //
 extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 {
-	RECT	src;
-
-	SetRect(&src, x-LInfo->r, y-LInfo->r, x+LInfo->r, y+LInfo->r);
+	RECT src = {
+		(x - LInfo->r), (y - LInfo->r), (x + LInfo->r), (y + LInfo->r)
+	};
 	for(;;){
 		auto ddrval = LInfo->gTemp->BltFast(0, 0,DxObj.Back,&src,DDBLTFAST_NOCOLORKEY);
 		if(ddrval == DD_OK){

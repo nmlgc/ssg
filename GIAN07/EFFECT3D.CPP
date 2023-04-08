@@ -685,7 +685,7 @@ void DrawEffectFakeECL(void)
 		GrpBlt(&src, FakeECLStr[i].x>>6, FakeECLStr[i].y>>6, GrMap);
 	}
 
-	SetRect(&src, 0, 272, 416, 352);
+	src = { 0, 272, 416, 352 };
 	GrpBlt(&src, 128, 400, GrMap);
 }
 
@@ -1079,7 +1079,7 @@ void DrawStg6Raster()
 	int		x1, x2, dx, oy;
 
 	for(i=0; i<S6STAR_MAX; i++){
-		SetRect(&src, 624, 352, 624+16, 352+16);
+		src = { 624, 352, (624 + 16), (352 + 16) };
 		GrpBlt(&src, S6Star[i].x, S6Star[i].y, GrMap);
 	}
 
@@ -1091,7 +1091,7 @@ void DrawStg6Raster()
 		w  = (x2 - x1)/2;
 		for(j=0; j<h; j+=2){
 			dx = sinl(S6Ras[i].deg + j, S6Ras[i].amp);
-			SetRect(&src, x1, j+oy, x2, j+2);
+			src = { x1, (j + oy), x2, (j + 2) };
 			GrpBlt(&src, S6Ras[i].x+dx-w, S6Ras[i].y+j, GrMap);
 		}
 	}
@@ -1132,10 +1132,9 @@ void MoveStg3Star()
 void DrawStg3Star()
 {
 	int		i;
-	RECT	src;
 
 	for(i=0; i<S3STAR_MAX; i++){
-		SetRect(&src, 640-16, 0, 640, 16);
+		RECT src = { (640 - 16), 0, 640, 16 };
 		GrpBlt(&src, S6Star[i].x, S6Star[i].y, GrMap);
 	}
 }

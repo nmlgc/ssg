@@ -420,19 +420,19 @@ static void DrawWindowFrame(int x,int y,int w,int h)
 	h = h >> 1;
 
 	// 左上 //
-	SetRect(&src,0,0,w,h);
+	src = { 0, 0, w, h };
 	GrpBlt(&src,x,y,GrTama);
 
 	// 右上 //
-	SetRect(&src,384-w,0,384,h);
+	src = { (384 - w), 0, 384, h };
 	GrpBlt(&src,x+w,y,GrTama);
 
 	// 左下 //
-	SetRect(&src,0,80-h,w,80);
+	src = { 0, (80 - h), w, 80 };
 	GrpBlt(&src,x,y+h,GrTama);
 
 	// 右下 //
-	SetRect(&src,384-w,80-h,384,80);
+	src = { (384 - w), (80 - h), 384, 80 };
 	GrpBlt(&src,x+w,y+h,GrTama);
 }
 

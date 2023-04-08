@@ -142,8 +142,11 @@ static void enemy_set(void)
 	BOOL		CtrlFlag = FALSE;
 
 	// ウィンドウの表示位置を設定する //
-	if(ConfigDat.GraphFlags&GRPF_WINDOW_UPPER)	SetRect(&MWinRect,128,16,640-128,96);
-	else										SetRect(&MWinRect,128,400,640-128,480);
+	if(ConfigDat.GraphFlags & GRPF_WINDOW_UPPER) {
+		MWinRect = { 128,  16, (640 - 128),  96 };
+	} else {
+		MWinRect = { 128, 400, (640 - 128), 480 };
+	}
 
 	while(bFlag){
 		cmd = SCL_Now;
@@ -772,13 +775,12 @@ static void ScrollCmdStg3Boss(void)
 static void Stg3BossMapDraw(void)
 {
 	int		x,y;
-	RECT	src;
 
 	x = X_MIN;
 	y = Y_MIN - ScrollInfo.ExCount;
 
 	for(; y<Y_MAX; y+=208){
-		SetRect(&src, 0, 272, (640-256), 272+208);
+		RECT src = { 0, 272, (640 - 256), (272 + 208) };
 		GrpBlt(&src,x,y,GrMap);
 	}
 
@@ -897,6 +899,6 @@ static void InitMapChipRect(void)
 	for(i=0;i<1200;i++){
 		x = (i%(640/16))<<4;		// マップエディタと同様の演算式
 		y = (i/(640/16))<<4;		// マップエディタと同様の演算式
-		SetRect(&rcMapChip[i],x,y,x+16,y+16);
+		rcMapChip[i] = { x, y, (x + 16), (y + 16) };
 	}
 }

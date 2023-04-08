@@ -68,15 +68,13 @@ static void __BackSurfUnlock(void)
 
 
 // 半径:r  出っ張り:m  のレンズを作成 //
-extern LensInfo *GrpCreateLensBall(int r, int m, GRP Surface)
+LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, GRP Surface)
 {
 	LensInfo	*NewLens;
 	DWORD		*Table;
 	DWORD		DataSize;
-	DWORD		Diameter;
 	DWORD		Pitch;
-	int			s,dx,z,r2,w;
-	int			i;
+	int	dx,z,w;
 
 	// Since the surface pitch can be different than its with, [Table] will
 	// still contain byte offsets, regardless of our main pixel format.
@@ -92,7 +90,7 @@ extern LensInfo *GrpCreateLensBall(int r, int m, GRP Surface)
 		return NULL;
 	}
 
-	Diameter = r * 2;
+	const auto Diameter = (int32_t{ r } * 2);
 	DataSize = sizeof(DWORD) * Diameter * Diameter;
 	NewLens->Data = (DWORD *)LocalAlloc(LPTR, DataSize);
 	if(NewLens->Data == NULL){
@@ -110,10 +108,10 @@ extern LensInfo *GrpCreateLensBall(int r, int m, GRP Surface)
 	Pitch = NewLens->gPitch;
 
 	Table = NewLens->Data;
-	r2    = (r * r);
-	s     = isqrt(r2 - (m * m));
+	const auto r2 = (int32_t{ r } * r);
+	const auto s = isqrt(r2 - (int32_t{ m } * m));
 
-	for(i=-r; i<r; i++){
+	for(auto i = -int32_t{ r }; i < r; i++){
 		// ｘ座標の測定だ //
 		dx = (s * s) - (i * i);
 

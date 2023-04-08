@@ -15,8 +15,8 @@
 
 // レンズデータ定義用構造体 //
 typedef struct tagLensInfo {
-	DWORD		r;			// レンズの半径
-	DWORD		Height;		// レンズの直径
+	uint16_t	r;	// レンズの半径
+	uint16_t	Height;	// レンズの直径
 	DWORD		*Data;		// レンズ置換テーブル
 
 	GRP			gTemp;		// データ一時待避用Surface(できればSysMemory)
@@ -31,7 +31,7 @@ extern LensInfo *Lens;
 ///// [ 関数 ] /////
 
 // 半径:r  出っ張り:m  のレンズを作成 //
-extern LensInfo *GrpCreateLensBall(int r, int m, GRP id);
+LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, GRP id);
 
 // GrpLock() 系関数 : レンズボールを描画する //
 extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y);

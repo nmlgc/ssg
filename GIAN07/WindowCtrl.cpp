@@ -300,8 +300,8 @@ static BOOL DifFnMsgDisplay(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(DebugDat.MsgDisplay) DebugDat.MsgDisplay = FALSE;
-			else                    DebugDat.MsgDisplay = TRUE;
+			if(DebugDat.MsgDisplay) DebugDat.MsgDisplay = false;
+			else                    DebugDat.MsgDisplay = true;
 		break;
 	}
 
@@ -322,8 +322,8 @@ static BOOL DifFnHit(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(DebugDat.Hit) DebugDat.Hit = FALSE;
-			else             DebugDat.Hit = TRUE;
+			if(DebugDat.Hit) DebugDat.Hit = false;
+			else             DebugDat.Hit = true;
 		break;
 	}
 
@@ -339,8 +339,8 @@ static BOOL DifFnDemo(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(DebugDat.DemoSave) DebugDat.DemoSave = FALSE;
-			else                  DebugDat.DemoSave = TRUE;
+			if(DebugDat.DemoSave) DebugDat.DemoSave = false;
+			else                  DebugDat.DemoSave = true;
 		break;
 	}
 
@@ -366,7 +366,9 @@ static BOOL GrpFnChgDevice(WORD key)
 			if(DxEnumNow<=1) break;
 
 			// 次のデバイスへ //
-			auto device_id_new = (ConfigDat.DeviceID + (BYTE)DxEnumNow + flag) % (BYTE)DxEnumNow;
+			auto device_id_new = (
+				(ConfigDat.DeviceID + DxEnumNow + flag) % DxEnumNow
+			);
 			auto& pXDD = DxEnum[device_id_new];
 
 			// Change bit depth to a supported one, if necessary //

@@ -45,9 +45,9 @@ static void DebugInit(void)
 {
 	const auto maybe_loaded = FileLoad<DEBUG_DATA>(DBG_FN);
 	if(!maybe_loaded) {
-		DebugDat.Hit        = TRUE;
-		DebugDat.MsgDisplay = TRUE;
-		DebugDat.DemoSave   = FALSE;
+		DebugDat.Hit        = true;
+		DebugDat.MsgDisplay = true;
+		DebugDat.DemoSave   = false;
 		DebugDat.StgSelect  = 1;
 	} else {
 		DebugDat = maybe_loaded.value();

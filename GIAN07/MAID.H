@@ -58,8 +58,8 @@ typedef struct
 
 	BYTE weapon;		// "とげ" の種類
 	BYTE exp;			// サボテンの経験値？
-	BYTE bomb;			// ボムの数
-	BYTE left;			// 残りサボテン数
+	uint8_t bomb;	// ボムの数
+	uint8_t left;	// 残りサボテン数
 	BYTE credit;		// のこりクレジット
 
 	BYTE GrpID;			// 表示すべきグラフィック

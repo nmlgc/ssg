@@ -135,7 +135,7 @@ typedef struct tagHIGH_SCORE{
 //extern HIGH_SCORE	*HighScore;
 //extern char			ScoreTable[8][80];
 extern DWORD		GameCount;
-extern BYTE			GameStage;
+extern uint8_t	GameStage;
 
 
 #ifdef PBG_DEBUG

@@ -13,7 +13,7 @@
 //HIGH_SCORE		*HighScore;
 //char			ScoreTable[8][80];
 DWORD			GameCount;
-BYTE			GameStage;
+uint8_t	GameStage;
 
 
 

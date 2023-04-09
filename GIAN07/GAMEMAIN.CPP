@@ -20,7 +20,7 @@ DWORD		DemoTimer  = 0;
 BYTE		WeaponKeyWait = 0;
 DWORD		GameOverTimer = 0;
 
-BYTE TempGameLevel = 0;
+decltype(CONFIG_DATA::GameLevel) TempGameLevel = 0;
 
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
 BYTE			CurrentRank;	// ネームレジスト用順位データ

@@ -90,7 +90,6 @@ extern CONFIG_DATA ConfigDat;
 
 ///// [関数] /////
 
-// Bit depths can only be validated if we have a graphics adapter.
-extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum);
+extern void ConfigLoad();
 
 extern void ConfigSave(void);	// コンフィグの内容を保存する

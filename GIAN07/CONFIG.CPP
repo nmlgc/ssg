@@ -56,14 +56,11 @@ static void DebugInit(void)
 #endif
 
 // コンフィグの内容を初期化する //
-extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
+extern void ConfigLoad()
 {
 #ifdef PBG_DEBUG
 	DebugInit();
 #endif
-	if(dxenum.size() == 0) {
-		return;
-	}
 
 	// Default settings
 	ConfigDat = {
@@ -73,11 +70,7 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 		.BombStock   = 2,
 
 		// グラフィック関連 //
-		// The fact that the default bit depth is hardware-dependent is most of
-		// the reason why we initialize this here rather than using default
-		// initializers within the struct itself.
 		.DeviceID   = 0,
-		.BitDepth   = dxenum[0].BitDepthBest(),
 		.FPSDivisor = 1, // 60Fps Mode
 		.GraphFlags = 0,
 
@@ -112,9 +105,9 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 		return;
 	};
 
-	if(loaded.DeviceID.v < dxenum.size()) {
-		ConfigDat.DeviceID = loaded.DeviceID;
-	}
+	// These are validated by their respective subsystems.
+	ConfigDat.DeviceID = loaded.DeviceID;
+	ConfigDat.BitDepth = loaded.BitDepth;
 
 	// Quirk: Off by 2 and 1, respectively?!
 	if(loaded.PlayerStock.v <= (STOCK_PLAYER_MAX + 2)) {
@@ -122,10 +115,6 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 	}
 	if(loaded.BombStock.v <= (STOCK_BOMB_MAX + 1)) {
 		ConfigDat.BombStock = loaded.BombStock;
-	}
-
-	if(dxenum[loaded.DeviceID.v].BitDepthSupported(loaded.BitDepth.v)) {
-		ConfigDat.BitDepth = loaded.BitDepth;
 	}
 
 	if(loaded.FPSDivisor.v <= FPS_DIVISOR_MAX) {

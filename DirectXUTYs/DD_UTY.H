@@ -60,6 +60,10 @@ struct PIXELFORMAT : public std::variant<uint8_t, uint16_t, uint32_t> {
 	bool IsChanneled() const {
 		return !IsPalettized();
 	}
+
+	std::strong_ordering operator <=>(const PIXELFORMAT& other) const {
+		return (index() <=> other.index());
+	}
 };
 
 class BITDEPTHS {
@@ -166,6 +170,7 @@ struct GRAPHICS_DDRAW {
 	PIXELFORMAT PixelFormat;
 	HWND					hWnd;			// ウィンドウハンドル
 	BOOL					bNeedChgPal;	// パレットを変更する必要があるか
+	std::optional<uint8_t>	DeviceID;
 
 	// TODO: Remove once the loader no longer needs it.
 	std::span<PALETTEENTRY> PaletteForDDraw();
@@ -226,7 +231,11 @@ extern DWORD		DxEnumNow;
 
 // 初期化など //
 bool GrpEnum(HWND hWnd);	// 使用できるデバイスを列挙する
-bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth);
+
+// Will mutate the two parameters and replace them with a supported
+// configuration if necessary.
+bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth);
+
 void GrpCleanup(void);	// いつも通りに(ただし失敗したら異常終了)
 void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
 bool GrpRestore(void);	// ロード済みのSurfaceを修復

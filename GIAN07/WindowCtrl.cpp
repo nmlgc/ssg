@@ -373,22 +373,13 @@ static BOOL GrpFnChgDevice(WORD key)
 			uint8_t device_id_new = (
 				(ConfigDat.DeviceID.v + DxEnumNow + flag) % DxEnumNow
 			);
-			auto& pXDD = DxEnum[device_id_new];
-
-			// Change bit depth to a supported one, if necessary //
-			if(!pXDD.BitDepthSupported(ConfigDat.BitDepth.v)) {
-				auto bitdepth_new = pXDD.BitDepthBest();
-				if(!bitdepth_new) {
-					break;
-				}
-				ConfigDat.BitDepth.v = bitdepth_new;
-			}
-			ConfigDat.DeviceID.v = device_id_new;
 
 			// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
-			GrpInit(pXDD.lpDDGuid, pXDD.D3D, ConfigDat.BitDepth.v);
-			InitSurface();
-			//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
+			if(GrpInit(device_id_new, ConfigDat.BitDepth.v)) {
+				ConfigDat.DeviceID.v = device_id_new;
+				InitSurface();
+				//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
+			}
 		break;
 	}
 
@@ -409,20 +400,17 @@ static BOOL GrpFnBpp(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT): {
-			auto& pXDD = DxEnum[ConfigDat.DeviceID.v];
 			auto bitdepth_new = ConfigDat.BitDepth.v.cycle(key == KEY_LEFT);
-			if(!pXDD.BitDepthSupported(bitdepth_new)) {
-				break;
-			}
-			ConfigDat.BitDepth.v = bitdepth_new;
 
 			// この部分に本当ならエラーチェックが必要 //
-			GrpInit(pXDD.lpDDGuid, pXDD.D3D, ConfigDat.BitDepth.v);
-			InitSurface();
-			//GrpSetPalette(DxObj.pe);
-			LoadPaletteFrom(GrEnemy);
+			if(GrpInit(ConfigDat.DeviceID.v, bitdepth_new)) {
+				ConfigDat.BitDepth.v = bitdepth_new;
+				InitSurface();
+				//GrpSetPalette(DxObj.pe);
+				LoadPaletteFrom(GrEnemy);
 
-			//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
+				//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
+			}
 		break;
 		}
 	}

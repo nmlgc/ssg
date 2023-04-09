@@ -34,7 +34,7 @@ void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf);
 
 
 // Ｚバッファを必要なら生成し、接続する //
-static BOOL CreateZbuffer(XD3DENUM *D3De);
+static bool CreateZbuffer(const XD3DENUM& D3De);
 
 // 列挙用コールバック関数群 //
 static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDName,LPVOID lpContext);
@@ -128,7 +128,7 @@ bool GrpEnum(HWND hWnd)
 	return TRUE;
 }
 
-bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth)
+bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 {
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
@@ -139,18 +139,37 @@ bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth)
 
 	if(DxObj.hWnd==NULL) return FALSE;
 
+	if(device_id >= DxEnumNow) {
+		device_id = 0;
+	}
+	auto& pXDD = DxEnum[device_id];
+
+	// Change bit depth to a supported one, if necessary //
+	if(!pXDD.BitDepthSupported(bitdepth)) {
+		bitdepth = pXDD.BitDepthBest();
+		if(!bitdepth) {
+			// TODO: Check other devices.
+			return false;
+		}
+	}
+
 	const auto maybe_pixel_format = bitdepth.pixel_format();
 	if(!maybe_pixel_format) {
 		return false;
 	}
 	const auto pixel_format = maybe_pixel_format.value();
 
+	// Already running with this configuration? //
+	if((device_id == DxObj.DeviceID) && (pixel_format == DxObj.PixelFormat)) {
+		return false;
+	}
+
 	GrpCleanup();
 	ZEROMEM(ddsd);
 	ZEROMEM(ddscaps);
 
 	try{
-		dxret = DirectDrawCreate(DDG,&lpDD,NULL);
+		dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
 		if(dxret!=DD_OK) throw("DirectDrawCreate に失敗");
 
 		dxret = lpDD->QueryInterface(IID_IDirectDraw2,(void **)&DxObj.DD);
@@ -182,6 +201,7 @@ bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth)
 		GrpFlip = GrpFlipFS;
 
 		// 2Dの初期化はここでおしまい //
+		DxObj.DeviceID = device_id;
 		DxObj.PixelFormat = pixel_format;
 		if(DxObj.PixelFormat.IsPalettized()) throw(TRUE);
 
@@ -190,12 +210,14 @@ bool GrpInit(LPGUID DDG, XD3DENUM *D3De, BITDEPTH bitdepth)
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 
 		// Direct3D Device の作成 //
-		dxret = DxObj.D3->CreateDevice(*D3De->lpGuid,DxObj.Back,&DxObj.D3Dev);
+		dxret = DxObj.D3->CreateDevice(
+			*pXDD.D3D[0].lpGuid, DxObj.Back, &DxObj.D3Dev
+		);
 		//dxret = DxObj.D3->CreateDevice(IID_IDirect3DHALDevice,DxObj.Back,&DxObj.D3Dev);
 		if(dxret!=D3D_OK) throw("CreateDevice(D3D_Device) に失敗");
 
 		// Ｚバッファ作成＆接続 //
-		if(!CreateZbuffer(D3De))
+		if(!CreateZbuffer(pXDD.D3D[0]))
 			throw("CreateSurface(Z-Buffer) に失敗");
 
 		// Direct3D Viewport の作成＆接続 //
@@ -651,23 +673,25 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	return TRUE;
 }
 
-static BOOL CreateZbuffer(XD3DENUM *D3De)
+static bool CreateZbuffer(const XD3DENUM& D3De)
 {
 	HRESULT				dxret;
 	DDSURFACEDESC		ddsd;
 	DWORD				mem_flag;
 
 	// Ｚバッファが必要ない場合 //
-	if(D3De->Zbuf==0) return TRUE;
+	if(D3De.Zbuf==0) {
+		return true;
+	}
 
 	ZEROMEM(ddsd);
 
-	mem_flag = D3De->bIsHW ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY;
+	mem_flag = (D3De.bIsHW ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY);
 	ddsd.dwSize = sizeof(ddsd);
 	ddsd.dwFlags = DDSD_WIDTH|DDSD_HEIGHT|DDSD_CAPS|DDSD_ZBUFFERBITDEPTH;
 	ddsd.dwWidth = 640;
 	ddsd.dwHeight = 480;
-	ddsd.dwZBufferBitDepth = D3De->Zbuf;
+	ddsd.dwZBufferBitDepth = D3De.Zbuf;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_ZBUFFER|mem_flag;
 	dxret = DxObj.DD->CreateSurface(&ddsd,&DxObj.Zbuf,NULL);
 	if(dxret!=D3D_OK) return FALSE;

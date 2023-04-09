@@ -207,6 +207,9 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 
 	DebugSetup();
 
+	// コンフィグをロードする //
+	ConfigLoad();
+
 	// キーボード(JoyPad)入力を受け付ける //
 	Key_Start(hInstance,hWndMain);
 
@@ -237,19 +240,13 @@ static void AppCleanup(void)
 
 BOOL XInit(void)
 {
-	XDDRAWENUM		*pXDD;
-
-	// コンフィグをロードする //
-	ConfigLoad({ DxEnum, DxEnumNow });
-
 	Key_PadConfig2(ConfigDat.PadTama.v,   KEY_TAMA);
 	Key_PadConfig2(ConfigDat.PadBomb.v,   KEY_BOMB);
 	Key_PadConfig2(ConfigDat.PadShift.v,  KEY_SHIFT);
 	Key_PadConfig2(ConfigDat.PadCancel.v, KEY_ESC);
 
 	// グラフィックの初期化 //
-	pXDD = &DxEnum[ConfigDat.DeviceID.v];
-	if(!GrpInit(pXDD->lpDDGuid, pXDD->D3D, ConfigDat.BitDepth.v)) {
+	if(!GrpInit(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
 		return false;
 	}
 	InitSurface();

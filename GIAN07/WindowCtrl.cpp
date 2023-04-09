@@ -764,80 +764,37 @@ static BOOL ContinueFnNo(WORD key)
 	}
 }
 
-static BOOL InpFnKeyTama(WORD key)
+static bool InpFnKey(uint8_t& config_pad, WORD pad_config_key, WORD key)
 {
-	int		temp;
-
 	key &= (~Pad_Data);
-	temp = Key_PadConfig(KEY_TAMA);
-	if(temp>=0) ConfigDat.PadTama = temp;
+	const auto temp = Key_PadConfig(pad_config_key);
+	if(temp >= 0) {
+		config_pad = temp;
+	}
 
 	SetIKeyItem();
 
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-		return FALSE;
+	return ((key != KEY_RETURN) && (key != KEY_TAMA));
+}
 
-		default:
-		return TRUE;
-	}
+static BOOL InpFnKeyTama(WORD key)
+{
+	return InpFnKey(ConfigDat.PadTama, KEY_TAMA, key);
 }
 
 static BOOL InpFnKeyBomb(WORD key)
 {
-	int		temp;
-
-	key &= (~Pad_Data);
-	temp = Key_PadConfig(KEY_BOMB);
-	if(temp>=0) ConfigDat.PadBomb = temp;
-
-	SetIKeyItem();
-
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-		return FALSE;
-
-		default:
-		return TRUE;
-	}
+	return InpFnKey(ConfigDat.PadBomb, KEY_BOMB, key);
 }
 
 static BOOL InpFnKeyShift(WORD key)
 {
-	int		temp;
-
-	key &= (~Pad_Data);
-	temp = Key_PadConfig(KEY_SHIFT);
-	if(temp>=0) ConfigDat.PadShift = temp;
-
-	SetIKeyItem();
-
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-		return FALSE;
-
-		default:
-		return TRUE;
-	}
+	return InpFnKey(ConfigDat.PadShift, KEY_SHIFT, key);
 }
 
 static BOOL InpFnKeyCancel(WORD key)
 {
-	int		temp;
-
-	key &= (~Pad_Data);
-	temp = Key_PadConfig(KEY_ESC);
-	if(temp>=0) ConfigDat.PadCancel = temp;
-
-	SetIKeyItem();
-
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-		return FALSE;
-
-		default:
-		return TRUE;
-	}
+	return InpFnKey(ConfigDat.PadCancel, KEY_ESC, key);
 }
 
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "LEVEL.H"
 #include "DirectXUTYs/DD_UTY.H"
 
 // フラグ //
@@ -42,33 +43,40 @@ template <typename T> struct CONFIG_OPTION_VALUE {
 typedef struct tagCONFIG_DATA{
 	template <typename T> using OPTION = CONFIG_OPTION_VALUE<T>;
 
-	OPTION<uint8_t> GameLevel;	// 難易度
-	OPTION<uint8_t> PlayerStock;	// 初期メイド数？
-	OPTION<uint8_t> BombStock;	// 初期ボム数
+	// 難易度関連 //
+	OPTION<uint8_t> GameLevel = { GAME_NORMAL };	// 難易度
+	OPTION<uint8_t> PlayerStock = { 2 };	// 初期メイド数？
+	OPTION<uint8_t> BombStock = { 2 };	// 初期ボム数
 
-	OPTION<uint8_t> DeviceID;	// 何番目のデバイスか
+	// グラフィック関連 //
+	OPTION<uint8_t> DeviceID = { 0 };	// 何番目のデバイスか
 	OPTION<BITDEPTH> BitDepth;	// ビット深度
 
 	// Target frame rate = 60 / [FPSDivisor]. 0 disables any frame rate
 	// limitation.
-	OPTION<uint8_t> FPSDivisor;
+	OPTION<uint8_t> FPSDivisor = { 1 }; // 60Fps Mode
 
-	OPTION<uint8_t> GraphFlags;	// グラフィックに関するフラグ
-	OPTION<uint8_t> SoundFlags;	// サウンド・ＭＩＤＩ関連のフラグ
-	OPTION<uint8_t> InputFlags;	// 入力に関するフラグ
+	OPTION<uint8_t> GraphFlags = { 0 };	// グラフィックに関するフラグ
 
-	OPTION<uint8_t> DebugFlags;	// デバッグに関するフラグ
+	// サウンド・ＭＩＤＩ関連 //
+	OPTION<uint8_t> SoundFlags = { (SNDF_WAVE_ENABLE | SNDF_MIDI_ENABLE) };
 
-	OPTION<uint8_t> PadTama;
-	OPTION<uint8_t> PadBomb;
-	OPTION<uint8_t> PadShift;
-	OPTION<uint8_t> PadCancel;
+	// 入力に関するフラグ
+	OPTION<uint8_t> InputFlags = { INPF_Z_MSKIP_ENABLE };
 
-	OPTION<uint8_t> ExtraStgFlags;	// エキストラステージ判定用フラグ
+	OPTION<uint8_t> DebugFlags = { 0 };	// デバッグに関するフラグ
+
+	OPTION<uint8_t> PadTama = { 1 };
+	OPTION<uint8_t> PadBomb = { 2 };
+	OPTION<uint8_t> PadShift = { 0 };
+	OPTION<uint8_t> PadCancel = { 0 };
+
+	// エキストラステージ判定用フラグ
+	OPTION<uint8_t> ExtraStgFlags = { 0 };
 	uint32_t CheckSum;
 
 	// ワケ有りでここにいるのです(チェックサムの範囲外)
-	OPTION<uint8_t> StageSelect;
+	OPTION<uint8_t> StageSelect = { 0 };
 
 	uint32_t CheckSumCalculate() const;
 } CONFIG_DATA;

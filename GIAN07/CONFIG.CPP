@@ -7,7 +7,6 @@
 
 #include "platform/file.h"
 #include "CONFIG.H"
-#include "LEVEL.H"
 
 ///// Constants /////
 constexpr auto CFG_FN = _PATH("秋霜CFG.DAT");
@@ -61,39 +60,6 @@ extern void ConfigLoad()
 #ifdef PBG_DEBUG
 	DebugInit();
 #endif
-
-	// Default settings
-	ConfigDat = {
-		// 難易度関連 //
-		.GameLevel   = GAME_NORMAL,
-		.PlayerStock = 2,
-		.BombStock   = 2,
-
-		// グラフィック関連 //
-		.DeviceID   = 0,
-		.FPSDivisor = 1, // 60Fps Mode
-		.GraphFlags = 0,
-
-		// サウンド・ＭＩＤＩ関連 //
-		.SoundFlags = (SNDF_WAVE_ENABLE | SNDF_MIDI_ENABLE),
-
-		// 入力関連 //
-		.InputFlags = INPF_Z_MSKIP_ENABLE,
-
-		// デバッグ関連 //
-		.DebugFlags = 0,
-
-		// パッド関連 //
-		.PadTama   = 1,
-		.PadBomb   = 2,
-		.PadShift  = 0,
-		.PadCancel = 0,
-
-		.ExtraStgFlags = 0,
-
-		// その他 //
-		.StageSelect = 0,
-	};
 
 	const auto maybe_loaded = FileLoad<CONFIG_DATA>(CFG_FN);
 	if(!maybe_loaded) {

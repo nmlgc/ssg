@@ -56,16 +56,16 @@ bool DemoplayLoadSetup()
 	ConfigTemp = ConfigDat;
 
 	// そのときのコンフィグを転送 //
-	ConfigDat.BombStock   = DemoInfo.CfgDat.BombStock;
-	ConfigDat.GameLevel   = DemoInfo.CfgDat.GameLevel;
-	ConfigDat.PlayerStock = DemoInfo.CfgDat.PlayerStock;
-	ConfigDat.InputFlags  = DemoInfo.CfgDat.InputFlags;
+	ConfigDat.BombStock.v   = DemoInfo.CfgDat.BombStock;
+	ConfigDat.GameLevel.v   = DemoInfo.CfgDat.GameLevel;
+	ConfigDat.PlayerStock.v = DemoInfo.CfgDat.PlayerStock;
+	ConfigDat.InputFlags.v  = DemoInfo.CfgDat.InputFlags;
 
 	// 本体の性能記述 //
 	Viv.exp    = DemoInfo.Exp;
 	Viv.weapon = DemoInfo.Weapon;
-	Viv.left   = ConfigDat.PlayerStock;
-	Viv.bomb   = ConfigDat.BombStock;
+	Viv.left   = ConfigDat.PlayerStock.v;
+	Viv.bomb   = ConfigDat.BombStock.v;
 
 	// 乱数の初期化 //
 	// 最後に乱数もそろえる //

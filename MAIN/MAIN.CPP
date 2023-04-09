@@ -66,7 +66,7 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 		else if(bIsActive){
 			// １フレーム進める //
 			tempdw = timeGetTime();
-			if(tempdw-WaitTime>=16 || ConfigDat.FPSDivisor==0){
+			if(((tempdw - WaitTime) >= 16) || (ConfigDat.FPSDivisor.v == 0)) {
 				GameMain();
 				WaitTime = tempdw;
 			}
@@ -242,33 +242,37 @@ BOOL XInit(void)
 	// コンフィグをロードする //
 	ConfigLoad({ DxEnum, DxEnumNow });
 
-	Key_PadConfig2(ConfigDat.PadTama,   KEY_TAMA);
-	Key_PadConfig2(ConfigDat.PadBomb,   KEY_BOMB);
-	Key_PadConfig2(ConfigDat.PadShift,  KEY_SHIFT);
-	Key_PadConfig2(ConfigDat.PadCancel, KEY_ESC);
+	Key_PadConfig2(ConfigDat.PadTama.v,   KEY_TAMA);
+	Key_PadConfig2(ConfigDat.PadBomb.v,   KEY_BOMB);
+	Key_PadConfig2(ConfigDat.PadShift.v,  KEY_SHIFT);
+	Key_PadConfig2(ConfigDat.PadCancel.v, KEY_ESC);
 
 	// グラフィックの初期化 //
-	pXDD = &DxEnum[ConfigDat.DeviceID];
-	if(!GrpInit(pXDD->lpDDGuid,pXDD->D3D,ConfigDat.BitDepth)) return FALSE;
+	pXDD = &DxEnum[ConfigDat.DeviceID.v];
+	if(!GrpInit(pXDD->lpDDGuid, pXDD->D3D, ConfigDat.BitDepth.v)) {
+		return false;
+	}
 	InitSurface();
 	InitFonts();
 	GrpSetRestoreHook(SEffectRestore);
 
 	// サウンドの初期化 //
-	if(ConfigDat.SoundFlags&SNDF_WAVE_ENABLE){
+	if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
 		// 何らかの理由で使用できなければ、Disable とする //
-		if(!SndInit(hWndMain)) ConfigDat.SoundFlags &= (~SNDF_WAVE_ENABLE);
+		if(!SndInit(hWndMain)) {
+			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+		}
 		else if(!LoadSound()){
-			ConfigDat.SoundFlags &= (~SNDF_WAVE_ENABLE);
+			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
 			SndCleanup();
 		}
 	}
 
 	// ＭＩＤＩの初期化 //
 	// MIDFN_MIDLOOP を使用すべきか //
-	if(ConfigDat.SoundFlags&SNDF_MIDI_ENABLE){
+	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
 		if(!Mid_Start(MIDFN_CALLBACK,MIDPL_NORM))
-			ConfigDat.SoundFlags &= (~SNDF_MIDI_ENABLE);
+			ConfigDat.SoundFlags.v &= (~SNDF_MIDI_ENABLE);
 	}
 
 	// Call a different *Init() function here to quickly test a different //

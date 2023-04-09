@@ -17,20 +17,20 @@ constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
 uint32_t CONFIG_DATA::CheckSumCalculate() const
 {
 	uint32_t ret = 0;
-	ret += (BitDepth.value() << 1);
-	ret += (BombStock << 3);
-	ret += (DeviceID << 2);
-	ret += (FPSDivisor << 6);
-	ret += (ExtraStgFlags << 5);
-	ret += (GameLevel << 2);
-	ret += (GraphFlags << 1);
-	ret += (InputFlags << 3);
-	ret += (PadBomb << 6);
-	ret += (PadCancel << 3);
-	ret += (PadShift << 1);
-	ret += (PadTama << 4);
-	ret += (PlayerStock << 5);
-	ret += (SoundFlags << 2);
+	ret += (BitDepth.v.value() << 1);
+	ret += (BombStock.v << 3);
+	ret += (DeviceID.v << 2);
+	ret += (FPSDivisor.v << 6);
+	ret += (ExtraStgFlags.v << 5);
+	ret += (GameLevel.v << 2);
+	ret += (GraphFlags.v << 1);
+	ret += (InputFlags.v << 3);
+	ret += (PadBomb.v << 6);
+	ret += (PadCancel.v << 3);
+	ret += (PadShift.v << 1);
+	ret += (PadTama.v << 4);
+	ret += (PlayerStock.v << 5);
+	ret += (SoundFlags.v << 2);
 	return ret;
 }
 
@@ -112,58 +112,58 @@ extern void ConfigLoad(const std::span<const XDDRAWENUM> dxenum)
 		return;
 	};
 
-	if(loaded.DeviceID < dxenum.size()) {
+	if(loaded.DeviceID.v < dxenum.size()) {
 		ConfigDat.DeviceID = loaded.DeviceID;
 	}
 
 	// Quirk: Off by 2 and 1, respectively?!
-	if(loaded.PlayerStock <= (STOCK_PLAYER_MAX + 2)) {
+	if(loaded.PlayerStock.v <= (STOCK_PLAYER_MAX + 2)) {
 		ConfigDat.PlayerStock = loaded.PlayerStock;
 	}
-	if(loaded.BombStock <= (STOCK_BOMB_MAX + 1)) {
+	if(loaded.BombStock.v <= (STOCK_BOMB_MAX + 1)) {
 		ConfigDat.BombStock = loaded.BombStock;
 	}
 
-	if(dxenum[loaded.DeviceID].BitDepthSupported(loaded.BitDepth)) {
+	if(dxenum[loaded.DeviceID.v].BitDepthSupported(loaded.BitDepth.v)) {
 		ConfigDat.BitDepth = loaded.BitDepth;
 	}
 
-	if(loaded.FPSDivisor <= FPS_DIVISOR_MAX) {
+	if(loaded.FPSDivisor.v <= FPS_DIVISOR_MAX) {
 		ConfigDat.FPSDivisor = loaded.FPSDivisor;
 	}
-	if(loaded.GameLevel <= GAME_LUNATIC) {
+	if(loaded.GameLevel.v <= GAME_LUNATIC) {
 		ConfigDat.GameLevel = loaded.GameLevel;
 	}
 
-	if(!(loaded.GraphFlags & GRPF_MASK)) {
+	if(!(loaded.GraphFlags.v & GRPF_MASK)) {
 		ConfigDat.GraphFlags = loaded.GraphFlags;
 	}
-	if(!(loaded.SoundFlags & SNDF_MASK)) {
+	if(!(loaded.SoundFlags.v & SNDF_MASK)) {
 		ConfigDat.SoundFlags = loaded.SoundFlags;
 	}
-	if(!(loaded.InputFlags & INPF_MASK)) {
+	if(!(loaded.InputFlags.v & INPF_MASK)) {
 		ConfigDat.InputFlags = loaded.InputFlags;
 	}
-	if(!(loaded.DebugFlags & DBGF_MASK)) {
+	if(!(loaded.DebugFlags.v & DBGF_MASK)) {
 		ConfigDat.DebugFlags = loaded.DebugFlags;
 	}
 
 	// 32 is the WinMM joy button limit //
-	if(loaded.PadTama   <= 32) {
+	if(loaded.PadTama.v   <= 32) {
 		ConfigDat.PadTama = loaded.PadTama;
 	}
-	if(loaded.PadBomb   <= 32) {
+	if(loaded.PadBomb.v   <= 32) {
 		ConfigDat.PadBomb = loaded.PadBomb;
 	}
-	if(loaded.PadShift  <= 32) {
+	if(loaded.PadShift.v  <= 32) {
 		ConfigDat.PadShift = loaded.PadShift;
 	}
-	if(loaded.PadCancel <= 32) {
+	if(loaded.PadCancel.v <= 32) {
 		ConfigDat.PadCancel = loaded.PadCancel;
 	}
 	ConfigDat.ExtraStgFlags = loaded.ExtraStgFlags;
 
-	if(loaded.StageSelect <= STAGE_MAX) {
+	if(loaded.StageSelect.v <= STAGE_MAX) {
 		ConfigDat.StageSelect = loaded.StageSelect;
 	}
 }

@@ -42,14 +42,14 @@ extern void OutputDebugMsg(void)
 	sprintf(buf,"%03d Fps",fps);
 	GrpPut16(0,0,buf);
 
-	sprintf(buf,"%2dBppMode",ConfigDat.BitDepth.value());
+	sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());
 	GrpPut16(0,32,buf);
-	//sprintf(buf,"%s",DItem[ConfigDat.GameLevel]);
+	//sprintf(buf,"%s",DItem[ConfigDat.GameLevel.v]);
 	//GrpPut16(0,50,buf);
 
 	sprintf(buf,"%s",DItem[PlayRank.GameLevel]);
 	GrpPut16(0,50,buf);
-	sprintf(buf,"%s<Cfg>",DItem[ConfigDat.GameLevel]);
+	sprintf(buf,"%s<Cfg>",DItem[ConfigDat.GameLevel.v]);
 	GrpPut16(0,68,buf);
 	sprintf(buf,"Pr %d",PlayRank.Rank);
 	GrpPut16(0,86,buf);
@@ -122,10 +122,10 @@ extern void StdStatusOutput(void)
 	sprintf(buf,"%03d Fps",fps);
 	GrpPut16(0,0,buf);
 
-	sprintf(buf,"%2dBppMode",ConfigDat.BitDepth);
+	sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v);
 	GrpPut16(0,32,buf);
 
-	sprintf(buf,"%s<Cfg>",DItem[ConfigDat.GameLevel]);
+	sprintf(buf, "%s<Cfg>", DItem[ConfigDat.GameLevel.v]);
 	GrpPut16(0,68,buf);
 */
 //	GrpPut16(0,440,"G07");

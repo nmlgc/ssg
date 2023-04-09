@@ -28,10 +28,10 @@ struct DEMOPLAY_CONFIG_DATA {
 	uint8_t Padding2[15] = { 0 };
 
 	void operator =(const CONFIG_DATA& config) {
-		GameLevel = config.GameLevel;
-		PlayerStock = config.PlayerStock;
-		BombStock = config.BombStock;
-		InputFlags = config.InputFlags;
+		GameLevel = config.GameLevel.v;
+		PlayerStock = config.PlayerStock.v;
+		BombStock = config.BombStock.v;
+		InputFlags = config.InputFlags.v;
 	}
 };
 static_assert(sizeof(DEMOPLAY_CONFIG_DATA) == 24);

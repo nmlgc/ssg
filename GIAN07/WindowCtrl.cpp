@@ -68,7 +68,9 @@ static BOOL RFnStg5(WORD key);
 static BOOL RFnStg6(WORD key);
 static BOOL RFnStgEx(WORD key);
 
-static bool RingFN(bool onchange(void), BYTE& var, WORD key, BYTE min, BYTE max)
+static bool RingFN(
+	bool onchange(void), uint8_t& var, WORD key, uint8_t min, uint8_t max
+)
 {
 	switch(key) {
 	case(KEY_BOMB):
@@ -233,7 +235,7 @@ void InitMainWindow(void)
 //	{"   Config"		,"各種設定を変更します"		,0,6,CfgItem,CfgItem+1,CfgItem+2,CfgItem+3,CfgItem+4,CfgItem+5},
 
 	// エキストラステージが選択できる場合には発生！ //
-	if(ConfigDat.ExtraStgFlags){
+	if(ConfigDat.ExtraStgFlags.v) {
 		MainItem[3].NumItems = 6;
 		MainItem[3].ItemPtr[4] = CfgItem + 4;
 		MainItem[3].ItemPtr[5] = CfgItem + 5;
@@ -277,18 +279,20 @@ void InitContinueWindow(void)
 
 static BOOL DifFnPlayerStock(WORD key)
 {
-	return RingFN(SetDifItem, ConfigDat.PlayerStock, key, 0, STOCK_PLAYER_MAX);
+	return RingFN(
+		SetDifItem, ConfigDat.PlayerStock.v, key, 0, STOCK_PLAYER_MAX
+	);
 }
 
 static BOOL DifFnBombStock(WORD key)
 {
-	return RingFN(SetDifItem, ConfigDat.BombStock, key, 0, STOCK_BOMB_MAX);
+	return RingFN(SetDifItem, ConfigDat.BombStock.v, key, 0, STOCK_BOMB_MAX);
 }
 
 static BOOL DifFnDifficulty(WORD key)
 {
 	return RingFN(
-		SetDifItem, ConfigDat.GameLevel, key, GAME_EASY, GAME_LUNATIC
+		SetDifItem, ConfigDat.GameLevel.v, key, GAME_EASY, GAME_LUNATIC
 	);
 }
 
@@ -366,23 +370,23 @@ static BOOL GrpFnChgDevice(WORD key)
 			if(DxEnumNow<=1) break;
 
 			// 次のデバイスへ //
-			auto device_id_new = (
-				(ConfigDat.DeviceID + DxEnumNow + flag) % DxEnumNow
+			uint8_t device_id_new = (
+				(ConfigDat.DeviceID.v + DxEnumNow + flag) % DxEnumNow
 			);
 			auto& pXDD = DxEnum[device_id_new];
 
 			// Change bit depth to a supported one, if necessary //
-			if(!pXDD.BitDepthSupported(ConfigDat.BitDepth)) {
+			if(!pXDD.BitDepthSupported(ConfigDat.BitDepth.v)) {
 				auto bitdepth_new = pXDD.BitDepthBest();
 				if(!bitdepth_new) {
 					break;
 				}
-				ConfigDat.BitDepth = bitdepth_new;
+				ConfigDat.BitDepth.v = bitdepth_new;
 			}
-			ConfigDat.DeviceID = device_id_new;
+			ConfigDat.DeviceID.v = device_id_new;
 
 			// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
-			GrpInit(pXDD.lpDDGuid,pXDD.D3D,ConfigDat.BitDepth);
+			GrpInit(pXDD.lpDDGuid, pXDD.D3D, ConfigDat.BitDepth.v);
 			InitSurface();
 			//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 		break;
@@ -395,7 +399,7 @@ static BOOL GrpFnChgDevice(WORD key)
 
 static BOOL GrpFnSkip(WORD key)
 {
-	return RingFN(SetGrpItem, ConfigDat.FPSDivisor, key, 0, FPS_DIVISOR_MAX);
+	return RingFN(SetGrpItem, ConfigDat.FPSDivisor.v, key, 0, FPS_DIVISOR_MAX);
 }
 
 static BOOL GrpFnBpp(WORD key)
@@ -405,15 +409,15 @@ static BOOL GrpFnBpp(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT): {
-			auto& pXDD = DxEnum[ConfigDat.DeviceID];
-			const auto bitdepth_new = ConfigDat.BitDepth.cycle(key == KEY_LEFT);
+			auto& pXDD = DxEnum[ConfigDat.DeviceID.v];
+			auto bitdepth_new = ConfigDat.BitDepth.v.cycle(key == KEY_LEFT);
 			if(!pXDD.BitDepthSupported(bitdepth_new)) {
 				break;
 			}
-			ConfigDat.BitDepth = bitdepth_new;
+			ConfigDat.BitDepth.v = bitdepth_new;
 
 			// この部分に本当ならエラーチェックが必要 //
-			GrpInit(pXDD.lpDDGuid,pXDD.D3D,ConfigDat.BitDepth);
+			GrpInit(pXDD.lpDDGuid, pXDD.D3D, ConfigDat.BitDepth.v);
 			InitSurface();
 			//GrpSetPalette(DxObj.pe);
 			LoadPaletteFrom(GrEnemy);
@@ -434,7 +438,7 @@ static BOOL GrpFnWinLocate(WORD key)
 	int		i;
 
 	for(i=0; i<3; i++){
-		if(ConfigDat.GraphFlags == flags[i]) break;
+		if(ConfigDat.GraphFlags.v == flags[i]) break;
 	}
 	if(i >= 3) i=0;
 
@@ -443,17 +447,18 @@ static BOOL GrpFnWinLocate(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.GraphFlags = flags[(i+1)%3];
+			ConfigDat.GraphFlags.v = flags[(i + 1) % 3];
 		break;
 /*
-			if(ConfigDat.GraphFlags&GRPF_WINDOW_UPPER)
-				ConfigDat.GraphFlags &= (~GRPF_WINDOW_UPPER);
-			else
-				ConfigDat.GraphFlags |= GRPF_WINDOW_UPPER;
+			if(ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) {
+				ConfigDat.GraphFlags.v &= (~GRPF_WINDOW_UPPER);
+			} else {
+				ConfigDat.GraphFlags.v |= GRPF_WINDOW_UPPER;
+			}
 		break;
 */
 		case(KEY_LEFT):
-			ConfigDat.GraphFlags = flags[(i+2)%3];
+			ConfigDat.GraphFlags.v = flags[(i + 2) % 3];
 		break;
 	}
 
@@ -476,16 +481,17 @@ static BOOL SndFnWAVE(WORD key)
 			//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
 			//DebugOut(buf);
 
-			if(ConfigDat.SoundFlags&SNDF_WAVE_ENABLE){
-				ConfigDat.SoundFlags &= (~SNDF_WAVE_ENABLE);
+			if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
+				ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
 				SndCleanup();
 			}
 			else{
-				ConfigDat.SoundFlags |= SNDF_WAVE_ENABLE;
+				ConfigDat.SoundFlags.v |= SNDF_WAVE_ENABLE;
 
-				if(!SndInit(hWndMain)) ConfigDat.SoundFlags &= (~SNDF_WAVE_ENABLE);
-				else if(!LoadSound()){
-					ConfigDat.SoundFlags &= (~SNDF_WAVE_ENABLE);
+				if(!SndInit(hWndMain)) {
+					ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+				} else if(!LoadSound()) {
+					ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
 					SndCleanup();
 				}
 			}
@@ -506,14 +512,14 @@ static BOOL SndFnMIDI(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.SoundFlags&SNDF_MIDI_ENABLE){
+			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
 				Mid_End();
-				ConfigDat.SoundFlags &= (~SNDF_MIDI_ENABLE);
+				ConfigDat.SoundFlags.v &= (~SNDF_MIDI_ENABLE);
 			}
 			else{
 				// 成功した場合にだけ有効にする //
 				if(Mid_Start(MIDFN_CALLBACK,MIDPL_NORM)){
-					ConfigDat.SoundFlags |= SNDF_MIDI_ENABLE;
+					ConfigDat.SoundFlags.v |= SNDF_MIDI_ENABLE;
 				}
 			}
 		break;
@@ -531,11 +537,15 @@ static BOOL SndFnMIDIDev(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			if(ConfigDat.SoundFlags&SNDF_MIDI_ENABLE) Mid_ChgDev(1);
+			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+				Mid_ChgDev(1);
+			}
 		break;
 
 		case(KEY_LEFT):
-			if(ConfigDat.SoundFlags&SNDF_MIDI_ENABLE) Mid_ChgDev(-1);
+			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+				Mid_ChgDev(-1);
+			}
 		break;
 	}
 
@@ -551,10 +561,11 @@ static BOOL InpFnMsgSkip(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.InputFlags & INPF_Z_MSKIP_ENABLE)
-				ConfigDat.InputFlags &= (~INPF_Z_MSKIP_ENABLE);
-			else
-				ConfigDat.InputFlags |= INPF_Z_MSKIP_ENABLE;
+			if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
+				ConfigDat.InputFlags.v &= (~INPF_Z_MSKIP_ENABLE);
+			} else {
+				ConfigDat.InputFlags.v |= INPF_Z_MSKIP_ENABLE;
+			}
 		break;
 	}
 
@@ -570,10 +581,11 @@ static BOOL InpFnZSpeedDown(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.InputFlags & INPF_Z_SPDDOWN_ENABLE)
-				ConfigDat.InputFlags &= (~INPF_Z_SPDDOWN_ENABLE);
-			else
-				ConfigDat.InputFlags |= INPF_Z_SPDDOWN_ENABLE;
+			if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
+				ConfigDat.InputFlags.v &= (~INPF_Z_SPDDOWN_ENABLE);
+			} else {
+				ConfigDat.InputFlags.v |= INPF_Z_SPDDOWN_ENABLE;
+			}
 		break;
 	}
 
@@ -646,7 +658,9 @@ static BOOL MainFnExStart(WORD key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
-			if(ConfigDat.ExtraStgFlags) GameExstgInit();
+			if(ConfigDat.ExtraStgFlags.v) {
+				GameExstgInit();
+			}
 		default:
 		return TRUE;
 	}
@@ -666,7 +680,9 @@ static BOOL MusicFn(WORD key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
-			if(ConfigDat.SoundFlags&SNDF_MIDI_ENABLE) MusicRoomInit();
+			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+				MusicRoomInit();
+			}
 		default:
 		return TRUE;
 	}
@@ -736,28 +752,28 @@ static bool InpFnKey(uint8_t& config_pad, WORD pad_config_key, WORD key)
 
 static BOOL InpFnKeyTama(WORD key)
 {
-	return InpFnKey(ConfigDat.PadTama, KEY_TAMA, key);
+	return InpFnKey(ConfigDat.PadTama.v, KEY_TAMA, key);
 }
 
 static BOOL InpFnKeyBomb(WORD key)
 {
-	return InpFnKey(ConfigDat.PadBomb, KEY_BOMB, key);
+	return InpFnKey(ConfigDat.PadBomb.v, KEY_BOMB, key);
 }
 
 static BOOL InpFnKeyShift(WORD key)
 {
-	return InpFnKey(ConfigDat.PadShift, KEY_SHIFT, key);
+	return InpFnKey(ConfigDat.PadShift.v, KEY_SHIFT, key);
 }
 
 static BOOL InpFnKeyCancel(WORD key)
 {
-	return InpFnKey(ConfigDat.PadCancel, KEY_ESC, key);
+	return InpFnKey(ConfigDat.PadCancel.v, KEY_ESC, key);
 }
 
 
 static BOOL CfgRepStgSelect(WORD key)
 {
-	return RingFN(SetCfgRepItem, ConfigDat.StageSelect, key, 1, STAGE_MAX);
+	return RingFN(SetCfgRepItem, ConfigDat.StageSelect.v, key, 1, STAGE_MAX);
 }
 
 
@@ -768,8 +784,7 @@ static BOOL CfgRepSave(WORD key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.StageSelect) ConfigDat.StageSelect = 0;
-			else                      ConfigDat.StageSelect = 1;
+			ConfigDat.StageSelect.v = ((ConfigDat.StageSelect.v) ? 0 : 1);
 		break;
 	}
 
@@ -783,13 +798,13 @@ static bool SetCfgRepItem(void)
 {
 	const char *SWItem[2]  = {"[ O N ]","[O F F]"};
 
-	if(0 == ConfigDat.StageSelect){
+	if(0 == ConfigDat.StageSelect.v) {
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", SWItem[1]);
 		strcpy(CfgRepTitle[1], "StageSelect [無 効]");
 	}
 	else{
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", SWItem[0]);
-		sprintf(CfgRepTitle[1], "StageSelect [  %d  ]", ConfigDat.StageSelect);
+		sprintf(CfgRepTitle[1], "StageSelect [  %d  ]", ConfigDat.StageSelect.v);
 	}
 	return true;
 }
@@ -804,9 +819,9 @@ static bool SetDifItem(void)
 	{DifTitle[5],"[DebugMode] ステージセレクト"			,DifFnStgSelect,0,0},
 	{DifTitle[6],"[DebugMode] 当たり判定"				,DifFnHit,0,0},
 */
-	sprintf(DifTitle[0],"PlayerStock [ %d ]",ConfigDat.PlayerStock+1);		// +1 に注意
-	sprintf(DifTitle[1],"BombStock   [ %d ]",ConfigDat.BombStock);
-	sprintf(DifTitle[2],"Difficulty[%s]",DifItem[ConfigDat.GameLevel]);
+	sprintf(DifTitle[0], "PlayerStock [ %d ]", (ConfigDat.PlayerStock.v + 1));	// +1 に注意
+	sprintf(DifTitle[1], "BombStock   [ %d ]", ConfigDat.BombStock.v);
+	sprintf(DifTitle[2], "Difficulty[%s]", DifItem[ConfigDat.GameLevel.v]);
 
 #ifdef PBG_DEBUG
 	sprintf(DifTitle[4],"DebugOut  %s",SWItem[DebugDat.MsgDisplay ? 0 : 1]);
@@ -824,15 +839,16 @@ static bool SetGrpItem(void)
 	int		i;
 
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
-	sprintf(GrpTitle[0],"Device   [%.7s]",DxEnum[ConfigDat.DeviceID].name);
-	sprintf(GrpTitle[1],"DrawMode [ %s ]",DMode[ConfigDat.FPSDivisor]);
-	sprintf(GrpTitle[2],"BitDepth [ %dBit ]",ConfigDat.BitDepth.value());
+	sprintf(GrpTitle[0], "Device   [%.7s]", DxEnum[ConfigDat.DeviceID.v].name);
+	sprintf(GrpTitle[1], "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
+	sprintf(GrpTitle[2], "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
 #undef SetFlagsMacro
 
-	if(ConfigDat.GraphFlags & GRPF_MSG_DISABLE)
+	if(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE) {
 		i = 2;
-	else
-		i = (ConfigDat.GraphFlags&GRPF_WINDOW_UPPER) ? 0 : 1;
+	} else {
+		i = (ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1;
+	}
 
 	sprintf(GrpTitle[3],"MsgWindow[%s]", UorD[i]);
 	return true;
@@ -847,10 +863,10 @@ static void SetSndItem(void)
 	static BYTE time = 0;
 
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
-	sprintf(SndTitle[0],"WAVE [%s]",SetFlagsMacro(EorD,ConfigDat.SoundFlags&SNDF_WAVE_ENABLE));
-	sprintf(SndTitle[1],"MIDI [%s]",SetFlagsMacro(EorD,ConfigDat.SoundFlags&SNDF_MIDI_ENABLE));
+	sprintf(SndTitle[0], "WAVE [%s]", SetFlagsMacro(EorD, ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE));
+	sprintf(SndTitle[1], "MIDI [%s]", SetFlagsMacro(EorD, ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE));
 
-	if(ConfigDat.SoundFlags&SNDF_MIDI_ENABLE){
+	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
 		time+=16;
 		ptr = Mid_Dev.name[Mid_Dev.NowID];
 		l = strlen(ptr);
@@ -873,19 +889,17 @@ static void SetInpItem(void)
 {
 	int		temp;
 
-	if(ConfigDat.InputFlags & INPF_Z_MSKIP_ENABLE) temp = 1;
-	else                                           temp = 0;
+	temp = ((ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) ? 1 : 0);
 	sprintf(InpTitle,"Z-MessageSkip[%s]",temp ? "ＯＫ" : "禁止");
 
-	if(ConfigDat.InputFlags & INPF_Z_SPDDOWN_ENABLE) temp = 1;
-	else                                             temp = 0;
+	temp = ((ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) ? 1 : 0);
 	sprintf(InpTitle2,"Z-SpeedDown  [%s]",temp ? "ＯＫ" : "禁止");
 }
 
 static void SetIKeyItem(void)
 {
-	sprintf(IKeyTitle[0],"Shot     [Button%2d]",ConfigDat.PadTama);
-	sprintf(IKeyTitle[1],"Bomb     [Button%2d]",ConfigDat.PadBomb);
-	sprintf(IKeyTitle[2],"SpeedDown[Button%2d]",ConfigDat.PadShift);
-	sprintf(IKeyTitle[3],"ESC      [Button%2d]",ConfigDat.PadCancel);
+	sprintf(IKeyTitle[0], "Shot     [Button%2d]", ConfigDat.PadTama.v);
+	sprintf(IKeyTitle[1], "Bomb     [Button%2d]", ConfigDat.PadBomb.v);
+	sprintf(IKeyTitle[2], "SpeedDown[Button%2d]", ConfigDat.PadShift.v);
+	sprintf(IKeyTitle[3], "ESC      [Button%2d]", ConfigDat.PadCancel.v);
 }

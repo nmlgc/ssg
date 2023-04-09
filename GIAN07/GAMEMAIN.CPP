@@ -20,7 +20,7 @@ DWORD		DemoTimer  = 0;
 BYTE		WeaponKeyWait = 0;
 DWORD		GameOverTimer = 0;
 
-decltype(CONFIG_DATA::GameLevel) TempGameLevel = 0;
+decltype(CONFIG_DATA::GameLevel.v) TempGameLevel = 0;
 
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
 BYTE			CurrentRank;	// ネームレジスト用順位データ
@@ -60,14 +60,19 @@ void ScoreDraw(void);	// スコアの描画
 
 void(*GameMain)(void) = TitleProc;
 
+uint8_t CurrentLevel()
+{
+	return (
+		(GameStage == GRAPH_ID_EXSTAGE) ? GAME_EXTRA : ConfigDat.GameLevel.v
+	);
+}
 
 
 
 // スコアネーム表示の準備を行う //
 extern bool ScoreNameInit(void)
 {
-	if(GameStage == GRAPH_ID_EXSTAGE) CurrentDif = GAME_EXTRA;
-	else                              CurrentDif = ConfigDat.GameLevel;
+	CurrentDif = CurrentLevel();
 
 	CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
 	if(CurrentRank == 0) return GameExit();
@@ -229,7 +234,6 @@ void NameRegistProc(void)
 	// <- DemoInit() を修正するのだぞ
 	RECT	src = {0,0,400,64};
 	int		gx,gy,len;
-	int		Level;
 	static int	x,y;
 	static BYTE key_time;
 	static BYTE count;
@@ -319,10 +323,8 @@ void NameRegistProc(void)
 
 				ScoreString[CurrentRank-1].Name[NR_NAME_LEN-1] = '\0';
 
-				if(GameStage == GRAPH_ID_EXSTAGE) Level = GAME_EXTRA;
-				else                              Level = ConfigDat.GameLevel;
 				strcpy(CurrentName.Name, ScoreString[CurrentRank-1].Name);
-				SaveScoreData(&CurrentName, Level);
+				SaveScoreData(&CurrentName, CurrentLevel());
 
 				while(Key_Data) Key_Read();
 				x = y = key_time = 0;
@@ -388,7 +390,6 @@ void NameRegistProc(void)
 bool NameRegistInit(bool bNeedChgMusic)
 {
 	int		i;
-	BYTE	Level;
 
 	for(i=0;i<NR_NAME_LEN;i++) CurrentName.Name[i] = '\0';
 	CurrentName.Score  = Viv.score;
@@ -402,9 +403,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 	SndStopAll();
 
 	// ハイスコアで無いならばタイトルに移行する //
-	if(GameStage == GRAPH_ID_EXSTAGE) Level = GAME_EXTRA;
-	else                              Level = ConfigDat.GameLevel;
-	CurrentRank = (BYTE)SetScoreString(&CurrentName, Level);
+	CurrentRank = (BYTE)SetScoreString(&CurrentName, CurrentLevel());
 	if(CurrentRank == 0) return GameExit();
 
 	MWinForceClose();
@@ -493,8 +492,8 @@ extern bool GameExstgInit(void)
 	GrpCls();
 	GrpFlip();
 
-	TempGameLevel       = ConfigDat.GameLevel;
-	ConfigDat.GameLevel = GAME_HARD;
+	TempGameLevel         = ConfigDat.GameLevel.v;
+	ConfigDat.GameLevel.v = GAME_HARD;
 
 	GameSTD_Init();
 	PlayRankReset();
@@ -804,7 +803,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	GrpFlip();
 
 	if(GameStage == GRAPH_ID_EXSTAGE){
-		ConfigDat.GameLevel = TempGameLevel;
+		ConfigDat.GameLevel.v = TempGameLevel;
 	}
 
 	if(!LoadGraph(GRAPH_ID_TITLE)){
@@ -855,7 +854,7 @@ extern void GameOverInit(void)
 extern void GameContinue(void)
 {
 	Viv.evade_sum = 0;
-	Viv.left      = ConfigDat.PlayerStock;
+	Viv.left      = ConfigDat.PlayerStock.v;
 	Viv.score     = (Viv.score%10 + 1);
 
 	GameMain = GameProc;
@@ -876,10 +875,12 @@ void GameProc(void)
 #endif
 
 	// リプレイ時の保存処理 //
-	if(ConfigDat.StageSelect) ReplayRecord(Key_Data);
+	if(ConfigDat.StageSelect.v) {
+		ReplayRecord(Key_Data);
+	}
 
 	if(Key_Data & KEY_ESC){
-		if(ConfigDat.StageSelect){
+		if(ConfigDat.StageSelect.v) {
 			ReplaySave();
 			GameExit(TRUE);
 			return;
@@ -926,7 +927,7 @@ void GameOverProc0(void)
 		while(Key_Data != 0) Key_Read();
 
 		// ステージセレクトが有効な場合 //
-		if(ConfigDat.StageSelect){
+		if(ConfigDat.StageSelect.v) {
 			ReplaySave();
 			if(GameStage == GRAPH_ID_EXSTAGE) NameRegistInit(TRUE);
 			else                              GameExit(TRUE);
@@ -1073,7 +1074,9 @@ void WeaponSelectProc(void)
 		case(KEY_TAMA):case(KEY_RETURN):
 			if(spd) break;
 			if(GameStage == GRAPH_ID_EXSTAGE){
-				if(!((1<<Viv.weapon) & ConfigDat.ExtraStgFlags)) break;
+				if(!((1 << Viv.weapon) & ConfigDat.ExtraStgFlags.v)) {
+					break;
+				}
 			}
 
 			VivTemp.weapon = Viv.weapon;
@@ -1090,8 +1093,8 @@ void WeaponSelectProc(void)
 				if(DebugDat.DemoSave) DemoplayInit();
 			#else
 				// リプレイ用の処理を追加 //
-				if(ConfigDat.StageSelect){
-					GameStage = ConfigDat.StageSelect;
+				if(ConfigDat.StageSelect.v) {
+					GameStage = ConfigDat.StageSelect.v;
 					if(GameStage==2) Viv.exp = 160;
 					if(GameStage>=3) Viv.exp = 255;
 					ReplayInit();
@@ -1105,7 +1108,7 @@ void WeaponSelectProc(void)
 				Viv.credit = 0;
 				Viv.left   = 2;
 				Viv.exp    = 255;
-				if(ConfigDat.StageSelect){
+				if(ConfigDat.StageSelect.v) {
 					ReplayInit();
 				}
 			}
@@ -1160,8 +1163,12 @@ void WeaponSelectProc(void)
 		GrpSetColor(0,0,1);
 		GrpSetAlpha(128, ALPHA_NORM);
 		for(i=0;i<3;i++){
-			if(GameStage != GRAPH_ID_EXSTAGE) continue;
-			if((1<<i) & ConfigDat.ExtraStgFlags) continue;
+			if(
+				(GameStage != GRAPH_ID_EXSTAGE) ||
+				((1 << i) & ConfigDat.ExtraStgFlags.v)
+			) {
+				continue;
+			}
 
 			d = (-i+Viv.weapon)*85 + deg - 64;
 			x = 120 + cosl(d,90) - 56/2;
@@ -1556,9 +1563,11 @@ void GameDraw(void)
 
 bool IsDraw(void)
 {
-	if(ConfigDat.FPSDivisor){
+	if(ConfigDat.FPSDivisor.v) {
 		DrawCount++;
-		if(DrawCount%ConfigDat.FPSDivisor) return FALSE;
+		if(DrawCount % ConfigDat.FPSDivisor.v) {
+			return false;
+		}
 	}
 
 	return TRUE;

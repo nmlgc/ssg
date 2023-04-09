@@ -33,34 +33,42 @@ constexpr const auto FPS_DIVISOR_MAX = 3;
 constexpr const auto STAGE_MAX = 6; // ステージ数
 
 
+// Option class //
+template <typename T> struct CONFIG_OPTION_VALUE {
+	T v;
+};
+
 // オプション保持用構造体 //
 typedef struct tagCONFIG_DATA{
-	uint8_t	GameLevel;	// 難易度
-	uint8_t	PlayerStock;	// 初期メイド数？
-	uint8_t	BombStock;	// 初期ボム数
+	template <typename T> using OPTION = CONFIG_OPTION_VALUE<T>;
 
-	uint8_t	DeviceID;	// 何番目のデバイスか
-	BITDEPTH	BitDepth;	// ビット深度
+	OPTION<uint8_t> GameLevel;	// 難易度
+	OPTION<uint8_t> PlayerStock;	// 初期メイド数？
+	OPTION<uint8_t> BombStock;	// 初期ボム数
+
+	OPTION<uint8_t> DeviceID;	// 何番目のデバイスか
+	OPTION<BITDEPTH> BitDepth;	// ビット深度
 
 	// Target frame rate = 60 / [FPSDivisor]. 0 disables any frame rate
 	// limitation.
-	uint8_t	FPSDivisor;
+	OPTION<uint8_t> FPSDivisor;
 
-	uint8_t	GraphFlags;	// グラフィックに関するフラグ
-	uint8_t	SoundFlags;	// サウンド・ＭＩＤＩ関連のフラグ
-	uint8_t	InputFlags;	// 入力に関するフラグ
+	OPTION<uint8_t> GraphFlags;	// グラフィックに関するフラグ
+	OPTION<uint8_t> SoundFlags;	// サウンド・ＭＩＤＩ関連のフラグ
+	OPTION<uint8_t> InputFlags;	// 入力に関するフラグ
 
-	uint8_t	DebugFlags;	// デバッグに関するフラグ
+	OPTION<uint8_t> DebugFlags;	// デバッグに関するフラグ
 
-	uint8_t	PadTama;
-	uint8_t	PadBomb;
-	uint8_t	PadShift;
-	uint8_t	PadCancel;
+	OPTION<uint8_t> PadTama;
+	OPTION<uint8_t> PadBomb;
+	OPTION<uint8_t> PadShift;
+	OPTION<uint8_t> PadCancel;
 
-	uint8_t	ExtraStgFlags;	// エキストラステージ判定用フラグ
-	uint32_t	CheckSum;
+	OPTION<uint8_t> ExtraStgFlags;	// エキストラステージ判定用フラグ
+	uint32_t CheckSum;
 
-	uint8_t	StageSelect;	// ワケ有りでここにいるのです(チェックサムの範囲外)
+	// ワケ有りでここにいるのです(チェックサムの範囲外)
+	OPTION<uint8_t> StageSelect;
 
 	uint32_t CheckSumCalculate() const;
 } CONFIG_DATA;

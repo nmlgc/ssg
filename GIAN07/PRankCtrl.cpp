@@ -31,7 +31,7 @@ void PlayRankAdd(int n)
 	}
 
 	// この分岐に関しては、基本的にコンフィグの値に基づく //
-	switch(ConfigDat.GameLevel){
+	switch(ConfigDat.GameLevel.v) {
 		case(GAME_EASY):
 			if     (PlayRank.Rank < 0)      PlayRank.Rank = 0;
 			else if(PlayRank.Rank > 24*256) PlayRank.Rank = 24*256;
@@ -75,9 +75,9 @@ void PlayRankAdd(int n)
 // 現在の難易度に応じてプレイランクを初期化
 void PlayRankReset(void)
 {
-	PlayRank.GameLevel = ConfigDat.GameLevel;
+	PlayRank.GameLevel = ConfigDat.GameLevel.v;
 
-	switch(ConfigDat.GameLevel){
+	switch(ConfigDat.GameLevel.v) {
 		case(GAME_EASY):		PlayRank.Rank = 12*256;		break;
 		case(GAME_NORMAL):		PlayRank.Rank = 28*256;		break;
 		case(GAME_HARD):		PlayRank.Rank = 40*256;		break;

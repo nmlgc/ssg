@@ -285,7 +285,7 @@ extern void MaidMove(void)
 	else if(Viv.dscore>=10)		Viv.score+=10		,Viv.dscore-=10;
 
 	// 押しっぱなし減速を有効にするのか //
-	if(ConfigDat.InputFlags & INPF_Z_SPDDOWN_ENABLE){
+	if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
 		if(Key_Data & KEY_TAMA){
 			if(Viv.ShiftCounter < 8) Viv.ShiftCounter++;
 			else                     Key_Data = Key_Data | KEY_SHIFT;
@@ -369,8 +369,8 @@ extern void MaidSet(void)
 	Viv.dscore    = 0;
 	Viv.exp       = 0;
 	Viv.exp2      = 0;
-	Viv.bomb      = ConfigDat.BombStock;
-	Viv.left      = ConfigDat.PlayerStock;
+	Viv.bomb      = ConfigDat.BombStock.v;
+	Viv.left      = ConfigDat.PlayerStock.v;
 	Viv.credit    = 4;		//5;
 
 	Viv.bomb_time = 0;
@@ -393,7 +393,7 @@ extern void MaidSet(void)
 	Viv.BuzzSound = FALSE;
 
 	for(i=0;i<256;i++)
-		EvadeRate[i] = i*sct[ConfigDat.GameLevel];
+		EvadeRate[i] = i*sct[ConfigDat.GameLevel.v];
 }
 
 // 次のステージの準備 //
@@ -445,7 +445,7 @@ extern void MaidDead(void)
 	Viv.lay_time  = 0;
 	Viv.lay_grp   = 0;
 
-	Viv.bomb = ConfigDat.BombStock;
+	Viv.bomb = ConfigDat.BombStock.v;
 	Viv.muteki = VIVDEAD_VAL;
 
 	PlayRankAdd(-2560);

@@ -581,95 +581,50 @@ static BOOL InpFnZSpeedDown(WORD key)
 }
 
 
+static bool RFnStg(int stage, WORD key)
+{
+	if((key == KEY_BOMB) || (key == KEY_ESC)) {
+		return false;
+	} else if((key == KEY_RETURN) || (key == KEY_TAMA)) {
+		GameReplayInit(stage);
+	}
+	return true;
+}
+
+
 static BOOL RFnStg1(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(1);
-		default:
-		return TRUE;
-	}
+	return RFnStg(1, key);
 }
 
 static BOOL RFnStg2(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(2);
-		default:
-		return TRUE;
-	}
+	return RFnStg(2, key);
 }
 
 static BOOL RFnStg3(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(3);
-		default:
-		return TRUE;
-	}
+	return RFnStg(3, key);
 }
 
 static BOOL RFnStg4(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(4);
-		default:
-		return TRUE;
-	}
+	return RFnStg(4, key);
 }
 
 static BOOL RFnStg5(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(5);
-		default:
-		return TRUE;
-	}
+	return RFnStg(5, key);
 }
 
 static BOOL RFnStg6(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(6);
-		default:
-		return TRUE;
-	}
+	return RFnStg(6, key);
 }
 
 static BOOL RFnStgEx(WORD key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameReplayInit(GRAPH_ID_EXSTAGE);
-		default:
-		return TRUE;
-	}
+	return RFnStg(GRAPH_ID_EXSTAGE, key);
 }
 
 

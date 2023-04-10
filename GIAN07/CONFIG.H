@@ -66,6 +66,15 @@ template <
 > struct CONFIG_OPTION_VALUE {
 	T v;
 
+	// ([loaded] == std::nullopt): We loaded a config file from an earlier
+	// build, where this value was not present yet. It was initialized to its
+	// default value.
+	// ([loaded] == [v]): Option was present in a config file, and its value
+	// passed validation.
+	// ([loaded] != [v]): The config file contained an invalid value, and was
+	// reset to its default.
+	std::optional<T> loaded = std::nullopt;
+
 	const size_t Size() const {
 		return sizeof(T);
 	}
@@ -75,9 +84,9 @@ template <
 		if(!maybe_loaded) {
 			return false;
 		}
-		const auto loaded = maybe_loaded.value()[0];
-		if(Validate(loaded)) {
-			v = loaded;
+		loaded = maybe_loaded.value()[0];
+		if(Validate(maybe_loaded.value()[0])) {
+			v = maybe_loaded.value()[0];
 		}
 		return true;
 	}

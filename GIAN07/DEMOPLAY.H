@@ -16,11 +16,32 @@
 
 
 
+///// Replay-specific config option subset /////
+// The original code simply reused CONFIG_DATA, which we can't do in this fork
+// due to the additional fields we add to the structure.
+struct DEMOPLAY_CONFIG_DATA {
+	uint8_t GameLevel;
+	uint8_t PlayerStock;
+	uint8_t BombStock;
+	uint8_t Padding1[5] = { 0 };
+	uint8_t InputFlags;
+	uint8_t Padding2[15] = { 0 };
+
+	void operator =(const CONFIG_DATA& config) {
+		GameLevel = config.GameLevel;
+		PlayerStock = config.PlayerStock;
+		BombStock = config.BombStock;
+		InputFlags = config.InputFlags;
+	}
+};
+static_assert(sizeof(DEMOPLAY_CONFIG_DATA) == 24);
+
+
 ///// [構造体] /////
 typedef struct tagDEMOPLAY_INFO{
 	DWORD			RndSeed;		// 乱数のたね
 	DWORD			DataSize;		// データ部のサイズ(デコード時に使用する)
-	CONFIG_DATA		CfgDat;			// コンフィグの情報(Load時に一部を参照する)
+	DEMOPLAY_CONFIG_DATA	CfgDat;	// コンフィグの情報(Load時に一部を参照する)
 	BYTE			Exp;			// 初期パワーアップ
 	BYTE			Weapon;			// 初期装備
 } DEMOPLAY_INFO;

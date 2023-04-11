@@ -46,6 +46,35 @@ void DemoplayInit(void)
 }
 
 
+bool DemoplayLoadSetup()
+{
+	DemoBufPtr = 0;
+	DemoplayLoadEnable = true;
+
+	// コンフィグの初期化 //
+	// 現在のコンフィグを保持する //
+	ConfigTemp = ConfigDat;
+
+	// そのときのコンフィグを転送 //
+	ConfigDat.BombStock   = DemoInfo.CfgDat.BombStock;
+	ConfigDat.GameLevel   = DemoInfo.CfgDat.GameLevel;
+	ConfigDat.PlayerStock = DemoInfo.CfgDat.PlayerStock;
+	ConfigDat.InputFlags  = DemoInfo.CfgDat.InputFlags;
+
+	// 本体の性能記述 //
+	Viv.exp    = DemoInfo.Exp;
+	Viv.weapon = DemoInfo.Weapon;
+	Viv.left   = ConfigDat.PlayerStock;
+	Viv.bomb   = ConfigDat.BombStock;
+
+	// 乱数の初期化 //
+	// 最後に乱数もそろえる //
+	rnd_seed_set(DemoInfo.RndSeed);
+
+	return true;
+}
+
+
 // デモプレイデータを保存する //
 void DemoplayRecord(uint16_t key)
 {
@@ -107,27 +136,7 @@ bool DemoplayLoad(int stage)
 		const auto& inputs = maybe_inputs.value();
 		memcpy(DemoBuffer, inputs.data(), inputs.size_bytes());
 	}
-
-	DemoBufPtr = 0;
-	DemoplayLoadEnable = TRUE;
-
-	// コンフィグの初期化 //
-	ConfigTemp = ConfigDat;
-
-	ConfigDat.BombStock   = DemoInfo.CfgDat.BombStock;
-	ConfigDat.GameLevel   = DemoInfo.CfgDat.GameLevel;
-	ConfigDat.PlayerStock = DemoInfo.CfgDat.PlayerStock;
-	ConfigDat.InputFlags  = DemoInfo.CfgDat.InputFlags;
-
-	Viv.exp    = DemoInfo.Exp;
-	Viv.weapon = DemoInfo.Weapon;
-	Viv.left   = ConfigDat.PlayerStock;
-	Viv.bomb   = ConfigDat.BombStock;
-
-	// 乱数の初期化 //
-	rnd_seed_set(DemoInfo.RndSeed);
-
-	return TRUE;
+	return DemoplayLoadSetup();
 }
 
 
@@ -223,30 +232,7 @@ bool ReplayLoad(int stage)
 		return FALSE;
 	}
 	memcpy(DemoBuffer, temp.get(), sizeof(WORD)*DemoInfo.DataSize);
-
-
-	DemoBufPtr = 0;
-	DemoplayLoadEnable = TRUE;
-
-	// 現在のコンフィグを保持する //
-	ConfigTemp = ConfigDat;
-
-	// そのときのコンフィグを転送 //
-	ConfigDat.BombStock   = DemoInfo.CfgDat.BombStock;
-	ConfigDat.GameLevel   = DemoInfo.CfgDat.GameLevel;
-	ConfigDat.PlayerStock = DemoInfo.CfgDat.PlayerStock;
-	ConfigDat.InputFlags  = DemoInfo.CfgDat.InputFlags;
-
-	// 本体の性能記述 //
-	Viv.exp    = DemoInfo.Exp;
-	Viv.weapon = DemoInfo.Weapon;
-	Viv.left   = ConfigDat.PlayerStock;
-	Viv.bomb   = ConfigDat.BombStock;
-
-	// 最後に乱数もそろえる //
-	rnd_seed_set(DemoInfo.RndSeed);
-
-	return TRUE;
+	return DemoplayLoadSetup();
 }
 
 

@@ -109,8 +109,32 @@ const struct {
 	}
 } VERSION_ORIGINAL;
 
+const struct {
+	static constexpr auto FN = _PATH("SSG_V00.CFG");
+
+	static constexpr CONFIG_OPTION_ARRAY Options = {
+		ConfigDat.GameLevel,
+		ConfigDat.PlayerStock,
+		ConfigDat.BombStock,
+		ConfigDat.DeviceID,
+		ConfigDat.BitDepth,
+		ConfigDat.FPSDivisor,
+		ConfigDat.GraphFlags,
+		ConfigDat.SoundFlags,
+		ConfigDat.InputFlags,
+		ConfigDat.DebugFlags,
+		ConfigDat.PadTama,
+		ConfigDat.PadBomb,
+		ConfigDat.PadShift,
+		ConfigDat.PadCancel,
+		ConfigDat.ExtraStgFlags,
+		ConfigDat.StageSelect,
+	};
+} VERSION_00;
+
 // Must be sorted from the newest to the oldest version.
 const auto VERSIONS = std::make_tuple(
+	VERSION_00,
 	VERSION_ORIGINAL
 );
 

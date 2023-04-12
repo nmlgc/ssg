@@ -51,6 +51,10 @@ public:
 // On-disk config file versions
 // ----------------------------
 
+template <typename T> concept VERSION = requires(T t) {
+	{ t.Options } -> CONFIG_OPTION;
+};
+
 // Original 秋霜CFG.DAT
 const struct {
 	static constexpr auto FN = _PATH("秋霜CFG.DAT");
@@ -104,6 +108,24 @@ const struct {
 		return ret;
 	}
 } VERSION_ORIGINAL;
+
+// Must be sorted from the newest to the oldest version.
+const auto VERSIONS = std::make_tuple(
+	VERSION_ORIGINAL
+);
+
+bool VersionLoad(const VERSION auto& version)
+{
+	const auto loaded_buf = FileLoad(version.FN);
+	auto loaded_cursor = loaded_buf.cursor();
+	return version.Options.Read(loaded_cursor);
+}
+
+bool VersionSave(const VERSION auto& version)
+{
+	const auto buf = version.Options.Serialize();
+	return (buf && FileWrite(version.FN, buf.cursor()));
+}
 // ----------------------------
 
 ///// [グローバル変数] /////
@@ -134,21 +156,20 @@ extern void ConfigLoad()
 	DebugInit();
 #endif
 
-	const auto& version = VERSION_ORIGINAL;
-	const auto loaded_buf = FileLoad(version.FN);
-	auto loaded_cursor = loaded_buf.cursor();
-	version.Options.Read(loaded_cursor);
+	std::apply([](const auto&... version) {
+		(... || VersionLoad(version));
+	}, VERSIONS);
 }
 
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
-	const auto& version = VERSION_ORIGINAL;
-	version.CheckSum.v = version.CheckSumCalculate();
-	const auto buf = version.Options.Serialize();
-	if(buf) {
-		FileWrite(version.FN, buf.cursor());
-	}
+	// Backwards compatibility with 秋霜CFG.DAT
+	VERSION_ORIGINAL.CheckSum.v = VERSION_ORIGINAL.CheckSumCalculate();
+
+	std::apply([](const auto&... version) {
+		(..., VersionSave(version));
+	}, VERSIONS);
 
 #ifdef PBG_DEBUG
 	FileWrite(DBG_FN, DebugDat);

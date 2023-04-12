@@ -52,7 +52,7 @@ public:
 // ----------------------------
 
 // Original 秋霜CFG.DAT
-template <CONFIG_DATA& ConfigDat> struct VERSION_ORIGINAL {
+const struct {
 	static constexpr auto FN = _PATH("秋霜CFG.DAT");
 
 	static inline CONFIG_OPTION_VALUE<uint32_t> CheckSum;
@@ -103,7 +103,7 @@ template <CONFIG_DATA& ConfigDat> struct VERSION_ORIGINAL {
 		ret += (ConfigDat.SoundFlags.v << 2);
 		return ret;
 	}
-};
+} VERSION_ORIGINAL;
 // ----------------------------
 
 ///// [グローバル変数] /////
@@ -134,71 +134,16 @@ extern void ConfigLoad()
 	DebugInit();
 #endif
 
-	static CONFIG_DATA loaded; // Temporary
-
-	static VERSION_ORIGINAL<loaded> version;
+	const auto& version = VERSION_ORIGINAL;
 	const auto loaded_buf = FileLoad(version.FN);
 	auto loaded_cursor = loaded_buf.cursor();
-	if(!version.Options.Read(loaded_cursor)) {
-		return;
-	}
-
-	// These are validated by their respective subsystems.
-	ConfigDat.DeviceID = loaded.DeviceID;
-	ConfigDat.BitDepth = loaded.BitDepth;
-
-	// Quirk: Off by 2 and 1, respectively?!
-	if(loaded.PlayerStock.v <= (STOCK_PLAYER_MAX + 2)) {
-		ConfigDat.PlayerStock = loaded.PlayerStock;
-	}
-	if(loaded.BombStock.v <= (STOCK_BOMB_MAX + 1)) {
-		ConfigDat.BombStock = loaded.BombStock;
-	}
-
-	if(loaded.FPSDivisor.v <= FPS_DIVISOR_MAX) {
-		ConfigDat.FPSDivisor = loaded.FPSDivisor;
-	}
-	if(loaded.GameLevel.v <= GAME_LUNATIC) {
-		ConfigDat.GameLevel = loaded.GameLevel;
-	}
-
-	if(!(loaded.GraphFlags.v & GRPF_MASK)) {
-		ConfigDat.GraphFlags = loaded.GraphFlags;
-	}
-	if(!(loaded.SoundFlags.v & SNDF_MASK)) {
-		ConfigDat.SoundFlags = loaded.SoundFlags;
-	}
-	if(!(loaded.InputFlags.v & INPF_MASK)) {
-		ConfigDat.InputFlags = loaded.InputFlags;
-	}
-	if(!(loaded.DebugFlags.v & DBGF_MASK)) {
-		ConfigDat.DebugFlags = loaded.DebugFlags;
-	}
-
-	// 32 is the WinMM joy button limit //
-	if(loaded.PadTama.v   <= 32) {
-		ConfigDat.PadTama = loaded.PadTama;
-	}
-	if(loaded.PadBomb.v   <= 32) {
-		ConfigDat.PadBomb = loaded.PadBomb;
-	}
-	if(loaded.PadShift.v  <= 32) {
-		ConfigDat.PadShift = loaded.PadShift;
-	}
-	if(loaded.PadCancel.v <= 32) {
-		ConfigDat.PadCancel = loaded.PadCancel;
-	}
-	ConfigDat.ExtraStgFlags = loaded.ExtraStgFlags;
-
-	if(loaded.StageSelect.v <= STAGE_MAX) {
-		ConfigDat.StageSelect = loaded.StageSelect;
-	}
+	version.Options.Read(loaded_cursor);
 }
 
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
-	static VERSION_ORIGINAL<ConfigDat> version;
+	const auto& version = VERSION_ORIGINAL;
 	version.CheckSum.v = version.CheckSumCalculate();
 	const auto buf = version.Options.Serialize();
 	if(buf) {

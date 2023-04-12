@@ -57,8 +57,13 @@ template <typename T> concept CONFIG_OPTION = requires(
 	{ t.Write(cursor_write) } -> std::same_as<bool>;
 };
 
-// Option class //
-template <typename T> struct CONFIG_OPTION_VALUE {
+constexpr auto ValidateAlways = [](auto v) { return true; };
+
+// Option class, with optional validation of the value against a supported
+// static range.
+template <
+	typename T, bool (*Validate)(T) = ValidateAlways
+> struct CONFIG_OPTION_VALUE {
 	T v;
 
 	const size_t Size() const {
@@ -71,7 +76,9 @@ template <typename T> struct CONFIG_OPTION_VALUE {
 			return false;
 		}
 		const auto loaded = maybe_loaded.value()[0];
-		v = loaded;
+		if(Validate(loaded)) {
+			v = loaded;
+		}
 		return true;
 	}
 
@@ -87,12 +94,33 @@ template <typename T> struct CONFIG_OPTION_VALUE {
 
 // オプション保持用構造体 //
 typedef struct tagCONFIG_DATA{
-	template <typename T> using OPTION = CONFIG_OPTION_VALUE<T>;
+	template <
+		typename T, bool (*Validate)(T) = ValidateAlways
+	> using OPTION = CONFIG_OPTION_VALUE<T, Validate>;
+
+	template <uint8_t Max> using OPTION_U8_BELOW = OPTION<uint8_t, [](auto v) {
+		return (v <= Max);
+	}>;
+
+	template <uint8_t Mask> using OPTION_FLAGS = OPTION<uint8_t, [](auto v) {
+		return !(v & Mask);
+	}>;
+
+	// 32 is the WinMM joy button limit //
+	using OPTION_WINMM_PAD = OPTION_U8_BELOW<32>;
 
 	// 難易度関連 //
-	OPTION<uint8_t> GameLevel = { GAME_NORMAL };	// 難易度
-	OPTION<uint8_t> PlayerStock = { 2 };	// 初期メイド数？
-	OPTION<uint8_t> BombStock = { 2 };	// 初期ボム数
+	// ---------- //
+
+	OPTION_U8_BELOW<GAME_LUNATIC> GameLevel = { GAME_NORMAL };	// 難易度
+
+	// 初期メイド数？
+	// Quirk: Off by 2?
+	OPTION_U8_BELOW<STOCK_PLAYER_MAX + 2> PlayerStock = { 2 };
+
+	// Quirk: Off by 1?
+	OPTION_U8_BELOW<STOCK_BOMB_MAX + 1> BombStock = { 2 }; // 初期ボム数
+	// ---------- //
 
 	// グラフィック関連 //
 	OPTION<uint8_t> DeviceID = { 0 };	// 何番目のデバイスか
@@ -100,28 +128,32 @@ typedef struct tagCONFIG_DATA{
 
 	// Target frame rate = 60 / [FPSDivisor]. 0 disables any frame rate
 	// limitation.
-	OPTION<uint8_t> FPSDivisor = { 1 }; // 60Fps Mode
+	OPTION_U8_BELOW<FPS_DIVISOR_MAX> FPSDivisor = { 1 }; // 60Fps Mode
 
-	OPTION<uint8_t> GraphFlags = { 0 };	// グラフィックに関するフラグ
+	// グラフィックに関するフラグ
+	OPTION_FLAGS<GRPF_MASK> GraphFlags = { 0 };
 
 	// サウンド・ＭＩＤＩ関連 //
-	OPTION<uint8_t> SoundFlags = { (SNDF_WAVE_ENABLE | SNDF_MIDI_ENABLE) };
+	OPTION_FLAGS<SNDF_MASK> SoundFlags = {
+		(SNDF_WAVE_ENABLE | SNDF_MIDI_ENABLE)
+	};
 
 	// 入力に関するフラグ
-	OPTION<uint8_t> InputFlags = { INPF_Z_MSKIP_ENABLE };
+	OPTION_FLAGS<INPF_MASK> InputFlags = { INPF_Z_MSKIP_ENABLE };
 
-	OPTION<uint8_t> DebugFlags = { 0 };	// デバッグに関するフラグ
+	// デバッグに関するフラグ
+	OPTION_FLAGS<DBGF_MASK> DebugFlags = { 0 };
 
-	OPTION<uint8_t> PadTama = { 1 };
-	OPTION<uint8_t> PadBomb = { 2 };
-	OPTION<uint8_t> PadShift = { 0 };
-	OPTION<uint8_t> PadCancel = { 0 };
+	OPTION_WINMM_PAD PadTama = { 1 };
+	OPTION_WINMM_PAD PadBomb = { 2 };
+	OPTION_WINMM_PAD PadShift = { 0 };
+	OPTION_WINMM_PAD PadCancel = { 0 };
 
 	// エキストラステージ判定用フラグ
 	OPTION<uint8_t> ExtraStgFlags = { 0 };
 
 	// ワケ有りでここにいるのです(チェックサムの範囲外)
-	OPTION<uint8_t> StageSelect = { 0 };
+	OPTION_U8_BELOW<STAGE_MAX> StageSelect = { 0 };
 } CONFIG_DATA;
 
 // Active configuration

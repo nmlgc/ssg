@@ -7,6 +7,7 @@
 
 #include "LEVEL.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "platform/buffer.h"
 
 // フラグ //
 #define GRPF_MASK				(~0x07)
@@ -34,9 +35,54 @@ constexpr const auto FPS_DIVISOR_MAX = 3;
 constexpr const auto STAGE_MAX = 6; // ステージ数
 
 
+// Option interface. Allows us to arrange values from [ConfigDat] into arrays
+// that define multiple versions of config files, and can be trivially looped
+// over.
+template <typename T> concept CONFIG_OPTION = requires(
+	T t,
+	BYTE_BUFFER_CURSOR<const uint8_t>& cursor_read,
+	BYTE_BUFFER_CURSOR<uint8_t>& cursor_write
+) {
+	// Returns the size of the option value.
+	{ t.Size() } -> std::same_as<size_t>;
+
+	// Reads the configuration value from the given [cursor], advancing it by
+	// the value of Size(). Returns whether there were enough bytes left and
+	// reading should continue.
+	{ t.Read(cursor_read) } -> std::same_as<bool>;
+
+	// Writes the configuration value to the given [cursor], advancing it by
+	// the value of Size(). Returns whether there were enough bytes left and
+	// writing should continue.
+	{ t.Write(cursor_write) } -> std::same_as<bool>;
+};
+
 // Option class //
 template <typename T> struct CONFIG_OPTION_VALUE {
 	T v;
+
+	const size_t Size() const {
+		return sizeof(T);
+	}
+
+	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor) {
+		const auto maybe_loaded = cursor.next<T>();
+		if(!maybe_loaded) {
+			return false;
+		}
+		const auto loaded = maybe_loaded.value()[0];
+		v = loaded;
+		return true;
+	}
+
+	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) {
+		auto maybe_v = cursor.next<T>();
+		if(!maybe_v) {
+			return false;
+		}
+		maybe_v.value()[0] = v;
+		return true;
+	}
 };
 
 // オプション保持用構造体 //
@@ -73,14 +119,12 @@ typedef struct tagCONFIG_DATA{
 
 	// エキストラステージ判定用フラグ
 	OPTION<uint8_t> ExtraStgFlags = { 0 };
-	uint32_t CheckSum;
 
 	// ワケ有りでここにいるのです(チェックサムの範囲外)
 	OPTION<uint8_t> StageSelect = { 0 };
-
-	uint32_t CheckSumCalculate() const;
 } CONFIG_DATA;
 
+// Active configuration
 extern CONFIG_DATA ConfigDat;
 
 #ifdef PBG_DEBUG

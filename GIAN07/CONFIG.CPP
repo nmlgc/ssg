@@ -9,29 +9,102 @@
 #include "CONFIG.H"
 
 ///// Constants /////
-constexpr auto CFG_FN = _PATH("秋霜CFG.DAT");
 constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
 
-///// Methods /////
-uint32_t CONFIG_DATA::CheckSumCalculate() const
-{
-	uint32_t ret = 0;
-	ret += (BitDepth.v.value() << 1);
-	ret += (BombStock.v << 3);
-	ret += (DeviceID.v << 2);
-	ret += (FPSDivisor.v << 6);
-	ret += (ExtraStgFlags.v << 5);
-	ret += (GameLevel.v << 2);
-	ret += (GraphFlags.v << 1);
-	ret += (InputFlags.v << 3);
-	ret += (PadBomb.v << 6);
-	ret += (PadCancel.v << 3);
-	ret += (PadShift.v << 1);
-	ret += (PadTama.v << 4);
-	ret += (PlayerStock.v << 5);
-	ret += (SoundFlags.v << 2);
-	return ret;
-}
+// Arrays of configuration options for simple serialization
+template <CONFIG_OPTION... Options> class CONFIG_OPTION_ARRAY {
+private:
+	const std::tuple<Options&...> options;
+
+public:
+	constexpr CONFIG_OPTION_ARRAY(Options&... options)
+		: options(options...) {
+	}
+
+	const size_t Size() const {
+		return std::apply([](const auto&... opt) {
+			return (... + opt.Size());
+		}, options);
+	}
+
+	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor) const {
+		return std::apply([&cursor](auto&... opt) {
+			return (... && opt.Read(cursor));
+		}, options);
+	}
+
+	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) const {
+		return std::apply([&cursor](auto&... opt) {
+			return (... && opt.Write(cursor));
+		}, options);
+	}
+
+	// Recursively writes the options into a buffer, to be then saved into the
+	// configuration file.
+	BYTE_BUFFER_OWNED Serialize() const {
+		BYTE_BUFFER_OWNED ret = { Size() };
+		auto cursor = ret.cursor_mut();
+		return (!Write(cursor) ? nullptr : std::move(ret));
+	}
+};
+
+// On-disk config file versions
+// ----------------------------
+
+// Original 秋霜CFG.DAT
+template <CONFIG_DATA& ConfigDat> struct VERSION_ORIGINAL {
+	static constexpr auto FN = _PATH("秋霜CFG.DAT");
+
+	static inline CONFIG_OPTION_VALUE<uint32_t> CheckSum;
+	static inline CONFIG_OPTION_VALUE<uint8_t> PaddingByte;
+
+	static constexpr CONFIG_OPTION_ARRAY Options = {
+		ConfigDat.GameLevel,
+		ConfigDat.PlayerStock,
+		ConfigDat.BombStock,
+		ConfigDat.DeviceID,
+		ConfigDat.BitDepth,
+		ConfigDat.FPSDivisor,
+		ConfigDat.GraphFlags,
+		ConfigDat.SoundFlags,
+		ConfigDat.InputFlags,
+		ConfigDat.DebugFlags,
+		ConfigDat.PadTama,
+		ConfigDat.PadBomb,
+		ConfigDat.PadShift,
+		ConfigDat.PadCancel,
+		ConfigDat.ExtraStgFlags,
+		PaddingByte,
+		CheckSum,
+
+		// ワケ有りでここにいるのです(チェックサムの範囲外)
+		ConfigDat.StageSelect,
+
+		PaddingByte,
+		PaddingByte,
+		PaddingByte,
+	};
+
+	static uint32_t CheckSumCalculate() {
+		uint32_t ret = 0;
+		ret += (ConfigDat.BitDepth.v.value() << 1);
+		ret += (ConfigDat.BombStock.v << 3);
+		ret += (ConfigDat.DeviceID.v << 2);
+		ret += (ConfigDat.FPSDivisor.v << 6);
+		ret += (ConfigDat.ExtraStgFlags.v << 5);
+		ret += (ConfigDat.GameLevel.v << 2);
+		ret += (ConfigDat.GraphFlags.v << 1);
+		ret += (ConfigDat.InputFlags.v << 3);
+		ret += (ConfigDat.PadBomb.v << 6);
+		ret += (ConfigDat.PadCancel.v << 3);
+		ret += (ConfigDat.PadShift.v << 1);
+		ret += (ConfigDat.PadTama.v << 4);
+		ret += (ConfigDat.PlayerStock.v << 5);
+		ret += (ConfigDat.SoundFlags.v << 2);
+		return ret;
+	}
+};
+// ----------------------------
 
 ///// [グローバル変数] /////
 CONFIG_DATA ConfigDat;
@@ -61,11 +134,14 @@ extern void ConfigLoad()
 	DebugInit();
 #endif
 
-	const auto maybe_loaded = FileLoad<CONFIG_DATA>(CFG_FN);
-	if(!maybe_loaded) {
+	static CONFIG_DATA loaded; // Temporary
+
+	static VERSION_ORIGINAL<loaded> version;
+	const auto loaded_buf = FileLoad(version.FN);
+	auto loaded_cursor = loaded_buf.cursor();
+	if(!version.Options.Read(loaded_cursor)) {
 		return;
 	}
-	const auto& loaded = maybe_loaded.value();
 
 	// These are validated by their respective subsystems.
 	ConfigDat.DeviceID = loaded.DeviceID;
@@ -122,8 +198,12 @@ extern void ConfigLoad()
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
-	ConfigDat.CheckSum = ConfigDat.CheckSumCalculate();
-	FileWrite(CFG_FN, ConfigDat);
+	static VERSION_ORIGINAL<ConfigDat> version;
+	version.CheckSum.v = version.CheckSumCalculate();
+	const auto buf = version.Options.Serialize();
+	if(buf) {
+		FileWrite(version.FN, buf.cursor());
+	}
 
 #ifdef PBG_DEBUG
 	FileWrite(DBG_FN, DebugDat);

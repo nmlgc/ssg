@@ -67,10 +67,6 @@ extern void ConfigLoad()
 	}
 	const auto& loaded = maybe_loaded.value();
 
-	if(loaded.CheckSumCalculate() != loaded.CheckSum) {
-		return;
-	};
-
 	// These are validated by their respective subsystems.
 	ConfigDat.DeviceID = loaded.DeviceID;
 	ConfigDat.BitDepth = loaded.BitDepth;

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "game/surface.h"
-#include "platform/buffer.h"
+#include "game/format_bmp.h"
 
 // Only required for the HBITMAP type, which is basically void*.
 #define WIN32_LEAN_AND_MEAN
@@ -21,9 +21,8 @@ struct SURFACE_GDI : public SURFACE {
 	SURFACE_GDI& operator=(const SURFACE_GDI&) = delete;
 	~SURFACE_GDI();
 
-	// Calls Delete() and reinitializes [img] with the contents of [buffer] if
-	// they are a valid .BMP.
-	bool LoadBMP(BYTE_BUFFER_OWNED buffer);
+	// Calls Delete() and reinitializes [img].
+	bool Load(BMP_OWNED bmp);
 
 	void Delete();
 };

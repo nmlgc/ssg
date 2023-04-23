@@ -8,13 +8,27 @@
 #include "CONFIG.H"
 #include "LOADER.H"
 #include "LENS.H"
+#include <assert.h>
 #include <ddraw.h>
 
 
 // Packfile loading //
 bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
 {
-	return GrpBMPLoad(in.MemExpand(filno), surf_id);
+	auto maybe_bmp = BMPLoad(in.MemExpand(filno));
+
+	// If this fails, we're going to crash due to the uninitialized surface
+	// anyway. Might as well announce it in debug mode.
+	assert(maybe_bmp);
+
+	// Still necessary to avoid generation of exception handling code in
+	// Release mode.
+	if(!maybe_bmp) {
+		return false;
+	}
+
+	auto& bmp = maybe_bmp.value();
+	return GrpBMPLoad(surf_id, std::move(bmp));
 }
 
 bool PMid_Load(const PACKFILE_READ &in, fil_no_t filno)

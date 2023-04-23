@@ -15,6 +15,9 @@ BASE = {
 if (tup.getconfig("DEBUG") != "n") then
 	CONFIGS.debug.cflags = (CONFIGS.debug.cflags .. " /DPBG_DEBUG")
 end
+if (tup.getconfig("RELEASE") != "n") then
+	CONFIGS.release.cflags = (CONFIGS.release.cflags .. " /DNDEBUG")
+end
 
 main_src += tup.glob("game/*.cpp")
 main_src += tup.glob("platform/windows/*.cpp")

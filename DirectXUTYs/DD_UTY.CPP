@@ -393,12 +393,12 @@ SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size)
 	return &DxSurf[surf_id];
 }
 
-bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
+bool GrpBMPLoad(BYTE surf_id, BMP_OWNED bmp)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	auto& surf = DxSurf[surf_id];
-	return (surf.LoadBMP(std::move(buffer)) && DxObj.SurfaceRestore(surf));
+	return (surf.Load(std::move(bmp)) && DxObj.SurfaceRestore(surf));
 }
 
 void GrpCls(void)
@@ -560,32 +560,14 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 	else             return TRUE;
 }
 
-bool SURFACE_GDI::LoadBMP(BYTE_BUFFER_OWNED buffer)
+bool SURFACE_GDI::Load(BMP_OWNED bmp)
 {
-	BITMAPFILEHEADER		*BMP_file;
-	BITMAPINFOHEADER		*BMP_info;
-
-	if(!buffer) {
-		return false;
-	}
-
-	BMP_file = (BITMAPFILEHEADER *)buffer.get();
-	BMP_info = (BITMAPINFOHEADER *)((BMP_file) +   1);
-	auto* dib_pal = reinterpret_cast<RGBQUAD *>(BMP_info + 1);
-	const auto* image = (
-		reinterpret_cast<const std::byte *>(BMP_file) + BMP_file->bfOffBits
-	);
-
-	// ヘッダチェッカ //
-	if(BMP_file->bfType != MAKEWORD('B','M')) return FALSE;
-	if(BMP_info->biBitCount != 8) return FALSE;
-
-	if(DxObj.PixelFormat.IsPalettized()){
+	if(DxObj.PixelFormat.IsPalettized() && !bmp.palette.empty()) {
 		// Yup, we must mutate the .BMP palette in addition to the DirectDraw
-		// palette, since we pass it via [BMP_info] into CreateDIBSection()
+		// palette, since we pass it via [bmp.info] into CreateDIBSection()
 		// below. Not doing that will turn the black parts of Marisa's sprite
 		// transparent.
-		dib_pal[0] = { 0, 0, 0 }; // 例外的な処理 //
+		bmp.palette[0] = { 0, 0, 0 }; // 例外的な処理 //
 	}
 
 	Delete();
@@ -593,7 +575,7 @@ bool SURFACE_GDI::LoadBMP(BYTE_BUFFER_OWNED buffer)
 	void* hbmp_bits = nullptr;
 	img = CreateDIBSection(
 		GetDC(nullptr),
-		reinterpret_cast<const BITMAPINFO *>(BMP_info),
+		reinterpret_cast<const BITMAPINFO *>(&bmp.info),
 		DIB_RGB_COLORS,
 		&hbmp_bits,
 		nullptr,
@@ -602,18 +584,7 @@ bool SURFACE_GDI::LoadBMP(BYTE_BUFFER_OWNED buffer)
 	if(!img) {
 		return false;
 	}
-
-	// [BMP_info->biSizeImage] can be 0, so we have to manually calculate the
-	// actual size allocated by CreateDIBSection() by DWORD-aligning the row
-	// stride. We can't just take everything from [image] to the end of the
-	// buffer because nothing prevents the file from being larger than what
-	// CreateDIBSection() allocated. This actually happens with File 22 in
-	// GRAPH.DAT (Reimu's faceset).
-	const auto stride = (
-		(((BMP_info->biWidth * BMP_info->biBitCount) + 31u) & ~31) / 8u
-	);
-	memcpy(hbmp_bits, image, (stride * BMP_info->biHeight));
-
+	memcpy(hbmp_bits, bmp.pixels.data(), bmp.pixels.size_bytes());
 	return true;
 }
 

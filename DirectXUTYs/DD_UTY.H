@@ -23,6 +23,7 @@
 
 // ヘッダファイル //
 #include "game/coords.h"
+#include "game/format_bmp.h"
 #include "game/graphics.h"
 #include "platform/buffer.h"
 #include "platform/windows/surface_ddraw.h"
@@ -238,7 +239,7 @@ void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size);	// Surface の作成(BMPリロード有り)
 
 // ＢＭＰファイルロード //
-bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface
+bool GrpBMPLoad(BYTE surf_id, BMP_OWNED bmp);	// Buffer->Surface
 
 extern BOOL GrpSetColorKey(IDirectDrawSurface* lpds);	// ビット深度によりカラーキーをセットする
 extern void GrpOffsClear(IDirectDrawSurface* lpds);		// ある Surface を初期化する

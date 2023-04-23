@@ -229,7 +229,7 @@ static void AppCleanup(void)
 {
 	XCleanup();
 
-	GrpCleanup();
+	DxObj.Cleanup();
 	SndCleanup();
 	Mid_Stop();
 	Mid_End();
@@ -246,7 +246,7 @@ BOOL XInit(void)
 	Key_PadConfig2(ConfigDat.PadCancel.v, KEY_ESC);
 
 	// グラフィックの初期化 //
-	if(!GrpInit(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
+	if(!DxObj.Init(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
 		return false;
 	}
 	InitSurface();

@@ -43,7 +43,9 @@ inline bool AlphaEnable(bool flag)
 
 	dxret = DxObj.D3Dev->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE,flag);
 	if(dxret!=D3D_OK){
-		if(!GrpRestore()) return FALSE;
+		if(!DxObj.Restore()) {
+			return false;
+		}
 	}
 
 	return TRUE;
@@ -85,13 +87,17 @@ void _3DLock(void)
 	// 目標セット //
 	dxret = DxObj.D3Dev->SetRenderTarget(DxObj.Back,0);
 	if(dxret!=D3D_OK){
-		if(!GrpRestore()) return;
+		if(!DxObj.Restore()) {
+			return;
+		}
 	}
 
 	// Ｚバッファだけをクリアする //
 	dxret = DxObj.View->Clear(1,&d3drc,/*D3DCLEAR_TARGET|*/D3DCLEAR_ZBUFFER);
 	if(dxret!=D3D_OK){
-		if(!GrpRestore()) return;
+		if(!DxObj.Restore()) {
+			return;
+		}
 	}
 
 	// 描き込み開始 //

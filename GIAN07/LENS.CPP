@@ -156,7 +156,7 @@ extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 			break;
 		}
 		if(ddrval == DDERR_SURFACELOST){
-			if(!GrpRestore())
+			if(!DxObj.Restore())
 			return;
 		}
 		if(ddrval != DDERR_WASSTILLDRAWING){

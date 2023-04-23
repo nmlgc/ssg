@@ -375,7 +375,7 @@ static BOOL GrpFnChgDevice(WORD key)
 			);
 
 			// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
-			if(GrpInit(device_id_new, ConfigDat.BitDepth.v)) {
+			if(DxObj.Init(device_id_new, ConfigDat.BitDepth.v)) {
 				ConfigDat.DeviceID.v = device_id_new;
 				InitSurface();
 				//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
@@ -403,7 +403,7 @@ static BOOL GrpFnBpp(WORD key)
 			auto bitdepth_new = ConfigDat.BitDepth.v.cycle(key == KEY_LEFT);
 
 			// この部分に本当ならエラーチェックが必要 //
-			if(GrpInit(ConfigDat.DeviceID.v, bitdepth_new)) {
+			if(DxObj.Init(ConfigDat.DeviceID.v, bitdepth_new)) {
 				ConfigDat.BitDepth.v = bitdepth_new;
 				InitSurface();
 				//GrpSetPalette(DxObj.pe);

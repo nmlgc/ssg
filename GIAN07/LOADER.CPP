@@ -28,7 +28,7 @@ bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
 	}
 
 	auto& bmp = maybe_bmp.value();
-	return GrpBMPLoad(surf_id, std::move(bmp));
+	return DxObj.SurfaceLoad(surf_id, std::move(bmp));
 }
 
 bool PMid_Load(const PACKFILE_READ &in, fil_no_t filno)
@@ -107,33 +107,33 @@ BOOL InitSurface(void)
 
 //	bIsBombPalette = FALSE;
 
-	GrTama = GrpCreateSurface(SURFACE_ID_SYSTEM, { 640, 480 });
+	GrTama = DxObj.SurfaceCreate(SURFACE_ID_SYSTEM, { 640, 480 });
 	if(GrTama==NULL) return FALSE;
 
-	GrMap = GrpCreateSurface(SURFACE_ID_MAPCHIP, { 640, 480 });
+	GrMap = DxObj.SurfaceCreate(SURFACE_ID_MAPCHIP, { 640, 480 });
 	if(GrMap==NULL) return FALSE;
 
-	GrEnemy = GrpCreateSurface(SURFACE_ID_ENEMY, { 640, 480 });
+	GrEnemy = DxObj.SurfaceCreate(SURFACE_ID_ENEMY, { 640, 480 });
 	if(GrEnemy==NULL) return FALSE;
 
 	for(i=0;i<FACE_MAX;i++){
-		FaceData[i].GrSurf = GrpCreateSurface(
+		FaceData[i].GrSurf = DxObj.SurfaceCreate(
 			(SURFACE_ID_FACE0 + i), { (96 * FACE_NUMX), 96 }
 		);
 		if(FaceData[i].GrSurf==NULL) return FALSE;
 	}
 
-	GrBomber = GrpCreateSurface(SURFACE_ID_BOMBER, { 640, 480 });
+	GrBomber = DxObj.SurfaceCreate(SURFACE_ID_BOMBER, { 640, 480 });
 	if(GrBomber == NULL) return FALSE;
 
-	GrMTitle = GrpCreateSurface(SURFACE_ID_MTITLE, { 640, 20 });
+	GrMTitle = DxObj.SurfaceCreate(SURFACE_ID_MTITLE, { 640, 20 });
 	if(GrMTitle==NULL) return FALSE;
 
 
 	// レンズをすでに作成しているのなら、破棄する //
 	if(Lens) GrpReleaseLensBall(Lens);
 
-	GrLens = GrpCreateSurface(SURFACE_ID_LENS, { 140, 140 });
+	GrLens = DxObj.SurfaceCreate(SURFACE_ID_LENS, { 140, 140 });
 	if(GrLens==NULL) return FALSE;
 
 	Lens = GrpCreateLensBall(70, 36, GrLens);
@@ -209,8 +209,9 @@ BOOL LoadGraph(int stage)
 					break;
 				}
 				if(ddrval == DDERR_SURFACELOST){
-					if(!GrpRestore())
-					return FALSE;
+					if(!DxObj.Restore()) {
+						return false;
+					}
 				}
 				if(ddrval != DDERR_WASSTILLDRAWING){
 					return FALSE;

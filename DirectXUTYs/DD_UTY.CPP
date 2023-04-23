@@ -83,7 +83,7 @@ static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関
 
 // Templating the functor avoids both the need for #including <functional> and
 // any potential runtime exceptions related to the call.
-void DDrawRetryUntilSuccessful(auto action)
+void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
 {
 	for(;;) {
 		HRESULT ddrval = action();
@@ -91,7 +91,7 @@ void DDrawRetryUntilSuccessful(auto action)
 			break;
 		}
 		if(ddrval == DDERR_SURFACELOST) {
-			if(!GrpRestore()) {
+			if(!dxobj.Restore()) {
 				return;
 			}
 		}
@@ -131,7 +131,7 @@ bool GrpEnum(HWND hWnd)
 	return TRUE;
 }
 
-bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
+bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 {
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
@@ -140,7 +140,9 @@ bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 //	D3DMATERIAL			mat;
 //	D3DMATERIALHANDLE	hmat;
 
-	if(DxObj.hWnd==NULL) return FALSE;
+	if(hWnd == nullptr) {
+		return false;
+	}
 
 	if(device_id >= DxEnumNow) {
 		device_id = 0;
@@ -163,11 +165,11 @@ bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 	const auto pixel_format = maybe_pixel_format.value();
 
 	// Already running with this configuration? //
-	if((device_id == DxObj.DeviceID) && (pixel_format == DxObj.PixelFormat)) {
+	if((device_id == DeviceID) && (pixel_format == PixelFormat)) {
 		return false;
 	}
 
-	GrpCleanup();
+	Cleanup();
 	ZEROMEM(ddsd);
 	ZEROMEM(ddscaps);
 
@@ -175,16 +177,18 @@ bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 		dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
 		if(dxret!=DD_OK) throw("DirectDrawCreate に失敗");
 
-		dxret = lpDD->QueryInterface(IID_IDirectDraw2,(void **)&DxObj.DD);
+		dxret = lpDD->QueryInterface(IID_IDirectDraw2, (void **)&DD);
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 		RELEASE(lpDD);
 
 		// 強調レベルのセット //
-		dxret = DxObj.DD->SetCooperativeLevel(DxObj.hWnd,DDSCL_EXCLUSIVE|DDSCL_FULLSCREEN);
+		dxret = DD->SetCooperativeLevel(
+			hWnd, (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN)
+		);
 		if(dxret!=DD_OK) throw("SetCooperativeLevel に失敗");
 
 		// ディスプレイモードのセット //
-		dxret = DxObj.DD->SetDisplayMode(640,480,bitdepth.value(),0,0);
+		dxret = DD->SetDisplayMode(640, 480, bitdepth.value(), 0, 0);
 		if(dxret!=DD_OK) throw("SetDisplayMode に失敗");
 
 		// プライマリ＆バックサーフェスの作成 //
@@ -192,31 +196,29 @@ bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 		ddsd.dwFlags = DDSD_CAPS|DDSD_BACKBUFFERCOUNT;
 		ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE|DDSCAPS_3DDEVICE|DDSCAPS_FLIP|DDSCAPS_COMPLEX;
 		ddsd.dwBackBufferCount = 1;
-		dxret = DxObj.DD->CreateSurface(&ddsd,&DxObj.Prim,NULL);
+		dxret = DD->CreateSurface(&ddsd, &Prim, nullptr);
 		if(dxret!=DD_OK) throw("CreateSurface(Prim) に失敗");
 
 		// BackBuffer へのポインタを Get //
 		ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
-		dxret = DxObj.Prim->GetAttachedSurface(&ddscaps,&DxObj.Back);
+		dxret = Prim->GetAttachedSurface(&ddscaps, &Back);
 		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
 
 		// フルスクリーン用フリップ //
 		GrpFlip = GrpFlipFS;
 
 		// 2Dの初期化はここでおしまい //
-		DxObj.DeviceID = device_id;
-		DxObj.PixelFormat = pixel_format;
-		if(DxObj.PixelFormat.IsPalettized()) throw(TRUE);
+		DeviceID = device_id;
+		PixelFormat = pixel_format;
+		if(PixelFormat.IsPalettized()) throw(TRUE);
 
 		// Direct3D Object の取得 //
-		dxret = DxObj.DD->QueryInterface(IID_IDirect3D2,(void **)&DxObj.D3);
+		dxret = DD->QueryInterface(IID_IDirect3D2, (void **)&D3);
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 
 		// Direct3D Device の作成 //
-		dxret = DxObj.D3->CreateDevice(
-			*pXDD.D3D[0].lpGuid, DxObj.Back, &DxObj.D3Dev
-		);
-		//dxret = DxObj.D3->CreateDevice(IID_IDirect3DHALDevice,DxObj.Back,&DxObj.D3Dev);
+		dxret = D3->CreateDevice(*pXDD.D3D[0].lpGuid, Back, &D3Dev);
+		//dxret = D3->CreateDevice(IID_IDirect3DHALDevice, Back, &D3Dev);
 		if(dxret!=D3D_OK) throw("CreateDevice(D3D_Device) に失敗");
 
 		// Ｚバッファ作成＆接続 //
@@ -224,18 +226,18 @@ bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 			throw("CreateSurface(Z-Buffer) に失敗");
 
 		// Direct3D Viewport の作成＆接続 //
-		dxret = DxObj.D3->CreateViewport(&DxObj.View,NULL);
+		dxret = D3->CreateViewport(&View, nullptr);
 		if(dxret!=D3D_OK) throw("CreateViewport に失敗");
-		dxret = DxObj.D3Dev->AddViewport(DxObj.View);
+		dxret = D3Dev->AddViewport(View);
 		if(dxret!=D3D_OK) throw("AddViewport に失敗");
-		dxret = DxObj.D3Dev->SetCurrentViewport(DxObj.View);
+		dxret = D3Dev->SetCurrentViewport(View);
 		if(dxret!=D3D_OK) throw("SetCurrentViewport に失敗");
 
 		throw(TRUE);
 	}
 	catch(char *error){
 		DebugOut(error);
-		GrpCleanup();
+		Cleanup();
 		return FALSE;
 	}
 	catch(BOOL flag){
@@ -252,25 +254,25 @@ bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth)
 	return FALSE;
 }
 
-void GrpCleanup(void)
+void GRAPHICS_DDRAW::Cleanup(void)
 {
 	int		i;
 
-	RELEASE(DxObj.View);
-	RELEASE(DxObj.D3Dev);
-	RELEASE(DxObj.D3);
-	RELEASE(DxObj.Zbuf);
+	RELEASE(View);
+	RELEASE(D3Dev);
+	RELEASE(D3);
+	RELEASE(Zbuf);
 
-	RELEASE(DxObj.Pal);
+	RELEASE(Pal);
 
 	// ここではSurfaceのBMPを解放しないことに注意 //
 	for(i=0;i<SURFACE_MAX;i++){
 		RELEASE(DxSurf[i].surf);
 	}
 
-	RELEASE(DxObj.Back);
-	RELEASE(DxObj.Prim);
-	RELEASE(DxObj.DD);
+	RELEASE(Back);
+	RELEASE(Prim);
+	RELEASE(DD);
 
 	// グラフィック系関数を実行できないようにする //
 	SetDummyFunc();
@@ -317,26 +319,26 @@ void GrpSetClip(int sx, int sy, int ex, int ey)
 	}
 }
 
-bool GrpRestore(void)
+bool GRAPHICS_DDRAW::Restore(void)
 {
 	HRESULT		dxval;
 	int			i;
 
-	if(DxObj.Prim){
-		dxval = DxObj.Prim->Restore();
+	if(Prim) {
+		dxval = Prim->Restore();
 		if(dxval!=DD_OK) return FALSE;
 	}
-	if(DxObj.Back){
-		DxObj.Back->Restore();
+	if(Back) {
+		Back->Restore();
 		if(dxval!=DD_OK) return FALSE;
 	}
-	if(DxObj.Zbuf){
-		DxObj.Zbuf->Restore();
+	if(Zbuf) {
+		Zbuf->Restore();
 		if(dxval!=DD_OK) return FALSE;
 	}
 
 	for(i=0;i<SURFACE_MAX;i++){
-		if(!DxObj.SurfaceRestore(DxSurf[i])) {
+		if(!SurfaceRestore(DxSurf[i])) {
 			return false;
 		}
 	}
@@ -389,9 +391,8 @@ void GrpSetPalette(const PALETTE& pal)
 	DisableAlphaTable();
 }
 
-SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size)
+SURFACE_DDRAW* GRAPHICS_DDRAW::SurfaceCreate(BYTE surf_id, PIXEL_SIZE size)
 {
-	HRESULT				dxval;
 	DDSURFACEDESC		ddsd;
 	IDirectDrawSurface*	temp = nullptr;
 
@@ -407,23 +408,23 @@ SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size)
 	ddsd.dwHeight       = size.h;
 	ddsd.dwFlags        = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	dxval = DxObj.DD->CreateSurface(&ddsd,&temp,NULL);
+	auto dxval = DD->CreateSurface(&ddsd, &temp, nullptr);
 
 	if(dxval==DD_OK){
 		DxSurf[surf_id].surf = temp;
 		DxSurf[surf_id].size = size;
-		DxObj.SurfaceRestore(DxSurf[surf_id]);
+		SurfaceRestore(DxSurf[surf_id]);
 	}
 
 	return &DxSurf[surf_id];
 }
 
-bool GrpBMPLoad(BYTE surf_id, BMP_OWNED bmp)
+bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	auto& surf = DxSurf[surf_id];
-	return (surf.Load(std::move(bmp)) && DxObj.SurfaceRestore(surf));
+	return (surf.Load(std::move(bmp)) && SurfaceRestore(surf));
 }
 
 void GrpCls(void)
@@ -450,7 +451,7 @@ void GrpClsEx(const std::optional<RECT>& Target, DWORD col)
 		rect = &rect_local;
 	}
 
-	DDrawRetryUntilSuccessful([&] {
+	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->Blt(
 			rect, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx
 		);
@@ -465,7 +466,7 @@ extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds)
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
 	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()) ? RGB256(0,0,0) : 0;
-	DDrawRetryUntilSuccessful([&] {
+	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return lpds->Blt(nullptr, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx);
 	});
 	DDCOLORKEY key = { ddbltfx.dwFillColor, ddbltfx.dwFillColor };
@@ -483,7 +484,7 @@ static void GrpFlipFS(void)
 		DxObj.Back->SetPalette(DxObj.Pal);		// 裏画面にパレットをセットする
 		DxObj.bNeedChgPal = FALSE;
 	}
-	DDrawRetryUntilSuccessful([&] {
+	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Prim->Flip(nullptr, 0);
 	});
 }
@@ -494,7 +495,7 @@ static void GrpFlipWnd(void)
 	if(CaptureFlag && (GetAsyncKeyState(VK_SNAPSHOT)&0x8000))
 		PutSurfaceToBmp(DxObj.Back);
 
-	DDrawRetryUntilSuccessful([&] {
+	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Prim->Blt(nullptr, DxObj.Back, nullptr, 0, nullptr);
 	});
 }
@@ -532,7 +533,7 @@ bool GrpClip(RECT *src, int *x, int *y)
 
 void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
-	DDrawRetryUntilSuccessful([&] {
+	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(
 			x, y, surf->surf, src, DDBLTFAST_SRCCOLORKEY
 		);
@@ -541,7 +542,7 @@ void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 
 void GrpBltXC(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 {
-	DDrawRetryUntilSuccessful([&] {
+	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(x, y, surf->surf, src, DDBLTFAST_NOCOLORKEY);
 	});
 }
@@ -629,31 +630,31 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 
 	// Set the palette first to ensure that the colors get mapped correctly
 	// when blitting the DIB to the DirectDraw surface.
-	if(DxObj.PixelFormat.IsPalettized()) {
-		std::array<RGBQUAD, DxObj.Palette.size()> pal;
+	if(PixelFormat.IsPalettized()) {
+		std::array<RGBQUAD, decltype(Palette)().size()> pal;
 		if(GetDIBColorTable(surf.dc, 0, pal.size(), pal.data()) == pal.size()) {
 			// Convert BGR to RGB...
-			for(size_t i = 0; i < DxObj.Palette.size(); i++) {
+			for(size_t i = 0; i < Palette.size(); i++) {
 				const auto& bgr = pal[i];
-				DxObj.Palette[i] = { bgr.rgbRed, bgr.rgbGreen, bgr.rgbBlue };
+				Palette[i] = { bgr.rgbRed, bgr.rgbGreen, bgr.rgbBlue };
 			}
 
-			if(DxObj.Pal) {
-				DxObj.Pal->Release();
+			if(Pal) {
+				Pal->Release();
 			}
 
-			ddrval = DxObj.DD->CreatePalette(
+			ddrval = DD->CreatePalette(
 				(DDPCAPS_8BIT | DDPCAPS_ALLOW256),
-				DxObj.PaletteForDDraw().data(),
-				&DxObj.Pal,
+				PaletteForDDraw().data(),
+				&Pal,
 				nullptr
 			);
 			if(ddrval != DD_OK) {
 				return false;
 			}
-			DxObj.Prim->SetPalette(DxObj.Pal);
-			DxObj.Back->SetPalette(DxObj.Pal);
-			surf.surf->SetPalette(DxObj.Pal);
+			Prim->SetPalette(Pal);
+			Back->SetPalette(Pal);
+			surf.surf->SetPalette(Pal);
 		}
 	}
 

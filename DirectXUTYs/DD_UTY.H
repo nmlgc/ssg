@@ -172,11 +172,33 @@ struct GRAPHICS_DDRAW {
 	BOOL					bNeedChgPal;	// パレットを変更する必要があるか
 	std::optional<uint8_t>	DeviceID;
 
+protected:
+	// Ensures that a DirectDraw surface matches its underlying image.
+	bool SurfaceRestore(SURFACE_DDRAW& surf);
+
+public:
+	// Can mutate the two parameters and replace them with a supported
+	// configuration if necessary.
+	bool Init(uint8_t& device_id, BITDEPTH& bitdepth);
+
+	// いつも通りに(ただし失敗したら異常終了)
+	void Cleanup();
+
+	// ロード済みのSurfaceを修復
+	bool Restore(void);
+
 	// TODO: Remove once the loader no longer needs it.
 	std::span<PALETTEENTRY> PaletteForDDraw();
 
-	// Ensures that a DirectDraw surface matches its underlying image.
-	bool SurfaceRestore(SURFACE_DDRAW& surf);
+	// オフスクリーン Surface 作成 //
+	// --------------------------- //
+
+	// Surface の作成(BMPリロード有り)
+	SURFACE_DDRAW* SurfaceCreate(BYTE surf_id, PIXEL_SIZE size);
+
+	// ＢＭＰファイルロード //
+	bool SurfaceLoad(BYTE surf_id, BMP_OWNED bmp);
+	// --------------------------- //
 };
 
 typedef struct tagD3DENUM{
@@ -224,31 +246,18 @@ typedef struct tagDDRAWENUM{
 
 // グローバル変数 //
 extern GRAPHICS_DDRAW	DxObj;
-extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
+extern SURFACE_DDRAW	DxSurf[];
 extern XDDRAWENUM	DxEnum[XDDRAWENUM_MAX];
 extern DWORD		DxEnumNow;
 
 
 // 初期化など //
 bool GrpEnum(HWND hWnd);	// 使用できるデバイスを列挙する
-
-// Will mutate the two parameters and replace them with a supported
-// configuration if necessary.
-bool GrpInit(uint8_t& device_id, BITDEPTH& bitdepth);
-
-void GrpCleanup(void);	// いつも通りに(ただし失敗したら異常終了)
 void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
-bool GrpRestore(void);	// ロード済みのSurfaceを修復
 
 void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
 void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
-
-// オフスクリーン Surface 作成 //
-SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size);	// Surface の作成(BMPリロード有り)
-
-// ＢＭＰファイルロード //
-bool GrpBMPLoad(BYTE surf_id, BMP_OWNED bmp);	// Buffer->Surface
 
 extern void GrpOffsClear(IDirectDrawSurface* lpds);		// ある Surface を初期化する
 

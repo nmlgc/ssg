@@ -1,5 +1,6 @@
 #include "../GIAN07/GIAN.H"
 #include "../GIAN07/CONFIG.H"
+#include "platform/unicode.h"
 #include <direct.h>
 
 extern constexpr auto APP_CLASS = _UNICODE("GIAN07");

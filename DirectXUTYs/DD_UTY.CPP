@@ -3,7 +3,6 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "platform/file.h"
 #include "DD_UTY.H"
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
@@ -396,11 +395,6 @@ bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 	DxSurf[surf_id].img = std::move(buffer);
 
 	return GrpBMLoadMemory(&DxSurf[surf_id]);
-}
-
-bool GrpBMPLoad(const PATH_LITERAL filename, uint8_t surf_id)
-{
-	return GrpBMPLoad(FileLoad(filename), surf_id);
 }
 
 void GrpCls(void)

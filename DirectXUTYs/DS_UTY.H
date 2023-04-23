@@ -11,7 +11,6 @@
 
 
 // ヘッダファイル //
-#include "platform/unicode.h"
 #include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
 
@@ -82,7 +81,6 @@ void SndCleanup(void);
 
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max);
-bool SndWAVLoad(const PATH_LITERAL filename, uint8_t id, int max);	// 後でエラーを吐くようにする
 
 // 再生＆停止 //
 void SndPlay(uint8_t id);

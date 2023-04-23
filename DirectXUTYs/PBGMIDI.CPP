@@ -350,11 +350,6 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	return true;
 }
 
-BOOL Mid_Load(const PATH_LITERAL filename)
-{
-	return Mid_Load(FileLoad(filename));
-}
-
 static BOOL Mid_Init(void)
 {
 	MID_TRACK	*p;

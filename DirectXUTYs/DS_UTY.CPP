@@ -160,11 +160,6 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)
 	return TRUE;
 }
 
-bool SndWAVLoad(const PATH_LITERAL filename, uint8_t id, int max)
-{
-	return SndWAVLoad(FileLoad(filename), id, max);
-}
-
 void SndPlay(uint8_t id)
 {
 	HRESULT	dsrval;

@@ -363,8 +363,6 @@ GRP GrpCreateSurface(int width,int height,BYTE surf_id)
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
 	dxval = DxObj.DD->CreateSurface(&ddsd,&temp,NULL);
 
-	GrpOffsClear(temp);
-
 	if(dxval==DD_OK){
 		DxSurf[surf_id].surf   = temp;
 		DxSurf[surf_id].width  = width;

@@ -107,7 +107,7 @@ typedef struct{
 	BYTE	n;					// アニメーションパターン数
 	int		width;				// 絵の幅
 	int		height;				// 絵の高さ
-	RECT	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
+	PIXEL_LTRB	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
 } ANIME_DATA;
 
 //// 敵変数 ////
@@ -140,8 +140,8 @@ extern void SetAnime32(int x,int y,int id,int n,BYTE mode);
 extern void SetAnime40(int x,int y,int id);
 extern void SetAnime48(int x,int y,int id);
 extern void SetAnime80(int x,int y,int id);
-extern RECT *Enemy_AnimeClip(int *x,int *y,ENEMY_DATA *e);
-extern RECT *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e);
+extern PIXEL_LTRB *Enemy_AnimeClip(int *x, int *y, ENEMY_DATA *e);
+extern PIXEL_LTRB *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e);
 extern void EnemyAnimeMove(ENEMY_DATA *e);
 
 

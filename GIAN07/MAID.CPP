@@ -14,13 +14,13 @@ DWORD			EvadeRate[256];			// かすり得点レート
 
 extern void WideBombDraw(void)
 {
-	//RECT	src = {0, 0, 382, 480};
-	static RECT data[6] = {
+	//PIXEL_LTRB	src = {0, 0, 382, 480};
+	static PIXEL_LTRB data[6] = {
 		{0,   0, 210, 240}, {210,   0, 210*2, 240}, {210*2,   0, 210*3, 240},
 		{0, 240, 210, 480}, {210, 240, 210*2, 480}, {210*2, 240, 210*3, 480}
 	};
 
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		x,y;
 	int		t;
 
@@ -52,7 +52,7 @@ extern void WideBombDraw(void)
 void LaserBombDraw(void)
 {
 	BYTE			d,c;
-	POINT			p[4];
+	WINDOW_POINT	p[4];
 	int				i,w;
 	int				lx,ly;
 	int				wx,wy;
@@ -174,7 +174,7 @@ void LaserBombDraw(void)
 
 extern void MaidDraw(void)
 {
-	static RECT VivBit[4][2] = {
+	static PIXEL_LTRB VivBit[4][2] = {
 		{{480,128,480+24,128+24},{504,128,504+24,128+24}},	// ワイド
 		{{480,152,480+24,152+24},{504,152,504+24,152+24}},	// ホーミング
 		{{528,152,528+24,152+24},{552,152,552+24,152+24}},	// レーザー
@@ -188,7 +188,7 @@ extern void MaidDraw(void)
 	int		y  = (Viv.y>>6)-24;
 	int		ox = (Viv.opx>>6) - 12;
 	int		oy = (Viv.opy>>6) - 12;
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	draw_flag = 1 - draw_flag;
 	draw_flag2++;
@@ -217,8 +217,8 @@ extern void MaidDraw(void)
 extern void StateDraw(void)
 {
 	int		i,temp;
-	//RECT	src = {0,80,128,80+16};
-	RECT	src = {0,80,128,80+24};
+	//PIXEL_LTRB	src = { 0, 80, 128, (80 + 16) };
+	PIXEL_LTRB	src = { 0, 80, 128, (80 + 24) };
 	char	buf[100];
 
 	// 残りかすり時間ゲージの表示 //

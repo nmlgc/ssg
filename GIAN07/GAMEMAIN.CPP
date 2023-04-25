@@ -134,7 +134,7 @@ void ScoreNameProc(void)
 void ScoreDraw(void)
 {
 	int		i,gx,gy,v;
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	for(i=0;i<5;i++){
 		v = (ScoreString[i].x - ((50  + i*24) << 6))/12;
@@ -232,7 +232,7 @@ char GetAddr2Char(int x, int y)
 void NameRegistProc(void)
 {
 	// <- DemoInit() を修正するのだぞ
-	RECT	src = {0,0,400,64};
+	PIXEL_LTRB	src = {0, 0, 400, 64};
 	int		gx,gy,len;
 	static int	x,y;
 	static BYTE key_time;
@@ -587,7 +587,7 @@ extern bool GameReplayInit(int Stage)
 void ReplayProc(void)
 {
 	static BYTE ExTimer;
-	RECT	rc;
+	PIXEL_LTRB	rc;
 
 	ExTimer = (ExTimer+1)%128;
 
@@ -679,7 +679,7 @@ void SProjectProc(void)
 {
 	static WORD timer = 0;
 
-	RECT	rc = {0,0,320,42};
+	PIXEL_LTRB	rc = { 0, 0, 320, 42 };
 	BYTE	d;
 	int		x, y;
 
@@ -819,7 +819,7 @@ extern bool GameExit(bool bNeedChgMusic)
 
 	//LoadFace(0,0);
 	MWinForceClose();
-	RECT rc = { (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 };
+	WINDOW_LTRB rc = { (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 };
 	MWinOpen(&rc);
 	//MWinFace(0);
 
@@ -908,7 +908,7 @@ void GameProc(void)
 	if(IsDraw()){
 		GameDraw();
 		if(DemoplaySaveEnable){
-			RECT	rc;
+			PIXEL_LTRB	rc;
 			BltSetRect(&rc,288,80,24,8);
 			GrpBlt(&rc,128,470,GrTama);
 		}
@@ -970,7 +970,7 @@ void GameOverProc(void)
 		CWinDraw(&ContinueWindow);
 		/*
 		if(DemoplaySaveEnable){
-			RECT	rc;
+			PIXEL_LTRB	rc;
 			BltSetRect(&rc,288,80,24,8);
 			GrpBlt(&rc,128,470,GrTama);
 		}*/
@@ -1018,7 +1018,7 @@ void DemoProc(void)
 // 装備選択 //
 void WeaponSelectProc(void)
 {
-	RECT	src[4],rc;
+	PIXEL_LTRB	src[4], rc;
 	int		i,x,y;
 	BYTE	d;
 	char	buf[100];
@@ -1243,10 +1243,10 @@ void WeaponSelectProc(void)
 
 void TitleProc(void)
 {
-	RECT	src = {0,0,640,396};
-	//RECT	src = {0,0,350,403};
-	//RECT	src = {0,0,195,256};
-	//RECT	src = {0,0,275,256};
+	PIXEL_LTRB	src = { 0, 0, 640, 396 };
+	//PIXEL_LTRB	src = { 0, 0, 350, 403 };
+	//PIXEL_LTRB	src = { 0, 0, 195, 256 };
+	//PIXEL_LTRB	src = { 0, 0, 275, 256 };
 
 /*
 	// 鳩プロテクト? //
@@ -1300,7 +1300,7 @@ void TitleProc(void)
 
 void PauseProc(void)
 {
-	RECT	rc;
+	WINDOW_LTRB	rc;
 
 	Key_Read();
 
@@ -1322,7 +1322,7 @@ void PauseProc(void)
 // 音楽室 //
 void MusicRoomProc(void)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	HDC		hdc;
 	HFONT	oldfont;
 	char	buf[100];
@@ -1486,7 +1486,7 @@ void GameMove(void)
 
 void GameDraw(void)
 {
-//	RECT	rc;
+//	WINDOW_LTRB	rc;
 
 
 	GrpCls();

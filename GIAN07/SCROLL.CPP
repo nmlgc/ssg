@@ -12,7 +12,7 @@
 
 SCROLL_INFO		ScrollInfo;			// スクロールに関する情報
 SCL_INFO		SclInfo;			// ＳＣＬに関する情報
-RECT			rcMapChip[1200];	// マップパーツＩＤに対する矩形
+PIXEL_LTRB	rcMapChip[1200];	// マップパーツＩＤに対する矩形
 
 static void enemy_set(void);			// 敵をセットする
 static void _PutEnemy(BYTE *p);			// p:SCL_ENEMY以降の敵配置データ
@@ -130,7 +130,7 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 // p:SCL_ENEMY以降の敵配置データ //
 static void enemy_set(void)
 {
-	RECT		MWinRect;
+	WINDOW_LTRB	MWinRect;
 	int			x,y;
 	BYTE		id;
 	BOOL		bFlag = TRUE;
@@ -536,7 +536,6 @@ static void ExDraw(void)
 void ScrollDraw(void)
 {
 	PBGMAP	*p;
-	RECT	src;
 	int		i,j,k,x,y;
 	int		dx = 0;				// 振動用
 	int		RasterDx;			// ラスター用
@@ -585,7 +584,7 @@ void ScrollDraw(void)
 				if(*p != MAPDATA_NONE){
 					x   = (j<<4) + X_MIN + dx + RasterDx;
 					y   = (i<<4) + ScrollInfo.LayerDy[k];
-					src = rcMapChip[*p];
+					auto src = rcMapChip[*p];
 					GrpBlt(&src,x,y,GrMap);
 					p++,j++;
 				}
@@ -793,7 +792,7 @@ static void Stg3BossMapDraw(void)
 	y = Y_MIN - ScrollInfo.ExCount;
 
 	for(; y<Y_MAX; y+=208){
-		RECT src = { 0, 272, (640 - 256), (272 + 208) };
+		PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
 		GrpBlt(&src,x,y,GrMap);
 	}
 

@@ -71,7 +71,7 @@ typedef struct{
 
 	DWORD	count;			// フレームカウンタ
 
-	POINT	p[4];			// 座標保持用のポインタ(Grp)
+	WINDOW_POINT	p[4];	// 座標保持用のポインタ(Grp)
 
 	BYTE	d;				// レーザーの発射角
 	BYTE	c;				// レーザーの色

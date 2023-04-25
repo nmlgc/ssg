@@ -251,7 +251,7 @@ void _2DCircleA(int x, int y, int r)
 }
 
 // αポリゴン塗りつぶし //
-void _2DPolygonA(POINT *p, int n)
+void _2DPolygonA(WINDOW_POINT *p, int n)
 {
 	// 工事中につき、少々お待ち下さい... //
 	if(AlphaFlag) _2DUpdateAlphaTable();

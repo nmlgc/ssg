@@ -120,7 +120,7 @@ void InitWarning(void)
 
 void DrawWarning(void)
 {
-	RECT src = {0,152+16,384,232+16};
+	PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
 	extern SURFACE_DDRAW* GrTama;
 	int	st,det;
 	static int count;
@@ -334,7 +334,7 @@ void MoveTriangle(void)
 void DrawTriangle(void)
 {
 	int		i;
-	POINT	*p;
+	WINDOW_POINT	*p;
 
 	GrpLock();
 
@@ -468,7 +468,7 @@ void Init3DCube(void)
 void Draw3DCube(void)
 {
 	int		i;
-	RECT	rc;
+	PIXEL_LTRB	rc;
 
 	for(i=0; i<STAR_MAX; i++){
 		BltSetRect(&rc, 136, 272, 16, 24);
@@ -652,7 +652,7 @@ void MoveEffectFakeECL(void)
 
 void DrawEffectFakeECL(void)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		i,j;
 
 	GrpLock();
@@ -740,7 +740,7 @@ void MoveStg3Cloud(void)
 void DrawStg3Cloud(void)
 {
 #define _RsetMacro(x, y, w, h)		{(x), (y), ((x)+(w)), ((y)+(h))}
-	static RECT Data[6] = {
+	static PIXEL_LTRB Data[6] = {
 		_RsetMacro(  0, 288, 144, 160),			// Large_1
 		_RsetMacro(144, 288, 144, 112),			// Large_2
 		_RsetMacro(288, 288, 144, 176),			// Large_3
@@ -752,13 +752,13 @@ void DrawStg3Cloud(void)
 	};
 #undef _RsetMacro
 
-	static POINT	Size[6] = {
+	static PIXEL_LTRB	Size[6] = {
 		144/2, 160/2, 144/2, 112/2, 144/2, 176/2,		// Large
 		 //32,  48,
 		 32/2,  48/2,  48/2,  32/2,  48/2,  48/2		// Small
 	};
 
-	RECT		src;
+	PIXEL_LTRB	src;
 	Cloud2D		*p;		//Cloud[CLOUD_MAX];
 	int			i, j;
 	int			x, y;
@@ -926,11 +926,11 @@ void MoveStg4Rock(void)
 
 void DrawStg4Rock(void)
 {
-	static RECT src[3] ={{0, 224, 80, 288},{0, 288, 48, 336},{48, 288, 80, 320}};
+	static PIXEL_LTRB src[3] ={{0, 224, 80, 288},{0, 288, 48, 336},{48, 288, 80, 320}};
 	static int dx[3] = {80/2, 48/2, 32/2};
 	static int dy[3] = {64/2, 48/2, 32/2};
 
-	RECT	temp;
+	PIXEL_LTRB	temp;
 	Rock3D	*p = Rock;
 
 	int		x,y,i;
@@ -1070,11 +1070,11 @@ void MoveStg6Raster()
 // ６面ラスター描画 //
 void DrawStg6Raster()
 {
-	static RECT Target[3] = {
+	static PIXEL_LTRB Target[3] = {
 		{608, 272, 640, 352}, {592, 160, 640, 272}, {576, 0, 640, 160},
 	};
 
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		i, j, h, w;
 	int		x1, x2, dx, oy;
 
@@ -1134,7 +1134,7 @@ void DrawStg3Star()
 	int		i;
 
 	for(i=0; i<S3STAR_MAX; i++){
-		RECT src = { (640 - 16), 0, 640, 16 };
+		PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
 		GrpBlt(&src, S6Star[i].x, S6Star[i].y, GrMap);
 	}
 }

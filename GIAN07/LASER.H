@@ -7,6 +7,7 @@
 #define PBGWIN_LASER_H		"LASEER : Ver 0.51 : Update 2000/02/17"
 //#pragma message(PBGWIN_LASER_H)
 
+#include "game/coords.h"
 #include <array>
 
 ///// [更新履歴] /////
@@ -93,7 +94,7 @@ typedef struct{
 	int wx,wy;		// 表示座標の加算値(太さ)
 	int v;			// 速度
 
-	POINT p[4];		// 表示する座標
+	WINDOW_POINT p[4];	// 表示する座標
 
 	char a;			// 加速度(つかうのか??)
 	BYTE d;			// 進行方向

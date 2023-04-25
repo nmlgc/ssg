@@ -81,13 +81,13 @@ bool EndingInit(void)
 {
 	PALETTE	pal;
 
-	RECT	src[7] = {
+	PIXEL_LTRB	src[7] = {
 		{0, 0,160, 24}, {0, 24,104, 48}, {0, 48,160, 72},
 		{0,72,232, 96}, {0, 96,168,120}, {0,144,104,168},
 		{0, 480-32, 9*32, 480},
 	};
 
-	RECT	src2[7] = {
+	PIXEL_LTRB	src2[7] = {
 		{0, 168, 72, 192}, {96, 168, 168, 192}, {192, 168, 264, 192}, {288, 168, 360, 192},
 		{0, 192, 144, 216}, {168, 192, 320, 216},
 		{0, 216, 336, 264}
@@ -248,12 +248,10 @@ void UpdateStfInfo()
 // グラフィックの描画 //
 void DrawGrpInfo()
 {
-	RECT			src;
-
 	if(!EGrpInfo.bWantDisp) return;
 
 	// 驚異の画像表示 //
-	src = EGrpInfo.target->rcTarget;
+	auto src = EGrpInfo.target->rcTarget;
 	GrpBltXC(&src, EGrpInfo.x, EGrpInfo.y, EGrpInfo.target->GrSurf);
 }
 

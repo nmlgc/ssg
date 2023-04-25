@@ -309,7 +309,7 @@ static void __fastcall slaser_pset(LASER_DATA *lp)
 
 static void __fastcall SLdraw(LASER_DATA *lp)
 {
-	static POINT p[4];
+	static WINDOW_POINT p[4];
 	int x,y;
 
 	int tx,ty;

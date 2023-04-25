@@ -30,11 +30,11 @@ void _2DLine(int x1, int y1, int x2, int y2);	// 直線
 void _2DBox(int x1, int y1, int x2, int y2);	// 長方形
 void _2DCircle(int x, int y, int r);	// 円
 void _2DCircleF(int x, int y, int r);	// 円塗りつぶし
-void _2DPolygon(POINT *p, int n);	// ポリゴン塗りつぶし
+void _2DPolygon(WINDOW_POINT *p, int n);	// ポリゴン塗りつぶし
 
 void _2DBoxA(int x1, int y1, int x2, int y2);	// α長方形
 void _2DCircleA(int x, int y, int r);	// α円塗りつぶし
-void _2DPolygonA(POINT *p, int n);	// αポリゴン塗りつぶし
+void _2DPolygonA(WINDOW_POINT *p, int n);	// αポリゴン塗りつぶし
 
 void DisableAlphaTable(void);
 

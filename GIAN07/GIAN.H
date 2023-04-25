@@ -146,7 +146,7 @@ extern void StdStatusOutput(void);
 
 
 
-_inline void BltSetRect(RECT *rc,int x1,int y1,int x2,int y2)
+_inline void BltSetRect(PIXEL_LTRB *rc, int x1, int y1, int x2, int y2)
 {
 	rc->right  = (rc->left = x1) + x2;
 	rc->bottom = (rc->top  = y1) + y2;

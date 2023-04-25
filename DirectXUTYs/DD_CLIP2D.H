@@ -13,12 +13,13 @@
 
 
 // ヘッダファイル //
+#include "game/coords.h"
 #include "DX_TYPE.H"
 #include <stdint.h>
 
 
 // 関数 //
-int  __stdcall Grp_PClip(POINT *dest,POINT *src,int n);		// ポリゴン用クリッピング
+int  __stdcall Grp_PClip(WINDOW_POINT *dest, WINDOW_POINT *src, int n);	// ポリゴン用クリッピング
 
 
 #define OUTCODE_X		0x03

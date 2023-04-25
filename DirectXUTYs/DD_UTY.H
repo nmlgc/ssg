@@ -267,7 +267,7 @@ void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
-void GrpClsEx(const std::optional<RECT>& Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
+void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
 
 extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
 extern void (*GrpLock)(void);	// 図形描画の準備をする
@@ -280,25 +280,25 @@ extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
 extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形
 extern void (*GrpCircle)(int x, int y, int r);	// 円
 extern void (*GrpCircleF)(int x, int y, int r);	// 円塗りつぶし
-extern void (*GrpPolygon)(POINT *p, int n);	// ポリゴン塗りつぶし
+extern void (*GrpPolygon)(WINDOW_POINT *p, int n);	// ポリゴン塗りつぶし
 
 extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
 extern void (*GrpCircleA)(int x, int y, int r);	// α円塗りつぶし
-extern void (*GrpPolygonA)(POINT *p, int n);	// αポリゴン塗りつぶし
+extern void (*GrpPolygonA)(WINDOW_POINT *p, int n);	// αポリゴン塗りつぶし
 
 extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 
-extern void (*GrpBlt)(RECT *src, int x, int y, SURFACE_DDRAW* surf);	// ビットマップ転送(WithClip)
+extern void (*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);	// ビットマップ転送(WithClip)
 
-extern bool GrpClip(RECT *src, int *x, int *y);	// クリッピングをかける
-extern void GrpGetClip(RECT *dest);	// クリッピング枠を取得する
+extern bool GrpClip(PIXEL_LTRB *src, int *x, int *y);	// クリッピングをかける
+extern void GrpGetClip(WINDOW_LTRB *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf);
+void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltXC(RECT *src, int x, int y, SURFACE_DDRAW* surf);
+void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
 
 #endif

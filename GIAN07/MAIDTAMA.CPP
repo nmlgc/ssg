@@ -206,8 +206,8 @@ void MaidTamaDraw(void)
 	// 独自に描画ルーチンを展開する。                                      //
 
 	int				i,x,y;
-	RECT			src,ltemp;
-	static RECT		HomingBomb[5] = {
+	PIXEL_LTRB	src, ltemp;
+	static PIXEL_LTRB	HomingBomb[5] = {
 		{520,104,520+8 ,104+8},
 		{528,104,528+16,104+16},
 		{544,104,544+24,104+24},

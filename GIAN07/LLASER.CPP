@@ -287,7 +287,7 @@ extern void LLaserDraw(void)
 	int				i,x,y;
 	BYTE			c;
 	LLASER_DATA		*lp;
-	POINT			p[4];
+	WINDOW_POINT	p[4];
 	int				wx,wy,len;
 
 	static const BYTE Table16Bit[16][3] = {
@@ -310,7 +310,7 @@ extern void LLaserDraw(void)
 
 
 	int n;
-	POINT p2[256];
+	WINDOW_POINT p2[256];
 
 	GrpLock();
 
@@ -441,7 +441,7 @@ extern void LLaserSetup(void)
 
 static void _LLaserPointSet(LLASER_DATA *lp)
 {
-	POINT *pp = lp->p;
+	auto *pp = lp->p;
 
 	pp[1].x = pp[0].x = (lp->x>>6) + lp->wx + lp->lx;
 	pp[1].y = pp[0].y = (lp->y>>6) + lp->wy + lp->ly;

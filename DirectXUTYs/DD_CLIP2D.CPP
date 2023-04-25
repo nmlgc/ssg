@@ -41,7 +41,7 @@ extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 
 
 #pragma warning(disable : 4035)
-int __stdcall Grp_PClip(POINT *dest,POINT *src,int n)
+int __stdcall Grp_PClip(WINDOW_POINT *dest, WINDOW_POINT *src, int n)
 {
 	int d,oc,x,y,radr,lastout,i;
 

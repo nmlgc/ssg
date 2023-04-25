@@ -94,7 +94,7 @@ typedef struct tagFACE_DATA{
 // エンディングのグラフィック管理用 //
 typedef struct tagENDING_GRP{
 	SURFACE_DDRAW*	GrSurf;	// Surface
-	RECT				rcTarget;		// 矩形の範囲
+	PIXEL_LTRB	rcTarget;	// 矩形の範囲
 	PALETTE	pal;	// パレット
 } ENDING_GRP;
 

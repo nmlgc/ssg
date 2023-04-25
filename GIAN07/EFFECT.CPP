@@ -347,7 +347,7 @@ void SEffectDraw(void)
 	int				temp;
 	BYTE			degx = 0;
 	SEFFECT_DATA	*e;
-	RECT			src;
+	PIXEL_LTRB	src;
 	char			buf[20];
 
 	for(i=0;i<SEFFECT_MAX;i++){
@@ -525,7 +525,7 @@ void ScreenEffectMove(void)
 void ScreenEffectDraw(void)
 {
 	int		i, j;
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	switch(ScreenInfo.cmd){
 		case(SCNEFC_CFADEIN):	// 円形フェードイン
@@ -562,7 +562,7 @@ void ScreenEffectDraw(void)
 // 円形フェードサポート関数 //
 extern void CircleFadeOut(int x, int y, int r)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		i,j,temp;
 
 	if(r<0) r=0;
@@ -681,7 +681,7 @@ void ObjectLockDraw(void)
 {
 	LOCKON_INFO		*l;
 	int				i;
-	RECT			temp;
+	PIXEL_LTRB	temp;
 
 	for(i=0;i<LOCKON_MAX;i++){
 		l = LockInfo + i;
@@ -714,7 +714,7 @@ void GrpDrawSpect(int x, int y)
 	static WORD ftable3[128+8+8];
 	static BYTE ftable3flag;
 
-	RECT	src = {16*16,0,16*16+8*21,8};		// ,,,8*4
+	PIXEL_LTRB	src = { (16 * 16), 0, ((16 * 16) + (8 * 21)), 8 };	// ,,,8*4
 
 	BYTE ColTable[10]={
 		RGB256(2,0,0),RGB256(3,0,0),RGB256(4,0,0),RGB256(5,0,0),RGB256(5,1,0),
@@ -792,7 +792,7 @@ void GrpDrawNote(void)
 	// o#o#oo#o#o#o
 	// o o oo o o o
 
-	RECT src[12] = {
+	PIXEL_LTRB src[12] = {
 		{ 0,464, 3,474},		// しろ
 		{ 0,456, 3,461},		// 黒
 
@@ -812,7 +812,7 @@ void GrpDrawNote(void)
 		{24,464,27,474},		// しろ
 	};
 
-	RECT src2[12] = {
+	PIXEL_LTRB src2[12] = {
 		{ 0,464-24, 3,474-24},		// しろ
 		{ 0,456-24, 3,461-24},		// 黒
 
@@ -853,7 +853,7 @@ void GrpDrawNote(void)
 	};
 
 	int		Track,NoteNo,x,y,LevelSum,num;
-	RECT	rc;
+	PIXEL_LTRB	rc;
 
 	for(Track=0;Track<16;Track++){
 		GrpPutMidNum( 50,22+Track*24,Mid_VolumeTable[Track]);

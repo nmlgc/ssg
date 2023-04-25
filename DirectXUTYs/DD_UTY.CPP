@@ -18,9 +18,9 @@ static void DM_BBB(uint8_t a, uint8_t b, uint8_t c);
 static void DM_BB(uint8_t a, uint8_t b);
 static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
-static void DM_PI(POINT *p, int n);
+static void DM_PI(WINDOW_POINT *p, int n);
 static bool DM_RESTORE(void);
-static void DM_GRPBLT(RECT *src, int x, int y, SURFACE_DDRAW* surf);
+static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
 
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
@@ -30,7 +30,7 @@ int CLIP_Y_MAX = 479;
 
 // キャプチャーを行うか(->MtoB) //
 BOOL CaptureFlag = FALSE;
-void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf);
+void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
 
 
 // Ｚバッファを必要なら生成し、接続する //
@@ -72,12 +72,12 @@ void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
 void(*GrpCircle)(int x, int y, int r)               = DM_III;
 void(*GrpCircleF)(int x, int y, int r)              = DM_III;
-void(*GrpPolygon)(POINT *p, int n)                  = DM_PI;
+void(*GrpPolygon)(WINDOW_POINT *p, int n)                  = DM_PI;
 void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpCircleA)(int x, int y, int r)              = DM_III;
-void(*GrpPolygonA)(POINT *p, int n)                 = DM_PI;
+void(*GrpPolygonA)(WINDOW_POINT *p, int n)                 = DM_PI;
 void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
-void(*GrpBlt)(RECT *src, int x, int y, SURFACE_DDRAW* surf) = STD_GrpBlt;
+void(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf) = STD_GrpBlt;
 
 static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
@@ -279,7 +279,7 @@ void GRAPHICS_DDRAW::Cleanup(void)
 }
 
 // クリッピング枠を取得する //
-void GrpGetClip(RECT *dest)
+void GrpGetClip(WINDOW_LTRB *dest)
 {
 	dest->left   = CLIP_X_MIN;
 	dest->top    = CLIP_Y_MIN;
@@ -447,8 +447,7 @@ void GrpCls(void)
 }
 
 
-// 直接番号指定で矩形内を塗りつぶす //
-void GrpClsEx(const std::optional<RECT>& Target, DWORD col)
+void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, DWORD col)
 {
 	DDBLTFX		ddbltfx;
 	RECT	rect_local;
@@ -459,7 +458,8 @@ void GrpClsEx(const std::optional<RECT>& Target, DWORD col)
 	ddbltfx.dwFillColor = col;
 
 	if(Target) {
-		rect_local = Target.value();
+		const auto& target = Target.value();
+		rect_local = { target.left, target.top, target.right, target.bottom };
 		rect = &rect_local;
 	}
 
@@ -498,7 +498,7 @@ static void GrpFlipWnd(void)
 	});
 }
 
-bool GrpClip(RECT *src, int *x, int *y)
+bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 {
 	int w = src->right - src->left - 1;
 	int h = src->bottom - src->top - 1;
@@ -529,25 +529,29 @@ bool GrpClip(RECT *src, int *x, int *y)
 	return TRUE;
 }
 
-void GrpBltX(RECT *src, int x, int y, SURFACE_DDRAW* surf)
+void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf)
 {
+	RECT rect = { src->left, src->top, src->right, src->bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(
-			x, y, surf->surf, src, DDBLTFAST_SRCCOLORKEY
+			x, y, surf->surf, &rect, DDBLTFAST_SRCCOLORKEY
 		);
 	});
 }
 
-void GrpBltXC(RECT *src, int x, int y, SURFACE_DDRAW* surf)
+void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf)
 {
+	RECT rect = { src->left, src->top, src->right, src->bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
-		return DxObj.Back->BltFast(x, y, surf->surf, src, DDBLTFAST_NOCOLORKEY);
+		return DxObj.Back->BltFast(
+			x, y, surf->surf, &rect, DDBLTFAST_NOCOLORKEY
+		);
 	});
 }
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
-void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf)
+void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf)
 {
 	// 完全に範囲外なら何もしない //
 	if(!GrpClip(src,&x,&y)) return;
@@ -859,7 +863,7 @@ static void DM_BBB(uint8_t a, uint8_t b, uint8_t c) {}
 static void DM_BB(uint8_t a, uint8_t b) {}
 static void DM_III(int a, int b, int c) {}
 static void DM_IIII(int a, int b, int c, int d) {}
-static void DM_PI(POINT *p, int n) {}
+static void DM_PI(WINDOW_POINT *p, int n) {}
 
 static bool DM_RESTORE(void)
 {
@@ -867,4 +871,4 @@ static bool DM_RESTORE(void)
 	return TRUE;
 }
 
-static void DM_GRPBLT(RECT *src, int x, int y, SURFACE_DDRAW* surf) {}
+static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf) {}

@@ -14,12 +14,12 @@ static int DrawTrapezoid(int y, int dy);	// 台形の描画
 
 
 // ポリゴンの描画 //
-void _2DPolygon(POINT *p, int n)
+void _2DPolygon(WINDOW_POINT *p, int n)
 {
 	int		i,j,dy;
 	int		nLeft,nRight;
 	int		TopY,BottomY;
-	POINT	temp[100];
+	WINDOW_POINT	temp[100];
 
 	switch(i=Grp_PClip(temp,p,n)){
 		case(0):			// 完全に外側

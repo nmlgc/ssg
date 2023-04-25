@@ -143,7 +143,7 @@ BOOL CWinExitFn(WORD key)
 }
 
 // メッセージウィンドウをオープンする //
-void MWinOpen(RECT *rc)
+void MWinOpen(WINDOW_LTRB *rc)
 {
 	int			i,y_mid;
 
@@ -248,7 +248,7 @@ void MWinDraw(void)
 	HFONT	oldfont;
 	HDC		hdc;
 	BYTE	alpha;
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	int		x = MsgWindow.NowSize.left;		// ウィンドウ左上Ｘ
 	int		y = MsgWindow.NowSize.top;		// ウィンドウ左上Ｙ
@@ -414,7 +414,7 @@ void MWinCmd(BYTE cmd)
 // ウィンドウ枠を描画する //
 static void DrawWindowFrame(int x,int y,int w,int h)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	w = w >> 1;
 	h = h >> 1;

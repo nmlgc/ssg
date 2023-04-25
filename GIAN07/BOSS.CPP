@@ -163,16 +163,16 @@ void BossDraw(void)
 	int			w,h,t;
 	ENEMY_DATA	*e;
 	BOSS_DATA	*b;
-	RECT		*src;
-	RECT		wing;
+	PIXEL_LTRB	*src;
+	PIXEL_LTRB	wing;
 /*
-	RECT	Right[6] = {
+	PIXEL_LTRB	Right[6] = {
 		{240+40, 400, 240+80, 480}, {320, 400, 320+32, 480},
 		{384+24, 400, 384+48, 480}, {432+8, 400, 432+16, 480},
 		{464+8,  400, 464+16, 480}, {480+8, 400, 480+16,  480},
 	};
 
-	RECT	Left[6] = {
+	PIXEL_LTRB	Left[6] = {
 		{240, 400, 240+40, 480}, {320, 400, 320+32, 480},
 		{384, 400, 384+48, 480}, {432, 400, 432+16, 480},
 		{464, 400, 464+16,  480}, {480, 400, 480+16,  480},
@@ -362,7 +362,7 @@ static void BossHPG_Close(void)
 // ボスの体力ゲージを描画する //
 void BossHPG_Draw(void)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		i,x1,x2;
 
 	switch(BossHPG.State){
@@ -375,7 +375,7 @@ void BossHPG_Draw(void)
 		break;
 
 		case(BHPG_OPEN2):case(BHPG_NORM):case(BHPG_OPEN3):
-			POINT		Src[4];
+			WINDOW_POINT Src[4];
 
 			// 体力ゲージの描画 //
 			GrpLock();

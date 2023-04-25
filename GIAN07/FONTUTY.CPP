@@ -10,9 +10,9 @@
 void __FillExpoint(EXPOINT *p, int x, int y, int w, int h);
 
 // Glyph selection inside the 16×16 font //
-std::optional<RECT> Glyph16x16(char c)
+std::optional<PIXEL_LTRB> Glyph16x16(char c)
 {
-	RECT src;
+	PIXEL_LTRB src;
 
 	// GrTama における文字の並びは次のようになっている。 //
 	// (変更する可能性もあるので十分に注意すること)      //
@@ -115,7 +115,7 @@ extern void GrpPutc(int x, int y, char c)
 // 05x07 べた貼りフォント //
 extern void GrpPut57(int x, int y, char *s)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		sx,tx,ty;
 
 	sx = x;
@@ -137,7 +137,7 @@ extern void GrpPut57(int x, int y, char *s)
 // 07x11 音楽室用フォント
 extern void GrpPut7B(int x, int y, char *s)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		sx,tx,ty;
 
 	sx = x;
@@ -165,7 +165,7 @@ extern void GrpPut7B(int x, int y, char *s)
 // 得点アイテムのスコアを描画 //
 extern void GrpPutScore(int x, int y, char *s)
 {
-	RECT	src;
+	PIXEL_LTRB	src;
 	int		sx,tx,ty;
 
 	sx = x;
@@ -189,7 +189,7 @@ extern void GrpPutMidNum(int x, int y, int n)
 {
 	char	buf[10];
 	int		i;
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	sprintf(buf,"%3d",n);
 
@@ -281,7 +281,7 @@ extern void DrawGrdFont(SURFACE_DDRAW* surf, char *s)
 
 
 // フォント生成 //
-ExtraFontInfo *CreateExtraFont(SURFACE_DDRAW* Surface, RECT *pSrc)
+ExtraFontInfo *CreateExtraFont(SURFACE_DDRAW* Surface, PIXEL_LTRB *pSrc)
 {
 	ExtraFontInfo		*pInfo;
 	int					MaxSize;

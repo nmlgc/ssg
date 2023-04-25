@@ -195,7 +195,7 @@ void _3DCircleF(int x, int y, int r)
 }
 
 // ポリゴン塗りつぶし //
-void _3DPolygon(POINT *p, int n)
+void _3DPolygon(WINDOW_POINT *p, int n)
 {
 	int i;
 
@@ -243,7 +243,7 @@ void _3DCircleA(int x, int y, int r)
 }
 
 // αポリゴン塗りつぶし //
-void _3DPolygonA(POINT *p, int n)
+void _3DPolygonA(WINDOW_POINT *p, int n)
 {
 	int i;
 
@@ -285,7 +285,7 @@ void _3DFatCircleA(int x, int y, int r, int w)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRect(POINT *p)
+void GrpGrdRect(WINDOW_POINT *p)
 {
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGB_MAKE(255,255,255);
@@ -309,7 +309,7 @@ void GrpGrdRect(POINT *p)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRectA(POINT *p)
+void GrpGrdRectA(WINDOW_POINT *p)
 {
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGBA_MAKE(255,255,255,Col3D_A);
@@ -333,7 +333,7 @@ void GrpGrdRectA(POINT *p)
 }
 
 // グラデーション付きポリゴン(レーザー用？) //
-void GrpGrdPolygon(POINT *p, int n)
+void GrpGrdPolygon(WINDOW_POINT *p, int n)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //
@@ -383,7 +383,7 @@ void GrpTexBox(int x1, int y1, int x2, int y2)
 	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,4,D3DDP_WAIT);
 }
 
-void GrpTexBoxEx(POINT *p)
+void GrpTexBoxEx(WINDOW_POINT *p)
 {
 	int i;
 

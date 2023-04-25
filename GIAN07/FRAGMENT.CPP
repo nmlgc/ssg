@@ -153,7 +153,7 @@ void fragment_setup(void)
 static void __stdcall _FDraw(FRAGMENT_DATA *f)
 {
 	int		x,y;
-	RECT	src;
+	PIXEL_LTRB	src;
 
 	switch(f->cmd){
 		case(FRG_EVADE):

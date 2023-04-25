@@ -117,7 +117,7 @@ void _ExBombSTDDraw(BombEfcCtrl *p)
 {
 	int			i, x, y, dx;
 	SpObj		*target;
-	RECT		src;
+	PIXEL_LTRB	src;
 
 	// Graphic 48 * 48 //
 	target = p->Obj;

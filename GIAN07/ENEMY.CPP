@@ -148,7 +148,7 @@ void enemy_draw(void)
 {
 	int			i,x,y;
 	//HRESULT		ddrval;
-	RECT		*src;
+	PIXEL_LTRB	*src;
 
 	for(i=0;i<EnemyNow;i++){
 		auto* e = &Enemy[EnemyInd[i]];
@@ -573,9 +573,9 @@ void EnemyAnimeMove(ENEMY_DATA *e)
 	}
 }
 
-RECT *Enemy_AnimeClip(int *x,int *y,ENEMY_DATA *e)
+PIXEL_LTRB *Enemy_AnimeClip(int *x, int *y, ENEMY_DATA *e)
 {
-	static RECT		temp;
+	static PIXEL_LTRB	temp;
 	BYTE			d;
 	ANIME_DATA		*a;
 
@@ -600,9 +600,9 @@ RECT *Enemy_AnimeClip(int *x,int *y,ENEMY_DATA *e)
 	return GrpClip(&temp,x,y) ? &temp : NULL;
 }
 
-extern RECT *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e)
+extern PIXEL_LTRB *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e)
 {
-	static RECT		temp;
+	static PIXEL_LTRB	temp;
 	BYTE			d;
 	ANIME_DATA		*a;
 
@@ -619,7 +619,7 @@ extern RECT *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e)
 
 static void _EnemyDrawBomb(int x,int y,DWORD count)
 {
-	RECT		src;
+	PIXEL_LTRB	src;
 
 /*
 	switch(count/ENEMY_BOMB_SPD){
@@ -669,7 +669,7 @@ void parse_ECL(ENEMY_DATA *e)
 	int		RegCmp;
 	HLaserInfo		HInfo;
 
-	const RECT rcDegX2 =
+	const PIXEL_LTRB rcDegX2 =
 		{GX_MIN+150*64, GY_MIN+(GY_MID-GY_MIN-40*64)/3,
 			GX_MAX-150*64, GY_MID-(GY_MID-GY_MIN-40*64)/3 - 40*64};
 	WORD	BaseAngle;

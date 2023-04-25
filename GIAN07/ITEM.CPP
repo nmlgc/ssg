@@ -115,7 +115,7 @@ void ItemDraw(void)
 {
 	int				i,j,x,y;
 	BYTE			ptn;
-	RECT			src;
+	PIXEL_LTRB	src;
 	static BYTE		time;
 
 	for(i=0;i<ItemNow;i++){

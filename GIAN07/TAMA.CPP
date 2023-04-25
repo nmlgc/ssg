@@ -331,12 +331,12 @@ void tama_draw(void)
 	WORD		i;
 	TAMA_DATA	*t;
 //	HRESULT		ddrval;
-	RECT		src;
+	PIXEL_LTRB	src;
 	int			x,y;
 	int			dx,dy;
 	BYTE		d;
 
-	static const RECT	rcExtraTama[4] = {
+	static const PIXEL_LTRB	rcExtraTama[4] = {
 		{128   , 384, 128+32, 384+32},
 		{128+32, 384, 128+56, 384+24},
 		{128+56, 384, 128+72, 384+16},
@@ -465,7 +465,7 @@ void __fastcall _TamaEffectDraw(TAMA_DATA *t)
 {
 #define RCSET(x, y, w) {(x), (y), (x+w), (y+w)}
 
-	static RECT Data[6][5] = {	// [色][パターン]
+	static PIXEL_LTRB Data[6][5] = {	// [色][パターン]
 		{	// 赤 //
 			RCSET(168, 344, 32), RCSET(232, 344, 28),
 			RCSET(288, 344, 24), RCSET(336, 344, 20),
@@ -500,7 +500,7 @@ void __fastcall _TamaEffectDraw(TAMA_DATA *t)
 #undef RCSET
 
 	static int  Width[5]     = {32/2, 28/2, 24/2, 20/2, 16/2};
-	static RECT *Target[16*3] =
+	static PIXEL_LTRB *Target[16*3] =
 	{
 		Data[0], Data[1], Data[2], Data[3], Data[4], Data[5], Data[0], Data[0],
 		Data[0], Data[0], Data[0], Data[0], Data[0], Data[0], Data[0], Data[0],
@@ -512,7 +512,7 @@ void __fastcall _TamaEffectDraw(TAMA_DATA *t)
 		Data[0], Data[0], Data[0], Data[0], Data[0], Data[0], Data[0], Data[0],
 	};
 
-	RECT	temp;
+	PIXEL_LTRB	temp;
 	int		ptn = (t->count/4) % 5;
 	int		x,y;
 

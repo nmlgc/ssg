@@ -15,6 +15,7 @@
 
 
 ///// [ヘッダファイル] /////
+#include "game/coords.h"
 #include "GIAN.H"
 
 
@@ -35,10 +36,10 @@ typedef struct tagPoint3D{
 } Point3D;
 
 typedef struct tagLineList3D{
-	int			ox,oy;	/* 頂点の座標の補正用 */
-	POINT		*p;		/* 頂点の座標         */
+	PIXEL_POINT	center;	/* 頂点の座標の補正用 */
+	WORLD_POINT	*p;	/* 頂点の座標         */
 	int			n;		/* 頂点数             */
-	POINT		*Work;	/* ワークエリア       */
+	WORLD_POINT	*Work;	/* ワークエリア       */
 
 	BYTE		DegX,DegY,DegZ;		/* 各軸に対する回転角 */
 } LineList3D;

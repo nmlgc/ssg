@@ -16,6 +16,10 @@ using PIXEL_COORD = int;
 struct PIXEL_POINT {
 	PIXEL_COORD x;
 	PIXEL_COORD y;
+
+	PIXEL_POINT operator +(const PIXEL_POINT& other) const {
+		return { (x + other.x), (y + other.y) };
+	}
 };
 
 // Area size in unscaled pixel space.
@@ -46,3 +50,40 @@ struct WINDOW_POINT : public PIXEL_POINT {
 struct WINDOW_LTRB : public PIXEL_LTRB {
 };
 // -----------------------
+
+// World-space coordinates
+// -----------------------
+// Not exclusively used for the playfield.
+
+constexpr auto WORLD_COORD_BITS = 6;
+
+using WORLD_COORD = int;
+
+struct WORLD_POINT {
+	WORLD_COORD x;
+	WORLD_COORD y;
+
+	WORLD_POINT() {
+	}
+
+	WORLD_POINT(const PIXEL_POINT& pixel) :
+		x(pixel.x << WORLD_COORD_BITS),
+		y(pixel.y << WORLD_COORD_BITS) {
+	}
+
+	WORLD_POINT& operator -=(const WORLD_POINT& other) {
+		x -= other.x;
+		y -= other.y;
+		return *this;
+	}
+
+	// Assumes this to be a centered coordinate, and calculates the
+	// corresponding top-left coordinate based on the given size.
+	PIXEL_POINT ToPixel(PIXEL_SIZE size_if_centered = { 0, 0 }) const {
+		return {
+			.x = ((x >> WORLD_COORD_BITS) - (size_if_centered.w >> 1)),
+			.y = ((y >> WORLD_COORD_BITS) - (size_if_centered.h >> 1)),
+		};
+	}
+};
+// ---------------------------

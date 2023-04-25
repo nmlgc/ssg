@@ -250,7 +250,6 @@ SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size);	// Surface の�
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE surf_id, BMP_OWNED bmp);	// Buffer->Surface
 
-extern BOOL GrpSetColorKey(IDirectDrawSurface* lpds);	// ビット深度によりカラーキーをセットする
 extern void GrpOffsClear(IDirectDrawSurface* lpds);		// ある Surface を初期化する
 
 

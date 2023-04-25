@@ -52,6 +52,9 @@ static void SetDummyFunc(void);
 static void GrpFlipFS(void);
 static void GrpFlipWnd(void);
 
+// ビット深度によりカラーキーをセットする
+extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);
+
 
 // グローバル変数 //
 GRAPHICS_DDRAW	DxObj;
@@ -465,6 +468,8 @@ extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds)
 	DDrawRetryUntilSuccessful([&] {
 		return lpds->Blt(nullptr, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx);
 	});
+	DDCOLORKEY key = { ddbltfx.dwFillColor, ddbltfx.dwFillColor };
+	lpds->SetColorKey(DDCKEY_SRCBLT, &key);
 }
 
 static void GrpFlipFS(void)

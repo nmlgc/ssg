@@ -404,22 +404,30 @@ bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id)
 void GrpCls(void)
 {
 	return GrpClsEx(
-		nullptr, ((DxObj.PixelFormat.IsPalettized()) ? RGB256(0, 0, 0) : 0)
+		std::nullopt, ((DxObj.PixelFormat.IsPalettized()) ? RGB256(0, 0, 0) : 0)
 	);
 }
 
 
 // 直接番号指定で矩形内を塗りつぶす //
-void GrpClsEx(RECT *Target, DWORD col)
+void GrpClsEx(const std::optional<RECT>& Target, DWORD col)
 {
 	DDBLTFX		ddbltfx;
+	RECT	rect_local;
+	RECT*	rect = nullptr;
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
 	ddbltfx.dwFillColor = col;
+
+	if(Target) {
+		rect_local = Target.value();
+		rect = &rect_local;
+	}
+
 	DDrawRetryUntilSuccessful([&] {
 		return DxObj.Back->Blt(
-			Target, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx
+			rect, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx
 		);
 	});
 }

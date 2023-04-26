@@ -179,7 +179,7 @@ void EndingDraw(void)
 {
 	// 画面消去 //
 	DWORD cls_col = (DxObj.PixelFormat.IsPalettized() ? 255 : RGB(0,0,0));
-	GrpClsEx(NULL, cls_col);
+	GrpClsEx(std::nullopt, cls_col);
 
 	// それぞれのグラフィックを描画するで //
 	DrawGrpInfo();

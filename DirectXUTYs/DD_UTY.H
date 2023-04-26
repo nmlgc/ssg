@@ -245,7 +245,7 @@ extern void GrpOffsClear(IDirectDrawSurface* lpds);		// ある Surface を初期
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
-void GrpClsEx(RECT *Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
+void GrpClsEx(const std::optional<RECT>& Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
 
 extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
 extern void (*GrpLock)(void);	// 図形描画の準備をする

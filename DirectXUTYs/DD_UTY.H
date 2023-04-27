@@ -22,6 +22,7 @@
 
 
 // ヘッダファイル //
+#include "game/coords.h"
 #include "game/graphics.h"
 #include "platform/buffer.h"
 #include "platform/windows/surface_ddraw.h"
@@ -234,7 +235,7 @@ void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // オフスクリーン Surface 作成 //
-SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id);	// Surface の作成(BMPリロード有り)
+SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size);	// Surface の作成(BMPリロード有り)
 
 // ＢＭＰファイルロード //
 bool GrpBMPLoad(BYTE_BUFFER_OWNED buffer, BYTE surf_id);	// Buffer->Surface

@@ -93,31 +93,33 @@ BOOL InitSurface(void)
 
 //	bIsBombPalette = FALSE;
 
-	GrTama = GrpCreateSurface(640,480,SURFACE_ID_SYSTEM);
+	GrTama = GrpCreateSurface(SURFACE_ID_SYSTEM, { 640, 480 });
 	if(GrTama==NULL) return FALSE;
 
-	GrMap = GrpCreateSurface(640,480,SURFACE_ID_MAPCHIP);
+	GrMap = GrpCreateSurface(SURFACE_ID_MAPCHIP, { 640, 480 });
 	if(GrMap==NULL) return FALSE;
 
-	GrEnemy = GrpCreateSurface(640,480,SURFACE_ID_ENEMY);
+	GrEnemy = GrpCreateSurface(SURFACE_ID_ENEMY, { 640, 480 });
 	if(GrEnemy==NULL) return FALSE;
 
 	for(i=0;i<FACE_MAX;i++){
-		FaceData[i].GrSurf = GrpCreateSurface(96*FACE_NUMX,96,SURFACE_ID_FACE0+i);
+		FaceData[i].GrSurf = GrpCreateSurface(
+			(SURFACE_ID_FACE0 + i), { (96 * FACE_NUMX), 96 }
+		);
 		if(FaceData[i].GrSurf==NULL) return FALSE;
 	}
 
-	GrBomber = GrpCreateSurface(640, 480, SURFACE_ID_BOMBER);
+	GrBomber = GrpCreateSurface(SURFACE_ID_BOMBER, { 640, 480 });
 	if(GrBomber == NULL) return FALSE;
 
-	GrMTitle = GrpCreateSurface(640,20,SURFACE_ID_MTITLE);
+	GrMTitle = GrpCreateSurface(SURFACE_ID_MTITLE, { 640, 20 });
 	if(GrMTitle==NULL) return FALSE;
 
 
 	// レンズをすでに作成しているのなら、破棄する //
 	if(Lens) GrpReleaseLensBall(Lens);
 
-	GrLens = GrpCreateSurface(140,140,SURFACE_ID_LENS);
+	GrLens = GrpCreateSurface(SURFACE_ID_LENS, { 140, 140 });
 	if(GrLens==NULL) return FALSE;
 
 	Lens = GrpCreateLensBall(70, 36, GrLens);

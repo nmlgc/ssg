@@ -364,7 +364,7 @@ void GrpSetPalette(const PALETTE& pal)
 	DisableAlphaTable();
 }
 
-SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id)
+SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size)
 {
 	HRESULT				dxval;
 	DDSURFACEDESC		ddsd;
@@ -377,16 +377,16 @@ SURFACE_DDRAW* GrpCreateSurface(int width, int height, BYTE surf_id)
 	ZEROMEM(ddsd);
 
 	ddsd.dwSize         = sizeof(ddsd);
-	ddsd.dwWidth        = width;
-	ddsd.dwHeight       = height;
+	ddsd.dwWidth        = size.w;
+	ddsd.dwHeight       = size.h;
 	ddsd.dwFlags        = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
 	dxval = DxObj.DD->CreateSurface(&ddsd,&temp,NULL);
 
 	if(dxval==DD_OK){
 		DxSurf[surf_id].surf   = temp;
-		DxSurf[surf_id].width  = width;
-		DxSurf[surf_id].height = height;
+		DxSurf[surf_id].width  = size.w;
+		DxSurf[surf_id].height = size.h;
 		DxObj.SurfaceRestore(DxSurf[surf_id]);
 	}
 

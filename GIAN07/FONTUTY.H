@@ -17,6 +17,7 @@
 
 
 #include "DirectXUTYs/DD_UTY.H"
+#include <string_view>
 
 
 
@@ -55,7 +56,7 @@ extern void InitFonts(void);	// フォントをセットする
 extern void CleanupFont(void);	// フォントを解放する
 
 // グラデーション付きフォントを描画する
-void DrawGrdFont(SURFACE_DDRAW& surf, char *s);
+void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str);
 
 ExtraFontInfo *CreateExtraFont(SURFACE_DDRAW& Surface, PIXEL_LTRB *pSrc);	// フォント生成
 void DeleteExtraFont(ExtraFontInfo *pFont);							// フォント削除

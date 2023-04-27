@@ -233,15 +233,16 @@ extern void CleanupFont(void)
 	if(WinGrpInfo.SmallFont)	DeleteObject(WinGrpInfo.SmallFont);
 }
 
-void DrawGrdFont(SURFACE_DDRAW& surf, char *s)
+void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
 {
 	HDC			hdc;
 	HFONT		oldfont;
-	int			i,j;
-	int			len;
+	int			j;
 	DWORD		temp,old;
 
-	len = strlen(s)*16;
+	// The MIDI sequence titles passed to this function tend to come with lots
+	// of trailing whitespace. Adding 1 also turns `npos` to 0.
+	str = str.substr(0, (str.find_last_not_of(" ") + 1));
 
 	DDCOLORKEY key = { RGB(0x00, 0x00, 0x00), RGB(0x00, 0x00, 0x00) };
 	surf.surf->SetColorKey(DDCKEY_SRCBLT, &key);
@@ -263,15 +264,18 @@ void DrawGrdFont(SURFACE_DDRAW& surf, char *s)
 	oldfont = (HFONT)SelectObject(hdc,WinGrpInfo.NormalFont);
 	SetBkMode(hdc,TRANSPARENT);
 
-	SetTextColor(hdc,RGB(0,0,128));			TextOut(hdc,2,2,s,len);
-	SetTextColor(hdc,RGB(0,0,128));			TextOut(hdc,1,2,s,len);
-	SetTextColor(hdc,RGB(255,255,255));		TextOut(hdc,1,1,s,len);
-	SetTextColor(hdc,RGB(255,255,255));		TextOut(hdc,0,1,s,len);
+	SetTextColor(hdc, RGB(0, 0, 128));
+	TextOut(hdc, 2, 2, str.data(), str.size());
+	TextOut(hdc, 1, 2, str.data(), str.size());
+	SetTextColor(hdc, RGB(255, 255, 255));
+	TextOut(hdc, 1, 1, str.data(), str.size());
+	TextOut(hdc, 0, 1, str.data(), str.size());
 
 #define FSIZE 8
 	//COLORREF temp = GetPixel(hdc,0,0);
-	for(i=1;i<len;i++){
-		for(j=1;j<16;j++){
+	const PIXEL_COORD w = (str.size() * 16);
+	for(PIXEL_COORD i = 1; i < w; i++) {
+		for(auto j = 1; j < 16; j++) {
 			if(GetPixel(hdc,i,j)==temp)//RGB(255,255,255))
 				SetPixel(hdc,i,j,RGB(255+FSIZE-j*FSIZE,255+FSIZE-j*FSIZE,255));
 		}

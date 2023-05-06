@@ -470,7 +470,7 @@ void Draw3DCube(void)
 	PIXEL_LTRB	rc;
 
 	for(i=0; i<STAR_MAX; i++){
-		BltSetRect(&rc, 136, 272, 16, 24);
+		rc = PIXEL_LTWH{ 136, 272, 16, 24 };
 		GrpBlt(&rc,Star[i].x,Star[i].y,GrTama);
 	}
 
@@ -680,7 +680,7 @@ void DrawEffectFakeECL(void)
 	GrpUnlock();
 
 	for(i=0; i<FAKE_ECLSTR_MAX; i++){
-		BltSetRect(&src, FakeECLStr[i].SrcX, FakeECLStr[i].SrcY, 72, 16);
+		src = PIXEL_LTWH{ FakeECLStr[i].SrcX, FakeECLStr[i].SrcY, 72, 16 };
 		GrpBlt(&src, FakeECLStr[i].x>>6, FakeECLStr[i].y>>6, GrMap);
 	}
 

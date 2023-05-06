@@ -196,7 +196,7 @@ extern void MaidDraw(void)
 	if(Viv.muteki == VIVDEAD_VAL) draw_flag = 0;
 
 	if(Viv.muteki==0 || draw_flag){
-		BltSetRect(&src,384+Viv.GrpID*32,128,16*2,16*3);
+		src = PIXEL_LTWH{ (384 + (Viv.GrpID * 32)), 128, (16 * 2), (16 * 3) };
 		GrpBlt(&src,x,y,GrTama);
 	}
 
@@ -248,7 +248,7 @@ extern void StateDraw(void)
 
 	// 残りメイド数表示 //
 	for(i=0; i<Viv.left; i++){
-		BltSetRect(&src, 608, 432, 16, 16);
+		src = PIXEL_LTWH{ 608, 432, 16, 16 };
 		GrpBlt(&src, 280+i*14, 0, GrTama);
 	}
 }

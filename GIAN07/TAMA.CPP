@@ -356,7 +356,7 @@ void tama_draw(void)
 
 		switch(t->effect){
 			case(TE_DELETE):
-				BltSetRect(&src,384+((t->count/6)<<4),104,16,16);
+				src = PIXEL_LTWH{ (384 + ((t->count / 6) << 4)), 104, 16, 16 };
 				GrpBlt(&src,x,y,GrTama);
 			continue;
 
@@ -431,7 +431,7 @@ void tama_draw(void)
 
 		switch(t->effect){
 			case(TE_DELETE):
-				BltSetRect(&src,384+((t->count/6)<<3),120,8,8);
+				src = PIXEL_LTWH{ (384 + ((t->count / 6) << 3)), 120, 8, 8 };
 				GrpBlt(&src,x,y,GrTama);
 			continue;
 

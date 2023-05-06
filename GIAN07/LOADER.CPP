@@ -208,8 +208,8 @@ BOOL LoadGraph(int stage)
 		for(auto i = 0; i < ENDING_PIC_MAX; i++) {
 			if(!GrpBMPLoadP(in,1+i,SURFACE_ID_MAPCHIP))		return FALSE;
 			GrpGetPalette(EndingGrp[i].pal);
-			if(i>=4) BltSetRect(&EndingGrp[i].rcTarget, (i%4)*320, 0, 320, 240);
-			else     BltSetRect(&EndingGrp[i].rcTarget, (i%2)*320, (i/2)*240, 320, 240);
+			if(i>=4) EndingGrp[i].rcTarget = PIXEL_LTWH{ ((i % 4) * 320), 0, 320, 240 };
+			else     EndingGrp[i].rcTarget = PIXEL_LTWH{ ((i % 2) * 320), ((i / 2) * 240), 320, 240 };
 
 			x = EndingGrp[i].rcTarget.left;
 			y = EndingGrp[i].rcTarget.top;
@@ -445,7 +445,7 @@ BOOL LoadStageData(BYTE stage)
 			Anime[21].height = 40;
 			Anime[21].n      = 4;
 			Anime[21].mode   = ANM_NORM;
-			for(i=0; i<4; i++)  BltSetRect(Anime[21].ptn+i, 160+i*40, 80, 40, 40);
+			for(i=0; i<4; i++)  Anime[21].ptn[i] = PIXEL_LTWH{ (160 + (i * 40)), 80, 40, 40 };
 
 			// 22 : ■Ｅ : ダメージマスク(A)
 			SetAnimeTH(Anime+22, 320, 80, 1);
@@ -465,7 +465,7 @@ BOOL LoadStageData(BYTE stage)
 			Anime[26].n      = 16;
 			Anime[26].mode   = ANM_DEG;		// 16 パターンで助かりましたな...
 			for(i=0; i<16; i++)
-				BltSetRect(Anime[26].ptn+i, (i*80)%640, 160, 80, 80);
+				Anime[26].ptn[i] = PIXEL_LTWH{ ((i * 80) % 640), 160, 80, 80 };
 
 			// 27 : ■Ｇ : 通常段階攻撃２溜めポーズ　および、ワープ前後、
 			SetAnimeTH(Anime+27, 560, 320, 1);
@@ -488,7 +488,7 @@ BOOL LoadStageData(BYTE stage)
 			Anime[38].height = 56;
 			Anime[38].n      = 1;
 			Anime[38].mode   = ANM_NORM;
-			BltSetRect(Anime[38].ptn+0, 512, 0, 40, 56);
+			Anime[38].ptn[0] = PIXEL_LTWH{ 512, 0, 40, 56 };
 
 			// 中ボス //
 			Anime[39].width  = 72;
@@ -510,17 +510,17 @@ BOOL LoadStageData(BYTE stage)
 			Anime[41].height = 64;
 			Anime[41].n      = 1;
 			Anime[41].mode   = ANM_NORM;
-			BltSetRect(Anime[41].ptn+0, 512, 56, 40, 56);
+			Anime[41].ptn[0] = PIXEL_LTWH{ 512, 56, 40, 56 };
 
 			// 謎の光弾 //
 			Anime[42].width  = 24;
 			Anime[42].height = 24;
 			Anime[42].n      = 4;
 			Anime[42].mode   = ANM_NORM;
-			BltSetRect(Anime[42].ptn+0, 552,  0, 24, 24);
-			BltSetRect(Anime[42].ptn+1, 552, 24, 24, 24);
-			BltSetRect(Anime[42].ptn+2, 552,  0, 24, 24);
-			BltSetRect(Anime[42].ptn+3, 552, 48, 24, 24);
+			Anime[42].ptn[0] = PIXEL_LTWH{ 552,  0, 24, 24 };
+			Anime[42].ptn[1] = PIXEL_LTWH{ 552, 24, 24, 24 };
+			Anime[42].ptn[2] = PIXEL_LTWH{ 552,  0, 24, 24 };
+			Anime[42].ptn[3] = PIXEL_LTWH{ 552, 48, 24, 24 };
 		break;
 
 		case(1):		// Ｓｔａｇｅ１のグラフィック矩形
@@ -665,8 +665,8 @@ BOOL LoadStageData(BYTE stage)
 			Anime[0].height = 56;
 			Anime[0].n      = 16;
 			Anime[0].mode   = ANM_DEG;
-			for(i=0;i<8;i++) BltSetRect(Anime[0].ptn+i  ,i*56, 0,56,56);
-			for(i=0;i<8;i++) BltSetRect(Anime[0].ptn+i+8,i*56,56,56,56);
+			for(i=0;i<8;i++) Anime[0].ptn[i    ] = PIXEL_LTWH{ i*56,  0, 56, 56 };
+			for(i=0;i<8;i++) Anime[0].ptn[i + 8] = PIXEL_LTWH{ i*56, 56, 56, 56 };
 
 			SetAnime32(0,112,1,16,ANM_DEG);
 			SetAnime32(0,144,2,16,ANM_DEG);
@@ -676,22 +676,22 @@ BOOL LoadStageData(BYTE stage)
 			Anime[4].height = 16;
 			Anime[4].n      = 2;
 			Anime[4].mode   = ANM_NORM;
-			BltSetRect(Anime[4].ptn+0,592, 0,48,16);
-			BltSetRect(Anime[4].ptn+1,592,16,48,16);
+			Anime[4].ptn[0] = PIXEL_LTWH{ 592,  0, 48, 16 };
+			Anime[4].ptn[1] = PIXEL_LTWH{ 592, 16, 48, 16 };
 
 			Anime[5].width  = 48;
 			Anime[5].height = 16;
 			Anime[5].n      = 2;
 			Anime[5].mode   = ANM_NORM;
-			BltSetRect(Anime[5].ptn+0,592,32,48,16);
-			BltSetRect(Anime[5].ptn+1,592,48,48,16);
+			Anime[5].ptn[0] = PIXEL_LTWH{ 592, 32, 48, 16 };
+			Anime[5].ptn[1] = PIXEL_LTWH{ 592, 48, 48, 16 };
 
 			// ボス (464,384)
 			Anime[6].width  = 11*16;
 			Anime[6].height =  5*16 + 8;
 			Anime[6].n      = 1;
 			Anime[6].mode   = ANM_NORM;
-			BltSetRect(Anime[6].ptn+0,464,392,11*16,5*16+8);
+			Anime[6].ptn[0] = PIXEL_LTWH{ 464, 392, (11 * 16), ((5 * 16) + 8) };
 
 			SetAnime32(0,208,7,16,ANM_DEG);
 			SetAnime40(0,240,8);
@@ -713,7 +713,7 @@ BOOL LoadStageData(BYTE stage)
 			Anime[9].height =  5*16 + 8;
 			Anime[9].n      = 1;
 			Anime[9].mode   = ANM_NORM;
-			BltSetRect(Anime[9].ptn+0, 464, 392-88, 11*16, 5*16+8);
+			Anime[9].ptn[0] = PIXEL_LTWH{ 464, (392 - 88), (11 * 16), ((5 * 16) + 8) };
 		*/
 		break;
 
@@ -754,10 +754,10 @@ BOOL LoadStageData(BYTE stage)
 			Anime[7].height = 24;
 			Anime[7].n      = 4;
 			Anime[7].mode   = ANM_NORM;
-			BltSetRect(Anime[7].ptn+0, 592, 96+ 0, 24, 24);
-			BltSetRect(Anime[7].ptn+1, 592, 96+24, 24, 24);
-			BltSetRect(Anime[7].ptn+2, 592, 96+ 0, 24, 24);
-			BltSetRect(Anime[7].ptn+3, 592, 96+48, 24, 24);
+			Anime[7].ptn[0] = PIXEL_LTWH{ 592, (96 +  0), 24, 24 };
+			Anime[7].ptn[1] = PIXEL_LTWH{ 592, (96 + 24), 24, 24 };
+			Anime[7].ptn[2] = PIXEL_LTWH{ 592, (96 +  0), 24, 24 };
+			Anime[7].ptn[3] = PIXEL_LTWH{ 592, (96 + 48), 24, 24 };
 
 			SetAnimeRect(Anime+8, 512, 96, 80, 9*8);	// 屈強なる中ボス
 
@@ -775,50 +775,50 @@ BOOL LoadStageData(BYTE stage)
 			Anime[0].height = 72;
 			Anime[0].n      = 6;
 			Anime[0].mode   = ANM_STOP;
-			BltSetRect(Anime[0].ptn+0, 56*0,72,56,72);
-			BltSetRect(Anime[0].ptn+1, 56*1,72,56,72);
-			BltSetRect(Anime[0].ptn+2, 56*2,72,56,72);
-			BltSetRect(Anime[0].ptn+3, 56*3,72,56,72);
-			BltSetRect(Anime[0].ptn+4, 56*4,72,56,72);
-			BltSetRect(Anime[0].ptn+5, 56*5,72,56,72);
+			Anime[0].ptn[0] = PIXEL_LTWH{ (56 * 0), 72, 56, 72 };
+			Anime[0].ptn[1] = PIXEL_LTWH{ (56 * 1), 72, 56, 72 };
+			Anime[0].ptn[2] = PIXEL_LTWH{ (56 * 2), 72, 56, 72 };
+			Anime[0].ptn[3] = PIXEL_LTWH{ (56 * 3), 72, 56, 72 };
+			Anime[0].ptn[4] = PIXEL_LTWH{ (56 * 4), 72, 56, 72 };
+			Anime[0].ptn[5] = PIXEL_LTWH{ (56 * 5), 72, 56, 72 };
 
 			// ラスボス(立ち->座り) //
 			Anime[1].width  = 56;
 			Anime[1].height = 72;
 			Anime[1].n      = 6;
 			Anime[1].mode   = ANM_STOP;
-			BltSetRect(Anime[1].ptn+0, 56*5,72,56,72);
-			BltSetRect(Anime[1].ptn+1, 56*4,72,56,72);
-			BltSetRect(Anime[1].ptn+2, 56*3,72,56,72);
-			BltSetRect(Anime[1].ptn+3, 56*2,72,56,72);
-			BltSetRect(Anime[1].ptn+4, 56*1,72,56,72);
-			BltSetRect(Anime[1].ptn+5, 56*0,72,56,72);
+			Anime[1].ptn[0] = PIXEL_LTWH{ (56 * 5), 72, 56, 72 };
+			Anime[1].ptn[1] = PIXEL_LTWH{ (56 * 4), 72, 56, 72 };
+			Anime[1].ptn[2] = PIXEL_LTWH{ (56 * 3), 72, 56, 72 };
+			Anime[1].ptn[3] = PIXEL_LTWH{ (56 * 2), 72, 56, 72 };
+			Anime[1].ptn[4] = PIXEL_LTWH{ (56 * 1), 72, 56, 72 };
+			Anime[1].ptn[5] = PIXEL_LTWH{ (56 * 0), 72, 56, 72 };
 
 			// ラスボス(ガード) //
 			Anime[2].width  = 56;
 			Anime[2].height = 72;
 			Anime[2].n      = 4;
 			Anime[2].mode   = ANM_NORM;
-			BltSetRect(Anime[2].ptn+0, 56*6,72,56,72);
-			BltSetRect(Anime[2].ptn+1, 56*7,72,56,72);
-			BltSetRect(Anime[2].ptn+2, 56*6,72,56,72);
-			BltSetRect(Anime[2].ptn+3, 56*8,72,56,72);
+			Anime[2].ptn[0] = PIXEL_LTWH{ (56 * 6), 72, 56, 72 };
+			Anime[2].ptn[1] = PIXEL_LTWH{ (56 * 7), 72, 56, 72 };
+			Anime[2].ptn[2] = PIXEL_LTWH{ (56 * 6), 72, 56, 72 };
+			Anime[2].ptn[3] = PIXEL_LTWH{ (56 * 8), 72, 56, 72 };
 
 			// ラスボス(攻撃-壱) //
 			Anime[3].width  = 56;
 			Anime[3].height = 72;
 			Anime[3].n      = 9+1;
 			Anime[3].mode   = ANM_STOP;
-			BltSetRect(Anime[3].ptn+0, 56*0,0,56,72);
-			BltSetRect(Anime[3].ptn+1, 56*1,0,56,72);
-			BltSetRect(Anime[3].ptn+2, 56*2,0,56,72);
-			BltSetRect(Anime[3].ptn+3, 56*3,0,56,72);
-			BltSetRect(Anime[3].ptn+4, 56*4,0,56,72);
-			BltSetRect(Anime[3].ptn+5, 56*5,0,56,72);
-			BltSetRect(Anime[3].ptn+6, 56*6,0,56,72);
-			BltSetRect(Anime[3].ptn+7, 56*7,0,56,72);
-			BltSetRect(Anime[3].ptn+8, 56*8,0,56,72);
-			BltSetRect(Anime[3].ptn+9, 56*5,72,56,72);	// ちょっと追加
+			Anime[3].ptn[0] = PIXEL_LTWH{ (56 * 0),  0, 56, 72 };
+			Anime[3].ptn[1] = PIXEL_LTWH{ (56 * 1),  0, 56, 72 };
+			Anime[3].ptn[2] = PIXEL_LTWH{ (56 * 2),  0, 56, 72 };
+			Anime[3].ptn[3] = PIXEL_LTWH{ (56 * 3),  0, 56, 72 };
+			Anime[3].ptn[4] = PIXEL_LTWH{ (56 * 4),  0, 56, 72 };
+			Anime[3].ptn[5] = PIXEL_LTWH{ (56 * 5),  0, 56, 72 };
+			Anime[3].ptn[6] = PIXEL_LTWH{ (56 * 6),  0, 56, 72 };
+			Anime[3].ptn[7] = PIXEL_LTWH{ (56 * 7),  0, 56, 72 };
+			Anime[3].ptn[8] = PIXEL_LTWH{ (56 * 8),  0, 56, 72 };
+			Anime[3].ptn[9] = PIXEL_LTWH{ (56 * 5), 72, 56, 72 };	// ちょっと追加
 
 			// 幼虫期(//
 			SetAnimeRect2(Anime+4, 432,272,632,464);
@@ -828,17 +828,17 @@ BOOL LoadStageData(BYTE stage)
 			Anime[5].height = 72;
 			Anime[5].n      = 11;
 			Anime[5].mode   = ANM_STOP;
-			BltSetRect(Anime[5].ptn+0,  56*0,72,56,72);
-			BltSetRect(Anime[5].ptn+1,  56*1,72,56,72);
-			BltSetRect(Anime[5].ptn+2,  56*2,72,56,72);
-			BltSetRect(Anime[5].ptn+3,  56*3,72,56,72);
-			BltSetRect(Anime[5].ptn+4,  56*4,72,56,72);
-			BltSetRect(Anime[5].ptn+5,  56*5,72,56,72);
-			BltSetRect(Anime[5].ptn+6,  56*4,72,56,72);
-			BltSetRect(Anime[5].ptn+7,  56*3,72,56,72);
-			BltSetRect(Anime[5].ptn+8,  56*2,72,56,72);
-			BltSetRect(Anime[5].ptn+9,  56*1,72,56,72);
-			BltSetRect(Anime[5].ptn+10, 56*0,72,56,72);
+			Anime[5].ptn[ 0] = PIXEL_LTWH{ (56 * 0), 72, 56, 72 };
+			Anime[5].ptn[ 1] = PIXEL_LTWH{ (56 * 1), 72, 56, 72 };
+			Anime[5].ptn[ 2] = PIXEL_LTWH{ (56 * 2), 72, 56, 72 };
+			Anime[5].ptn[ 3] = PIXEL_LTWH{ (56 * 3), 72, 56, 72 };
+			Anime[5].ptn[ 4] = PIXEL_LTWH{ (56 * 4), 72, 56, 72 };
+			Anime[5].ptn[ 5] = PIXEL_LTWH{ (56 * 5), 72, 56, 72 };
+			Anime[5].ptn[ 6] = PIXEL_LTWH{ (56 * 4), 72, 56, 72 };
+			Anime[5].ptn[ 7] = PIXEL_LTWH{ (56 * 3), 72, 56, 72 };
+			Anime[5].ptn[ 8] = PIXEL_LTWH{ (56 * 2), 72, 56, 72 };
+			Anime[5].ptn[ 9] = PIXEL_LTWH{ (56 * 1), 72, 56, 72 };
+			Anime[5].ptn[10] = PIXEL_LTWH{ (56 * 0), 72, 56, 72 };
 
 
 			// 蝶状態で放つビット？(Open) //
@@ -846,32 +846,32 @@ BOOL LoadStageData(BYTE stage)
 			Anime[6].height = 32;
 			Anime[6].n      = 10;
 			Anime[6].mode   = ANM_STOP;
-			BltSetRect(Anime[6].ptn+0, 32*0,416,32,32);
-			BltSetRect(Anime[6].ptn+1, 32*1,416,32,32);
-			BltSetRect(Anime[6].ptn+2, 32*2,416,32,32);
-			BltSetRect(Anime[6].ptn+3, 32*3,416,32,32);
-			BltSetRect(Anime[6].ptn+4, 32*4,416,32,32);
-			BltSetRect(Anime[6].ptn+5, 32*5,416,32,32);
-			BltSetRect(Anime[6].ptn+6, 32*0,448,32,32);
-			BltSetRect(Anime[6].ptn+7, 32*1,448,32,32);
-			BltSetRect(Anime[6].ptn+8, 32*2,448,32,32);
-			BltSetRect(Anime[6].ptn+9, 32*3,448,32,32);
+			Anime[6].ptn[0] = PIXEL_LTWH{ (32 * 0), 416, 32, 32 };
+			Anime[6].ptn[1] = PIXEL_LTWH{ (32 * 1), 416, 32, 32 };
+			Anime[6].ptn[2] = PIXEL_LTWH{ (32 * 2), 416, 32, 32 };
+			Anime[6].ptn[3] = PIXEL_LTWH{ (32 * 3), 416, 32, 32 };
+			Anime[6].ptn[4] = PIXEL_LTWH{ (32 * 4), 416, 32, 32 };
+			Anime[6].ptn[5] = PIXEL_LTWH{ (32 * 5), 416, 32, 32 };
+			Anime[6].ptn[6] = PIXEL_LTWH{ (32 * 0), 448, 32, 32 };
+			Anime[6].ptn[7] = PIXEL_LTWH{ (32 * 1), 448, 32, 32 };
+			Anime[6].ptn[8] = PIXEL_LTWH{ (32 * 2), 448, 32, 32 };
+			Anime[6].ptn[9] = PIXEL_LTWH{ (32 * 3), 448, 32, 32 };
 
 			// 蝶状態で放つビット？(Close) //
 			Anime[7].width  = 33;
 			Anime[7].height = 32;
 			Anime[7].n      = 10;
 			Anime[7].mode   = ANM_STOP;
-			BltSetRect(Anime[7].ptn+0, 32*3,448,32,32);
-			BltSetRect(Anime[7].ptn+1, 32*2,448,32,32);
-			BltSetRect(Anime[7].ptn+2, 32*1,448,32,32);
-			BltSetRect(Anime[7].ptn+3, 32*0,448,32,32);
-			BltSetRect(Anime[7].ptn+4, 32*5,416,32,32);
-			BltSetRect(Anime[7].ptn+5, 32*4,416,32,32);
-			BltSetRect(Anime[7].ptn+6, 32*3,416,32,32);
-			BltSetRect(Anime[7].ptn+7, 32*2,416,32,32);
-			BltSetRect(Anime[7].ptn+8, 32*1,416,32,32);
-			BltSetRect(Anime[7].ptn+9, 32*0,416,32,32);
+			Anime[7].ptn[0] = PIXEL_LTWH{ (32 * 3), 448, 32, 32 };
+			Anime[7].ptn[1] = PIXEL_LTWH{ (32 * 2), 448, 32, 32 };
+			Anime[7].ptn[2] = PIXEL_LTWH{ (32 * 1), 448, 32, 32 };
+			Anime[7].ptn[3] = PIXEL_LTWH{ (32 * 0), 448, 32, 32 };
+			Anime[7].ptn[4] = PIXEL_LTWH{ (32 * 5), 416, 32, 32 };
+			Anime[7].ptn[5] = PIXEL_LTWH{ (32 * 4), 416, 32, 32 };
+			Anime[7].ptn[6] = PIXEL_LTWH{ (32 * 3), 416, 32, 32 };
+			Anime[7].ptn[7] = PIXEL_LTWH{ (32 * 2), 416, 32, 32 };
+			Anime[7].ptn[8] = PIXEL_LTWH{ (32 * 1), 416, 32, 32 };
+			Anime[7].ptn[9] = PIXEL_LTWH{ (32 * 0), 416, 32, 32 };
 
 			SetAnimeRect(Anime+8, 0, 368, 48, 48);	// 屈強なる中ボス
 		break;
@@ -888,7 +888,7 @@ static void SetAnimeRect(ANIME_DATA *anm,int x, int y, int w, int h)
 	anm->n      = 1;
 	anm->mode   = ANM_NORM;
 
-	BltSetRect(anm->ptn+0, x, y, w, h);
+	anm->ptn[0] = PIXEL_LTWH{ x, y, w, h };
 }
 
 // １パターンのグラフィックをアニメとして定義する //
@@ -912,7 +912,7 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
 	anm->mode   = ANM_NORM;
 
 	for(i=0; i<n; i++){
-		BltSetRect(anm->ptn+i, x+i*80, y, 80, 80);
+		anm->ptn[i] = PIXEL_LTWH{ (x + (i * 80)), y, 80, 80 };
 	}
 }
 

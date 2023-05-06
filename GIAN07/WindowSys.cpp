@@ -297,7 +297,9 @@ void MWinDraw(void)
 	switch(MsgWindow.FaceState){
 		case(MFACE_WAIT):
 			oy = MsgWindow.MaxSize.bottom - 100;
-			BltSetRect(&src,(MsgWindow.FaceID%FACE_NUMX)*96,0,96,96);
+			src = PIXEL_LTWH{
+				((MsgWindow.FaceID % FACE_NUMX) * 96), 0, 96, 96
+			};
 			GrpBlt(&src,x+2,oy,GrFace);
 		break;
 
@@ -307,7 +309,9 @@ void MWinDraw(void)
 			for(i=0;i<96;i++){
 				len = cosl(time+i*153,(64-time)/2);
 				//len = cosl(time+i*4,64-time);
-				BltSetRect(&src,(MsgWindow.FaceID%FACE_NUMX)*96,i,96,1);
+				src = PIXEL_LTWH{
+					((MsgWindow.FaceID % FACE_NUMX) * 96), i, 96, 1
+				};
 				GrpBlt(&src,x+len+2,oy+i,GrFace);
 				//if(i&1)	GrpBlt(&src,x+len+2,oy+i,GrFace);
 				//else	GrpBlt(&src,x-len+2,oy+i,GrFace);
@@ -320,7 +324,9 @@ void MWinDraw(void)
 			for(i=0;i<96;i++){
 				len = cosl(time+i*153,(64-time)/2);
 				//len = cosl(time+i*4,64-time);
-				BltSetRect(&src,(MsgWindow.FaceID%FACE_NUMX)*96,i,96,1);
+				src = PIXEL_LTWH{
+					((MsgWindow.FaceID % FACE_NUMX) * 96), i, 96, 1
+				};
 				GrpBlt(&src,x+len+2,oy+i,GrFace);
 				//if(i&1)	GrpBlt(&src,x+len+2,oy+i,GrFace);
 				//else	GrpBlt(&src,x-len+2,oy+i,GrFace);
@@ -332,7 +338,9 @@ void MWinDraw(void)
 			oy = MsgWindow.MaxSize.bottom - 100;
 			for(i=0;i<96;i++){
 				len = cosl(time+i*4,time);
-				BltSetRect(&src,(MsgWindow.FaceID%FACE_NUMX)*96,i,96,1);
+				src = PIXEL_LTWH{
+					((MsgWindow.FaceID % FACE_NUMX) * 96), i, 96, 1
+				};
 				if(i&1)	GrpBlt(&src,x-len+2,oy+i,GrFace);
 				else	GrpBlt(&src,x+len+2,oy+i,GrFace);
 			}

@@ -31,6 +31,15 @@ struct PIXEL_SIZE {
 	PIXEL_COORD h;
 };
 
+// Left-top-width-height rectangle in unscaled pixel space. Relative to any
+// origin.
+struct PIXEL_LTWH {
+	PIXEL_COORD left;
+	PIXEL_COORD top;
+	PIXEL_COORD w;
+	PIXEL_COORD h;
+};
+
 // Left-top-right-bottom rectangle in unscaled pixel space. Relative to any
 // origin.
 struct PIXEL_LTRB {
@@ -38,6 +47,24 @@ struct PIXEL_LTRB {
 	PIXEL_COORD top;
 	PIXEL_COORD right;
 	PIXEL_COORD bottom;
+
+	PIXEL_LTRB() = default;
+	PIXEL_LTRB(const PIXEL_LTRB&) = default;
+	PIXEL_LTRB(PIXEL_LTRB&&) = default;
+	PIXEL_LTRB& operator=(const PIXEL_LTRB&) = default;
+	PIXEL_LTRB& operator=(PIXEL_LTRB&&) = default;
+	PIXEL_LTRB(
+		decltype(left) left,
+		decltype(top) top,
+		decltype(right) right,
+		decltype(bottom) bottom
+	) :
+		left(left), top(top), right(right), bottom(bottom) {
+	}
+
+	PIXEL_LTRB(const PIXEL_LTWH& o) :
+		left(o.left), top(o.top), right(o.left + o.w), bottom(o.top + o.h) {
+	}
 };
 
 // X/Y coordinate in unscaled game window space. The visible area ranges from
@@ -48,6 +75,7 @@ struct WINDOW_POINT : public PIXEL_POINT {
 // Left-top-right-bottom rectangle in unscaled game window space. The visible
 // area ranges from (0, 0) to (639, 479) inclusive.
 struct WINDOW_LTRB : public PIXEL_LTRB {
+	using PIXEL_LTRB::PIXEL_LTRB;
 };
 // -----------------------
 

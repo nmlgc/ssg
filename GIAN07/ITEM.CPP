@@ -123,7 +123,9 @@ void ItemDraw(void)
 		switch(ip->type){
 			case(ITEM_SCORE):
 				ptn = (BYTE)((ip->count>>2)&3);
-				BltSetRect(&src,384+(ptn<<4),256+16,16,16);
+				src = PIXEL_LTWH{
+					(384 + (ptn << 4)), (256 + 16), 16, 16
+				};
 				x = (ip->x>>6) - 8;
 				y = (ip->y>>6) - 8;
 				GrpBlt(&src,x,y,GrTama);
@@ -132,14 +134,18 @@ void ItemDraw(void)
 			case(ITEM_EXTEND):
 				for(j=0; j<8; j++){
 					ptn = (BYTE)((ip->count>>2)&3);
-					BltSetRect(&src,384+16*4+(ptn<<4),256+16,16,16);
+					src = PIXEL_LTWH{
+						(384 + (16 * 4) + (ptn << 4)), (256 + 16), 16, 16
+					};
 					x = (ip->x>>6) - 8 + cosl(ip->count+j*256/8, 12);
 					y = (ip->y>>6) - 8 + sinl(ip->count+j*256/8, 12);
 					GrpBlt(&src,x,y,GrTama);
 				}
 
 			//	ptn = (BYTE)((ip->count>>2)&3);
-			//	BltSetRect(&src,384+16*4+(ptn<<4),256+16,16,16);
+			//	src = PIXEL_LTWH{
+			//		(384 + (16 * 4) + (ptn << 4)), (256 + 16), 16, 16
+			//	};
 			//	x = (ip->x>>6) - 8;
 			//	y = (ip->y>>6) - 8;
 			//	GrpBlt(&src,x,y,GrTama);
@@ -148,14 +154,18 @@ void ItemDraw(void)
 			case(ITEM_BOMB):
 				for(j=0; j<8; j++){
 					ptn = (BYTE)((ip->count>>2)&3);
-					BltSetRect(&src,384+16*8+(ptn<<4),256+16,16,16);
+					src = PIXEL_LTWH{
+						(384 + (16 * 8) + (ptn << 4)), (256 + 16), 16, 16
+					};
 					x = (ip->x>>6) - 8 + cosl(-2*ip->count+j*256/8, 12);
 					y = (ip->y>>6) - 8 + sinl(-2*ip->count+j*256/8, 12);
 					GrpBlt(&src,x,y,GrTama);
 				}
 
 			//	ptn = (BYTE)((ip->count>>2)&3);
-			//	BltSetRect(&src,384+16*8+(ptn<<4),256+16,16,16);
+			//	src = PIXEL_LTWH{
+			//		(384 + (16 * 8) + (ptn << 4)), (256 + 16), 16, 16
+			//	};
 			//	x = (ip->x>>6) - 8;
 			//	y = (ip->y>>6) - 8;
 			//	GrpBlt(&src,x,y,GrTama);

@@ -624,27 +624,27 @@ static void _EnemyDrawBomb(int x,int y,DWORD count)
 /*
 	switch(count/ENEMY_BOMB_SPD){
 		case(0):case(1):
-			BltSetRect(&src,520,104,8,8);
+			src = PIXEL_LTWH{ 520, 104,  8,  8 };
 			x-=4;y-=4;
 		break;
 
 		case(2):case(3):
-			BltSetRect(&src,528,104,16,16);
+			src = PIXEL_LTWH{ 528, 104, 16, 16 };
 			x-=8;y-=8;
 		break;
 
 		case(4):case(5):
-			BltSetRect(&src,544,104,24,24);
+			src = PIXEL_LTWH{ 544, 104, 24, 24 };
 			x-=12;y-=12;
 		break;
 
 		case(6):
-			BltSetRect(&src,568,104,32,32);
+			src = PIXEL_LTWH{ 568, 104, 32, 32 };
 			x-=16;y-=16;
 		break;
 
 		case(7):
-			BltSetRect(&src,600,104,48,48);
+			src = PIXEL_LTWH{ 600, 104, 48, 48 };
 			x-=24;y-=24;
 		break;
 	}

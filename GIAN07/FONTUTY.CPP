@@ -12,7 +12,9 @@ void __FillExpoint(EXPOINT *p, int x, int y, int w, int h);
 // Glyph selection inside the 16×16 font //
 std::optional<PIXEL_LTRB> Glyph16x16(char c)
 {
-	PIXEL_LTRB src;
+	PIXEL_LTWH src;
+	src.w = 16;
+	src.h = 16;
 
 	// GrTama における文字の並びは次のようになっている。 //
 	// (変更する可能性もあるので十分に注意すること)      //
@@ -20,23 +22,23 @@ std::optional<PIXEL_LTRB> Glyph16x16(char c)
 	// abcdefghijklmnopqrstuvwxyz!?#\<>=,+-              //
 
 	if((c >= 'A') && (c <= 'Z')) {
-		BltSetRect(&src,((c)-'A')<<4,480-32,16,16);
+		src.left = ((c - 'A') << 4); src.top = (480 - 32);
 	} else if((c >= 'a') && (c <= 'z')) {
-		BltSetRect(&src,((c)-'a')<<4,480-16,16,16);
+		src.left = ((c - 'a') << 4); src.top = (480 - 16);
 	} else if((c >= '0') && (c <= '9')) {
-		BltSetRect(&src,(((c)-'0')<<4)+416,480-32,16,16);
+		src.left = (((c - '0') << 4) + 416); src.top = (480 - 32);
 	} else {
 		switch(c) {
-		case('!'):	BltSetRect(&src,((0)<<4)+416,480-16,16,16);	break;
-		case('?'):	BltSetRect(&src,((1)<<4)+416,480-16,16,16);	break;
-		case('#'):	BltSetRect(&src,((2)<<4)+416,480-16,16,16);	break;
-		case('\\'):	BltSetRect(&src,((3)<<4)+416,480-16,16,16);	break;
-		case('<'):	BltSetRect(&src,((4)<<4)+416,480-16,16,16);	break;
-		case('>'):	BltSetRect(&src,((5)<<4)+416,480-16,16,16);	break;
-		case('='):	BltSetRect(&src,((6)<<4)+416,480-16,16,16);	break;
-		case(','):	BltSetRect(&src,((7)<<4)+416,480-16,16,16);	break;
-		case('+'):	BltSetRect(&src,((8)<<4)+416,480-16,16,16);	break;
-		case('-'):	BltSetRect(&src,((9)<<4)+416,480-16,16,16);	break;
+		case('!'):	src.left = ((0 << 4) + 416); src.top = (480 - 16);	break;
+		case('?'):	src.left = ((1 << 4) + 416); src.top = (480 - 16);	break;
+		case('#'):	src.left = ((2 << 4) + 416); src.top = (480 - 16);	break;
+		case('\\'):	src.left = ((3 << 4) + 416); src.top = (480 - 16);	break;
+		case('<'):	src.left = ((4 << 4) + 416); src.top = (480 - 16);	break;
+		case('>'):	src.left = ((5 << 4) + 416); src.top = (480 - 16);	break;
+		case('='):	src.left = ((6 << 4) + 416); src.top = (480 - 16);	break;
+		case(','):	src.left = ((7 << 4) + 416); src.top = (480 - 16);	break;
+		case('+'):	src.left = ((8 << 4) + 416); src.top = (480 - 16);	break;
+		case('-'):	src.left = ((9 << 4) + 416); src.top = (480 - 16);	break;
 		default:	return std::nullopt;
 		}
 	}
@@ -122,7 +124,7 @@ extern void GrpPut57(int x, int y, char *s)
 
 	for(;(*s)!='\0';s++,x+=6){
 		if((*s)>='0' && (*s)<='9'){
-			BltSetRect(&src,(((*s)-'0')<<3)+128,80,5,7);
+			src = PIXEL_LTWH{ (((*s - '0') << 3) + 128), 80, 5, 7 };
 		}
 		else{
 			continue;
@@ -140,13 +142,13 @@ extern void GrpPut7B(int x, int y, char *s)
 	PIXEL_LTRB	src;
 	for(;(*s)!='\0';s++,x+=8){
 		if((*s)>='0' && (*s)<='9'){
-			BltSetRect(&src,(((*s)-'0')<<3)+184,456,7,11);
+			src = PIXEL_LTWH{ (((*s - '0') << 3) + 184), 456, 7, 11 };
 		}
 		else if((*s)=='-'){
-			BltSetRect(&src,264,456,7,11);
+			src = PIXEL_LTWH{ (264 + 0), 456, 7, 11 };
 		}
 		else if((*s)==':'){
-			BltSetRect(&src,264+8,456,7,11);
+			src = PIXEL_LTWH{ (264 + 8), 456, 7, 11 };
 		}
 		else{
 			continue;
@@ -168,7 +170,7 @@ extern void GrpPutScore(int x, int y, char *s)
 
 	for(;(*s)!='\0';s++,x+=6){
 		if((*s)>='0' && (*s)<='9'){
-			BltSetRect(&src,(((*s)-'0')<<3)+128,88,5,7);
+			src = PIXEL_LTWH{ (((*s - '0') << 3) + 128), 88, 5, 7 };
 		}
 		else{
 			continue;
@@ -192,11 +194,11 @@ extern void GrpPutMidNum(int x, int y, int n)
 	// n = 1Byte ならば３桁以内に収まるハズ //
 	for(i=0;i<3;i++,x+=5){
 		if(buf[i]>='0' && buf[i]<='9'){
-			BltSetRect(&src,80+(buf[i]-'0')*4,432,4,5);
+			src = PIXEL_LTWH{ (80 + ((buf[i] - '0') * 4)), 432, 4, 5 };
 			GrpBlt(&src, x, y, GrMusic);
 		}
 		if(buf[i]=='-'){
-			BltSetRect(&src,80+10*4,432,4,5);
+			src = PIXEL_LTWH{ (80 + (10 * 4)), 432, 4, 5 };
 			GrpBlt(&src, x, y, GrMusic);
 		}
 	}

@@ -159,49 +159,55 @@ static void __stdcall _FDraw(FRAGMENT_DATA *f)
 		case(FRG_EVADE):
 			x = (f->x>>6) - 4;
 			y = (f->y>>6) - 4;
-			BltSetRect(&src,592+(((24-f->count)>>2)<<3),8,8,8);
+			src = PIXEL_LTWH{
+				(592 + (((24 - f->count) >> 2) << 3)), 8, 8, 8
+			};
 			GrpBlt(&src,x,y,GrTama);
 		break;
 
 		case(FRG_HIT):
 			x = (f->x>>6) - 4;
 			y = (f->y>>6) - 4;
-			BltSetRect(&src,592+(((24-f->count)>>2)<<3),8+8,8,8);
+			src = PIXEL_LTWH{
+				(592 + (((24 - f->count) >> 2) << 3)), (8 + 8), 8, 8
+			};
 			GrpBlt(&src,x,y,GrTama);
 		break;
 
 		case(FRG_SMOKE):
 			x = (f->x>>6) - 4;
 			y = (f->y>>6) - 4;
-			BltSetRect(&src,592+(((24-f->count)>>2)<<3),0,8,8);
+			src = PIXEL_LTWH{
+				(592 + (((24 - f->count) >> 2) << 3)), 0, 8, 8
+			};
 			GrpBlt(&src,x,y,GrTama);
 		break;
 
 		case(FRG_STAR1):
 			x = (f->x>>6) - 8;
 			y = (f->y>>6) - 8;
-			BltSetRect(&src,624,432,16,16);
+			src = PIXEL_LTWH{ 624, 432, 16, 16 };
 			GrpBlt(&src,x,y,GrTama);
 		break;
 
 		case(FRG_STAR2):
 			x = (f->x>>6) - 16;
 			y = (f->y>>6) - 16;
-			BltSetRect(&src,608,448,32,32);
+			src = PIXEL_LTWH{ 608, 448, 32, 32 };
 			GrpBlt(&src,x,y,GrTama);
 		break;
 
 		case(FRG_STAR3):
 			x = (f->x>>6) - 16;
 			y = (f->y>>6) - 16;
-			BltSetRect(&src,608,448,32,32);
+			src = PIXEL_LTWH{ 608, 448, 32, 32 };
 			GrpBlt(&src,x,y,GrTama);
 		break;
 
 		case(FRG_HEART):
 			x = (f->x>>6) - 16;
 			y = (f->y>>6) - 16;
-			BltSetRect(&src,576,448,32,32);
+			src = PIXEL_LTWH{ 576, 448, 32, 32 };
 			GrpBlt(&src,x,y,GrTama);
 		break;
 

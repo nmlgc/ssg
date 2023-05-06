@@ -145,7 +145,7 @@ void ScoreDraw(void)
 		else
 			ScoreString[i].bMoveEnable = FALSE;
 
-		BltSetRect(&src,0,64+32*i,400,32);
+		src = PIXEL_LTWH{ 0, (64 + (32 * i)), 400, 32 };
 		GrpBlt(
 			&src, (ScoreString[i].x >> 6), (ScoreString[i].y >> 6), GrNameReg
 		);
@@ -175,7 +175,7 @@ void ScoreDraw(void)
 
 		gx = (ScoreString[i].x>>6) + 224 + 80;
 		gy = (ScoreString[i].y>>6) + 25;
-		BltSetRect(&src, 0, 400+ScoreString[i].Weapon*8, 48, 8);
+		src = PIXEL_LTWH{ 0, (400 + (ScoreString[i].Weapon * 8)), 48, 8 };
 		GrpBlt(&src, gx, gy-1, GrNameReg);
 	}
 }
@@ -371,8 +371,11 @@ void NameRegistProc(void)
 	GrpBlt(&src, 112, 420, GrNameReg);
 
 	// カーソル //
-	if(x>=20 && y==2)	BltSetRect(&src,432,432+((count>>3)<<4),32,16);
-	else				BltSetRect(&src,416,432+((count>>3)<<4),16,16);
+	if((x >= 20) && (y == 2)) {
+		src = PIXEL_LTWH{ 432, (432 + ((count >> 3) << 4)), 32, 16 };
+	} else {
+		src = PIXEL_LTWH{ 416, (432 + ((count >> 3) << 4)), 16, 16 };
+	}
 	GrpBlt(&src, (112 + (x << 4)), (420 + (y << 4)), GrNameReg);
 
 	//sprintf(buf,"(%2d,%2d)", x, y);
@@ -615,7 +618,7 @@ void ReplayProc(void)
 	if(IsDraw()){
 		GameDraw();
 
-		BltSetRect(&rc,312,80,32,8);
+		rc = PIXEL_LTWH{ 312, 80, 32, 8 };
 		GrpBlt(&rc,128,470,GrTama);
 		if(ExTimer<64+32){
 			GrpLock();
@@ -623,7 +626,7 @@ void ReplayProc(void)
 			GrpSetColor(0,0,0);
 			GrpBoxA(128+45-3, 470+4-1, 128+45+72, 470+4+5);
 			GrpUnlock();
-			BltSetRect(&rc,312,88,72,8);
+			rc = PIXEL_LTWH{ 312, 88, 72, 8 };
 			GrpBlt(&rc,128+45,470+4,GrTama);
 		}
 		GrpFlip();
@@ -910,8 +913,7 @@ void GameProc(void)
 	if(IsDraw()){
 		GameDraw();
 		if(DemoplaySaveEnable){
-			PIXEL_LTRB	rc;
-			BltSetRect(&rc,288,80,24,8);
+			PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
 			GrpBlt(&rc,128,470,GrTama);
 		}
 		GrpFlip();
@@ -972,8 +974,7 @@ void GameOverProc(void)
 		CWinDraw(&ContinueWindow);
 		/*
 		if(DemoplaySaveEnable){
-			PIXEL_LTRB	rc;
-			BltSetRect(&rc,288,80,24,8);
+			PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
 			GrpBlt(&rc,128,470,GrTama);
 		}*/
 		GrpFlip();
@@ -1020,7 +1021,7 @@ void DemoProc(void)
 // 装備選択 //
 void WeaponSelectProc(void)
 {
-	PIXEL_LTRB	src[4], rc;
+	PIXEL_LTRB	rc;
 	int		i,x,y;
 	BYTE	d;
 	char	buf[100];
@@ -1029,10 +1030,12 @@ void WeaponSelectProc(void)
 	static char spd  = 0;
 	static WORD	count = 0;
 
-	BltSetRect(src+0,0,344,56,48);
-	BltSetRect(src+1,0,392,56,48);
-	BltSetRect(src+2,56,344,56,48);
-	BltSetRect(src+3,56,392,56,48);
+	PIXEL_LTRB src[4] = {
+		PIXEL_LTWH{  0, 344, 56, 48 },
+		PIXEL_LTWH{  0, 392, 56, 48 },
+		PIXEL_LTWH{ 56, 344, 56, 48 },
+		PIXEL_LTWH{ 56, 392, 56, 48 },
+	};
 
 	deg += spd;
 	if(deg>=85 || deg<=-85){
@@ -1145,11 +1148,11 @@ void WeaponSelectProc(void)
 		rc = { 0, (264 - 8), 224, (296 - 24) };
 		GrpBlt(&rc,320-112,20,GrTama);
 
-		BltSetRect(&rc,0,272,64,24);
+		rc = PIXEL_LTWH{ 0, 272, 64, 24 };
 		GrpBlt(&rc,120-32,260-12,GrTama);
 
 		d = ((count/8)%2)<<3;
-		BltSetRect(&rc,72,272+d,56,8);
+		rc = PIXEL_LTWH{ 72, (272 + d), 56, 8 };
 		GrpBlt(&rc,400-28+4,420,GrTama);
 
 		for(i=0;i<3;i++){
@@ -1196,15 +1199,15 @@ void WeaponSelectProc(void)
 		for(x=400-110-2; x<400+110; x+=32){
 			for(y=400-300+2+(count*2)%32-32; y<400+10; y+=32){
 				d = Viv.weapon<<4;
-				BltSetRect(&rc,224,256,32,32);
-				//BltSetRect(&rc,d,296-24,16,16);
+				rc = PIXEL_LTWH{ 224, 256, 32, 32 };
+				//rc = PIXEL_LTWH{ d, (296 - 24), 16, 16 };
 				GrpBlt(&rc,x,y,GrTama);
 			}
 		}
 		MaidDraw();
 		MaidTamaDraw();
 
-		BltSetRect(&rc,72,272+16,56,8);
+		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
 		GrpBlt(&rc,468,400,GrTama);
 		sprintf(buf,"%d",((WORD)Viv.exp+1)>>5);
 		GrpPutScore(500,400,buf);

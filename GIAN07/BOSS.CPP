@@ -194,7 +194,9 @@ void BossDraw(void)
 
 			// 霊魂状態 //
 			if(b->ExState == BEXST_SHILD2 && Viv.bomb_time && (e->flag&EF_DRAW)){
-				BltSetRect(&wing, 160+(e->count/2)%4*40, 80, 40, 40);
+				wing = PIXEL_LTWH{
+					(160 + ((e->count / 2) % 4) * 40), 80, 40, 40
+				};
 				GrpBltX(&wing,x-20,y-20,GrEnemy);	// クリッピングなし
 				continue;
 			}

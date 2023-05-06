@@ -535,7 +535,12 @@ void ScreenEffectDraw(void)
 		break;
 
 		case(SCNEFC_WHITEIN):	// ホワイトイン
-			BltSetRect(&src,(15-(ScreenInfo.count/10))*16,128+16,16,16);
+			src = PIXEL_LTWH{
+				.left = ((15 - (int(ScreenInfo.count) / 10)) * 16),
+				.top = (128 + 16),
+				.w = 16,
+				.h = 16
+			};
 			for(i=128; i<640-128; i+=16){
 				for(j=0; j<480; j+=16){
 					GrpBlt(&src, i, j, GrTama);
@@ -544,7 +549,12 @@ void ScreenEffectDraw(void)
 		break;
 
 		case(SCNEFC_WHITEOUT):	// ホワイトアウト
-			BltSetRect(&src,(ScreenInfo.count/10)*16,128+16,16,16);
+			src = PIXEL_LTWH{
+				.left = ((int(ScreenInfo.count) / 10) * 16),
+				.top = (128 + 16),
+				.w = 16,
+				.h = 16
+			};
 			for(i=128; i<640-128; i+=16){
 				for(j=0; j<480; j+=16){
 					GrpBlt(&src, i, j, GrTama);
@@ -572,13 +582,13 @@ extern void CircleFadeOut(int x, int y, int r)
 			if(temp<r && r-temp<8*16 && temp>=0){
 				temp = (r-temp)>>3;
 				//temp = (r-temp)>>4;
-				//BltSetRect(&src,((temp)<<4)+256,104,16,16);
-				BltSetRect(&src,((temp)<<4),128,16,16);
+				//src = PIXEL_LTWH{ ((temp << 4) + 256), 104, 16, 16 };
+				src = PIXEL_LTWH{ (temp << 4), 128, 16, 16 };
 				GrpBlt(&src,i,j,GrTama);
 			}
 			else if(temp>=r){
-				//BltSetRect(&src,256,104,16,16);
-				BltSetRect(&src,0,128,16,16);
+				//src = PIXEL_LTWH{ 256, 104, 16, 16 };
+				src = PIXEL_LTWH{ 0, 128, 16, 16 };
 				GrpBlt(&src,i,j,GrTama);
 			}
 		}
@@ -881,7 +891,7 @@ void GrpDrawNote(void)
 		}
 
 		if(num){
-			BltSetRect(&rc,80,456,min(LevelSum/num,96),5);
+			rc = PIXEL_LTWH{ 80, 456, (std::min)((LevelSum / num), 96), 5 };
 			GrpBlt(&rc, 240, (22 + (Track * 24)), GrMusic);
 		}
 	}

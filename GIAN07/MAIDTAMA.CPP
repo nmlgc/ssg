@@ -223,12 +223,12 @@ void MaidTamaDraw(void)
 
 		// 弾の種類により、描画指定用矩形をセットする //
 		switch(t->c){
-			case(TID_WIDE_MAIN):	BltSetRect(&src,384+((t->d+8)&0xf0),176,16,16);	break;
-			case(TID_WIDE_SUB):		BltSetRect(&src,384+((t->d+8)&0xf0),192,16,16);	break;
-			case(TID_HOMING_MAIN):	BltSetRect(&src,384+((t->d+8)&0xf0),208,16,16);	break;
-			case(TID_HOMING_SUB):	BltSetRect(&src,384+((t->d+8)&0xf0),224,16,16);	break;
-			case(TID_HOMING_BOMB_A):BltSetRect(&src,384+((t->d+8)&0xf0),288,16,16);	break;
-			case(TID_LASER_SUB):	BltSetRect(&src,384+((t->d+8)&0xf0),256,16,16);	break;
+			case(TID_WIDE_MAIN):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 176, 16, 16 };	break;
+			case(TID_WIDE_SUB):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 192, 16, 16 };	break;
+			case(TID_HOMING_MAIN):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 208, 16, 16 };	break;
+			case(TID_HOMING_SUB):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 224, 16, 16 };	break;
+			case(TID_HOMING_BOMB_A):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 288, 16, 16 };	break;
+			case(TID_LASER_SUB):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 256, 16, 16 };	break;
 
 			case(TID_HOMING_BOMB_B):
 				src = HomingBomb[(t->count/4)%5];
@@ -241,7 +241,7 @@ void MaidTamaDraw(void)
 
 	// レーザーの描画 //
 	if(Viv.weapon == 2  &&  Viv.lay_grp){
-		BltSetRect(&ltemp,384+((Viv.lay_grp-1)<<4),240,8,16);
+		ltemp = PIXEL_LTWH{ (384 + ((Viv.lay_grp - 1) << 4)), 240, 8, 16 };
 
 		x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 		y = (Viv.opy>>6)-20;
@@ -251,7 +251,7 @@ void MaidTamaDraw(void)
 		y = (Viv.opy>>6)-20;
 		src = ltemp;GrpBlt(&src,x,y,GrTama);
 
-		BltSetRect(&ltemp,384+8+((Viv.lay_grp-1)<<4),240,8,16);
+		ltemp = PIXEL_LTWH{ (384 + 8 + ((Viv.lay_grp - 1) << 4)), 240, 8, 16 };
 		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
 			x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 			y = i;

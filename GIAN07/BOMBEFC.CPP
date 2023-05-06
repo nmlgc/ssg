@@ -117,7 +117,6 @@ void _ExBombSTDDraw(BombEfcCtrl *p)
 {
 	int			i, x, y, dx;
 	SpObj		*target;
-	PIXEL_LTRB	src;
 
 	// Graphic 48 * 48 //
 	target = p->Obj;
@@ -126,7 +125,7 @@ void _ExBombSTDDraw(BombEfcCtrl *p)
 			x = (target->x >> 6) - 24;
 			y = (target->y >> 6) - 24;
 			dx = (target->d>>1) * 48;
-			BltSetRect(&src, dx, 296, 48, 48);
+			PIXEL_LTRB src = PIXEL_LTWH{ dx, 296, 48, 48 };
 			GrpBlt(&src, x, y, GrTama);
 		}
 	}

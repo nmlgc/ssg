@@ -7,7 +7,7 @@
 #define PBGWIN_LASER_H		"LASEER : Ver 0.51 : Update 2000/02/17"
 //#pragma message(PBGWIN_LASER_H)
 
-
+#include <array>
 
 ///// [更新履歴] /////
 
@@ -132,8 +132,8 @@ extern void laserind_set(void);		// レーザー順序用配列の初期化
 
 ////レーザーの各種変数たち////
 extern LASER_CMD	LaserCmd;				// 標準レーザーコマンド構造体
-extern LASER_DATA	Laser[LASER_MAX];		// レーザー格納用構造体
-extern WORD			LaserInd[LASER_MAX];	// レーザー順番維持用配列
+extern std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
+extern std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
 extern WORD			LaserNow;				// レーザーの本数
 //extern REFLECTOR	Reflector[RT_MAX];		// 反射物構造体
 //extern WORD			ReflectorNow;			// 反射物の個数

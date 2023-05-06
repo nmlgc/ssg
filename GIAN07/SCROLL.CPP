@@ -399,8 +399,7 @@ static void _PutEnemy(BYTE *p)
 
 	if(EnemyNow+1>=ENEMY_MAX) return;
 
-	e = Enemy+ (*(EnemyInd+EnemyNow));
-	EnemyNow++;
+	e = &Enemy[EnemyInd[EnemyNow++]];
 
 	n      = 4 + (((BYTE)p[4])<<2);
 

@@ -7,8 +7,8 @@
 
 
 
-ITEM_DATA	Item[ITEM_MAX];
-WORD		ItemInd[ITEM_MAX];
+std::array<ITEM_DATA, ITEM_MAX>	Item;
+std::array<uint16_t, ITEM_MAX>	ItemInd;
 WORD		ItemNow;
 
 
@@ -19,12 +19,11 @@ static void Indsort(WORD *ind,WORD *now);
 // アイテムを発生させる //
 void ItemSet(int x, int y, uint8_t type)
 {
-	ITEM_DATA	*ip;
 	BYTE		deg;
 
 	if(ItemNow+1>=ITEM_MAX) return;
 
-	ip = Item + ItemInd[ItemNow++];
+	auto* ip = &Item[ItemInd[ItemNow++]];
 
 	deg = -64;//rnd()%(128-110)+128+55;
 
@@ -54,7 +53,6 @@ void ItemSet(int x, int y, uint8_t type)
 // アイテムを動かす //
 void ItemMove(void)
 {
-	ITEM_DATA		*ip;
 	int				i,tx,ty,l;
 	DWORD			point;
 
@@ -62,7 +60,7 @@ void ItemMove(void)
 	point = (((SY_MAX-Viv.y)>>6)+Viv.evade*4)*160;
 
 	for(i=0;i<ItemNow;i++){
-		ip = Item + ItemInd[i];
+		auto* ip = &Item[ItemInd[i]];
 		if(!Viv.bomb_time){
 			ip->x += ip->vx;
 			ip->y += ip->vy;
@@ -110,20 +108,19 @@ void ItemMove(void)
 			ip->type = ITEM_DELETE;
 	}
 
-	Indsort(ItemInd,&ItemNow);
+	Indsort(ItemInd.data(), &ItemNow);
 }
 
 // アイテムを描画する //
 void ItemDraw(void)
 {
-	ITEM_DATA		*ip;
 	int				i,j,x,y;
 	BYTE			ptn;
 	RECT			src;
 	static BYTE		time;
 
 	for(i=0;i<ItemNow;i++){
-		ip = Item + ItemInd[i];
+		auto* ip = &Item[ItemInd[i]];
 		switch(ip->type){
 			case(ITEM_SCORE):
 				ptn = (BYTE)((ip->count>>2)&3);
@@ -190,11 +187,11 @@ static void Indsort(WORD *ind,WORD *now)
 
 	for(i=temp=next=0;i<(*now);i++){
 
-		if((Item+(*(ind+i)))->type == ITEM_DELETE){
+		if(Item[ind[i]].type == ITEM_DELETE) {
 
 			// フラグの立っていないアイテムを検索する //
 			for(temp=i+1;temp<(*now);temp++){
-				if((Item+(*(ind+temp)))->type != ITEM_DELETE){
+				if(Item[ind[temp]].type != ITEM_DELETE) {
 					next++;
 					goto SEARCH_END;
 				}

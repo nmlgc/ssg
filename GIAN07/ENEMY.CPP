@@ -35,8 +35,8 @@
 BYTE_BUFFER_OWNED		ECL_Head = nullptr;
 BYTE_BUFFER_OWNED		SCL_Head = nullptr;
 BYTE		*SCL_Now  = NULL;
-ENEMY_DATA	Enemy[ENEMY_MAX];
-WORD		EnemyInd[ENEMY_MAX];
+std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
+std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 WORD		EnemyNow = 0;
 ANIME_DATA	Anime[ANIME_MAX];
 
@@ -79,13 +79,12 @@ _inline Debug(DWORD old,int id)
 void enemy_move(void)
 {
 	int				i;//,chkx,chky;
-	ENEMY_DATA		*e;
 	//DWORD temp;
 
 	if(BossNow==0) HomingFlag = HOMING_DUMMY;
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+(*(EnemyInd+i));
+		auto* e = &Enemy[EnemyInd[i]];
 		e->IsDamaged = 0;
 		if(!(e->flag & EF_BOMB)){
 			// 通常の敵の処理 //
@@ -132,18 +131,17 @@ void enemy_move(void)
 		e->count++;
 	}
 
-	Indsort(EnemyInd,&EnemyNow);
+	Indsort(EnemyInd.data(), &EnemyNow);
 }
 
 void enemy_draw(void)
 {
 	int			i,x,y;
-	ENEMY_DATA	*e;
 	//HRESULT		ddrval;
 	RECT		*src;
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+(*(EnemyInd+i));
+		auto* e = &Enemy[EnemyInd[i]];
 
 		// 敵を描画する(クリッピング＆幅、高さ処理を追加すること) //
 		x = (e->x>>6);
@@ -171,10 +169,9 @@ void enemy_draw(void)
 extern void enemy_clear(void)
 {
 	int			i;
-	ENEMY_DATA	*e;
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+(*(EnemyInd+i));
+		auto* e = &Enemy[EnemyInd[i]];
 		if(e->flag == EF_BOMB) continue;
 
 		if(e->flag & EF_DRAW){
@@ -195,7 +192,7 @@ extern void enemy_clear(void)
 		}
 	}
 
-	Indsort(EnemyInd,&EnemyNow);
+	Indsort(EnemyInd.data(), &EnemyNow);
 }
 
 void enemyind_set(void)
@@ -213,13 +210,12 @@ void enemyind_set(void)
 // 敵にダメージを与える //
 extern BOOL enemy_damage(int x,int y,int damage)
 {
-	ENEMY_DATA		*e;
 	int				i;
 
 	if(BossDamage(x,y,damage)) return TRUE;
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+EnemyInd[i];
+		auto* e = &Enemy[EnemyInd[i]];
 		if(HITCHK(x,e->x,e->g_width) && HITCHK(y,e->y,e->g_height) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
@@ -251,14 +247,13 @@ extern BOOL enemy_damage(int x,int y,int damage)
 // ｙ上方向無限Ver.敵にダメージを与える //
 extern BOOL enemy_damage2(int x,int y,int damage)
 {
-	ENEMY_DATA		*e;
 	int				i;
 	BOOL			ret_val = FALSE;
 
 	if(BossDamage2(x,y,damage)) ret_val = TRUE;
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+EnemyInd[i];
+		auto* e = &Enemy[EnemyInd[i]];
 		if(HITCHK(x,e->x,e->g_width) && (y > e->y) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
@@ -290,7 +285,6 @@ extern BOOL enemy_damage2(int x,int y,int damage)
 // ナナメレーザーの当たり判定 //
 extern VOID enemy_damage3(int x,int y,BYTE d)
 {
-	ENEMY_DATA		*e;
 	int				i;
 	//BOOL			ret_val = FALSE;
 	int				damage  = 8;
@@ -298,7 +292,7 @@ extern VOID enemy_damage3(int x,int y,BYTE d)
 	BossDamage3(x,y,d);
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+EnemyInd[i];
+		auto* e = &Enemy[EnemyInd[i]];
 		if(LaserHITCHK(e, x, y, d) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
@@ -327,13 +321,12 @@ extern VOID enemy_damage3(int x,int y,BYTE d)
 // すべての敵にダメージを与える /
 extern void enemy_damage4(int damage)
 {
-	ENEMY_DATA		*e;
 	int				i;
 
 	BossDamage4(damage);
 
 	for(i=0;i<EnemyNow;i++){
-		e = Enemy+EnemyInd[i];
+		auto* e = &Enemy[EnemyInd[i]];
 		if(e->flag&EF_DAMAGE){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
@@ -1659,14 +1652,12 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_ENEMYSETD):	// ＋角度指定(レジスタ)
 		{
 			DWORD			n;
-			ENEMY_DATA		*new_enemy;
 			short			x,y;
 
 			bRetFlag = FALSE;
 
 			if(EnemyNow+1>=ENEMY_MAX) break;
-			new_enemy = Enemy+ (*(EnemyInd+EnemyNow));
-			EnemyNow++;
+			auto* new_enemy = &Enemy[EnemyInd[EnemyNow++]];
 
 			x   = (e->x >>6) + (*(short *)(&cmd[1]));	//((int)(*(short *)(&p[0])))*64;
 			y   = (e->y >>6) + (*(short *)(&cmd[3]));	//((int)(*(short *)(&p[2])))*64;
@@ -2009,9 +2000,9 @@ static void Indsort(WORD *ind,WORD *now)
 	int i,temp,next;
 
 	for(i=temp=next=0;i<(*now);i++){
-		if(((Enemy+(*(ind+i)))->flag) & EF_DELETE){
+		if(Enemy[ind[i]].flag & EF_DELETE) {
 			for(temp=i+1;temp<(*now);temp++){
-				if(((Enemy+(*(ind+temp)))->flag & EF_DELETE)==0){
+				if((Enemy[ind[temp]].flag & EF_DELETE) == 0) {
 					next++;
 					goto SEARCH_END;
 				}

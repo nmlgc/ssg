@@ -23,6 +23,7 @@
 #include "ECL.H"
 #include "TAMA.H"
 #include "LASER.H"
+#include <array>
 
 
 //// 敵定数 ////
@@ -110,11 +111,11 @@ typedef struct{
 } ANIME_DATA;
 
 //// 敵変数 ////
-extern ENEMY_DATA	Enemy[ENEMY_MAX];
+extern std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
 extern BYTE_BUFFER_OWNED	ECL_Head;
 extern BYTE_BUFFER_OWNED	SCL_Head;
 extern uint8_t			*SCL_Now;
-extern WORD			EnemyInd[ENEMY_MAX];
+extern std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 extern WORD			EnemyNow;
 extern ANIME_DATA	Anime[ANIME_MAX];
 

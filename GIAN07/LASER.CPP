@@ -41,8 +41,8 @@ const int laser_color[16] ={
 
 ////グローバル変数////
 LASER_CMD		LaserCmd;							// 標準レーザーコマンド構造体
-LASER_DATA		Laser[LASER_MAX];					// レーザー格納用構造体
-WORD			LaserInd[LASER_MAX];				// レーザー順番維持用配列
+std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
+std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
 WORD			LaserNow;							// レーザーの本数
 //REFLECTOR		Reflector[RT_MAX];					// 反射物_構造体
 //WORD			ReflectorNow;						// 反射物の個数
@@ -87,14 +87,12 @@ void laser_set(void)
 
 void laser_setEX(void)
 {
-	LASER_DATA *lp;
 	WORD i;
 
 	for(i=0;i<LaserCmd.n;i++){
 		if(LaserNow+1 == LASER_MAX) return;		// 最大数を越えた場合
 
-		lp = Laser + (*(LaserInd+LaserNow));
-		LaserNow++;
+		auto* lp = &Laser[LaserInd[LaserNow++]];
 
 		lp->v    = LaserCmd.v;				// レーザーの速度
 		lp->a    = LaserCmd.a;				// レーザーの加速度
@@ -137,11 +135,10 @@ void laser_setEX(void)
 
 void laser_move(void)
 {
-	LASER_DATA *lp;
 	WORD i;
 
 	for(i=0;i<LaserNow;i++){
-		lp = Laser + LaserInd[i];
+		auto* lp = &Laser[LaserInd[i]];
 		Lmove(lp);
 		lp->count++;
 		if((lp->x)<GX_MIN||(lp->x)>GX_MAX||(lp->y)<GY_MIN||(lp->y)>GY_MAX)
@@ -149,18 +146,17 @@ void laser_move(void)
 
 		if(Viv.muteki==0 && !(lp->flag&(LF_CLEAR|LF_DELETE))) laser_hitchk(lp);
 	}
-	Indsort(LaserInd,&LaserNow);
+	Indsort(LaserInd.data(), &LaserNow);
 }
 
 void laser_draw(void)
 {
-	LASER_DATA		*lp;
 	int				i;
 
 	GrpLock();
 
 	for(i=0;i<LaserNow;i++){
-		lp = Laser + (*(LaserInd+i));
+		auto* lp = &Laser[LaserInd[i]];
 		switch(lp->type){
 			// ノーマルショートレーザー＆反射レーザー //
 			case(LS_SHORT):case(LS_REF):
@@ -178,7 +174,7 @@ void laser_draw(void)
 
 	/*
 	for(i=0;i<LaserNow;i++){
-		lp = Laser + (*(LaserInd+i));
+		auto* lp = &Laser[LaserInd[i]];
 		if(lp->type==LS_REF || lp->type==LS_SHORT)
 			SLdraw(lp);
 	}
@@ -192,9 +188,10 @@ void laser_clear(void)
 	WORD i;
 
 	for(i=0;i<LaserNow;i++){
-		if((Laser + (*(LaserInd+i)))->flag != LF_CLEAR){
-			(Laser + (*(LaserInd+i)))->flag = LF_CLEAR;
-			(Laser + (*(LaserInd+i)))->count = 0;
+		auto& l = Laser[LaserInd[i]];
+		if(l.flag != LF_CLEAR){
+			l.flag = LF_CLEAR;
+			l.count = 0;
 		}
 	}
 }
@@ -577,12 +574,12 @@ static void Indsort(WORD *ind,WORD *now)
 	for(i=temp=next=0;i<(*now);i++){
 
 		// 消去要請フラグが立っている->swap 立っていない-> counter++ //
-		if(((Laser+(*(ind+i)))->flag) & LF_DELETE){
+		if(Laser[ind[i]].flag & LF_DELETE) {
 
 			// フラグの立っていないレーザーを検索する //
 			// temp = 1 + i;  // ((temp>i) ? temp : i);
 			for(temp=i+1;temp<(*now);temp++){
-				if(((Laser+(*(ind+temp)))->flag & LF_DELETE)== 0){
+				if((Laser[ind[temp]].flag & LF_DELETE) == 0) {
 					next++;
 					goto SEARCH_END;
 				}

@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
 #include "GIAN.H"
+#include <array>
 
 
 
@@ -44,8 +45,8 @@ void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化
 
 
 ///// [ 変数 ] /////
-extern TAMA_DATA	MaidTama[MAIDTAMA_MAX];			// 自機ショットの格納用構造体
-extern WORD			MaidTamaInd[MAIDTAMA_MAX];		// 弾の順番を維持するための配列(TAMA.CPP互換)
+extern std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
+extern std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
 extern WORD			MaidTamaNow;					// 現在の数
 
 

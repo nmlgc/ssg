@@ -7,6 +7,8 @@
 #define PBGWIN_TAMA_H		"TAMA : Ver 0.62 : Update 2000/02/17"
 //#pragma message(PBGWIN_TAMA_H)
 
+#include <array>
+
 
 ///// [更新履歴] /////
 
@@ -160,9 +162,9 @@ typedef struct{
 
 ////弾の各種変数たち////
 extern TAMA_CMD		TamaCmd;			// 標準・弾コマンド構造体
-extern TAMA_DATA	Tama[TAMA_MAX];		// 弾の格納用構造体
-extern WORD			Tama1Ind[TAMA_MAX];	// 小型弾の順番を維持するための配列
-extern WORD			Tama2Ind[TAMA_MAX];	// 特殊弾の順番を維持するための配列
+extern std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
+extern std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
+extern std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
 extern WORD			Tama1Now;			// 小型弾の弾数
 extern WORD			Tama2Now;			// 特殊弾の弾数
 extern WORD			Tama1Max;			// 小型弾の最大数

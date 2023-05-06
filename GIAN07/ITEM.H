@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_ITEM_H)
 
 #include "GIAN.H"
+#include <array>
 
 
 ///// [ 定数 ] /////
@@ -47,8 +48,8 @@ void ItemIndSet(void);	// アイテム配列の初期化
 
 
 ///// [ 変数 ] /////
-extern ITEM_DATA	Item[ITEM_MAX];
-extern WORD			ItemInd[ITEM_MAX];
+extern std::array<ITEM_DATA, ITEM_MAX>	Item;
+extern std::array<uint16_t, ITEM_MAX>	ItemInd;
 extern WORD			ItemNow;
 
 

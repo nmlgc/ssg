@@ -61,8 +61,7 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 	n = 4 + (TailID<<2);
 	for(i=0;i<len;i++){
 		if(EnemyNow+1<ENEMY_MAX){
-			e = Enemy+ (*(EnemyInd+EnemyNow));
-			EnemyNow++;
+			e = &Enemy[EnemyInd[EnemyNow++]];
 
 			InitEnemyDataX64(e,b->Edat.x,b->Edat.y,n);
 			s->EnemyPtr[i] = e;
@@ -177,7 +176,6 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 
 	int			i;
 	DWORD		n;
-	ENEMY_DATA	*e;
 
 	// 他の関数と違い、不等号なので注意すべし
 	// このビット構造体が有効な場合、この関数の実行はできないので
@@ -208,8 +206,7 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 	for(i=0; i<NumBits; i++){
 		if(EnemyNow+1 < ENEMY_MAX){
 			// 敵資源の要求 //
-			e = Enemy + (*(EnemyInd+EnemyNow));
-			EnemyNow++;
+			auto* e = &Enemy[EnemyInd[EnemyNow++]];
 
 			// データを初期化 //
 			InitEnemyDataX64(e, BitData.x, BitData.y, n);

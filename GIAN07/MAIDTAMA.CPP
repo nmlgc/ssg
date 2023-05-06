@@ -57,8 +57,8 @@ static void SetCactusBomb(void);
 
 
 
-TAMA_DATA	MaidTama[MAIDTAMA_MAX];			// 自機ショットの格納用構造体
-WORD		MaidTamaInd[MAIDTAMA_MAX];		// 弾の順番を維持するための配列(TAMA.CPP互換)
+std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
+std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
 WORD		MaidTamaNow;					// 現在の数
 
 BYTE TogeDamage[4*2+2] =
@@ -153,10 +153,9 @@ void MaidTamaMove(void)
 	// 敵に当たっているかをチェックするものとする。                          //
 
 	int				i;
-	TAMA_DATA		*t;
 
 	for(i=0;i<MaidTamaNow;i++){
-		t = MaidTama + *(MaidTamaInd+i);
+		auto* t = &MaidTama[MaidTamaInd[i]];
 		if(t->c == TID_HOMING_BOMB_B){
 			enemy_damage(t->x,t->y,TogeDamage[t->c]);
 			t->count++;
@@ -187,7 +186,7 @@ void MaidTamaMove(void)
 		else
 			tamaEmove(t);
 	}
-	Indsort(MaidTamaInd,&MaidTamaNow);
+	Indsort(MaidTamaInd.data(), &MaidTamaNow);
 
 
 	// レーザーの当たり判定 //
@@ -206,7 +205,6 @@ void MaidTamaDraw(void)
 	// 独自に描画ルーチンを展開する。                                      //
 
 	int				i,x,y;
-	TAMA_DATA		*t;
 	RECT			src,ltemp;
 	static RECT		HomingBomb[5] = {
 		{520,104,520+8 ,104+8},
@@ -217,7 +215,7 @@ void MaidTamaDraw(void)
 	};
 
 	for(i=0;i<MaidTamaNow;i++){
-		t = MaidTama + *(MaidTamaInd+i);
+		auto* t = &MaidTama[MaidTamaInd[i]];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です
 		y = (t->y >> 6)-8;	// 上に同じ
@@ -286,13 +284,11 @@ void MaidTamaIndSet(void)
 static void MTamaSet(void)
 {
 	WORD i;
-	TAMA_DATA *t;
 
 	for(i=0;i<TamaCmd.n;i++){
 		if(MaidTamaNow+1 >= MAIDTAMA_MAX) return;			// セットできない場合
 
-		MaidTamaNow = MaidTamaNow + 1;						// 弾数をインクリメント
-		t = MaidTama + (*(MaidTamaInd+MaidTamaNow-1));		// 弾ポインタをセット
+		auto* t = &MaidTama[MaidTamaInd[MaidTamaNow++]];	// 弾ポインタをセット
 
 		t->x = t->tx = TamaCmd.x;					// X座標のセット
 		t->y = t->ty = TamaCmd.y;					// Y座標のセット
@@ -324,12 +320,12 @@ static void Indsort(WORD *ind,WORD *now)
 	for(i=temp=next=0;i<(*now);i++){
 
 		// 消去要請フラグが立っている->swap 立っていない-> counter++ //
-		if(((MaidTama+(*(ind+i)))->flag) & TF_DELETE){
+		if(MaidTama[ind[i]].flag & TF_DELETE) {
 
 			// フラグの立っていない弾を検索する //
 			// temp = 1 + i;  // ((temp>i) ? temp : i);
 			for(temp=i+1;temp<(*now);temp++){
-				if(!(((MaidTama+(*(ind+temp)))->flag) & TF_DELETE)){
+				if(!(MaidTama[ind[temp]].flag & TF_DELETE)) {
 					next++;
 					goto SEARCH_END;
 				}

@@ -9,9 +9,9 @@
 
 ////グローバル変数////
 TAMA_CMD		TamaCmd;				// 標準・弾コマンド構造体
-TAMA_DATA		Tama[TAMA_MAX];			// 弾の格納用構造体
-WORD			Tama1Ind[TAMA_MAX];		// 小型弾の順番を維持するための配列
-WORD			Tama2Ind[TAMA_MAX];		// 特殊弾の順番を維持するための配列
+std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
+std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
+std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
 WORD			Tama1Now;				// 小型弾の弾数
 WORD			Tama2Now;				// 特殊弾の弾数
 WORD			Tama1Max;				// 小型弾の最大数
@@ -80,7 +80,6 @@ void tama_setEX(void)
 void tama_setLine(void)
 {
 //	DWORD temp;
-	TAMA_DATA *t;					// 弾配列のアクセスに用いる
 
 	WORD i;							// 雑用
 	WORD setmax;					// セットする弾数(連射を考慮に入れる)
@@ -106,7 +105,7 @@ void tama_setLine(void)
 		if( (*indnow)+1 >= (*indmax) ) return;	// セットできない場合
 
 		*indnow = *indnow + 1;					// 弾数をインクリメント
-		t = Tama + (*(indp+i));					// 弾ポインタをセット
+		auto* t = &Tama[indp[i]];	// 弾ポインタをセット
 
 		t->x = t->tx = TamaCmd.x;				// X座標のセット
 		t->y = t->ty = TamaCmd.y;				// Y座標のセット
@@ -141,7 +140,6 @@ void tama_setLine(void)
 void tama_setExtra01(void)
 {
 //	DWORD temp;
-	TAMA_DATA *t;					// 弾配列のアクセスに用いる
 
 	WORD i;							// 雑用
 	WORD setmax;					// セットする弾数(連射を考慮に入れる)
@@ -168,7 +166,7 @@ void tama_setExtra01(void)
 		if( (*indnow)+1 >= (*indmax) ) return;	// セットできない場合
 
 		*indnow = *indnow + 1;					// 弾数をインクリメント
-		t = Tama + (*(indp+i));					// 弾ポインタをセット
+		auto* t = &Tama[indp[i]];	// 弾ポインタをセット
 
 		t->x = t->tx = TamaCmd.x;				// X座標のセット
 		t->y = t->ty = TamaCmd.y;				// Y座標のセット
@@ -218,8 +216,6 @@ static void __TamaSet(void)
 //	DWORD temp;
 
 
-	TAMA_DATA *t;					// 弾配列のアクセスに用いる
-
 	WORD i;							// 雑用
 	WORD setmax;					// セットする弾数(連射を考慮に入れる)
 
@@ -239,7 +235,7 @@ static void __TamaSet(void)
 		if( (*indnow)+1 >= (*indmax) ) return;	// セットできない場合
 
 		*indnow = *indnow + 1;					// 弾数をインクリメント
-		t = Tama + (*(indp+i));					// 弾ポインタをセット
+		auto* t = &Tama[indp[i]];
 
 		t->x = t->tx = TamaCmd.x;				// X座標のセット
 		t->y = t->ty = TamaCmd.y;				// Y座標のセット
@@ -277,11 +273,10 @@ void tama_move(void)
 	// よりも生きている時間のほうが長いからなのですが...                  //
 
 	WORD i;
-	TAMA_DATA *t;
 
 	// 小型弾の処理 //
 	for(i=0;i<Tama1Now;i++){
-		t = Tama + *(Tama1Ind+i);
+		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect==TE_NONE){
 			tamaTmove(t);
 			tamaOmove(t);
@@ -303,11 +298,11 @@ void tama_move(void)
 			t->count++;
 		}
 	}
-	Indsort(Tama1Ind,&Tama1Now);
+	Indsort(Tama1Ind.data(), &Tama1Now);
 
 	// 大型弾＆特殊弾の処理 //
 	for(i=0;i<Tama2Now;i++){
-		t = Tama + *(Tama2Ind+i);
+		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect==TE_NONE){
 			tamaTmove(t);
 			tamaOmove(t);
@@ -329,7 +324,7 @@ void tama_move(void)
 			t->count++;
 		}
 	}
-	Indsort(Tama2Ind,&Tama2Now);
+	Indsort(Tama2Ind.data(), &Tama2Now);
 }
 
 void tama_draw(void)
@@ -355,7 +350,7 @@ void tama_draw(void)
 
 	// 大型弾＆特殊弾(16*16) の描画 //
 	for(i=0;i<Tama2Now;i++){
-		t = Tama + *(Tama2Ind+i);
+		auto* t = &Tama[Tama2Ind[i]];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です
 		y = (t->y >> 6)-8;	// 上に同じ
@@ -430,7 +425,7 @@ void tama_draw(void)
 
 	// 小型弾(8*8) の描画 //
 	for(i=0;i<Tama1Now;i++){
-		t = Tama + *(Tama1Ind+i);
+		auto* t = &Tama[Tama1Ind[i]];
 
 		x = (t->x >> 6)-4;	// -4 は座標の補正用です
 		y = (t->y >> 6)-4;	// 上に同じ
@@ -538,20 +533,22 @@ void tama_clear(void)
 	WORD i;
 
 	for(i=0;i<Tama1Now;i++){
-		if((Tama+ *(Tama1Ind+i))->effect!=TE_DELETE){
-			(Tama + *(Tama1Ind+i))->effect = TE_DELETE;
-			(Tama + *(Tama1Ind+i))->count  = 0;
-			//(Tama + *(Tama1Ind+i))->c      = 0x25;
-			(Tama + *(Tama1Ind+i))->d      = 0;
+		auto& t = Tama[Tama1Ind[i]];
+		if(t.effect != TE_DELETE){
+			t.effect = TE_DELETE;
+			t.count  = 0;
+			//t.c      = 0x25;
+			t.d      = 0;
 		}
 	}
 
 	for(i=0;i<Tama2Now;i++){
-		if((Tama+ *(Tama2Ind+i))->effect!=TE_DELETE){
-			(Tama + *(Tama2Ind+i))->effect = TE_DELETE;
-			(Tama + *(Tama2Ind+i))->count  = 0;
-			//(Tama + *(Tama2Ind+i))->c      = 0x25;
-			(Tama + *(Tama2Ind+i))->d      = 0;
+		auto& t = Tama[Tama2Ind[i]];
+		if(t.effect != TE_DELETE){
+			t.effect = TE_DELETE;
+			t.count  = 0;
+			//t.c      = 0x25;
+			t.d      = 0;
 		}
 	}
 }
@@ -560,13 +557,12 @@ void tama_clear(void)
 DWORD tama2score(void)
 {
 	WORD		i;
-	TAMA_DATA	*t;
 	DWORD		sum = 0;
 	DWORD		Score;
 
 	Score = TAMA1_POINT + Viv.evade * 100;
 	for(i=0;i<Tama1Now;i++){
-		t = Tama + *(Tama1Ind+i);
+		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect!=TE_DELETE){
 			StringEffect2(t->x-64*4,t->y-64*4,Score);
 			sum += Score;
@@ -576,11 +572,11 @@ DWORD tama2score(void)
 			t->d      = 0;
 		}
 	}
-	Indsort(Tama1Ind,&Tama1Now);
+	Indsort(Tama1Ind.data(), &Tama1Now);
 
 	Score = TAMA2_POINT + Viv.evade * 100;
 	for(i=0;i<Tama2Now;i++){
-		t = Tama + *(Tama2Ind+i);
+		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect!=TE_DELETE){
 			StringEffect2(t->x-64*8,t->y-64*8,Score);
 			sum += Score;
@@ -590,7 +586,7 @@ DWORD tama2score(void)
 			t->d      = 0;
 		}
 	}
-	Indsort(Tama2Ind,&Tama2Now);
+	Indsort(Tama2Ind.data(), &Tama2Now);
 
 	return sum;
 }
@@ -599,7 +595,6 @@ DWORD tama2score(void)
 void tama2item(BYTE n)
 {
 	WORD		i;
-	TAMA_DATA	*t;
 //	DWORD		sum = 0;
 //	DWORD		Score;
 
@@ -611,7 +606,7 @@ void tama2item(BYTE n)
 	}
 
 	for(i=0;i<Tama1Now;i++){
-		t = Tama + *(Tama1Ind+i);
+		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect!=TE_DELETE){
 			t->count  = 0;
 			t->d      = 0;
@@ -628,11 +623,11 @@ void tama2item(BYTE n)
 			}
 		}
 	}
-	Indsort(Tama1Ind,&Tama1Now);
+	Indsort(Tama1Ind.data(), &Tama1Now);
 
 //	Score = TAMA2_POINT + Viv.evade * 100;
 	for(i=0;i<Tama2Now;i++){
-		t = Tama + *(Tama2Ind+i);
+		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect!=TE_DELETE){
 			t->count  = 0;
 			t->d      = 0;
@@ -649,7 +644,7 @@ void tama2item(BYTE n)
 			}
 		}
 	}
-	Indsort(Tama2Ind,&Tama2Now);
+	Indsort(Tama2Ind.data(), &Tama2Now);
 
 //	return sum;
 }
@@ -1187,12 +1182,12 @@ static void Indsort(WORD *ind,WORD *now)
 	for(i=temp=next=0;i<(*now);i++){
 
 		// 消去要請フラグが立っている->swap 立っていない-> counter++ //
-		if(((Tama+(*(ind+i)))->flag) & TF_DELETE){
+		if(Tama[ind[i]].flag & TF_DELETE){
 
 			// フラグの立っていない弾を検索する //
 			// temp = 1 + i;  // ((temp>i) ? temp : i);
 			for(temp=i+1;temp<(*now);temp++){
-				if(!(((Tama+(*(ind+temp)))->flag) & TF_DELETE)){
+				if(!(Tama[ind[temp]].flag & TF_DELETE)) {
 					next++;
 					goto SEARCH_END;
 				}

@@ -5,7 +5,6 @@
 
 #include "FONTUTY.H"
 #include "LOADER.H"
-#include "WindowSys.h"
 #include "game/coords.h"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/UT_MATH.H"
@@ -208,6 +207,8 @@ extern void GrpPutMidNum(int x, int y, int n)
 		}
 	}
 }
+
+WIN_GRPINFO WinGrpInfo;
 
 // フォントをセットする //
 extern void InitFonts(void)

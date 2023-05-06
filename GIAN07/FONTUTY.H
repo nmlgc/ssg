@@ -38,6 +38,15 @@ typedef struct tagExtraFontInfo {
 	EXPOINT	*Data;		// データ格納先
 } ExtraFontInfo;
 
+// ウィンドウ全体の情報 //
+struct WIN_GRPINFO {
+	HFONT	SmallFont;	// フォント(小さい文字用)
+	HFONT	NormalFont;	// フォント(通常の文字用)
+	HFONT	LargeFont;	// フォント(大きい文字用)
+};
+
+extern WIN_GRPINFO WinGrpInfo;
+
 
 
 

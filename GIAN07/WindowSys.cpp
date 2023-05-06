@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "WindowSys.h"
+#include "FONTUTY.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
@@ -26,7 +27,6 @@ static void GrpBoxA2(int x1,int y1,int x2,int y2);			// 平行四辺形ＢＯＸ
 
 ///// [グローバル変数] /////
 
-WIN_GRPINFO		WinGrpInfo;		// ウィンドウに使用するフォント、Surface など
 MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 

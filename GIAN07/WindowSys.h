@@ -112,14 +112,6 @@ typedef struct tagMSG_WINDOW{
 	//char		MsgBuf[MSG_HEIGHT][MESSAGE_MAX];	// メッセージ格納配列の実体
 } MSG_WINDOW;
 
-// ウィンドウ全体の情報 //
-typedef struct tagWIN_GRPINFO{
-	//LPDIRECTDRAWSURFACE		lpSurf;						// ウィンドウデータ用Surface
-	HFONT					SmallFont;					// フォント(小さい文字用)
-	HFONT					NormalFont;					// フォント(通常の文字用)
-	HFONT					LargeFont;					// フォント(大きい文字用)
-} WIN_GRPINFO;
-
 
 
 ///// [ 関数 ] /////
@@ -151,7 +143,6 @@ void MWinHelp(WINDOW_SYSTEM *ws);		// メッセージウィンドウにヘルプ
 
 ///// [グローバル変数] /////
 
-extern WIN_GRPINFO		WinGrpInfo;		// ウィンドウに使用するフォント、Surface など
 extern MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 

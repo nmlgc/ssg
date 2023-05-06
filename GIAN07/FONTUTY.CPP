@@ -8,159 +8,24 @@
 // ヒミツの関数 //
 void __FillExpoint(EXPOINT *p, int x, int y, int w, int h);
 
-
-
-// 16x16 透過フォントで文字列出力(高速) //
-extern void GrpPut16(int x, int y, const char *s)
+// Glyph selection inside the 16×16 font //
+std::optional<RECT> Glyph16x16(char c)
 {
-	RECT	src;
-	int		sx,tx,ty;
-
-	sx = x;
+	RECT src;
 
 	// GrTama における文字の並びは次のようになっている。 //
 	// (変更する可能性もあるので十分に注意すること)      //
 	// ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789              //
 	// abcdefghijklmnopqrstuvwxyz!?#\<>=,+-              //
 
-	for(;(*s)!='\0';s++,x+=14){
-		if((*s)>='A' && (*s)<='Z'){
-			BltSetRect(&src,((*s)-'A')<<4,480-32,16,16);
-		}
-		else if((*s)>='a' && (*s)<='z'){
-			BltSetRect(&src,((*s)-'a')<<4,480-16,16,16);
-		}
-		else if((*s)>='0' && (*s)<='9'){
-			BltSetRect(&src,(((*s)-'0')<<4)+416,480-32,16,16);
-		}
-		else{
-			switch(*s){
-			case('!'):	BltSetRect(&src,((0)<<4)+416,480-16,16,16);	break;
-			case('?'):	BltSetRect(&src,((1)<<4)+416,480-16,16,16);	break;
-			case('#'):	BltSetRect(&src,((2)<<4)+416,480-16,16,16);	break;
-			case('\\'):	BltSetRect(&src,((3)<<4)+416,480-16,16,16);	break;
-			case('<'):	BltSetRect(&src,((4)<<4)+416,480-16,16,16);	break;
-			case('>'):	BltSetRect(&src,((5)<<4)+416,480-16,16,16);	break;
-			case('='):	BltSetRect(&src,((6)<<4)+416,480-16,16,16);	break;
-			case(','):	BltSetRect(&src,((7)<<4)+416,480-16,16,16);	break;
-			case('+'):	BltSetRect(&src,((8)<<4)+416,480-16,16,16);	break;
-			case('-'):	BltSetRect(&src,((9)<<4)+416,480-16,16,16);	break;
-			default:	continue;
-			}
-		}
-
-		tx = x;ty = y;
-		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBltX(&src,tx,ty,GrTama);
-	}
-}
-
-// 16x16 透過フォントで文字列出力(高速) //
-extern void GrpPut16c(int x, int y, char *s)
-{
-	RECT	src;
-	int		sx,tx,ty;
-
-	sx = x;
-
-	// GrTama における文字の並びは次のようになっている。 //
-	// (変更する可能性もあるので十分に注意すること)      //
-	// ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789              //
-	// abcdefghijklmnopqrstuvwxyz!?#\<>=,+-              //
-
-	for(;(*s)!='\0';s++,x+=14){
-		if((*s)>='A' && (*s)<='Z'){
-			BltSetRect(&src,((*s)-'A')<<4,480-32,16,16);
-		}
-		else if((*s)>='a' && (*s)<='z'){
-			BltSetRect(&src,((*s)-'a')<<4,480-16,16,16);
-		}
-		else if((*s)>='0' && (*s)<='9'){
-			BltSetRect(&src,(((*s)-'0')<<4)+416,480-32,16,16);
-		}
-		else{
-			switch(*s){
-			case('!'):	BltSetRect(&src,((0)<<4)+416,480-16,16,16);	break;
-			case('?'):	BltSetRect(&src,((1)<<4)+416,480-16,16,16);	break;
-			case('#'):	BltSetRect(&src,((2)<<4)+416,480-16,16,16);	break;
-			case('\\'):	BltSetRect(&src,((3)<<4)+416,480-16,16,16);	break;
-			case('<'):	BltSetRect(&src,((4)<<4)+416,480-16,16,16);	break;
-			case('>'):	BltSetRect(&src,((5)<<4)+416,480-16,16,16);	break;
-			case('='):	BltSetRect(&src,((6)<<4)+416,480-16,16,16);	break;
-			case(','):	BltSetRect(&src,((7)<<4)+416,480-16,16,16);	break;
-			case('+'):	BltSetRect(&src,((8)<<4)+416,480-16,16,16);	break;
-			case('-'):	BltSetRect(&src,((9)<<4)+416,480-16,16,16);	break;
-			default:	continue;
-			}
-		}
-
-		tx = x;ty = y;
-		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(&src,tx,ty,GrTama);
-	}
-}
-
-// 上と同じだが、ｘ移動幅が１６ //
-extern void GrpPut16c2(int x, int y, char *s)
-{
-	RECT	src;
-	int		sx,tx,ty;
-
-	sx = x;
-
-	// GrTama における文字の並びは次のようになっている。 //
-	// (変更する可能性もあるので十分に注意すること)      //
-	// ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789              //
-	// abcdefghijklmnopqrstuvwxyz!?#\<>=,+-              //
-
-	for(;(*s)!='\0';s++,x+=16){
-		if((*s)>='A' && (*s)<='Z'){
-			BltSetRect(&src,((*s)-'A')<<4,480-32,16,16);
-		}
-		else if((*s)>='a' && (*s)<='z'){
-			BltSetRect(&src,((*s)-'a')<<4,480-16,16,16);
-		}
-		else if((*s)>='0' && (*s)<='9'){
-			BltSetRect(&src,(((*s)-'0')<<4)+416,480-32,16,16);
-		}
-		else{
-			switch(*s){
-			case('!'):	BltSetRect(&src,((0)<<4)+416,480-16,16,16);	break;
-			case('?'):	BltSetRect(&src,((1)<<4)+416,480-16,16,16);	break;
-			case('#'):	BltSetRect(&src,((2)<<4)+416,480-16,16,16);	break;
-			case('\\'):	BltSetRect(&src,((3)<<4)+416,480-16,16,16);	break;
-			case('<'):	BltSetRect(&src,((4)<<4)+416,480-16,16,16);	break;
-			case('>'):	BltSetRect(&src,((5)<<4)+416,480-16,16,16);	break;
-			case('='):	BltSetRect(&src,((6)<<4)+416,480-16,16,16);	break;
-			case(','):	BltSetRect(&src,((7)<<4)+416,480-16,16,16);	break;
-			case('+'):	BltSetRect(&src,((8)<<4)+416,480-16,16,16);	break;
-			case('-'):	BltSetRect(&src,((9)<<4)+416,480-16,16,16);	break;
-			default:	continue;
-			}
-		}
-
-		tx = x;ty = y;
-		//if(tx>=0 && tx<630)	// 安全対策???
-		GrpBlt(&src,tx,ty,GrTama);
-	}
-}
-
-// 16x16 透過フォントで文字出力(クリッピング有) //
-extern void GrpPutc(int x, int y, char c)
-{
-	RECT	src;
-
-	if(c>='A' && c<='Z'){
-		BltSetRect(&src,(c-'A')<<4,480-32,16,16);
-	}
-	else if(c>='a' && c<='z'){
-		BltSetRect(&src,(c-'a')<<4,480-16,16,16);
-	}
-	else if(c>='0' && c<='9'){
-		BltSetRect(&src,((c-'0')<<4)+416,480-32,16,16);
-	}
-	else{
-		switch(c){
+	if((c >= 'A') && (c <= 'Z')) {
+		BltSetRect(&src,((c)-'A')<<4,480-32,16,16);
+	} else if((c >= 'a') && (c <= 'z')) {
+		BltSetRect(&src,((c)-'a')<<4,480-16,16,16);
+	} else if((c >= '0') && (c <= '9')) {
+		BltSetRect(&src,(((c)-'0')<<4)+416,480-32,16,16);
+	} else {
+		switch(c) {
 		case('!'):	BltSetRect(&src,((0)<<4)+416,480-16,16,16);	break;
 		case('?'):	BltSetRect(&src,((1)<<4)+416,480-16,16,16);	break;
 		case('#'):	BltSetRect(&src,((2)<<4)+416,480-16,16,16);	break;
@@ -171,11 +36,79 @@ extern void GrpPutc(int x, int y, char c)
 		case(','):	BltSetRect(&src,((7)<<4)+416,480-16,16,16);	break;
 		case('+'):	BltSetRect(&src,((8)<<4)+416,480-16,16,16);	break;
 		case('-'):	BltSetRect(&src,((9)<<4)+416,480-16,16,16);	break;
-		default:	return;
+		default:	return std::nullopt;
 		}
 	}
+	return src;
+}
 
-	GrpBlt(&src,x,y,GrTama);
+
+// 16x16 透過フォントで文字列出力(高速) //
+extern void GrpPut16(int x, int y, const char *s)
+{
+	int		sx,tx,ty;
+
+	sx = x;
+
+	for(;(*s)!='\0';s++,x+=14){
+		auto maybe_src = Glyph16x16(*s);
+		if(maybe_src) {
+			auto& src = maybe_src.value();
+
+			tx = x;ty = y;
+			if(tx>=0 && tx<630)	// 安全対策???
+				GrpBltX(&src,tx,ty,GrTama);
+		}
+	}
+}
+
+// 16x16 透過フォントで文字列出力(高速) //
+extern void GrpPut16c(int x, int y, char *s)
+{
+	int		sx,tx,ty;
+
+	sx = x;
+
+	for(;(*s)!='\0';s++,x+=14){
+		auto maybe_src = Glyph16x16(*s);
+		if(maybe_src) {
+			auto& src = maybe_src.value();
+
+			tx = x;ty = y;
+			if(tx>=0 && tx<630)	// 安全対策???
+				GrpBlt(&src,tx,ty,GrTama);
+		}
+	}
+}
+
+// 上と同じだが、ｘ移動幅が１６ //
+extern void GrpPut16c2(int x, int y, char *s)
+{
+	int		sx,tx,ty;
+
+	sx = x;
+
+	for(;(*s)!='\0';s++,x+=16){
+		auto maybe_src = Glyph16x16(*s);
+		if(maybe_src) {
+			auto& src = maybe_src.value();
+
+			tx = x;ty = y;
+			//if(tx>=0 && tx<630)	// 安全対策???
+			GrpBlt(&src,tx,ty,GrTama);
+		}
+	}
+}
+
+// 16x16 透過フォントで文字出力(クリッピング有) //
+extern void GrpPutc(int x, int y, char c)
+{
+	auto maybe_src = Glyph16x16(c);
+	if(maybe_src) {
+		auto& src = maybe_src.value();
+
+		GrpBlt(&src, x, y, GrTama);
+	}
 }
 
 // 05x07 べた貼りフォント //

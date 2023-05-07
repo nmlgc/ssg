@@ -3,6 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "MAIDTAMA.H"
 #include "GIAN.H"
 
 

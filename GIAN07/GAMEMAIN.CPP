@@ -6,8 +6,10 @@
 #include "GAMEMAIN.H"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "GIAN.H"
 #include "LENS.H"
 #include "LEVEL.H"
+#include "SCORE.H"
 #include <ddraw.h>
 
 

@@ -7,6 +7,7 @@
 #define PBGWIN_FRAGMENT_H		"FRAGMENT : Ver 0.10 : Update 99/10/31"
 //#pragma message(PBGWIN_FRAGMENT_H)
 
+#include "DirectXUTYs/DX_TYPE.H"
 
 //// 破片定数 ////
 #define FRAGMENT_MAX	1000		// 破片の最大数

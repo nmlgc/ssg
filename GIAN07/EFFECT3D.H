@@ -16,7 +16,9 @@
 
 ///// [ヘッダファイル] /////
 #include "game/coords.h"
-#include "GIAN.H"
+#include "DirectXUTYs/DX_TYPE.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/UT_MATH.H"
 
 
 

@@ -3,10 +3,13 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "DirectXUTYs/DX_TYPE.H"
 #include "game/graphics.h"
-#include "LZ_UTY.H"
+#include "ENEMY.H"
 #include "CONFIG.H"
+#include "GIAN.H"
 #include "LOADER.H"
+#include "LZ_UTY.H"
 #include "LENS.H"
 #include <assert.h>
 #include <ddraw.h>

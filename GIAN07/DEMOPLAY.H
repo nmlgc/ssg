@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_DEMOPLAY_H)
 
 #include "CONFIG.H"
-#include "GIAN.H"
+#include "DirectXUTYs/DX_TYPE.H"
 
 
 ///// [ 定数 ] /////

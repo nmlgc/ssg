@@ -4,6 +4,11 @@
 /*                                                                           */
 
 #include "FONTUTY.H"
+#include "LOADER.H"
+#include "WindowSys.h"
+#include "game/coords.h"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/UT_MATH.H"
 #include <ddraw.h>
 
 // ヒミツの関数 //

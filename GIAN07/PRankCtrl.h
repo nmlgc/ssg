@@ -6,7 +6,7 @@
 #ifndef PBGWIN_PRANKCTRL_H
 #define PBGWIN_PRANKCTRL_H		"PRANKCTRL : Version 0.01 : Update 2000/09/13"
 
-#include "GIAN.H"
+#include "DirectXUTYs/DX_TYPE.H"
 
 
 

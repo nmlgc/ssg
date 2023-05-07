@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_EXDEF_H)
 
 
+#include "DirectXUTYs/DX_TYPE.H"
 
 
 // 角度付き座標の管理用構造体 //

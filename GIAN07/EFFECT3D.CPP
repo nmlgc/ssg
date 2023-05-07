@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "EFFECT3D.H"
+#include "GIAN.H"
 
 #define TRIANGLE_MAX		50
 #define CIRCLE_MAX			40

@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "ITEM.H"
+#include "GIAN.H"
 #include "GIAN07/entity.h"
 
 

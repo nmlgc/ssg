@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "BOSS.H"
+#include "GIAN.H"
 #include "EnemyExCtrl.h"
 #include "../DirectXUTYs/DD_GRP3D.H"
 

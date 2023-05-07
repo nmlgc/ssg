@@ -7,7 +7,8 @@
 #define PBGWIN_SCROLL_H		"SCROLL : Version 0.11 : Update 2000/02/28"
 //#pragma message(PBGWIN_SCROLL_H)
 
-#include "GIAN.H"
+#include "DirectXUTYs/DX_TYPE.H"
+#include "platform/buffer.h"
 
 
 ///// [更新履歴] /////

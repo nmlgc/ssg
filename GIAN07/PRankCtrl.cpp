@@ -6,6 +6,7 @@
 #include "PRankCtrl.h"
 #include "CONFIG.H"
 #include "LEVEL.H"
+#include "GIAN.H"
 
 PlayRankInfo	PlayRank;
 

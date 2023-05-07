@@ -4,6 +4,9 @@
  */
 
 #include "ENDING.H"
+#include "FONTUTY.H"
+#include "GIAN.H"
+#include "LOADER.H"
 #include <ddraw.h>
 
 

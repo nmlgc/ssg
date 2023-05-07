@@ -3,8 +3,9 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#include "GIAN.H"
+#include "ENEMY.H"
 #include "ECL_LEN.H"
+#include "GIAN.H"
 #include "LEVEL.H"
 #include "GIAN07/entity.h"
 

@@ -4,6 +4,9 @@
 /*                                                                           */
 
 #include "HOMINGL.H"
+#include "GIAN.H"
+#include "MAID.H"
+#include "DirectXUTYs/UT_MATH.H"
 
 #define HOMINGL_WIDTH	(8*64)
 

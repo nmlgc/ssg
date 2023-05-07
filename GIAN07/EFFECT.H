@@ -7,7 +7,8 @@
 #define PBGWIN_EFFECT_H		"EFFECT : Version 0.20 : Update 2000/02/23"
 //#pragma message(PBGWIN_EFFECT_H)
 
-#include "GIAN.H"
+#include "DirectXUTYs/DX_TYPE.H"
+#include <stdint.h>
 
 
 

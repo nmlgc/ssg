@@ -4,8 +4,15 @@
 /*                                                                           */
 
 #include "WindowCtrl.h"
+#include "WindowSys.h"
 #include "CONFIG.H"
+#include "GAMEMAIN.H"
 #include "LEVEL.H"
+#include "LOADER.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/DI_UTY.H"
+#include "DirectXUTYs/DS_UTY.H"
+#include "DirectXUTYs/PBGMIDI.H"
 
 
 

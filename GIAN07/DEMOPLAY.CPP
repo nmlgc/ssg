@@ -5,6 +5,7 @@
 
 #include "platform/file.h"
 #include "LZ_UTY.H"
+#include "GIAN.H"
 #include "DEMOPLAY.H"
 
 

@@ -6,6 +6,7 @@
 #include "SCROLL.H"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "GIAN.H"
 #include "LEVEL.H"
 
 

@@ -3,8 +3,11 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "GIAN.H"
+#include "LLASER.H"
+#include "MAID.H"
 #include "DirectXUTYs/DD_GRP3D.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/DS_UTY.H"
 
 
 //// レーザー変数２ ////

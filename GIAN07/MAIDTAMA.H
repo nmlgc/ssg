@@ -7,7 +7,8 @@
 #define PBGWIN_MAIDTAMA_H		"めいどたま : Version 0.01 : Update 2000/02/25"
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
-#include "GIAN.H"
+#include "TAMA.H"
+#include "DirectXUTYs/DX_TYPE.H"
 #include <array>
 
 

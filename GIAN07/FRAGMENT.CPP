@@ -3,7 +3,11 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#include "GIAN.H"
+#include "FRAGMENT.H"
+#include "LOADER.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/UT_MATH.H"
+#include "game/coords.h"
 
 
 FRAGMENT_DATA	Fragment[FRAGMENT_MAX];		// 破片データ管理用構造体

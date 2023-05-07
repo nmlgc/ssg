@@ -4,6 +4,11 @@
 /*                                                                           */
 
 #include "EnemyExCtrl.h"
+#include "LLASER.H"
+#include "LOADER.H"
+#include "MAID.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/DS_UTY.H"
 
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 

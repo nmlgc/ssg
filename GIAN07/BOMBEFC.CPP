@@ -4,6 +4,9 @@
  */
 
 #include "BOMBEFC.H"
+#include "LOADER.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/UT_MATH.H"
 
 
 BombEfcCtrl		BombEfc[EXBOMB_MAX];

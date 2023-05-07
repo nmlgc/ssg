@@ -7,7 +7,7 @@
 #define PBGWIN_LOADER_H		"LOADER : Version 0.10 : Update 2000/02/18"
 //#pragma message(PBGWIN_LOADER_H)
 
-#include "GIAN.H"
+#include "DirectXUTYs/DD_UTY.H"
 
 
 ///// [ 定数 ] /////

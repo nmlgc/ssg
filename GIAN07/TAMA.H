@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_TAMA_H)
 
 #include "GIAN07/entity.h"
+#include "DirectXUTYs/DX_TYPE.H"
 #include <array>
 
 

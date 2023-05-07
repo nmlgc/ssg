@@ -16,6 +16,8 @@
 
 // ヘッダファイル //
 #include "DX_TYPE.H"
+#include "game/coords.h"
+#include <stdint.h>
 
 
 // 関数 //

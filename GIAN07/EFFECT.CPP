@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "EFFECT.H"
+#include "GIAN.H"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];

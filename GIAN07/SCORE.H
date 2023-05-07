@@ -7,7 +7,7 @@
 #define PBGWIN_SCORE_H		"SCORE : Version 0.01 : Update 2000/07/29"
 //#pragma message(PBGWIN_SCORE_H)
 
-#include "GIAN.H"
+#include "DirectXUTYs/DX_TYPE.H"
 
 
 

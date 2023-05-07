@@ -208,56 +208,58 @@ extern void GrpPutMidNum(int x, int y, int n)
 	}
 }
 
-WIN_GRPINFO WinGrpInfo;
+struct GDI_FONTS {
+	ENUMARRAY<HFONT, GIAN_FONT_ID> fonts;
 
-// フォントをセットする //
-extern void InitFonts(void)
-{
-	LOGFONTW logfont = {
-		.lfEscapement = 0,
-		.lfOrientation = 0,
-		.lfItalic = false,
-		.lfUnderline = false,
-		.lfStrikeOut = false,
-		.lfCharSet = SHIFTJIS_CHARSET,
-		.lfOutPrecision = OUT_TT_ONLY_PRECIS,
-		.lfClipPrecision = CLIP_DEFAULT_PRECIS,
-		.lfQuality = PROOF_QUALITY,
-		.lfPitchAndFamily = FIXED_PITCH,
-		.lfFaceName = L"ＭＳ ゴシック"
-	};
+	GDI_FONTS() {
+		LOGFONTW logfont = {
+			.lfEscapement = 0,
+			.lfOrientation = 0,
+			.lfItalic = false,
+			.lfUnderline = false,
+			.lfStrikeOut = false,
+			.lfCharSet = SHIFTJIS_CHARSET,
+			.lfOutPrecision = OUT_TT_ONLY_PRECIS,
+			.lfClipPrecision = CLIP_DEFAULT_PRECIS,
+			.lfQuality = PROOF_QUALITY,
+			.lfPitchAndFamily = FIXED_PITCH,
+			.lfFaceName = L"ＭＳ ゴシック"
+		};
 
-	// でかいフォント //
-	logfont.lfHeight = 24;
-	logfont.lfWidth = 12;
-	logfont.lfWeight = FW_MEDIUM;
-	WinGrpInfo.LargeFont = CreateFontIndirectW(&logfont);
+		// でかいフォント //
+		logfont.lfHeight = 24;
+		logfont.lfWidth = 12;
+		logfont.lfWeight = FW_MEDIUM;
+		fonts[GIAN_FONT_ID::LARGE] = CreateFontIndirectW(&logfont);
 
-	// 並なフォント //
-	logfont.lfHeight = 16;
-	logfont.lfWidth = 8;
-	logfont.lfWeight = FW_NORMAL;
-	WinGrpInfo.NormalFont = CreateFontIndirectW(&logfont);
+		// 並なフォント //
+		logfont.lfHeight = 16;
+		logfont.lfWidth = 8;
+		logfont.lfWeight = FW_NORMAL;
+		fonts[GIAN_FONT_ID::NORMAL] = CreateFontIndirectW(&logfont);
 
-	// ちっこいフォント //
-	logfont.lfHeight = 14;
-	logfont.lfWidth = 7;
-	logfont.lfWeight = FW_NORMAL;
-	WinGrpInfo.SmallFont = CreateFontIndirectW(&logfont);
-}
+		// ちっこいフォント //
+		logfont.lfHeight = 14;
+		logfont.lfWidth = 7;
+		logfont.lfWeight = FW_NORMAL;
+		fonts[GIAN_FONT_ID::SMALL] = CreateFontIndirectW(&logfont);
+	}
 
-// フォントを解放する //
-extern void CleanupFont(void)
-{
-	if(WinGrpInfo.LargeFont)	DeleteObject(WinGrpInfo.LargeFont);
-	if(WinGrpInfo.NormalFont)	DeleteObject(WinGrpInfo.NormalFont);
-	if(WinGrpInfo.SmallFont)	DeleteObject(WinGrpInfo.SmallFont);
-}
+	~GDI_FONTS() {
+		for(auto& font : fonts) {
+			if(font) {
+				DeleteObject(font);
+			}
+		}
+	}
+};
+GDI_FONTS GDIFonts;
+
+TEXTRENDER_GDI<GIAN_FONT_ID> TextObj = { GDIFonts.fonts };
 
 void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
 {
 	HDC			hdc;
-	HFONT		oldfont;
 	int			j;
 	DWORD		temp,old;
 
@@ -282,7 +284,7 @@ void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
 	temp = GetPixel(hdc,0,0);
 	SetPixel(hdc,0,0,old);
 
-	oldfont = (HFONT)SelectObject(hdc,WinGrpInfo.NormalFont);
+	auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]);
 	SetBkMode(hdc,TRANSPARENT);
 
 	SetTextColor(hdc, RGB(0, 0, 128));

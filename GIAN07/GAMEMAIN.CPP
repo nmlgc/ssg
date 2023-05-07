@@ -1314,7 +1314,6 @@ void MusicRoomProc(void)
 {
 	PIXEL_LTRB	src;
 	HDC		hdc;
-	HFONT	oldfont;
 	char	buf[100];
 	int		m,s;
 	int		i;
@@ -1407,7 +1406,9 @@ void MusicRoomProc(void)
 		//TextOut(hdc,561,112+2,buf,strlen(buf));
 
 		if(DxObj.Back->GetDC(&hdc)==DD_OK){
-			oldfont = (HFONT)SelectObject(hdc,WinGrpInfo.NormalFont);
+			auto oldfont = SelectObject(
+				hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]
+			);
 
 			//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));
 			SetBkMode(hdc,TRANSPARENT);
@@ -1418,7 +1419,7 @@ void MusicRoomProc(void)
 			SetTextColor(hdc,RGB(153,204,255));
 			TextOut(hdc,400,144+2,buf,strlen(buf));
 			SelectObject(hdc,oldfont);
-			oldfont = (HFONT)SelectObject(hdc,WinGrpInfo.SmallFont);
+			oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::SMALL]);
 
 			for(i=0; i<12; i++){
 				TextOut(hdc, 400-40, 144+30+i*16, MCommentBuffer[i], strlen(MCommentBuffer[i]));

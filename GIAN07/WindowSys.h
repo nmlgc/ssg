@@ -6,7 +6,7 @@
 #ifndef PBGWIN_WINDOWSYS_H
 #define PBGWIN_WINDOWSYS_H		"WINDOWSYS : Version 0.24 : Update 2000/02/28"
 
-#include "DirectXUTYs/DX_TYPE.H"
+#include "FONTUTY.H"
 #include "game/coords.h"
 
 
@@ -96,7 +96,7 @@ typedef struct tagMSG_WINDOW{
 	WINDOW_LTRB	MaxSize;	// ウィンドウの最終的な大きさ
 	WINDOW_LTRB	NowSize;	// ウィンドウの現在のサイズ
 
-	BYTE		FontID;				// 使用するフォント
+	GIAN_FONT_ID	FontID;	// 使用するフォント
 	BYTE		FontDy;				// フォントのＹ増量値
 	BYTE		State;				// 状態
 	BYTE		MaxLine;			// 最大表示可能行数

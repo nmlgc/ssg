@@ -4,7 +4,6 @@
 /*                                                                           */
 
 #include "WindowSys.h"
-#include "FONTUTY.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
@@ -20,7 +19,6 @@ static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws);	// アクティブな�
 static void CWinKeyEvent(WINDOW_SYSTEM *ws);				// キーボード入力を処理する
 
 static void DrawWindowFrame(int x,int y,int w,int h);		// ウィンドウ枠を描画する
-static HFONT SetFont(HDC hdc,BYTE FontID);					// フォントをセットする
 static void GrpBoxA2(int x1,int y1,int x2,int y2);			// 平行四辺形ＢＯＸ描画
 
 
@@ -86,7 +84,6 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	WINDOW_INFO		*p;
 	int				i;
 	HDC				hdc;
-	HFONT			oldfont;
 	BYTE			alpha;
 
 	// アクティブな項目を検索する //
@@ -118,7 +115,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	// 文字列の描画 //
 	if(DxObj.Back->GetDC(&hdc)==DD_OK){
 		SetBkMode(hdc,TRANSPARENT);
-		oldfont = (HFONT)SelectObject(hdc,WinGrpInfo.SmallFont);
+		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::SMALL]);
 		SetTextColor(hdc,RGB(128,128,128));
 		TextOut(hdc,ws->x+1,ws->y,p->Title,strlen(p->Title));
 		SetTextColor(hdc,RGB(255,255,255));
@@ -250,7 +247,6 @@ void MWinMove(void)
 // メッセージウィンドウを描画する(上に同じ) //
 void MWinDraw(void)
 {
-	HFONT	oldfont;
 	HDC		hdc;
 	BYTE	alpha;
 	PIXEL_LTRB	src;
@@ -277,7 +273,8 @@ void MWinDraw(void)
 	// -> こうしないと文字列用 Surface を作成することになるので... //
 	if(MsgWindow.State == MWIN_FREE){
 		if(DxObj.Back->GetDC(&hdc)==DD_OK){
-			oldfont = SetFont(hdc,MsgWindow.FontID);	// セットされたフォントで描画
+			// セットされたフォントで描画
+			auto oldfont = SelectObject(hdc, TextObj.fonts[MsgWindow.FontID]);
 			SetBkMode(hdc,TRANSPARENT);
 
 			for(i=0;i<MsgWindow.Line;i++){
@@ -412,7 +409,7 @@ void MWinCmd(BYTE cmd)
 			for(i=0;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;			// 文字列無効化
 			MsgWindow.MaxLine = temp / Ysize;							// 表示可能最大行数
 			MsgWindow.FontDy  =(temp % Ysize)/(temp/Ysize)+Ysize + 1;	// Ｙ増量
-			MsgWindow.FontID  = cmd;									// 使用フォント
+			MsgWindow.FontID  = GIAN_FONT_ID(cmd);	// 使用フォント
 
 		case(MWCMD_NEWPAGE):		// 改ページする
 			for(i=0;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;			// 文字列無効化
@@ -447,18 +444,6 @@ static void DrawWindowFrame(int x,int y,int w,int h)
 	// 右下 //
 	src = { (384 - w), (80 - h), 384, 80 };
 	GrpBlt(&src,x+w,y+h,GrTama);
-}
-
-// フォントをセットする //
-static HFONT SetFont(HDC hdc,BYTE FontID)
-{
-	// ID に対応するフォントをセットする //
-	switch(FontID){
-		case(MWCMD_SMALLFONT):		return (HFONT)SelectObject(hdc,WinGrpInfo.SmallFont);
-		case(MWCMD_NORMALFONT):		return (HFONT)SelectObject(hdc,WinGrpInfo.NormalFont);
-		case(MWCMD_LARGEFONT):		return (HFONT)SelectObject(hdc,WinGrpInfo.LargeFont);
-		default:					return NULL;
-	}
 }
 
 // ヘルプ文字列を送る //

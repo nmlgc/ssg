@@ -17,6 +17,7 @@
 
 
 #include "DirectXUTYs/DD_UTY.H"
+#include "platform/windows/text_gdi.h"
 #include <string_view>
 
 
@@ -38,14 +39,14 @@ typedef struct tagExtraFontInfo {
 	EXPOINT	*Data;		// データ格納先
 } ExtraFontInfo;
 
-// ウィンドウ全体の情報 //
-struct WIN_GRPINFO {
-	HFONT	SmallFont;	// フォント(小さい文字用)
-	HFONT	NormalFont;	// フォント(通常の文字用)
-	HFONT	LargeFont;	// フォント(大きい文字用)
+enum class GIAN_FONT_ID : uint8_t {
+	SMALL = 0,	// フォント(小さい文字用)
+	NORMAL = 1,	// フォント(通常の文字用)
+	LARGE = 2,	// フォント(大きい文字用)
+	COUNT,
 };
 
-extern WIN_GRPINFO WinGrpInfo;
+extern TEXTRENDER_GDI<GIAN_FONT_ID> TextObj;
 
 
 
@@ -60,9 +61,6 @@ extern void GrpPut7B(int x, int y, char *s);	// 07x11 音楽室用フォント
 extern void GrpPutScore(int x, int y, char *s);	// 得点アイテムのスコアを描画
 
 extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画する
-
-extern void InitFonts(void);	// フォントをセットする
-extern void CleanupFont(void);	// フォントを解放する
 
 // グラデーション付きフォントを描画する
 void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str);

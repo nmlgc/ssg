@@ -294,7 +294,7 @@ void DrawTextInfo()
 
 	if(DxObj.Back->GetDC(&hdc) == DD_OK){
 		SetBkMode(hdc, TRANSPARENT);
-		auto oldfont = SelectObject(hdc, WinGrpInfo.NormalFont);
+		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]);
 
 		SetTextColor(hdc, RGB(128, 128, 128));
 		for(i=0; i<EText.NumText; i++){

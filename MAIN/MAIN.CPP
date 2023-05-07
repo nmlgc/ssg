@@ -1,6 +1,5 @@
 #include "../GIAN07/CONFIG.H"
 #include "../GIAN07/EFFECT.H"
-#include "../GIAN07/FONTUTY.H"
 #include "../GIAN07/GAMEMAIN.H"
 #include "../GIAN07/LENS.H"
 #include "../GIAN07/LOADER.H"
@@ -258,7 +257,6 @@ BOOL XInit(void)
 		return false;
 	}
 	InitSurface();
-	InitFonts();
 	GrpSetRestoreHook(SEffectRestore);
 
 	// サウンドの初期化 //
@@ -291,7 +289,6 @@ BOOL XInit(void)
 
 void XCleanup(void)
 {
-	CleanupFont();
 	CleanupLens();
 	ConfigSave();
 }

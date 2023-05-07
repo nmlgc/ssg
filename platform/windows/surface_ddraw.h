@@ -11,6 +11,4 @@ struct IDirectDrawSurface;
 
 struct SURFACE_DDRAW : public SURFACE_GDI {
 	IDirectDrawSurface* surf = nullptr;
-	int width;
-	int height;
 };

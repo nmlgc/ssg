@@ -373,6 +373,7 @@ SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size)
 
 	if(surf_id>=SURFACE_MAX) return NULL;
 	RELEASE(DxSurf[surf_id].surf);
+	DxSurf[surf_id].size = { 0, 0 };
 
 	ZEROMEM(ddsd);
 
@@ -384,9 +385,8 @@ SURFACE_DDRAW* GrpCreateSurface(BYTE surf_id, PIXEL_SIZE size)
 	dxval = DxObj.DD->CreateSurface(&ddsd,&temp,NULL);
 
 	if(dxval==DD_OK){
-		DxSurf[surf_id].surf   = temp;
-		DxSurf[surf_id].width  = size.w;
-		DxSurf[surf_id].height = size.h;
+		DxSurf[surf_id].surf = temp;
+		DxSurf[surf_id].size = size;
 		DxObj.SurfaceRestore(DxSurf[surf_id]);
 	}
 
@@ -637,7 +637,7 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	ddrval = surf.surf->GetDC(&ddraw_dc);
 	if(ddrval!=DD_OK) return FALSE;
 
-	BitBlt(ddraw_dc, 0, 0, surf.width, surf.height, img_dc, 0, 0, SRCCOPY);
+	BitBlt(ddraw_dc, 0, 0, surf.size.w, surf.size.h, img_dc, 0, 0, SRCCOPY);
 
 	// 後始末 //
 	surf.surf->ReleaseDC(ddraw_dc);

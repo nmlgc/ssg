@@ -147,11 +147,3 @@ extern void StdStatusOutput(void)
 	sprintf(buf,"Credit %d",Viv.credit);		// -1 に注意だ！！
 	GrpPut16(640-128,460,buf);
 }
-
-extern void swap16(uint16_t *a, uint16_t *b)
-{
-	WORD temp = *a;
-
-	*a = *b;
-	*b = temp;
-}

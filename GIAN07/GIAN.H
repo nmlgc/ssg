@@ -143,7 +143,6 @@ extern void OutputDebugMsg(void);	// デバッグ情報を出力する
 #endif
 
 extern void StdStatusOutput(void);
-extern void swap16(uint16_t *a, uint16_t *b);
 
 
 

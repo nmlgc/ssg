@@ -6,6 +6,7 @@
 #include "GIAN.H"
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "LEVEL.H"
+#include "GIAN07/entity.h"
 
 
 /*
@@ -60,8 +61,6 @@ static void __fastcall laser_hitchk(LASER_DATA *lp);	// レーザーの当たり
 
 static void __fastcall REFL_move(LASER_DATA *lp);		// 反射レーザーの移動
 static int  __fastcall REFL_hit(LASER_DATA *lp);		// ﾘﾌﾚｸﾀｰとの当たり判定(ﾋｯﾄ->非０)
-
-static void Indsort(WORD *ind,WORD *now);
 
 
 void laser_set(void)
@@ -146,7 +145,9 @@ void laser_move(void)
 
 		if(Viv.muteki==0 && !(lp->flag&(LF_CLEAR|LF_DELETE))) laser_hitchk(lp);
 	}
-	Indsort(LaserInd.data(), &LaserNow);
+	Indsort(LaserInd, LaserNow, Laser, [](const LASER_DATA& l) {
+		return (l.flag & LF_DELETE);
+	});
 }
 
 void laser_draw(void)
@@ -565,32 +566,4 @@ static int  __fastcall REFL_hit(LASER_DATA *lp)
 	}
 
 	return 0;	// はずれ
-}
-
-static void Indsort(WORD *ind,WORD *now)
-{
-	WORD i,temp,next;
-
-	for(i=temp=next=0;i<(*now);i++){
-
-		// 消去要請フラグが立っている->swap 立っていない-> counter++ //
-		if(Laser[ind[i]].flag & LF_DELETE) {
-
-			// フラグの立っていないレーザーを検索する //
-			// temp = 1 + i;  // ((temp>i) ? temp : i);
-			for(temp=i+1;temp<(*now);temp++){
-				if((Laser[ind[temp]].flag & LF_DELETE) == 0) {
-					next++;
-					goto SEARCH_END;
-				}
-			}
-
-			SEARCH_END:
-			swap16(ind+i,ind+temp);
-		}
-		else
-			next++;
-	}
-
-	*now=next;
 }

@@ -7,7 +7,6 @@
 
 
 ///// [ひみつの関数] /////
-static void Indsort(WORD *ind,WORD *now);
 static void MTamaSet(void);
 
 static void SetT_A0(void);		// めいどたまＴＹＰＥ－Ａ
@@ -186,7 +185,9 @@ void MaidTamaMove(void)
 		else
 			tamaEmove(t);
 	}
-	Indsort(MaidTamaInd.data(), &MaidTamaNow);
+	Indsort(MaidTamaInd, MaidTamaNow, MaidTama, [](const TAMA_DATA& t) {
+		return (t.flag & TF_DELETE);
+	});
 
 
 	// レーザーの当たり判定 //
@@ -311,34 +312,6 @@ static void MTamaSet(void)
 		t->count  = 0;							// カウンタの初期化
 		t->flag   = tama_flag();				// フラグの初期化
 	}
-}
-
-static void Indsort(WORD *ind,WORD *now)
-{
-	WORD i,temp,next;
-
-	for(i=temp=next=0;i<(*now);i++){
-
-		// 消去要請フラグが立っている->swap 立っていない-> counter++ //
-		if(MaidTama[ind[i]].flag & TF_DELETE) {
-
-			// フラグの立っていない弾を検索する //
-			// temp = 1 + i;  // ((temp>i) ? temp : i);
-			for(temp=i+1;temp<(*now);temp++){
-				if(!(MaidTama[ind[temp]].flag & TF_DELETE)) {
-					next++;
-					goto SEARCH_END;
-				}
-			}
-
-			SEARCH_END:
-			swap16(ind+i,ind+temp);
-		}
-		else
-			next++;
-	}
-
-	*now=next;
 }
 
 #define IsMainShot(t)	((t)==MAID_MAIN_SHOT||(t)==MAID_MAIN_SHOT*2||(t)==MAID_MAIN_SHOT*3)

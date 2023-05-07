@@ -7,6 +7,7 @@
 #define PBGWIN_TAMA_H		"TAMA : Ver 0.62 : Update 2000/02/17"
 //#pragma message(PBGWIN_TAMA_H)
 
+#include "GIAN07/entity.h"
 #include <array>
 
 
@@ -22,6 +23,7 @@
  *
  * > 6/13 (8:05)  : どっと単位のクリッピング
  */
+
 
 
 ////弾定数////
@@ -242,6 +244,16 @@ _inline void TamaSetXY(int x,int y)
 {
 	TamaCmd.x = x;
 	TamaCmd.y = y;
+}
+
+template <size_t N> void Indsort(
+	std::array<uint16_t, N>& indices,
+	uint16_t& count,
+	const std::array<TAMA_DATA, N>& entities
+) {
+	Indsort(indices, count, entities, [](const TAMA_DATA& t) {
+		return (t.flag & TF_DELETE);
+	});
 }
 
 

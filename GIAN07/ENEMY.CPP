@@ -6,6 +6,7 @@
 #include "GIAN.H"
 #include "ECL_LEN.H"
 #include "LEVEL.H"
+#include "GIAN07/entity.h"
 
 /*
  * ECLコマンドのアドレス更新には ECL_CmdLen[ECLコマンド定数] を使用する
@@ -50,7 +51,16 @@ BYTE		EnemyEXDEG_D;	// 特殊角度の増分
 
 // 関数 //
 static void _EnemyDrawBomb(int x,int y,DWORD count);
-static void Indsort(WORD *ind,WORD *now);
+
+template <size_t N> void Indsort(
+	std::array<uint16_t, N>& indices,
+	uint16_t& count,
+	const std::array<ENEMY_DATA, N>& entities
+) {
+	Indsort(EnemyInd, EnemyNow, Enemy, [](const ENEMY_DATA& e) {
+		return (e.flag & EF_DELETE);
+	});
+}
 
 static DWORD ID2Value(ENEMY_DATA *e,BYTE id);		// ECLCST_?? からその値に変換する
 
@@ -131,7 +141,7 @@ void enemy_move(void)
 		e->count++;
 	}
 
-	Indsort(EnemyInd.data(), &EnemyNow);
+	Indsort(EnemyInd, EnemyNow, Enemy);
 }
 
 void enemy_draw(void)
@@ -192,7 +202,7 @@ extern void enemy_clear(void)
 		}
 	}
 
-	Indsort(EnemyInd.data(), &EnemyNow);
+	Indsort(EnemyInd, EnemyNow, Enemy);
 }
 
 void enemyind_set(void)
@@ -1993,26 +2003,4 @@ static DWORD ID2Value(ENEMY_DATA *e,BYTE id)
 		default:
 		return 0;
 	}
-}
-
-static void Indsort(WORD *ind,WORD *now)
-{
-	int i,temp,next;
-
-	for(i=temp=next=0;i<(*now);i++){
-		if(Enemy[ind[i]].flag & EF_DELETE) {
-			for(temp=i+1;temp<(*now);temp++){
-				if((Enemy[ind[temp]].flag & EF_DELETE) == 0) {
-					next++;
-					goto SEARCH_END;
-				}
-			}
-
-			SEARCH_END:
-			swap16(ind+i,ind+temp);
-		}
-		else next++;
-	}
-
-	*now = next;
 }

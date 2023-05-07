@@ -4,16 +4,13 @@
 /*                                                                           */
 
 #include "ITEM.H"
+#include "GIAN07/entity.h"
 
 
 
 std::array<ITEM_DATA, ITEM_MAX>	Item;
 std::array<uint16_t, ITEM_MAX>	ItemInd;
 WORD		ItemNow;
-
-
-static void Indsort(WORD *ind,WORD *now);
-
 
 
 // アイテムを発生させる //
@@ -108,7 +105,9 @@ void ItemMove(void)
 			ip->type = ITEM_DELETE;
 	}
 
-	Indsort(ItemInd.data(), &ItemNow);
+	Indsort(ItemInd, ItemNow, Item, [](const ITEM_DATA& i) {
+		return (i.type == ITEM_DELETE);
+	});
 }
 
 // アイテムを描画する //
@@ -179,30 +178,4 @@ void ItemIndSet(void)
 	}
 
 	ItemNow = 0;
-}
-
-static void Indsort(WORD *ind,WORD *now)
-{
-	WORD i,temp,next;
-
-	for(i=temp=next=0;i<(*now);i++){
-
-		if(Item[ind[i]].type == ITEM_DELETE) {
-
-			// フラグの立っていないアイテムを検索する //
-			for(temp=i+1;temp<(*now);temp++){
-				if(Item[ind[temp]].type != ITEM_DELETE) {
-					next++;
-					goto SEARCH_END;
-				}
-			}
-
-			SEARCH_END:
-			swap16(ind+i,ind+temp);
-		}
-		else
-			next++;
-	}
-
-	*now=next;
 }

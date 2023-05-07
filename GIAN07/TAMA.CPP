@@ -25,7 +25,6 @@ static void easy_cmd(void);				// 難易度：Ｅａｓｙ
 static void hard_cmd(void);				// 難易度：Ｈａｒｄ
 static void luna_cmd(void);				// 難易度：Ｌｕｎａｔｉｃ
 
-static void Indsort(WORD *ind,WORD *now);	// 弾消去の要求によりTama?Indを更新する
 int __fastcall NewTamaSpeed(WORD i);
 int __fastcall LineCmdNewTamaSpeed(WORD i);
 int __fastcall TamaSpeedEx(BYTE d);
@@ -298,7 +297,7 @@ void tama_move(void)
 			t->count++;
 		}
 	}
-	Indsort(Tama1Ind.data(), &Tama1Now);
+	Indsort(Tama1Ind, Tama1Now, Tama);
 
 	// 大型弾＆特殊弾の処理 //
 	for(i=0;i<Tama2Now;i++){
@@ -324,7 +323,7 @@ void tama_move(void)
 			t->count++;
 		}
 	}
-	Indsort(Tama2Ind.data(), &Tama2Now);
+	Indsort(Tama2Ind, Tama2Now, Tama);
 }
 
 void tama_draw(void)
@@ -572,7 +571,7 @@ DWORD tama2score(void)
 			t->d      = 0;
 		}
 	}
-	Indsort(Tama1Ind.data(), &Tama1Now);
+	Indsort(Tama1Ind, Tama1Now, Tama);
 
 	Score = TAMA2_POINT + Viv.evade * 100;
 	for(i=0;i<Tama2Now;i++){
@@ -586,7 +585,7 @@ DWORD tama2score(void)
 			t->d      = 0;
 		}
 	}
-	Indsort(Tama2Ind.data(), &Tama2Now);
+	Indsort(Tama2Ind, Tama2Now, Tama);
 
 	return sum;
 }
@@ -623,7 +622,7 @@ void tama2item(BYTE n)
 			}
 		}
 	}
-	Indsort(Tama1Ind.data(), &Tama1Now);
+	Indsort(Tama1Ind, Tama1Now, Tama);
 
 //	Score = TAMA2_POINT + Viv.evade * 100;
 	for(i=0;i<Tama2Now;i++){
@@ -644,7 +643,7 @@ void tama2item(BYTE n)
 			}
 		}
 	}
-	Indsort(Tama2Ind.data(), &Tama2Now);
+	Indsort(Tama2Ind, Tama2Now, Tama);
 
 //	return sum;
 }
@@ -1172,33 +1171,4 @@ void __fastcall tamaEmove(TAMA_DATA *t)
 			}
 		return;
 	}
-}
-
-static void Indsort(WORD *ind,WORD *now)
-{
-	WORD i,temp,next;
-
-	// かなり複雑なのでバグに注意！ //
-	for(i=temp=next=0;i<(*now);i++){
-
-		// 消去要請フラグが立っている->swap 立っていない-> counter++ //
-		if(Tama[ind[i]].flag & TF_DELETE){
-
-			// フラグの立っていない弾を検索する //
-			// temp = 1 + i;  // ((temp>i) ? temp : i);
-			for(temp=i+1;temp<(*now);temp++){
-				if(!(Tama[ind[temp]].flag & TF_DELETE)) {
-					next++;
-					goto SEARCH_END;
-				}
-			}
-
-			SEARCH_END:
-			swap16(ind+i,ind+temp);
-		}
-		else
-			next++;
-	}
-
-	*now=next;
 }

@@ -265,9 +265,6 @@ void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
 void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
-extern void GrpOffsClear(IDirectDrawSurface* lpds);		// ある Surface を初期化する
-
-
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
 void GrpClsEx(const std::optional<RECT>& Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす

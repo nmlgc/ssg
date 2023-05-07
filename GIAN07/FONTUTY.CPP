@@ -241,7 +241,16 @@ extern void DrawGrdFont(SURFACE_DDRAW* surf, char *s)
 
 	len = strlen(s)*16;
 
+	DDCOLORKEY key = { RGB(0x00, 0x00, 0x00), RGB(0x00, 0x00, 0x00) };
+	surf->surf->SetColorKey(DDCKEY_SRCBLT, &key);
+
 	surf->surf->GetDC(&hdc);
+
+	// Since we render the string multiple times on top of each other, we can't
+	// rely on SetBkMode(hdc, OPAQUE) for clearing the bitmap. The text might
+	// also be smaller than the one we rendered previously.
+	const RECT full = { 0, 0, surf->size.w, surf->size.h };
+	FillRect(hdc, &full, reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
 
 	// ここら辺は、一種の常套手段か？ //
 	old = GetPixel(hdc,0,0);

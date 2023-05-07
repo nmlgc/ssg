@@ -471,20 +471,6 @@ void GrpClsEx(const std::optional<RECT>& Target, DWORD col)
 }
 
 
-extern void GrpOffsClear(LPDIRECTDRAWSURFACE lpds)
-{
-	DDBLTFX		ddbltfx;
-
-	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
-	ddbltfx.dwSize      = sizeof(ddbltfx);
-	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()) ? RGB256(0,0,0) : 0;
-	DDrawRetryUntilSuccessful(DxObj, [&] {
-		return lpds->Blt(nullptr, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx);
-	});
-	DDCOLORKEY key = { ddbltfx.dwFillColor, ddbltfx.dwFillColor };
-	lpds->SetColorKey(DDCKEY_SRCBLT, &key);
-}
-
 static void GrpFlipFS(void)
 {
 	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //

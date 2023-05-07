@@ -248,7 +248,6 @@ void SetMusicTitle(int y, char *s)
 	SEffect[n].vx   = len*16;
 	SEffect[n].vy   = 16;
 
-	GrpOffsClear(GrMTitle->surf);
 	DrawGrdFont(GrMTitle, MTitleBuf);
 }
 
@@ -449,7 +448,6 @@ bool SEffectRestore(void)
 {
 	if(GrMTitle==NULL) return FALSE;
 
-	GrpOffsClear(GrMTitle->surf);
 	DrawGrdFont(GrMTitle,MTitleBuf);
 
 	return TRUE;

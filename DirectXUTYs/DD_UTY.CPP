@@ -248,6 +248,14 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		}
 
 		GrpSetClip(0,0,640,480);
+
+		for(size_t i = 0; i < SURFACE_MAX; i++) {
+			auto& surf = DxSurf[i];
+			if(surf.size) {
+				SurfaceCreate(i, surf.size);
+			}
+		}
+
 		return flag;
 	}
 

@@ -29,6 +29,10 @@ struct PIXEL_POINT {
 struct PIXEL_SIZE {
 	PIXEL_COORD w;
 	PIXEL_COORD h;
+
+	explicit operator bool() const {
+		return ((w > 0) && (h > 0));
+	}
 };
 
 // Left-top-width-height rectangle in unscaled pixel space. Relative to any

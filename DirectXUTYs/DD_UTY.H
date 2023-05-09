@@ -209,7 +209,8 @@ public:
 	// to the DirectDraw one.
 	bool SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size);
 
-	// ＢＭＰファイルロード //
+	// Consumes the given .BMP file and sets the given surface to its contents,
+	// re-creating it in the correct size if necessary.
 	bool SurfaceLoad(BYTE surf_id, BMP_OWNED bmp);
 
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.

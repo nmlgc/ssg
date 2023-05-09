@@ -433,6 +433,14 @@ bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	auto& surf = DxSurf[surf_id];
+	PIXEL_SIZE bmp_size = {
+		std::abs(bmp.info.biWidth), std::abs(bmp.info.biHeight),
+	};
+	if(surf.size != bmp_size) {
+		if(!SurfaceCreateUninitialized(surf_id, bmp_size)) {
+			return false;
+		}
+	}
 	return (surf.Load(std::move(bmp)) && SurfaceRestore(surf));
 }
 

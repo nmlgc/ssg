@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <compare>
+
 // Pixel-space coordinates
 // -----------------------
 // The unscaled output space in the game's original 640×480 resolution.
@@ -33,6 +35,8 @@ struct PIXEL_SIZE {
 	explicit operator bool() const {
 		return ((w > 0) && (h > 0));
 	}
+
+	std::strong_ordering operator <=>(const PIXEL_SIZE& other) const = default;
 };
 
 // Left-top-width-height rectangle in unscaled pixel space. Relative to any

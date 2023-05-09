@@ -125,27 +125,13 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n);
 // Surface を作成する //
 BOOL InitSurface(void)
 {
-	int			i;
-
 //	bIsBombPalette = FALSE;
 
 	if(
-		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_SYSTEM, { 640, 480 }) ||
-		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_MAPCHIP, { 640, 480 }) ||
-		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_ENEMY, { 640, 480 }) ||
-		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_BOMBER, { 640, 480 }) ||
 		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_MTITLE, { 640, 20 }) ||
 		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_LENS, { 140, 140 })
 	) {
 		return false;
-	}
-
-	for(i=0;i<FACE_MAX;i++){
-		if(!DxObj.SurfaceCreateUninitialized(
-			(SURFACE_ID_FACE + i), { (96 * FACE_NUMX), 96 }
-		)) {
-			return false;
-		}
 	}
 
 	// レンズをすでに作成しているのなら、破棄する //

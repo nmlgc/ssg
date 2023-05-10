@@ -35,7 +35,11 @@
 
 
 // 定数＆マクロ //
+
+// TODO: Move to GIAN_SURFACE_ID once LOADER.H does no longer depend on this
+// header.
 #define SURFACE_MAX		10				// テクスチャ,Prim,BackをのぞくSurfaceの最大数
+
 #define XDDRAWENUM_MAX	4				// ビデオカード４枚差しをする人はいないと思うので...
 #define XD3DENUM_MAX	8				// DDrawデバイスに対する3Dデバイスの列挙最大数
 

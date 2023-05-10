@@ -11,24 +11,8 @@
 
 
 ///// [ 定数 ] /////
-
-// Surface 関連 //
-#define SURFACE_ID_SYSTEM		0			// システム用       Surface のＩＤ
-#define SURFACE_ID_MAPCHIP		1			// マップチップ用   Surface のＩＤ
-#define SURFACE_ID_SPROJECT		1			// 西方Project表示用Surface のＩＤ
-#define SURFACE_ID_ENEMY		2			// 敵(雑魚＆Boss)用 Surface のＩＤ
-#define SURFACE_ID_MUSIC		2			// 音楽室用         Surface のＩＤ(Enemyと共有)
-#define SURFACE_ID_TITLE		2			// たいとる用       Surface のＩＤ(上に同じ)
-#define SURFACE_ID_NAMEREG		2			// お名前登録用     Surface のＩＤ(上に同じ)
-#define SURFACE_ID_MTITLE		3			// 曲名加工用       Surface のＩＤ
-#define SURFACE_ID_BOMBER		7			// ボム画像用       Surface のＩＤ
-#define SURFACE_ID_LENS			8			// レンズ加工用     Surface のＩＤ
-
 #define FACE_MAX				3			// 同時にロード可能な人数...
 #define FACE_NUMX				6			// 顔グラの横の個数
-#define SURFACE_ID_FACE0		4			// 顔グラ用(0)      Surface のＩＤ
-#define SURFACE_ID_FACE1		5			// 顔グラ用(1)      Surface のＩＤ
-#define SURFACE_ID_FACE2		6			// 顔グラ用(2)      Surface のＩＤ
 
 // 特殊グラフィックID (For LoadGraph() ) //
 #define GRAPH_ID_MUSICROOM		(128)		// 音楽室用ＢＭＰのＩＤ(数値は1-6 で無ければ良い)
@@ -105,7 +89,7 @@ extern BOOL InitSurface(void);			// Surface を作成する
 
 extern BOOL LoadStageData(BYTE stage);				// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする
 extern BOOL LoadGraph(int stage);					// あるステージのグラフィックをロードする
-extern BOOL LoadFace(BYTE SurfaceID,BYTE FileNo);	// 顔グラフィックをロードする
+bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする
 extern BOOL LoadMusic(int no);						// ｎ番目の曲をロードする
 extern BOOL LoadSound(void);						// 全ての Sound データをロードする
 extern BOOL LoadMusicRoomComment(int no);			// MusicRoom のコメントをロードする
@@ -123,6 +107,31 @@ extern void LeaveBombPalette(void);		// ボム用パレット属性を外す
 */
 
 //// [ 変数 ] ////
+enum GIAN_SURFACE_ID {
+	SURFACE_ID_SYSTEM,	// システム用
+
+	// Title Screen
+	SURFACE_ID_TITLE = 2,	// たいとる用
+
+	// Music Room
+	SURFACE_ID_MUSIC = 2,	// 音楽室用
+
+	// Name Registration
+	SURFACE_ID_NAMEREG = 2,	// お名前登録用
+
+	// In-game
+	SURFACE_ID_MAPCHIP = 1,	// 背景用
+	SURFACE_ID_ENEMY = 2,	// 敵(雑魚＆ボス)用
+	SURFACE_ID_MTITLE,	// 曲のタイトル加工用
+	SURFACE_ID_FACE,	// 顔グラ用
+	SURFACE_ID_FACE_last = (SURFACE_ID_FACE + FACE_MAX - 1),
+	SURFACE_ID_BOMBER,	// ボム用グラフィック用
+
+	// Splash screen
+	SURFACE_ID_SPROJECT = 1,	// 西方Project表示用
+	SURFACE_ID_LENS = 8,	// レンズエフェクト用
+};
+
 extern SURFACE_DDRAW*	GrTama;	// システム用
 extern SURFACE_DDRAW*	GrEnemy;	// 敵(雑魚＆ボス)用
 extern SURFACE_DDRAW*	GrMap;	// 背景用

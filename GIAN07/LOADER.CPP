@@ -118,7 +118,7 @@ BOOL InitSurface(void)
 
 	for(i=0;i<FACE_MAX;i++){
 		FaceData[i].GrSurf = DxObj.SurfaceCreate(
-			(SURFACE_ID_FACE0 + i), { (96 * FACE_NUMX), 96 }
+			(SURFACE_ID_FACE + i), { (96 * FACE_NUMX), 96 }
 		);
 		if(FaceData[i].GrSurf==NULL) return FALSE;
 	}
@@ -272,15 +272,17 @@ BOOL LoadGraph(int stage)
 	return TRUE;
 }
 
-// 顔グラフィックをロードする //
-BOOL LoadFace(BYTE SurfaceID,BYTE FileNo)
+bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 {
-	if(SurfaceID<0 || SurfaceID>=SURFACE_MAX) return FALSE;
-
-	if(!DATGraphLoad(13+FileNo,SURFACE_ID_FACE0+SurfaceID))		return FALSE;
+	if(FaceID >= FACE_MAX) {
+		return false;
+	}
+	if(!DATGraphLoad((13 + FileNo), (SURFACE_ID_FACE + FaceID))) {
+		return false;
+	}
 
 	// パレットを保存する //
-	GrpGetPalette(FaceData[SurfaceID].pal);
+	GrpGetPalette(FaceData[FaceID].pal);
 
 	return TRUE;
 }

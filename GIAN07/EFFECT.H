@@ -94,6 +94,7 @@ typedef struct tagSCREENEFC_INFO{
 
 
 ///// [ 関数 ] /////
+void MTitleInit(void);	// Registers the music title rectangle
 void SEffectInit(void);	// エフェクトの初期化を行う
 void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
 void StringEffect2(int x, int y, uint32_t point);	// 得点表示エフェクト

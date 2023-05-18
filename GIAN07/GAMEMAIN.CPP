@@ -505,8 +505,10 @@ bool WeaponSelectInit(bool ExStg)
 
 bool GameInit(void(*NextProc)(void))
 {
+	TextObj.Clear();
 	if(NextProc != DemoProc) {
 		Mid_FadeOut(240);
+		MTitleInit();
 	}
 	GrpSetClip(X_MIN, Y_MIN, X_MAX, Y_MAX);
 	GameMain = NextProc;

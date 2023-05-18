@@ -12,6 +12,7 @@ SEFFECT_DATA		SEffect[SEFFECT_MAX];
 CIRCLE_EFC_DATA		CEffect[CIRCLE_EFC_MAX];
 LOCKON_INFO			LockInfo[LOCKON_MAX];
 SCREENEFC_INFO		ScreenInfo;
+TEXTRENDER_RECT_ID	MTitleRect;
 
 static char			MTitleBuf[300] = "";
 
@@ -153,6 +154,11 @@ void CEffectSet(int x, int y, uint8_t type)
 		default:
 		break;
 	}
+}
+
+void MTitleInit(void)
+{
+	MTitleRect = TextObj.Register({ ((X_MAX + 1) - X_MIN), 20 });
 }
 
 // エフェクトの初期化を行う //

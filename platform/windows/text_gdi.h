@@ -8,9 +8,13 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "game/enum_array.h"
+#include "game/text_packed.h"
 #include <windows.h>
 
-template <ENUMARRAY_ID FontID> class TEXTRENDER_GDI {
+template <
+	ENUMARRAY_ID FontID
+> class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
+
 public:
 	const ENUMARRAY<HFONT, FontID>& fonts;
 

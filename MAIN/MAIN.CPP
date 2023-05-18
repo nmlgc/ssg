@@ -257,7 +257,6 @@ BOOL XInit(void)
 		return false;
 	}
 	InitSurface();
-	GrpSetRestoreHook(SEffectRestore);
 
 	// サウンドの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {

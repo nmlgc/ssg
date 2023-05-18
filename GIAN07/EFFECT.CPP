@@ -14,8 +14,6 @@ LOCKON_INFO			LockInfo[LOCKON_MAX];
 SCREENEFC_INFO		ScreenInfo;
 TEXTRENDER_RECT_ID	MTitleRect;
 
-static char			MTitleBuf[300] = "";
-
 
 extern void CircleFadeOut(int x, int y, int r);
 
@@ -231,12 +229,9 @@ void StringEffect3(void)
 }
 
 // 曲名の表示 //
-void SetMusicTitle(int y, char *s)
+void SetMusicTitle(int y, std::string_view s)
 {
-	int			n,len;
-	int			x;
-
-	if(s==NULL) return;
+	int	n;
 
 	// 空きバッファ検索 //
 	for(n=0;n<SEFFECT_MAX;n++){
@@ -245,18 +240,16 @@ void SetMusicTitle(int y, char *s)
 	if(n==SEFFECT_MAX) return;
 
 	// 曲のタイトルが長すぎる場合、どうしましょう？ //
-	strcpy(MTitleBuf,s);
-	len = strlen(s);
-	x   = (640-128-16-9*min(strlen(s),23+1));
+	auto x = (640 - 128 - 16 - (9 * min(s.length(), (23 + 1))));
 
 	SEffect[n].cmd  = SEFC_MTITLE1;
 	SEffect[n].x    = (x<<6);// + (64*2)*16;
 	SEffect[n].y    = y<<6;
 	SEffect[n].time = 64*2;
-	SEffect[n].vx   = len*16;
+	SEffect[n].vx   = (s.length() * 16);
 	SEffect[n].vy   = 16;
 
-	DrawGrdFont(GrText, MTitleBuf);
+	DrawGrdFont(GrText, s);
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
@@ -461,14 +454,6 @@ void SEffectDraw(void)
 			break;
 		}
 	}
-}
-
-// エフェクト用 Restore 処理 //
-bool SEffectRestore(void)
-{
-	DrawGrdFont(GrText, MTitleBuf);
-
-	return TRUE;
 }
 
 // 画面全体に対するエフェクトの初期化 //

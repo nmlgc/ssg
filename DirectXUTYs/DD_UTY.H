@@ -295,7 +295,6 @@ void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていた
 
 void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
 void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
-void GrpSetRestoreHook(bool (*func)(void));	// Restore の事後処理フック
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)

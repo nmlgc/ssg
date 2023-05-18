@@ -20,7 +20,6 @@ static void DM_BB(uint8_t a, uint8_t b);
 static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
 static void DM_PI(WINDOW_POINT *p, int n);
-static bool DM_RESTORE(void);
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // クリッピング枠 //
@@ -79,8 +78,6 @@ void(*GrpCircleA)(int x, int y, int r)              = DM_III;
 void(*GrpPolygonA)(WINDOW_POINT *p, int n)                 = DM_PI;
 void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
-
-static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
 // Templating the functor avoids both the need for #including <functional> and
 // any potential runtime exceptions related to the call.
@@ -353,15 +350,7 @@ bool GRAPHICS_DDRAW::Restore(void)
 		}
 	}
 
-	return RestoreHookFn();
-}
-
-// Restore の事後処理フック //
-void GrpSetRestoreHook(bool(*func)(void))
-{
-	// 安全対策(上を見れば分かるように、NULLチェックがないので...)
-	if(func==NULL) RestoreHookFn = DM_RESTORE;
-	else           RestoreHookFn = func;
+	return true;
 }
 
 std::span<PALETTEENTRY> GRAPHICS_DDRAW::PaletteForDDraw()
@@ -926,12 +915,6 @@ static void DM_BB(uint8_t a, uint8_t b) {}
 static void DM_III(int a, int b, int c) {}
 static void DM_IIII(int a, int b, int c, int d) {}
 static void DM_PI(WINDOW_POINT *p, int n) {}
-
-static bool DM_RESTORE(void)
-{
-	// ダミー関数は確実に成功する //
-	return TRUE;
-}
 
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {

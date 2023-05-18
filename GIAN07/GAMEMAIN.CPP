@@ -146,8 +146,10 @@ void ScoreDraw(void)
 			ScoreString[i].bMoveEnable = FALSE;
 
 		BltSetRect(&src,0,64+32*i,400,32);
-		GrpBlt(&src,ScoreString[i].x>>6, ScoreString[i].y>>6, GrEnemy);
-		//GrpBlt(&src,50+i*24,100+i*48,GrEnemy);
+		GrpBlt(
+			&src, (ScoreString[i].x >> 6), (ScoreString[i].y >> 6), GrNameReg
+		);
+		// GrpBlt(&src, (50 + (i * 24)), (100 + (i * 48), GrNameReg);
 
 		gx = (ScoreString[i].x>>6) + 88;
 		gy = (ScoreString[i].y>>6) + 4;
@@ -174,7 +176,7 @@ void ScoreDraw(void)
 		gx = (ScoreString[i].x>>6) + 224 + 80;
 		gy = (ScoreString[i].y>>6) + 25;
 		BltSetRect(&src, 0, 400+ScoreString[i].Weapon*8, 48, 8);
-		GrpBlt(&src, gx, gy-1, GrEnemy);
+		GrpBlt(&src, gx, gy-1, GrNameReg);
 	}
 }
 
@@ -360,18 +362,18 @@ void NameRegistProc(void)
 
 	GrpUnlock();
 
-	GrpBlt(&src,120,0,GrEnemy);
+	GrpBlt(&src, 120, 0, GrNameReg);
 
 	ScoreDraw();
 
 	// 名前入力用文字列群 //
 	src = { 0, 432, 416, 480 };
-	GrpBlt(&src,112,420,GrEnemy);
+	GrpBlt(&src, 112, 420, GrNameReg);
 
 	// カーソル //
 	if(x>=20 && y==2)	BltSetRect(&src,432,432+((count>>3)<<4),32,16);
 	else				BltSetRect(&src,416,432+((count>>3)<<4),16,16);
-	GrpBlt(&src,112+(x<<4),420+(y<<4),GrEnemy);
+	GrpBlt(&src, (112 + (x << 4)), (420 + (y << 4)), GrNameReg);
 
 	//sprintf(buf,"(%2d,%2d)", x, y);
 	//GrpPut16(0,0,buf);
@@ -695,7 +697,7 @@ void SProjectProc(void)
 	if(IsDraw()){
 		GrpCls();//Ex(NULL, 255);
 
-		GrpBlt(&rc,320-320/2,240+40,GrMap);
+		GrpBlt(&rc, (320 - (320 / 2)), (240 + 40), GrSProject);
 
 		if(timer < 64){
 			if(DxObj.PixelFormat.IsChanneled()){
@@ -1286,8 +1288,8 @@ void TitleProc(void)
 
 	if(IsDraw()){
 		GrpCls();
-		GrpBlt(&src,0,42,GrEnemy);
-		//GrpBlt(&src,320-175,77,GrEnemy);
+		GrpBlt(&src, 0, 42, GrTitle);
+		// GrpBlt(&src, (320 - 175), 77, GrTitle);
 		MWinDraw();
 		CWinDraw(&MainWindow);
 		#ifdef PBG_DEBUG
@@ -1394,10 +1396,10 @@ void MusicRoomProc(void)
 	if(IsDraw()){
 		GrpCls();
 		src = { 0,   0, 640, 392 };
-		GrpBlt(&src,0,0,GrEnemy);
+		GrpBlt(&src, 0, 0, GrMusic);
 
 		src = { 0, 392, 640, 432 };
-		GrpBlt(&src,8,410,GrEnemy);
+		GrpBlt(&src, 8, 410, GrMusic);
 		//GrpDrawSpect(0,480);
 		GrpDrawSpect(352,128);
 		GrpDrawNote();

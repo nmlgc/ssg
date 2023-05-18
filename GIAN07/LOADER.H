@@ -137,6 +137,10 @@ extern SURFACE_DDRAW&	GrMap;	// 背景用
 extern SURFACE_DDRAW&	GrMTitle;	// 曲のタイトル加工用
 extern SURFACE_DDRAW&	GrBomber;	// ボム用グラフィック用
 extern SURFACE_DDRAW&	GrLens;	// レンズエフェクト用
+extern SURFACE_DDRAW&	GrSProject;
+extern SURFACE_DDRAW&	GrTitle;
+extern SURFACE_DDRAW&	GrMusic;
+extern SURFACE_DDRAW&	GrNameReg;
 
 // 顔グラ用
 extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX];

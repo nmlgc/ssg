@@ -863,14 +863,14 @@ void GrpDrawNote(void)
 			if(Mid_NoteWTable[Track][NoteNo]){
 				x = 40 + destX[NoteNo%12] + (NoteNo/12)*28;
 				y =  9 + Track*24;
-				GrpBlt(src2+NoteNo%12,x,y,GrEnemy);
+				GrpBlt((src + (NoteNo % 12)), x, y, GrMusic);
 				Mid_NoteWTable[Track][NoteNo]--;
 			}
 
 			if(Mid_NoteTable[Track][NoteNo]){
 				x = 40 + destX[NoteNo%12] + (NoteNo/12)*28;
 				y =  9 + Track*24;
-				GrpBlt(src+NoteNo%12,x,y,GrEnemy);
+				GrpBlt((src + (NoteNo % 12)), x, y, GrMusic);
 			}
 			if(Mid_PlayTable2[Track][NoteNo]){
 				LevelSum += (Mid_PlayTable2[Track][NoteNo]);
@@ -882,7 +882,7 @@ void GrpDrawNote(void)
 
 		if(num){
 			BltSetRect(&rc,80,456,min(LevelSum/num,96),5);
-			GrpBlt(&rc,240,22+Track*24,GrEnemy);
+			GrpBlt(&rc, 240, (22 + (Track * 24)), GrMusic);
 		}
 	}
 }

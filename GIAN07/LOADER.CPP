@@ -65,12 +65,16 @@ BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
 
 
 // グローバル変数 //
-SURFACE_DDRAW& GrTama   = DxSurf[SURFACE_ID_SYSTEM];	// 弾など
-SURFACE_DDRAW& GrEnemy  = DxSurf[SURFACE_ID_ENEMY];	// 雑魚など
-SURFACE_DDRAW& GrMap    = DxSurf[SURFACE_ID_MAPCHIP];	// 背景
-SURFACE_DDRAW& GrMTitle = DxSurf[SURFACE_ID_MTITLE];	// 曲のタイトル加工用
-SURFACE_DDRAW& GrBomber = DxSurf[SURFACE_ID_BOMBER];	// ボム用グラフィック用
-SURFACE_DDRAW& GrLens   = DxSurf[SURFACE_ID_LENS];	// レンズエフェクト用
+SURFACE_DDRAW& GrTama	= DxSurf[SURFACE_ID_SYSTEM];	// 弾など
+SURFACE_DDRAW& GrEnemy	= DxSurf[SURFACE_ID_ENEMY];	// 雑魚など
+SURFACE_DDRAW& GrMap	= DxSurf[SURFACE_ID_MAPCHIP];	// 背景
+SURFACE_DDRAW& GrMTitle	= DxSurf[SURFACE_ID_MTITLE];	// 曲のタイトル加工用
+SURFACE_DDRAW& GrBomber	= DxSurf[SURFACE_ID_BOMBER];	// ボム用グラフィック用
+SURFACE_DDRAW& GrLens	= DxSurf[SURFACE_ID_LENS];	// レンズエフェクト用
+SURFACE_DDRAW& GrSProject	= DxSurf[SURFACE_ID_SPROJECT];
+SURFACE_DDRAW& GrTitle	= DxSurf[SURFACE_ID_TITLE];
+SURFACE_DDRAW& GrMusic	= DxSurf[SURFACE_ID_MUSIC];
+SURFACE_DDRAW& GrNameReg	= DxSurf[SURFACE_ID_NAMEREG];
 
 extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX] = {
 	{ DxSurf[SURFACE_ID_FACE + 0] },

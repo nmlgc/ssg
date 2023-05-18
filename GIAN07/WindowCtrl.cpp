@@ -407,7 +407,7 @@ static BOOL GrpFnBpp(WORD key)
 				ConfigDat.BitDepth.v = bitdepth_new;
 				InitSurface();
 				//GrpSetPalette(DxObj.pe);
-				LoadPaletteFrom(GrEnemy);
+				LoadPaletteFrom(GrTitle);
 
 				//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 			}

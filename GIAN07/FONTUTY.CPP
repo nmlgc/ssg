@@ -138,10 +138,6 @@ extern void GrpPut57(int x, int y, char *s)
 extern void GrpPut7B(int x, int y, char *s)
 {
 	PIXEL_LTRB	src;
-	int		sx,tx,ty;
-
-	sx = x;
-
 	for(;(*s)!='\0';s++,x+=8){
 		if((*s)>='0' && (*s)<='9'){
 			BltSetRect(&src,(((*s)-'0')<<3)+184,456,7,11);
@@ -156,9 +152,9 @@ extern void GrpPut7B(int x, int y, char *s)
 			continue;
 		}
 
-		tx = x;ty = y;
-		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBltX(&src,tx,ty,GrEnemy);
+		if((x >= 0) && (x < 630)) { // 安全対策???
+			GrpBltX(&src, x, y, GrMusic);
+		}
 	}
 }
 
@@ -197,11 +193,11 @@ extern void GrpPutMidNum(int x, int y, int n)
 	for(i=0;i<3;i++,x+=5){
 		if(buf[i]>='0' && buf[i]<='9'){
 			BltSetRect(&src,80+(buf[i]-'0')*4,432,4,5);
-			GrpBlt(&src,x,y,GrEnemy);
+			GrpBlt(&src, x, y, GrMusic);
 		}
 		if(buf[i]=='-'){
 			BltSetRect(&src,80+10*4,432,4,5);
-			GrpBlt(&src,x,y,GrEnemy);
+			GrpBlt(&src, x, y, GrMusic);
 		}
 	}
 }

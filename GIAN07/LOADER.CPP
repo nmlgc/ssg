@@ -133,7 +133,7 @@ BOOL InitSurface(void)
 //	bIsBombPalette = FALSE;
 
 	if(
-		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_TEXT, { 640, 20 }) ||
+		!DxObj.SurfaceCreateBlank(SURFACE_ID_TEXT, { 640, 20 }) ||
 		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_LENS, { 140, 140 })
 	) {
 		return false;

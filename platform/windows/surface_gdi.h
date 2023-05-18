@@ -13,12 +13,11 @@
 #include <windows.h>
 
 class SURFACE_GDI : public SURFACE {
-private:
+public:
 	// Required for unselecting [img] prior to deleting it. Could have probably
 	// been `static`, but let's keep it correct for now.
 	HGDIOBJ stock_img;
 
-public:
 	// Source bitmap data, if any.
 	HBITMAP img = nullptr;
 

@@ -6,6 +6,7 @@
 #include "DD_UTY.H"
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
+#include <assert.h>
 #include <d3d.h>
 #include <stdio.h>
 #pragma message(PBGWIN_DD_UTY_H)
@@ -426,6 +427,38 @@ bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size)
 	DxSurf[surf_id].size = size;
 	DxSurf[surf_id].surf = temp;
 	return true;
+}
+
+bool GRAPHICS_DDRAW::SurfaceCreateBlank(BYTE surf_id, PIXEL_SIZE size)
+{
+	auto& surf = DxSurf[surf_id];
+
+	surf.Delete();
+
+	if(
+		!size ||
+		(size.w > (std::numeric_limits<int32_t>::max)()) ||
+		(size.h > (std::numeric_limits<int32_t>::max)())
+	) {
+		assert(!"Invalid size for blank surface");
+		return false;
+	}
+
+	HDC reference_dc;
+	if(Back->GetDC(&reference_dc) != DD_OK) {
+		return false;
+	}
+
+	// This *MUST* be a compatible bitmap. You do *NOT* want to blit a 24-bit
+	// GDI image onto an 8-bit DirectDraw surface, and work around all of GDI's
+	// undocumented palette color matching quirks.
+	surf.img = CreateCompatibleBitmap(reference_dc, size.w, size.h);
+
+	if((Back->ReleaseDC(reference_dc) != DD_OK) || !surf.img) {
+		return false;
+	}
+	surf.stock_img = SelectObject(surf.dc, surf.img);
+	return SurfaceCreateUninitialized(surf_id, size);
 }
 
 bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)

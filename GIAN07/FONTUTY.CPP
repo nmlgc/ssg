@@ -261,53 +261,51 @@ TEXTRENDER_GDI<SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
 
 void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
 {
-	HDC			hdc;
-	int			j;
-	DWORD		temp,old;
+	DxObj.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 });
+	DxObj.SurfaceEdit(surf, [&str](auto hdc, const PIXEL_LTWH& rect) {
+		// The MIDI sequence titles passed to this function tend to come with
+		// lots of trailing whitespace. Adding 1 also turns `npos` to 0.
+		str = str.substr(0, (str.find_last_not_of(" ") + 1));
 
-	// The MIDI sequence titles passed to this function tend to come with lots
-	// of trailing whitespace. Adding 1 also turns `npos` to 0.
-	str = str.substr(0, (str.find_last_not_of(" ") + 1));
+		// Since we render the string multiple times on top of each other, we
+		// can't rely on SetBkMode(hdc, OPAQUE) for clearing the bitmap. The
+		// text might also be smaller than the one we rendered previously.
+		const PIXEL_LTRB ltrb = rect;
+		const RECT full = { ltrb.left, ltrb.top, ltrb.right, ltrb.bottom };
+		FillRect(
+			hdc, &full, reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH))
+		);
 
-	DDCOLORKEY key = { RGB(0x00, 0x00, 0x00), RGB(0x00, 0x00, 0x00) };
-	surf.surf->SetColorKey(DDCKEY_SRCBLT, &key);
+		// ここら辺は、一種の常套手段か？ //
+		const auto old = GetPixel(hdc, 0, 0);
+		SetPixel(hdc, 0, 0, RGB(255, 255, 255));
+		const auto temp = GetPixel(hdc, 0, 0);
+		SetPixel(hdc, 0, 0, old);
 
-	surf.surf->GetDC(&hdc);
+		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]);
+		SetBkMode(hdc,TRANSPARENT);
 
-	// Since we render the string multiple times on top of each other, we can't
-	// rely on SetBkMode(hdc, OPAQUE) for clearing the bitmap. The text might
-	// also be smaller than the one we rendered previously.
-	const RECT full = { 0, 0, surf.size.w, surf.size.h };
-	FillRect(hdc, &full, reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)));
+		SetTextColor(hdc, RGB(0, 0, 128));
+		TextOut(hdc, 2, 2, str.data(), str.size());
+		TextOut(hdc, 1, 2, str.data(), str.size());
+		SetTextColor(hdc, RGB(255, 255, 255));
+		TextOut(hdc, 1, 1, str.data(), str.size());
+		TextOut(hdc, 0, 1, str.data(), str.size());
 
-	// ここら辺は、一種の常套手段か？ //
-	old = GetPixel(hdc,0,0);
-	SetPixel(hdc,0,0,RGB(255,255,255));
-	temp = GetPixel(hdc,0,0);
-	SetPixel(hdc,0,0,old);
-
-	auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]);
-	SetBkMode(hdc,TRANSPARENT);
-
-	SetTextColor(hdc, RGB(0, 0, 128));
-	TextOut(hdc, 2, 2, str.data(), str.size());
-	TextOut(hdc, 1, 2, str.data(), str.size());
-	SetTextColor(hdc, RGB(255, 255, 255));
-	TextOut(hdc, 1, 1, str.data(), str.size());
-	TextOut(hdc, 0, 1, str.data(), str.size());
-
-#define FSIZE 8
-	//COLORREF temp = GetPixel(hdc,0,0);
-	const PIXEL_COORD w = (str.size() * 16);
-	for(PIXEL_COORD i = 1; i < w; i++) {
-		for(auto j = 1; j < 16; j++) {
-			if(GetPixel(hdc,i,j)==temp)//RGB(255,255,255))
-				SetPixel(hdc,i,j,RGB(255+FSIZE-j*FSIZE,255+FSIZE-j*FSIZE,255));
+		constexpr auto FSIZE = 8;
+		const PIXEL_COORD w = (str.size() * 16);
+		for(auto y = 1; y < 16; y++) {
+			const auto gradient = (255 + FSIZE - (y * FSIZE));
+			const COLORREF color = RGB(gradient, gradient, 255);
+			for(PIXEL_COORD x = 1; x < w; x++) {
+				if(GetPixel(hdc, x, y) == temp) { // RGB(255, 255, 255)
+					SetPixel(hdc, x, y, color);
+				}
+			}
 		}
-	}
-
-	SelectObject(hdc,oldfont);
-	surf.surf->ReleaseDC(hdc);
+		SelectObject(hdc,oldfont);
+		return true;
+	});
 }
 
 

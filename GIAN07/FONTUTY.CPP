@@ -255,7 +255,9 @@ struct GDI_FONTS {
 };
 GDI_FONTS GDIFonts;
 
-TEXTRENDER_GDI<GIAN_FONT_ID> TextObj = { GDIFonts.fonts };
+TEXTRENDER_GDI<SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
+	GrText, GDIFonts.fonts
+};
 
 void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
 {

@@ -256,7 +256,7 @@ void SetMusicTitle(int y, char *s)
 	SEffect[n].vx   = len*16;
 	SEffect[n].vy   = 16;
 
-	DrawGrdFont(GrMTitle, MTitleBuf);
+	DrawGrdFont(GrText, MTitleBuf);
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
@@ -415,8 +415,14 @@ void SEffectDraw(void)
 				for(j=0;j<e->vx;j++){
 					src = { j, 0, (j + 1), e->vy };
 					temp = sinl(degx,100);
+					const auto y = (
+						(e->y >> 6) - sinl((degx + j), degx /*40*/)
+					);
 					for(k=0;k<2;k++){
-						GrpBlt(&src,(e->x>>6)+sinl(degx+j/2,temp)+j+k,(e->y>>6)-sinl(degx+j,degx/*40*/),GrMTitle);
+						const auto x = (
+							(e->x >> 6) + sinl((degx + (j / 2)), temp) + j + k
+						);
+						GrpBlt(&src, x, y, GrText);
 					}
 				}
 			break;
@@ -426,8 +432,14 @@ void SEffectDraw(void)
 				for(j=0;j<e->vx;j++){
 					src = { j, 0, (j + 1), e->vy };
 					temp = sinl(degx,160);
+					const auto y = (
+						(e->y >> 6) - sinl((degx + j), degx /*40*/)
+					);
 					for(k=0;k<2;k++){
-						GrpBlt(&src,(e->x>>6)+sinl(degx+j/2,temp)+j+k,(e->y>>6)-sinl(degx+j,degx/*40*/),GrMTitle);
+						const auto x = (
+							(e->x >> 6) + sinl((degx + (j / 2)), temp) + j + k
+						);
+						GrpBlt(&src, x, y, GrText);
 					}
 				}
 			break;
@@ -442,7 +454,7 @@ void SEffectDraw(void)
 				}
 				GrpUnlock();
 				src = { 0, 0, e->vx, e->vy };
-				GrpBlt(&src,e->x>>6,e->y>>6,GrMTitle);
+				GrpBlt(&src, (e->x >> 6), (e->y >> 6), GrText);
 			break;
 
 			case(SEFC_NONE):default:
@@ -454,7 +466,7 @@ void SEffectDraw(void)
 // エフェクト用 Restore 処理 //
 bool SEffectRestore(void)
 {
-	DrawGrdFont(GrMTitle,MTitleBuf);
+	DrawGrdFont(GrText, MTitleBuf);
 
 	return TRUE;
 }

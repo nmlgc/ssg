@@ -70,10 +70,10 @@ BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
 
 
 // グローバル変数 //
+SURFACE_DDRAW& GrText	= DxSurf[SURFACE_ID_TEXT];	// 曲のタイトル加工用
 SURFACE_DDRAW& GrTama	= DxSurf[SURFACE_ID_SYSTEM];	// 弾など
 SURFACE_DDRAW& GrEnemy	= DxSurf[SURFACE_ID_ENEMY];	// 雑魚など
 SURFACE_DDRAW& GrMap	= DxSurf[SURFACE_ID_MAPCHIP];	// 背景
-SURFACE_DDRAW& GrMTitle	= DxSurf[SURFACE_ID_MTITLE];	// 曲のタイトル加工用
 SURFACE_DDRAW& GrBomber	= DxSurf[SURFACE_ID_BOMBER];	// ボム用グラフィック用
 SURFACE_DDRAW& GrLens	= DxSurf[SURFACE_ID_LENS];	// レンズエフェクト用
 SURFACE_DDRAW& GrSProject	= DxSurf[SURFACE_ID_SPROJECT];
@@ -133,7 +133,7 @@ BOOL InitSurface(void)
 //	bIsBombPalette = FALSE;
 
 	if(
-		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_MTITLE, { 640, 20 }) ||
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_TEXT, { 640, 20 }) ||
 		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_LENS, { 140, 140 })
 	) {
 		return false;

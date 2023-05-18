@@ -12,14 +12,15 @@
 #include <windows.h>
 
 template <
-	ENUMARRAY_ID FontID
+	class Surface, ENUMARRAY_ID FontID
 > class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
+	Surface& surf;
 
 public:
 	const ENUMARRAY<HFONT, FontID>& fonts;
 
 	// Can share the font array with other GDI renderers.
-	TEXTRENDER_GDI(const decltype(fonts)& fonts) :
-		fonts(fonts) {
+	TEXTRENDER_GDI(Surface& surf, const decltype(fonts)& fonts) :
+		surf(surf), fonts(fonts) {
 	}
 };

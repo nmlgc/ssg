@@ -46,7 +46,8 @@ enum class GIAN_FONT_ID : uint8_t {
 	COUNT,
 };
 
-extern TEXTRENDER_GDI<GIAN_FONT_ID> TextObj;
+struct SURFACE_DDRAW;
+extern TEXTRENDER_GDI<SURFACE_DDRAW, GIAN_FONT_ID> TextObj;
 
 
 

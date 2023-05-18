@@ -121,26 +121,30 @@ enum GIAN_SURFACE_ID {
 	// In-game
 	SURFACE_ID_MAPCHIP = 1,	// 背景用
 	SURFACE_ID_ENEMY = 2,	// 敵(雑魚＆ボス)用
-	SURFACE_ID_MTITLE,	// 曲のタイトル加工用
 	SURFACE_ID_FACE,	// 顔グラ用
 	SURFACE_ID_FACE_last = (SURFACE_ID_FACE + FACE_MAX - 1),
 	SURFACE_ID_BOMBER,	// ボム用グラフィック用
 
 	// Splash screen
 	SURFACE_ID_SPROJECT = 1,	// 西方Project表示用
-	SURFACE_ID_LENS = 8,	// レンズエフェクト用
+	SURFACE_ID_LENS = 7,	// レンズエフェクト用
+
+	// Rendered text. Since this one is procedurally generated and therefore
+	// doesn't have a palette, it must come last to ensure that DirectDraw
+	// initializes it with the implicit palette loaded for an earlier surface.
+	SURFACE_ID_TEXT,
 };
 
 extern SURFACE_DDRAW&	GrTama;	// システム用
 extern SURFACE_DDRAW&	GrEnemy;	// 敵(雑魚＆ボス)用
 extern SURFACE_DDRAW&	GrMap;	// 背景用
-extern SURFACE_DDRAW&	GrMTitle;	// 曲のタイトル加工用
 extern SURFACE_DDRAW&	GrBomber;	// ボム用グラフィック用
 extern SURFACE_DDRAW&	GrLens;	// レンズエフェクト用
 extern SURFACE_DDRAW&	GrSProject;
 extern SURFACE_DDRAW&	GrTitle;
 extern SURFACE_DDRAW&	GrMusic;
 extern SURFACE_DDRAW&	GrNameReg;
+extern SURFACE_DDRAW&	GrText;
 
 // 顔グラ用
 extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX];

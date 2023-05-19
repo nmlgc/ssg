@@ -46,9 +46,9 @@ enum class GIAN_FONT_ID : uint8_t {
 	COUNT,
 };
 
+struct GRAPHICS_DDRAW;
 struct SURFACE_DDRAW;
-extern TEXTRENDER_GDI<SURFACE_DDRAW, GIAN_FONT_ID> TextObj;
-
+extern TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj;
 
 
 
@@ -64,7 +64,7 @@ extern void GrpPutScore(int x, int y, char *s);	// 得点アイテムのスコ�
 extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画する
 
 // グラデーション付きフォントを描画する
-void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str);
+void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, std::string_view str);
 
 ExtraFontInfo *CreateExtraFont(SURFACE_DDRAW& Surface, PIXEL_LTRB *pSrc);	// フォント生成
 void DeleteExtraFont(ExtraFontInfo *pFont);							// フォント削除

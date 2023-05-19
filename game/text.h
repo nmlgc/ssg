@@ -6,12 +6,22 @@
 #pragma once
 
 #include "game/coords.h"
+#include "game/enum_array.h"
+#include "game/graphics.h"
 #include <optional>
+#include <string_view>
 
 using TEXTRENDER_RECT_ID = unsigned int;
 
 // Concept for a text rendering backend.
-template <class T> concept TEXTRENDER = requires(T t, PIXEL_SIZE size) {
+template <class T> concept TEXTRENDER = requires(
+	T t,
+	PIXEL_SIZE size,
+	WINDOW_POINT dst,
+	TEXTRENDER_RECT_ID rect_id,
+	auto func,
+	std::optional<PIXEL_LTWH> subrect
+) {
 	// Rectangle management
 	// --------------------
 
@@ -26,4 +36,12 @@ template <class T> concept TEXTRENDER = requires(T t, PIXEL_SIZE size) {
 	// Invalidates all registered text rectangles.
 	t.Clear();
 	// --------------------
+
+	// Retained interface
+	// ------------------
+	// Explicit prerendering with later blitting.
+
+	{ t.Prerender(rect_id, func) } -> std::same_as<bool>;
+	t.Blit(dst, rect_id, subrect);
+	// ------------------
 };

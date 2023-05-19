@@ -27,6 +27,10 @@ protected:
 	PIXEL_LTWH Insert(const PIXEL_SIZE& subrect_size);
 
 public:
+	PIXEL_LTWH Subrect(
+		TEXTRENDER_RECT_ID rect_id, std::optional<PIXEL_LTWH> maybe_subrect
+	);
+
 	TEXTRENDER_RECT_ID Register(const PIXEL_SIZE& size);
 
 	// Resets both bounds and empty spaces.

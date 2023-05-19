@@ -160,6 +160,20 @@ PIXEL_LTWH TEXTRENDER_PACKED::Insert(const PIXEL_SIZE& subrect_size)
 	return Insert(subrect_size);
 }
 
+PIXEL_LTWH TEXTRENDER_PACKED::Subrect(
+	TEXTRENDER_RECT_ID rect_id, std::optional<PIXEL_LTWH> maybe_subrect
+) {
+	assert(rect_id < rects.size());
+	auto ret = rects[rect_id];
+	if(maybe_subrect) {
+		const auto& subrect = maybe_subrect.value();
+		ret.left += subrect.left;
+		ret.top += subrect.top;
+		ret.w = (std::min)(subrect.w, ret.w);
+		ret.h = (std::min)(subrect.h, ret.h);
+	}
+	return ret;
+}
 
 TEXTRENDER_RECT_ID TEXTRENDER_PACKED::Register(const PIXEL_SIZE& size)
 {

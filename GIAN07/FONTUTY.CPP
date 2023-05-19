@@ -255,14 +255,13 @@ struct GDI_FONTS {
 };
 GDI_FONTS GDIFonts;
 
-TEXTRENDER_GDI<SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
-	GrText, GDIFonts.fonts
+TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
+	DxObj, GrText, GDIFonts.fonts
 };
 
-void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
+void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, std::string_view str)
 {
-	DxObj.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 });
-	DxObj.SurfaceEdit(surf, [&str](auto hdc, const PIXEL_LTWH& rect) {
+	TextObj.Prerender(rect_id, [&str](auto hdc, auto rect) {
 		// The MIDI sequence titles passed to this function tend to come with
 		// lots of trailing whitespace. Adding 1 also turns `npos` to 0.
 		str = str.substr(0, (str.find_last_not_of(" ") + 1));
@@ -286,18 +285,19 @@ void DrawGrdFont(SURFACE_DDRAW& surf, std::string_view str)
 		SetBkMode(hdc,TRANSPARENT);
 
 		SetTextColor(hdc, RGB(0, 0, 128));
-		TextOut(hdc, 2, 2, str.data(), str.size());
-		TextOut(hdc, 1, 2, str.data(), str.size());
+		TextOut(hdc, (rect.left + 2), (rect.top + 2), str.data(), str.size());
+		TextOut(hdc, (rect.left + 1), (rect.top + 2), str.data(), str.size());
 		SetTextColor(hdc, RGB(255, 255, 255));
-		TextOut(hdc, 1, 1, str.data(), str.size());
-		TextOut(hdc, 0, 1, str.data(), str.size());
+		TextOut(hdc, (rect.left + 1), (rect.top + 1), str.data(), str.size());
+		TextOut(hdc, (rect.left + 0), (rect.top + 1), str.data(), str.size());
 
 		constexpr auto FSIZE = 8;
 		const PIXEL_COORD w = (str.size() * 16);
-		for(auto y = 1; y < 16; y++) {
+		const PIXEL_COORD h = 16;
+		for(auto y = (rect.top + 1); y < (rect.top + h); y++) {
 			const auto gradient = (255 + FSIZE - (y * FSIZE));
 			const COLORREF color = RGB(gradient, gradient, 255);
-			for(PIXEL_COORD x = 1; x < w; x++) {
+			for(auto x = (rect.left + 1); x < (rect.left + w); x++) {
 				if(GetPixel(hdc, x, y) == temp) { // RGB(255, 255, 255)
 					SetPixel(hdc, x, y, color);
 				}

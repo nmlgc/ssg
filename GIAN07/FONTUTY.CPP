@@ -261,50 +261,35 @@ TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
 
 void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, std::string_view str)
 {
-	TextObj.Prerender(rect_id, [&str](auto hdc, auto rect) {
+	TextObj.Prerender(rect_id, [&str](GIAN_TEXTRENDER_SESSION auto& s) {
 		// The MIDI sequence titles passed to this function tend to come with
 		// lots of trailing whitespace. Adding 1 also turns `npos` to 0.
 		str = str.substr(0, (str.find_last_not_of(" ") + 1));
 
-		// Since we render the string multiple times on top of each other, we
-		// can't rely on SetBkMode(hdc, OPAQUE) for clearing the bitmap. The
-		// text might also be smaller than the one we rendered previously.
-		const PIXEL_LTRB ltrb = rect;
-		const RECT full = { ltrb.left, ltrb.top, ltrb.right, ltrb.bottom };
-		FillRect(
-			hdc, &full, reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH))
-		);
-
 		// ここら辺は、一種の常套手段か？ //
-		const auto old = GetPixel(hdc, 0, 0);
-		SetPixel(hdc, 0, 0, RGB(255, 255, 255));
-		const auto temp = GetPixel(hdc, 0, 0);
-		SetPixel(hdc, 0, 0, old);
+		const auto old = GetPixel(s.hdc, 0, 0);
+		SetPixel(s.hdc, 0, 0, RGB(255, 255, 255));
+		const auto temp = GetPixel(s.hdc, 0, 0);
+		SetPixel(s.hdc, 0, 0, old);
 
-		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]);
-		SetBkMode(hdc,TRANSPARENT);
-
-		SetTextColor(hdc, RGB(0, 0, 128));
-		TextOut(hdc, (rect.left + 2), (rect.top + 2), str.data(), str.size());
-		TextOut(hdc, (rect.left + 1), (rect.top + 2), str.data(), str.size());
-		SetTextColor(hdc, RGB(255, 255, 255));
-		TextOut(hdc, (rect.left + 1), (rect.top + 1), str.data(), str.size());
-		TextOut(hdc, (rect.left + 0), (rect.top + 1), str.data(), str.size());
+		s.SetFont(GIAN_FONT_ID::NORMAL);
+		s.Put({ 2, 2 }, str, RGBA{   0,   0, 128 });
+		s.Put({ 1, 2 }, str, RGBA{   0,   0, 128 });
+		s.Put({ 1, 1 }, str, RGBA{ 255, 255, 255 });
+		s.Put({ 0, 1 }, str, RGBA{ 255, 255, 255 });
 
 		constexpr auto FSIZE = 8;
 		const PIXEL_COORD w = (str.size() * 16);
 		const PIXEL_COORD h = 16;
-		for(auto y = (rect.top + 1); y < (rect.top + h); y++) {
+		for(auto y = (s.rect.top + 1); y < (s.rect.top + h); y++) {
 			const auto gradient = (255 + FSIZE - (y * FSIZE));
 			const COLORREF color = RGB(gradient, gradient, 255);
-			for(auto x = (rect.left + 1); x < (rect.left + w); x++) {
-				if(GetPixel(hdc, x, y) == temp) { // RGB(255, 255, 255)
-					SetPixel(hdc, x, y, color);
+			for(auto x = (s.rect.left + 1); x < (s.rect.left + w); x++) {
+				if(GetPixel(s.hdc, x, y) == temp) { // RGB(255, 255, 255)
+					SetPixel(s.hdc, x, y, color);
 				}
 			}
 		}
-		SelectObject(hdc,oldfont);
-		return true;
 	});
 }
 

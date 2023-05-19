@@ -13,13 +13,46 @@
 
 using TEXTRENDER_RECT_ID = unsigned int;
 
+// Concept for a text render session on a single rectangle, abstracting away
+// the rasterizer.
+template <class T, class FontID> concept TEXTRENDER_SESSION = (
+	ENUMARRAY_ID<FontID> && requires (
+		T t,
+		PIXEL_POINT topleft_rel,
+		std::string_view str,
+		RGBA color,
+		FontID font
+	) {
+		t.SetFont(font);
+		t.SetColor(color);
+
+		// Text display with the current color and font.
+		t.Put(topleft_rel, str);
+
+		// Convenience overload to change the color before rendering the text.
+		// (Not adding one for the font, since the ID is templated. This
+		// allows Put() to be fully implemented within a type-erased base
+		// class.)
+		t.Put(topleft_rel, str, color);
+	}
+);
+
+// Concept that describes valid text rendering session functors in game code.
+template <typename F, class Session, class FontID>
+concept TEXTRENDER_SESSION_FUNC = (
+	TEXTRENDER_SESSION<Session, FontID> &&
+	requires(F f, Session& s) {
+		{ f(s) };
+	}
+);
+
 // Concept for a text rendering backend.
-template <class T> concept TEXTRENDER = requires(
+template <class T, class Session, class FontID> concept TEXTRENDER = requires(
 	T t,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
 	TEXTRENDER_RECT_ID rect_id,
-	auto func,
+	TEXTRENDER_SESSION_FUNC<Session, FontID> auto func,
 	std::optional<PIXEL_LTWH> subrect
 ) {
 	// Rectangle management

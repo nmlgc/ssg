@@ -5,12 +5,45 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-
 #include "game/enum_array.h"
 #include "game/text_packed.h"
 #include <assert.h>
+#include <span>
+
+// Only required for the HDC, HFONT, and HGDIOBJ types, which are basically
+// void*.
 #include <windows.h>
+
+// Un-templated session code
+class TEXTRENDER_GDI_SESSION_BASE {
+protected:
+	const std::span<HFONT> fonts;
+
+	// HFONT would require a cast of the value returned from SelectObject().
+	std::optional<HGDIOBJ> font_initial = std::nullopt;
+
+	// A COLORREF created with the RGB macro always has 0x00 in the topmost 8
+	// bits.
+	uint32_t color_cur = -1;
+
+	void SetFont(size_t id);
+
+public:
+	const PIXEL_LTWH rect;
+	HDC hdc;
+
+	void SetColor(const RGBA& color);
+	void Put(
+		const PIXEL_POINT& topleft_rel,
+		std::string_view str,
+		std::optional<RGBA> color = std::nullopt
+	);
+
+	TEXTRENDER_GDI_SESSION_BASE(
+		const PIXEL_LTWH& rect, HDC hdc, const std::span<HFONT> fonts
+	);
+	~TEXTRENDER_GDI_SESSION_BASE();
+};
 
 template <
 	class Graphics, class Surface, ENUMARRAY_ID FontID
@@ -18,13 +51,31 @@ template <
 	Graphics& graphics;
 	Surface& surf;
 
+	class SESSION : public TEXTRENDER_GDI_SESSION_BASE {
+		FontID font_cur = FontID::COUNT;
+
+	public:
+		using TEXTRENDER_GDI_SESSION_BASE::TEXTRENDER_GDI_SESSION_BASE;
+
+		void SetFont(FontID font) {
+			if(font_cur != font) {
+				TEXTRENDER_GDI_SESSION_BASE::SetFont(size_t(font));
+				font_cur = font;
+			}
+		}
+	};
+
 	// Common rendering preparation code.
-	std::optional<PIXEL_LTWH> PreparePrerender(TEXTRENDER_RECT_ID rect_id) {
+	std::optional<SESSION> PreparePrerender(TEXTRENDER_RECT_ID rect_id) {
 		if(!graphics.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 })) {
 			return std::nullopt;
 		}
 		assert(rect_id < rects.size());
-		return rects[rect_id];
+		return SESSION{
+			rects[rect_id],
+			surf.dc,
+			std::span<HFONT>{ fonts.data(), fonts.size() }
+		};
 	}
 
 public:
@@ -35,12 +86,19 @@ public:
 		graphics(graphics), surf(surf), fonts(fonts) {
 	}
 
-	bool Prerender(TEXTRENDER_RECT_ID rect_id, auto func) {
-		auto maybe_rect = PreparePrerender(rect_id);
-		if(!maybe_rect) {
+	bool Prerender(
+		TEXTRENDER_RECT_ID rect_id,
+		TEXTRENDER_SESSION_FUNC<SESSION, FontID> auto func
+	) {
+		auto maybe_session = PreparePrerender(rect_id);
+		if(!maybe_session) {
 			return false;
 		}
-		return graphics.SurfaceEdit(surf, func, maybe_rect.value());
+		auto& session = maybe_session.value();
+		return graphics.SurfaceEdit(surf, [&session, func](auto, auto) {
+			func(std::ref(session).get());
+			return true;
+		}, session.rect);
 	}
 
 	bool Blit(

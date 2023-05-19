@@ -65,9 +65,16 @@ template <
 		}
 	};
 
+	bool Wipe() {
+		return (
+			graphics.SurfaceCreateBlank(surf, bounds) &&
+			graphics.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 })
+		);
+	}
+
 	// Common rendering preparation code.
 	std::optional<SESSION> PreparePrerender(TEXTRENDER_RECT_ID rect_id) {
-		if(!graphics.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 })) {
+		if((surf.size != bounds) && !Wipe()) {
 			return std::nullopt;
 		}
 		assert(rect_id < rects.size());

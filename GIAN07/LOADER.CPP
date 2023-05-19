@@ -132,10 +132,7 @@ BOOL InitSurface(void)
 {
 //	bIsBombPalette = FALSE;
 
-	if(
-		!DxObj.SurfaceCreateBlank(GrText, { 640, 20 }) ||
-		!DxObj.SurfaceCreateUninitialized(GrLens, { 140, 140 })
-	) {
+	if(!DxObj.SurfaceCreateUninitialized(GrLens, { 140, 140 })) {
 		return false;
 	}
 

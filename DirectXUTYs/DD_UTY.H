@@ -236,6 +236,13 @@ public:
 		);
 		return (func(surf.dc, r) && SurfaceUpdateFromGDI(surf, r));
 	}
+
+	// Blits the given [src] rectangle inside [surf] to the given top-left
+	// point on the back buffer, while clipping the destination rectangle to
+	// the clipping area. Returns `true` if any part of the sprite was blitted.
+	bool SurfaceBlit(
+		WINDOW_POINT topleft, SURFACE_DDRAW& surf, PIXEL_LTRB& src
+	);
 	// --------------------------- //
 };
 

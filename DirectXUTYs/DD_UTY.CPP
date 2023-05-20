@@ -478,6 +478,13 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col)
 	);
 }
 
+bool GRAPHICS_DDRAW::SurfaceBlit(
+	WINDOW_POINT topleft, SURFACE_DDRAW& surf, PIXEL_LTRB& src
+)
+{
+	return GrpBlt(&src, topleft.x, topleft.y, surf);
+}
+
 void GrpCls(void)
 {
 	return GrpClsEx(

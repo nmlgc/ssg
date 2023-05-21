@@ -8,7 +8,6 @@
 #include "GIAN.H"
 #include "LOADER.H"
 #include "DirectXUTYs/PBGMIDI.H"
-#include <ddraw.h>
 
 
 typedef struct tagEndingGrpInfo {
@@ -40,8 +39,12 @@ typedef struct tagEndingStTask{
 } EndingStTask;
 
 typedef struct tagEndingText {
-	char	*Text[10];		// 表示するテキストへのポインタ
+	std::string_view Text[10];	// 表示するテキストへのポインタ
 	int		NumText;		// 現在格納されているテキストの数
+	TEXTRENDER_RECT_ID Rect;
+	bool Rerender;
+
+	void Prerender();
 } EndingText;
 
 
@@ -62,7 +65,6 @@ void UpdateStfInfo();		// スタッフの更新(内部データ)
 
 void DrawGrpInfo();		// グラフィックの描画
 void DrawStfInfo();		// スタッフの描画
-void DrawTextInfo();	// テキストの描画
 
 void DrawFadeInfo();	// フェードＩＯ情報の反映
 
@@ -121,7 +123,10 @@ bool EndingInit(void)
 	EGrpInfo.bWantDisp = FALSE;
 	EStfTask.bWantDisp = FALSE;
 
+	TextObj.Clear();
 	EText.NumText = 0;
+	EText.Rect = TextObj.Register({ 640, 131 });
+	EText.Rerender = true;
 
 	for(i=0; i<7; i++){
 		pFontInfo[i] = CreateExtraFont(GrEndingCredits, &src[i]);
@@ -188,7 +193,11 @@ void EndingDraw(void)
 	// それぞれのグラフィックを描画するで //
 	DrawGrpInfo();
 	DrawStfInfo();
-	DrawTextInfo();
+	if(EText.Rerender) {
+		EText.Prerender();
+		EText.Rerender = false;
+	}
+	TextObj.Blit({ 0, 349 }, EText.Rect);
 
 	// フェード情報の反映ぢゃ //
 	DrawFadeInfo();
@@ -280,38 +289,31 @@ void DrawStfInfo()
 
 
 // テキストの描画 //
-void DrawTextInfo()
+void EndingText::Prerender()
 {
-	int			i, max = 0;
-	int			dx;
-	HDC			hdc;
+	TextObj.Prerender(Rect, [this](GIAN_TEXTRENDER_SESSION auto& s) {
+		int max = 0;
 
-	for(i=0; i<EText.NumText; i++){
-		if(max < strlen(EText.Text[i])) max = strlen(EText.Text[i]);
-	}
-
-	dx = 8 * (39-max/2);
-
-	if(DxObj.Back->GetDC(&hdc) == DD_OK){
-		SetBkMode(hdc, TRANSPARENT);
-		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]);
-
-		SetTextColor(hdc, RGB(128, 128, 128));
-		for(i=0; i<EText.NumText; i++){
-			TextOut(hdc, dx+21, 360-10+i*25, EText.Text[i], strlen(EText.Text[i]));
-			TextOut(hdc, dx+19, 360-10+i*25, EText.Text[i], strlen(EText.Text[i]));
-			TextOut(hdc, dx+20, 359-10+i*25, EText.Text[i], strlen(EText.Text[i]));
-			TextOut(hdc, dx+20, 361-10+i*25, EText.Text[i], strlen(EText.Text[i]));
+		for(decltype(NumText) i = 0; i < NumText; i++) {
+			max = (std::max)(max, static_cast<int>(Text[i].size()));
 		}
 
-		SetTextColor(hdc, RGB(255, 255, 255));
-		for(i=0; i<EText.NumText; i++){
-			TextOut(hdc, dx+20, 360-10+i*25, EText.Text[i], strlen(EText.Text[i]));
+		const auto dx = (8 * (39 - (max / 2)));
+
+		s.SetFont(GIAN_FONT_ID::NORMAL);
+		s.SetColor({ 128, 128, 128 });
+		for(decltype(NumText) i = 0; i < NumText; i++) {
+			s.Put({ (dx + 21), (1 + (i * 25)) }, Text[i]);
+			s.Put({ (dx + 19), (1 + (i * 25)) }, Text[i]);
+			s.Put({ (dx + 20), (0 + (i * 25)) }, Text[i]);
+			s.Put({ (dx + 20), (2 + (i * 25)) }, Text[i]);
 		}
 
-		SelectObject(hdc, oldfont);
-		DxObj.Back->ReleaseDC(hdc);
-	}
+		s.SetColor({ 255, 255, 255 });
+		for(decltype(NumText) i = 0; i < NumText; i++) {
+			s.Put({ (dx + 20), (1 + (i * 25)) }, Text[i]);
+		}
+	});
 }
 
 
@@ -396,6 +398,7 @@ void EndingSCLDecode()
 
 			case(SCL_MSG):		// メッセージを出力する
 				EText.Text[EText.NumText++] = (char *)cmd+1;
+				EText.Rerender = true;
 				SCL_Now += (strlen((char *)cmd+1)+2);
 			break;
 
@@ -479,6 +482,7 @@ void EndingSCLDecode()
 
 			case(SCL_NPG):		// 新しいページに変更する
 				EText.NumText = 0;
+				EText.Rerender = true;
 				SCL_Now++;
 			break;
 

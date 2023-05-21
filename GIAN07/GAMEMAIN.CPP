@@ -18,7 +18,6 @@
 
 extern HWND hWndMain;
 DWORD		DrawCount = 0;
-char		*MidiTitle;
 DWORD		MidiPlayID = 0;
 char		MidiTempo  = 0;
 DWORD		DemoTimer  = 0;
@@ -777,7 +776,6 @@ extern bool MusicRoomInit(void)
 		return FALSE;
 	}
 */
-	MidiTitle = Mid_GetTitle();
 //	Mid_Play();
 
 	GameMain = MusicRoomProc;
@@ -1339,7 +1337,6 @@ void MusicRoomProc(void)
 				MidiPlayID = (MidiPlayID+MusicNum-1)%MusicNum;
 				LoadMusic(MidiPlayID);
 				LoadMusicRoomComment(MidiPlayID);
-				MidiTitle = Mid_GetTitle();
 				Mid_Play();
 			break;
 		}

@@ -161,9 +161,6 @@ extern FACE_DATA	FaceData[FACE_MAX];	// 顔グラ用
 
 extern DWORD		MusicNum;			// 曲数
 
-extern char MCommentBuffer[12][50];
-extern char MTitleBuffer[50];
-
 extern PALETTE SProjectPalette;
 
 extern ENDING_GRP	EndingGrp[ENDING_PIC_MAX];

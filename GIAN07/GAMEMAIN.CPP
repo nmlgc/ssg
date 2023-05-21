@@ -9,11 +9,11 @@
 #include "GIAN.H"
 #include "LENS.H"
 #include "LEVEL.H"
+#include "MUSIC.H"
 #include "SCORE.H"
 #include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
-#include <ddraw.h>
 
 
 extern HWND hWndMain;
@@ -744,6 +744,9 @@ bool SProjectInit(void)
 // 音楽室の初期化をする //
 extern bool MusicRoomInit(void)
 {
+	TextObj.Clear();
+	MusicRoomText = MUSICROOM_TEXT::Register();
+
 	MWinForceClose();
 	GrpCls();
 	GrpFlip();
@@ -1313,7 +1316,6 @@ void PauseProc(void)
 void MusicRoomProc(void)
 {
 	PIXEL_LTRB	src;
-	HDC		hdc;
 	char	buf[100];
 	int		m,s;
 	int		i;
@@ -1365,6 +1367,9 @@ void MusicRoomProc(void)
 	if(GetAsyncKeyState('D')&0x8000){
 		if(DevChgWait==0){
 			Mid_ChgDev(1);
+			if(MusicRoomText) {
+				MusicRoomText.value().PrerenderMidDev();
+			}
 			Mid_TableInit();
 			DevChgWait = 1;
 		}
@@ -1403,35 +1408,15 @@ void MusicRoomProc(void)
 		sprintf(buf,"%3d",MidiTempo);
 		GrpPut7B(560,112+2+2,buf);
 		//TextOut(hdc,561,112+2,buf,strlen(buf));
+		//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));
 
-		if(DxObj.Back->GetDC(&hdc)==DD_OK){
-			auto oldfont = SelectObject(
-				hdc, TextObj.fonts[GIAN_FONT_ID::NORMAL]
-			);
+		if(MusicRoomText) {
+			const auto text = MusicRoomText.value();
 
-			//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));
-			SetBkMode(hdc,TRANSPARENT);
-
-			sprintf(buf,"#%02d %.26s",MidiPlayID+1,MTitleBuffer);
-			SetTextColor(hdc,RGB(51,102,153));
-			TextOut(hdc,401,144+2,buf,strlen(buf));
-			SetTextColor(hdc,RGB(153,204,255));
-			TextOut(hdc,400,144+2,buf,strlen(buf));
-			SelectObject(hdc,oldfont);
-			oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::SMALL]);
-
-			for(i=0; i<12; i++){
-				TextOut(hdc, 400-40, 144+30+i*16, MCommentBuffer[i], strlen(MCommentBuffer[i]));
-			}
-
-			sprintf(buf,"%.13s",Mid_Dev.name[Mid_Dev.NowID]);
-			TextOut(hdc,540+2,96-3,buf,strlen(buf));
-
-			strcpy(buf,"秋霜玉    Version 1.005     ★デモ対応版＃★");
-			TextOut(hdc,200-50,460,buf,strlen(buf));
-
-			SelectObject(hdc,oldfont);
-			DxObj.Back->ReleaseDC(hdc);
+			TextObj.Blit({ (540 +  2), ( 96 -  3) }, text.mid_dev);
+			TextObj.Blit({  400,       (144 +  2) }, text.title);
+			TextObj.Blit({ (400 - 40), (144 + 30) }, text.comment);
+			TextObj.Blit({ (200 - 50),  460       }, text.version);
 		}
 
 		GrpFlip();

@@ -8,6 +8,7 @@
 #include "ENEMY.H"
 #include "CONFIG.H"
 #include "GIAN.H"
+#include "MUSIC.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
 #include "LENS.H"
@@ -105,9 +106,6 @@ LensInfo	*Lens = NULL;
 DWORD		MusicNum = 0;			// 曲数
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
 ENDING_GRP	EndingGrp[ENDING_PIC_MAX];	// エンディング用
-
-char MCommentBuffer[12][50];
-char MTitleBuffer[50];
 
 
 
@@ -886,26 +884,12 @@ BOOL LoadSound(void)
 // MusicRoom のコメントをロードする //
 extern BOOL LoadMusicRoomComment(int no)
 {
-	int				i, j;
-	BYTE_BUFFER_OWNED	temp;
-
 	if(no < 0 || no > 19) return FALSE;
-
-	if(!(temp=DATEnemyLoad(27+no))) return FALSE;
-
-	for(i=0; i<19*2; i++){
-		MTitleBuffer[i] = (BYTE)temp[i];
+	if(!MusicRoomText) {
+		return false;
 	}
-	MTitleBuffer[19*2] = '\0';
-
-	for(i=0; i<12; i++){
-		for(j=0; j<19*2; j++){
-			MCommentBuffer[i][j] = (BYTE)temp[(i+1)*19*2 + j];
-		}
-		MCommentBuffer[i][19*2] = '\0';
-	}
-
-	return TRUE;
+	const auto& text = MusicRoomText.value();
+	return text.PrerenderTitleAndComment(DATEnemyLoad(27 + no), no);
 }
 
 

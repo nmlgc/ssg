@@ -683,19 +683,28 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	}
 
 	// DIB から DC を作成 //
-	HDC ddraw_dc;
-	ddrval = surf.surf->GetDC(&ddraw_dc);
-	if(ddrval!=DD_OK) return FALSE;
-
-	BitBlt(ddraw_dc, 0, 0, surf.size.w, surf.size.h, surf.dc, 0, 0, SRCCOPY);
-
-	// 後始末 //
-	surf.surf->ReleaseDC(ddraw_dc);
+	SurfaceEdit(surf, [](auto, auto) { return true; });
 
 	DisableAlphaTable();
 
 	// カラーキーをセットする //
 	return SurfaceSetColorKeyFromFirstPixel(surf);
+}
+
+bool GRAPHICS_DDRAW::SurfaceUpdateFromGDI(
+	SURFACE_DDRAW& surf, const PIXEL_LTWH& r
+)
+{
+	HDC ddraw_dc;
+	if(surf.surf->GetDC(&ddraw_dc) != DD_OK) {
+		return false;
+	}
+	return (
+		BitBlt(
+			ddraw_dc, r.left, r.top, r.w, r.h, surf.dc, r.left, r.top, SRCCOPY
+		) &&
+		(surf.surf->ReleaseDC(ddraw_dc) == DD_OK)
+	);
 }
 
 static bool CreateZbuffer(const XD3DENUM& D3De)

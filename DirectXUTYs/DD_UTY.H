@@ -183,6 +183,8 @@ protected:
 	// Also ensures the correct color key for palettized pixel formats.
 	bool SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf);
 
+	bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r);
+
 public:
 	// Can mutate the two parameters and replace them with a supported
 	// configuration if necessary.
@@ -215,6 +217,19 @@ public:
 
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
 	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col);
+
+	// Ensures that the given rectangle of the DirectDraw surface matches the
+	// underlying GDI image after an edit.
+	template <typename T> bool SurfaceEdit(
+		SURFACE_DDRAW& surf,
+		T func,
+		std::optional<PIXEL_LTWH> rect = std::nullopt
+	) {
+		const auto r = rect.value_or(
+			PIXEL_LTWH{ 0, 0, surf.size.w, surf.size.h }
+		);
+		return (func(surf.dc, r) && SurfaceUpdateFromGDI(surf, r));
+	}
 	// --------------------------- //
 };
 

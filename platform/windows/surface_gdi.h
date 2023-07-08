@@ -33,5 +33,8 @@ public:
 	// Calls Delete() and reinitializes [img].
 	bool Load(BMP_OWNED bmp);
 
+	// Saves [img] to a .BMP file with the given name.
+	bool Save(const PATH_LITERAL s) const;
+
 	void Delete();
 };

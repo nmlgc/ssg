@@ -26,11 +26,7 @@ struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 		span(reinterpret_cast<const uint8_t *>(&val), sizeof(val)) {
 	}
 
-	template <typename T> BYTE_BUFFER_BORROWED(std::span<const T> val) :
-		span(reinterpret_cast<const uint8_t *>(val.data()), val.size_bytes()) {
-	}
-
-	template <typename T> BYTE_BUFFER_BORROWED(std::span<T> val) :
+	template <typename T, size_t N> BYTE_BUFFER_BORROWED(std::span<T, N> val) :
 		span(reinterpret_cast<const uint8_t *>(val.data()), val.size_bytes()) {
 	}
 

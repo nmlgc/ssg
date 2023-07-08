@@ -4,6 +4,7 @@
  */
 
 #include "game/format_bmp.h"
+#include "platform/file.h"
 #include <assert.h>
 
 uint16_t BMPPaletteSizeFromBPP(uint8_t bpp)
@@ -77,4 +78,44 @@ std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
 	auto& pixels = maybe_pixels.value();
 
 	return BMP_OWNED{ std::move(buffer), header_info, palette, pixels };
+}
+
+bool BMPSave(
+	const PATH_LITERAL s,
+	PIXEL_SIZE size,
+	uint16_t planes,
+	uint16_t bpp,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels
+)
+{
+	BMP_INFOHEADER header_info = {
+		.biSize = sizeof(BMP_INFOHEADER),
+		.biWidth = size.w,
+		.biHeight = size.h,
+		.biPlanes = planes,
+		.biBitCount = bpp,
+		.biCompression = 0, // BI_RGB
+		.biSizeImage = pixels.size_bytes(),
+		.biClrUsed = palette.size(),
+	};
+	const uint32_t pixel_offset = (
+		sizeof(BMP_FILEHEADER) + header_info.biSize + palette.size_bytes()
+	);
+	const BMP_FILEHEADER header_file = {
+		.bfType = 0x4D42, // "BM"
+		.bfSize = pixel_offset,
+		.bfReserved1 = 0,
+		.bfReserved2 = 0,
+		.bfOffBits = pixel_offset,
+	};
+	auto stream = FileStreamWrite(s);
+	assert(stream);
+	return (
+		stream &&
+		stream->Write(header_file) &&
+		stream->Write(header_info) &&
+		stream->Write(std::as_bytes(palette)) &&
+		stream->Write(pixels)
+	);
 }

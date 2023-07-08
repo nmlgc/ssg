@@ -6,6 +6,8 @@
 #pragma once
 
 #include "platform/buffer.h"
+#include "platform/unicode.h"
+#include "game/coords.h"
 
 // Platform-independent .BMP header types
 // --------------------------------------
@@ -69,3 +71,12 @@ constexpr uint16_t BMP_PALETTE_SIZE_MAX = 256;
 uint16_t BMPPaletteSizeFromBPP(uint8_t bpp);
 
 std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer);
+
+bool BMPSave(
+	const PATH_LITERAL s,
+	PIXEL_SIZE size,
+	uint16_t planes,
+	uint16_t bpp,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels
+);

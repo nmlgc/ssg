@@ -12,3 +12,5 @@ struct IDirectDrawSurface;
 struct SURFACE_DDRAW : public SURFACE_GDI {
 	IDirectDrawSurface* surf = nullptr;
 };
+
+bool DDrawSaveSurface(const PATH_LITERAL s, IDirectDrawSurface* surf);

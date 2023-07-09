@@ -268,9 +268,9 @@ void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, std::string_view str)
 
 		// ここら辺は、一種の常套手段か？ //
 		const auto old = GetPixel(s.hdc, 0, 0);
-		SetPixel(s.hdc, 0, 0, RGB(255, 255, 255));
+		SetPixelV(s.hdc, 0, 0, RGB(255, 255, 255));
 		const auto temp = GetPixel(s.hdc, 0, 0);
-		SetPixel(s.hdc, 0, 0, old);
+		SetPixelV(s.hdc, 0, 0, old);
 
 		s.SetFont(GIAN_FONT_ID::NORMAL);
 		s.Put({ 2, 2 }, str, RGBA{   0,   0, 128 });
@@ -286,7 +286,7 @@ void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, std::string_view str)
 			const COLORREF color = RGB(gradient, gradient, 255);
 			for(auto x = (s.rect.left + 1); x < (s.rect.left + w); x++) {
 				if(GetPixel(s.hdc, x, y) == temp) { // RGB(255, 255, 255)
-					SetPixel(s.hdc, x, y, color);
+					SetPixelV(s.hdc, x, y, color);
 				}
 			}
 		}

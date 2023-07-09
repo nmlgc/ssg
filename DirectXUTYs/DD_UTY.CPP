@@ -252,7 +252,8 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		for(size_t i = 0; i < SURFACE_MAX; i++) {
 			auto& surf = DxSurf[i];
 			if(surf.size) {
-				SurfaceCreate(i, surf.size);
+				SurfaceCreateUninitialized(i, surf.size);
+				SurfaceRestore(surf);
 			}
 		}
 
@@ -399,7 +400,7 @@ void GrpSetPalette(const PALETTE& pal)
 	DisableAlphaTable();
 }
 
-bool GRAPHICS_DDRAW::SurfaceCreate(BYTE surf_id, PIXEL_SIZE size)
+bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size)
 {
 	DDSURFACEDESC		ddsd;
 	IDirectDrawSurface*	temp = nullptr;
@@ -424,7 +425,7 @@ bool GRAPHICS_DDRAW::SurfaceCreate(BYTE surf_id, PIXEL_SIZE size)
 	}
 	DxSurf[surf_id].size = size;
 	DxSurf[surf_id].surf = temp;
-	return SurfaceRestore(DxSurf[surf_id]);
+	return true;
 }
 
 bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)

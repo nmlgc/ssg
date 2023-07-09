@@ -203,6 +203,12 @@ public:
 	// Surface の作成(BMPリロード有り)
 	bool SurfaceCreate(BYTE surf_id, PIXEL_SIZE size);
 
+	// (Re-)creates the DirectDraw surface associated with [surf_id], in the
+	// given size and with undefined initial contents. After filling the GDI
+	// surface with the intended pixels, call SurfaceRestore() to upload them
+	// to the DirectDraw one.
+	bool SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size);
+
 	// ＢＭＰファイルロード //
 	bool SurfaceLoad(BYTE surf_id, BMP_OWNED bmp);
 

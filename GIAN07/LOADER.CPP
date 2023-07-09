@@ -130,18 +130,18 @@ BOOL InitSurface(void)
 //	bIsBombPalette = FALSE;
 
 	if(
-		!DxObj.SurfaceCreate(SURFACE_ID_SYSTEM, { 640, 480 }) ||
-		!DxObj.SurfaceCreate(SURFACE_ID_MAPCHIP, { 640, 480 }) ||
-		!DxObj.SurfaceCreate(SURFACE_ID_ENEMY, { 640, 480 }) ||
-		!DxObj.SurfaceCreate(SURFACE_ID_BOMBER, { 640, 480 }) ||
-		!DxObj.SurfaceCreate(SURFACE_ID_MTITLE, { 640, 20 }) ||
-		!DxObj.SurfaceCreate(SURFACE_ID_LENS, { 140, 140 })
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_SYSTEM, { 640, 480 }) ||
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_MAPCHIP, { 640, 480 }) ||
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_ENEMY, { 640, 480 }) ||
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_BOMBER, { 640, 480 }) ||
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_MTITLE, { 640, 20 }) ||
+		!DxObj.SurfaceCreateUninitialized(SURFACE_ID_LENS, { 140, 140 })
 	) {
 		return false;
 	}
 
 	for(i=0;i<FACE_MAX;i++){
-		if(!DxObj.SurfaceCreate(
+		if(!DxObj.SurfaceCreateUninitialized(
 			(SURFACE_ID_FACE + i), { (96 * FACE_NUMX), 96 }
 		)) {
 			return false;

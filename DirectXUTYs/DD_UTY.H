@@ -176,6 +176,9 @@ protected:
 	// Ensures that a DirectDraw surface matches its underlying image.
 	bool SurfaceRestore(SURFACE_DDRAW& surf);
 
+	// Also ensures the correct color key for palettized pixel formats.
+	bool SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf);
+
 public:
 	// Can mutate the two parameters and replace them with a supported
 	// configuration if necessary.
@@ -198,6 +201,9 @@ public:
 
 	// ＢＭＰファイルロード //
 	bool SurfaceLoad(BYTE surf_id, BMP_OWNED bmp);
+
+	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
+	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col);
 	// --------------------------- //
 };
 

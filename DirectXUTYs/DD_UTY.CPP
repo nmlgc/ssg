@@ -427,6 +427,18 @@ bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
 	return (surf.Load(std::move(bmp)) && SurfaceRestore(surf));
 }
 
+bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col)
+{
+	HDC ddraw_dc;
+	return (
+		surf.surf &&
+		(surf.surf->GetDC(&ddraw_dc) == DD_OK) &&
+		SetPixelV(ddraw_dc, 0, 0, RGB(col.r, col.g, col.b)) &&
+		(surf.surf->ReleaseDC(ddraw_dc) == DD_OK) &&
+		SurfaceSetColorKeyFromFirstPixel(surf)
+	);
+}
+
 void GrpCls(void)
 {
 	return GrpClsEx(
@@ -555,15 +567,17 @@ void STD_GrpBlt(RECT *src, int x, int y, SURFACE_DDRAW* surf)
 	if(!GrpClip(src,&x,&y)) return;
 	GrpBltX(src, x, y, surf);
 }
-extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
+
+bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 {
 	DDSURFACEDESC			ddsd;
-	HRESULT					dxval;
 	DDCOLORKEY				key;
 
 	// Lock する //
 	ZEROMEM(ddsd);ddsd.dwSize = sizeof(ddsd);
-	if(lpds->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL)!=DD_OK) return FALSE;
+	if(surf.surf->Lock(nullptr, &ddsd, DDLOCK_WAIT, nullptr) != DD_OK) {
+		return false;
+	}
 
 	// はじっこの色獲得＆カラーキー準備 //
 	DWORD temp = std::visit([&ddsd](auto pixel) {
@@ -575,15 +589,15 @@ extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds)
 			);
 		}
 		return DWORD{ *reinterpret_cast<decltype(pixel) *>(ddsd.lpSurface) };
-	}, DxObj.PixelFormat);
+	}, PixelFormat);
 
 	// Unlock する //
-	dxval = lpds->Unlock(NULL);
+	auto dxval = surf.surf->Unlock(nullptr);
 
 	// カラーキーをセットする//
 	key.dwColorSpaceHighValue = temp;
 	key.dwColorSpaceLowValue  = temp;
-	lpds->SetColorKey(DDCKEY_SRCBLT,&key);
+	surf.surf->SetColorKey(DDCKEY_SRCBLT, &key);
 	if(dxval!=DD_OK) return FALSE;
 	else             return TRUE;
 }
@@ -668,12 +682,10 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	// 後始末 //
 	surf.surf->ReleaseDC(ddraw_dc);
 
-	// カラーキーをセットする //
-	GrpSetColorKey(surf.surf);
-
 	DisableAlphaTable();
 
-	return TRUE;
+	// カラーキーをセットする //
+	return SurfaceSetColorKeyFromFirstPixel(surf);
 }
 
 static bool CreateZbuffer(const XD3DENUM& D3De)

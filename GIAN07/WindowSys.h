@@ -91,27 +91,6 @@ typedef struct tagWINDOW_SYSTEM{
 	BOOL			FirstWait;				// 最初のキー解放待ち
 } WINDOW_SYSTEM;
 
-// メッセージウィンドウ管理用構造体 //
-typedef struct tagMSG_WINDOW{
-	WINDOW_LTRB	MaxSize;	// ウィンドウの最終的な大きさ
-	WINDOW_LTRB	NowSize;	// ウィンドウの現在のサイズ
-
-	GIAN_FONT_ID	FontID;	// 使用するフォント
-	BYTE		FontDy;				// フォントのＹ増量値
-	BYTE		State;				// 状態
-	BYTE		MaxLine;			// 最大表示可能行数
-	BYTE		Line;				// 次に挿入する行
-
-	BYTE		FaceID;				// 使用する顔番号
-	BYTE		NextFace;			// 次に表示する顔番号
-	BYTE		FaceState;			// 顔の状態
-	BYTE		FaceTime;			// 顔表示用カウンタ
-
-	const char	*Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
-
-	//char		MsgBuf[MSG_HEIGHT][MESSAGE_MAX];	// メッセージ格納配列の実体
-} MSG_WINDOW;
-
 
 
 ///// [ 関数 ] /////
@@ -138,12 +117,6 @@ void MWinFace(BYTE faceID);		// 顔をセットする
 void MWinCmd(BYTE cmd);			// コマンドを送る
 
 void MWinHelp(WINDOW_SYSTEM *ws);		// メッセージウィンドウにヘルプ文字列を送る
-
-
-
-///// [グローバル変数] /////
-
-extern MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 
 

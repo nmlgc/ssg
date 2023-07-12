@@ -13,6 +13,31 @@
 
 
 
+///// [構造体] /////
+
+// メッセージウィンドウ管理用構造体 //
+typedef struct tagMSG_WINDOW{
+	WINDOW_LTRB	MaxSize;	// ウィンドウの最終的な大きさ
+	WINDOW_LTRB	NowSize;	// ウィンドウの現在のサイズ
+
+	GIAN_FONT_ID	FontID;	// 使用するフォント
+	uint8_t	FontDy;	// フォントのＹ増量値
+	uint8_t	State;	// 状態
+	uint8_t	MaxLine;	// 最大表示可能行数
+	uint8_t	Line;	// 次に挿入する行
+
+	uint8_t	FaceID;	// 使用する顔番号
+	uint8_t	NextFace;	// 次に表示する顔番号
+	uint8_t	FaceState;	// 顔の状態
+	uint8_t	FaceTime;	// 顔表示用カウンタ
+
+	const char	*Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
+
+	//char		MsgBuf[MSG_HEIGHT][MESSAGE_MAX];	// メッセージ格納配列の実体
+} MSG_WINDOW;
+
+
+
 ///// [非公開関数] /////
 
 static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws);	// アクティブなウィンドウを探す

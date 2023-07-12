@@ -40,6 +40,13 @@ typedef struct tagMSG_WINDOW{
 	const char	*Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
 
 	//char		MsgBuf[MSG_HEIGHT][MESSAGE_MAX];	// メッセージ格納配列の実体
+
+	void MsgBlank() {
+		Line = 0;
+		for(auto& msg : Msg) {
+			msg = nullptr;
+		}
+	}
 } MSG_WINDOW;
 
 
@@ -178,8 +185,6 @@ BOOL CWinExitFn(WORD key)
 // メッセージウィンドウをオープンする //
 void MWinOpen(WINDOW_LTRB *rc)
 {
-	int			i,y_mid;
-
 	if(MsgWindow.State != MWIN_DEAD) return;
 
 	// 状態および、最終値のセット //
@@ -190,7 +195,7 @@ void MWinOpen(WINDOW_LTRB *rc)
 	MsgWindow.MaxSize = (*rc);
 
 	// 矩形の初期値をセットする //
-	y_mid = (MsgWindow.MaxSize.bottom + MsgWindow.MaxSize.top)/2;
+	auto y_mid = ((MsgWindow.MaxSize.bottom + MsgWindow.MaxSize.top) / 2);
 	MsgWindow.NowSize.left   = MsgWindow.MaxSize.left;
 	MsgWindow.NowSize.right  = MsgWindow.MaxSize.right;
 	MsgWindow.NowSize.top    = y_mid - 4;
@@ -199,8 +204,7 @@ void MWinOpen(WINDOW_LTRB *rc)
 	MWinCmd(MWCMD_NORMALFONT);					// ノーマルフォント
 
 	// ウィンドウ内に表示するものの初期化 //
-	MsgWindow.Line = 0;
-	for(i=0;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;
+	MsgWindow.MsgBlank();
 }
 
 // メッセージウィンドウをクローズする //
@@ -388,11 +392,7 @@ void MWinMsg(const char *s)
 
 	Line = MsgWindow.Line;
 
-	if(Line==0){
-		// 新規挿入の場合 //
-		for(i=0;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;
-	}
-	else if(Line==MsgWindow.MaxLine){
+	if(Line==MsgWindow.MaxLine){
 		// すでに表示最大行数を超えていた場合 //
 		for(i=1;i<MsgWindow.MaxLine-1;i++) MsgWindow.Msg[i] = MsgWindow.Msg[i+1];
 		MsgWindow.Msg[Line-1] = s;
@@ -437,14 +437,13 @@ void MWinCmd(BYTE cmd)
 		case(MWCMD_SMALLFONT):		// スモールフォントを使用する
 			Ysize += 14;
 			temp = MsgWindow.MaxSize.bottom - MsgWindow.MaxSize.top - 16;
-			for(i=0;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;			// 文字列無効化
 			MsgWindow.MaxLine = temp / Ysize;							// 表示可能最大行数
 			MsgWindow.FontDy  =(temp % Ysize)/(temp/Ysize)+Ysize + 1;	// Ｙ増量
 			MsgWindow.FontID  = GIAN_FONT_ID(cmd);	// 使用フォント
 
 		case(MWCMD_NEWPAGE):		// 改ページする
-			for(i=0;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;			// 文字列無効化
-			MsgWindow.Line = 0;											// 最初の行へ
+			// 文字列無効化, 最初の行へ
+			MsgWindow.MsgBlank();
 		break;
 
 		default:		// ここに来たらバグね...
@@ -481,15 +480,13 @@ static void DrawWindowFrame(int x,int y,int w,int h)
 void MWinHelp(WINDOW_SYSTEM *ws)
 {
 	WINDOW_INFO		*p;
-	int				i;
 
 	// アクティブなウィンドウを検索し、メッセージ領域をクリアする //
 	p = CWinSearchActive(ws);
-	for(i=1;i<MSG_HEIGHT;i++) MsgWindow.Msg[i] = NULL;
+	MsgWindow.MsgBlank();
 
 	// 一列だけ文字列を割り当てる //
-	MsgWindow.Msg[0] = p->ItemPtr[ws->Select[ws->SelectDepth]]->Help;
-	MsgWindow.Line   = 1;
+	MWinMsg(p->ItemPtr[ws->Select[ws->SelectDepth]]->Help);
 }
 
 // アクティブなウィンドウを探す //

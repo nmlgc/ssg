@@ -5,6 +5,7 @@
 
 #include "WindowSys.h"
 #include "LOADER.H"
+#include "FONTUTY.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/DS_UTY.H"
@@ -17,6 +18,8 @@
 
 constexpr PIXEL_COORD FACE_W = 96;
 constexpr PIXEL_COORD FACE_H = 96;
+
+constexpr PIXEL_POINT MSG_TEXT_TOPLEFT = { FACE_W, 8 };
 // -----------
 
 ///// [構造体] /////
@@ -42,6 +45,8 @@ typedef struct tagMSG_WINDOW{
 	// Contains all text from [Msg], concatenated with '\n'.
 	std::string	Text;
 
+	std::optional<TEXTRENDER_RECT_ID>	TRR;
+
 	void MsgBlank() {
 		Line = 0;
 		for(auto& msg : Msg) {
@@ -49,6 +54,7 @@ typedef struct tagMSG_WINDOW{
 		}
 		Text.clear();
 	}
+
 } MSG_WINDOW;
 
 
@@ -184,8 +190,13 @@ BOOL CWinExitFn(WORD key)
 	}
 }
 
-// メッセージウィンドウをオープンする //
-void MWinOpen(WINDOW_LTRB *rc)
+void MWinInit(const WINDOW_LTRB& rc)
+{
+	MsgWindow.MaxSize = rc;
+	MsgWindow.TRR = TextObj.Register(rc.Size() - MSG_TEXT_TOPLEFT);
+}
+
+void MWinOpen(void)
 {
 	if(MsgWindow.State != MWIN_DEAD) return;
 
@@ -194,7 +205,6 @@ void MWinOpen(WINDOW_LTRB *rc)
 	MsgWindow.FaceState = MFACE_NONE;			// 何も表示しない
 	MsgWindow.FaceID    = 0;
 	MsgWindow.FaceTime  = 0;
-	MsgWindow.MaxSize = (*rc);
 
 	// 矩形の初期値をセットする //
 	auto y_mid = ((MsgWindow.MaxSize.bottom + MsgWindow.MaxSize.top) / 2);
@@ -284,7 +294,6 @@ void MWinMove(void)
 // メッセージウィンドウを描画する(上に同じ) //
 void MWinDraw(void)
 {
-	HDC		hdc;
 	BYTE	alpha;
 	PIXEL_LTRB	src;
 
@@ -292,7 +301,6 @@ void MWinDraw(void)
 	int		y = MsgWindow.NowSize.top;		// ウィンドウ左上Ｙ
 	int		w = (MsgWindow.NowSize.right  - x);		// ウィンドウ幅
 	int		h = (MsgWindow.NowSize.bottom - y);		// ウィンドウ高さ
-	int		i,TextX,TextY;
 	int		len,time,oy;
 
 	// メッセージウィンドウが死んでいたら何もしない //
@@ -308,31 +316,28 @@ void MWinDraw(void)
 
 	// 文字列を表示するのはウィンドウが[FREE]である場合だけ        //
 	// -> こうしないと文字列用 Surface を作成することになるので... //
-	if(MsgWindow.State == MWIN_FREE){
-		if(DxObj.Back->GetDC(&hdc)==DD_OK){
+	if((MsgWindow.State == MWIN_FREE) && MsgWindow.TRR) {
+		const auto topleft = (WINDOW_POINT{ x, y } + MSG_TEXT_TOPLEFT);
+		const auto trr = MsgWindow.TRR.value();
+		const auto& text = MsgWindow.Text;
+		TextObj.Render(topleft, trr, text, [](GIAN_TEXTRENDER_SESSION auto& s) {
 			// セットされたフォントで描画
-			auto oldfont = SelectObject(hdc, TextObj.fonts[MsgWindow.FontID]);
-			SetBkMode(hdc,TRANSPARENT);
-
-			for(i=0;i<MsgWindow.Line;i++){
+			s.SetFont(MsgWindow.FontID);
+			for(auto i = 0; i < MsgWindow.Line; i++) {
 				const auto& line = MsgWindow.Msg[i];
 
 				// 一応安全対策
 				if(line.empty()) {
 					continue;
 				}
+				const PIXEL_COORD top = (i * MsgWindow.FontDy);
 
-				TextX = (x + FACE_W);
-				TextY = y +  8 + i*MsgWindow.FontDy;
-				SetTextColor(hdc,RGB(128,128,128));		// 灰色で１どっとずらして描画
-				TextOut(hdc, (TextX + 1), TextY, line.data(), line.length());
-				SetTextColor(hdc,RGB(255,255,255));		// 白で表示すべき位置に表示
-				TextOut(hdc, (TextX + 0), TextY, line.data(), line.length());
+				// 灰色で１どっとずらして描画
+				s.Put({ 1, top }, line, RGBA{ 128, 128, 128 });
+				// 白で表示すべき位置に表示
+				s.Put({ 0, top }, line, RGBA{ 255, 255, 255 });
 			}
-
-			SelectObject(hdc,oldfont);
-			DxObj.Back->ReleaseDC(hdc);
-		}
+		});
 	}
 
 	DrawWindowFrame(x,y,w,h);
@@ -351,7 +356,7 @@ void MWinDraw(void)
 		case(MFACE_OPEN):
 			time = MsgWindow.FaceTime>>2;
 			oy = MsgWindow.MaxSize.bottom - 100;
-			for(i = 0; i < FACE_H; i++){
+			for(auto i = 0; i < FACE_H; i++){
 				len = cosl(time+i*153,(64-time)/2);
 				//len = cosl(time+i*4,64-time);
 				src = PIXEL_LTWH{
@@ -366,7 +371,7 @@ void MWinDraw(void)
 		case(MFACE_NEXT):
 			time = (255-MsgWindow.FaceTime)>>2;
 			oy = MsgWindow.MaxSize.bottom - 100;
-			for(i = 0; i < FACE_H; i++){
+			for(auto i = 0; i < FACE_H; i++){
 				len = cosl(time+i*153,(64-time)/2);
 				//len = cosl(time+i*4,64-time);
 				src = PIXEL_LTWH{
@@ -381,7 +386,7 @@ void MWinDraw(void)
 		case(MFACE_CLOSE):
 			time = MsgWindow.FaceTime>>1;
 			oy = MsgWindow.MaxSize.bottom - 100;
-			for(i = 0; i < FACE_H; i++){
+			for(auto i = 0; i < FACE_H; i++){
 				len = cosl(time+i*4,time);
 				src = PIXEL_LTWH{
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1

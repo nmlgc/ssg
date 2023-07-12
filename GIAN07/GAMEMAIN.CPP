@@ -509,6 +509,16 @@ bool GameInit(void(*NextProc)(void))
 		Mid_FadeOut(240);
 		MTitleInit();
 	}
+	if(NextProc == GameProc) {
+		// ウィンドウの表示位置を設定する //
+		// Replays don't show dialog, so this is the only place where we need
+		// to do this.
+		if(ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) {
+			MWinInit({ 128,  16, (640 - 128),  96 });
+		} else if(!(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)) {
+			MWinInit({ 128, 400, (640 - 128), 480 });
+		}
+	}
 	GrpSetClip(X_MIN, Y_MIN, X_MAX, Y_MAX);
 	GameMain = NextProc;
 	return TRUE;
@@ -795,6 +805,7 @@ extern void GameRestart(void)
 // ゲームから抜ける //
 extern bool GameExit(bool bNeedChgMusic)
 {
+	TextObj.Clear();
 	GrpCls();
 	GrpFlip();
 
@@ -815,8 +826,8 @@ extern bool GameExit(bool bNeedChgMusic)
 
 	//LoadFace(0,0);
 	MWinForceClose();
-	WINDOW_LTRB rc = { (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 };
-	MWinOpen(&rc);
+	MWinInit({ (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 });
+	MWinOpen();
 	//MWinFace(0);
 
 	DemoTimer = 0;

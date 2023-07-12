@@ -105,7 +105,11 @@ BOOL CWinExitFn(WORD key);						// コマンド [Exit] のデフォルト処理�
 
 
 // メッセージウィンドウ処理 //
-void MWinOpen(WINDOW_LTRB *rc);	// メッセージウィンドウをオープンする
+
+// Prepares text rendering for a window with the given dimensions.
+void MWinInit(const WINDOW_LTRB& rc);
+
+void MWinOpen(void);	// メッセージウィンドウをオープンする
 void MWinClose(void);			// メッセージウィンドウをクローズする
 void MWinForceClose(void);		// メッセージウィンドウを強制クローズする
 void MWinMove(void);			// メッセージウィンドウを動作させる(後で上と統合する)

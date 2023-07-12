@@ -36,6 +36,10 @@ struct PIXEL_SIZE {
 		return ((w > 0) && (h > 0));
 	}
 
+	PIXEL_SIZE operator -(const PIXEL_POINT& other) const {
+		return { (w - other.x), (h - other.y) };
+	}
+
 	std::strong_ordering operator <=>(const PIXEL_SIZE& other) const = default;
 };
 
@@ -73,11 +77,18 @@ struct PIXEL_LTRB {
 	PIXEL_LTRB(const PIXEL_LTWH& o) :
 		left(o.left), top(o.top), right(o.left + o.w), bottom(o.top + o.h) {
 	}
+
+	PIXEL_SIZE Size() const {
+		return { (right - left), (bottom - top) };
+	}
 };
 
 // X/Y coordinate in unscaled game window space. The visible area ranges from
 // (0, 0) to (639, 479) inclusive.
 struct WINDOW_POINT : public PIXEL_POINT {
+	WINDOW_POINT operator +(const PIXEL_POINT& other) const {
+		return { (x + other.x), (y + other.y) };
+	}
 };
 
 // Left-top-right-bottom rectangle in unscaled game window space. The visible

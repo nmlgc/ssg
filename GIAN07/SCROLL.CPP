@@ -145,13 +145,6 @@ static void enemy_set(void)
 	char		buf[100];
 	BOOL		CtrlFlag = FALSE;
 
-	// ウィンドウの表示位置を設定する //
-	if(ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) {
-		MWinRect = { 128,  16, (640 - 128),  96 };
-	} else {
-		MWinRect = { 128, 400, (640 - 128), 480 };
-	}
-
 	while(bFlag){
 		cmd = SCL_Now;
 		switch(cmd[0]){
@@ -221,7 +214,7 @@ static void enemy_set(void)
 					DemoplayLoadEnable ||
 					(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
 				)) {
-					MWinOpen(&MWinRect);
+					MWinOpen();
 				}
 				SclInfo.MsgFlag = TRUE;
 				SCL_Now++;
@@ -262,7 +255,7 @@ static void enemy_set(void)
 
 			case(SCL_END):		// カウントも変更させずにリターンする
 				/*
-				MWinOpen(&MWinRect);
+				MWinOpen();
 				MWinCmd(MWCMD_NEWPAGE);
 				MWinCmd(MWCMD_LARGEFONT);
 				MWinMsg("ＳＣＬ完了ですの");
@@ -389,7 +382,7 @@ static void enemy_set(void)
 			break;
 
 			default:	// 未実装 or ばぐ
-				MWinOpen(&MWinRect);
+				MWinOpen();
 				MWinCmd(MWCMD_NEWPAGE);
 				MWinCmd(MWCMD_LARGEFONT);
 				MWinMsg("バグ発生だにょ");

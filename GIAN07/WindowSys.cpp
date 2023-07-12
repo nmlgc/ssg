@@ -12,6 +12,12 @@
 #include <ddraw.h>
 
 
+// Coordinates
+// -----------
+
+constexpr PIXEL_COORD FACE_W = 96;
+constexpr PIXEL_COORD FACE_H = 96;
+// -----------
 
 ///// [構造体] /////
 
@@ -304,7 +310,7 @@ void MWinDraw(void)
 
 			for(i=0;i<MsgWindow.Line;i++){
 				if(MsgWindow.Msg[i]==NULL) continue;	// 一応安全対策
-				TextX = x + 96;
+				TextX = (x + FACE_W);
 				TextY = y +  8 + i*MsgWindow.FontDy;
 				SetTextColor(hdc,RGB(128,128,128));		// 灰色で１どっとずらして描画
 				TextOut(hdc,TextX+1,TextY,MsgWindow.Msg[i],strlen(MsgWindow.Msg[i]));
@@ -325,7 +331,7 @@ void MWinDraw(void)
 		case(MFACE_WAIT):
 			oy = MsgWindow.MaxSize.bottom - 100;
 			src = PIXEL_LTWH{
-				((MsgWindow.FaceID % FACE_NUMX) * 96), 0, 96, 96
+				((MsgWindow.FaceID % FACE_NUMX) * FACE_W), 0, FACE_W, FACE_H
 			};
 			GrpBlt(&src,x+2,oy,GrFace);
 		break;
@@ -333,11 +339,11 @@ void MWinDraw(void)
 		case(MFACE_OPEN):
 			time = MsgWindow.FaceTime>>2;
 			oy = MsgWindow.MaxSize.bottom - 100;
-			for(i=0;i<96;i++){
+			for(i = 0; i < FACE_H; i++){
 				len = cosl(time+i*153,(64-time)/2);
 				//len = cosl(time+i*4,64-time);
 				src = PIXEL_LTWH{
-					((MsgWindow.FaceID % FACE_NUMX) * 96), i, 96, 1
+					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
 				GrpBlt(&src,x+len+2,oy+i,GrFace);
 				//if(i&1)	GrpBlt(&src,x+len+2,oy+i,GrFace);
@@ -348,11 +354,11 @@ void MWinDraw(void)
 		case(MFACE_NEXT):
 			time = (255-MsgWindow.FaceTime)>>2;
 			oy = MsgWindow.MaxSize.bottom - 100;
-			for(i=0;i<96;i++){
+			for(i = 0; i < FACE_H; i++){
 				len = cosl(time+i*153,(64-time)/2);
 				//len = cosl(time+i*4,64-time);
 				src = PIXEL_LTWH{
-					((MsgWindow.FaceID % FACE_NUMX) * 96), i, 96, 1
+					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
 				GrpBlt(&src,x+len+2,oy+i,GrFace);
 				//if(i&1)	GrpBlt(&src,x+len+2,oy+i,GrFace);
@@ -363,10 +369,10 @@ void MWinDraw(void)
 		case(MFACE_CLOSE):
 			time = MsgWindow.FaceTime>>1;
 			oy = MsgWindow.MaxSize.bottom - 100;
-			for(i=0;i<96;i++){
+			for(i = 0; i < FACE_H; i++){
 				len = cosl(time+i*4,time);
 				src = PIXEL_LTWH{
-					((MsgWindow.FaceID % FACE_NUMX) * 96), i, 96, 1
+					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
 				if(i&1)	GrpBlt(&src,x-len+2,oy+i,GrFace);
 				else	GrpBlt(&src,x+len+2,oy+i,GrFace);

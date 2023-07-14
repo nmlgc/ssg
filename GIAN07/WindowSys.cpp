@@ -37,15 +37,17 @@ typedef struct tagMSG_WINDOW{
 	uint8_t	FaceState;	// 顔の状態
 	uint8_t	FaceTime;	// 顔表示用カウンタ
 
-	const char	*Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
+	std::string_view	Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
 
-	//char		MsgBuf[MSG_HEIGHT][MESSAGE_MAX];	// メッセージ格納配列の実体
+	// Contains all text from [Msg], concatenated with '\n'.
+	std::string	Text;
 
 	void MsgBlank() {
 		Line = 0;
 		for(auto& msg : Msg) {
-			msg = nullptr;
+			msg = {};
 		}
+		Text.clear();
 	}
 } MSG_WINDOW;
 
@@ -313,13 +315,19 @@ void MWinDraw(void)
 			SetBkMode(hdc,TRANSPARENT);
 
 			for(i=0;i<MsgWindow.Line;i++){
-				if(MsgWindow.Msg[i]==NULL) continue;	// 一応安全対策
+				const auto& line = MsgWindow.Msg[i];
+
+				// 一応安全対策
+				if(line.empty()) {
+					continue;
+				}
+
 				TextX = (x + FACE_W);
 				TextY = y +  8 + i*MsgWindow.FontDy;
 				SetTextColor(hdc,RGB(128,128,128));		// 灰色で１どっとずらして描画
-				TextOut(hdc,TextX+1,TextY,MsgWindow.Msg[i],strlen(MsgWindow.Msg[i]));
+				TextOut(hdc, (TextX + 1), TextY, line.data(), line.length());
 				SetTextColor(hdc,RGB(255,255,255));		// 白で表示すべき位置に表示
-				TextOut(hdc,TextX+0,TextY,MsgWindow.Msg[i],strlen(MsgWindow.Msg[i]));
+				TextOut(hdc, (TextX + 0), TextY, line.data(), line.length());
 			}
 
 			SelectObject(hdc,oldfont);
@@ -385,8 +393,7 @@ void MWinDraw(void)
 	}
 }
 
-// メッセージ文字列を送る //
-void MWinMsg(const char *s)
+void MWinMsg(std::string_view s)
 {
 	int			Line,i;
 
@@ -396,12 +403,17 @@ void MWinMsg(const char *s)
 		// すでに表示最大行数を超えていた場合 //
 		for(i=1;i<MsgWindow.MaxLine-1;i++) MsgWindow.Msg[i] = MsgWindow.Msg[i+1];
 		MsgWindow.Msg[Line-1] = s;
-		return;
+	} else {
+		// ポインタセット＆行数更新 //
+		MsgWindow.Msg[Line] = s;
+		MsgWindow.Line = Line+1;
 	}
 
-	// ポインタセット＆行数更新 //
-	MsgWindow.Msg[Line] = s;
-	MsgWindow.Line = Line+1;
+	MsgWindow.Text.clear();
+	for(const auto& s : MsgWindow.Msg) {
+		MsgWindow.Text += s;
+		MsgWindow.Text += '\n';
+	}
 }
 
 // 顔をセットする //

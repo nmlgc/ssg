@@ -29,7 +29,6 @@
 // 最大数に関する定数 //
 #define WINITEM_MAX		20			// 項目の最大数
 #define WINDOW_DEPTH	10			// ウィンドウの深さ
-#define MESSAGE_MAX		100			// 一行に表示できる最大メッセージ長
 #define MSG_HEIGHT		5			// メッセージウィンドウの高さ
 
 // コマンドウィンドウの状態 //
@@ -112,7 +111,7 @@ void MWinForceClose(void);		// メッセージウィンドウを強制クロー�
 void MWinMove(void);			// メッセージウィンドウを動作させる(後で上と統合する)
 void MWinDraw(void);			// メッセージウィンドウを描画する(上に同じ)
 
-void MWinMsg(const char *s);			// メッセージ文字列を送る
+void MWinMsg(std::string_view str);	// メッセージ文字列を送る
 void MWinFace(BYTE faceID);		// 顔をセットする
 void MWinCmd(BYTE cmd);			// コマンドを送る
 

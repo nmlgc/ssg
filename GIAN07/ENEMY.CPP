@@ -469,7 +469,7 @@ extern void SetAnime24(int x,int y,int id)
 	int			i;
 	ANIME_DATA	*a = Anime+id;
 
-	a->width = a->height = 24;
+	a->size = { 24, 24 };
 	a->n     = 16;
 	a->mode  = ANM_DEG;
 
@@ -486,7 +486,7 @@ void SetAnime32(int x,int y,int id,int n,BYTE mode)
 	int			i;
 	ANIME_DATA	*a = Anime+id;
 
-	a->width = a->height = 32;
+	a->size = { 32, 32 };
 	a->n     = n;
 	a->mode  = mode;
 
@@ -503,7 +503,7 @@ extern void SetAnime40(int x,int y,int id)
 	int			i;
 	ANIME_DATA	*a = Anime+id;
 
-	a->width = a->height = 40;
+	a->size = { 40, 40 };
 	a->n     = 16;
 	a->mode  = ANM_DEG;
 
@@ -520,7 +520,7 @@ extern void SetAnime48(int x,int y,int id)
 	int			i;
 	ANIME_DATA	*a = Anime+id;
 
-	a->width = a->height = 48;
+	a->size = { 48, 48 };
 	a->n     = 16;
 	a->mode  = ANM_DEG;
 
@@ -537,7 +537,7 @@ extern void SetAnime80(int x,int y,int id)
 	int			i;
 	ANIME_DATA	*a = Anime+id;
 
-	a->width = a->height = 80;
+	a->size = { 80, 80 };
 	a->n     = 16;
 	a->mode  = ANM_DEG;
 
@@ -582,8 +582,8 @@ PIXEL_LTRB *Enemy_AnimeClip(int *x, int *y, ENEMY_DATA *e)
 	a = Anime+(e->anm_ptn);
 
 	// 座標セット //
-	*x -= (a->width >>1);
-	*y -= (a->height>>1);
+	*x -= (a->size.w >> 1);
+	*y -= (a->size.h >> 1);
 
 	// 描画モード選択 //
 	switch(a->mode){
@@ -609,8 +609,8 @@ extern PIXEL_LTRB *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e)
 	a = Anime+(e->anm_ptnEx);
 
 	// 座標セット //
-	*x -= (a->width >>1);
-	*y -= (a->height>>1);
+	*x -= (a->size.w >> 1);
+	*y -= (a->size.h >> 1);
 
 	temp = a->ptn[0];
 
@@ -1613,10 +1613,10 @@ void parse_ECL(ENEMY_DATA *e)
 			e->anm_ptn  = e->anm_ptnEx = (BYTE)cmd[1];
 			e->anm_sp   = (char)cmd[2];
 			//if(e->anm_sp==0) e->anm_sp=1;
-			e->g_height = (Anime[e->anm_ptn].height<<5);
-			e->g_width  = (Anime[e->anm_ptn].width <<5);
-			//if(Anime[e->anm_ptn].height>32) e->g_height = (e->g_height<<1)/3;
-			//if(Anime[e->anm_ptn].width>32)  e->g_width  = (e->g_width <<1)/3;
+			e->g_height = (Anime[e->anm_ptn].size.h << 5);
+			e->g_width  = (Anime[e->anm_ptn].size.w << 5);
+			//if(Anime[e->anm_ptn].size.h>32) e->g_height = (e->g_height<<1)/3;
+			//if(Anime[e->anm_ptn].size.w>32) e->g_width  = (e->g_width <<1)/3;
 			e->anm_c    = 0;
 			bRetFlag = FALSE;
 		break;

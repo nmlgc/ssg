@@ -105,8 +105,7 @@ typedef struct{
 typedef struct{
 	BYTE	mode;				// アニメーションモード
 	BYTE	n;					// アニメーションパターン数
-	int		width;				// 絵の幅
-	int		height;				// 絵の高さ
+	PIXEL_SIZE	size;	// 絵の幅, 絵の高さ
 	PIXEL_LTRB	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
 } ANIME_DATA;
 

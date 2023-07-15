@@ -86,6 +86,30 @@ _inline Debug(DWORD old,int id)
 }
 */
 
+void ENEMY_DATA::Draw() const
+{
+	// TODO: Remove once the structure itself uses WORLD_POINT.
+	const WORLD_POINT center = { &x, &y };
+
+	const auto& a = Anime[anm_ptn];
+	const auto topleft = center.ToPixel(a.size); // 座標セット //
+
+	// 描画モード選択 //
+	// Copy! (For now.)
+	auto src = ((a.mode == ANM_DEG)
+		? a.ptn[uint8_t(d - 64 + 8) >> 4]
+		: a.ptn[anm_c]
+	);
+	if(GrpBlt(&src, topleft.x, topleft.y, GrEnemy)) {
+		if((anm_ptn != anm_ptnEx) && IsDamaged) {
+			const auto& a = Anime[anm_ptnEx];
+			const auto topleft = center.ToPixel(a.size); // 座標セット //
+			auto src = a.ptn[0]; // Copy! (For now.)
+			GrpBlt(&src, topleft.x, topleft.y, GrEnemy);
+		}
+	}
+}
+
 void enemy_move(void)
 {
 	int				i;//,chkx,chky;
@@ -162,15 +186,7 @@ void enemy_draw(void)
 		}
 
 		if(e->flag&EF_DRAW){
-			if((src=Enemy_AnimeClip(&x,&y,e))==NULL) continue;
-			GrpBltX(src,x,y,GrEnemy);	// クリッピングなし
-
-			if((e->anm_ptn != e->anm_ptnEx) && e->IsDamaged){
-				x = (e->x>>6);
-				y = (e->y>>6);
-				if((src=Enemy_HitGrpClip(&x,&y,e))==NULL) continue;
-				GrpBltX(src,x,y,GrEnemy);	// クリッピングなし
-			}
+			e->Draw();
 		}
 	}
 }
@@ -571,50 +587,6 @@ void EnemyAnimeMove(ENEMY_DATA *e)
 		default:
 		break;
 	}
-}
-
-PIXEL_LTRB *Enemy_AnimeClip(int *x, int *y, ENEMY_DATA *e)
-{
-	static PIXEL_LTRB	temp;
-	BYTE			d;
-	ANIME_DATA		*a;
-
-	a = Anime+(e->anm_ptn);
-
-	// 座標セット //
-	*x -= (a->size.w >> 1);
-	*y -= (a->size.h >> 1);
-
-	// 描画モード選択 //
-	switch(a->mode){
-		case(ANM_DEG):
-			d    = e->d-64+8;
-			temp = a->ptn[d>>4];
-		break;
-
-		case(ANM_NORM):case(ANM_STOP):default:
-			temp = a->ptn[e->anm_c];
-		break;
-	}
-
-	return GrpClip(&temp,x,y) ? &temp : NULL;
-}
-
-extern PIXEL_LTRB *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e)
-{
-	static PIXEL_LTRB	temp;
-	BYTE			d;
-	ANIME_DATA		*a;
-
-	a = Anime+(e->anm_ptnEx);
-
-	// 座標セット //
-	*x -= (a->size.w >> 1);
-	*y -= (a->size.h >> 1);
-
-	temp = a->ptn[0];
-
-	return GrpClip(&temp,x,y) ? &temp : NULL;
 }
 
 static void _EnemyDrawBomb(int x,int y,DWORD count)

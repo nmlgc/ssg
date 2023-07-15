@@ -58,8 +58,8 @@ typedef struct{
 } INT_VECTOR;
 
 //// 敵データ構造体 ////
-typedef struct{
-	int			x,y;		// 表示座標
+struct ENEMY_DATA {
+	WORLD_COORD	x, y;	// 表示座標
 	int			vx,vy;		// 速度の(x,y)成分 x64系
 
 	int			v;			// 速度成分 x64系
@@ -100,7 +100,9 @@ typedef struct{
 
 	TAMA_CMD	t_cmd;		// 弾発射用コマンド
 	LASER_CMD	l_cmd;		// レーザー発射用コマンド
-} ENEMY_DATA;
+
+	void Draw() const;
+};
 
 typedef struct{
 	BYTE	mode;				// アニメーションモード
@@ -139,8 +141,6 @@ extern void SetAnime32(int x,int y,int id,int n,BYTE mode);
 extern void SetAnime40(int x,int y,int id);
 extern void SetAnime48(int x,int y,int id);
 extern void SetAnime80(int x,int y,int id);
-extern PIXEL_LTRB *Enemy_AnimeClip(int *x, int *y, ENEMY_DATA *e);
-extern PIXEL_LTRB *Enemy_HitGrpClip(int *x, int *y, ENEMY_DATA *e);
 extern void EnemyAnimeMove(ENEMY_DATA *e);
 
 

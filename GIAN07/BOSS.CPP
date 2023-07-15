@@ -234,15 +234,7 @@ void BossDraw(void)
 			}
 
 			if(e->flag&EF_DRAW){
-				if((src=Enemy_AnimeClip(&x,&y,e))==NULL) continue;
-				GrpBltX(src,x,y,GrEnemy);	// クリッピングなし
-
-				if((e->anm_ptnEx != e->anm_ptn) && e->IsDamaged){
-					x = (e->x>>6);
-					y = (e->y>>6);
-					if((src=Enemy_HitGrpClip(&x,&y,e))==NULL) continue;
-					GrpBltX(src,x,y,GrEnemy);	// クリッピングなし
-				}
+				e->Draw();
 			}
 		}
 	}

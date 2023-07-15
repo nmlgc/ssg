@@ -94,6 +94,19 @@ struct WORLD_POINT {
 	WORLD_POINT() {
 	}
 
+	// World-space points should never be constructed from integer literals.
+	// These literals may or may not be pixels, and usage code should not
+	// assume or bother with [WORLD_COORD_BITS]. To construct a WORLD_POINT
+	// from a pixel literal, explicitly construct a PIXEL_POINT first.
+	WORLD_POINT(int x, int y) = delete;
+
+	// TODO: Keeping this one around so that we can at least pass structure
+	// fields while we gradually migrate the game to this structure, but it
+	// should be `delete`d once we're done.
+	WORLD_POINT(const WORLD_COORD* x, const WORLD_COORD* y) :
+		x(*x), y(*y) {
+	}
+
 	WORLD_POINT(const PIXEL_POINT& pixel) :
 		x(pixel.x << WORLD_COORD_BITS),
 		y(pixel.y << WORLD_COORD_BITS) {

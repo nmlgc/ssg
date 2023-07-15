@@ -20,7 +20,7 @@ static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
 static void DM_PI(WINDOW_POINT *p, int n);
 static bool DM_RESTORE(void);
-static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
@@ -30,7 +30,7 @@ int CLIP_Y_MAX = 479;
 
 // キャプチャーを行うか(->MtoB) //
 BOOL CaptureFlag = FALSE;
-void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 
 // Ｚバッファを必要なら生成し、接続する //
@@ -77,7 +77,7 @@ void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpCircleA)(int x, int y, int r)              = DM_III;
 void(*GrpPolygonA)(WINDOW_POINT *p, int n)                 = DM_PI;
 void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
-void(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
+bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 
 static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
@@ -529,7 +529,7 @@ bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 	return TRUE;
 }
 
-void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+bool GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {
 	RECT rect = { src->left, src->top, src->right, src->bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
@@ -537,6 +537,7 @@ void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 			x, y, surf.surf, &rect, DDBLTFAST_SRCCOLORKEY
 		);
 	});
+	return true;
 }
 
 void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
@@ -551,11 +552,13 @@ void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
-void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {
 	// 完全に範囲外なら何もしない //
-	if(!GrpClip(src,&x,&y)) return;
-	GrpBltX(src, x, y, surf);
+	if(!GrpClip(src, &x, &y)) {
+		return false;
+	}
+	return GrpBltX(src, x, y, surf);
 }
 
 bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
@@ -871,4 +874,7 @@ static bool DM_RESTORE(void)
 	return TRUE;
 }
 
-static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) {}
+static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+{
+	return false;
+}

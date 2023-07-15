@@ -292,14 +292,17 @@ extern void (*GrpPolygonA)(WINDOW_POINT *p, int n);	// αポリゴン塗りつ�
 
 extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 
-extern void (*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW &surf); // ビットマップ転送(WithClip)
+// ビットマップ転送(WithClip)
+// Returns `true` if any part of the sprite was blitted.
+extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 extern bool GrpClip(PIXEL_LTRB *src, int *x, int *y);	// クリッピングをかける
 extern void GrpGetClip(WINDOW_LTRB *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+// Always returns `true`. //
+bool GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //

@@ -77,6 +77,11 @@ MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 
 
+void WINDOW_SYSTEM::Init(PIXEL_COORD w)
+{
+	W = w;
+}
+
 void WINDOW_SYSTEM::Open(WINDOW_POINT topleft, int select)
 {
 	x = topleft.x;
@@ -144,7 +149,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	GrpSetAlpha(alpha,ALPHA_NORM);
 
 	GrpSetColor(0,0,0);
-	GrpBoxA(ws->x, top, (ws->x + 140), (top + CWIN_ITEM_H));
+	GrpBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 	top += CWIN_ITEM_H;
 
 	GrpSetColor(0,0,2);
@@ -153,7 +158,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 			GrpSetAlpha(128,ALPHA_NORM);
 			GrpSetColor(5,0,0);
 		}
-		GrpBoxA(ws->x, top, (ws->x + 140), (top + CWIN_ITEM_H));
+		GrpBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 		top += CWIN_ITEM_H;
 		if(i==ws->Select[ws->SelectDepth]){
 			GrpSetAlpha(alpha,ALPHA_NORM);

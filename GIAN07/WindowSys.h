@@ -80,6 +80,7 @@ typedef struct tagWINDOW_INFO{
 typedef struct tagWINDOW_SYSTEM{
 	WINDOW_INFO		Parent;					// 親ウィンドウ
 	int				x,y;					// ウィンドウ左上の座標
+	PIXEL_COORD	W;
 	DWORD			Count;					// フレームカウンタ
 	BYTE			Select[WINDOW_DEPTH];	// 選択中の項目スタック
 	BYTE			SelectDepth;			// 選択中の項目に対するＳＰ
@@ -88,6 +89,9 @@ typedef struct tagWINDOW_SYSTEM{
 	WORD			OldKey;					// 前に押されていたキー
 	BYTE			KeyCount;				// キーボードウェイト
 	BOOL			FirstWait;				// 最初のキー解放待ち
+
+	// Prepares text rendering for a window with the given width.
+	void Init(PIXEL_COORD w);
 
 	// コマンドウィンドウの初期化 //
 	void Open(WINDOW_POINT topleft, int select);

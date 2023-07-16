@@ -68,7 +68,8 @@ template <
 	bool Wipe() {
 		return (
 			graphics.SurfaceCreateBlank(surf, bounds) &&
-			graphics.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 })
+			graphics.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 }) &&
+			TEXTRENDER_PACKED::Wipe()
 		);
 	}
 
@@ -79,7 +80,7 @@ template <
 		}
 		assert(rect_id < rects.size());
 		return SESSION{
-			rects[rect_id],
+			rects[rect_id].rect,
 			surf.dc,
 			std::span<HFONT>{ fonts.data(), fonts.size() }
 		};
@@ -115,5 +116,23 @@ public:
 	) {
 		PIXEL_LTRB rect = Subrect(rect_id, subrect);
 		return graphics.SurfaceBlit(dst, surf, rect);
+	}
+
+	bool Render(
+		WINDOW_POINT dst,
+		TEXTRENDER_RECT_ID rect_id,
+		std::string_view contents,
+		TEXTRENDER_SESSION_FUNC<SESSION, FontID> auto func,
+		std::optional<PIXEL_LTWH> subrect = std::nullopt
+	) {
+		assert(rect_id < rects.size());
+		auto& rect = rects[rect_id];
+		if(rect.contents != contents) {
+			if(!Prerender(rect_id, func)) {
+				return false;
+			}
+			rect.contents = contents;
+		}
+		return Blit(dst, rect_id, subrect);
 	}
 };

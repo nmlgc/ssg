@@ -12,9 +12,14 @@
 
 class TEXTRENDER_PACKED {
 protected:
+	struct RECT_AND_CONTENTS {
+		PIXEL_LTWH rect;
+		std::string contents;
+	};
+
 	PIXEL_SIZE bounds = {};
 	std::vector<PIXEL_LTWH> spaces;
-	std::vector<PIXEL_LTWH> rects;
+	std::vector<RECT_AND_CONTENTS> rects;
 
 	template <class T> void SpaceAdd(T&& space) {
 		if((space.w > 0) && (space.h > 0)) {
@@ -32,6 +37,8 @@ public:
 	);
 
 	TEXTRENDER_RECT_ID Register(const PIXEL_SIZE& size);
+
+	bool Wipe();
 
 	// Resets both bounds and empty spaces.
 	void Clear();

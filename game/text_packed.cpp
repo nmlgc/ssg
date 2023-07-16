@@ -164,7 +164,7 @@ PIXEL_LTWH TEXTRENDER_PACKED::Subrect(
 	TEXTRENDER_RECT_ID rect_id, std::optional<PIXEL_LTWH> maybe_subrect
 ) {
 	assert(rect_id < rects.size());
-	auto ret = rects[rect_id];
+	auto ret = rects[rect_id].rect;
 	if(maybe_subrect) {
 		const auto& subrect = maybe_subrect.value();
 		ret.left += subrect.left;
@@ -179,6 +179,14 @@ TEXTRENDER_RECT_ID TEXTRENDER_PACKED::Register(const PIXEL_SIZE& size)
 {
 	rects.emplace_back(Insert(size));
 	return TEXTRENDER_RECT_ID(rects.size() - 1);
+}
+
+bool TEXTRENDER_PACKED::Wipe()
+{
+	for(auto& rect : rects) {
+		rect.contents.clear();
+	}
+	return true;
 }
 
 void TEXTRENDER_PACKED::Clear()

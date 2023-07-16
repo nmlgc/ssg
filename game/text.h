@@ -51,6 +51,7 @@ template <class T, class Session, class FontID> concept TEXTRENDER = requires(
 	T t,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
+	std::string_view contents,
 	TEXTRENDER_RECT_ID rect_id,
 	TEXTRENDER_SESSION_FUNC<Session, FontID> auto func,
 	std::optional<PIXEL_LTWH> subrect
@@ -77,4 +78,13 @@ template <class T, class Session, class FontID> concept TEXTRENDER = requires(
 	{ t.Prerender(rect_id, func) } -> std::same_as<bool>;
 	t.Blit(dst, rect_id, subrect);
 	// ------------------
+
+	// Immediate interface
+	// -------------------
+	// Associates the results of [func] with the given [contents], thus caching
+	// the result rendered to [rect_id]. [func] will only be called again if
+	// the [contents] changed.
+
+	t.Render(dst, rect_id, contents, func, subrect);
+	// -------------------
 };

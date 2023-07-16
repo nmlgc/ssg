@@ -83,6 +83,8 @@ struct PIXEL_LTRB {
 	}
 };
 
+using WINDOW_COORD = PIXEL_COORD;
+
 // X/Y coordinate in unscaled game window space. The visible area ranges from
 // (0, 0) to (639, 479) inclusive.
 struct WINDOW_POINT : public PIXEL_POINT {

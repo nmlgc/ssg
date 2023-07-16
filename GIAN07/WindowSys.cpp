@@ -16,6 +16,8 @@
 // Coordinates
 // -----------
 
+constexpr PIXEL_COORD CWIN_ITEM_H = 16;
+
 constexpr PIXEL_COORD FACE_W = 96;
 constexpr PIXEL_COORD FACE_H = 96;
 
@@ -130,6 +132,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	int				i;
 	HDC				hdc;
 	BYTE			alpha;
+	WINDOW_COORD	top = ws->y;
 
 	// アクティブな項目を検索する //
 	p = CWinSearchActive(ws);
@@ -141,7 +144,8 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	GrpSetAlpha(alpha,ALPHA_NORM);
 
 	GrpSetColor(0,0,0);
-	GrpBoxA(ws->x,ws->y,ws->x+140,ws->y+16);
+	GrpBoxA(ws->x, top, (ws->x + 140), (top + CWIN_ITEM_H));
+	top += CWIN_ITEM_H;
 
 	GrpSetColor(0,0,2);
 	for(i=0;i<p->NumItems;i++){
@@ -149,7 +153,8 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 			GrpSetAlpha(128,ALPHA_NORM);
 			GrpSetColor(5,0,0);
 		}
-		GrpBoxA(ws->x,ws->y+(i+1)*16,ws->x+140,ws->y+(i+2)*16);
+		GrpBoxA(ws->x, top, (ws->x + 140), (top + CWIN_ITEM_H));
+		top += CWIN_ITEM_H;
 		if(i==ws->Select[ws->SelectDepth]){
 			GrpSetAlpha(alpha,ALPHA_NORM);
 			GrpSetColor(0,0,2);
@@ -159,18 +164,24 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 
 	// 文字列の描画 //
 	if(DxObj.Back->GetDC(&hdc)==DD_OK){
+		top = ws->y;
+		const std::string_view str = p->Title;
+
 		SetBkMode(hdc,TRANSPARENT);
 		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::SMALL]);
 		SetTextColor(hdc,RGB(128,128,128));
-		TextOut(hdc,ws->x+1,ws->y,p->Title,strlen(p->Title));
+		TextOut(hdc, (ws->x + 1), top, str.data(), str.length());
 		SetTextColor(hdc,RGB(255,255,255));
-		TextOut(hdc,ws->x+0,ws->y,p->Title,strlen(p->Title));
+		TextOut(hdc, (ws->x + 0), top, str.data(), str.length());
+		top += (CWIN_ITEM_H + 1); // ???
 
 		for(i=0;i<p->NumItems;i++){
+			const std::string_view str = p->ItemPtr[i]->Title;
 			SetTextColor(hdc,RGB(128,128,128));
-			TextOut(hdc,ws->x+1+8,ws->y+(i+1)*16+1,p->ItemPtr[i]->Title,strlen(p->ItemPtr[i]->Title));
+			TextOut(hdc, (ws->x + 1 + 8), top, str.data(), str.length());
 			SetTextColor(hdc,RGB(255,255,255));
-			TextOut(hdc,ws->x+0+8,ws->y+(i+1)*16+1,p->ItemPtr[i]->Title,strlen(p->ItemPtr[i]->Title));
+			TextOut(hdc, (ws->x + 0 + 8), top, str.data(), str.length());
+			top += CWIN_ITEM_H;
 		}
 		SelectObject(hdc,oldfont);
 		DxObj.Back->ReleaseDC(hdc);

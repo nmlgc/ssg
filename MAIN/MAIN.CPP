@@ -270,9 +270,8 @@ BOOL XInit(void)
 			ConfigDat.SoundFlags &= (~SNDF_MIDI_ENABLE);
 	}
 
-	if(!GameInit()) return FALSE;		// 各種初期化
-	//if(!GameExit()) return FALSE;		// タイトルへ
-	//if(!EndingInit()) return FALSE;
+	// Call a different *Init() function here to quickly test a different //
+	// game state. //
 	if(!SProjectInit()) return FALSE;
 
 	GrpSetCaptureFilename("秋霜");

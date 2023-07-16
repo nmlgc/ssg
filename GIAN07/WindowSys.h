@@ -74,6 +74,9 @@ typedef struct tagWINDOW_INFO{
 	BOOL			(*CallBackFn)(WORD);	// 特殊処理用コールバック関数(未使用ならNULL)
 	BYTE			NumItems;				// 項目数(<ITEM_MAX)
 	tagWINDOW_INFO	*ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
+
+	// Returns the maximum number of items among all submenus.
+	uint8_t MaxItems() const;
 } WINDOW_INFO;
 
 // ウィンドウ群 //
@@ -89,6 +92,8 @@ typedef struct tagWINDOW_SYSTEM{
 	WORD			OldKey;					// 前に押されていたキー
 	BYTE			KeyCount;				// キーボードウェイト
 	BOOL			FirstWait;				// 最初のキー解放待ち
+
+	TEXTRENDER_RECT_ID	TRRs[1 + WINITEM_MAX]; // Initialized by Init().
 
 	// Prepares text rendering for a window with the given width.
 	void Init(PIXEL_COORD w);

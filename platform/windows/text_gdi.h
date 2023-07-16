@@ -50,6 +50,7 @@ template <
 > class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
 	Graphics& graphics;
 	Surface& surf;
+	ENUMARRAY<HFONT, FontID>& fonts;
 
 	class SESSION : public TEXTRENDER_GDI_SESSION_BASE {
 		FontID font_cur = FontID::COUNT;
@@ -87,8 +88,6 @@ template <
 	}
 
 public:
-	ENUMARRAY<HFONT, FontID>& fonts;
-
 	// Can share the font array with other GDI renderers.
 	TEXTRENDER_GDI(Graphics& graphics, Surface& surf, decltype(fonts)& fonts) :
 		graphics(graphics), surf(surf), fonts(fonts) {

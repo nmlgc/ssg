@@ -10,7 +10,6 @@
 #include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/UT_MATH.H"
-#include <ddraw.h>
 
 
 // Coordinates
@@ -77,9 +76,25 @@ MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 
 
+uint8_t WINDOW_INFO::MaxItems() const
+{
+	uint8_t ret = NumItems;
+	for(auto i = 0; i < NumItems; i++) {
+		ret = (std::max)(ret, ItemPtr[i]->MaxItems());
+	}
+	return ret;
+}
+
 void WINDOW_SYSTEM::Init(PIXEL_COORD w)
 {
 	W = w;
+
+	// Don't forget the header.
+	const auto max_items = (1 + Parent.MaxItems());
+
+	for(auto i = 0; i < max_items; i++) {
+		TRRs[i] = TextObj.Register({ W, CWIN_ITEM_H });
+	}
 }
 
 void WINDOW_SYSTEM::Open(WINDOW_POINT topleft, int select)
@@ -168,28 +183,25 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	GrpUnlock();
 
 	// 文字列の描画 //
-	if(DxObj.Back->GetDC(&hdc)==DD_OK){
-		top = ws->y;
-		const std::string_view str = p->Title;
+	WINDOW_POINT topleft = { ws->x, ws->y };
+	const auto trr = ws->TRRs[0];
+	const std::string_view str = p->Title;
+	TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+		s.SetFont(GIAN_FONT_ID::SMALL);
+		s.Put({ 1, 0 }, str, RGBA{ 128, 128, 128 });
+		s.Put({ 0, 0 }, str, RGBA{ 255, 255, 255 });
+	});
+	topleft.y += (CWIN_ITEM_H + 1); // ???
 
-		SetBkMode(hdc,TRANSPARENT);
-		auto oldfont = SelectObject(hdc, TextObj.fonts[GIAN_FONT_ID::SMALL]);
-		SetTextColor(hdc,RGB(128,128,128));
-		TextOut(hdc, (ws->x + 1), top, str.data(), str.length());
-		SetTextColor(hdc,RGB(255,255,255));
-		TextOut(hdc, (ws->x + 0), top, str.data(), str.length());
-		top += (CWIN_ITEM_H + 1); // ???
-
-		for(i=0;i<p->NumItems;i++){
-			const std::string_view str = p->ItemPtr[i]->Title;
-			SetTextColor(hdc,RGB(128,128,128));
-			TextOut(hdc, (ws->x + 1 + 8), top, str.data(), str.length());
-			SetTextColor(hdc,RGB(255,255,255));
-			TextOut(hdc, (ws->x + 0 + 8), top, str.data(), str.length());
-			top += CWIN_ITEM_H;
-		}
-		SelectObject(hdc,oldfont);
-		DxObj.Back->ReleaseDC(hdc);
+	for(i = 0; i < p->NumItems; i++) {
+		const auto trr = ws->TRRs[1 + i];
+		const std::string_view str = p->ItemPtr[i]->Title;
+		TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+			s.SetFont(GIAN_FONT_ID::SMALL);
+			s.Put({ (8 + 1), 0 }, str, RGBA{ 128, 128, 128 });
+			s.Put({ (8 + 0), 0 }, str, RGBA{ 255, 255, 255 });
+		});
+		topleft.y += CWIN_ITEM_H;
 	}
 }
 

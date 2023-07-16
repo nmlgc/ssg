@@ -20,7 +20,7 @@ static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
 static void DM_PI(WINDOW_POINT *p, int n);
 static bool DM_RESTORE(void);
-static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
+static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
@@ -30,7 +30,7 @@ int CLIP_Y_MAX = 479;
 
 // キャプチャーを行うか(->MtoB) //
 BOOL CaptureFlag = FALSE;
-void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
+void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 
 // Ｚバッファを必要なら生成し、接続する //
@@ -77,7 +77,7 @@ void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpCircleA)(int x, int y, int r)              = DM_III;
 void(*GrpPolygonA)(WINDOW_POINT *p, int n)                 = DM_PI;
 void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
-void(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf) = STD_GrpBlt;
+void(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 
 static bool(*RestoreHookFn)(void) = DM_RESTORE;	// Restore の事後処理用関数
 
@@ -391,13 +391,15 @@ void GrpSetPalette(const PALETTE& pal)
 	DisableAlphaTable();
 }
 
-SURFACE_DDRAW* GRAPHICS_DDRAW::SurfaceCreate(BYTE surf_id, PIXEL_SIZE size)
+bool GRAPHICS_DDRAW::SurfaceCreate(BYTE surf_id, PIXEL_SIZE size)
 {
 	DDSURFACEDESC		ddsd;
 	IDirectDrawSurface*	temp = nullptr;
 
 
-	if(surf_id>=SURFACE_MAX) return NULL;
+	if(surf_id >= SURFACE_MAX) {
+		return false;
+	}
 	RELEASE(DxSurf[surf_id].surf);
 	DxSurf[surf_id].size = { 0, 0 };
 
@@ -409,14 +411,12 @@ SURFACE_DDRAW* GRAPHICS_DDRAW::SurfaceCreate(BYTE surf_id, PIXEL_SIZE size)
 	ddsd.dwFlags        = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
 	auto dxval = DD->CreateSurface(&ddsd, &temp, nullptr);
-
-	if(dxval==DD_OK){
-		DxSurf[surf_id].surf = temp;
-		DxSurf[surf_id].size = size;
-		SurfaceRestore(DxSurf[surf_id]);
+	if(dxval != DD_OK) {
+		return false;
 	}
-
-	return &DxSurf[surf_id];
+	DxSurf[surf_id].size = size;
+	DxSurf[surf_id].surf = temp;
+	return SurfaceRestore(DxSurf[surf_id]);
 }
 
 bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
@@ -529,29 +529,29 @@ bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 	return TRUE;
 }
 
-void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf)
+void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {
 	RECT rect = { src->left, src->top, src->right, src->bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(
-			x, y, surf->surf, &rect, DDBLTFAST_SRCCOLORKEY
+			x, y, surf.surf, &rect, DDBLTFAST_SRCCOLORKEY
 		);
 	});
 }
 
-void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf)
+void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {
 	RECT rect = { src->left, src->top, src->right, src->bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(
-			x, y, surf->surf, &rect, DDBLTFAST_NOCOLORKEY
+			x, y, surf.surf, &rect, DDBLTFAST_NOCOLORKEY
 		);
 	});
 }
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
-void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf)
+void STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {
 	// 完全に範囲外なら何もしない //
 	if(!GrpClip(src,&x,&y)) return;
@@ -871,4 +871,4 @@ static bool DM_RESTORE(void)
 	return TRUE;
 }
 
-static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf) {}
+static void DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) {}

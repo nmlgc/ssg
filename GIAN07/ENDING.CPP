@@ -252,7 +252,9 @@ void DrawGrpInfo()
 
 	// 驚異の画像表示 //
 	auto src = EGrpInfo.target->rcTarget;
-	GrpBltXC(&src, EGrpInfo.x, EGrpInfo.y, EGrpInfo.target->GrSurf);
+	GrpBltXC(
+		&src, EGrpInfo.x, EGrpInfo.y, GrEndingPic[EGrpInfo.target - EndingGrp]
+	);
 }
 
 

@@ -13,6 +13,7 @@
 ///// [ 定数 ] /////
 #define FACE_MAX				3			// 同時にロード可能な人数...
 #define FACE_NUMX				6			// 顔グラの横の個数
+constexpr auto ENDING_PIC_MAX = 6;
 
 // 特殊グラフィックID (For LoadGraph() ) //
 #define GRAPH_ID_MUSICROOM		(128)		// 音楽室用ＢＭＰのＩＤ(数値は1-6 で無ければ良い)
@@ -71,13 +72,11 @@
 
 
 typedef struct tagFACE_DATA{
-	SURFACE_DDRAW*	GrSurf;	// 顔グラ用 Surface へのポインタ
 	PALETTE	pal;	// 顔グラ用パレット
 } FACE_DATA;
 
 // エンディングのグラフィック管理用 //
 typedef struct tagENDING_GRP{
-	SURFACE_DDRAW*	GrSurf;	// Surface
 	PIXEL_LTRB	rcTarget;	// 矩形の範囲
 	PALETTE	pal;	// パレット
 } ENDING_GRP;
@@ -94,7 +93,7 @@ extern BOOL LoadMusic(int no);						// ｎ番目の曲をロードする
 extern BOOL LoadSound(void);						// 全ての Sound データをロードする
 extern BOOL LoadMusicRoomComment(int no);			// MusicRoom のコメントをロードする
 
-extern void LoadPaletteFrom(SURFACE_DDRAW* surf);
+extern void LoadPaletteFrom(SURFACE_DDRAW& surf);
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
 
 extern void CleanupLens(void);	//  レンズを破棄する
@@ -132,12 +131,17 @@ enum GIAN_SURFACE_ID {
 	SURFACE_ID_LENS = 8,	// レンズエフェクト用
 };
 
-extern SURFACE_DDRAW*	GrTama;	// システム用
-extern SURFACE_DDRAW*	GrEnemy;	// 敵(雑魚＆ボス)用
-extern SURFACE_DDRAW*	GrMap;	// 背景用
-extern SURFACE_DDRAW*	GrMTitle;	// 曲のタイトル加工用
-extern SURFACE_DDRAW*	GrBomber;	// ボム用グラフィック用
-extern SURFACE_DDRAW*	GrLens;	// レンズエフェクト用
+extern SURFACE_DDRAW&	GrTama;	// システム用
+extern SURFACE_DDRAW&	GrEnemy;	// 敵(雑魚＆ボス)用
+extern SURFACE_DDRAW&	GrMap;	// 背景用
+extern SURFACE_DDRAW&	GrMTitle;	// 曲のタイトル加工用
+extern SURFACE_DDRAW&	GrBomber;	// ボム用グラフィック用
+extern SURFACE_DDRAW&	GrLens;	// レンズエフェクト用
+
+// 顔グラ用
+extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX];
+
+extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[ENDING_PIC_MAX];
 
 extern FACE_DATA	FaceData[FACE_MAX];	// 顔グラ用
 
@@ -148,7 +152,7 @@ extern char MTitleBuffer[50];
 
 extern PALETTE SProjectPalette;
 
-extern ENDING_GRP	EndingGrp[6];
+extern ENDING_GRP	EndingGrp[ENDING_PIC_MAX];
 
 
 

@@ -293,7 +293,7 @@ void MWinDraw(void)
 	DrawWindowFrame(x,y,w,h);
 
 	// お顔をかきましょう(表示を要請されている場合にだけ) //
-	auto* GrFace = FaceData[MsgWindow.FaceID/FACE_NUMX].GrSurf;
+	auto& GrFace = GrFaces[MsgWindow.FaceID / FACE_NUMX];
 	switch(MsgWindow.FaceState){
 		case(MFACE_WAIT):
 			oy = MsgWindow.MaxSize.bottom - 100;

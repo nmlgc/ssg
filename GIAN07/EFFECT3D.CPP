@@ -121,7 +121,7 @@ void InitWarning(void)
 void DrawWarning(void)
 {
 	PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
-	extern SURFACE_DDRAW* GrTama;
+	extern SURFACE_DDRAW& GrTama;
 	int	st,det;
 	static int count;
 

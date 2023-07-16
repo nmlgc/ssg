@@ -201,7 +201,7 @@ public:
 	// --------------------------- //
 
 	// Surface の作成(BMPリロード有り)
-	SURFACE_DDRAW* SurfaceCreate(BYTE surf_id, PIXEL_SIZE size);
+	bool SurfaceCreate(BYTE surf_id, PIXEL_SIZE size);
 
 	// ＢＭＰファイルロード //
 	bool SurfaceLoad(BYTE surf_id, BMP_OWNED bmp);
@@ -292,17 +292,17 @@ extern void (*GrpPolygonA)(WINDOW_POINT *p, int n);	// αポリゴン塗りつ�
 
 extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 
-extern void (*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);	// ビットマップ転送(WithClip)
+extern void (*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW &surf); // ビットマップ転送(WithClip)
 
 extern bool GrpClip(PIXEL_LTRB *src, int *x, int *y);	// クリッピングをかける
 extern void GrpGetClip(WINDOW_LTRB *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
+void GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW* surf);
+void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 #endif

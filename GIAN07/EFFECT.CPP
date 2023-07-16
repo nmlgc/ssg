@@ -446,8 +446,6 @@ void SEffectDraw(void)
 // エフェクト用 Restore 処理 //
 bool SEffectRestore(void)
 {
-	if(GrMTitle==NULL) return FALSE;
-
 	DrawGrdFont(GrMTitle,MTitleBuf);
 
 	return TRUE;

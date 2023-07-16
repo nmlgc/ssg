@@ -65,18 +65,36 @@ BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
 
 
 // グローバル変数 //
-SURFACE_DDRAW* GrTama   = nullptr;	// 弾など
-SURFACE_DDRAW* GrEnemy  = nullptr;	// 雑魚など
-SURFACE_DDRAW* GrMap    = nullptr;	// 背景
-SURFACE_DDRAW* GrMTitle = nullptr;	// 曲のタイトル加工用
-SURFACE_DDRAW* GrBomber = nullptr;	// ボム用グラフィック用
-SURFACE_DDRAW* GrLens   = nullptr;	// レンズエフェクト用
+SURFACE_DDRAW& GrTama   = DxSurf[SURFACE_ID_SYSTEM];	// 弾など
+SURFACE_DDRAW& GrEnemy  = DxSurf[SURFACE_ID_ENEMY];	// 雑魚など
+SURFACE_DDRAW& GrMap    = DxSurf[SURFACE_ID_MAPCHIP];	// 背景
+SURFACE_DDRAW& GrMTitle = DxSurf[SURFACE_ID_MTITLE];	// 曲のタイトル加工用
+SURFACE_DDRAW& GrBomber = DxSurf[SURFACE_ID_BOMBER];	// ボム用グラフィック用
+SURFACE_DDRAW& GrLens   = DxSurf[SURFACE_ID_LENS];	// レンズエフェクト用
+
+extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX] = {
+	{ DxSurf[SURFACE_ID_FACE + 0] },
+	{ DxSurf[SURFACE_ID_FACE + 1] },
+	{ DxSurf[SURFACE_ID_FACE + 2] },
+};
+
+extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
+	ENDING_PIC_MAX
+] = {
+	{ DxSurf[SURFACE_ID_ENEMY] },
+	{ DxSurf[SURFACE_ID_ENEMY] },
+	{ DxSurf[SURFACE_ID_ENEMY] },
+	{ DxSurf[SURFACE_ID_ENEMY] },
+	{ DxSurf[SURFACE_ID_BOMBER] },
+	{ DxSurf[SURFACE_ID_BOMBER] },
+};
+
 
 LensInfo	*Lens = NULL;
 
 DWORD		MusicNum = 0;			// 曲数
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
-ENDING_GRP	EndingGrp[6];			// エンディング用
+ENDING_GRP	EndingGrp[ENDING_PIC_MAX];	// エンディング用
 
 char MCommentBuffer[12][50];
 char MTitleBuffer[50];
@@ -107,36 +125,29 @@ BOOL InitSurface(void)
 
 //	bIsBombPalette = FALSE;
 
-	GrTama = DxObj.SurfaceCreate(SURFACE_ID_SYSTEM, { 640, 480 });
-	if(GrTama==NULL) return FALSE;
-
-	GrMap = DxObj.SurfaceCreate(SURFACE_ID_MAPCHIP, { 640, 480 });
-	if(GrMap==NULL) return FALSE;
-
-	GrEnemy = DxObj.SurfaceCreate(SURFACE_ID_ENEMY, { 640, 480 });
-	if(GrEnemy==NULL) return FALSE;
-
-	for(i=0;i<FACE_MAX;i++){
-		FaceData[i].GrSurf = DxObj.SurfaceCreate(
-			(SURFACE_ID_FACE + i), { (96 * FACE_NUMX), 96 }
-		);
-		if(FaceData[i].GrSurf==NULL) return FALSE;
+	if(
+		!DxObj.SurfaceCreate(SURFACE_ID_SYSTEM, { 640, 480 }) ||
+		!DxObj.SurfaceCreate(SURFACE_ID_MAPCHIP, { 640, 480 }) ||
+		!DxObj.SurfaceCreate(SURFACE_ID_ENEMY, { 640, 480 }) ||
+		!DxObj.SurfaceCreate(SURFACE_ID_BOMBER, { 640, 480 }) ||
+		!DxObj.SurfaceCreate(SURFACE_ID_MTITLE, { 640, 20 }) ||
+		!DxObj.SurfaceCreate(SURFACE_ID_LENS, { 140, 140 })
+	) {
+		return false;
 	}
 
-	GrBomber = DxObj.SurfaceCreate(SURFACE_ID_BOMBER, { 640, 480 });
-	if(GrBomber == NULL) return FALSE;
-
-	GrMTitle = DxObj.SurfaceCreate(SURFACE_ID_MTITLE, { 640, 20 });
-	if(GrMTitle==NULL) return FALSE;
-
+	for(i=0;i<FACE_MAX;i++){
+		if(!DxObj.SurfaceCreate(
+			(SURFACE_ID_FACE + i), { (96 * FACE_NUMX), 96 }
+		)) {
+			return false;
+		}
+	}
 
 	// レンズをすでに作成しているのなら、破棄する //
 	if(Lens) GrpReleaseLensBall(Lens);
 
-	GrLens = DxObj.SurfaceCreate(SURFACE_ID_LENS, { 140, 140 });
-	if(GrLens==NULL) return FALSE;
-
-	Lens = GrpCreateLensBall(70, 36, GrLens);
+	Lens = GrpCreateLensBall(70, 36, &GrLens);
 	if(Lens == NULL) return FALSE;
 
 	return TRUE;
@@ -153,7 +164,7 @@ void CleanupLens(void)
 // あるステージのグラフィックをロードする //
 BOOL LoadGraph(int stage)
 {
-	int			i, x, y;
+	int	x, y;
 	HRESULT		ddrval;
 
 //	bIsBombPalette = FALSE;
@@ -190,20 +201,17 @@ BOOL LoadGraph(int stage)
 		const auto in = FilStartR(_PATH("GRAPH2.DAT"));
 
 		RECT src = { 0, 0, 320, 240 };
-		for(i=0; i<6; i++){
+		for(auto i = 0; i < ENDING_PIC_MAX; i++) {
 			if(!GrpBMPLoadP(in,1+i,SURFACE_ID_MAPCHIP))		return FALSE;
 			GrpGetPalette(EndingGrp[i].pal);
 			if(i>=4) BltSetRect(&EndingGrp[i].rcTarget, (i%4)*320, 0, 320, 240);
 			else     BltSetRect(&EndingGrp[i].rcTarget, (i%2)*320, (i/2)*240, 320, 240);
 
-			if(i<4) EndingGrp[i].GrSurf = GrEnemy;
-			else    EndingGrp[i].GrSurf = GrBomber;
-
 			x = EndingGrp[i].rcTarget.left;
 			y = EndingGrp[i].rcTarget.top;
 			for(;;){
-				ddrval = EndingGrp[i].GrSurf->surf->BltFast(
-					x, y, GrMap->surf, &src, DDBLTFAST_NOCOLORKEY
+				ddrval = GrEndingPic[i].get().surf->BltFast(
+					x, y, GrMap.surf, &src, DDBLTFAST_NOCOLORKEY
 				);
 				if(ddrval == DD_OK){
 					break;
@@ -287,13 +295,14 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 	return TRUE;
 }
 
-void LoadPaletteFrom(SURFACE_DDRAW* surf)
+void LoadPaletteFrom(SURFACE_DDRAW& surf)
 {
 	LPDIRECTDRAWPALETTE		lpdp;
 
 	if(DxObj.PixelFormat.IsChanneled()) return;
-	if(!surf) return;
-	if(surf->surf->GetPalette(&lpdp) != DD_OK) return;
+	if(surf.surf->GetPalette(&lpdp) != DD_OK) {
+		return;
+	}
 
 	auto p = DxObj.PaletteForDDraw();
 	lpdp->GetEntries(0, 0, p.size(), p.data());

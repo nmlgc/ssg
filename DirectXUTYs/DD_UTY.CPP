@@ -247,10 +247,9 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 
 		GrpSetClip(0,0,640,480);
 
-		for(size_t i = 0; i < SURFACE_MAX; i++) {
-			auto& surf = DxSurf[i];
+		for(auto& surf : DxSurf) {
 			if(surf.size) {
-				SurfaceCreateUninitialized(i, surf.size);
+				SurfaceCreateUninitialized(surf, surf.size);
 				SurfaceRestore(surf);
 			}
 		}
@@ -390,17 +389,15 @@ void GrpSetPalette(const PALETTE& pal)
 	DisableAlphaTable();
 }
 
-bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size)
+bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
+	SURFACE_DDRAW& surf, PIXEL_SIZE size
+)
 {
 	DDSURFACEDESC		ddsd;
 	IDirectDrawSurface*	temp = nullptr;
 
-
-	if(surf_id >= SURFACE_MAX) {
-		return false;
-	}
-	RELEASE(DxSurf[surf_id].surf);
-	DxSurf[surf_id].size = { 0, 0 };
+	RELEASE(surf.surf);
+	surf.size = { 0, 0 };
 
 	ZEROMEM(ddsd);
 
@@ -413,15 +410,13 @@ bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size)
 	if(dxval != DD_OK) {
 		return false;
 	}
-	DxSurf[surf_id].size = size;
-	DxSurf[surf_id].surf = temp;
+	surf.size = size;
+	surf.surf = temp;
 	return true;
 }
 
-bool GRAPHICS_DDRAW::SurfaceCreateBlank(BYTE surf_id, PIXEL_SIZE size)
+bool GRAPHICS_DDRAW::SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size)
 {
-	auto& surf = DxSurf[surf_id];
-
 	surf.Delete();
 
 	if(
@@ -447,7 +442,7 @@ bool GRAPHICS_DDRAW::SurfaceCreateBlank(BYTE surf_id, PIXEL_SIZE size)
 		return false;
 	}
 	surf.stock_img = SelectObject(surf.dc, surf.img);
-	return SurfaceCreateUninitialized(surf_id, size);
+	return SurfaceCreateUninitialized(surf, size);
 }
 
 bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
@@ -459,7 +454,7 @@ bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
 		std::abs(bmp.info.biWidth), std::abs(bmp.info.biHeight),
 	};
 	if(surf.size != bmp_size) {
-		if(!SurfaceCreateUninitialized(surf_id, bmp_size)) {
+		if(!SurfaceCreateUninitialized(surf, bmp_size)) {
 			return false;
 		}
 	}

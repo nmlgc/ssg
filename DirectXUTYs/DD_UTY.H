@@ -206,16 +206,17 @@ public:
 	bool SurfaceCreate(BYTE surf_id, PIXEL_SIZE size);
 
 	// (Re-)creates the DirectDraw surface associated with [surf_id], in the
-	// given size and with undefined initial contents. After filling the GDI
-	// surface with the intended pixels, call SurfaceRestore() to upload them
-	// to the DirectDraw one.
-	bool SurfaceCreateUninitialized(BYTE surf_id, PIXEL_SIZE size);
+	// given size and with undefined initial contents, retaining whatever state
+	// the GDI surface might have had. After filling the GDI surface with the
+	// intended pixels, call SurfaceRestore() to upload them to the DirectDraw
+	// surface.
+	bool SurfaceCreateUninitialized(SURFACE_DDRAW& surf, PIXEL_SIZE size);
 
-	// (Re-)creates the GDI and DirectDraw surfaces associated with [surf_id],
-	// in the given size and with undefined initial contents. After filling the
+	// (Re-)creates the GDI and DirectDraw surfaces associated with [surf], in
+	// the given size and with undefined initial contents. After filling the
 	// GDI surface with the intended pixels, call SurfaceRestore() to upload
 	// them to the DirectDraw one.
-	bool SurfaceCreateBlank(BYTE surf_id, PIXEL_SIZE size);
+	bool SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size);
 
 	// Consumes the given .BMP file and sets the given surface to its contents,
 	// re-creating it in the correct size if necessary.

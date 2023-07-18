@@ -474,11 +474,15 @@ void GameSTD_Init(void)
 }
 
 
-// ゲームの初期化をする //
-extern bool GameInit(void)
+bool WeaponSelectInit(bool ExStg)
 {
 	GrpCls();
 	GrpFlip();
+
+	if(ExStg) {
+		TempGameLevel         = ConfigDat.GameLevel.v;
+		ConfigDat.GameLevel.v = GAME_HARD;
+	}
 
 	GameSTD_Init();
 	PlayRankReset();
@@ -490,35 +494,22 @@ extern bool GameInit(void)
 	WeaponKeyWait = 1;
 	Viv.weapon    = 0;
 	GameMain = WeaponSelectProc;
+	if(ExStg) {
+		GameStage = GRAPH_ID_EXSTAGE;
+	}
 
 	VivTemp = Viv;
 
 	return TRUE;
 }
 
-// エキストラステージを始める //
-extern bool GameExstgInit(void)
+bool GameInit(void(*NextProc)(void))
 {
-	GrpCls();
-	GrpFlip();
-
-	TempGameLevel         = ConfigDat.GameLevel.v;
-	ConfigDat.GameLevel.v = GAME_HARD;
-
-	GameSTD_Init();
-	PlayRankReset();
-
-	MaidSet();
-
-	GrpSetClip(0,0,640,480);
-
-	WeaponKeyWait = 1;
-	Viv.weapon    = 0;
-	GameMain = WeaponSelectProc;
-	GameStage = GRAPH_ID_EXSTAGE;
-
-	VivTemp = Viv;
-
+	if(NextProc != DemoProc) {
+		Mid_FadeOut(240);
+	}
+	GrpSetClip(X_MIN, Y_MIN, X_MAX, Y_MAX);
+	GameMain = NextProc;
 	return TRUE;
 }
 
@@ -586,12 +577,7 @@ extern bool GameReplayInit(int Stage)
 		Viv.credit = 0;
 	}
 
-	GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
-	GameMain = ReplayProc;
-
-	Mid_FadeOut(240);
-
-	return TRUE;
+	return GameInit(ReplayProc);
 }
 
 void ReplayProc(void)
@@ -673,10 +659,7 @@ bool DemoInit(void)
 		return FALSE;
 	}
 
-	GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
-	GameMain = DemoProc;
-
-	return TRUE;
+	return GameInit(DemoProc);
 }
 
 void FadeoutPalette(const PALETTE& Src, uint8_t a)
@@ -1132,10 +1115,7 @@ void WeaponSelectProc(void)
 				return;
 			}
 
-			Mid_FadeOut(240);
-			GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
-
-			GameMain = GameProc;
+			GameInit(GameProc);
 		return;
 
 		case(KEY_ESC):case(KEY_BOMB):
@@ -1283,7 +1263,7 @@ void TitleProc(void)
 	if(MainWindow.State==CWIN_DEAD){
 		switch(MainWindow.Select[0]){
 			case(0):
-				GameInit();
+				WeaponSelectInit(false);
 			return;
 
 			default:

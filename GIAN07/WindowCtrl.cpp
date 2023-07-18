@@ -641,7 +641,7 @@ static BOOL MainFnGameStart(WORD key)
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
 			//EndingInit();
-			GameInit();
+			WeaponSelectInit(false);
 		default:
 		return TRUE;
 	}
@@ -652,7 +652,7 @@ static BOOL MainFnExStart(WORD key)
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
 			if(ConfigDat.ExtraStgFlags.v) {
-				GameExstgInit();
+				WeaponSelectInit(true);
 			}
 		default:
 		return TRUE;

@@ -75,21 +75,20 @@ MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 
 
-// コマンドウィンドウの初期化 //
-void CWinInit(WINDOW_SYSTEM *ws,int x,int y,int select)
+void WINDOW_SYSTEM::Open(WINDOW_POINT topleft, int select)
 {
-	ws->x = x;
-	ws->y = y;
+	x = topleft.x;
+	y = topleft.y;
 
-	ws->Count       = 0;
-	ws->Select[0]   = select;
-	ws->SelectDepth = 0;
-	ws->State       = CWIN_INIT;
+	Count       = 0;
+	Select[0]   = select;
+	SelectDepth = 0;
+	State       = CWIN_INIT;
 
-	ws->OldKey   = Key_Data;
-	ws->KeyCount = CWIN_KEYWAIT;
+	OldKey   = Key_Data;
+	KeyCount = CWIN_KEYWAIT;
 
-	ws->FirstWait = TRUE;
+	FirstWait = true;
 }
 
 // コマンドウィンドウを１フレーム動作させる //

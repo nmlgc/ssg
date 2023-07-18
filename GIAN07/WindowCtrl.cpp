@@ -251,10 +251,6 @@ void InitMainWindow(void)
 		MainItem[3].NumItems = 5;
 		MainItem[3].ItemPtr[4] = CfgItem + 5;
 	}
-
-	CWinInit(&MainWindow,400,250,0);
-	//CWinInit(&MainWindow,150,200,0);
-	//CWinInit(&MainWindow,250,150,0);
 }
 
 
@@ -267,8 +263,6 @@ void InitExitWindow(void)
 
 	ExitWindow.Parent.ItemPtr[0] = &ExitYesNoItem[0];
 	ExitWindow.Parent.ItemPtr[1] = &ExitYesNoItem[1];
-
-	CWinInit(&ExitWindow,250,150,1);
 }
 
 void InitContinueWindow(void)
@@ -280,8 +274,6 @@ void InitContinueWindow(void)
 
 	ContinueWindow.Parent.ItemPtr[0] = &ContinueYesNoItem[0];
 	ContinueWindow.Parent.ItemPtr[1] = &ContinueYesNoItem[1];
-
-	CWinInit(&ContinueWindow,250,150+50,0);
 }
 
 static BOOL DifFnPlayerStock(WORD key)

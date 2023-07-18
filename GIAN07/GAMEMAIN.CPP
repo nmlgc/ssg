@@ -518,6 +518,10 @@ bool GameInit(void(*NextProc)(void))
 		} else if(!(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)) {
 			MWinInit({ 128, 400, (640 - 128), 480 });
 		}
+
+		// These windows can also only show up outside of replays.
+		InitExitWindow();
+		InitContinueWindow();
 	}
 	GrpSetClip(X_MIN, Y_MIN, X_MAX, Y_MAX);
 	GameMain = NextProc;
@@ -822,13 +826,16 @@ extern bool GameExit(bool bNeedChgMusic)
 	LLaserSetup();		// 音を止める
 	SndStop(8);			// ワーニング音を止めるのだ
 
-	InitMainWindow();
-
 	//LoadFace(0,0);
 	MWinForceClose();
 	MWinInit({ (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 });
 	MWinOpen();
 	//MWinFace(0);
+
+	InitMainWindow();
+	MainWindow.Open({ 400, 250 }, 0);
+	// MainWindow.Open({ 150, 200 }, 0);
+	// MainWindow.Open({ 250, 150 }, 0);
 
 	DemoTimer = 0;
 
@@ -893,7 +900,7 @@ void GameProc(void)
 			return;
 		}
 
-		InitExitWindow();
+		ExitWindow.Open({ 250, 150 }, 1);
 		GameMain = PauseProc;
 		return;
 	}
@@ -946,7 +953,7 @@ void GameOverProc0(void)
 			return;			// 仮
 		}
 
-		InitContinueWindow();
+		ContinueWindow.Open({ 250, 200 }, 0);
 		GameMain = GameOverProc;
 		return;
 	}

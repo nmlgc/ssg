@@ -88,6 +88,9 @@ typedef struct tagWINDOW_SYSTEM{
 	WORD			OldKey;					// 前に押されていたキー
 	BYTE			KeyCount;				// キーボードウェイト
 	BOOL			FirstWait;				// 最初のキー解放待ち
+
+	// コマンドウィンドウの初期化 //
+	void Open(WINDOW_POINT topleft, int select);
 } WINDOW_SYSTEM;
 
 
@@ -95,10 +98,6 @@ typedef struct tagWINDOW_SYSTEM{
 ///// [ 関数 ] /////
 
 // コマンドウィンドウ処理 //
-
-// コマンドウィンドウの初期化 //
-void CWinInit(WINDOW_SYSTEM *ws,int x,int y,int select);
-
 void CWinMove(WINDOW_SYSTEM *ws);				// コマンドウィンドウを１フレーム動作させる
 void CWinDraw(WINDOW_SYSTEM *ws);				// コマンドウィンドウの描画
 BOOL CWinExitFn(WORD key);						// コマンド [Exit] のデフォルト処理関数

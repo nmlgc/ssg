@@ -124,12 +124,12 @@ bool EndingInit(void)
 	EText.NumText = 0;
 
 	for(i=0; i<7; i++){
-		pFontInfo[i] = CreateExtraFont(GrMap, &src[i]);
+		pFontInfo[i] = CreateExtraFont(GrEndingCredits, &src[i]);
 		if(pFontInfo[i] == NULL) return FALSE;
 	}
 
 	for(i=0; i<7; i++){
-		pMember[i] = CreateExtraFont(GrMap, &src2[i]);
+		pMember[i] = CreateExtraFont(GrEndingCredits, &src2[i]);
 		if(pMember[i] == NULL) return FALSE;
 	}
 
@@ -255,7 +255,7 @@ void DrawGrpInfo()
 	if(!EGrpInfo.bWantDisp) return;
 
 	// 驚異の画像表示 //
-	auto src = EGrpInfo.target->rcTarget;
+	PIXEL_LTRB src = { 0, 0, 320, 240 };
 	GrpBltXC(
 		&src, EGrpInfo.x, EGrpInfo.y, GrEndingPic[EGrpInfo.target - EndingGrp]
 	);

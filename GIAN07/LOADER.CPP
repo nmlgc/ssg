@@ -80,6 +80,7 @@ SURFACE_DDRAW& GrSProject	= DxSurf[SURFACE_ID_SPROJECT];
 SURFACE_DDRAW& GrTitle	= DxSurf[SURFACE_ID_TITLE];
 SURFACE_DDRAW& GrMusic	= DxSurf[SURFACE_ID_MUSIC];
 SURFACE_DDRAW& GrNameReg	= DxSurf[SURFACE_ID_NAMEREG];
+SURFACE_DDRAW& GrEndingCredits	= DxSurf[SURFACE_ID_ENDING_CREDITS];
 
 extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX] = {
 	{ DxSurf[SURFACE_ID_FACE + 0] },
@@ -90,12 +91,12 @@ extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX] = {
 extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
 	ENDING_PIC_MAX
 ] = {
-	{ DxSurf[SURFACE_ID_ENEMY] },
-	{ DxSurf[SURFACE_ID_ENEMY] },
-	{ DxSurf[SURFACE_ID_ENEMY] },
-	{ DxSurf[SURFACE_ID_ENEMY] },
-	{ DxSurf[SURFACE_ID_BOMBER] },
-	{ DxSurf[SURFACE_ID_BOMBER] },
+	{ DxSurf[SURFACE_ID_ENDING_PIC + 0] },
+	{ DxSurf[SURFACE_ID_ENDING_PIC + 1] },
+	{ DxSurf[SURFACE_ID_ENDING_PIC + 2] },
+	{ DxSurf[SURFACE_ID_ENDING_PIC + 3] },
+	{ DxSurf[SURFACE_ID_ENDING_PIC + 4] },
+	{ DxSurf[SURFACE_ID_ENDING_PIC + 5] },
 };
 
 
@@ -156,9 +157,6 @@ void CleanupLens(void)
 // あるステージのグラフィックをロードする //
 BOOL LoadGraph(int stage)
 {
-	int	x, y;
-	HRESULT		ddrval;
-
 //	bIsBombPalette = FALSE;
 
 	// 音楽室用 //
@@ -192,35 +190,15 @@ BOOL LoadGraph(int stage)
 	if(stage==GRAPH_ID_ENDING){
 		const auto in = FilStartR(_PATH("GRAPH2.DAT"));
 
-		RECT src = { 0, 0, 320, 240 };
-		for(auto i = 0; i < ENDING_PIC_MAX; i++) {
-			if(!GrpBMPLoadP(in,1+i,SURFACE_ID_MAPCHIP))		return FALSE;
-			GrpGetPalette(EndingGrp[i].pal);
-			if(i>=4) EndingGrp[i].rcTarget = PIXEL_LTWH{ ((i % 4) * 320), 0, 320, 240 };
-			else     EndingGrp[i].rcTarget = PIXEL_LTWH{ ((i % 2) * 320), ((i / 2) * 240), 320, 240 };
-
-			x = EndingGrp[i].rcTarget.left;
-			y = EndingGrp[i].rcTarget.top;
-			for(;;){
-				ddrval = GrEndingPic[i].get().surf->BltFast(
-					x, y, GrMap.surf, &src, DDBLTFAST_NOCOLORKEY
-				);
-				if(ddrval == DD_OK){
-					break;
-				}
-				if(ddrval == DDERR_SURFACELOST){
-					if(!DxObj.Restore()) {
-						return false;
-					}
-				}
-				if(ddrval != DDERR_WASSTILLDRAWING){
-					return FALSE;
-				}
-			}
+		if(!GrpBMPLoadP(in, 0, SURFACE_ID_ENDING_CREDITS)) {
+			return false;
 		}
-
-		if(!GrpBMPLoadP(in, 0, SURFACE_ID_MAPCHIP))		return FALSE;
-
+		for(auto i = 0; i < ENDING_PIC_MAX; i++) {
+			if(!GrpBMPLoadP(in, (1 + i), (SURFACE_ID_ENDING_PIC + i))) {
+				return false;
+			}
+			GrpGetPalette(EndingGrp[i].pal);
+		}
 		return TRUE;
 	}
 

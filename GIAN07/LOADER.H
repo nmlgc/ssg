@@ -129,6 +129,11 @@ enum GIAN_SURFACE_ID {
 	SURFACE_ID_SPROJECT = 1,	// 西方Project表示用
 	SURFACE_ID_LENS = 7,	// レンズエフェクト用
 
+	// Endings
+	SURFACE_ID_ENDING_CREDITS = 1,
+	SURFACE_ID_ENDING_PIC,
+	SURFACE_ID_ENDING_PIC_last = (SURFACE_ID_ENDING_PIC + ENDING_PIC_MAX - 1),
+
 	// Rendered text. Since this one is procedurally generated and therefore
 	// doesn't have a palette, it must come last to ensure that DirectDraw
 	// initializes it with the implicit palette loaded for an earlier surface.
@@ -144,6 +149,7 @@ extern SURFACE_DDRAW&	GrSProject;
 extern SURFACE_DDRAW&	GrTitle;
 extern SURFACE_DDRAW&	GrMusic;
 extern SURFACE_DDRAW&	GrNameReg;
+extern SURFACE_DDRAW&	GrEndingCredits;
 extern SURFACE_DDRAW&	GrText;
 
 // 顔グラ用

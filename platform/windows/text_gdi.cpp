@@ -60,7 +60,12 @@ void TEXTRENDER_GDI_SESSION_BASE::Put(
 	if(color) {
 		SetColor(color.value());
 	}
-	auto left = (rect.left + topleft_rel.x);
-	auto top =  (rect.top  + topleft_rel.y);
-	TextOutA(hdc, left, top, str.data(), str.size());
+	RECT r = {
+		.left = (rect.left + topleft_rel.x),
+		.top = (rect.top + topleft_rel.y),
+		.right = (rect.left + rect.w),
+		.bottom = (rect.top + rect.h),
+	};
+	const UINT flags = (DT_LEFT | DT_TOP | DT_SINGLELINE);
+	DrawTextA(hdc, str.data(), str.size(), &r, flags);
 }

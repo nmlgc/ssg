@@ -94,6 +94,14 @@ public:
 		graphics(graphics), surf(surf), fonts(fonts) {
 	}
 
+	void WipeBeforeNextRender() {
+		TEXTRENDER_PACKED::Wipe();
+
+		// This also skips the needless creation of an uninitialized surface
+		// during DirectDraw's init function.
+		surf.size = { 0, 0 };
+	}
+
 	bool Prerender(
 		TEXTRENDER_RECT_ID rect_id,
 		TEXTRENDER_SESSION_FUNC<SESSION, FontID> auto func

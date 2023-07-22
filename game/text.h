@@ -71,6 +71,11 @@ template <class T, class Session, class FontID> concept TEXTRENDER = requires(
 	t.Clear();
 	// --------------------
 
+	// Forces the next (pre-)render call to clear all image data and recreate
+	// the surface with the necessary size, but retaining all registered
+	// rectangles. Necessary for mode switches.
+	t.WipeBeforeNextRender();
+
 	// Retained interface
 	// ------------------
 	// Explicit prerendering with later blitting.

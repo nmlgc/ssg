@@ -43,26 +43,32 @@ struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 	}
 };
 
-struct BYTE_BUFFER_CURSOR : private BYTE_BUFFER_BORROWED {
+template <
+	typename ConstOrNonConstByte
+> struct BYTE_BUFFER_CURSOR : public std::span<ConstOrNonConstByte> {
+	using std::span<ConstOrNonConstByte>::span;
+
+	template <typename T> using transfer_const = std::conditional_t<
+		std::is_const_v<ConstOrNonConstByte>, const T, T
+	>;
+
 	size_t cursor = 0;
 
 	// Reads up to [n] contiguous values of type T from the active cursor
 	// position if possible. If the function returns a valid span, all [n]
 	// objects are safe to access.
-	template <typename T> std::optional<std::span<const T>> next(size_t n = 1) {
+	template <typename T> std::optional<std::span<transfer_const<T>>> next(
+		size_t n = 1
+	) {
 		auto cursor_new = (cursor + (sizeof(T) * n));
-		if((cursor_new > size()) || (cursor_new < cursor)) {
+		if((cursor_new > this->size()) || (cursor_new < cursor)) {
 			return std::nullopt;
 		}
-		auto ret = std::span<const T>(
-			reinterpret_cast<const T *>(data() + cursor), n
-		);
+		auto ret = std::span<transfer_const<T>>{
+			reinterpret_cast<transfer_const<T> *>(this->data() + cursor), n
+		};
 		cursor = cursor_new;
 		return ret;
-	}
-
-	BYTE_BUFFER_CURSOR(BYTE_BUFFER_BORROWED buffer) :
-		BYTE_BUFFER_BORROWED(buffer) {
 	}
 };
 
@@ -89,9 +95,14 @@ public:
 		return size_;
 	}
 
-	// Borrows a buffer with a cursor.
-	BYTE_BUFFER_CURSOR cursor() const {
-		return { { get(), size() } };
+	// Borrows a buffer with an immutable cursor.
+	BYTE_BUFFER_CURSOR<const uint8_t> cursor() const {
+		return { get(), size() };
+	}
+
+	// Borrows a buffer with a mutable cursor.
+	BYTE_BUFFER_CURSOR<uint8_t> cursor_mut() {
+		return { get(), size() };
 	}
 };
 

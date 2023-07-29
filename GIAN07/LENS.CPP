@@ -72,10 +72,14 @@ static void __BackSurfUnlock(void)
 
 // 半径:r  出っ張り:m  のレンズを作成 //
 std::optional<LensInfo> GrpCreateLensBall(
-	uint16_t r, uint16_t m, SURFACE_DDRAW* surf
+	uint16_t r, uint16_t m, SURFACE_DDRAW& surf
 )
 {
-	LensInfo	NewLens;
+	if(!DxObj.SurfaceCreateUninitialized(surf, { (r * 2), (r * 2) })) {
+		return std::nullopt;
+	}
+
+	LensInfo	NewLens = { .gTemp = &surf };
 	DWORD		DataSize;
 	int	dx,z,w;
 
@@ -94,8 +98,6 @@ std::optional<LensInfo> GrpCreateLensBall(
 	if(NewLens.Data == nullptr) {
 		return std::nullopt;
 	}
-
-	NewLens.gTemp = surf;
 
 	NewLens.r      = r;
 	NewLens.Height = Diameter;

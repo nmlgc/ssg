@@ -131,14 +131,10 @@ BOOL InitSurface(void)
 {
 //	bIsBombPalette = FALSE;
 
-	if(!DxObj.SurfaceCreateUninitialized(GrLens, { 140, 140 })) {
-		return false;
-	}
-
 	// レンズをすでに作成しているのなら、破棄する //
 	if(Lens) GrpReleaseLensBall(Lens);
 
-	Lens = GrpCreateLensBall(70, 36, &GrLens);
+	Lens = GrpCreateLensBall(70, 36, GrLens);
 	if(!Lens) {
 		return false;
 	}

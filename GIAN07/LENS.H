@@ -38,7 +38,7 @@ extern std::optional<LensInfo> Lens;
 
 // 半径:r  出っ張り:m  のレンズを作成 //
 std::optional<LensInfo> GrpCreateLensBall(
-	uint16_t r, uint16_t m, SURFACE_DDRAW* surf
+	uint16_t r, uint16_t m, SURFACE_DDRAW& surf
 );
 
 // レンズボール用データを破棄する //

@@ -255,7 +255,6 @@ BOOL XInit(void)
 	if(!DxObj.Init(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
 		return false;
 	}
-	InitSurface();
 
 	// サウンドの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {

@@ -11,7 +11,6 @@
 #include "MUSIC.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
-#include "LENS.H"
 #include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include <assert.h>
@@ -101,8 +100,6 @@ extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
 };
 
 
-std::optional<LensInfo>	Lens;
-
 DWORD		MusicNum = 0;			// 曲数
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
 ENDING_GRP	EndingGrp[ENDING_PIC_MAX];	// エンディング用
@@ -124,21 +121,6 @@ PALETTE SProjectPalette;
 static void SetAnimeRect(ANIME_DATA *anm, int x, int y, int w, int h);
 static void SetAnimeRect2(ANIME_DATA *anm, int x1, int y1, int x2, int y2);
 static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n);
-
-
-// Surface を作成する //
-BOOL InitSurface(void)
-{
-//	bIsBombPalette = FALSE;
-
-	// レンズをすでに作成しているのなら、破棄する //
-	Lens = GrpCreateLensBall(70, 36, GrLens);
-	if(!Lens) {
-		return false;
-	}
-
-	return TRUE;
-}
 
 
 // あるステージのグラフィックをロードする //

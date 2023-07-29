@@ -683,6 +683,8 @@ void FadeoutPalette(const PALETTE& Src, uint8_t a)
 }
 
 // 西方Ｐｒｏｊｅｃｔ表示動作部 //
+std::optional<LensInfo> Lens;
+
 void SProjectProc(void)
 {
 	static WORD timer = 0;
@@ -696,6 +698,7 @@ void SProjectProc(void)
 	if(timer >= 256){
 		timer   = 0;
 
+		Lens = std::nullopt;
 		GameExit();
 		return;
 	}
@@ -747,6 +750,12 @@ bool SProjectInit(void)
 	if(!LoadGraph(GRAPH_ID_SPROJECT)){
 		DebugOut("GRAPH.DAT が破壊されています");
 		return FALSE;
+	}
+
+	// レンズをすでに作成しているのなら、破棄する //
+	Lens = GrpCreateLensBall(70, 36, GrLens);
+	if(!Lens) {
+		return false;
 	}
 
 	GameMain = SProjectProc;

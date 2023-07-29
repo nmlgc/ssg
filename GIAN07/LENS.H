@@ -31,8 +31,6 @@ struct LensInfo {
 	void Draw(WINDOW_POINT center);
 };
 
-extern std::optional<LensInfo> Lens;
-
 
 
 ///// [ 関数 ] /////

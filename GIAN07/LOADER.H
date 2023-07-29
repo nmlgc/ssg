@@ -84,8 +84,6 @@ typedef struct tagENDING_GRP{
 
 
 ///// [ 関数 ] /////
-extern BOOL InitSurface(void);			// Surface を作成する
-
 extern BOOL LoadStageData(BYTE stage);				// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする
 extern BOOL LoadGraph(int stage);					// あるステージのグラフィックをロードする
 bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする

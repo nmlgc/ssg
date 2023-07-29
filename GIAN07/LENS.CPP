@@ -144,13 +144,13 @@ LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
 
 
 // GrpLock() 系関数 : レンズボールを描画する //
-extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
+void LensInfo::Draw(WINDOW_POINT center)
 {
 	RECT src = {
-		(x - LInfo->r), (y - LInfo->r), (x + LInfo->r), (y + LInfo->r)
+		(center.x - r), (center.y - r), (center.x + r), (center.y + r)
 	};
 	for(;;){
-		auto ddrval = LInfo->gTemp->surf->BltFast(
+		auto ddrval = gTemp->surf->BltFast(
 			0, 0, DxObj.Back, &src, DDBLTFAST_NOCOLORKEY
 		);
 		if(ddrval == DD_OK){
@@ -166,27 +166,34 @@ extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 	}
 
 	// (x,y) が中心になるように補正する //
-	x -= LInfo->r;
-	y -= LInfo->r;
+	const WINDOW_COORD left = (center.x - r);
+	const WINDOW_COORD top = (center.y - r);
 
-	if(x<0 || y<0 || x+LInfo->Height>639 || y+LInfo->Height>479) return;
+	if(
+		(left < 0) ||
+		(top < 0) ||
+		((left + Height) > 639) ||
+		((top + Height) > 479)
+	) {
+		return;
+	}
 
 	// 転送先はロックされているかな //
 	if(!__BackSurfLock()) return;
 //	GrpLock();
 //	if(Grp_Vram == NULL) return;
 
-	auto* Src = __LSurfLock(LInfo);
+	auto* Src = __LSurfLock(this);
 	if(Src == NULL){
 		__BackSurfUnlock();
 		return;
 	}
 
-	std::visit([&LInfo, &x, &y, &Src](auto pixel) {
-		auto* Table = LInfo->Data; // テーブル参照用
-		auto* Dest = &__GrpBack[(y * __GrpPitch) + (x * sizeof(pixel))];
+	std::visit([this, &left, &top, &Src](auto pixel) {
+		auto* Table = Data; // テーブル参照用
+		auto* Dest = &__GrpBack[(top * __GrpPitch) + (left * sizeof(pixel))];
 
-		for(decltype(LInfo->Height) row = 0; row < LInfo->Height; row++) {
+		for(decltype(Height) row = 0; row < Height; row++) {
 			auto Width = *(Table++);
 			auto* p = reinterpret_cast<decltype(pixel) *>(Dest + *(Table++));
 
@@ -197,7 +204,7 @@ extern void GrpDrawLensBall(LensInfo *LInfo, int x, int y)
 		}
 	}, DxObj.PixelFormat);
 
-	__LSurfUnlock(LInfo);
+	__LSurfUnlock(this);
 	__BackSurfUnlock();
 	//GrpUnlock();
 }

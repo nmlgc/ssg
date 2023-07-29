@@ -733,7 +733,7 @@ void SProjectProc(void)
 			d = timer - 64;
 			x = 320 + sinl(d-64, 240);
 			y = 295 + sinl(d*2, 20);
-			GrpDrawLensBall(Lens, x, y);
+			Lens->Draw({ x, y });
 		}
 
 		GrpFlip();

@@ -8,6 +8,7 @@
 #pragma message(PBGWIN_LENS_H)
 
 #include "game/coords.h"
+#include <memory>
 #include <optional>
 #include <stdint.h>
 
@@ -20,7 +21,7 @@ struct SURFACE_DDRAW; // TODO: Remove once we use IDs
 struct LensInfo {
 	uint16_t	r;	// レンズの半径
 	uint16_t	Height;	// レンズの直径
-	uint32_t	*Data;		// レンズ置換テーブル
+	std::unique_ptr<uint32_t[]>	Data;	// レンズ置換テーブル
 
 	SURFACE_DDRAW*	gTemp;	// データ一時待避用Surface(できればSysMemory)
 	size_t	gPitch;		// Surface の横幅
@@ -40,9 +41,6 @@ extern std::optional<LensInfo> Lens;
 std::optional<LensInfo> GrpCreateLensBall(
 	uint16_t r, uint16_t m, SURFACE_DDRAW& surf
 );
-
-// レンズボール用データを破棄する //
-extern void GrpReleaseLensBall(std::optional<LensInfo>& LInfo);
 
 
 

@@ -80,7 +80,6 @@ std::optional<LensInfo> GrpCreateLensBall(
 	}
 
 	LensInfo	NewLens = { .gTemp = &surf };
-	DWORD		DataSize;
 	int	dx,z,w;
 
 	// Since the surface pitch can be different than its with, [Table] will
@@ -93,8 +92,9 @@ std::optional<LensInfo> GrpCreateLensBall(
 	assert(r > m);	// 出っ張りは半径より小さくせよ！
 
 	const auto Diameter = (int32_t{ r } * 2);
-	DataSize = sizeof(DWORD) * Diameter * Diameter;
-	NewLens.Data = (uint32_t *)LocalAlloc(LPTR, DataSize);
+	NewLens.Data = std::unique_ptr<uint32_t[]>(
+		new (std::nothrow) uint32_t[Diameter * Diameter]
+	);
 	if(NewLens.Data == nullptr) {
 		return std::nullopt;
 	}
@@ -106,7 +106,7 @@ std::optional<LensInfo> GrpCreateLensBall(
 	__LSurfUnlock(&NewLens);
 	const auto Pitch = NewLens.gPitch;
 
-	auto* Table = NewLens.Data;
+	auto* Table = NewLens.Data.get();
 	const auto r2 = (int32_t{ r } * r);
 	const auto s = isqrt(r2 - (int32_t{ m } * m));
 
@@ -188,7 +188,7 @@ void LensInfo::Draw(WINDOW_POINT center)
 	}
 
 	std::visit([this, &left, &top, &Src](auto pixel) {
-		auto* Table = Data; // テーブル参照用
+		auto* Table = Data.get(); // テーブル参照用
 		auto* Dest = &__GrpBack[(top * __GrpPitch) + (left * sizeof(pixel))];
 
 		for(decltype(Height) row = 0; row < Height; row++) {
@@ -205,13 +205,4 @@ void LensInfo::Draw(WINDOW_POINT center)
 	__LSurfUnlock(this);
 	__BackSurfUnlock();
 	//GrpUnlock();
-}
-
-
-// レンズボール用データを破棄する //
-extern void GrpReleaseLensBall(std::optional<LensInfo>& LInfo)
-{
-	if(LInfo) {
-		LocalFree(LInfo.value().Data);
-	}
 }

@@ -132,21 +132,12 @@ BOOL InitSurface(void)
 //	bIsBombPalette = FALSE;
 
 	// レンズをすでに作成しているのなら、破棄する //
-	if(Lens) GrpReleaseLensBall(Lens);
-
 	Lens = GrpCreateLensBall(70, 36, GrLens);
 	if(!Lens) {
 		return false;
 	}
 
 	return TRUE;
-}
-
-
-//  レンズを破棄する
-void CleanupLens(void)
-{
-	if(Lens) GrpReleaseLensBall(Lens);
 }
 
 

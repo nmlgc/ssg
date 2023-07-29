@@ -96,8 +96,6 @@ extern BOOL LoadMusicRoomComment(int no);			// MusicRoom のコメントをロ�
 extern void LoadPaletteFrom(SURFACE_DDRAW& surf);
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
 
-extern void CleanupLens(void);	//  レンズを破棄する
-
 
 /*
 // 廃止：2000/12/01 //

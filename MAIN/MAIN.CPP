@@ -1,7 +1,6 @@
 #include "../GIAN07/CONFIG.H"
 #include "../GIAN07/EFFECT.H"
 #include "../GIAN07/GAMEMAIN.H"
-#include "../GIAN07/LENS.H"
 #include "../GIAN07/LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
@@ -288,6 +287,5 @@ BOOL XInit(void)
 
 void XCleanup(void)
 {
-	CleanupLens();
 	ConfigSave();
 }

@@ -101,7 +101,7 @@ extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
 };
 
 
-LensInfo	*Lens = NULL;
+std::optional<LensInfo>	Lens;
 
 DWORD		MusicNum = 0;			// 曲数
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
@@ -139,7 +139,9 @@ BOOL InitSurface(void)
 	if(Lens) GrpReleaseLensBall(Lens);
 
 	Lens = GrpCreateLensBall(70, 36, &GrLens);
-	if(Lens == NULL) return FALSE;
+	if(!Lens) {
+		return false;
+	}
 
 	return TRUE;
 }

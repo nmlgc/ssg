@@ -729,11 +729,11 @@ void SProjectProc(void)
 				FadeoutPalette(SProjectPalette, (255-timer) * 4);
 			}
 		}
-		else{
+		else if(Lens) {
 			d = timer - 64;
 			x = 320 + sinl(d-64, 240);
 			y = 295 + sinl(d*2, 20);
-			Lens->Draw({ x, y });
+			Lens.value().Draw({ x, y });
 		}
 
 		GrpFlip();

@@ -8,6 +8,7 @@
 #pragma message(PBGWIN_LENS_H)
 
 #include "game/coords.h"
+#include <optional>
 #include <stdint.h>
 
 struct SURFACE_DDRAW; // TODO: Remove once we use IDs
@@ -29,17 +30,19 @@ struct LensInfo {
 	void Draw(WINDOW_POINT center);
 };
 
-extern LensInfo *Lens;
+extern std::optional<LensInfo> Lens;
 
 
 
 ///// [ 関数 ] /////
 
 // 半径:r  出っ張り:m  のレンズを作成 //
-LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf);
+std::optional<LensInfo> GrpCreateLensBall(
+	uint16_t r, uint16_t m, SURFACE_DDRAW* surf
+);
 
 // レンズボール用データを破棄する //
-extern void GrpReleaseLensBall(LensInfo *LInfo);
+extern void GrpReleaseLensBall(std::optional<LensInfo>& LInfo);
 
 
 

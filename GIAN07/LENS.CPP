@@ -6,6 +6,7 @@
 #include "LENS.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/UT_MATH.H"
+#include <assert.h>
 #include <ddraw.h>
 
 
@@ -70,11 +71,12 @@ static void __BackSurfUnlock(void)
 
 
 // 半径:r  出っ張り:m  のレンズを作成 //
-LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
+std::optional<LensInfo> GrpCreateLensBall(
+	uint16_t r, uint16_t m, SURFACE_DDRAW* surf
+)
 {
-	LensInfo	*NewLens;
+	LensInfo	NewLens;
 	DWORD		DataSize;
-	DWORD		Pitch;
 	int	dx,z,w;
 
 	// Since the surface pitch can be different than its with, [Table] will
@@ -83,32 +85,26 @@ LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
 		return sizeof(pixel);
 	}, DxObj.PixelFormat);
 
-	if(r <= 0) return NULL;		// 半径がおかしい
-	if(r <= m) return NULL;		// 出っ張りは半径より小さくせよ！
-
-	NewLens = (LensInfo *)LocalAlloc(LPTR, sizeof(LensInfo));
-	if(NewLens == NULL){
-		return NULL;
-	}
+	assert(r > 0);	// 半径がおかしい
+	assert(r > m);	// 出っ張りは半径より小さくせよ！
 
 	const auto Diameter = (int32_t{ r } * 2);
 	DataSize = sizeof(DWORD) * Diameter * Diameter;
-	NewLens->Data = (uint32_t *)LocalAlloc(LPTR, DataSize);
-	if(NewLens->Data == NULL){
-		LocalFree(NewLens);
-		return NULL;
+	NewLens.Data = (uint32_t *)LocalAlloc(LPTR, DataSize);
+	if(NewLens.Data == nullptr) {
+		return std::nullopt;
 	}
 
-	NewLens->gTemp = surf;
+	NewLens.gTemp = surf;
 
-	NewLens->r      = r;
-	NewLens->Height = Diameter;
+	NewLens.r      = r;
+	NewLens.Height = Diameter;
 
-	__LSurfLock(NewLens);
-	__LSurfUnlock(NewLens);
-	Pitch = NewLens->gPitch;
+	__LSurfLock(&NewLens);
+	__LSurfUnlock(&NewLens);
+	const auto Pitch = NewLens.gPitch;
 
-	auto* Table = NewLens->Data;
+	auto* Table = NewLens.Data;
 	const auto r2 = (int32_t{ r } * r);
 	const auto s = isqrt(r2 - (int32_t{ m } * m));
 
@@ -211,11 +207,9 @@ void LensInfo::Draw(WINDOW_POINT center)
 
 
 // レンズボール用データを破棄する //
-extern void GrpReleaseLensBall(LensInfo *LInfo)
+extern void GrpReleaseLensBall(std::optional<LensInfo>& LInfo)
 {
-	if(LInfo == NULL) return;
-
-	if(LInfo->Data) LocalFree(LInfo->Data);
-
-	LocalFree(LInfo);
+	if(LInfo) {
+		LocalFree(LInfo.value().Data);
+	}
 }

@@ -7,6 +7,7 @@
 #include "FONTUTY.H"
 #include "GIAN.H"
 #include "LOADER.H"
+#include "DirectXUTYs/PBGMIDI.H"
 #include <ddraw.h>
 
 

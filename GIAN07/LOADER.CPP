@@ -11,6 +11,8 @@
 #include "LOADER.H"
 #include "LZ_UTY.H"
 #include "LENS.H"
+#include "DirectXUTYs/DS_UTY.H"
+#include "DirectXUTYs/PBGMIDI.H"
 #include <assert.h>
 #include <ddraw.h>
 

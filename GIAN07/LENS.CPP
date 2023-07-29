@@ -4,6 +4,8 @@
 /*                                                                           */
 
 #include "LENS.H"
+#include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/UT_MATH.H"
 #include <ddraw.h>
 
 
@@ -71,7 +73,6 @@ static void __BackSurfUnlock(void)
 LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
 {
 	LensInfo	*NewLens;
-	DWORD		*Table;
 	DWORD		DataSize;
 	DWORD		Pitch;
 	int	dx,z,w;
@@ -92,7 +93,7 @@ LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
 
 	const auto Diameter = (int32_t{ r } * 2);
 	DataSize = sizeof(DWORD) * Diameter * Diameter;
-	NewLens->Data = (DWORD *)LocalAlloc(LPTR, DataSize);
+	NewLens->Data = (uint32_t *)LocalAlloc(LPTR, DataSize);
 	if(NewLens->Data == NULL){
 		LocalFree(NewLens);
 		return NULL;
@@ -107,7 +108,7 @@ LensInfo* GrpCreateLensBall(uint16_t r, uint16_t m, SURFACE_DDRAW* surf)
 	__LSurfUnlock(NewLens);
 	Pitch = NewLens->gPitch;
 
-	Table = NewLens->Data;
+	auto* Table = NewLens->Data;
 	const auto r2 = (int32_t{ r } * r);
 	const auto s = isqrt(r2 - (int32_t{ m } * m));
 

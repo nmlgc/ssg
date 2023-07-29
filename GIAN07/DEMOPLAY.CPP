@@ -7,6 +7,7 @@
 #include "LZ_UTY.H"
 #include "GIAN.H"
 #include "DEMOPLAY.H"
+#include "DirectXUTYs/DI_UTY.H"
 
 
 BOOL			DemoplaySaveEnable = FALSE;		// デモプレイのセーブが動作しているか

@@ -6,6 +6,7 @@
 #include "ITEM.H"
 #include "GIAN.H"
 #include "GIAN07/entity.h"
+#include "DirectXUTYs/DS_UTY.H"
 
 
 

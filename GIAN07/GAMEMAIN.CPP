@@ -10,6 +10,9 @@
 #include "LENS.H"
 #include "LEVEL.H"
 #include "SCORE.H"
+#include "DirectXUTYs/DI_UTY.H"
+#include "DirectXUTYs/DS_UTY.H"
+#include "DirectXUTYs/PBGMIDI.H"
 #include <ddraw.h>
 
 

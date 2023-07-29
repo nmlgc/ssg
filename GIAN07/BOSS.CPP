@@ -7,6 +7,7 @@
 #include "GIAN.H"
 #include "EnemyExCtrl.h"
 #include "../DirectXUTYs/DD_GRP3D.H"
+#include "../DirectXUTYs/DS_UTY.H"
 
 
 // 公開グローバル //

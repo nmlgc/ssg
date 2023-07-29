@@ -5,6 +5,7 @@
 
 #include "EFFECT.H"
 #include "GIAN.H"
+#include "DirectXUTYs/DS_UTY.H"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];
@@ -714,6 +715,7 @@ void ObjectLockDraw(void)
 
 
 #include "DirectXUTYs/DD_GRP3D.H"
+#include "DirectXUTYs/PBGMIDI.H"
 // スペアナ描画 //
 void GrpDrawSpect(int x, int y)
 {

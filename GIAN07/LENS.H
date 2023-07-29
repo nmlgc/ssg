@@ -7,8 +7,9 @@
 #define PBGWIN_LENS_H		"LENS_EFC : Version 0.01 : Update 2000/09/18"
 #pragma message(PBGWIN_LENS_H)
 
-#include "DirectXUTYs/PBGUTY_X.H"
+#include <stdint.h>
 
+struct SURFACE_DDRAW; // TODO: Remove once we use IDs
 
 
 ///// [構造体] /////
@@ -17,10 +18,10 @@
 typedef struct tagLensInfo {
 	uint16_t	r;	// レンズの半径
 	uint16_t	Height;	// レンズの直径
-	DWORD		*Data;		// レンズ置換テーブル
+	uint32_t	*Data;		// レンズ置換テーブル
 
 	SURFACE_DDRAW*	gTemp;	// データ一時待避用Surface(できればSysMemory)
-	DWORD		gPitch;		// Surface の横幅
+	size_t	gPitch;		// Surface の横幅
 	//BYTE		gID;		// SurfaceID (DD_UTY の関数に対する)
 } LensInfo;
 

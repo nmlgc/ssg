@@ -27,10 +27,10 @@ typedef struct tagEndingStTask{
 	DWORD		fadein;		// フェードイン時刻
 	DWORD		fadeout;	// フェードアウト時刻
 
-	DWORD		NumStf;		// 全スタッフ数
 	DWORD		StfID[10];	// スタッフＩＤ
 	DWORD		TitleID;	// タイトル、すなわち役職ＩＤ
 
+	short	NumStf;	// 全スタッフ数
 	short		alpha;		// パレットの状態
 
 	int			ox, oy;		// 表示基準座標
@@ -52,9 +52,25 @@ EndingGrpInfo	EGrpInfo;
 EndingStTask	EStfTask;
 EndingText		EText;
 
-// フォント情報格納用ね //
-ExtraFontInfo	*pFontInfo[7];
-ExtraFontInfo	*pMember[7];
+const PIXEL_LTRB StaffLabel[7] = {
+	{ 0,   0, 160,  24 },
+	{ 0,  24, 104,  48 },
+	{ 0,  48, 160,  72 },
+	{ 0,  72, 232,  96 },
+	{ 0,  96, 168, 120 },
+	{ 0, 144, 104, 168 },
+	{ 0, (480 - 32), (9 * 32), 480 },
+};
+
+const PIXEL_LTRB StaffMember[7] = {
+	{   0, 168,  72, 192 },
+	{  96, 168, 168, 192 },
+	{ 192, 168, 264, 192 },
+	{ 288, 168, 360, 192 },
+	{   0, 192, 144, 216 },
+	{ 168, 192, 320, 216 },
+	{   0, 216, 336, 264 }
+};
 
 // フラッシュの状態 //
 DWORD FlashState = 0;
@@ -67,8 +83,6 @@ void DrawGrpInfo();		// グラフィックの描画
 void DrawStfInfo();		// スタッフの描画
 
 void DrawFadeInfo();	// フェードＩＯ情報の反映
-
-void EndingCleanup();	// おしまい処理
 
 void EndingSCLDecode();	// エンディング用 SCL のデコード
 
@@ -86,20 +100,6 @@ void EndingSetFixedColors(PALETTE& pal)
 bool EndingInit(void)
 {
 	PALETTE	pal;
-
-	PIXEL_LTRB	src[7] = {
-		{0, 0,160, 24}, {0, 24,104, 48}, {0, 48,160, 72},
-		{0,72,232, 96}, {0, 96,168,120}, {0,144,104,168},
-		{0, 480-32, 9*32, 480},
-	};
-
-	PIXEL_LTRB	src2[7] = {
-		{0, 168, 72, 192}, {96, 168, 168, 192}, {192, 168, 264, 192}, {288, 168, 360, 192},
-		{0, 192, 144, 216}, {168, 192, 320, 216},
-		{0, 216, 336, 264}
-	};
-
-	int		i;
 
 	GrpSetClip(0, 0, 640, 480);
 	GrpCls();
@@ -128,32 +128,7 @@ bool EndingInit(void)
 	EText.Rect = TextObj.Register({ 640, 131 });
 	EText.Rerender = true;
 
-	for(i=0; i<7; i++){
-		pFontInfo[i] = CreateExtraFont(GrEndingCredits, &src[i]);
-		if(pFontInfo[i] == NULL) return FALSE;
-	}
-
-	for(i=0; i<7; i++){
-		pMember[i] = CreateExtraFont(GrEndingCredits, &src2[i]);
-		if(pMember[i] == NULL) return FALSE;
-	}
-
 	return TRUE;
-}
-
-
-// おしまい処理 //
-void EndingCleanup()
-{
-	int		i;
-
-	for(i=0; i<7; i++){
-		DeleteExtraFont(pFontInfo[i]);
-	}
-
-	for(i=0; i<7; i++){
-		DeleteExtraFont(pMember[i]);
-	}
 }
 
 
@@ -163,7 +138,6 @@ void EndingProc(void)
 	Key_Read();
 
 	if(Key_Data){
-		EndingCleanup();
 		GameExit();
 		return;
 	}
@@ -274,16 +248,18 @@ void DrawGrpInfo()
 // スタッフの描画 //
 void DrawStfInfo()
 {
-	int		i;
-
 	if(!EStfTask.bWantDisp) return;
 
-	DrawExtraFont(pFontInfo[EStfTask.TitleID],
-		EStfTask.ox, EStfTask.oy, 0);//255-EStfTask.alpha);
+	// [src] is copied! For now.
+	auto Blit = [](WINDOW_POINT dst, PIXEL_LTRB src) {
+		dst -= (src.Size() / 2);
+		GrpBlt(&src, dst.x, dst.y, GrEndingCredits);
+	};
 
-	for(i=0; i<EStfTask.NumStf; i++){
-		DrawExtraFont(pMember[EStfTask.StfID[i]],
-			EStfTask.ox, EStfTask.oy+i*30+50, 0);//255-EStfTask.alpha);
+	Blit({ EStfTask.ox, EStfTask.oy }, StaffLabel[EStfTask.TitleID]);
+	for(decltype(EStfTask.NumStf) i = 0; i < EStfTask.NumStf; i++){
+		const WINDOW_POINT dst = { EStfTask.ox, (EStfTask.oy + (i * 30) + 50) };
+		Blit(dst, StaffMember[EStfTask.StfID[i]]);
 	}
 }
 
@@ -487,7 +463,6 @@ void EndingSCLDecode()
 			break;
 
 			case(SCL_END):		// カウントも変更させずにリターンするのだ
-				EndingCleanup();
 				EGrpInfo.bWantDisp = FALSE;
 				EStfTask.bWantDisp = FALSE;
 				NameRegistInit(FALSE);

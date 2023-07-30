@@ -40,8 +40,14 @@ struct PIXEL_SIZE {
 		return { (w - other.x), (h - other.y) };
 	}
 
+	PIXEL_SIZE operator /(int divisor) const {
+		return { (w / divisor), (h / divisor) };
+	}
+
 	std::strong_ordering operator <=>(const PIXEL_SIZE& other) const = default;
 };
+
+PIXEL_POINT& operator -=(PIXEL_POINT& self, const PIXEL_SIZE& other);
 
 // Left-top-width-height rectangle in unscaled pixel space. Relative to any
 // origin.

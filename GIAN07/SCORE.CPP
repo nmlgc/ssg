@@ -18,10 +18,11 @@ NR_SCORE_STRING		ScoreString[NR_RANK_MAX];	// スコアデータ文字列格納�
 
 BYTE ExtraFlags = 0;
 
-static NR_SCORE_DATA *ScoreData = NULL;		// スコアデータ格納先(名前空間で保護)
+// スコアデータ格納先(名前空間で保護)
+static std::unique_ptr<NR_SCORE_DATA> ScoreData = nullptr;
 
 static BOOL LoadScoreData(void);			// スコアデータを読み込む
-static BOOL ReleaseScoreData(void);			// スコアデータを解放する
+static void ReleaseScoreData(void);	// スコアデータを解放する
 static NR_NAME_DATA *SetNDataPtr(BYTE Dif);	// 難易度でポインタを振り分ける
 static BOOL SetDefaultScoreData(void);		// スコアデータ初期値をセット
 
@@ -192,8 +193,12 @@ static BOOL LoadScoreData(void)
 	// すでにロード済みの場合(これは失敗にしない) //
 	if(ScoreData) return TRUE;
 
-	ScoreData = (NR_SCORE_DATA *)LocalAlloc(LPTR, sizeof(NR_SCORE_DATA));
-	if(ScoreData == NULL) return FALSE;
+	ScoreData = std::unique_ptr<NR_SCORE_DATA>(
+		new (std::nothrow) NR_SCORE_DATA
+	);
+	if(ScoreData == nullptr) {
+		return false;
+	}
 
 	// ビット読み込みモードでファイルを開く //
 	auto bd = BitFilCreateR(ScoreFileName);
@@ -218,17 +223,10 @@ static BOOL LoadScoreData(void)
 }
 
 
-// スコアデータを解放する //
-static BOOL ReleaseScoreData(void)
+static void ReleaseScoreData(void)
 {
-	// まだロードされていない場合(これは失敗にする) //
-	if(!ScoreData) return FALSE;
-
 	// 解放～ //
-	LocalFree(ScoreData);
-	ScoreData = NULL;
-
-	return TRUE;
+	ScoreData = nullptr;
 }
 
 

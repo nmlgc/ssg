@@ -59,6 +59,11 @@ template <typename T> concept VERSION = requires(T t) {
 const struct {
 	static constexpr auto FN = _PATH("秋霜CFG.DAT");
 
+	// The original build of the game only supported 8-bit and 16-bit. Anything
+	// else would cause a validation failure, resetting the configuration and
+	// re-locking the Extra Stage even if the checksum was correct.
+	static inline CONFIG_OPTION_VALUE<BITDEPTH> BitDepth8Or16;
+
 	static inline CONFIG_OPTION_VALUE<uint32_t> CheckSum;
 	static inline CONFIG_OPTION_VALUE<uint8_t> PaddingByte;
 
@@ -67,7 +72,7 @@ const struct {
 		ConfigDat.PlayerStock,
 		ConfigDat.BombStock,
 		ConfigDat.DeviceID,
-		ConfigDat.BitDepth,
+		BitDepth8Or16,
 		ConfigDat.FPSDivisor,
 		ConfigDat.GraphFlags,
 		ConfigDat.SoundFlags,
@@ -91,7 +96,7 @@ const struct {
 
 	static uint32_t CheckSumCalculate() {
 		uint32_t ret = 0;
-		ret += (ConfigDat.BitDepth.v.value() << 1);
+		ret += (BitDepth8Or16.v.value() << 1);
 		ret += (ConfigDat.BombStock.v << 3);
 		ret += (ConfigDat.DeviceID.v << 2);
 		ret += (ConfigDat.FPSDivisor.v << 6);
@@ -183,12 +188,20 @@ extern void ConfigLoad()
 	std::apply([](const auto&... version) {
 		(... || VersionLoad(version));
 	}, VERSIONS);
+
+	if(VERSION_ORIGINAL.BitDepth8Or16.loaded) {
+		ConfigDat.BitDepth = VERSION_ORIGINAL.BitDepth8Or16;
+	}
 }
 
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
 	// Backwards compatibility with 秋霜CFG.DAT
+	VERSION_ORIGINAL.BitDepth8Or16.v = ((ConfigDat.BitDepth.v.value() > 16)
+		? BITDEPTHS::find_if([](auto bpp) { return (bpp == 16); })
+		: ConfigDat.BitDepth.v
+	);
 	VERSION_ORIGINAL.CheckSum.v = VERSION_ORIGINAL.CheckSumCalculate();
 
 	std::apply([](const auto&... version) {

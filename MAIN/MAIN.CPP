@@ -6,6 +6,7 @@
 #include "strings/title.h"
 #include "platform/snd.h"
 #include "platform/unicode.h"
+#include "game/input.h"
 #include <direct.h>
 
 #pragma comment(lib, "user32.lib")

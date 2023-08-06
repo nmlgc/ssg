@@ -7,7 +7,6 @@
 #include "LOADER.H"
 #include "FONTUTY.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/UT_MATH.H"
 #include "platform/snd.h"
 
@@ -206,7 +205,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 }
 
 // コマンド [Exit] のデフォルト処理関数 //
-BOOL CWinExitFn(WORD key)
+bool CWinExitFn(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_BOMB):case(KEY_ESC):

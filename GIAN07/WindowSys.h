@@ -8,6 +8,7 @@
 
 #include "FONTUTY.H"
 #include "game/coords.h"
+#include "game/input.h"
 
 
 
@@ -71,7 +72,9 @@ typedef struct tagWINDOW_INFO{
 	const char		*Title;			// タイトル文字列へのポインタ(実体ではない！)
 	const char		*Help;			// ヘルプ文字列へのポインタ(これも実体ではない)
 
-	BOOL			(*CallBackFn)(WORD);	// 特殊処理用コールバック関数(未使用ならNULL)
+	// 特殊処理用コールバック関数(未使用ならNULL)
+	bool	(*CallBackFn)(INPUT_BITS);
+
 	BYTE			NumItems;				// 項目数(<ITEM_MAX)
 	tagWINDOW_INFO	*ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
 
@@ -89,7 +92,7 @@ typedef struct tagWINDOW_SYSTEM{
 	BYTE			SelectDepth;			// 選択中の項目に対するＳＰ
 	BYTE			State;					// 状態
 
-	WORD			OldKey;					// 前に押されていたキー
+	INPUT_BITS	OldKey;	// 前に押されていたキー
 	BYTE			KeyCount;				// キーボードウェイト
 	BOOL			FirstWait;				// 最初のキー解放待ち
 
@@ -109,7 +112,7 @@ typedef struct tagWINDOW_SYSTEM{
 // コマンドウィンドウ処理 //
 void CWinMove(WINDOW_SYSTEM *ws);				// コマンドウィンドウを１フレーム動作させる
 void CWinDraw(WINDOW_SYSTEM *ws);				// コマンドウィンドウの描画
-BOOL CWinExitFn(WORD key);						// コマンド [Exit] のデフォルト処理関数
+bool CWinExitFn(INPUT_BITS key);	// コマンド [Exit] のデフォルト処理関数
 
 
 // メッセージウィンドウ処理 //

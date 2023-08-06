@@ -7,13 +7,13 @@
 #include "LZ_UTY.H"
 #include "GIAN.H"
 #include "DEMOPLAY.H"
-#include "DirectXUTYs/DI_UTY.H"
+#include "game/input.h"
 
 
 bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作しているか
 bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作しているか
 DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
-WORD			DemoBuffer[DEMOBUF_MAX];		// デモプレイ用バッファ
+INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
 DWORD			DemoBufPtr;						// デモプレイ用バッファPtr(Ｃのそれではない)
 CONFIG_DATA		ConfigTemp;						// コンフィグのデータ一時保存用
 
@@ -76,7 +76,7 @@ bool DemoplayLoadSetup()
 }
 
 
-bool DemoplayRecord(uint16_t key)
+bool DemoplayRecord(INPUT_BITS key)
 {
 	if(!DemoplaySaveEnable) {
 		return false;
@@ -105,7 +105,7 @@ void DemoplaySaveDemo(void)
 
 	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {
 		DemoInfo,
-		std::span<WORD>{ DemoBuffer, (DemoBufPtr + 1) },
+		std::span<INPUT_BITS>{ DemoBuffer, (DemoBufPtr + 1) },
 	};
 	FileWrite(fn, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
 
@@ -140,7 +140,7 @@ bool DemoplayLoadDemo(int stage)
 }
 
 
-uint16_t DemoplayMove(void)
+INPUT_BITS DemoplayMove(void)
 {
 	DWORD ptr;
 
@@ -174,10 +174,10 @@ void DemoplaySaveReplay(void)
 	DemoBuffer[DemoBufPtr] = KEY_ESC;
 	DemoInfo.DataSize = DemoBufPtr+1;
 
-	const auto demo_size = (sizeof(WORD) * DemoInfo.DataSize);
+	const auto demo_size = (sizeof(INPUT_BITS) * DemoInfo.DataSize);
 	PACKFILE_WRITE out = { {
 		DemoInfo,
-		std::span<WORD>{ DemoBuffer, demo_size },
+		std::span<INPUT_BITS>{ DemoBuffer, demo_size },
 	} };
 
 	const auto fn = ReplayFN(GameStage);

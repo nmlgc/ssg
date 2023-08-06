@@ -38,13 +38,11 @@ InputConfig			IConfig;
 
 
 // グローバル変数(Public)の実体
-WORD Key_Data = 0;
-WORD Pad_Data = 0;
 void (*Key_Read)(void) = Key_Read_STD;
 
 
 // 秘密の関数 //
-WORD Pad_Read(void);
+INPUT_BITS Pad_Read(void);
 
 
 
@@ -147,7 +145,7 @@ void Key_End(void)
 
 extern void Key_Read_STD(void)
 {
-	WORD		val = 0;
+	INPUT_BITS	val = 0;
 //	JOYINFOEX	joy;
 //	UINT		x,y;
 	BYTE		buf[256];
@@ -189,7 +187,7 @@ extern void Key_Read_DI(void)
 	static BYTE		buf[300];
 
 	HRESULT		dirval;
-	WORD		val = 0;
+	INPUT_BITS	val = 0;
 
 	dirval = InputObj.pdev->GetDeviceState(256,(LPVOID)buf);
 	if(dirval != DI_OK){
@@ -236,11 +234,11 @@ extern void Key_Read_DI(void)
 }
 
 
-WORD Pad_Read(void)
+INPUT_BITS Pad_Read(void)
 {
 	JOYINFOEX	joy;
 	int			x,y;
-	WORD		val = 0;
+	INPUT_BITS	val = 0;
 
 	joy.dwSize  = sizeof(joy);
 	joy.dwFlags = JOY_RETURNBUTTONS|JOY_RETURNX|JOY_RETURNY;
@@ -265,7 +263,7 @@ WORD Pad_Read(void)
 }
 
 
-extern int Key_PadConfig(WORD Key)
+extern int Key_PadConfig(INPUT_BITS Key)
 {
 	JOYINFOEX	joy;
 	DWORD		mask;
@@ -340,7 +338,7 @@ extern int Key_PadConfig(WORD Key)
 	return ret;
 }
 
-extern void Key_PadConfig2(BYTE PadID, WORD KeyData)
+extern void Key_PadConfig2(BYTE PadID, INPUT_BITS KeyData)
 {
 	DWORD		temp;
 

@@ -14,6 +14,7 @@
 #include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
+#include "game/input.h"
 
 
 DWORD		DrawCount = 0;
@@ -342,7 +343,7 @@ void NameRegistProc(bool&)
 				ScoreString[CurrentRank-1].Name[NR_NAME_LEN-1] = '\0';
 
 				strcpy(CurrentName.Name, ScoreString[CurrentRank-1].Name);
-				SaveScoreData(&CurrentName, CurrentLevel());
+				// SaveScoreData(&CurrentName, CurrentLevel());
 
 				key_time = END_WAIT;
 				break;

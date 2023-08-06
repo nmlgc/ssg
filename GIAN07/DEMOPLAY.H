@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_DEMOPLAY_H)
 
 #include "CONFIG.H"
+#include "game/input.h"
 
 
 ///// [ 定数 ] /////
@@ -52,14 +53,14 @@ void DemoplayInit(void);	// デモプレイデータの準備
 // デモプレイデータを保存する
 // Returns `true` if the replay is over and should be saved via either
 // DemoplaySave() or ReplaySave().
-bool DemoplayRecord(uint16_t key);
+bool DemoplayRecord(INPUT_BITS key);
 
 void DemoplaySaveDemo(void);	// デモプレイデータをファイルに書き込む
 void DemoplaySaveReplay(void);	// リプレイデータをファイルに書き込む
 
 bool DemoplayLoadDemo(int stage);	// デモプレイデータをロードする
 bool DemoplayLoadReplay(int stage);	// リプレイデータをロードする
-uint16_t DemoplayMove(void);	// Key_Data を返す
+INPUT_BITS DemoplayMove(void);	// Key_Data を返す
 void DemoplayCleanup(void);	// デモプレイロードの事後処理
 
 

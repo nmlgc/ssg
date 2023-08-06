@@ -13,23 +13,7 @@
 
 
 #include "DX_ERROR.H"
-
-
-// キーボード定数 //
-#define KEY_UP			0x0001
-#define KEY_DOWN		0x0002
-#define KEY_LEFT		0x0004
-#define KEY_RIGHT		0x0008
-#define KEY_TAMA		0x0010
-#define KEY_BOMB		0x0020
-#define KEY_SHIFT		0x0040
-#define KEY_RETURN		0x0080
-#define KEY_ESC			0x0100
-
-#define KEY_ULEFT		(KEY_UP|KEY_LEFT)
-#define KEY_URIGHT		(KEY_UP|KEY_RIGHT)
-#define KEY_DLEFT		(KEY_DOWN|KEY_LEFT)
-#define KEY_DRIGHT		(KEY_DOWN|KEY_RIGHT)
+#include "game/input.h"
 
 
 // キーボード定義用構造体 //
@@ -56,22 +40,18 @@ typedef struct tagInputConfig{
 } InputConfig;
 
 
-// グローバル変数(Public) //
-extern WORD Key_Data;
-extern WORD Pad_Data;
-
 extern void (*Key_Read)(void);
 
 
 // 関数プロトタイプ宣言 //
 extern bool Key_Start(void);	// キー入力開始
-extern void Key_Config(WORD Key);					// あるキーボード定数に対するコンフィグ
+extern void Key_Config(INPUT_BITS Key);	// あるキーボード定数に対するコンフィグ
 extern void Key_End(void);							// キー入力終了
 
 extern void Key_Read_STD(void);
 extern void Key_Read_DI(void);
 
-extern int  Key_PadConfig(WORD Key);
-extern void Key_PadConfig2(BYTE PadID, WORD KeyData);
+extern int  Key_PadConfig(INPUT_BITS Key);
+extern void Key_PadConfig2(BYTE PadID, INPUT_BITS KeyData);
 
 #endif

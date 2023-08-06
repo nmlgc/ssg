@@ -13,52 +13,53 @@
 #include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
+#include "game/input.h"
 
 
 
-static BOOL DifFnPlayerStock(WORD key);
-static BOOL DifFnBombStock(WORD key);
-static BOOL DifFnDifficulty(WORD key);
+static bool DifFnPlayerStock(INPUT_BITS key);
+static bool DifFnBombStock(INPUT_BITS key);
+static bool DifFnDifficulty(INPUT_BITS key);
 
 #ifdef PBG_DEBUG
-static BOOL DifFnMsgDisplay(WORD key);
-static BOOL DifFnStgSelect(WORD key);
-static BOOL DifFnHit(WORD key);
-static BOOL DifFnDemo(WORD key);
+static bool DifFnMsgDisplay(INPUT_BITS key);
+static bool DifFnStgSelect(INPUT_BITS key);
+static bool DifFnHit(INPUT_BITS key);
+static bool DifFnDemo(INPUT_BITS key);
 #endif
 
-static BOOL GrpFnChgDevice(WORD key);
-static BOOL GrpFnSkip(WORD key);
-static BOOL GrpFnBpp(WORD key);
-static BOOL GrpFnWinLocate(WORD key);
+static bool GrpFnChgDevice(INPUT_BITS key);
+static bool GrpFnSkip(INPUT_BITS key);
+static bool GrpFnBpp(INPUT_BITS key);
+static bool GrpFnWinLocate(INPUT_BITS key);
 
-static BOOL SndFnWAVE(WORD key);
-static BOOL SndFnMIDI(WORD key);
-static BOOL SndFnMIDIDev(WORD key);
+static bool SndFnWAVE(INPUT_BITS key);
+static bool SndFnMIDI(INPUT_BITS key);
+static bool SndFnMIDIDev(INPUT_BITS key);
 
-static BOOL InpFnMsgSkip(WORD key);
-static BOOL InpFnZSpeedDown(WORD key);
+static bool InpFnMsgSkip(INPUT_BITS key);
+static bool InpFnZSpeedDown(INPUT_BITS key);
 
-static BOOL InpFnKeyTama(WORD key);
-static BOOL InpFnKeyBomb(WORD key);
-static BOOL InpFnKeyShift(WORD key);
-static BOOL InpFnKeyCancel(WORD key);
+static bool InpFnKeyTama(INPUT_BITS key);
+static bool InpFnKeyBomb(INPUT_BITS key);
+static bool InpFnKeyShift(INPUT_BITS key);
+static bool InpFnKeyCancel(INPUT_BITS key);
 
-static BOOL CfgRepStgSelect(WORD key);
-static BOOL CfgRepSave(WORD key);
+static bool CfgRepStgSelect(INPUT_BITS key);
+static bool CfgRepSave(INPUT_BITS key);
 
-static BOOL MainFnGameStart(WORD key);
-static BOOL MainFnExStart(WORD key);
+static bool MainFnGameStart(INPUT_BITS key);
+static bool MainFnExStart(INPUT_BITS key);
 
-static BOOL MusicFn(WORD key);
+static bool MusicFn(INPUT_BITS key);
 
-static BOOL ExitFnYes(WORD key);
-static BOOL ExitFnNo(WORD key);
+static bool ExitFnYes(INPUT_BITS key);
+static bool ExitFnNo(INPUT_BITS key);
 
-static BOOL ContinueFnYes(WORD key);
-static BOOL ContinueFnNo(WORD key);
+static bool ContinueFnYes(INPUT_BITS key);
+static bool ContinueFnNo(INPUT_BITS key);
 
-static BOOL ScoreFn(WORD key);
+static bool ScoreFn(INPUT_BITS key);
 
 static bool SetDifItem(void);
 static bool SetGrpItem(void);
@@ -67,16 +68,16 @@ static void SetInpItem(void);
 static void SetIKeyItem(void);
 static bool SetCfgRepItem(void);
 
-static BOOL RFnStg1(WORD key);
-static BOOL RFnStg2(WORD key);
-static BOOL RFnStg3(WORD key);
-static BOOL RFnStg4(WORD key);
-static BOOL RFnStg5(WORD key);
-static BOOL RFnStg6(WORD key);
-static BOOL RFnStgEx(WORD key);
+static bool RFnStg1(INPUT_BITS key);
+static bool RFnStg2(INPUT_BITS key);
+static bool RFnStg3(INPUT_BITS key);
+static bool RFnStg4(INPUT_BITS key);
+static bool RFnStg5(INPUT_BITS key);
+static bool RFnStg6(INPUT_BITS key);
+static bool RFnStgEx(INPUT_BITS key);
 
 static bool RingFN(
-	bool onchange(void), uint8_t& var, WORD key, uint8_t min, uint8_t max
+	bool onchange(void), uint8_t& var, INPUT_BITS key, uint8_t min, uint8_t max
 )
 {
 	switch(key) {
@@ -282,19 +283,19 @@ void InitContinueWindow(void)
 	ContinueWindow.Init(140);
 }
 
-static BOOL DifFnPlayerStock(WORD key)
+static bool DifFnPlayerStock(INPUT_BITS key)
 {
 	return RingFN(
 		SetDifItem, ConfigDat.PlayerStock.v, key, 0, STOCK_PLAYER_MAX
 	);
 }
 
-static BOOL DifFnBombStock(WORD key)
+static bool DifFnBombStock(INPUT_BITS key)
 {
 	return RingFN(SetDifItem, ConfigDat.BombStock.v, key, 0, STOCK_BOMB_MAX);
 }
 
-static BOOL DifFnDifficulty(WORD key)
+static bool DifFnDifficulty(INPUT_BITS key)
 {
 	return RingFN(
 		SetDifItem, ConfigDat.GameLevel.v, key, GAME_EASY, GAME_LUNATIC
@@ -302,7 +303,7 @@ static BOOL DifFnDifficulty(WORD key)
 }
 
 #ifdef PBG_DEBUG
-static BOOL DifFnMsgDisplay(WORD key)
+static bool DifFnMsgDisplay(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -319,12 +320,12 @@ static BOOL DifFnMsgDisplay(WORD key)
 	return TRUE;
 }
 
-static BOOL DifFnStgSelect(WORD key)
+static bool DifFnStgSelect(INPUT_BITS key)
 {
 	return RingFN(SetDifItem, DebugDat.StgSelect, key, 1, STAGE_MAX);
 }
 
-static BOOL DifFnHit(WORD key)
+static bool DifFnHit(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -341,7 +342,7 @@ static BOOL DifFnHit(WORD key)
 	return TRUE;
 }
 
-static BOOL DifFnDemo(WORD key)
+static bool DifFnDemo(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -360,7 +361,7 @@ static BOOL DifFnDemo(WORD key)
 
 #endif // PBG_DEBUG
 
-static BOOL GrpFnChgDevice(WORD key)
+static bool GrpFnChgDevice(INPUT_BITS key)
 {
 	int				flag = 0;
 
@@ -393,12 +394,12 @@ static BOOL GrpFnChgDevice(WORD key)
 	return TRUE;
 }
 
-static BOOL GrpFnSkip(WORD key)
+static bool GrpFnSkip(INPUT_BITS key)
 {
 	return RingFN(SetGrpItem, ConfigDat.FPSDivisor.v, key, 0, FPS_DIVISOR_MAX);
 }
 
-static BOOL GrpFnBpp(WORD key)
+static bool GrpFnBpp(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -425,7 +426,7 @@ static BOOL GrpFnBpp(WORD key)
 	return TRUE;
 }
 
-static BOOL GrpFnWinLocate(WORD key)
+static bool GrpFnWinLocate(INPUT_BITS key)
 {
 	BYTE	flags[3] = {0, GRPF_WINDOW_UPPER, GRPF_MSG_DISABLE};
 	int		i;
@@ -460,7 +461,7 @@ static BOOL GrpFnWinLocate(WORD key)
 	return TRUE;
 }
 
-static BOOL SndFnWAVE(WORD key)
+static bool SndFnWAVE(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -496,7 +497,7 @@ static BOOL SndFnWAVE(WORD key)
 	return TRUE;
 }
 
-static BOOL SndFnMIDI(WORD key)
+static bool SndFnMIDI(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -521,7 +522,7 @@ static BOOL SndFnMIDI(WORD key)
 	return TRUE;
 }
 
-static BOOL SndFnMIDIDev(WORD key)
+static bool SndFnMIDIDev(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -545,7 +546,7 @@ static BOOL SndFnMIDIDev(WORD key)
 	return TRUE;
 }
 
-static BOOL InpFnMsgSkip(WORD key)
+static bool InpFnMsgSkip(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -565,7 +566,7 @@ static BOOL InpFnMsgSkip(WORD key)
 	return TRUE;
 }
 
-static BOOL InpFnZSpeedDown(WORD key)
+static bool InpFnZSpeedDown(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -586,7 +587,7 @@ static BOOL InpFnZSpeedDown(WORD key)
 }
 
 
-static bool RFnStg(int stage, WORD key)
+static bool RFnStg(int stage, INPUT_BITS key)
 {
 	if((key == KEY_BOMB) || (key == KEY_ESC)) {
 		return false;
@@ -597,44 +598,44 @@ static bool RFnStg(int stage, WORD key)
 }
 
 
-static BOOL RFnStg1(WORD key)
+static bool RFnStg1(INPUT_BITS key)
 {
 	return RFnStg(1, key);
 }
 
-static BOOL RFnStg2(WORD key)
+static bool RFnStg2(INPUT_BITS key)
 {
 	return RFnStg(2, key);
 }
 
-static BOOL RFnStg3(WORD key)
+static bool RFnStg3(INPUT_BITS key)
 {
 	return RFnStg(3, key);
 }
 
-static BOOL RFnStg4(WORD key)
+static bool RFnStg4(INPUT_BITS key)
 {
 	return RFnStg(4, key);
 }
 
-static BOOL RFnStg5(WORD key)
+static bool RFnStg5(INPUT_BITS key)
 {
 	return RFnStg(5, key);
 }
 
-static BOOL RFnStg6(WORD key)
+static bool RFnStg6(INPUT_BITS key)
 {
 	return RFnStg(6, key);
 }
 
-static BOOL RFnStgEx(WORD key)
+static bool RFnStgEx(INPUT_BITS key)
 {
 	return RFnStg(GRAPH_ID_EXSTAGE, key);
 }
 
 
 
-static BOOL MainFnGameStart(WORD key)
+static bool MainFnGameStart(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -645,7 +646,7 @@ static BOOL MainFnGameStart(WORD key)
 	}
 }
 
-static BOOL MainFnExStart(WORD key)
+static bool MainFnExStart(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -657,7 +658,7 @@ static BOOL MainFnExStart(WORD key)
 	}
 }
 
-static BOOL ScoreFn(WORD key)
+static bool ScoreFn(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -667,7 +668,7 @@ static BOOL ScoreFn(WORD key)
 	}
 }
 
-static BOOL MusicFn(WORD key)
+static bool MusicFn(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -679,7 +680,7 @@ static BOOL MusicFn(WORD key)
 	}
 }
 
-static BOOL ExitFnYes(WORD key)
+static bool ExitFnYes(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -691,7 +692,7 @@ static BOOL ExitFnYes(WORD key)
 	}
 }
 
-static BOOL ExitFnNo(WORD key)
+static bool ExitFnNo(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -703,7 +704,7 @@ static BOOL ExitFnNo(WORD key)
 	}
 }
 
-static BOOL ContinueFnYes(WORD key)
+static bool ContinueFnYes(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -715,7 +716,7 @@ static BOOL ContinueFnYes(WORD key)
 	}
 }
 
-static BOOL ContinueFnNo(WORD key)
+static bool ContinueFnNo(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
@@ -728,7 +729,9 @@ static BOOL ContinueFnNo(WORD key)
 	}
 }
 
-static bool InpFnKey(uint8_t& config_pad, WORD pad_config_key, WORD key)
+static bool InpFnKey(
+	uint8_t& config_pad, INPUT_BITS pad_config_key, INPUT_BITS key
+)
 {
 	key &= (~Pad_Data);
 	const auto temp = Key_PadConfig(pad_config_key);
@@ -741,34 +744,34 @@ static bool InpFnKey(uint8_t& config_pad, WORD pad_config_key, WORD key)
 	return ((key != KEY_RETURN) && (key != KEY_TAMA));
 }
 
-static BOOL InpFnKeyTama(WORD key)
+static bool InpFnKeyTama(INPUT_BITS key)
 {
 	return InpFnKey(ConfigDat.PadTama.v, KEY_TAMA, key);
 }
 
-static BOOL InpFnKeyBomb(WORD key)
+static bool InpFnKeyBomb(INPUT_BITS key)
 {
 	return InpFnKey(ConfigDat.PadBomb.v, KEY_BOMB, key);
 }
 
-static BOOL InpFnKeyShift(WORD key)
+static bool InpFnKeyShift(INPUT_BITS key)
 {
 	return InpFnKey(ConfigDat.PadShift.v, KEY_SHIFT, key);
 }
 
-static BOOL InpFnKeyCancel(WORD key)
+static bool InpFnKeyCancel(INPUT_BITS key)
 {
 	return InpFnKey(ConfigDat.PadCancel.v, KEY_ESC, key);
 }
 
 
-static BOOL CfgRepStgSelect(WORD key)
+static bool CfgRepStgSelect(INPUT_BITS key)
 {
 	return RingFN(SetCfgRepItem, ConfigDat.StageSelect.v, key, 1, STAGE_MAX);
 }
 
 
-static BOOL CfgRepSave(WORD key)
+static bool CfgRepSave(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):

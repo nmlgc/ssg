@@ -7,6 +7,7 @@
 #include "GIAN.H"
 #include "DirectXUTYs/DI_UTY.H"
 #include "platform/snd.h"
+#include "game/input.h"
 
 
 ///// [ひみつの関数] /////

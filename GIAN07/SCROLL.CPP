@@ -8,9 +8,9 @@
 #include "DEMOPLAY.H"
 #include "GIAN.H"
 #include "LEVEL.H"
-#include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
+#include "game/input.h"
 
 
 

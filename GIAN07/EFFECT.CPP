@@ -300,17 +300,6 @@ void SEffectMove(void)
 				}
 			break;
 
-			case(SEFC_GAMEOVER2):
-				if(e->time==0){
-					e->cmd  = SEFC_GAMEOVER3;
-					e->time = 180;
-				}
-			break;
-
-			case(SEFC_GAMEOVER3):
-				if(e->time==0) e->cmd = SEFC_NONE;
-			break;
-
 			case(SEFC_MTITLE1):		// 曲名出現
 				//e->x -= 16;
 				if(e->time==0){
@@ -387,17 +376,6 @@ void SEffectDraw(void)
 				for(j=0;j<9;j++){
 					// *37 //
 					x = (e->x>>6) + (j-4)*(35-e->time);
-					y = (e->y>>6);
-					GrpPutc(x,y,buf[j]);
-				}
-			break;
-
-			case(SEFC_GAMEOVER3):
-				strcpy(buf,"GAME OVER");
-				//if(e->time%60<30) break;
-				for(j=0;j<9;j++){
-					// *37 //
-					x = (e->x>>6) + (j-4)*(35);
 					y = (e->y>>6);
 					GrpPutc(x,y,buf[j]);
 				}

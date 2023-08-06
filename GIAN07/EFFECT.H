@@ -40,7 +40,6 @@
 
 #define SEFC_GAMEOVER	0x07		// ワーニングの表示とか
 #define SEFC_GAMEOVER2	0x08		// ワーニングの表示とか
-#define SEFC_GAMEOVER3	0x09		// ワーニングの表示とか
 
 #define SEFC_STR2		0x10		// 得点アイテム用？エフェクト
 

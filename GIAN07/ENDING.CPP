@@ -134,8 +134,6 @@ bool EndingInit(void)
 
 void EndingProc(bool&)
 {/*
-	Key_Read();
-
 	if(Key_Data){
 		GameExit();
 		return;

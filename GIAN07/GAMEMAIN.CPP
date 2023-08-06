@@ -11,7 +11,6 @@
 #include "LEVEL.H"
 #include "MUSIC.H"
 #include "SCORE.H"
-#include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
 #include "game/input.h"
@@ -77,8 +76,6 @@ bool InputLocked;
 // スコアネーム表示の準備を行う //
 extern bool ScoreNameInit(void)
 {
-	Key_Read();
-
 	CurrentDif = CurrentLevel();
 
 	CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
@@ -105,8 +102,6 @@ extern bool ScoreNameInit(void)
 void ScoreNameProc(bool&)
 {
 	static const char *ExString[5] = {"Easy","Normal","Hard","Lunatic","Extra"};
-
-	Key_Read();
 
 	switch(Key_Data){
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_BOMB):case(KEY_ESC):
@@ -256,8 +251,6 @@ void NameRegistProc(bool&)
 	char	c;
 
 	constexpr int8_t END_WAIT = -1;
-
-	Key_Read();
 
 	if(key_time==0){
 		key_time = 8;//16;
@@ -628,7 +621,6 @@ void ReplayProc(bool&)
 
 	ExTimer = (ExTimer+1)%128;
 
-	Key_Read();
 	if(Key_Data != KEY_ESC) {
 		Key_Data = DemoplayMove();
 	}
@@ -918,8 +910,6 @@ extern void GameContinue(void)
 
 void GameProc(bool&)
 {
-	Key_Read();
-
 #ifdef PBG_DEBUG
 	if(DebugDat.DemoSave && DemoplayRecord(Key_Data)) {
 		DemoplaySaveDemo();
@@ -970,8 +960,6 @@ void GameProc(bool&)
 // ゲームオーバー出現用
 void GameOverProc0(bool&)
 {
-	Key_Read();
-
 	switch(GameOverTimer) {
 	default:
 		GameOverTimer--;
@@ -1020,7 +1008,6 @@ void GameOverProc0(bool&)
 // ゲームオーバー
 void GameOverProc(bool&)
 {
-	Key_Read();
 	CWinMove(&ContinueWindow);
 	if(GameMain != GameOverProc){
 		SEffectInit();
@@ -1046,7 +1033,6 @@ void DemoProc(bool&)
 
 	ExTimer = (ExTimer+1)%128;
 
-	Key_Read();
 	if(Key_Data) Key_Data = KEY_ESC;
 	else         Key_Data = DemoplayMove();
 
@@ -1107,7 +1093,6 @@ void WeaponSelectProc(bool&)
 		SndPlay(SOUND_ID_BUZZ);
 	}
 
-	Key_Read();
 	if(WeaponKeyWait){
 		if(!Key_Data) WeaponKeyWait = 0;
 		else          Key_Data      = 0;
@@ -1318,7 +1303,6 @@ void TitleProc(bool& quit)
 	}
 */
 
-	Key_Read();
 	if(Key_Data==0) DemoTimer += 1;
 	else            DemoTimer  = 0;
 	if(MainWindow.SelectDepth!=0) DemoTimer = 0;
@@ -1363,8 +1347,6 @@ void PauseProc(bool&)
 {
 	WINDOW_LTRB	rc;
 
-	Key_Read();
-
 	CWinMove(&ExitWindow);
 	if(GameMain!=PauseProc) return;
 
@@ -1389,8 +1371,6 @@ void MusicRoomProc(bool&)
 	int		i;
 	static WORD Old_Key;
 	static BYTE DevChgWait;
-
-	Key_Read();
 
 	if(Key_Data!=Old_Key){
 		switch(Key_Data){

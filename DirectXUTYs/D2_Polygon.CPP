@@ -77,7 +77,6 @@ void _2DPolygon(WINDOW_POINT *p, int n)
 		if(p[i].y < p[j].y)	dy = p[i].y-TopY;
 		else				dy = p[j].y-TopY;
 
-		//Key_Read();
 		//if(Key_Data&KEY_TAMA) return;
 
 		TopY = DrawTrapezoid(TopY,dy);

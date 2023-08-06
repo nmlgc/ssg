@@ -248,11 +248,13 @@ void NameRegistProc(bool&)
 	PIXEL_LTRB	src = {0, 0, 400, 64};
 	int		gx,gy,len;
 	static int	x,y;
-	static BYTE key_time;
+	static int8_t key_time;
 	static BYTE count;
 	static BYTE time;
 	//char	buf[100],
 	char	c;
+
+	constexpr int8_t END_WAIT = -1;
 
 	Key_Read();
 
@@ -342,10 +344,8 @@ void NameRegistProc(bool&)
 				strcpy(CurrentName.Name, ScoreString[CurrentRank-1].Name);
 				SaveScoreData(&CurrentName, CurrentLevel());
 
-				while(Key_Data) Key_Read();
-				x = y = key_time = 0;
-				GameExit();
-			return;
+				key_time = END_WAIT;
+				break;
 
 			case 0:
 				InputLocked = false;
@@ -353,13 +353,23 @@ void NameRegistProc(bool&)
 		}
 
 		if(x>20 && y==2)	x &= (~1);
+	} else if(key_time != END_WAIT) {
+		key_time--;
 	}
-	else key_time--;
 
-	if(Key_Data==0) key_time = 0;
-
-	count = (count+1)%24;
-	time++;
+	if(key_time == -1) {
+		if(Key_Data == 0) {
+			x = y = key_time = 0;
+			GameExit();
+			return;
+		}
+	} else {
+		if(Key_Data == 0) {
+			key_time = 0;
+		}
+		count = ((count + 1) % 24);
+		time++;
+	}
 
 	GrpCls();
 

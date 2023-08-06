@@ -557,7 +557,7 @@ bool GameInit(void(*NextProc)(bool& quit))
 extern bool GameNextStage(void)
 {
 #ifdef PBG_DEBUG
-	DemoplaySave();
+	DemoplaySaveDemo();
 #endif
 
 	GameStage++;
@@ -591,7 +591,7 @@ extern bool GameReplayInit(int Stage)
 //	rnd_seed_set(timeGetTime());
 	GameStage = Stage;
 
-	if(!ReplayLoad(GameStage)){
+	if(!DemoplayLoadReplay(GameStage)) {
 		//DebugOut("デモプレイデータが存在せず");
 		return FALSE;
 	}
@@ -604,12 +604,12 @@ extern bool GameReplayInit(int Stage)
 
 	if(!LoadGraph(GameStage)){
 		DebugOut("GRAPH.DAT が破壊されています");
-		ReplayLoadCleanup();
+		DemoplayCleanup();
 		return FALSE;
 	}
 	if(!LoadStageData(GameStage)){
 		DebugOut("ENEMY.DAT が破壊されています");
-		ReplayLoadCleanup();
+		DemoplayCleanup();
 		return FALSE;
 	}
 
@@ -628,12 +628,13 @@ void ReplayProc(bool&)
 	ExTimer = (ExTimer+1)%128;
 
 	Key_Read();
-	if(Key_Data==KEY_ESC) Key_Data = KEY_ESC;
-	else         Key_Data = ReplayMove();
+	if(Key_Data != KEY_ESC) {
+		Key_Data = DemoplayMove();
+	}
 
 	// ＥＳＣが押されたら即、終了 //
 	if(Key_Data & KEY_ESC){
-		ReplayLoadCleanup();
+		DemoplayCleanup();
 		GameExit();
 		return;
 	}
@@ -641,7 +642,7 @@ void ReplayProc(bool&)
 	GameMove();
 
 	if(GameMain != ReplayProc){
-		ReplayLoadCleanup();		// 後始末
+		DemoplayCleanup();	// 後始末
 		GameExit();					// 強制終了させる(ゲームオーバー対策)
 		return;
 	}
@@ -683,7 +684,7 @@ bool DemoInit(void)
 //	GameStage = (rnd()%3)+1;		// この部分は体験版(コミケ)だけ //
 //	GameStage = 1;					// こっちはＨＰ体験版用         //
 
-	if(!DemoplayLoad(GameStage)){
+	if(!DemoplayLoadDemo(GameStage)) {
 		//DebugOut("デモプレイデータが存在せず");
 		return FALSE;
 	}
@@ -919,17 +920,19 @@ void GameProc(bool&)
 	Key_Read();
 
 #ifdef PBG_DEBUG
-	if(DebugDat.DemoSave) DemoplayRecord(Key_Data);
+	if(DebugDat.DemoSave && DemoplayRecord(Key_Data)) {
+		DemoplaySaveDemo();
+	}
 #endif
 
 	// リプレイ時の保存処理 //
-	if(ConfigDat.StageSelect.v) {
-		ReplayRecord(Key_Data);
+	if(ConfigDat.StageSelect.v && DemoplayRecord(Key_Data)) {
+		DemoplaySaveReplay();
 	}
 
 	if(Key_Data & KEY_ESC){
 		if(ConfigDat.StageSelect.v) {
-			ReplaySave();
+			DemoplaySaveReplay();
 			GameExit(TRUE);
 			return;
 		}
@@ -990,7 +993,7 @@ void GameOverProc0(bool&)
 
 		// ステージセレクトが有効な場合 //
 		if(ConfigDat.StageSelect.v) {
-			ReplaySave();
+			DemoplaySaveReplay();
 			if(GameStage == GRAPH_ID_EXSTAGE) NameRegistInit(TRUE);
 			else                              GameExit(TRUE);
 			return;
@@ -1050,7 +1053,7 @@ void DemoProc(bool&)
 
 	// ＥＳＣが押されたら即、終了 //
 	if(Key_Data & KEY_ESC){
-		DemoplayLoadCleanup();
+		DemoplayCleanup();
 		IsDemoplay = FALSE;
 		GameExit();
 		return;
@@ -1059,7 +1062,7 @@ void DemoProc(bool&)
 	GameMove();
 
 	if(GameMain != DemoProc){
-		DemoplayLoadCleanup();		// 後始末
+		DemoplayCleanup();	// 後始末
 		IsDemoplay = FALSE;
 		GameExit();					// 強制終了させる(ゲームオーバー対策)
 		return;
@@ -1156,7 +1159,7 @@ void WeaponSelectProc(bool&)
 					GameStage = ConfigDat.StageSelect.v;
 					if(GameStage==2) Viv.exp = 160;
 					if(GameStage>=3) Viv.exp = 255;
-					ReplayInit();
+					DemoplayInit();
 				}
 				else{
 					GameStage = 1;
@@ -1168,7 +1171,7 @@ void WeaponSelectProc(bool&)
 				Viv.left   = 2;
 				Viv.exp    = 255;
 				if(ConfigDat.StageSelect.v) {
-					ReplayInit();
+					DemoplayInit();
 				}
 			}
 

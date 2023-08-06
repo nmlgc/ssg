@@ -340,7 +340,7 @@ static void enemy_set(void)
 
 			case(SCL_STAGECLEAR):	// ステージクリア
 				if(ConfigDat.StageSelect.v) {
-					ReplaySave();
+					DemoplaySaveReplay();
 					GameExit(TRUE);
 					return;
 				}
@@ -351,7 +351,7 @@ static void enemy_set(void)
 
 			case(SCL_GAMECLEAR):
 				if(ConfigDat.StageSelect.v) {
-					ReplaySave();
+					DemoplaySaveReplay();
 					GameExit(TRUE);
 					return;
 				}
@@ -371,7 +371,7 @@ static void enemy_set(void)
 
 			case(SCL_EXTRACLEAR):
 				if(ConfigDat.StageSelect.v) {
-					ReplaySave();	// 終了はしない
+					DemoplaySaveReplay();	// 終了はしない
 				}
 				if(DemoplayLoadEnable) return;
 

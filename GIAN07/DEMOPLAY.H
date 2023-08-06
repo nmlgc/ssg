@@ -48,22 +48,19 @@ typedef struct tagDEMOPLAY_INFO{
 
 ///// [ 関数 ] /////
 void DemoplayInit(void);	// デモプレイデータの準備
-void DemoplayRecord(uint16_t key);	// デモプレイデータを保存する
-void DemoplaySave(void);	// デモプレイデータをファイルに書き込む
 
-bool DemoplayLoad(int stage);	// デモプレイデータをロードする
+// デモプレイデータを保存する
+// Returns `true` if the replay is over and should be saved via either
+// DemoplaySave() or ReplaySave().
+bool DemoplayRecord(uint16_t key);
+
+void DemoplaySaveDemo(void);	// デモプレイデータをファイルに書き込む
+void DemoplaySaveReplay(void);	// リプレイデータをファイルに書き込む
+
+bool DemoplayLoadDemo(int stage);	// デモプレイデータをロードする
+bool DemoplayLoadReplay(int stage);	// リプレイデータをロードする
 uint16_t DemoplayMove(void);	// Key_Data を返す
-void DemoplayLoadCleanup(void);	// デモプレイロードの事後処理
-
-
-// 要望に付き、追加するのだ //
-void ReplayInit(void);	// リプレイデータの準備
-void ReplayRecord(uint16_t key);	// リプレイデータを保存する
-void ReplaySave(void);	// リプレイデータをファイルに書き込む
-
-bool ReplayLoad(int stage);	// リプレイデータをロードする
-uint16_t ReplayMove(void);	// Key_Data を返す
-void ReplayLoadCleanup(void);	// リプレイデータロードの事後処理
+void DemoplayCleanup(void);	// デモプレイロードの事後処理
 
 
 

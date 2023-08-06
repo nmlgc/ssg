@@ -32,7 +32,6 @@ PATH_STRING ReplayFN(uint8_t stage)
 	return ret;
 }
 
-// デモプレイデータの準備 //
 void DemoplayInit(void)
 {
 	// 乱数の準備 //
@@ -77,24 +76,24 @@ bool DemoplayLoadSetup()
 }
 
 
-// デモプレイデータを保存する //
-void DemoplayRecord(uint16_t key)
+bool DemoplayRecord(uint16_t key)
 {
-	if(!DemoplaySaveEnable) return;
+	if(!DemoplaySaveEnable) {
+		return false;
+	}
 
 	DemoBuffer[DemoBufPtr++] = key;
 
 	// バッファが最後に来たか、ＥＳＣが押された場合 //
 	if(DemoBufPtr==DEMOBUF_MAX || (key&KEY_ESC)){
 		DemoBufPtr--;
-		DemoplaySave();
-		DemoplaySaveEnable = FALSE;
+		return true;
 	}
+	return false;
 }
 
 
-// デモプレイデータをファイルに書き込む //
-void DemoplaySave(void)
+void DemoplaySaveDemo(void)
 {
 	if(!DemoplaySaveEnable) return;
 
@@ -114,8 +113,7 @@ void DemoplaySave(void)
 }
 
 
-// デモプレイデータをロードする //
-bool DemoplayLoad(int stage)
+bool DemoplayLoadDemo(int stage)
 {
 	// Not too pretty… //
 	BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno);
@@ -142,7 +140,6 @@ bool DemoplayLoad(int stage)
 }
 
 
-// Key_Data を返す //
 uint16_t DemoplayMove(void)
 {
 	DWORD ptr;
@@ -160,42 +157,15 @@ uint16_t DemoplayMove(void)
 }
 
 
-// デモプレイロードの事後処理 //
-void DemoplayLoadCleanup(void)
+void DemoplayCleanup(void)
 {
 	ConfigDat          = ConfigTemp;
 	DemoplayLoadEnable = FALSE;
 }
 
 
-// リプレイデータの準備 //
-void ReplayInit(void)
+void DemoplaySaveReplay(void)
 {
-	// これは同じ //
-	DemoplayInit();
-}
-
-
-// リプレイデータを保存する //
-void ReplayRecord(uint16_t key)
-{
-	if(!DemoplaySaveEnable) return;
-
-	DemoBuffer[DemoBufPtr++] = key;
-
-	if(DemoBufPtr == DEMOBUF_MAX || (key&KEY_ESC)){
-		DemoBufPtr--;
-		ReplaySave();					// 強制吐き出し
-		DemoplaySaveEnable = FALSE;
-	}
-}
-
-
-// リプレイデータをファイルに書き込む //
-void ReplaySave(void)
-{
-	char			buf[100];
-
 	if(!DemoplaySaveEnable) return;
 
 	// すぐさま、無効化する //
@@ -215,8 +185,7 @@ void ReplaySave(void)
 }
 
 
-// リプレイデータをロードする //
-bool ReplayLoad(int stage)
+bool DemoplayLoadReplay(int stage)
 {
 	BYTE_BUFFER_OWNED	temp;
 
@@ -235,32 +204,4 @@ bool ReplayLoad(int stage)
 	}
 	memcpy(DemoBuffer, temp.get(), sizeof(WORD)*DemoInfo.DataSize);
 	return DemoplayLoadSetup();
-}
-
-
-// Key_Data を返す //
-uint16_t ReplayMove(void)
-{
-	DWORD	ptr;
-
-	if(!DemoplayLoadEnable) return KEY_ESC;
-
-	ptr = DemoBufPtr;
-
-	if(ptr >= DemoInfo.DataSize){
-		ptr = DemoBufPtr;
-		DemoplayLoadEnable = FALSE;
-	}
-	else
-		DemoBufPtr++;
-
-	return DemoBuffer[ptr];
-}
-
-
-// リプレイデータロードの事後処理 //
-void ReplayLoadCleanup(void)
-{
-	ConfigDat = ConfigTemp;
-	DemoplayLoadEnable = FALSE;
 }

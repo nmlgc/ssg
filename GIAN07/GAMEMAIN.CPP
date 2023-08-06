@@ -21,7 +21,7 @@ DWORD		MidiPlayID = 0;
 char		MidiTempo  = 0;
 DWORD		DemoTimer  = 0;
 BYTE		WeaponKeyWait = 0;
-DWORD		GameOverTimer = 0;
+int	GameOverTimer = 0;
 
 decltype(CONFIG_DATA::GameLevel.v) TempGameLevel = 0;
 
@@ -940,12 +940,27 @@ void GameProc(bool&)
 // ゲームオーバー出現用
 void GameOverProc0(bool&)
 {
-	GameOverTimer--;
+	Key_Read();
 
-	if(GameOverTimer == 0){
-		Key_Data = 0;
-		while(Key_Data == 0) Key_Read();
-		while(Key_Data != 0) Key_Read();
+	switch(GameOverTimer) {
+	default:
+		GameOverTimer--;
+		fragment_move();
+		SEffectMove();
+		break;
+
+	case 0:
+		// Wait for press
+		if(Key_Data != 0) {
+			GameOverTimer--;
+		}
+		break;
+
+	case -1:
+		// Wait for release
+		if(Key_Data != 0) {
+			break;
+		}
 
 		// ステージセレクトが有効な場合 //
 		if(ConfigDat.StageSelect.v) {
@@ -964,10 +979,6 @@ void GameOverProc0(bool&)
 		ContinueWindow.Open({ 250, 200 }, 0);
 		GameMain = GameOverProc;
 		return;
-	}
-	else{
-		fragment_move();
-		SEffectMove();
 	}
 
 	if(IsDraw()){

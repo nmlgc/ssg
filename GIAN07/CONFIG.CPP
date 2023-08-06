@@ -56,7 +56,7 @@ template <typename T> concept VERSION = requires(T t) {
 };
 
 // Original 秋霜CFG.DAT
-const struct {
+const struct VERSION_ORIGINAL {
 	static constexpr auto FN = _PATH("秋霜CFG.DAT");
 
 	// The original build of the game only supported 8-bit and 16-bit. Anything
@@ -114,7 +114,7 @@ const struct {
 	}
 } VERSION_ORIGINAL;
 
-const struct {
+const struct VERSION_00 {
 	static constexpr auto FN = _PATH("SSG_V00.CFG");
 
 	static constexpr CONFIG_OPTION_ARRAY Options = {

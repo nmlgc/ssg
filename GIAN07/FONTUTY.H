@@ -35,6 +35,7 @@ extern TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj;
 template <class T> concept GIAN_TEXTRENDER_SESSION = (
 	TEXTRENDER_SESSION<T, GIAN_FONT_ID>
 );
+static_assert(TEXTRENDER<decltype(TextObj), GIAN_FONT_ID>);
 
 
 

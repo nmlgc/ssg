@@ -46,14 +46,22 @@ concept TEXTRENDER_SESSION_FUNC = (
 	}
 );
 
+// Just here to keep the TEXTRENDER concept from requiring an impossible
+// template parameter for the session functor.
+template <class FontID> struct TEXTRENDER_SESSION_FUNC_ARCHETYPE {
+	TEXTRENDER_SESSION_FUNC_ARCHETYPE() = delete;
+	void operator()(TEXTRENDER_SESSION<FontID> auto& s) {
+	}
+};
+
 // Concept for a text rendering backend.
-template <class T, class Session, class FontID> concept TEXTRENDER = requires(
+template <class T, class FontID> concept TEXTRENDER = requires(
 	T t,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
 	std::string_view contents,
 	TEXTRENDER_RECT_ID rect_id,
-	TEXTRENDER_SESSION_FUNC<Session, FontID> auto func,
+	TEXTRENDER_SESSION_FUNC_ARCHETYPE<FontID>& func,
 	std::optional<PIXEL_LTWH> subrect
 ) {
 	// Rectangle management

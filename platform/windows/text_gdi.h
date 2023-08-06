@@ -67,6 +67,8 @@ template <
 		}
 	};
 
+	static_assert(TEXTRENDER_SESSION<SESSION, FontID>);
+
 	bool Wipe() {
 		return (
 			graphics.SurfaceCreateBlank(surf, bounds) &&

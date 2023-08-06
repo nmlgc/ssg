@@ -7,6 +7,7 @@
 #pragma once
 
 #include "game/text.h"
+#include <string>
 #include <optional>
 #include <vector>
 

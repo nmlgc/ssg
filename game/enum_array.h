@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <utility>
 
 template <class E> concept ENUMARRAY_ID = (
 	std::is_enum_v<E> &&

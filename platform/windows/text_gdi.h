@@ -8,6 +8,7 @@
 #include "game/enum_array.h"
 #include "game/text_packed.h"
 #include <assert.h>
+#include <functional>
 #include <span>
 
 // Only required for the HDC, HFONT, and HGDIOBJ types, which are basically

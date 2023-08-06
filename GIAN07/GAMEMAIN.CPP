@@ -287,6 +287,9 @@ void NameRegistProc(bool&)
 			goto BACK_NR_PROC;
 
 			case(KEY_TAMA):case(KEY_RETURN):
+				if(InputLocked) {
+					break;
+				}
 				SndPlay(SOUND_ID_SELECT);
 
 				// 最後の文字まで来ていた場合 //
@@ -343,6 +346,10 @@ void NameRegistProc(bool&)
 				x = y = key_time = 0;
 				GameExit();
 			return;
+
+			case 0:
+				InputLocked = false;
+				break;
 		}
 
 		if(x>20 && y==2)	x &= (~1);
@@ -433,6 +440,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 
 	GrpSetClip(0,0,640,480);
 
+	InputLocked = Key_Data;
 	GameMain = NameRegistProc;
 
 	if(bNeedChgMusic){

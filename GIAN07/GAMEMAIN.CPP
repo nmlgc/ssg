@@ -70,11 +70,14 @@ uint8_t CurrentLevel()
 	);
 }
 
+bool InputLocked;
 
 
 // スコアネーム表示の準備を行う //
 extern bool ScoreNameInit(void)
 {
+	Key_Read();
+
 	CurrentDif = CurrentLevel();
 
 	CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
@@ -91,9 +94,7 @@ extern bool ScoreNameInit(void)
 
 	GrpSetClip(0,0,640,480);
 
-	Key_Read();
-	while(Key_Data) Key_Read();
-
+	InputLocked = Key_Data;
 	GameMain = ScoreNameProc;
 
 	return TRUE;
@@ -108,6 +109,9 @@ void ScoreNameProc(bool&)
 
 	switch(Key_Data){
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_BOMB):case(KEY_ESC):
+			if(InputLocked) {
+				break;
+			}
 			SndPlay(SOUND_ID_CANCEL);
 			GameExit(FALSE);
 		return;
@@ -125,6 +129,10 @@ void ScoreNameProc(bool&)
 			CurrentDif  = (CurrentDif+1)%5;
 			CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
 		break;
+
+		case 0:
+			InputLocked = false;
+			break;
 	}
 
 	GrpCls();

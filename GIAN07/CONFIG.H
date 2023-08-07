@@ -10,23 +10,23 @@
 #include "platform/buffer.h"
 
 // フラグ //
-#define GRPF_MASK				(~0x07)
-#define GRPF_ALPHA_ENABLE		0x01		// 半透明が有効(無効時はメッシュ???)
-#define GRPF_WINDOW_UPPER		0x02		// メッセージウィンドウを上の方に表示する
-#define GRPF_MSG_DISABLE		0x04		// 会話シーンを省略
+constexpr uint8_t GRPF_MASK	= (~0x07);
+constexpr uint8_t GRPF_ALPHA_ENABLE	= 0x01;	// 半透明が有効(無効時はメッシュ???)
+constexpr uint8_t GRPF_WINDOW_UPPER	= 0x02;	// メッセージウィンドウを上の方に表示する
+constexpr uint8_t GRPF_MSG_DISABLE	= 0x04;	// 会話シーンを省略
 
-#define SNDF_MASK				(~0x03)
-#define SNDF_MIDI_ENABLE		0x01		// ＭＩＤＩが有効
-#define SNDF_WAVE_ENABLE		0x02		// ＷＡＶＥが有効
+constexpr uint8_t SNDF_MASK	= (~0x03);
+constexpr uint8_t SNDF_MIDI_ENABLE	= 0x01;	// ＭＩＤＩが有効
+constexpr uint8_t SNDF_WAVE_ENABLE	= 0x02;	// ＷＡＶＥが有効
 
-#define INPF_MASK				(~0x07)
-#define INPF_JOYPAD_ENABLE		0x01		// パッドが有効
-#define INPF_Z_MSKIP_ENABLE		0x02		// Ｚキーでメッセージを送れる
-#define INPF_Z_SPDDOWN_ENABLE	0x04		// 押しっぱなしでシフト移動
+constexpr uint8_t INPF_MASK	= (~0x07);
+constexpr uint8_t INPF_JOYPAD_ENABLE	= 0x01;	// パッドが有効
+constexpr uint8_t INPF_Z_MSKIP_ENABLE	= 0x02;	// Ｚキーでメッセージを送れる
+constexpr uint8_t INPF_Z_SPDDOWN_ENABLE	= 0x04;	// 押しっぱなしでシフト移動
 
-#define DBGF_MASK				(~0x03)
-#define DBGF_DISPLAYINFO		0x01		// デバッグ情報を出力する
-#define DBGF_HIT_ON				0x02		// 当たり判定が有効
+constexpr uint8_t DBGF_MASK	= (~0x03);
+constexpr uint8_t DBGF_DISPLAYINFO	= 0x01;	// デバッグ情報を出力する
+constexpr uint8_t DBGF_HIT_ON	= 0x02;	// 当たり判定が有効
 
 // Limits //
 constexpr const auto STOCK_PLAYER_MAX = 4;

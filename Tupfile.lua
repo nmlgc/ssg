@@ -99,6 +99,7 @@ ANALYSIS_CFLAGS = (
 
 	-- Disabled warnings
 	"/wd4834 " .. -- Discarding `[[nodiscard]]` (C6031 covers this and more)
+	"/wd26408 " .. -- Avoid _malloca()
 	"/wd26432 " .. -- Rule of Five boilerplate
 	"/wd26440 " .. -- `noexcept` all the things
 	"/wd26481 " .. -- Don't use pointer arithmetic

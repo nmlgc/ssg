@@ -26,7 +26,8 @@ template <class T, class FontID> concept TEXTRENDER_SESSION = (
 		t.SetFont(font);
 		t.SetColor(color);
 
-		// Text display with the current color and font.
+		// Text display with the current color and font. [str] can be either
+		// UTF-8 or Shift-JIS.
 		t.Put(topleft_rel, str);
 
 		// Convenience overload to change the color before rendering the text.

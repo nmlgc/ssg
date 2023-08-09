@@ -125,7 +125,7 @@ WINDOW_INFO GrpItem[5] = {
 	{"Exit"		,"一つ前のメニューにもどります"		,CWinExitFn,0,0},
 };
 
-char	SndTitle[4][20];
+char	SndTitle[4][24];
 WINDOW_INFO SndItem[4] = {
 	{SndTitle[0],"WAVEを鳴らすかどうかの設定"	,SndFnWAVE,0,0},
 	{SndTitle[1],"MIDIを鳴らすかどうかの設定"	,SndFnMIDI,0,0},
@@ -134,7 +134,7 @@ WINDOW_INFO SndItem[4] = {
 };
 
 char IKeyTitle[4][20];
-char InpHelp[34] = "パッド上のボタンを押すと変更";
+char InpHelp[] = "パッド上のボタンを押すと変更";
 WINDOW_INFO InpKey[5] = {
 	{IKeyTitle[0],InpHelp, InpFnKeyTama,0,0},
 	{IKeyTitle[1],InpHelp, InpFnKeyBomb,0,0},
@@ -143,8 +143,8 @@ WINDOW_INFO InpKey[5] = {
 	{" Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
 };
 
-char	InpTitle[20];
-char	InpTitle2[20];
+char	InpTitle[23];
+char	InpTitle2[23];
 WINDOW_INFO	InpItem[4] = {
 	{InpTitle, "弾キーのメッセージスキップ設定"	,InpFnMsgSkip,0,0},
 	{InpTitle2,"弾キーの押しっぱなしで低速移動", InpFnZSpeedDown, 0, 0},
@@ -154,7 +154,7 @@ WINDOW_INFO	InpItem[4] = {
 };
 
 
-char CfgRepTitle[2][20];
+char CfgRepTitle[2][23];
 
 WINDOW_INFO CfgRep[3] = {
 	{CfgRepTitle[0], "リプレイ用データの保存", CfgRepSave, 0, 0},

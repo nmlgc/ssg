@@ -122,7 +122,7 @@ main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, {
 			"/I. " ..
 			"/EHsc " ..
 			"/source-charset:utf-8 " ..
-			"/execution-charset:shift-jis"
+			"/execution-charset:utf-8"
 		),
 		lflags = "obj/dinput.lib",
 		objdir = "ssg/",

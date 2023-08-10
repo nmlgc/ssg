@@ -11,7 +11,7 @@
 
 
 // グローバル変数 //
-constexpr auto ErrorOut = _PATH("ErrLOG2.TXT");
+constexpr auto ErrorOut = _PATH("ErrLOG_UTF8.TXT");
 static bool ErrorActive = false;
 
 

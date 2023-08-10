@@ -5,6 +5,7 @@
 
 #include "D2_Polygon.H"
 #include "DD_CLIP2D.H"
+#include <string.h>
 
 
 static LINE_WORK TZOID_A,TZOID_B;
@@ -116,43 +117,17 @@ static void GrpHLineX(int x1, int x2, int y)
 	//if(y<0) y = 0;
 	//if(y>479) y = 479;
 
-
-	_asm{
-		PUSH EDI			// EDI 保存
-
-		MOV EDI,Grp_Vram
-		JZ  HL_END			// NULL チェック(高速化のために外す？)
-
-		LEA EBX,Grp_AddrY
-		MOV EAX,y			// EAX = y
-		SHL EAX,2			// EAX = y*4 (DWORD)
-		ADD EBX,EAX			// EBX = Grp_AddrY+y(DD) <Pointer>
-		MOV EAX,[EBX]		// EAX = Grp_AddrY[y]
-
-		ADD EDI,EAX			// EDI := Vram + Grp_AddrY[y]
-		MOV EBX,x1			// EBX := x1
-		MOV ECX,x2			// ECX := x2
-		SUB ECX,EBX			// ECX := x2 - x1
-		ADD EDI,EBX			// EDI := Vram + Grp_AddrY[y] + x1(EBX)
-		INC ECX				// ECX := x2 - x1 + 1 (Length)
-		MOV EBX,ECX			// EBX := x2 - x1 + 1
-		AND EBX,3			// EBX := (x2-x1 +1)%4
-		SHR ECX,2			// ECX := (x2-x1 +1)/4
-
-		MOV EAX,Col2D
-
-		REP STOSD			// DWORD 描画 (４の倍数で描ける範囲で)
-		MOV ECX,EBX			// ECX := (x2-x1 +1)%4
-		REP STOSB			// BYTE 描画 (残りを描き込む)
-
-HL_END:
-		POP EDI				// EDI 復元
-	}
+	memset((Grp_Vram + Grp_AddrY[y] + x1), Col2D, ((x2 - x1) + 1));
 }
 
 // 台形の描画 //
 int DrawTrapezoid(int y, int dy)
 {
+	// NULL チェック(高速化のために外す？)
+	if(!Grp_Vram) {
+		return y;
+	}
+
 	int		left_x = TZOID_A.x;
 	int		det_x  = TZOID_B.x;// - left_x;
 

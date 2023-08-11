@@ -22,7 +22,11 @@ struct PIXEL_POINT {
 	PIXEL_POINT operator +(const PIXEL_POINT& other) const {
 		return { (x + other.x), (y + other.y) };
 	}
+
+	std::strong_ordering operator <=>(const PIXEL_POINT& other) const = default;
 };
+
+PIXEL_POINT& operator -=(PIXEL_POINT& self, const PIXEL_POINT& other);
 
 // Area size in unscaled pixel space.
 // Using signed integers to avoid complicating the conversion into rectangle

@@ -18,7 +18,8 @@
 
 
 // 関数 //
-int  __stdcall Grp_PClip(WINDOW_POINT *dest, WINDOW_POINT *src, int n);	// ポリゴン用クリッピング
+// ポリゴン用クリッピング
+int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n);
 
 
 #define OUTCODE_X		0x03

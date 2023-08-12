@@ -84,7 +84,7 @@ public:
 	// Tries to allocate [size] bytes, and leaves the buffer empty on failure.
 	BYTE_BUFFER_OWNED(size_t size) :
 		std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[size]),
-		size_(!this ? 0 : size) {
+		size_(get() ? size : 0) {
 	}
 
 	auto size() const {

@@ -37,11 +37,11 @@ DWORD	WaitTime;
 int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
 {
 	MSG			msg;
-	HWND		old_gian;
 	DWORD		tempdw;
 
 	// 他のところで起動していたらそいつをRestoreする //
-	if(old_gian=FindWindowW(APP_CLASS,NULL)){
+	auto old_gian = FindWindowW(APP_CLASS, nullptr);
+	if(old_gian) {
 		SetForegroundWindow(old_gian);
 		SendMessageW(old_gian,WM_SYSCOMMAND,SC_RESTORE,0);
 		return FALSE;

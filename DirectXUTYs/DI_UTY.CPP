@@ -48,7 +48,7 @@ WORD Pad_Read(void);
 
 
 
-BOOL Key_Start(HINSTANCE hInst,HWND hWnd)
+bool Key_Start(void)
 {
 	HRESULT		dirval;
 
@@ -76,9 +76,14 @@ BOOL Key_Start(HINSTANCE hInst,HWND hWnd)
 	IConfig.KeyShift = DIK_LSHIFT;	IConfig.bIsUsed[DIK_LSHIFT]  = TRUE;
 
 	// DirectInput オブジェクトの作成 //
-	dirval = DirectInputCreate(hInst,DIRECTINPUT_VERSION,&(InputObj.pdi),NULL);
+	extern HINSTANCE hInstanceMain;
+	dirval = DirectInputCreate(
+		hInstanceMain, DIRECTINPUT_VERSION, &InputObj.pdi, nullptr
+	);
 	if(dirval != DI_OK){
-		dirval = DirectInputCreate(hInst,0x0300,&(InputObj.pdi),NULL);
+		dirval = DirectInputCreate(
+			hInstanceMain, 0x0300, &InputObj.pdi, nullptr
+		);
 		if(dirval != DI_OK) return FALSE;
 	}
 
@@ -90,7 +95,10 @@ BOOL Key_Start(HINSTANCE hInst,HWND hWnd)
 	}
 
 	// 協調レベルのセット //
-	dirval = InputObj.pdev->SetCooperativeLevel(hWnd,DISCL_NONEXCLUSIVE|DISCL_FOREGROUND);
+	extern HWND hWndMain;
+	dirval = InputObj.pdev->SetCooperativeLevel(
+		hWndMain, (DISCL_NONEXCLUSIVE | DISCL_FOREGROUND)
+	);
 	if(dirval != DI_OK){
 		Key_End();
 		return FALSE;

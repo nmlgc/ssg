@@ -298,7 +298,7 @@ extern DWORD		DxEnumNow;
 
 
 // 初期化など //
-bool GrpEnum(HWND hWnd);	// 使用できるデバイスを列挙する
+bool GrpEnum(void);	// 使用できるデバイスを列挙する
 void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
 
 void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する

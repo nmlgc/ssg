@@ -123,7 +123,7 @@ void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
 }
 
 
-bool GrpEnum(HWND hWnd)
+bool GrpEnum(void)
 {
 	HRESULT		dxret;
 
@@ -143,7 +143,8 @@ bool GrpEnum(HWND hWnd)
 		return FALSE;
 	}
 
-	DxObj.hWnd = hWnd;
+	extern HWND hWndMain;
+	DxObj.hWnd = hWndMain;
 
 #ifdef _DEBUG
 	DebugOut("正常に列挙できたの");

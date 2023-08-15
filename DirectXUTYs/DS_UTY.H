@@ -75,7 +75,7 @@ typedef struct tagWAVEHEAD_FACT{
 
 
 // 初期化など //
-bool SndInit(HWND hWnd, int x_mid = SND_XMID_DEFAULT);
+bool SndInit(int x_mid = SND_XMID_DEFAULT);
 void SndCleanup(void);
 
 // ＷＡＶファイルロード(ある制限があるが...) //

@@ -45,7 +45,7 @@ LPSE_STRUCT				Snd_OBJ[SND_OBJ_MAX];
 int						SndXMID = SND_XMID_DEFAULT;
 
 
-bool SndInit(HWND hWnd, int x_mid)
+bool SndInit(int x_mid)
 {
 	HRESULT		dsrval;
 
@@ -53,7 +53,8 @@ bool SndInit(HWND hWnd, int x_mid)
 		dsrval = DirectSoundCreate(NULL,&Snd_DS,NULL);
 		if(dsrval != DS_OK) throw("DirectSoundCreate に失敗");
 
-		dsrval = Snd_DS->SetCooperativeLevel(hWnd,DSSCL_NORMAL);
+		extern HWND hWndMain;
+		dsrval = Snd_DS->SetCooperativeLevel(hWndMain, DSSCL_NORMAL);
 		if(dsrval != DS_OK) throw("SetCooperativeLevel(DSound) に失敗");
 
 		SndXMID = x_mid;

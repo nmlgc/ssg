@@ -28,6 +28,7 @@ static void AppCleanup(void);
 
 
 // グローバル変数 //
+HINSTANCE	hInstanceMain;
 HWND	hWndMain;
 BOOL	bIsActive;
 BOOL	bMouseVisible;
@@ -208,6 +209,7 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 		NULL);											//
 
 	if(!hWndMain) return FALSE;
+	hInstanceMain = hInstance;
 
 	//ShowWindow(hWndMain,nCmdShow);
 	//UpdateWindow(hWndMain);
@@ -226,15 +228,12 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 	ConfigLoad();
 
 	// キーボード(JoyPad)入力を受け付ける //
-	Key_Start(hInstance,hWndMain);
+	Key_Start();
 
-	try{
-		if(!GrpEnum(hWndMain))	throw(FALSE);
-		if(!XInit())			throw(FALSE);		// コンフィグ依存の初期化処理
-	}
-	catch(BOOL flag){
+	// コンフィグ依存の初期化処理
+	if(!GrpEnum() || !XInit()) {
 		DestroyWindow(hWndMain);
-		return flag;
+		return false;
 	}
 
 	return TRUE;
@@ -268,7 +267,7 @@ BOOL XInit(void)
 	// サウンドの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
 		// 何らかの理由で使用できなければ、Disable とする //
-		if(!SndInit(hWndMain)) {
+		if(!SndInit()) {
 			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
 		}
 		else if(!LoadSound()){

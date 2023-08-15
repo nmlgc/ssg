@@ -462,8 +462,6 @@ static BOOL GrpFnWinLocate(WORD key)
 
 static BOOL SndFnWAVE(WORD key)
 {
-	extern HWND hWndMain;
-
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
 		return FALSE;
@@ -481,7 +479,7 @@ static BOOL SndFnWAVE(WORD key)
 			else{
 				ConfigDat.SoundFlags.v |= SNDF_WAVE_ENABLE;
 
-				if(!SndInit(hWndMain)) {
+				if(!SndInit()) {
 					ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
 				} else if(!LoadSound()) {
 					ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);

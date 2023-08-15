@@ -64,7 +64,7 @@ extern void (*Key_Read)(void);
 
 
 // 関数プロトタイプ宣言 //
-extern BOOL Key_Start(HINSTANCE hInst,HWND hWnd);	// キー入力開始
+extern bool Key_Start(void);	// キー入力開始
 extern void Key_Config(WORD Key);					// あるキーボード定数に対するコンフィグ
 extern void Key_End(void);							// キー入力終了
 

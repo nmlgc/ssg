@@ -18,7 +18,7 @@
 
 /***** [関数プロトタイプ] *****/
 bool EndingInit(void);	// エンディングまわりの初期化
-void EndingProc(void);	// エンディング状態推移用プロシージャ
+void EndingProc(bool&);	// エンディング状態推移用プロシージャ
 void EndingDraw(void);	// エンディング時の描画処理
 
 

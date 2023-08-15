@@ -75,7 +75,14 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 			// １フレーム進める //
 			tempdw = timeGetTime();
 			if(((tempdw - WaitTime) >= 16) || (ConfigDat.FPSDivisor.v == 0)) {
-				GameMain();
+				bool quit = false;
+				GameMain(quit);
+				if(quit) {
+					// DestroyWindow->PostMessage
+					// タスクバーにアイコンが残るのを防止だっけ？
+					PostMessage(hWndMain, WM_SYSCOMMAND, SC_CLOSE, 0);
+				}
+
 				WaitTime = tempdw;
 			}
 			//else Sleep(1);

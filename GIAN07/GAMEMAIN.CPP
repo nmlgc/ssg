@@ -16,7 +16,6 @@
 #include "DirectXUTYs/PBGMIDI.H"
 
 
-extern HWND hWndMain;
 DWORD		DrawCount = 0;
 DWORD		MidiPlayID = 0;
 char		MidiTempo  = 0;
@@ -35,23 +34,23 @@ MAID		VivTemp;
 bool IsDemoplay = false;
 
 
-void TitleProc(void);
-void WeaponSelectProc(void);	// 装備選択
-void GameProc(void);
-void GameOverProc0(void);	// ゲームオーバー出現用
-void GameOverProc(void);	// ゲームオーバー
-void PauseProc(void);
-void MusicRoomProc(void);	// 音楽室
-void DemoProc(void);	// デモプレイ
-void NameRegistProc(void);	// お名前入力
+void TitleProc(bool& quit);
+void WeaponSelectProc(bool&);	// 装備選択
+void GameProc(bool&);
+void GameOverProc0(bool&);	// ゲームオーバー出現用
+void GameOverProc(bool&);	// ゲームオーバー
+void PauseProc(bool&);
+void MusicRoomProc(bool&);	// 音楽室
+void DemoProc(bool&);	// デモプレイ
+void NameRegistProc(bool&);	// お名前入力
 
-void ReplayProc(void);
+void ReplayProc(bool&);
 
 
 bool SProjectInit(void);	// 西方Ｐｒｏｊｅｃｔ初期化部
-void SProjectProc(void);	// 西方Ｐｒｏｊｅｃｔ表示動作部
+void SProjectProc(bool&);	// 西方Ｐｒｏｊｅｃｔ表示動作部
 
-void ScoreNameProc(void);
+void ScoreNameProc(bool&);
 
 void GameSTD_Init(void);	// ゲームを立ち上げる際に必ず行う初期化関数群
 bool DemoInit(void);	// デモプレイの初期化を行う
@@ -62,7 +61,7 @@ bool IsDraw(void);
 
 void ScoreDraw(void);	// スコアの描画
 
-void(*GameMain)(void) = TitleProc;
+void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
@@ -101,7 +100,7 @@ extern bool ScoreNameInit(void)
 }
 
 // スコアネームの表示 //
-void ScoreNameProc(void)
+void ScoreNameProc(bool&)
 {
 	static const char *ExString[5] = {"Easy","Normal","Hard","Lunatic","Extra"};
 
@@ -235,7 +234,7 @@ char GetAddr2Char(int x, int y)
 }
 
 // お名前入力 //
-void NameRegistProc(void)
+void NameRegistProc(bool&)
 {
 	// <- DemoInit() を修正するのだぞ
 	PIXEL_LTRB	src = {0, 0, 400, 64};
@@ -502,7 +501,7 @@ bool WeaponSelectInit(bool ExStg)
 	return TRUE;
 }
 
-bool GameInit(void(*NextProc)(void))
+bool GameInit(void(*NextProc)(bool& quit))
 {
 	TextObj.Clear();
 	if(NextProc != DemoProc) {
@@ -595,7 +594,7 @@ extern bool GameReplayInit(int Stage)
 	return GameInit(ReplayProc);
 }
 
-void ReplayProc(void)
+void ReplayProc(bool&)
 {
 	static BYTE ExTimer;
 	PIXEL_LTRB	rc;
@@ -685,7 +684,7 @@ void FadeoutPalette(const PALETTE& Src, uint8_t a)
 // 西方Ｐｒｏｊｅｃｔ表示動作部 //
 std::optional<LensInfo> Lens;
 
-void SProjectProc(void)
+void SProjectProc(bool&)
 {
 	static WORD timer = 0;
 
@@ -889,7 +888,7 @@ extern void GameContinue(void)
 	}
 }
 
-void GameProc(void)
+void GameProc(bool&)
 {
 	Key_Read();
 
@@ -939,7 +938,7 @@ void GameProc(void)
 }
 
 // ゲームオーバー出現用
-void GameOverProc0(void)
+void GameOverProc0(bool&)
 {
 	GameOverTimer--;
 
@@ -978,7 +977,7 @@ void GameOverProc0(void)
 }
 
 // ゲームオーバー
-void GameOverProc(void)
+void GameOverProc(bool&)
 {
 	Key_Read();
 	CWinMove(&ContinueWindow);
@@ -1000,7 +999,7 @@ void GameOverProc(void)
 }
 
 // デモプレイ
-void DemoProc(void)
+void DemoProc(bool&)
 {
 	static BYTE ExTimer;
 
@@ -1037,7 +1036,7 @@ void DemoProc(void)
 }
 
 // 装備選択 //
-void WeaponSelectProc(void)
+void WeaponSelectProc(bool&)
 {
 	PIXEL_LTRB	rc;
 	int		i,x,y;
@@ -1261,7 +1260,7 @@ void WeaponSelectProc(void)
 }
 
 
-void TitleProc(void)
+void TitleProc(bool& quit)
 {
 	PIXEL_LTRB	src = { 0, 0, 640, 396 };
 	//PIXEL_LTRB	src = { 0, 0, 350, 403 };
@@ -1270,9 +1269,12 @@ void TitleProc(void)
 
 /*
 	// 鳩プロテクト? //
-	if((GetAsyncKeyState(VK_F1) & 0x80000000)
-		&& (GetAsyncKeyState(VK_F10) & 0x8000000))
-		PostMessage(hWndMain,WM_SYSCOMMAND,SC_CLOSE,0);
+	if(
+		(GetAsyncKeyState(VK_F1) & 0x80000000) &&
+		(GetAsyncKeyState(VK_F10) & 0x8000000)
+	) {
+		quit = true;
+	}
 */
 
 	Key_Read();
@@ -1297,9 +1299,7 @@ void TitleProc(void)
 			return;
 
 			default:
-				// DestroyWindow->PostMessage
-				// タスクバーにアイコンが残るのを防止だっけ？
-				PostMessage(hWndMain,WM_SYSCOMMAND,SC_CLOSE,0);
+				quit = true;
 			return;
 		}
 	}
@@ -1318,7 +1318,7 @@ void TitleProc(void)
 	}
 }
 
-void PauseProc(void)
+void PauseProc(bool&)
 {
 	WINDOW_LTRB	rc;
 
@@ -1340,7 +1340,7 @@ void PauseProc(void)
 }
 
 // 音楽室 //
-void MusicRoomProc(void)
+void MusicRoomProc(bool&)
 {
 	PIXEL_LTRB	src;
 	char	buf[100];

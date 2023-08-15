@@ -132,8 +132,7 @@ bool EndingInit(void)
 }
 
 
-// エンディング状態推移用プロシージャ //
-void EndingProc(void)
+void EndingProc(bool&)
 {/*
 	Key_Read();
 

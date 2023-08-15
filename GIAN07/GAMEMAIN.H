@@ -30,10 +30,11 @@ extern bool IsDemoplay;
 
 
 ///// [関数] /////
-extern void(*GameMain)(void);	// ゲーム進行用関数ポインタ(WinMainからコールする)
+// ゲーム進行用関数ポインタ(WinMainからコールする)
+extern void(*GameMain)(bool& quit);
 
 bool WeaponSelectInit(bool ExStg);
-bool GameInit(void(*NextProc)(void));	// ゲームの初期化をする
+bool GameInit(void(*NextProc)(bool& quit));	// ゲームの初期化をする
 extern void GameRestart(void);	// ゲームを再開する(ESC 抜けから)
 extern bool GameExit(bool bNeedChgMusic = true);	// ゲームから抜ける
 extern void GameOverInit(void);	// ゲームオーバーの前処理

@@ -20,7 +20,7 @@ To build:
 
 1. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
 2. Navigate to the checkout directory of this repository.
-3. Invoke `tup` in your way of choice:
+3. Invoke `build.bat` in your way of choice:
    * If you use Visual Studio Code, open the editor from this command-line environment:
 
      ```batch
@@ -29,7 +29,7 @@ To build:
 
      Then, you can run the build task with the default `Ctrl-Shift-B` keybinding.
 
-   * Or you can always run `tup` directly from this shell.
+   * Or you can always run `build.bat` directly from this shell.
 
 The binary will be put into the `bin/` subdirectory, where you can also place the game's original data files.
 

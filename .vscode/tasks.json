@@ -4,9 +4,9 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "tup",
-			"type": "process",
-			"command": "tup",
+			"label": "Build",
+			"type": "shell",
+			"command": "./build.bat",
 			"group": {
 				"kind": "build",
 				"isDefault": true

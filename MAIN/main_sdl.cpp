@@ -89,6 +89,14 @@ int Run()
 				Key_Read();
 				GameMain(quit);
 				if(ConfigDat.FPSDivisor.v != 0) {
+					// Since SDL_Delay() works at not-even-exact millisecond
+					// granularity, we subtract 1 and spin for the last
+					// millisecond to ensure that we hit the exact frame
+					// boundary.
+					const auto ticks_frame = (SDL_GetTicks64() - ticks_start);
+					if(ticks_frame < (FRAME_TIME_TARGET - 1)) {
+						SDL_Delay((FRAME_TIME_TARGET - 1) - ticks_frame);
+					}
 					ticks_last = ticks_start;
 				}
 			}

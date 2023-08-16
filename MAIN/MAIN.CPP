@@ -143,10 +143,8 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 				MoveWindow(hWndMain,0,0,0,0,TRUE);
 				ShowWindow(hWndMain,SW_HIDE);
 				DestroyWindow(hWndMain);
-				break;
 			}
-			if(wParam == SC_RESTORE)	break;
-		return 1;
+			break;
 
 		case WM_SYSKEYDOWN:
 			if(ExitFlag) return 0;
@@ -211,7 +209,6 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 	hMenu = GetSystemMenu(hWndMain,FALSE);
 	DeleteMenu(hMenu,SC_MAXIMIZE,MF_BYCOMMAND);
 	DeleteMenu(hMenu,SC_MINIMIZE,MF_BYCOMMAND);
-	DeleteMenu(hMenu,SC_MOVE    ,MF_BYCOMMAND);
 	DeleteMenu(hMenu,SC_SIZE    ,MF_BYCOMMAND);
 
 	if(!XInit()) {

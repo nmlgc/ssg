@@ -17,6 +17,7 @@
 
 #include <windows.h>
 #include <mmsystem.h>
+#include "platform/buffer.h"
 
 
 #define MIDFN_NOPLAY	0x00	// 再生しない

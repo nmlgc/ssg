@@ -10,7 +10,7 @@
 #pragma comment(lib, "user32.lib")
 
 extern constexpr auto APP_CLASS = _UNICODE("GIAN07");
-extern constexpr auto APP_NAME = _UNICODE("秋霜玉");
+extern constexpr auto APP_NAME = _UNICODE(GAME_TITLE);
 
 
 long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);

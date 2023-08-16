@@ -140,8 +140,17 @@ main_src += tup.glob("DirectXUTYs/*.CPP")
 main_src += tup.glob("DirectXUTYs/*.cpp")
 main_src += tup.glob("GIAN07/*.cpp")
 main_src += tup.glob("GIAN07/*.CPP")
-main_src += "MAIN/MAIN.CPP"
 
 main_obj = (cxx(modern_cfg, modern_src) + cxx(main_cfg, main_src))
 
-exe(main_cfg, main_obj, "GIAN07")
+main_win32_src += "MAIN/MAIN.CPP"
+main_win32_obj = cxx(main_cfg, main_win32_src)
+exe(main_cfg, (main_win32_obj + main_obj), "GIAN07_WIN32")
+
+main_sdl_cfg = main_cfg:branch("", ANALYSIS, {
+	base = { lflags = "/SUBSYSTEM:windows" }
+})
+
+main_sdl_src += "MAIN/main_sdl.cpp"
+main_sdl_obj = cxx(main_sdl_cfg, main_sdl_src)
+exe(main_sdl_cfg, (main_sdl_obj + main_obj + sdl_dll), "GIAN07")

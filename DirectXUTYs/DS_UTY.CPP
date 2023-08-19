@@ -8,7 +8,8 @@
 #include <dsound.h>
 #include "platform/file.h"
 #include "DS_UTY.H"
-#pragma message(PBGWIN_DS_UTY_H)
+#include "DX_ERROR.H"	// エラー処理用関数
+#pragma message("DS_UTY : Version 0.03 : Update 2000/02/04")
 
 #pragma comment(lib,"dsound.lib")
 
@@ -24,7 +25,62 @@
 	#pragma message("      DirectSound : Version <= 6.00???")
 #endif
 
+#ifndef DSBCAPS_CTRLDEFAULT
+	#define DSBCAPS_CTRLDEFAULT \
+		(DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY)
+#endif
+
 //#pragma optimize("",off)
+
+// 構造体 //
+
+#pragma pack(push, PBG_WAVEHEAD_PACK)
+#pragma pack(2)
+
+typedef struct tagWAVEHEAD{
+	DWORD	RIFF;
+	DWORD	RiffLen;
+	DWORD	WAVE;
+	DWORD	FMT;
+	DWORD	WaveLen;
+
+	WORD	tag;
+	WORD	ch;
+	DWORD	SamplePerSec;
+	DWORD	AvgBytePerSec;
+	WORD	BlockAlign;
+	WORD	BitPerSample;
+
+	DWORD	DATA;
+	DWORD	DataLen;
+} WAVEHEAD;
+
+typedef struct tagWAVEHEAD_FACT{
+	DWORD	RIFF;
+	DWORD	RiffLen;
+	DWORD	WAVE;
+	DWORD	FMT;
+	DWORD	WaveLen;
+
+	WORD	tag;
+	WORD	ch;
+	DWORD	SamplePerSec;
+	DWORD	AvgBytePerSec;
+	WORD	BlockAlign;
+	WORD	BitPerSample;
+
+	DWORD	FACT;
+	WORD	Dummy_2;
+	WORD	Dummy_3;
+	WORD	Dummy_4;
+	WORD	Dummy_5;
+
+	DWORD	DATA;
+	DWORD	DataLen;
+} WAVEHEAD_FACT;
+
+#pragma pack(pop, PBG_WAVEHEAD_PACK)
+
 
 typedef struct tagSE_STRUCT{
 	BYTE				*data;		//
@@ -35,6 +91,8 @@ typedef struct tagSE_STRUCT{
 } SE_STRUCT,*LPSE_STRUCT;
 
 
+// 補助 //
+void SndRelease(uint8_t id);
 bool SndFillBuffer(IDirectSoundBuffer *ds, uint8_t *data, size_t size);
 
 // サウンド停止用補助関数 //
@@ -87,7 +145,8 @@ void SndCleanup(void)
 	}
 }
 
-bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)
+// ＷＡＶファイルロード(ある制限があるが...) //
+bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max)
 {
 	LPSE_STRUCT		p;
 	HRESULT			dsrval;
@@ -270,11 +329,6 @@ void SndRelease(uint8_t id)
 	se->data = NULL;
 
 	LocalFree(se);
-}
-
-bool SndRestore(void)
-{
-	return FALSE;
 }
 
 static void _Snd_Stop(LPSE_STRUCT se,int no)

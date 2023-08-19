@@ -3,6 +3,11 @@
 	url = https://github.com/libsdl-org/SDL
 	branch = SDL2
 	shallow = true
+[submodule "libs/miniaudio"]
+	path = libs/miniaudio
+	url = https://github.com/mackron/miniaudio
+	branch = dev
+	shallow = true
 [submodule "libs/tupblocks"]
 	path = libs/tupblocks
 	url = https://github.com/nmlgc/tupblocks

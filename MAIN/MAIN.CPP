@@ -1,11 +1,9 @@
 #include "../GIAN07/CONFIG.H"
-#include "../GIAN07/EFFECT.H"
+#include "../GIAN07/ENTRY.H"
 #include "../GIAN07/GAMEMAIN.H"
-#include "../GIAN07/LOADER.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
+#include "strings/title.h"
 #include "platform/unicode.h"
 #include <direct.h>
 
@@ -15,14 +13,8 @@ extern constexpr auto APP_CLASS = _UNICODE("GIAN07");
 extern constexpr auto APP_NAME = _UNICODE("秋霜玉");
 
 
-// プロトタイプ宣言 //
-void XMain(void);
-BOOL XInit(void);
-void XCleanup(void);
-
 long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
 static BOOL AppInit(HINSTANCE hInstance,int nCmdShow);
-static void AppCleanup(void);
 
 //void SaveSnapshot(HWND hWnd);
 
@@ -146,7 +138,8 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case WM_SYSCOMMAND:
 			if(wParam == SC_CLOSE){
 				ExitFlag = TRUE;
-				AppCleanup();
+				XCleanup();
+				ShowCursor(true);
 				MoveWindow(hWndMain,0,0,0,0,TRUE);
 				ShowWindow(hWndMain,SW_HIDE);
 				DestroyWindow(hWndMain);
@@ -221,78 +214,10 @@ static BOOL AppInit(HINSTANCE hInstance,int nCmdShow)
 	DeleteMenu(hMenu,SC_MOVE    ,MF_BYCOMMAND);
 	DeleteMenu(hMenu,SC_SIZE    ,MF_BYCOMMAND);
 
-
-	DebugSetup();
-
-	// コンフィグをロードする //
-	ConfigLoad();
-
-	// キーボード(JoyPad)入力を受け付ける //
-	Key_Start();
-
-	// コンフィグ依存の初期化処理
-	if(!GrpEnum() || !XInit()) {
+	if(!XInit()) {
 		DestroyWindow(hWndMain);
 		return false;
 	}
 
 	return TRUE;
-}
-
-static void AppCleanup(void)
-{
-	XCleanup();
-
-	DxObj.Cleanup();
-	SndCleanup();
-	Mid_Stop();
-	Mid_End();
-	Key_End();
-
-	ShowCursor(TRUE);
-}
-
-BOOL XInit(void)
-{
-	Key_PadConfig2(ConfigDat.PadTama.v,   KEY_TAMA);
-	Key_PadConfig2(ConfigDat.PadBomb.v,   KEY_BOMB);
-	Key_PadConfig2(ConfigDat.PadShift.v,  KEY_SHIFT);
-	Key_PadConfig2(ConfigDat.PadCancel.v, KEY_ESC);
-
-	// グラフィックの初期化 //
-	if(!DxObj.Init(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
-		return false;
-	}
-
-	// サウンドの初期化 //
-	if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
-		// 何らかの理由で使用できなければ、Disable とする //
-		if(!SndInit()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
-		}
-		else if(!LoadSound()){
-			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
-			SndCleanup();
-		}
-	}
-
-	// ＭＩＤＩの初期化 //
-	// MIDFN_MIDLOOP を使用すべきか //
-	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
-		if(!Mid_Start(MIDFN_CALLBACK,MIDPL_NORM))
-			ConfigDat.SoundFlags.v &= (~SNDF_MIDI_ENABLE);
-	}
-
-	// Call a different *Init() function here to quickly test a different //
-	// game state. //
-	if(!SProjectInit()) return FALSE;
-
-	GrpSetCaptureFilename("秋霜");
-
-	return TRUE;
-}
-
-void XCleanup(void)
-{
-	ConfigSave();
 }

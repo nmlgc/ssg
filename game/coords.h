@@ -114,6 +114,10 @@ constexpr auto WORLD_COORD_BITS = 6;
 
 using WORLD_COORD = int;
 
+inline constexpr WORLD_COORD PixelToWorld(PIXEL_COORD v) {
+	return (v << WORLD_COORD_BITS);
+}
+
 struct WORLD_POINT {
 	WORLD_COORD x;
 	WORLD_COORD y;

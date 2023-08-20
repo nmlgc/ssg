@@ -12,11 +12,16 @@
 
 // 定数＆マクロ //
 #define SND_OBJ_MAX			30				// 効果音の種類の最大数
-#define SND_XMID_DEFAULT	(320*64)		// Ｘ座標の中心のデフォルト値
+
+// Constants for mapping the [x] parameter from any source unit to a position
+// in the stereo field. The resulting unit is the attenuation volume of either
+// the right (negative) or left (positive) channel, expressed in decibels.
+extern const int SND_X_MID;
+extern const int SND_X_PER_DECIBEL;
 
 
 // 初期化など //
-bool SndInit(int x_mid = SND_XMID_DEFAULT);
+bool SndInit(void);
 void SndCleanup(void);
 
 bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max);

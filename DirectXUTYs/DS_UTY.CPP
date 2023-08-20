@@ -100,10 +100,9 @@ static void _Snd_Stop(LPSE_STRUCT se,int no);
 
 LPDIRECTSOUND			Snd_DS = NULL;
 LPSE_STRUCT				Snd_OBJ[SND_OBJ_MAX];
-int						SndXMID = SND_XMID_DEFAULT;
 
 
-bool SndInit(int x_mid)
+bool SndInit(void)
 {
 	HRESULT		dsrval;
 
@@ -114,8 +113,6 @@ bool SndInit(int x_mid)
 		extern HWND hWndMain;
 		dsrval = Snd_DS->SetCooperativeLevel(hWndMain, DSSCL_NORMAL);
 		if(dsrval != DS_OK) throw("SetCooperativeLevel(DSound) に失敗");
-
-		SndXMID = x_mid;
 	}
 	catch(char *error){
 		DebugOut(error);
@@ -247,7 +244,7 @@ void SndPlayEX(uint8_t id, int x, bool loop)
 {
 	HRESULT	dsrval;
 	DWORD	st;
-	DWORD	pan = (x - SndXMID)>>4;
+	int32_t	pan = ((x - SND_X_MID) / (SND_X_PER_DECIBEL / 100));
 	LPSE_STRUCT se;
 
 	if(id>=SND_OBJ_MAX) return;

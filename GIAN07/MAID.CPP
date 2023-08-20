@@ -489,7 +489,7 @@ extern void evade_addEx(int x, int y, uint8_t n)
 
 	if(n){
 		if(Viv.BuzzSound == FALSE){
-			SndPlayEX(SOUND_ID_BUZZ,x,0);
+			SndPlay(SOUND_ID_BUZZ, x);
 			Viv.BuzzSound = TRUE;
 		}
 		fragment_set(x,y,FRG_EVADE);

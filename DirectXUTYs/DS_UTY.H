@@ -27,7 +27,6 @@ void SndCleanup(void);
 bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max);
 
 // 再生＆停止 //
-void SndPlay(uint8_t id);
-void SndPlayEX(uint8_t id, int x, bool loop);
+void SndPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
 void SndStop(uint8_t id);
 void SndStopAll(void);

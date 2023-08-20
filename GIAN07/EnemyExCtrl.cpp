@@ -124,7 +124,7 @@ void SnakyDelete(BOSS_DATA *b)
 
 		e = s->EnemyPtr[i];
 
-		//SndPlayEX(SOUND_ID_BOMB,e->x,0);
+		//SndPlay(SOUND_ID_BOMB, e->x);
 		if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 		//PowerUp(e->hp);			// パワーアップ
 		e->hp    = 0;
@@ -295,7 +295,7 @@ void BitMove(void)
 			e->count = 0;			// 爆発のアニメセット用
 			e->flag  = EF_BOMB;
 
-			SndPlayEX(SOUND_ID_BOMB,e->x,0);
+			SndPlay(SOUND_ID_BOMB, e->x);
 
 			for(j=i+1; j<BitData.NumBits; j++){
 				BitData.Bit[j-1] = BitData.Bit[j];
@@ -490,7 +490,7 @@ void BitDelete(void)
 		e->count = 0;
 		e->flag  = EF_BOMB;
 
-		SndPlayEX(SOUND_ID_BOMB,e->x,0);
+		SndPlay(SOUND_ID_BOMB, e->x);
 	}
 
 	// 後は、この関数に任せる //

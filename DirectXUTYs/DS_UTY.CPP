@@ -220,27 +220,7 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max)
 	return TRUE;
 }
 
-void SndPlay(uint8_t id)
-{
-	HRESULT	dsrval;
-	DWORD	st;
-	LPSE_STRUCT se;
-
-	if(id>=SND_OBJ_MAX) return;
-
-	se = Snd_OBJ[id];
-	if(se == NULL || se->buf[se->now] == NULL) return;
-
-	dsrval = se->buf[se->now]->GetStatus(&st);
-	if(dsrval != DS_OK) st=0;
-	if((st&DSBSTATUS_PLAYING)==DSBSTATUS_PLAYING) _Snd_Stop(se,se->now);
-
-	se->buf[se->now]->SetPan(0);
-	se->buf[se->now]->Play(0,0,0);
-	se->now = (se->now+1)%(se->max);
-}
-
-void SndPlayEX(uint8_t id, int x, bool loop)
+void SndPlay(uint8_t id, int x, bool loop)
 {
 	HRESULT	dsrval;
 	DWORD	st;

@@ -493,7 +493,7 @@ void BossKillAll(void)
 			SnakyDelete(b);
 			fragment_set(e->x,e->y,FRG_FATCIRCLE);
 			ExBombEfcSet(e->x, e->y, EXBOMB_STD);
-			SndPlayEX(SOUND_ID_BOSSBOMB,e->x,0);
+			SndPlay(SOUND_ID_BOSSBOMB, e->x);
 			if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 			e->hp = 0;
 			e->count = 0;
@@ -539,7 +539,7 @@ bool BossDamage(int x, int y, int damage)
 						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
 
 						ScrollCommand(SCMD_QUAKE);
-						SndPlayEX(SOUND_ID_BOSSBOMB,e->x,0);
+						SndPlay(SOUND_ID_BOSSBOMB, e->x);
 						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 						PowerUp((BYTE)e->hp);
 						e->hp    = 0;
@@ -562,7 +562,7 @@ bool BossDamage(int x, int y, int damage)
 						BossNow--;		// ボスの参照カウント？を使用する
 					}
 					else{
-						SndPlayEX(SOUND_ID_HIT,e->x,0);
+						SndPlay(SOUND_ID_HIT, e->x);
 						PowerUp(damage);
 						e->hp -= damage;
 					}
@@ -608,7 +608,7 @@ bool BossDamage2(int x, int y, int damage)
 						fragment_set(e->x,e->y,FRG_FATCIRCLE);
 						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
 						ScrollCommand(SCMD_QUAKE);
-						SndPlayEX(SOUND_ID_BOSSBOMB,e->x,0);
+						SndPlay(SOUND_ID_BOSSBOMB, e->x);
 						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 						PowerUp((BYTE)e->hp);
 						e->hp    = 0;
@@ -631,7 +631,7 @@ bool BossDamage2(int x, int y, int damage)
 						BossNow--;		// ボスの参照カウント？を使用する
 					}
 					else{
-						SndPlayEX(SOUND_ID_HIT,e->x,0);
+						SndPlay(SOUND_ID_HIT, e->x);
 						PowerUp(damage);
 						e->hp -= damage;
 					}
@@ -678,7 +678,7 @@ void BossDamage3(int x, int y, uint8_t d)
 						fragment_set(e->x,e->y,FRG_FATCIRCLE);
 						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
 						ScrollCommand(SCMD_QUAKE);
-						SndPlayEX(SOUND_ID_BOSSBOMB,e->x,0);
+						SndPlay(SOUND_ID_BOSSBOMB, e->x);
 						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 						PowerUp((BYTE)e->hp);
 						e->hp    = 0;
@@ -701,7 +701,7 @@ void BossDamage3(int x, int y, uint8_t d)
 						BossNow--;		// ボスの参照カウント？を使用する
 					}
 					else{
-						SndPlayEX(SOUND_ID_HIT,e->x,0);
+						SndPlay(SOUND_ID_HIT, e->x);
 						PowerUp(damage);
 						e->hp -= damage;
 					}
@@ -744,7 +744,7 @@ void BossDamage4(int damage)
 						fragment_set(e->x,e->y,FRG_FATCIRCLE);
 						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
 						ScrollCommand(SCMD_QUAKE);
-						SndPlayEX(SOUND_ID_BOSSBOMB,e->x,0);
+						SndPlay(SOUND_ID_BOSSBOMB, e->x);
 						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 						PowerUp((BYTE)e->hp);
 						e->hp    = 0;
@@ -767,7 +767,7 @@ void BossDamage4(int damage)
 						BossNow--;		// ボスの参照カウント？を使用する
 					}
 					else{
-						SndPlayEX(SOUND_ID_HIT,e->x,0);
+						SndPlay(SOUND_ID_HIT, e->x);
 						PowerUp(damage);
 						e->hp -= damage;
 					}

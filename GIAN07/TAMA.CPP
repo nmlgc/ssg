@@ -1125,7 +1125,7 @@ void __fastcall tamaOmove(TAMA_DATA *t)
 				if(TamaCmd.cmd&TAMA_ZSET) TamaCmd.d=0,TamaCmd.dw-=6;
 				TamaCmd.type = T_NORM;
 				TamaCmd.option = TOP_NONE;
-				SndPlayEX(12, TamaCmd.x, 0);
+				SndPlay(12, TamaCmd.x);
 				tama_set();		// 難易度で変化させるところがポイント
 			}
 		return;

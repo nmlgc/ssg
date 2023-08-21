@@ -14,7 +14,6 @@
 
 // ヘッダファイル //
 #include "game/coords.h"
-#include "DX_TYPE.H"
 #include <stdint.h>
 
 

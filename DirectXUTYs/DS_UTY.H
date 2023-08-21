@@ -11,7 +11,6 @@
 
 
 // ヘッダファイル //
-#include "DX_TYPE.H"					// 型＆マクロ
 #include "DX_ERROR.H"					// エラー処理用関数
 
 

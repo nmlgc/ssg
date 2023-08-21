@@ -9,6 +9,8 @@
 #include "platform/unicode.h"
 #include <direct.h>
 
+#pragma comment(lib, "user32.lib")
+
 extern constexpr auto APP_CLASS = _UNICODE("GIAN07");
 extern constexpr auto APP_NAME = _UNICODE("秋霜玉");
 

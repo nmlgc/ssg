@@ -8,6 +8,8 @@
 #include "PBGMIDI.H"
 #pragma message(PBGWIN_PBGMIDI_H)
 
+#pragma comment(lib, "winmm.lib")
+
 
 // ローカルな関数 //
 static void Mid_GMReset(void);

@@ -11,6 +11,9 @@
 #pragma message(PBGWIN_DI_UTY_H)
 
 #pragma comment(lib,"dinput.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "winmm.lib")
 
 #if   DIRECTINPUT_VERSION == 0x0700
 	#pragma message("      DirectInput : Version 7.00")

@@ -11,6 +11,20 @@
 #include <stdio.h>
 #pragma message(PBGWIN_DD_UTY_H)
 
+#pragma comment(lib, "ddraw.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "user32.lib")
+
+#if   DIRECTDRAW_VERSION == 0x0700
+	#pragma message("      DirectDraw  : Version 7.00")
+#elif DIRECTDRAW_VERSION == 0x0600
+	#pragma message("      DirectDraw  : Version 6.00")
+#elif DIRECTDRAW_VERSION == 0x0500
+	#pragma message("      DirectDraw  : Version 5.00")
+#elif DIRECTDRAW_VERSION == 0x0300
+	#pragma message("      DirectDraw  : Version 3.00")
+#endif
+
 
 // マクロ //
 void RELEASE(auto*& x)

@@ -3,7 +3,6 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include "game/graphics.h"
 #include "ENEMY.H"
 #include "CONFIG.H"

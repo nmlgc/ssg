@@ -12,7 +12,6 @@
 // 2000/01/11 : .c->.cpp に変更、英語->日本語に変更。
 
 
-#include "DX_TYPE.H"
 #include "DX_ERROR.H"
 
 

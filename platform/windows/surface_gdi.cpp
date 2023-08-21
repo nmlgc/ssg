@@ -9,6 +9,9 @@
 #include <array>
 #include <assert.h>
 
+#pragma comment(lib, "gdi32.lib")
+#pragma comment(lib, "user32.lib")
+
 SURFACE_GDI::SURFACE_GDI() noexcept :
 	dc(CreateCompatibleDC(GetDC(nullptr)))
 {

@@ -34,7 +34,6 @@ HINSTANCE hInstanceMain;
 // Still required for:
 // • DirectDraw
 // • DirectInput
-// • DirectSound
 HWND hWndMain;
 
 SDL_LogOutputFunction log_default_func;

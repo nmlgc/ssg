@@ -258,13 +258,6 @@ void SndStop(uint8_t id)
 	}
 }
 
-void SndStopAll(void)
-{
-	int i;
-
-	for(i=0;i<SND_OBJ_MAX;i++) SndStop(i);
-}
-
 bool SndFillBuffer(IDirectSoundBuffer *ds, uint8_t *data, size_t size)
 {
 	LPVOID	pMem1,pMem2;

@@ -8,8 +8,8 @@
 #include "FONTUTY.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/UT_MATH.H"
+#include "platform/snd.h"
 
 
 // Coordinates

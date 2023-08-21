@@ -8,7 +8,7 @@
 #include "GIAN.H"
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
+#include "platform/snd.h"
 
 
 MAID			Viv;					// 麗しきメイドさん構造体

@@ -1,7 +1,7 @@
-/*                                                                           */
-/*   DS_UTY.h   効果音関連の処理                                             */
-/*                                                                           */
-/*                                                                           */
+/*
+ *   PCM sound interface
+ *
+ */
 
 #pragma once
 

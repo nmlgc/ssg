@@ -5,7 +5,7 @@
 
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "DirectXUTYs/DS_UTY.H"
+#include "platform/snd.h"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];

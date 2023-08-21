@@ -22,8 +22,8 @@
 #include "GIAN07/ENTRY.H"
 #include "GIAN07/GAMEMAIN.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
+#include "platform/snd.h"
 #include "game/defer.h"
 #include "strings/title.h"
 

@@ -9,8 +9,8 @@
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
+#include "platform/snd.h"
 
 
 

@@ -7,7 +7,7 @@
 #include "MAID.H"
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
+#include "platform/snd.h"
 
 
 //// レーザー変数２ ////

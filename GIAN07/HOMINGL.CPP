@@ -6,7 +6,7 @@
 #include "HOMINGL.H"
 #include "GIAN.H"
 #include "MAID.H"
-#include "DirectXUTYs/DS_UTY.H"
+#include "platform/snd.h"
 #include "DirectXUTYs/UT_MATH.H"
 
 #define HOMINGL_WIDTH	(8*64)

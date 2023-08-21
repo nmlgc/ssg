@@ -8,7 +8,7 @@
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "GIAN07/entity.h"
-#include "DirectXUTYs/DS_UTY.H"
+#include "platform/snd.h"
 
 /*
  * ECLコマンドのアドレス更新には ECL_CmdLen[ECLコマンド定数] を使用する

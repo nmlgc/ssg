@@ -9,8 +9,8 @@
 #include "GIAN07/LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
+#include "platform/snd.h"
 #include "game/coords.h"
 
 // Mapping world coordinates to a position in the stereo field

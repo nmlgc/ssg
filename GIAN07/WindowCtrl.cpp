@@ -11,8 +11,8 @@
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DI_UTY.H"
-#include "DirectXUTYs/DS_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
+#include "platform/snd.h"
 
 
 

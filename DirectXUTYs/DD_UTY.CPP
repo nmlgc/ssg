@@ -104,7 +104,7 @@ bool GrpEnum(HWND hWnd)
 {
 	HRESULT		dxret;
 
-	ZEROMEM(DxEnum);
+	ZeroMemory(DxEnum, sizeof(DxEnum));
 	DxEnumNow = 0;
 
 	try{
@@ -134,7 +134,6 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
 	DDSURFACEDESC		ddsd;
-	DDSCAPS				ddscaps;
 //	D3DMATERIAL			mat;
 //	D3DMATERIALHANDLE	hmat;
 
@@ -168,8 +167,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 	}
 
 	Cleanup();
-	ZEROMEM(ddsd);
-	ZEROMEM(ddscaps);
+	ZeroMemory(&ddsd, sizeof(ddsd));
 
 	try{
 		dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
@@ -198,7 +196,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		if(dxret!=DD_OK) throw("CreateSurface(Prim) に失敗");
 
 		// BackBuffer へのポインタを Get //
-		ddscaps.dwCaps = DDSCAPS_BACKBUFFER;
+		DDSCAPS ddscaps = { .dwCaps = DDSCAPS_BACKBUFFER };
 		dxret = Prim->GetAttachedSurface(&ddscaps, &Back);
 		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
 
@@ -399,7 +397,7 @@ bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
 	RELEASE(surf.surf);
 	surf.size = { 0, 0 };
 
-	ZEROMEM(ddsd);
+	ZeroMemory(&ddsd, sizeof(ddsd));
 
 	ddsd.dwSize         = sizeof(ddsd);
 	ddsd.dwWidth        = size.w;
@@ -608,7 +606,8 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	DDCOLORKEY				key;
 
 	// Lock する //
-	ZEROMEM(ddsd);ddsd.dwSize = sizeof(ddsd);
+	ZeroMemory(&ddsd, sizeof(ddsd));
+	ddsd.dwSize = sizeof(ddsd);
 	if(surf.surf->Lock(nullptr, &ddsd, DDLOCK_WAIT, nullptr) != DD_OK) {
 		return false;
 	}
@@ -742,7 +741,7 @@ static bool CreateZbuffer(const XD3DENUM& D3De)
 		return true;
 	}
 
-	ZEROMEM(ddsd);
+	ZeroMemory(&ddsd, sizeof(ddsd));
 
 	mem_flag = (D3De.bIsHW ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY);
 	ddsd.dwSize = sizeof(ddsd);
@@ -773,8 +772,8 @@ static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDNam
 	if(DirectDrawCreate(lpGUID,&lpDD,NULL)!=DD_OK) return DDENUMRET_OK;
 
 	// ドライバの能力取得 //
-	ZEROMEM(DriverCaps);	DriverCaps.dwSize = sizeof(DDCAPS);
-	ZEROMEM(HelCaps);		HelCaps.dwSize    = sizeof(DDCAPS);
+	ZeroMemory(&DriverCaps, sizeof(DDCAPS)); DriverCaps.dwSize = sizeof(DDCAPS);
+	ZeroMemory(&HelCaps, sizeof(DDCAPS));    HelCaps.dwSize    = sizeof(DDCAPS);
 
 	if(lpDD->GetCaps(&DriverCaps,&HelCaps)==DD_OK){
 		// ２Ｄでサポートしている解像度をチェック(色数だが...) //

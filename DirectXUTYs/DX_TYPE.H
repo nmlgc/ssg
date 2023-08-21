@@ -45,6 +45,5 @@
 
 // マクロ //
 #define RELEASE(x)		if((x)!=NULL){(x)->Release();x=NULL;}
-#define ZEROMEM(x)		memset(&x,0,sizeof(x))
 
 #endif

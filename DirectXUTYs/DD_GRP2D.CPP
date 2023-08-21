@@ -22,8 +22,8 @@ typedef struct tagAlphaInfo {
 // ２Ｄ用変数 //
 BYTE				*Grp_Vram;				// これは公開しない
 long				Grp_Pitch = 0;			// これも公開しない
-DWORD				Grp_AddrY[480];			// Ｙ座標テーブル
-DWORD				Col2D;					// 現在の色 x ４バイト分
+uint32_t	Grp_AddrY[480];	// Ｙ座標テーブル
+uint32_t	Col2D;	// 現在の色 x ４バイト分
 BYTE				Col2D_R;				// 赤(α用)
 BYTE				Col2D_G;				// 緑(α用)
 BYTE				Col2D_B;				// 青(α用)

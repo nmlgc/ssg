@@ -3,9 +3,9 @@
  * 作成日時    01/31/01  01:34:57
  */
 
-#include "DirectXUTYs/DX_TYPE.H"
+#include <stdint.h>
 
-const BYTE ECL_CmdLen[256] = {
+const uint8_t ECL_CmdLen[256] = {
 	    9,		// SETUP
 	    1,		// END
 	    5,		// JMP

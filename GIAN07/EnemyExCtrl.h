@@ -54,16 +54,16 @@ typedef struct tagSNAKYMOVE_DATA{
 	BOSS_DATA		*Parent;							// 親(頭となるデータ)
 	int				Length;			// 長さ
 	int				Head;			// 頭を格納している地点のポインタ
-	BOOL			bIsUse;			// この構造体を使用しているか
+	bool	bIsUse;	// この構造体を使用しているか
 } SNAKYMOVE_DATA;
 
 
 typedef struct tagBIT_PARAM {
 	ENEMY_DATA	*pEnemy;	// 対象となる敵へのポインタ
 
-	DWORD		BitHP;		// ビットの耐久力
-	BYTE		BitID;		// 基準角から何番目(0～)に相当するビットか
-	BYTE		Angle;		// 現在の角度
+	uint32_t	BitHP;	// ビットの耐久力
+	uint8_t	BitID;	// 基準角から何番目(0～)に相当するビットか
+	uint8_t	Angle;	// 現在の角度
 	char		Force;		// 現在力の加えられている方向
 } BIT_PARAM;
 
@@ -75,22 +75,22 @@ typedef struct tagBIT_DATA {
 	int				v;					// 加速度付き移動時の速度
 	int				a;					// 加速度付き移動時の加速度
 
-	BYTE			d;					// 加速度付き移動時の進行角度
-	BYTE			NumBits;			// 初期ビット数
+	uint8_t	d;	// 加速度付き移動時の進行角度
+	uint8_t	NumBits;	// 初期ビット数
 
-	//WORD			DeltaAngle;			// ビット間の差分角
+	//uint16_t	DeltaAngle;	// ビット間の差分角
 
 	int				Length;				// ビットの回転半径
 	int				FinalLength;		// 最終目標とする回転半径
 
 	char			BitSpeed;			// ビットの基本回転速度
-	BYTE			State;				// このビット集合の状態
-	BYTE			LaserState;			// レーザーの状態
-	//WORD			ForceCount;			// 反動の残り時間
+	uint8_t	State;	// このビット集合の状態
+	uint8_t	LaserState;	// レーザーの状態
+	//uint16_t	ForceCount;	// 反動の残り時間
 
-	WORD			BaseAngle;			// ビットの回転基本角
+	uint16_t	BaseAngle;	// ビットの回転基本角
 
-	BOOL			bIsLaserEnable;		// レーザーが動作中かどうか
+	bool	bIsLaserEnable;	// レーザーが動作中かどうか
 } BIT_DATA;
 
 

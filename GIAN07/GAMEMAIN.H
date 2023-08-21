@@ -25,7 +25,7 @@
 ///// [構造体] /////
 
 ///// [グローバル変数] /////
-extern BOOL IsDemoplay;
+extern bool IsDemoplay;
 
 
 

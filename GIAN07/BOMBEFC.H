@@ -6,7 +6,6 @@
 #ifndef PBG_BOMBEFC_VERSION
 #define PBG_BOMBEFC_VERSION	"爆発系エフェクト : Version 0.01 : Update 2000/11/21"
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include <stdint.h>
 
 
@@ -22,17 +21,17 @@
 typedef struct tagSpObj {
 	int			x,y;
 	int			vx,vy;
-	BYTE		d;
+	uint8_t	d;
 } SpObj;
 
 typedef struct tagBombEfcCtrl {
 	int			x,y;					// エフェクトの中心座標
-	BOOL		bIsUsed;				// この構造体は使用中か
-	DWORD		count;					// フレームカウンタ
+	bool	bIsUsed;	// この構造体は使用中か
+	uint32_t	count;	// フレームカウンタ
 
 	SpObj		Obj[EXBOMB_OBJMAX];		// エフェクト補助用オブジェクト
 
-	BYTE		type;					// エフェクトの種類
+	uint8_t	type;	// エフェクトの種類
 } BombEfcCtrl;
 
 

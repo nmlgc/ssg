@@ -55,7 +55,7 @@
 
 //// 割り込みベクタ構造体 ////
 typedef struct{
-	DWORD	vect;		// 割り込みベクタ(0 なら無効)
+	uint32_t	vect;	// 割り込みベクタ(0 なら無効)
 	int		value;		// 比較値
 } INT_VECTOR;
 
@@ -66,39 +66,39 @@ struct ENEMY_DATA {
 
 	int			v;			// 速度成分 x64系
 
-	DWORD		hp;			// 残り体力(大きすぎるか？)
-	DWORD		item;		// アイテムその他に使用か？
-	DWORD		cmd;		// ECLコマンドの絶対アドレス(DOS版との大きな変更点)
-	DWORD		count;		// 多目的フレームカウンタ
-	DWORD		call_addr;	// RET 実行後にジャンプするアドレス
+	uint32_t	hp;	// 残り体力(大きすぎるか？)
+	uint32_t	item;	// アイテムその他に使用か？
+	uint32_t	cmd;	// ECLコマンドの絶対アドレス(DOS版との大きな変更点)
+	uint32_t	count;	// 多目的フレームカウンタ
+	uint32_t	call_addr;	// RET 実行後にジャンプするアドレス
 
-	DWORD		score;		// 得点(時間による得点変動対応か？)
-	DWORD		evscore;	// かすり得点用
+	uint32_t	score;	// 得点(時間による得点変動対応か？)
+	uint32_t	evscore;	// かすり得点用
 
-	DWORD		IntTimer;	// 割り込みようタイマー
+	uint32_t	IntTimer;	// 割り込みようタイマー
 
-	DWORD		GR[ECLREG_MAX];		// 変数用レジスタ
+	uint32_t	GR[ECLREG_MAX];	// 変数用レジスタ
 	INT_VECTOR	Vect[ECLVECT_MAX];	// 割り込みベクタ
 
-	WORD		g_width;	// グラフィックの幅  /2*64(当たり判定にも使用)
-	WORD		g_height;	// グラフィックの高さ/2*64(上に同じ)
-	WORD		rep_c;		// REP 命令用カウンタ
-	WORD		cmd_c;		// 実行中コマンドの繰り返し回数
-	WORD		anm_c;		// アニメーションカウンタ
+	uint16_t	g_width;	// グラフィックの幅  /2*64(当たり判定にも使用)
+	uint16_t	g_height;	// グラフィックの高さ/2*64(上に同じ)
+	uint16_t	rep_c;	// REP 命令用カウンタ
+	uint16_t	cmd_c;	// 実行中コマンドの繰り返し回数
+	uint16_t	anm_c;	// アニメーションカウンタ
 
-	BYTE		d;			// 進行角 256
+	uint8_t	d;	// 進行角 256
 	char		vd;			// 角速度 128
-	BYTE		amp;		// 振幅   256
-	BYTE		anm_ptn;	// 使用しているアニメーションパターン
-	BYTE		anm_ptnEx;	// ダメージ中のアニメーションパターン
+	uint8_t	amp;	// 振幅   256
+	uint8_t	anm_ptn;	// 使用しているアニメーションパターン
+	uint8_t	anm_ptnEx;	// ダメージ中のアニメーションパターン
 	char		anm_sp;		// アニメーションスピード
-	BYTE		IsDamaged;	// ダメージを受けたか
+	uint8_t	IsDamaged;	// ダメージを受けたか
 
-	BYTE		flag;		// 敵状態フラグ(状況によってサイズ変更のこと)
-	BYTE		tama_c;		// 弾発射用カウンタ
-	BYTE		t_rep;		// 弾発射間隔
+	uint8_t	flag;	// 敵状態フラグ(状況によってサイズ変更のこと)
+	uint8_t	tama_c;	// 弾発射用カウンタ
+	uint8_t	t_rep;	// 弾発射間隔
 
-	BYTE		LLaserRef;	// 太レーザーの参照カウント
+	uint8_t	LLaserRef;	// 太レーザーの参照カウント
 
 	TAMA_CMD	t_cmd;		// 弾発射用コマンド
 	LASER_CMD	l_cmd;		// レーザー発射用コマンド
@@ -107,8 +107,8 @@ struct ENEMY_DATA {
 };
 
 typedef struct{
-	BYTE	mode;				// アニメーションモード
-	BYTE	n;					// アニメーションパターン数
+	uint8_t	mode;	// アニメーションモード
+	uint8_t	n;	// アニメーションパターン数
 	PIXEL_SIZE	size;	// 絵の幅, 絵の高さ
 	PIXEL_LTRB	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
 } ANIME_DATA;
@@ -119,7 +119,7 @@ extern BYTE_BUFFER_OWNED	ECL_Head;
 extern BYTE_BUFFER_OWNED	SCL_Head;
 extern uint8_t			*SCL_Now;
 extern std::array<uint16_t, ENEMY_MAX>	EnemyInd;
-extern WORD			EnemyNow;
+extern uint16_t	EnemyNow;
 extern ANIME_DATA	Anime[ANIME_MAX];
 
 extern int HomingX;			// ホーミング対象のＸ座標
@@ -133,13 +133,13 @@ extern void enemy_draw(void);		// 敵を描画する
 extern void enemyind_set(void);		// 敵の順序設定用配列の初期化をする
 extern void enemy_clear(void);		// 雑魚を消滅させる
 
-extern BOOL enemy_damage(int x,int y,int damage);	// 敵にダメージを与える
-extern BOOL enemy_damage2(int x,int y,int damage);	// ｙ上方向無限Ver.敵にダメージを与える
-extern void enemy_damage3(int x,int y,BYTE d);		// ナナメレーザーの当たり判定
+bool enemy_damage(int x, int y, int damage);	// 敵にダメージを与える
+bool enemy_damage2(int x, int y, int damage);	// ｙ上方向無限Ver.敵にダメージを与える
+void enemy_damage3(int x, int y, uint8_t d);	// ナナメレーザーの当たり判定
 extern void enemy_damage4(int damage);				// すべての敵にダメージを与える
 
 extern void SetAnime24(int x,int y,int id);
-extern void SetAnime32(int x,int y,int id,int n,BYTE mode);
+void SetAnime32(int x, int y, int id, int n, uint8_t mode);
 extern void SetAnime40(int x,int y,int id);
 extern void SetAnime48(int x,int y,int id);
 extern void SetAnime80(int x,int y,int id);
@@ -147,13 +147,13 @@ extern void EnemyAnimeMove(ENEMY_DATA *e);
 
 
 // 敵データを初期化する(x,y は x64 で指定のこと) //
-extern void InitEnemyDataX64(ENEMY_DATA *e,int x,int y,DWORD EclID);
+void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID);
 
 // 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
-extern void InitEnemyDataSTD(ENEMY_DATA *e,short x,short y,DWORD EclID);
+void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID);
 
 // 強制的に ECL ブロック間を移動する //
-extern void EnemyECL_LongJump(ENEMY_DATA *e, DWORD EclID);
+void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID);
 
 extern void UpdateHoming(ENEMY_DATA *e);		// ホーミング座標を更新する
 extern void parse_ECL(ENEMY_DATA *e);			// 敵をＥＣＬに従って動かす
@@ -175,8 +175,7 @@ inline bool LaserHITCHK(ENEMY_DATA *e, int ox, int oy, uint8_t d)
 	l =  cosl(d,tx) + sinl(d,ty);
 	w = abs(-sinl(d,tx) + cosl(d,ty));
 
-	if(l>0 && w<chkw) return TRUE;
-	else              return FALSE;
+	return ((l > 0) && (w < chkw));
 }
 
 

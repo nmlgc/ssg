@@ -9,7 +9,6 @@
 //#pragma message(PBGWIN_HOMINGL_H)
 
 #include "EXDEF.H"
-#include "DirectXUTYs/DX_TYPE.H"
 
 
 
@@ -36,12 +35,12 @@ typedef struct tagHLaserData {
 	int		v;			// 速度
 	int		a;			// 加速度
 
-	DWORD	Count;		// フレームカウンタ
+	uint32_t	Count;	// フレームカウンタ
 
-	BYTE	Type;		// 種類(加速＆ホーミングタイプ)
-	BYTE	State;		// 状態
-	BYTE	c;			// 色
-	BYTE	Left;		// 残りホーミング回数
+	uint8_t	Type;	// 種類(加速＆ホーミングタイプ)
+	uint8_t	State;	// 状態
+	uint8_t	c;	// 色
+	uint8_t	Left;	// 残りホーミング回数
 
 	struct tagHLaserData	*Next;				// 次のレーザーへのポインタ
 	DegPoint	p[HLASER_LEN*HLASER_SECTION];	// 頂点キュー(ExDef.h)
@@ -51,18 +50,18 @@ typedef struct tagHLaserData {
 typedef struct tagHLaserInfo {
 	int		x,y;		// 中心座標
 
-	BYTE	d;			// 角度
-	BYTE	dw;			// 角度の開き
-	BYTE	n;			// 本数
+	uint8_t	d;	// 角度
+	uint8_t	dw;	// 角度の開き
+	uint8_t	n;	// 本数
 
-	BYTE	c;			// 色
-	BYTE	type;		// 種類
+	uint8_t	c;	// 色
+	uint8_t	type;	// 種類
 } HLaserInfo;
 
 
 
 ///// [グローバル変数] /////
-extern WORD			HLaserNow;			// ホーミングレーザーの本数
+extern uint16_t	HLaserNow;	// ホーミングレーザーの本数
 extern HLaserInfo	HLaserCmd;			// ホーミングレーザーセット用データ
 
 

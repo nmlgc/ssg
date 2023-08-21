@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_DEMOPLAY_H)
 
 #include "CONFIG.H"
-#include "DirectXUTYs/DX_TYPE.H"
 
 
 ///// [ 定数 ] /////
@@ -69,8 +68,8 @@ void ReplayLoadCleanup(void);	// リプレイデータロードの事後処理
 
 
 ///// [ 変数 ] /////
-extern BOOL DemoplaySaveEnable;		// デモプレイのセーブが動作しているか
-extern BOOL DemoplayLoadEnable;		// デモプレイのロードが動作しているか
+extern bool DemoplaySaveEnable;	// デモプレイのセーブが動作しているか
+extern bool DemoplayLoadEnable;	// デモプレイのロードが動作しているか
 
 
 #endif

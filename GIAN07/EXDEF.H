@@ -8,13 +8,13 @@
 //#pragma message(PBGWIN_EXDEF_H)
 
 
-#include "DirectXUTYs/DX_TYPE.H"
+#include <stdint.h>
 
 
 // 角度付き座標の管理用構造体 //
 typedef struct tagDegPoint{
 	int		x,y;	// 座標
-	BYTE	d;		// 角度
+	uint8_t	d;	// 角度
 } DegPoint;
 
 

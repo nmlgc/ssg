@@ -10,8 +10,8 @@
 #include "DirectXUTYs/DI_UTY.H"
 
 
-BOOL			DemoplaySaveEnable = FALSE;		// デモプレイのセーブが動作しているか
-BOOL			DemoplayLoadEnable = FALSE;		// デモプレイのロードが動作しているか
+bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作しているか
+bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作しているか
 DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
 WORD			DemoBuffer[DEMOBUF_MAX];		// デモプレイ用バッファ
 DWORD			DemoBufPtr;						// デモプレイ用バッファPtr(Ｃのそれではない)

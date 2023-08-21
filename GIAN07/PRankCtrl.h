@@ -6,13 +6,13 @@
 #ifndef PBGWIN_PRANKCTRL_H
 #define PBGWIN_PRANKCTRL_H		"PRANKCTRL : Version 0.01 : Update 2000/09/13"
 
-#include "DirectXUTYs/DX_TYPE.H"
+#include <stdint.h>
 
 
 
 ///// [構造体] /////
 typedef struct tagPlayRankInfo{
-	BYTE	GameLevel;		// 方向数も関係する難易度変化
+	uint8_t	GameLevel;	// 方向数も関係する難易度変化
 	int		Rank;			// 弾の速度変化に関する値
 } PlayRankInfo;
 

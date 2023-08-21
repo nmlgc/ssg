@@ -7,7 +7,6 @@
 #define PBGWIN_LASER_H		"LASEER : Ver 0.51 : Update 2000/02/17"
 //#pragma message(PBGWIN_LASER_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include "game/coords.h"
 #include <array>
 
@@ -74,16 +73,16 @@ typedef struct{
 	int l;			// レーザーの長さ最終値  (x64座標を使用する)
 	int l2;			// レーザーの発射位置補正(x64...)
 
-	BYTE d;			// 発射角
-	BYTE dw;		// 発射幅
+	uint8_t d;	// 発射角
+	uint8_t dw;	// 発射幅
 
-	BYTE n;			// レーザーの本数
-	BYTE c;			// レーザーの色
+	uint8_t n;	// レーザーの本数
+	uint8_t c;	// レーザーの色
 
 	char a;			// 加速度(つかうのかな???)
-	BYTE cmd;		// レーザー発動コマンド(ほとんど弾と同じかも)
-	BYTE type;		// ショート、無限遠など
-	BYTE notr;		// 反射しないリフレクターの番号
+	uint8_t cmd;	// レーザー発動コマンド(ほとんど弾と同じかも)
+	uint8_t type;	// ショート、無限遠など
+	uint8_t notr;	// 反射しないリフレクターの番号
 } LASER_CMD;
 
 
@@ -98,18 +97,18 @@ typedef struct{
 	WINDOW_POINT p[4];	// 表示する座標
 
 	char a;			// 加速度(つかうのか??)
-	BYTE d;			// 進行方向
+	uint8_t d;	// 進行方向
 
 	int w,wmax;		// 太さ
 	int l,lmax;		// 現在の長さ、長さの最終値
 	int ltemp;		// 反射レーザー専用変数(発射＆ヒットの場合にのみ使用)
 
-	WORD count;		// フレームカウンタ
-	BYTE c;			// 色
-	BYTE type;		// 種類
-	BYTE flag;		// 消去要請フラグ等(エフェクト含む)
-	BYTE notr;		// 反射しないリフレクターの番号
-	BYTE evade;		// かすり用フラグ
+	uint16_t count;	// フレームカウンタ
+	uint8_t c;	// 色
+	uint8_t type;	// 種類
+	uint8_t flag;	// 消去要請フラグ等(エフェクト含む)
+	uint8_t notr;	// 反射しないリフレクターの番号
+	uint8_t evade;	// かすり用フラグ
 } LASER_DATA;
 
 /*
@@ -117,15 +116,15 @@ typedef struct{
 typedef struct{
 	int		x,y;		// 反射物の中心座標
 
-	DWORD	l;			// リフレクターの長さ(中心から先端まで,つまり全体でl*2)
-	BYTE	d;			// 反射物の角度(0 <= d < 128)
+	uint32_t	l;	// リフレクターの長さ(中心から先端まで,つまり全体でl*2)
+	uint8_t	d;	// 反射物の角度(0 <= d < 128)
 } REFLECTOR;
 */
 
 ////レーザー関数////
 extern void laser_set(void);		// レーザーをセットする(難易度変更"有り")
 extern void laser_setEX(void);		// レーザーをセットする(難易度変更"無し")
-extern int  llaser_set(WORD *ind);	// 無限遠レーザーをセットする(セットできた数を返すのだ)
+extern int  llaser_set(uint16_t *ind);	// 無限遠レーザーをセットする(セットできた数を返すのだ)
 extern void laser_move(void);		// レーザーを動かす
 extern void laser_draw(void);		// レーザーを描画する
 extern void laser_clear(void);		// レーザー全てに消去エフェクトをかける
@@ -136,8 +135,8 @@ extern void laserind_set(void);		// レーザー順序用配列の初期化
 extern LASER_CMD	LaserCmd;				// 標準レーザーコマンド構造体
 extern std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
 extern std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
-extern WORD			LaserNow;				// レーザーの本数
+extern uint16_t	LaserNow;	// レーザーの本数
 //extern REFLECTOR	Reflector[RT_MAX];		// 反射物構造体
-//extern WORD			ReflectorNow;			// 反射物の個数
+//extern uint16_t	ReflectorNow;	// 反射物の個数
 
 #endif

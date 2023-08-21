@@ -235,8 +235,7 @@ void enemyind_set(void)
 	EnemyNow = 0;
 }
 
-// 敵にダメージを与える //
-extern BOOL enemy_damage(int x,int y,int damage)
+bool enemy_damage(int x,int y,int damage)
 {
 	int				i;
 
@@ -272,8 +271,7 @@ extern BOOL enemy_damage(int x,int y,int damage)
 	return FALSE;
 }
 
-// ｙ上方向無限Ver.敵にダメージを与える //
-extern BOOL enemy_damage2(int x,int y,int damage)
+bool enemy_damage2(int x,int y,int damage)
 {
 	int				i;
 	BOOL			ret_val = FALSE;
@@ -385,7 +383,7 @@ extern void enemy_damage4(int damage)
 
 
 // 敵データを初期化する(x,y は x64 で指定のこと) //
-extern void InitEnemyDataX64(ENEMY_DATA *e,int x,int y,DWORD EclID)
+void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID)
 {
 	e->x = x;
 	e->y = y;
@@ -453,7 +451,7 @@ extern void InitEnemyDataX64(ENEMY_DATA *e,int x,int y,DWORD EclID)
 
 
 // 強制的に ECL ブロック間を移動する //
-extern void EnemyECL_LongJump(ENEMY_DATA *e, DWORD EclID)
+void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID)
 {
 	e->cmd = (*(DWORD *)(&ECL_Head[EclID]));
 
@@ -466,7 +464,7 @@ extern void EnemyECL_LongJump(ENEMY_DATA *e, DWORD EclID)
 
 
 // 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
-extern void InitEnemyDataSTD(ENEMY_DATA *e,short x,short y,DWORD EclID)
+void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID)
 {
 	int		EnemyX = x;
 	int		EnemyY = y;

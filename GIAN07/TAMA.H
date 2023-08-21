@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_TAMA_H)
 
 #include "GIAN07/entity.h"
-#include "DirectXUTYs/DX_TYPE.H"
 #include <array>
 
 
@@ -118,20 +117,20 @@
 typedef struct{
 	int  x,y;		// 弾の発射位置
 
-	BYTE d;			// 発射角
-	BYTE dw;		// 発射幅
-	BYTE n;			// 弾数(ｎ方向に発射)
-	BYTE ns;		// 連射数(cmdのsビットがONのときだけ有効)
-	BYTE v;			// 速度(下位６ビット)＆ランダム要素(上位２ビット)
-	BYTE c;			// 弾の色＆形状
+	uint8_t d;	// 発射角
+	uint8_t dw;	// 発射幅
+	uint8_t n;	// 弾数(ｎ方向に発射)
+	uint8_t ns;	// 連射数(cmdのsビットがONのときだけ有効)
+	uint8_t v;	// 速度(下位６ビット)＆ランダム要素(上位２ビット)
+	uint8_t c;	// 弾の色＆形状
 	char a;			// 加速度(速度とは単位が違うので注意)
 
 	char vd;		// 角速度｜ホーミング率(BYTE にキャスト)
 
-	BYTE rep;		// 繰り返し回数(回転、ｎ回ホーミング等)
-	BYTE cmd;		// 弾コマンド＆エフェクト
-	BYTE type;		// 弾の種類
-	BYTE option;	// 弾の属性(バイブレーション,反射,炸裂,ボム)
+	uint8_t rep;	// 繰り返し回数(回転、ｎ回ホーミング等)
+	uint8_t cmd;	// 弾コマンド＆エフェクト
+	uint8_t type;	// 弾の種類
+	uint8_t option;	// 弾の属性(バイブレーション,反射,炸裂,ボム)
 } TAMA_CMD;
 
 
@@ -146,19 +145,19 @@ typedef struct{
 	int  v0;		// 初速度(回転系エフェクト等で使用)
 	char a;			// 加速度
 
-	BYTE d;			// 進行角
-	WORD d16;		// 進行角(固定小数点 x256) -> ｎ％ホーミングでのみ使用する
+	uint8_t d;	// 進行角
+	uint16_t d16;	// 進行角(固定小数点 x256) -> ｎ％ホーミングでのみ使用する
 	char vd;		// 角速度
 
-	BYTE c;			// 弾の色＆形状
+	uint8_t c;	// 弾の色＆形状
 
-	BYTE rep;		// typeによる制御を行う回数
-	BYTE type;		// 弾の種類(通常,加速,ホーミング2,回転3,落下,変更)
-	BYTE option;	// 弾の属性(バイブレーション,反射,炸裂,ボム)
-	BYTE effect;	// 実行中のエフェクト(なし,ロック,サークル,消去)
+	uint8_t rep;	// typeによる制御を行う回数
+	uint8_t type;	// 弾の種類(通常,加速,ホーミング2,回転3,落下,変更)
+	uint8_t option;	// 弾の属性(バイブレーション,反射,炸裂,ボム)
+	uint8_t effect;	// 実行中のエフェクト(なし,ロック,サークル,消去)
 
-	WORD count;		// フレームカウンタ
-	BYTE flag;		// 弾消去要請フラグ
+	uint16_t count;	// フレームカウンタ
+	uint8_t flag;	// 弾消去要請フラグ
 } TAMA_DATA;
 
 
@@ -168,10 +167,10 @@ extern TAMA_CMD		TamaCmd;			// 標準・弾コマンド構造体
 extern std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
 extern std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
 extern std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
-extern WORD			Tama1Now;			// 小型弾の弾数
-extern WORD			Tama2Now;			// 特殊弾の弾数
-extern WORD			Tama1Max;			// 小型弾の最大数
-extern WORD			Tama2Max;			// 特殊弾の最大数
+extern uint16_t	Tama1Now;	// 小型弾の弾数
+extern uint16_t	Tama2Now;	// 特殊弾の弾数
+extern uint16_t	Tama1Max;	// 小型弾の最大数
+extern uint16_t	Tama2Max;	// 特殊弾の最大数
 
 
 
@@ -183,14 +182,14 @@ void tama_setExtra01(void);				// エキストラボス専用弾幕
 void tama_move(void);					// 弾を動かす
 void tama_draw(void);					// 弾を描画する
 void tama_clear(void);					// 弾に消去エフェクトをセットする
-void tamaind_set(WORD tama1);			// 弾の個数の割合をセットする(危険！)
+void tamaind_set(uint16_t tama1);	// 弾の個数の割合をセットする(危険！)
 
-DWORD tama2score(void);					// 弾を得点化する(Ret : 得点)
-void  tama2item(BYTE n);				// 弾の 1/n をアイテム化する
+uint32_t tama2score(void);	// 弾を得点化する(Ret : 得点)
+void  tama2item(uint8_t n);	// 弾の 1/n をアイテム化する
 
-BYTE __fastcall tama_dir(WORD i);					// 弾の進行方向をセットする
-int  __fastcall tama_speed(WORD i);					// 弾の初速度をセットする
-BYTE __fastcall tama_flag(void);					// 弾のフラグを初期化する
+uint8_t __fastcall tama_dir(uint16_t i);	// 弾の進行方向をセットする
+int  __fastcall tama_speed(uint16_t i);	// 弾の初速度をセットする
+uint8_t __fastcall tama_flag(void);	// 弾のフラグを初期化する
 
 void __fastcall tamaTmove(TAMA_DATA *t);			// 弾の " Type " による移動を行う
 void __fastcall tamaOmove(TAMA_DATA *t);			// 弾の "Option" による移動を行う
@@ -210,7 +209,7 @@ inline void TamaEvadeAdd(TAMA_DATA *t)
 }
 
 //// 弾コマンド用マクロ ////
-_inline void TamaSetForm(BYTE cmd,BYTE option,BYTE type,BYTE c)
+_inline void TamaSetForm(uint8_t cmd, uint8_t option, uint8_t type, uint8_t c)
 {
 	TamaCmd.cmd    = cmd;
 	TamaCmd.option = option;
@@ -218,24 +217,24 @@ _inline void TamaSetForm(BYTE cmd,BYTE option,BYTE type,BYTE c)
 	TamaCmd.c      = c;
 }
 
-_inline void TamaSTDForm(BYTE c)
+_inline void TamaSTDForm(uint8_t c)
 {
 	TamaSetForm(TC_WAY,TOP_NONE,T_NORM,c);
 }
 
-_inline void TamaSetDeg(BYTE d,BYTE dw)
+_inline void TamaSetDeg(uint8_t d, uint8_t dw)
 {
 	TamaCmd.d  = d;
 	TamaCmd.dw = dw;
 }
 
-_inline void TamaSetNum(BYTE n,BYTE ns)
+_inline void TamaSetNum(uint8_t n, uint8_t ns)
 {
 	TamaCmd.n  = n;
 	TamaCmd.ns = ns;
 }
 
-_inline void TamaSetSpd(BYTE v,char a)
+_inline void TamaSetSpd(uint8_t v, char a)
 {
 	TamaCmd.v = v;
 	TamaCmd.a = a;

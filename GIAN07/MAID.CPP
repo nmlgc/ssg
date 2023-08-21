@@ -12,7 +12,7 @@
 
 
 MAID			Viv;					// 麗しきメイドさん構造体
-DWORD			EvadeRate[256];			// かすり得点レート
+uint32_t	EvadeRate[256];
 
 
 extern void WideBombDraw(void)
@@ -515,4 +515,22 @@ extern void evade_addEx(int x, int y, uint8_t n)
 extern void score_add(int sc)
 {
 	Viv.dscore += sc;
+}
+
+uint8_t GetLeftOrRightLaserDeg(uint8_t LaserDeg, int i)
+{
+	return ((LaserDeg < 58)
+		? ((LaserDeg * 3) + ((i * (64 - LaserDeg)) / 2))
+		: ((58 * 3) + ((i * (64 - (std::min)(62, int{ LaserDeg }))) / 2))
+	);
+}
+
+uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i)
+{
+	return (64 + 48 - GetLeftOrRightLaserDeg(LaserDeg, i));
+}
+
+uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i)
+{
+	return (64 - 48 + GetLeftOrRightLaserDeg(LaserDeg, i));
 }

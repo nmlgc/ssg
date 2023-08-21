@@ -21,7 +21,7 @@ static void _LLaserHitCheck(LLASER_DATA *lp);
 static void _LLaserXYSet(int id);			// レーザーの座標をセットする
 
 
-extern BOOL LLaserSet(BYTE id)
+bool LLaserSet(uint8_t id)
 {
 	LLASER_DATA		*lp;
 	int				i;

@@ -7,7 +7,7 @@
 #define PBGWIN_SCORE_H		"SCORE : Version 0.01 : Update 2000/07/29"
 //#pragma message(PBGWIN_SCORE_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
+#include <stdint.h>
 
 
 
@@ -22,9 +22,9 @@
 typedef struct tagNR_NAME_DATA{
 	char		Name[NR_NAME_LEN];		// 名前
 	__int64		Score;					// スコア
-	DWORD		Evade;					// かすり回数
-	BYTE		Stage;					// ステージ
-	BYTE		Weapon;					// 装備品
+	uint32_t	Evade;	// かすり回数
+	uint8_t	Stage;	// ステージ
+	uint8_t	Weapon;	// 装備品
 } NR_NAME_DATA;
 
 typedef struct tagNR_SCORE_DATA{
@@ -36,23 +36,23 @@ typedef struct tagNR_SCORE_DATA{
 } NR_SCORE_DATA;
 
 typedef struct tagNR_SCORE_STRING{
-	BYTE	Rank;					// 実際の順位(ある順位が複数ある場合の対策)
+	uint8_t	Rank;	// 実際の順位(ある順位が複数ある場合の対策)
 	int		x,y;					// 描画用座標
-	BOOL	bMoveEnable;			// 移動可能か？
+	bool	bMoveEnable;	// 移動可能か？
 
 	char	Name[NR_NAME_LEN];		// 名前
 	char	Score[11+1];			// 得点
 	char	Evade[6+1];				// かすり
 	char	Stage[1+1];				// ステージ
-	BYTE	Weapon;					// 装備
+	uint8_t	Weapon;	// 装備
 } NR_SCORE_STRING;
 
 
 
 ///// [ 関数 ] /////
-int  SetScoreString(NR_NAME_DATA *NData, BYTE Dif);	// 現在のスコア列を取得する(Ret:下と同じ)
-int  IsHighScore(NR_NAME_DATA *NData, BYTE Dif);	// ０：ハイスコアでない  それ以外：順位
-BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif);	// スコアデータを書き出す
+int  SetScoreString(NR_NAME_DATA *NData, uint8_t Dif);	// 現在のスコア列を取得する(Ret:下と同じ)
+int  IsHighScore(NR_NAME_DATA *NData, uint8_t Dif);	// ０：ハイスコアでない  それ以外：順位
+bool SaveScoreData(NR_NAME_DATA *NData, uint8_t Dif);	// スコアデータを書き出す
 
 
 

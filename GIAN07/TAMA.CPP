@@ -555,7 +555,7 @@ void tama_clear(void)
 }
 
 // 弾を得点化する(Ret : 得点)
-DWORD tama2score(void)
+uint32_t tama2score(void)
 {
 	WORD		i;
 	DWORD		sum = 0;

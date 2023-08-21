@@ -3,23 +3,22 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <windows.h>
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "CONFIG.H"
-#include <time.h>
 
 
 ///// [グローバル変数] /////
 //HIGH_SCORE		*HighScore;
 //char			ScoreTable[8][80];
-DWORD			GameCount;
+uint32_t	GameCount;
 uint8_t	GameStage;
 
 
 
 ///// [ 関数(非公開) ] /////
 #ifdef PBG_DEBUG
-#include <time.h>
 // デバッグ情報を出力する //
 extern void OutputDebugMsg(void)
 {

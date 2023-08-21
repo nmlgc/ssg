@@ -117,7 +117,7 @@
 // スコア管理用構造体 //
 typedef struct tagSCORE_DATA{
 	__int64	score;
-	BYTE	weapon;
+	uint8_t	weapon;
 	char	name[SCORE_NAME];
 } SCORE_DATA;
 
@@ -133,7 +133,7 @@ typedef struct tagHIGH_SCORE{
 ///// [グローバル変数] /////
 //extern HIGH_SCORE	*HighScore;
 //extern char			ScoreTable[8][80];
-extern DWORD		GameCount;
+extern uint32_t	GameCount;
 extern uint8_t	GameStage;
 
 

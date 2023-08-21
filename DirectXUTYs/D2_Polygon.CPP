@@ -100,10 +100,10 @@ void _2DPolygon(WINDOW_POINT *p, int n)
 	}
 }
 
-extern BYTE				*Grp_Vram;				// これは公開しない
+extern uint8_t*	Grp_Vram;	// これは公開しない
 extern long				Grp_Pitch;				// これも公開しない
-extern DWORD			Grp_AddrY[480];			// Ｙ座標テーブル
-extern DWORD			Col2D;
+extern uint32_t	Grp_AddrY[480];	// Ｙ座標テーブル
+extern uint32_t	Col2D;
 
 
 // 横ラインを引く //

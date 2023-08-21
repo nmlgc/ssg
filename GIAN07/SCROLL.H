@@ -7,7 +7,6 @@
 #define PBGWIN_SCROLL_H		"SCROLL : Version 0.11 : Update 2000/02/28"
 //#pragma message(PBGWIN_SCROLL_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include "platform/buffer.h"
 
 
@@ -50,7 +49,7 @@
 
 
 ///// [  型  ] /////
-typedef WORD	PBGMAP;		// マップパーツ格納用の型
+typedef uint16_t	PBGMAP;	// マップパーツ格納用の型
 
 
 
@@ -68,38 +67,38 @@ typedef struct tagScrollInfo{
 
 	PBGMAP	*LayerHead[LAYER_MAX];		// 各レイヤーのヘッダ
 	PBGMAP	*LayerPtr[LAYER_MAX];		// 現在のレイヤーのポインタ
-	DWORD	LayerWait[LAYER_MAX];		// レイヤーの重み
+	uint32_t	LayerWait[LAYER_MAX];	// レイヤーの重み
 	int		LayerCount[LAYER_MAX];		// レイヤーごとのカウンタ
-	BYTE	LayerDy[LAYER_MAX];			// レイヤーの1Dot単位のズレ
+	uint8_t	LayerDy[LAYER_MAX];	// レイヤーの1Dot単位のズレ
 
 	int		NumLayer;			// レイヤー数
 	int		ScrollSpeed;		// スクロール速度
-	DWORD	Count;				// 現在の時刻
-	DWORD	InfStart;			// 無限ループの開始時刻(デフォルトは０)
-	DWORD	InfEnd;				// 無限ループの終了時刻(デフォルトはマップの長さの最小値)
+	uint32_t	Count;	// 現在の時刻
+	uint32_t	InfStart;	// 無限ループの開始時刻(デフォルトは０)
+	uint32_t	InfEnd;	// 無限ループの終了時刻(デフォルトはマップの長さの最小値)
 
-	BYTE	State;				// スクロールステータス
-	BYTE	IsQuake;			// 振動中か？
+	uint8_t	State;	// スクロールステータス
+	uint8_t	IsQuake;	// 振動中か？
 
 	char	RasterDx[31];		// ラスタースクロールによるＸ加算値
-	BYTE	RasterWidth;		// ラスタースクロールにおける振幅
-	BYTE	RasterDeg;			// ラスタースクロール用の角度
+	uint8_t	RasterWidth;	// ラスタースクロールにおける振幅
+	uint8_t	RasterDeg;	// ラスタースクロール用の角度
 
 	void(*ExCmd)(void);	// 特殊コマンド
-	DWORD	ExCount;			// 特殊コマンド用カウンタ
+	uint32_t	ExCount;	// 特殊コマンド用カウンタ
 } SCROLL_INFO;
 
 // マップデータ保存用ヘッダ //
 typedef struct tagScrollSaveHeader{
-	DWORD		Address;				// このデータの開始アドレス
-	DWORD		ScrollWait;				// このレイヤーのディレイ
-	DWORD		Length;					// このレイヤーの長さ
+	uint32_t	Address;	// このデータの開始アドレス
+	uint32_t	ScrollWait;	// このレイヤーのディレイ
+	uint32_t	Length;	// このレイヤーの長さ
 } ScrollSaveHeader;
 
 // ＳＣＬ管理用構造体 //
 typedef struct tagSCL_INFO{
-	BOOL	MsgFlag;			// メッセージスキップ用フラグ
-	BOOL	ReturnFlag;			// リターンキー用フラグ
+	bool	MsgFlag;	// メッセージスキップ用フラグ
+	bool	ReturnFlag;	// リターンキー用フラグ
 } SCL_INFO;
 
 

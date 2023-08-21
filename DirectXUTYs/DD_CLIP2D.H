@@ -35,7 +35,7 @@ int  __stdcall Grp_PClip(WINDOW_POINT *dest, WINDOW_POINT *src, int n);	// ポ�
 inline uint8_t GetLineOutcode(int x, int y)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
-	BYTE	temp = OUTCODE_LEFT|OUTCODE_BOTTOM;
+	uint8_t	temp = (OUTCODE_LEFT | OUTCODE_BOTTOM);
 
 	if(CLIP_X_MIN <= x){
 		temp ^= OUTCODE_X;
@@ -60,7 +60,7 @@ inline bool GrpLineCut(int *x1, int *y1, int *x2, int *y2, uint8_t outcode)
 	if(outcode&OUTCODE_X){
 		temp = (outcode&OUTCODE_LEFT) ? CLIP_X_MIN : CLIP_X_MAX;
 		(*x1) -= (*x2);		// dx
-		if((*x1)==0) return FALSE;
+		if((*x1) == 0) return false;
 		(*y1) -= (*y2);		// dy
 
 		(*y1) = ( (temp-(*x2))*(*y1) )/(*x1) + (*y2);
@@ -68,14 +68,14 @@ inline bool GrpLineCut(int *x1, int *y1, int *x2, int *y2, uint8_t outcode)
 
 		if((*y1)<CLIP_Y_MIN)      outcode = OUTCODE_TOP;
 		else if((*y1)>CLIP_Y_MAX) outcode = OUTCODE_BOTTOM;
-		else return TRUE;
+		else return true;
 	}
 
 	// ｙ方向のクリッピングが必要な場合 //
 	if(outcode&OUTCODE_Y){
 		temp = (outcode&OUTCODE_TOP) ? CLIP_Y_MIN : CLIP_Y_MAX;
 		(*y1) -= (*y2);		// dy
-		if((*y1)==0) return FALSE;
+		if((*y1) == 0) return false;
 
 		(*x1) -= (*x2);		// dx
 
@@ -83,26 +83,26 @@ inline bool GrpLineCut(int *x1, int *y1, int *x2, int *y2, uint8_t outcode)
 		(*y1) = temp;
 	}
 
-	if((*x1)>=CLIP_X_MIN && (*x1)<=CLIP_X_MAX) return TRUE;
-	return FALSE;
+	return (((*x1) >= CLIP_X_MIN) && ((*x1) <= CLIP_X_MAX));
 }
 
 // ReturnValue == TRUE  : 完全に範囲内もしくはクリッピングが正常に行われた //
 // ReturnValue == FALSE : 完全に範囲外
 inline bool GrpLineClip(int *x1, int *y1, int *x2, int *y2)
 {
-	BYTE	Outcode1,Outcode2;
+	auto Outcode1 = GetLineOutcode(*x1, *y1);
+	auto Outcode2 = GetLineOutcode(*x2, *y2);
 
-	Outcode1 = GetLineOutcode(*x1,*y1);
-	Outcode2 = GetLineOutcode(*x2,*y2);
-
-	if((Outcode1 & Outcode2) != 0) return FALSE;
-	if(Outcode1==0 && Outcode2==0) return TRUE;
-
-	if(GrpLineCut(x1,y1,x2,y2,Outcode1)==TRUE && GrpLineCut(x2,y2,x1,y1,Outcode2)==TRUE)
-		return TRUE;
-	else
-		return FALSE;
+	if((Outcode1 & Outcode2) != 0) {
+		return false;
+	}
+	if((Outcode1 == 0) && (Outcode2 == 0)) {
+		return true;
+	}
+	return (
+		GrpLineCut(x1, y1, x2, y2, Outcode1) &&
+		GrpLineCut(x2, y2, x1, y1, Outcode2)
+	);
 }
 
 

@@ -7,7 +7,6 @@
 #define PBGWIN_EFFECT_H		"EFFECT : Version 0.20 : Update 2000/02/23"
 //#pragma message(PBGWIN_EFFECT_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include <stdint.h>
 #include <string_view>
 
@@ -62,20 +61,20 @@
 typedef struct _tagCIRCLE_EFC_DATA{
 	int		x,y;		// 中心座標
 	int		r,rmax;		// 半径／最大半径
-	DWORD	count;		// カウンタ
-	BYTE	type;		// 円エフェクトの種類
-//	BYTE	Level;		// 円エフェクトの段階
-	BYTE	d;			// 円エフェクトの角度(謎)
+	uint32_t	count;	// カウンタ
+	uint8_t	type;	// 円エフェクトの種類
+//	uint8_t	Level;	// 円エフェクトの段階
+	uint8_t	d;	// 円エフェクトの角度(謎)
 } CIRCLE_EFC_DATA;
 
 typedef struct _tagSEFFECT_DATA{
 	int		x,y;
 	int		vx,vy;
 
-	DWORD	time;
-	DWORD	point;
+	uint32_t	time;
+	uint32_t	point;
 
-	BYTE	cmd;
+	uint8_t	cmd;
 	char	c;
 } SEFFECT_DATA;
 
@@ -83,13 +82,13 @@ typedef struct tagLOCKON_INFO{
 	int		*x,*y;						// ロック座標へのポインタ
 	int		width,height;				// 幅＆高さ
 	int		vx,vy;						// 速度成分
-	DWORD	count;						// カウンタ
-	BYTE	state;						// 状態
+	uint32_t	count;	// カウンタ
+	uint8_t	state;	// 状態
 } LOCKON_INFO;
 
 typedef struct tagSCREENEFC_INFO{
-	BYTE	cmd;		// 発動中エフェクト
-	DWORD	count;		// エフェクトに対するカウンタ
+	uint8_t	cmd;	// 発動中エフェクト
+	uint32_t	count;	// エフェクトに対するカウンタ
 } SCREENEFC_INFO;
 
 

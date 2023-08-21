@@ -16,7 +16,6 @@
 
 ///// [ヘッダファイル] /////
 #include "game/coords.h"
-#include "DirectXUTYs/DX_TYPE.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/UT_MATH.H"
 
@@ -43,7 +42,7 @@ typedef struct tagLineList3D{
 	int			n;		/* 頂点数             */
 	WORLD_POINT	*Work;	/* ワークエリア       */
 
-	BYTE		DegX,DegY,DegZ;		/* 各軸に対する回転角 */
+	uint8_t	DegX, DegY, DegZ;	/* 各軸に対する回転角 */
 } LineList3D;
 
 typedef struct tagWireFrame3D{
@@ -57,15 +56,15 @@ typedef struct tagTriangle3D{
 
 	WINDOW_POINT	Grp[3];
 
-	BYTE	deg_x,deg_y,deg_z;
+	uint8_t	deg_x,deg_y,deg_z;
 	char	roll_x,roll_y,roll_z;
 } Triangle3D;
 
 typedef struct tagCircle3D{
 	int		ox,oy;
 	int		r;
-	BYTE	deg;
-	BYTE	n;
+	uint8_t	deg;
+	uint8_t	n;
 } Circle3D;
 
 typedef struct tagDeg3D{
@@ -89,14 +88,14 @@ typedef struct tagStar2D {
 typedef struct tagCloud2D {
 	int		x, y;		// ｘ６４座標
 	int		vy;			// 速度のｙ成分(ｙしかないけど)
-	BYTE	type;		// 雲の種類
+	uint8_t	type;	// 雲の種類
 } Cloud2D;
 
 // 非・汎用２Ｄ正方形ワイヤーフレーム //
 typedef struct tagWFLine2D {
 	int		ox,oy;		// 中心座標
 	int		w;			// 正方形の一辺の長さ
-	BYTE	d;			// 正方形の傾き角度
+	uint8_t	d;	// 正方形の傾き角度
 } WFLine2D;
 
 // 偽ＥＣＬ羅列管理用構造体 //
@@ -115,9 +114,9 @@ typedef struct tagRock3D {
 	int		v;				// 速度
 
 	char	a;				// 加速度
-	BYTE	d;				// 角度(2D-平面上)
-	BYTE	GrpID;			// グラフィックＩＤ
-	BYTE	State;			// 現在の状態
+	uint8_t	d;	// 角度(2D-平面上)
+	uint8_t	GrpID;	// グラフィックＩＤ
+	uint8_t	State;	// 現在の状態
 } Rock3D;
 
 
@@ -167,7 +166,7 @@ void DrawStg3Star();	// ３面高速星描画
 
 
 
-__inline void Transform3D(Point3D *p, BYTE dx, BYTE dy, BYTE dz)
+__inline void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 {
 	static Point3D	temp;
 

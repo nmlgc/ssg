@@ -7,7 +7,6 @@
 #define PBGWIN_MAID_H		"めいど : Version 0.01 : Update 2000/02/17"
 //#pragma message(PBGWIN_MAID_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include <stdint.h>
 
 
@@ -50,32 +49,32 @@ typedef struct
 	__int64 score;		// 得点カウンタ
 	__int64	dscore;		// 得点増加値
 
-	DWORD	evade_sum;		// かすり合計
+	uint32_t	evade_sum;	// かすり合計
 	int		evadesc;		// かすり得点
-	WORD	evade;			// かすり回数
-	WORD	evade_c;		// 連続「かすり」の残り許容時間
+	uint16_t	evade;	// かすり回数
+	uint16_t	evade_c;	// 連続「かすり」の残り許容時間
 
 	char v;				// サボテンの移動速度基本値(後で64~45倍にする)
 
-	BYTE weapon;		// "とげ" の種類
-	BYTE exp;			// サボテンの経験値？
+	uint8_t weapon;	// "とげ" の種類
+	uint8_t exp;	// サボテンの経験値？
 	uint8_t bomb;	// ボムの数
 	uint8_t left;	// 残りサボテン数
-	BYTE credit;		// のこりクレジット
+	uint8_t credit;	// のこりクレジット
 
-	BYTE GrpID;			// 表示すべきグラフィック
+	uint8_t GrpID;	// 表示すべきグラフィック
 
-	WORD bomb_time;		// ボムウェイト用
-	WORD exp2;			// 経験値増加抑制用
-	WORD muteki;		// 無敵フラグ(0:off !0:無敵時間カウンタ)
-	WORD lay_time;		// レーザーの発射タイミング用
-	BYTE lay_grp;		// レーザーのグラフィック用
-	BYTE toge_time;		// "とげ" の発射タイミング用
-	BYTE toge_ex;		// とげ発射用特殊変数
-	BYTE ShiftCounter;	// 押しっぱなし低速移動用
+	uint16_t bomb_time;	// ボムウェイト用
+	uint16_t exp2;	// 経験値増加抑制用
+	uint16_t muteki;	// 無敵フラグ(0:off !0:無敵時間カウンタ)
+	uint16_t lay_time;	// レーザーの発射タイミング用
+	uint8_t lay_grp;	// レーザーのグラフィック用
+	uint8_t toge_time;	// "とげ" の発射タイミング用
+	uint8_t toge_ex;	// とげ発射用特殊変数
+	uint8_t ShiftCounter;	// 押しっぱなし低速移動用
 
-	BOOL bGameOver;		// ゲームオーバー判定用フラグ
-	BOOL BuzzSound;		// かすった音を連続再生させないためのフラグ
+	bool bGameOver;	// ゲームオーバー判定用フラグ
+	bool BuzzSound;	// かすった音を連続再生させないためのフラグ
 } MAID;
 
 
@@ -99,7 +98,7 @@ extern void WideBombDraw(void);		// ワイドショット用のボム(やや例�
 
 ///// [ 変数 ] /////
 extern MAID			Viv;					// 麗しきメイドさん構造体
-extern DWORD		EvadeRate[256];			// かすり得点レート
+extern uint32_t	EvadeRate[256];	// かすり得点レート
 
 
 
@@ -109,7 +108,7 @@ inline void PowerUp(uint8_t damage)
 	Viv.exp2 += damage;
 
 	// Viv.exp(8bit+1bit) ooo oooooo //
-	switch(((WORD)Viv.exp+1)>>5){
+	switch(((uint16_t)Viv.exp+1)>>5){
 		case(0):	if(Viv.exp2>5-3)		Viv.exp++,	Viv.exp2=0;	return;
 		case(1):	if(Viv.exp2>25-15)		Viv.exp++,	Viv.exp2=0;	return;
 		case(2):	if(Viv.exp2>50-20)		Viv.exp++,	Viv.exp2=0;	return;
@@ -122,17 +121,8 @@ inline void PowerUp(uint8_t damage)
 	}
 }
 
-inline uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i)
-{
-	if(LaserDeg < 58) return 64+48 - LaserDeg*3 + i*(64-LaserDeg)/2;
-	else              return 64+48 - 58*3 + i*(64-min(62,LaserDeg))/2;
-}
-
-inline uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i)
-{
-	if(LaserDeg < 58) return 64-48 + LaserDeg*3 + i*(64-LaserDeg)/2;
-	else              return 64-48 + 58*3 + i*(64-min(62,LaserDeg))/2;
-}
+uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i);
+uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i);
 
 inline uint8_t GetLaserDeg(void)
 {

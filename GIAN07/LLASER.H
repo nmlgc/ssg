@@ -49,10 +49,10 @@ typedef struct{
 
 	int		w;			// レーザーの太さ最終値
 
-	BYTE	d;			// レーザー発射角
+	uint8_t	d;	// レーザー発射角
 
-	BYTE	c;			// レーザーの色
-	BYTE	type;		// レーザーの種類
+	uint8_t	c;	// レーザーの色
+	uint8_t	type;	// レーザーの種類
 } LLASER_CMD;
 
 
@@ -69,27 +69,27 @@ typedef struct{
 	int		w,wmax;			// 幅、最大幅(x64)
 	int		v;
 
-	DWORD	count;			// フレームカウンタ
+	uint32_t	count;	// フレームカウンタ
 
 	WINDOW_POINT	p[4];	// 座標保持用のポインタ(Grp)
 
-	BYTE	d;				// レーザーの発射角
-	BYTE	c;				// レーザーの色
+	uint8_t	d;	// レーザーの発射角
+	uint8_t	c;	// レーザーの色
 
-	BYTE	flag;			// レーザーの状態
-	BYTE	type;			// レーザーの種類
-	BYTE	EnemyID;		// 敵から見た番号
+	uint8_t	flag;	// レーザーの状態
+	uint8_t	type;	// レーザーの種類
+	uint8_t	EnemyID;	// 敵から見た番号
 } LLASER_DATA;
 
 
 
 //// レーザー関数２ ////
-extern BOOL LLaserSet(BYTE id);							// レーザーをセットする
-extern void LLaserOpen(ENEMY_DATA *e,BYTE id);			// レーザーを開く
-extern void LLaserClose(ENEMY_DATA *e,BYTE id);			// レーザーを閉じる
-extern void LLaserLine(ENEMY_DATA *e,BYTE id);			// レーザーをライン状態にする
-extern void LLaserDegA(ENEMY_DATA *e,BYTE d,BYTE id);	// レーザーを角度絶対で回転
-extern void LLaserDegR(ENEMY_DATA *e,char d,BYTE id);	// レーザーを角度相対で回転
+bool LLaserSet(uint8_t id);	// レーザーをセットする
+void LLaserOpen(ENEMY_DATA *e, uint8_t id);	// レーザーを開く
+void LLaserClose(ENEMY_DATA *e, uint8_t id);	// レーザーを閉じる
+void LLaserLine(ENEMY_DATA *e, uint8_t id);	// レーザーをライン状態にする
+void LLaserDegA(ENEMY_DATA *e, uint8_t d, uint8_t id);	// レーザーを角度絶対で回転
+void LLaserDegR(ENEMY_DATA *e, char d, uint8_t id);	// レーザーを角度相対で回転
 
 extern void LLaserForceClose(ENEMY_DATA *e);	// 敵に関連づけられたレーザーを強制クローズ
 

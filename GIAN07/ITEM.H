@@ -7,7 +7,6 @@
 #define PBGWIN_ITEM_H		"ITEM : Version 0.01 : Update 2000/03/11"
 //#pragma message(PBGWIN_ITEM_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
 #include <array>
 
 
@@ -32,8 +31,8 @@
 typedef struct tagITEM_DATA{
 	int		x,y;
 	int		vx,vy;
-	DWORD	count;
-	BYTE	type;
+	uint32_t	count;
+	uint8_t	type;
 } ITEM_DATA;
 
 
@@ -50,7 +49,7 @@ void ItemIndSet(void);	// アイテム配列の初期化
 ///// [ 変数 ] /////
 extern std::array<ITEM_DATA, ITEM_MAX>	Item;
 extern std::array<uint16_t, ITEM_MAX>	ItemInd;
-extern WORD			ItemNow;
+extern uint16_t	ItemNow;
 
 
 

@@ -6,6 +6,7 @@
 #include "LZ_UTY.H"
 #include "LEVEL.H"
 #include "SCORE.H"
+#include <windows.h>
 
 //#define PBG_MASK_VALUE		((DWORDLONG)0x342d3a4de92c68ba)
 //#define PBG_MASK_VALUE		((DWORDLONG)0xe92cd3a4d8ba6342)
@@ -144,7 +145,7 @@ int IsHighScore(NR_NAME_DATA *NData, BYTE Dif)
 
 
 // スコアデータを書き出す //
-BOOL SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
+bool SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 {
 	int				Rank;
 	int				i;

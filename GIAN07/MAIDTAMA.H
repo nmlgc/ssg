@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
 #include "TAMA.H"
-#include "DirectXUTYs/DX_TYPE.H"
 #include <array>
 
 
@@ -48,7 +47,7 @@ void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化
 ///// [ 変数 ] /////
 extern std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
 extern std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
-extern WORD			MaidTamaNow;					// 現在の数
+extern uint16_t	MaidTamaNow;	// 現在の数
 
 
 

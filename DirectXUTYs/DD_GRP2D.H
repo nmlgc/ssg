@@ -53,7 +53,7 @@ inline bool _2DChkPoint(int x, int y)
 inline void _2DPset(int x, int y, uint8_t c)
 {
 	extern BYTE		*Grp_Vram;
-	extern DWORD	Grp_AddrY[480];
+	extern uint32_t	Grp_AddrY[480];
 
 	if(_2DChkPoint(x,y))
 		*(Grp_Vram+x+Grp_AddrY[y]) = c;

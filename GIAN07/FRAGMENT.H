@@ -7,7 +7,7 @@
 #define PBGWIN_FRAGMENT_H		"FRAGMENT : Ver 0.10 : Update 99/10/31"
 //#pragma message(PBGWIN_FRAGMENT_H)
 
-#include "DirectXUTYs/DX_TYPE.H"
+#include <stdint.h>
 
 //// 破片定数 ////
 #define FRAGMENT_MAX	1000		// 破片の最大数
@@ -28,8 +28,8 @@
 typedef struct{
 	int		x,y;		// 現在の座標
 	int		vx,vy;		// 速度成分 (x64)
-	BYTE	count;		// フレームカウンタ(０の時は使用していないとする)
-	BYTE	cmd;		// どんな破片？
+	uint8_t	count;	// フレームカウンタ(０の時は使用していないとする)
+	uint8_t	cmd;	// どんな破片？
 } FRAGMENT_DATA;
 
 
@@ -38,7 +38,7 @@ extern FRAGMENT_DATA	Fragment[FRAGMENT_MAX];
 
 
 //// 破片関数 ////
-void fragment_set(int x,int y,BYTE cmd);
+void fragment_set(int x, int y, uint8_t cmd);
 void fragment_move(void);
 void fragment_draw(void);
 void fragment_setup(void);

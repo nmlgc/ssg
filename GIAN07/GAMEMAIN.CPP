@@ -32,7 +32,7 @@ BYTE			CurrentDif;		// 現在の難易度(スコアネーム表示用)
 
 MAID		VivTemp;
 
-BOOL IsDemoplay = FALSE;
+bool IsDemoplay = false;
 
 
 void TitleProc(void);

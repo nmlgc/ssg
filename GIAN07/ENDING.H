@@ -12,10 +12,6 @@
 
 
 
-#include "DirectXUTYs/DX_TYPE.H"
-
-
-
 /***** [クラス定義] *****/
 
 

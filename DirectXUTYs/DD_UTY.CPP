@@ -12,6 +12,15 @@
 #pragma message(PBGWIN_DD_UTY_H)
 
 
+// マクロ //
+void RELEASE(auto*& x)
+{
+	if(x != nullptr) {
+		x->Release();
+		x = nullptr;
+	}
+}
+
 // 図形描画関数に対するダミー関数 //
 static void DM_V(void);
 static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d);

@@ -80,7 +80,10 @@ void SndCleanup(void)
 	for(i=0;i<SND_OBJ_MAX;i++) Snd_OBJ[i] = NULL;
 
 	// ＤＳオブジェクトを解放 //
-	RELEASE(Snd_DS);
+	if(Snd_DS) {
+		Snd_DS->Release();
+		Snd_DS = nullptr;
+	}
 }
 
 bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)

@@ -43,7 +43,4 @@
 #pragma message("------------------------------")
 
 
-// マクロ //
-#define RELEASE(x)		if((x)!=NULL){(x)->Release();x=NULL;}
-
 #endif

@@ -14,6 +14,7 @@
 
 #include "DX_ERROR.H"
 #include "game/input.h"
+#include <optional>
 #include <span>
 
 
@@ -43,6 +44,10 @@ extern void Key_End(void);							// キー入力終了
 
 void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings);
 
-extern int  Key_PadConfig(INPUT_BITS Key);
+// Returns:
+// • ≥1: ID of the single gamepad button that is being pressed
+// •  0: More than one gamepad button is being pressed
+// • std::nullopt: No gamepad button is being pressed
+std::optional<INPUT_PAD_BUTTON> Key_PadSingle(void);
 
 #endif

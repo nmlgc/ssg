@@ -730,16 +730,15 @@ static bool ContinueFnNo(INPUT_BITS key)
 }
 
 static bool InpFnKey(
-	uint8_t& config_pad, INPUT_BITS pad_config_key, INPUT_BITS key
+	INPUT_PAD_BUTTON& config_pad, INPUT_BITS pad_config_key, INPUT_BITS key
 )
 {
 	key &= (~Pad_Data);
-	const auto temp = Key_PadConfig(pad_config_key);
-	if(temp >= 0) {
-		config_pad = temp;
+	const auto temp = Key_PadSingle();
+	if(temp) {
+		config_pad = temp.value();
+		SetIKeyItem();
 	}
-
-	SetIKeyItem();
 
 	return ((key != KEY_RETURN) && (key != KEY_TAMA));
 }

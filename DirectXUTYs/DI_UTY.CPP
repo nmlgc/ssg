@@ -262,7 +262,7 @@ void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 }
 
 
-extern int Key_PadConfig(INPUT_BITS Key)
+std::optional<INPUT_PAD_BUTTON> Key_PadSingle(void)
 {
 	JOYINFOEX	joy;
 	int			ret;
@@ -305,7 +305,7 @@ extern int Key_PadConfig(INPUT_BITS Key)
 		case JOY_BUTTON31:		ret = 31;	break;
 		case JOY_BUTTON32:		ret = 32;	break;
 
-		case 0:		return -1;
+		case 0:	return std::nullopt;
 
 		default:	// 同時押しで、無効化できる //
 			ret = 0;

@@ -28,12 +28,7 @@
 #include "strings/title.h"
 
 // Still required for:
-// • DirectInput
-HINSTANCE hInstanceMain;
-
-// Still required for:
 // • DirectDraw
-// • DirectInput
 HWND hWndMain;
 
 SDL_LogOutputFunction log_default_func;
@@ -65,8 +60,14 @@ int Run()
 	constexpr auto FRAME_TIME_TARGET = 16;
 
 	while(!quit) {
+		// Read input events first to remove them from the queue
+		SDL_PumpEvents();
+		Key_Read(PadBindings);
+
 		[[gsl::suppress(type.5)]] SDL_Event event;
-		while(SDL_PollEvent(&event)) {
+		while(SDL_PeepEvents(
+			&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT
+		) == 1) {
 			switch(event.type) {
 			case SDL_QUIT:
 				return 0;
@@ -100,7 +101,6 @@ int Run()
 				(ConfigDat.FPSDivisor.v == 0) ||
 				((ticks_start - ticks_last) >= FRAME_TIME_TARGET)
 			) {
-				Key_Read(PadBindings);
 				GameMain(quit);
 				if(ConfigDat.FPSDivisor.v != 0) {
 					// Since SDL_Delay() works at not-even-exact millisecond
@@ -134,7 +134,7 @@ int main(int argc, char** args)
 		return 1;
 	};
 
-	if(SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0) {
+	if(SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0) {
 		return fail(SDL_LOG_CATEGORY_VIDEO, "Error initializing SDL");
 	}
 	defer(SDL_Quit());
@@ -161,7 +161,6 @@ int main(int argc, char** args)
 	}
 
 	hWndMain = wminfo.info.win.window;
-	hInstanceMain = wminfo.info.win.hinstance;
 	if(!XInit()) {
 		// This is not a SDL error.
 		constexpr auto str = (

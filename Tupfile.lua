@@ -154,5 +154,6 @@ main_sdl_cfg = main_cfg:branch("", ANALYSIS, {
 
 main_sdl_src += "MAIN/main_sdl.cpp"
 main_sdl_src += tup.glob("platform/miniaudio/*.cpp")
+main_sdl_src += tup.glob("platform/sdl/*.cpp")
 main_sdl_obj = cxx(main_sdl_cfg, main_sdl_src)
 exe(main_sdl_cfg, (main_sdl_obj + main_obj + sdl_dll), "GIAN07")

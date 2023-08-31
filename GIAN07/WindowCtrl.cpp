@@ -14,6 +14,7 @@
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
 #include "game/input.h"
+#include <numeric>
 
 
 
@@ -97,6 +98,20 @@ static bool RingFN(
 	}
 	return onchange();
 }
+
+template <size_t N> struct LABELS {
+	const std::array<std::string_view, N> str;
+	const size_t w;
+
+	constexpr LABELS(std::array<std::string_view, N> strs) :
+		str(strs),
+		w(std::reduce(
+			strs.begin(), strs.end(), size_t{}, [](auto cur, const auto& str) {
+				return (std::max)(cur, str.length());
+			}
+		)) {
+	}
+};
 
 
 
@@ -891,8 +906,16 @@ static void SetInpItem(void)
 
 static void SetIKeyItem(void)
 {
-	sprintf(IKeyTitle[0], "Shot     [Button%2d]", ConfigDat.PadTama.v);
-	sprintf(IKeyTitle[1], "Bomb     [Button%2d]", ConfigDat.PadBomb.v);
-	sprintf(IKeyTitle[2], "SpeedDown[Button%2d]", ConfigDat.PadShift.v);
-	sprintf(IKeyTitle[3], "ESC      [Button%2d]", ConfigDat.PadCancel.v);
+	constexpr LABELS<4> labels = {{ "Shot", "Bomb", "SpeedDown", "ESC" }};
+	auto set = [](char* buf, std::string_view label, INPUT_PAD_BUTTON v) {
+		if(v > 0) {
+			sprintf(buf, "%-*s[Button%2d]", labels.w, label.data(), v);
+		} else {
+			sprintf(buf, "%-*s[--------]", labels.w, label.data());
+		}
+	};
+	set(IKeyTitle[0], labels.str[0], ConfigDat.PadTama.v);
+	set(IKeyTitle[1], labels.str[1], ConfigDat.PadBomb.v);
+	set(IKeyTitle[2], labels.str[2], ConfigDat.PadShift.v);
+	set(IKeyTitle[3], labels.str[3], ConfigDat.PadCancel.v);
 }

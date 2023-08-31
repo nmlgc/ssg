@@ -5,7 +5,6 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
-#include "DirectXUTYs/DI_UTY.H"
 #include "platform/snd.h"
 #include "game/input.h"
 

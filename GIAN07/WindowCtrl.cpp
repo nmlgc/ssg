@@ -10,10 +10,9 @@
 #include "LEVEL.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
-#include "game/input.h"
+#include "platform/input.h"
 #include <numeric>
 
 

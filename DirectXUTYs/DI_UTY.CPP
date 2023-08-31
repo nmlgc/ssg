@@ -10,7 +10,7 @@
 #define DIRECTINPUT_VERSION 0x0700
 
 #include <dinput.h>
-#include "DI_UTY.H"
+#include "platform/input.h"
 //#include "../GIAN_MAIN/GIAN.H"
 #pragma message("DI_UTY : Ver 0.10")
 

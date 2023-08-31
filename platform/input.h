@@ -1,7 +1,7 @@
-/*                                                                           */
-/*   DI_UTY.h   Direct Input 関連の関数                                      */
-/*                                                                           */
-/*                                                                           */
+/*
+ *   Keyboard and pad input interface
+ *
+ */
 
 #pragma once
 
@@ -10,8 +10,8 @@
 #include <span>
 
 // 関数プロトタイプ宣言 //
-extern bool Key_Start(void);	// キー入力開始
-extern void Key_End(void);							// キー入力終了
+bool Key_Start(void);	// キー入力開始
+void Key_End(void);	// キー入力終了
 
 void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings);
 

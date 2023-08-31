@@ -14,6 +14,7 @@
 
 #include "DX_ERROR.H"
 #include "game/input.h"
+#include <span>
 
 
 // キーボード定義用構造体 //
@@ -31,11 +32,6 @@ typedef struct tagInputConfig{
 	BYTE	KeyDLeft;			// 左下
 	BYTE	KeyDRight;			// 右下
 
-	DWORD	PadMask_Tama;		// パッド用マスク
-	DWORD	PadMask_Bomb;		//
-	DWORD	PadMask_Shift;		//
-	DWORD	PadMask_Cancel;		//
-
 	BOOL	bIsUsed[256];		// 多重定義防止用
 } InputConfig;
 
@@ -45,9 +41,8 @@ extern bool Key_Start(void);	// キー入力開始
 extern void Key_Config(INPUT_BITS Key);	// あるキーボード定数に対するコンフィグ
 extern void Key_End(void);							// キー入力終了
 
-void Key_Read(void);
+void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings);
 
 extern int  Key_PadConfig(INPUT_BITS Key);
-extern void Key_PadConfig2(BYTE PadID, INPUT_BITS KeyData);
 
 #endif

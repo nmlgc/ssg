@@ -219,7 +219,7 @@ INPUT_BITS Key_Read_DI(void)
 }
 
 
-INPUT_BITS Pad_Read(void)
+INPUT_BITS Pad_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 {
 	JOYINFOEX	joy;
 	int			x,y;
@@ -231,10 +231,13 @@ INPUT_BITS Pad_Read(void)
 		x = joy.dwXpos>>11;
 		y = joy.dwYpos>>11;
 
-		if(joy.dwButtons&IConfig.PadMask_Tama)		val |= KEY_TAMA;	// JOY_BUTTON1?
-		if(joy.dwButtons&IConfig.PadMask_Bomb)		val |= KEY_BOMB;	// JOY_BUTTON2?
-		if(joy.dwButtons&IConfig.PadMask_Shift)		val |= KEY_SHIFT;	// JOY_BUTTON5?
-		if(joy.dwButtons&IConfig.PadMask_Cancel)	val |= KEY_ESC;		// JOY_BUTTONXX
+		for(const auto& binding : PadBindings) {
+			if(binding.first > 0) {
+				if(joy.dwButtons & (1 << (binding.first - 1))) {
+					val |= binding.second;
+				}
+			}
+		}
 
 		if(x<=12)	val |= KEY_LEFT;
 		if(x>=20)	val |= KEY_RIGHT;
@@ -248,11 +251,11 @@ INPUT_BITS Pad_Read(void)
 }
 
 
-void Key_Read(void)
+void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 {
 	const auto val = (UsingDirectInput ? Key_Read_DI() : Key_Read_STD());
 	if(val == 0) {
-		Pad_Data = Pad_Read();
+		Pad_Data = Pad_Read(PadBindings);
 	}
 
 	Key_Data = (val | Pad_Data);
@@ -262,16 +265,13 @@ void Key_Read(void)
 extern int Key_PadConfig(INPUT_BITS Key)
 {
 	JOYINFOEX	joy;
-	DWORD		mask;
 	int			ret;
 
 	joy.dwSize  = sizeof(joy);
 	joy.dwFlags = JOY_RETURNBUTTONS|JOY_RETURNX|JOY_RETURNY;
 	if(joyGetPosEx(JOYSTICKID1, &joy) != JOYERR_NOERROR) return 0;
 
-	mask = joy.dwButtons;
-
-	switch(mask){
+	switch(joy.dwButtons) {
 		case JOY_BUTTON1:		ret = 1;	break;
 		case JOY_BUTTON2:		ret = 2;	break;
 		case JOY_BUTTON3:		ret = 3;	break;
@@ -308,7 +308,7 @@ extern int Key_PadConfig(INPUT_BITS Key)
 		case 0:		return -1;
 
 		default:	// 同時押しで、無効化できる //
-			ret = 0;	mask = 0;
+			ret = 0;
 		break;
 	}
 /*
@@ -322,76 +322,8 @@ extern int Key_PadConfig(INPUT_BITS Key)
 		ret = 0;
 	}
 */
-	switch(Key){
-		case(KEY_TAMA):		IConfig.PadMask_Tama   = mask;	break;
-		case(KEY_BOMB):		IConfig.PadMask_Bomb   = mask;	break;
-		case(KEY_SHIFT):	IConfig.PadMask_Shift  = mask;	break;
-		case(KEY_ESC):		IConfig.PadMask_Cancel = mask;	break;
-
-		default:	return 0;
-	}
 
 	return ret;
-}
-
-extern void Key_PadConfig2(BYTE PadID, INPUT_BITS KeyData)
-{
-	DWORD		temp;
-
-	switch(PadID){
-		case 0:		temp = 0;			break;
-
-		case 1:		temp = JOY_BUTTON1;		break;
-		case 2:		temp = JOY_BUTTON2;		break;
-		case 3:		temp = JOY_BUTTON3;		break;
-		case 4:		temp = JOY_BUTTON4;		break;
-		case 5:		temp = JOY_BUTTON5;		break;
-		case 6:		temp = JOY_BUTTON6;		break;
-		case 7:		temp = JOY_BUTTON7;		break;
-		case 8:		temp = JOY_BUTTON8;		break;
-		case 9:		temp = JOY_BUTTON9;		break;
-		case 10:	temp = JOY_BUTTON10;	break;
-		case 11:	temp = JOY_BUTTON11;	break;
-		case 12:	temp = JOY_BUTTON12;	break;
-		case 13:	temp = JOY_BUTTON13;	break;
-		case 14:	temp = JOY_BUTTON14;	break;
-		case 15:	temp = JOY_BUTTON15;	break;
-		case 16:	temp = JOY_BUTTON16;	break;
-		case 17:	temp = JOY_BUTTON17;	break;
-		case 18:	temp = JOY_BUTTON18;	break;
-		case 19:	temp = JOY_BUTTON19;	break;
-		case 21:	temp = JOY_BUTTON20;	break;
-		case 22:	temp = JOY_BUTTON21;	break;
-		case 23:	temp = JOY_BUTTON22;	break;
-		case 24:	temp = JOY_BUTTON23;	break;
-		case 25:	temp = JOY_BUTTON24;	break;
-		case 26:	temp = JOY_BUTTON26;	break;
-		case 27:	temp = JOY_BUTTON27;	break;
-		case 28:	temp = JOY_BUTTON28;	break;
-		case 29:	temp = JOY_BUTTON29;	break;
-		case 30:	temp = JOY_BUTTON30;	break;
-		case 31:	temp = JOY_BUTTON31;	break;
-		case 32:	temp = JOY_BUTTON32;	break;
-
-		default:	return;
-	}
-
-//	if(PadID == 0) temp = 0;
-//	else           temp = 1 << (PadID-1);
-
-	switch(KeyData){
-		case(KEY_TAMA):		IConfig.PadMask_Tama   = temp;	break;
-		case(KEY_BOMB):		IConfig.PadMask_Bomb   = temp;	break;
-		case(KEY_SHIFT):	IConfig.PadMask_Shift  = temp;	break;
-		case(KEY_ESC):		IConfig.PadMask_Cancel = temp;	break;
-	}
-
-	return;
-
-	//IConfig.PadMask_Tama   = JOY_BUTTON1;
-	//IConfig.PadMask_Bomb   = JOY_BUTTON2;
-	//IConfig.PadMask_Shift  = JOY_BUTTON5;
-	//IConfig.PadMask_Cancel = 0;
 }
 
 

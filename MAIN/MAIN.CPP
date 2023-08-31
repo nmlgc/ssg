@@ -70,7 +70,7 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 			// １フレーム進める //
 			tempdw = timeGetTime();
 			if(((tempdw - WaitTime) >= 16) || (ConfigDat.FPSDivisor.v == 0)) {
-				Key_Read();
+				Key_Read(PadBindings);
 
 				bool quit = false;
 				GameMain(quit);

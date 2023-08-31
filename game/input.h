@@ -6,9 +6,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <utility>
 
 // Current pressed/released state for all virtual KEY_* keys.
 using INPUT_BITS = uint16_t;
+
+// 0 = unmapped.
+using INPUT_PAD_BUTTON = uint8_t;
 
 // キーボード定数 //
 // Braced initializers cause a compile error if the constants don't fit within
@@ -31,3 +35,5 @@ constexpr INPUT_BITS KEY_DRIGHT = (KEY_DOWN | KEY_RIGHT);
 // グローバル変数(Public) //
 extern INPUT_BITS Key_Data;
 extern INPUT_BITS Pad_Data;
+
+using INPUT_PAD_BINDING = std::pair<const INPUT_PAD_BUTTON&, INPUT_BITS>;

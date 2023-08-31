@@ -47,11 +47,6 @@ bool XInit(void)
 		return false;
 	}
 
-	Key_PadConfig2(ConfigDat.PadTama.v,   KEY_TAMA);
-	Key_PadConfig2(ConfigDat.PadBomb.v,   KEY_BOMB);
-	Key_PadConfig2(ConfigDat.PadShift.v,  KEY_SHIFT);
-	Key_PadConfig2(ConfigDat.PadCancel.v, KEY_ESC);
-
 	// グラフィックの初期化 //
 	if(!DxObj.Init(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
 		return false;

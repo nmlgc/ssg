@@ -7,6 +7,7 @@
 
 #include "LEVEL.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "game/input.h"
 #include "platform/buffer.h"
 
 // フラグ //
@@ -107,16 +108,18 @@ typedef struct tagCONFIG_DATA{
 		typename T, bool (*Validate)(T) = ValidateAlways
 	> using OPTION = CONFIG_OPTION_VALUE<T, Validate>;
 
-	template <uint8_t Max> using OPTION_U8_BELOW = OPTION<uint8_t, [](auto v) {
+	template <typename T, T Max> using OPTION_BELOW = OPTION<T, [](auto v) {
 		return (v <= Max);
 	}>;
+
+	template <uint8_t Max> using OPTION_U8_BELOW = OPTION_BELOW<uint8_t, Max>;
 
 	template <uint8_t Mask> using OPTION_FLAGS = OPTION<uint8_t, [](auto v) {
 		return !(v & Mask);
 	}>;
 
 	// 32 is the WinMM joy button limit //
-	using OPTION_WINMM_PAD = OPTION_U8_BELOW<32>;
+	using OPTION_WINMM_PAD = OPTION_BELOW<INPUT_PAD_BUTTON, 32>;
 
 	// 難易度関連 //
 	// ---------- //
@@ -167,6 +170,13 @@ typedef struct tagCONFIG_DATA{
 
 // Active configuration
 extern CONFIG_DATA ConfigDat;
+
+static constexpr std::array<INPUT_PAD_BINDING, 4> PadBindings = { {
+	{ ConfigDat.PadTama.v, KEY_TAMA },
+	{ ConfigDat.PadBomb.v, KEY_BOMB },
+	{ ConfigDat.PadShift.v, KEY_SHIFT },
+	{ ConfigDat.PadCancel.v, KEY_ESC },
+} };
 
 #ifdef PBG_DEBUG
 	// デバッグ情報管理用構造体 //

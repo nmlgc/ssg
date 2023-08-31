@@ -100,7 +100,7 @@ int Run()
 				(ConfigDat.FPSDivisor.v == 0) ||
 				((ticks_start - ticks_last) >= FRAME_TIME_TARGET)
 			) {
-				Key_Read();
+				Key_Read(PadBindings);
 				GameMain(quit);
 				if(ConfigDat.FPSDivisor.v != 0) {
 					// Since SDL_Delay() works at not-even-exact millisecond

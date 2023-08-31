@@ -3,12 +3,16 @@
 /*                                                                           */
 /*                                                                           */
 
+// 更新履歴 //
+
+// 2000/01/11 : .c->.cpp に変更、英語->日本語に変更。
+
 #define DIRECTINPUT_VERSION 0x0700
 
 #include <dinput.h>
 #include "DI_UTY.H"
 //#include "../GIAN_MAIN/GIAN.H"
-#pragma message(PBGWIN_DI_UTY_H)
+#pragma message("DI_UTY : Ver 0.10")
 
 #pragma comment(lib,"dinput.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -32,11 +36,33 @@ typedef struct tagINPUT_OBJ{
 	LPDIRECTINPUTDEVICE		pdev;
 } INPUT_OBJ;
 
+// キーボード定義用構造体 //
+typedef struct tagInputConfig{
+	BYTE	KeyUp;	// 上方向に移動
+	BYTE	KeyDown;	// 下方向に移動
+	BYTE	KeyLeft;	// 左方向に移動
+	BYTE	KeyRight;	// 右方向に移動
+	BYTE	KeyTama;	// 弾発射＆決定
+	BYTE	KeyBomb;	// ボム発動＆キャンセル
+	BYTE	KeyShift;	// 低速移動
+
+	BYTE	KeyULeft;	// 左上
+	BYTE	KeyURight;	// 右上
+	BYTE	KeyDLeft;	// 左下
+	BYTE	KeyDRight;	// 右下
+
+	BOOL	bIsUsed[256];	// 多重定義防止用
+} InputConfig;
+
+
 // グローバル変数(Private)の実体 //
 bool	UsingDirectInput = false;
 INPUT_OBJ			InputObj;
 InputConfig			IConfig;
 
+
+// 秘密の関数 //
+extern void Key_Config(INPUT_BITS Key);	// あるキーボード定数に対するコンフィグ
 
 
 bool Key_Start(void)

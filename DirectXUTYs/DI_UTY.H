@@ -40,16 +40,12 @@ typedef struct tagInputConfig{
 } InputConfig;
 
 
-extern void (*Key_Read)(void);
-
-
 // 関数プロトタイプ宣言 //
 extern bool Key_Start(void);	// キー入力開始
 extern void Key_Config(INPUT_BITS Key);	// あるキーボード定数に対するコンフィグ
 extern void Key_End(void);							// キー入力終了
 
-extern void Key_Read_STD(void);
-extern void Key_Read_DI(void);
+void Key_Read(void);
 
 extern int  Key_PadConfig(INPUT_BITS Key);
 extern void Key_PadConfig2(BYTE PadID, INPUT_BITS KeyData);

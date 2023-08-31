@@ -33,16 +33,9 @@ typedef struct tagINPUT_OBJ{
 } INPUT_OBJ;
 
 // グローバル変数(Private)の実体 //
+bool	UsingDirectInput = false;
 INPUT_OBJ			InputObj;
 InputConfig			IConfig;
-
-
-// グローバル変数(Public)の実体
-void (*Key_Read)(void) = Key_Read_STD;
-
-
-// 秘密の関数 //
-INPUT_BITS Pad_Read(void);
 
 
 
@@ -116,7 +109,7 @@ bool Key_Start(void)
 	}
 
 	// ＤＩを使用した読み込み //
-	Key_Read = Key_Read_DI;
+	UsingDirectInput = true;
 
 	return TRUE;
 }
@@ -140,10 +133,10 @@ void Key_End(void)
 		InputObj.pdi = NULL;
 	}
 
-	Key_Read = Key_Read_STD;
+	UsingDirectInput = false;
 }
 
-extern void Key_Read_STD(void)
+INPUT_BITS Key_Read_STD(void)
 {
 	INPUT_BITS	val = 0;
 //	JOYINFOEX	joy;
@@ -175,14 +168,10 @@ extern void Key_Read_STD(void)
 	if(buf[VK_RETURN]&0x80)		val |= KEY_RETURN;
 	if(buf[VK_ESCAPE]&0x80)		val |= KEY_ESC;
 
-	if(val == 0){
-		Pad_Data = Pad_Read();
-	}
-
-	Key_Data = val | Pad_Data;
+	return val;
 }
 
-extern void Key_Read_DI(void)
+INPUT_BITS Key_Read_DI(void)
 {
 	static BYTE		buf[300];
 
@@ -193,12 +182,12 @@ extern void Key_Read_DI(void)
 	if(dirval != DI_OK){
 		if(dirval == DIERR_INPUTLOST){
 			dirval = InputObj.pdev->Acquire();
-			if(dirval==DI_OK) return;
+			if(dirval==DI_OK) return 0;
 		}
 
 		// キー入力ＡＰＩを通常に戻す //
 		Key_End();
-		return;
+		return 0;
 	}
 
 	if(buf[DIK_UP]&0x80)			val |= KEY_UP;
@@ -226,11 +215,7 @@ extern void Key_Read_DI(void)
 	if(buf[DIK_RETURN]&0x80)	val |= KEY_RETURN;
 	if(buf[DIK_ESCAPE]&0x80)	val |= KEY_ESC;
 
-	if(val == 0){
-		Pad_Data = Pad_Read();
-	}
-
-	Key_Data = val | Pad_Data;
+	return val;
 }
 
 
@@ -260,6 +245,17 @@ INPUT_BITS Pad_Read(void)
 	}
 
 	return 0;
+}
+
+
+void Key_Read(void)
+{
+	const auto val = (UsingDirectInput ? Key_Read_DI() : Key_Read_STD());
+	if(val == 0) {
+		Pad_Data = Pad_Read();
+	}
+
+	Key_Data = (val | Pad_Data);
 }
 
 

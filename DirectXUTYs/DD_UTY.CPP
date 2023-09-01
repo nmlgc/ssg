@@ -6,6 +6,7 @@
 #include "DD_UTY.H"
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
+#include "game/input.h"
 #include <assert.h>
 #include <d3d.h>
 #include <stdio.h>
@@ -537,8 +538,9 @@ void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, DWORD col)
 static void GrpFlipFS(void)
 {
 	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //
-	if(CaptureFlag && (GetAsyncKeyState(VK_SNAPSHOT)&0x8000))
+	if(CaptureFlag && (SystemKey_Data & SYSKEY_SNAPSHOT)) {
 		PutSurfaceToBmp(DxObj.Back);
+	}
 
 	// パレットを変更する必要があれば、変更だ //
 	if(DxObj.bNeedChgPal && DxObj.PixelFormat.IsPalettized()){
@@ -553,8 +555,9 @@ static void GrpFlipFS(void)
 static void GrpFlipWnd(void)
 {
 	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //
-	if(CaptureFlag && (GetAsyncKeyState(VK_SNAPSHOT)&0x8000))
+	if(CaptureFlag && (SystemKey_Data & SYSKEY_SNAPSHOT)) {
 		PutSurfaceToBmp(DxObj.Back);
+	}
 
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Prim->Blt(nullptr, DxObj.Back, nullptr, 0, nullptr);

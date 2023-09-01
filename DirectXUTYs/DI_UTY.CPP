@@ -162,9 +162,10 @@ void Key_End(void)
 	UsingDirectInput = false;
 }
 
-INPUT_BITS Key_Read_STD(void)
+std::pair<INPUT_BITS, INPUT_SYSTEM_BITS> Key_Read_STD(void)
 {
 	INPUT_BITS	val = 0;
+	INPUT_SYSTEM_BITS	sysval = 0;
 //	JOYINFOEX	joy;
 //	UINT		x,y;
 	BYTE		buf[256];
@@ -194,26 +195,32 @@ INPUT_BITS Key_Read_STD(void)
 	if(buf[VK_RETURN]&0x80)		val |= KEY_RETURN;
 	if(buf[VK_ESCAPE]&0x80)		val |= KEY_ESC;
 
-	return val;
+	if(buf[VK_SNAPSHOT] & 0x80)	sysval |= SYSKEY_SNAPSHOT;
+	if(buf[VK_CONTROL] & 0x80)	sysval |= SYSKEY_SKIP;
+	if(buf['F'] & 0x80)	sysval |= SYSKEY_BGM_FADE;
+	if(buf['D'] & 0x80)	sysval |= SYSKEY_BGM_DEVICE;
+
+	return std::make_pair(val, sysval);
 }
 
-INPUT_BITS Key_Read_DI(void)
+std::pair<INPUT_BITS, INPUT_SYSTEM_BITS> Key_Read_DI(void)
 {
 	static BYTE		buf[300];
 
 	HRESULT		dirval;
 	INPUT_BITS	val = 0;
+	INPUT_SYSTEM_BITS	sysval = 0;
 
 	dirval = InputObj.pdev->GetDeviceState(256,(LPVOID)buf);
 	if(dirval != DI_OK){
 		if(dirval == DIERR_INPUTLOST){
 			dirval = InputObj.pdev->Acquire();
-			if(dirval==DI_OK) return 0;
+			if(dirval==DI_OK) return std::make_pair(0, 0);
 		}
 
 		// キー入力ＡＰＩを通常に戻す //
 		Key_End();
-		return 0;
+		return std::make_pair(0, 0);
 	}
 
 	if(buf[DIK_UP]&0x80)			val |= KEY_UP;
@@ -241,7 +248,13 @@ INPUT_BITS Key_Read_DI(void)
 	if(buf[DIK_RETURN]&0x80)	val |= KEY_RETURN;
 	if(buf[DIK_ESCAPE]&0x80)	val |= KEY_ESC;
 
-	return val;
+	if(buf[DIK_SYSRQ] & 0x80)	sysval |= SYSKEY_SNAPSHOT;
+	if(buf[DIK_LCONTROL] & 0x80)	sysval |= SYSKEY_SKIP;
+	if(buf[DIK_RCONTROL] & 0x80)	sysval |= SYSKEY_SKIP;
+	if(buf[DIK_F] & 0x80)	sysval |= SYSKEY_BGM_FADE;
+	if(buf[DIK_D] & 0x80)	sysval |= SYSKEY_BGM_DEVICE;
+
+	return std::make_pair(val, sysval);
 }
 
 
@@ -280,11 +293,12 @@ INPUT_BITS Pad_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 {
 	const auto val = (UsingDirectInput ? Key_Read_DI() : Key_Read_STD());
-	if(val == 0) {
+	if(val.first == 0) {
 		Pad_Data = Pad_Read(PadBindings);
 	}
 
-	Key_Data = (val | Pad_Data);
+	Key_Data = (val.first | Pad_Data);
+	SystemKey_Data = val.second;
 }
 
 

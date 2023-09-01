@@ -32,8 +32,19 @@ constexpr INPUT_BITS KEY_URIGHT = (KEY_UP | KEY_RIGHT);
 constexpr INPUT_BITS KEY_DLEFT  = (KEY_DOWN | KEY_LEFT);
 constexpr INPUT_BITS KEY_DRIGHT = (KEY_DOWN | KEY_RIGHT);
 
+// Additional virtual keys for inputs that were read using GetAsyncKeyState()
+// in the original game. Treated separately to not complicate any existing
+// comparisons of [Key_Data] with 0.
+using INPUT_SYSTEM_BITS = uint8_t;
+
+constexpr INPUT_SYSTEM_BITS SYSKEY_SNAPSHOT   = { 0x01 };
+constexpr INPUT_SYSTEM_BITS SYSKEY_SKIP       = { 0x02 };
+constexpr INPUT_SYSTEM_BITS SYSKEY_BGM_FADE   = { 0x04 };
+constexpr INPUT_SYSTEM_BITS SYSKEY_BGM_DEVICE = { 0x08 };
+
 // グローバル変数(Public) //
 extern INPUT_BITS Key_Data;
 extern INPUT_BITS Pad_Data;
+extern INPUT_SYSTEM_BITS SystemKey_Data;
 
 using INPUT_PAD_BINDING = std::pair<const INPUT_PAD_BUTTON&, INPUT_BITS>;

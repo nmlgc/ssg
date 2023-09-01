@@ -158,7 +158,7 @@ static void enemy_set(void)
 					if(
 						(DemoplaySaveEnable || DemoplayLoadEnable) ||
 						(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE) ||
-						(GetAsyncKeyState(VK_CONTROL) & 0x8000)
+						(SystemKey_Data & SYSKEY_SKIP)
 					) {
 						CtrlFlag = true;
 					}
@@ -176,7 +176,7 @@ static void enemy_set(void)
 					else SclInfo.ReturnFlag = FALSE;
 				}
 /*
-				if((GetAsyncKeyState(VK_CONTROL)&0x8000)&&SclInfo.MsgFlag)
+				if((Key_Data & KEY_SKIP) && SclInfo.MsgFlag)
 					GameCount+=(temp-GameCount)/3;
 				else if((Key_Data&KEY_RETURN) && SclInfo.ReturnFlag==FALSE){
 					GameCount  = temp;

@@ -1410,9 +1410,11 @@ void MusicRoomProc(bool&)
 		break;
 	}
 
-	if(GetAsyncKeyState('F')&0x8000) Mid_FadeOut(120);
+	if(SystemKey_Data & SYSKEY_BGM_FADE) {
+		Mid_FadeOut(120);
+	}
 
-	if(GetAsyncKeyState('D')&0x8000){
+	if(SystemKey_Data & SYSKEY_BGM_DEVICE) {
 		if(DevChgWait==0){
 			Mid_ChgDev(1);
 			if(MusicRoomText) {

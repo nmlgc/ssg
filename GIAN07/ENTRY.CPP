@@ -12,6 +12,7 @@
 #include "platform/input.h"
 #include "platform/snd.h"
 #include "game/coords.h"
+#include "game/screenshot.h"
 
 // Mapping world coordinates to a position in the stereo field
 // -----------------------------------------------------------
@@ -77,7 +78,7 @@ bool XInit(void)
 		return false;
 	}
 
-	GrpSetCaptureFilename("秋霜");
+	ScreenshotSetPrefix(_PATH("秋霜"));
 
 	return true;
 }

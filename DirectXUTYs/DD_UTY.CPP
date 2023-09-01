@@ -7,6 +7,7 @@
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
 #include "game/input.h"
+#include "game/screenshot.h"
 #include <assert.h>
 #include <d3d.h>
 #include <stdio.h>
@@ -52,8 +53,6 @@ int CLIP_Y_MIN = 0;
 int CLIP_X_MAX = 639;
 int CLIP_Y_MAX = 479;
 
-// キャプチャーを行うか(->MtoB) //
-BOOL CaptureFlag = FALSE;
 bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 
@@ -537,9 +536,8 @@ void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, DWORD col)
 
 static void GrpFlipFS(void)
 {
-	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //
-	if(CaptureFlag && (SystemKey_Data & SYSKEY_SNAPSHOT)) {
-		PutSurfaceToBmp(DxObj.Back);
+	if(SystemKey_Data & SYSKEY_SNAPSHOT) {
+		DDrawSaveSurface(ScreenshotNextStream().get(), DxObj.Back);
 	}
 
 	// パレットを変更する必要があれば、変更だ //
@@ -554,9 +552,8 @@ static void GrpFlipFS(void)
 
 static void GrpFlipWnd(void)
 {
-	// キャプチャーフラグが有効かつ、キャプチャー要求が出ていれば画像を取り込む //
-	if(CaptureFlag && (SystemKey_Data & SYSKEY_SNAPSHOT)) {
-		PutSurfaceToBmp(DxObj.Back);
+	if(SystemKey_Data & SYSKEY_SNAPSHOT) {
+		DDrawSaveSurface(ScreenshotNextStream().get(), DxObj.Back);
 	}
 
 	DDrawRetryUntilSuccessful(DxObj, [&] {

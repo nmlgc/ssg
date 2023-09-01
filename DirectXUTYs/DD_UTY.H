@@ -28,7 +28,6 @@
 #include "platform/buffer.h"
 #include "platform/windows/surface_ddraw.h"
 #include "DX_ERROR.H"					// エラー処理用関数
-#include "MtoB.h"						// スクリーンキャプチャー
 #include <algorithm>
 #include <array>
 #include <variant>

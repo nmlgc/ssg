@@ -195,7 +195,7 @@ std::pair<INPUT_BITS, INPUT_SYSTEM_BITS> Key_Read_STD(void)
 	if(buf[VK_RETURN]&0x80)		val |= KEY_RETURN;
 	if(buf[VK_ESCAPE]&0x80)		val |= KEY_ESC;
 
-	if(buf[VK_SNAPSHOT] & 0x80)	sysval |= SYSKEY_SNAPSHOT;
+	if(buf['P'] & 0x80)	sysval |= SYSKEY_SNAPSHOT;
 	if(buf[VK_CONTROL] & 0x80)	sysval |= SYSKEY_SKIP;
 	if(buf['F'] & 0x80)	sysval |= SYSKEY_BGM_FADE;
 	if(buf['D'] & 0x80)	sysval |= SYSKEY_BGM_DEVICE;
@@ -248,7 +248,7 @@ std::pair<INPUT_BITS, INPUT_SYSTEM_BITS> Key_Read_DI(void)
 	if(buf[DIK_RETURN]&0x80)	val |= KEY_RETURN;
 	if(buf[DIK_ESCAPE]&0x80)	val |= KEY_ESC;
 
-	if(buf[DIK_SYSRQ] & 0x80)	sysval |= SYSKEY_SNAPSHOT;
+	if(buf[DIK_P] & 0x80)	sysval |= SYSKEY_SNAPSHOT;
 	if(buf[DIK_LCONTROL] & 0x80)	sysval |= SYSKEY_SKIP;
 	if(buf[DIK_RCONTROL] & 0x80)	sysval |= SYSKEY_SKIP;
 	if(buf[DIK_F] & 0x80)	sysval |= SYSKEY_BGM_FADE;

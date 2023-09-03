@@ -11,6 +11,8 @@
 #include <stdint.h>
 
 // 定数＆マクロ //
+using SND_INSTANCE_ID = uint8_t;
+
 #define SND_OBJ_MAX			30				// 効果音の種類の最大数
 
 // Constants for mapping the [x] parameter from any source unit to a position
@@ -24,7 +26,7 @@ extern const int SND_X_PER_DECIBEL;
 bool SndInit(void);
 void SndCleanup(void);
 
-bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max);
+bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
 
 // 再生＆停止 //
 void SndPlay(uint8_t id, int x = SND_X_MID, bool loop = false);

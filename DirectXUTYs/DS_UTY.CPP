@@ -86,7 +86,7 @@ typedef struct tagSE_STRUCT{
 	BYTE				*data;		//
 	DWORD				size;		//
 	int					max;		//
-	int					now;		//
+	SND_INSTANCE_ID	now;
 	IDirectSoundBuffer	*buf[1];	//
 } SE_STRUCT,*LPSE_STRUCT;
 
@@ -143,7 +143,7 @@ void SndCleanup(void)
 }
 
 // ＷＡＶファイルロード(ある制限があるが...) //
-bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max)
+bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 {
 	LPSE_STRUCT		p;
 	HRESULT			dsrval;
@@ -153,6 +153,9 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, int max)
 
 	if(Snd_DS==NULL) return FALSE;
 
+	if(max == 0) {
+		return false;
+	}
 	if(id>=SND_OBJ_MAX) return FALSE;
 	se = &Snd_OBJ[id];
 

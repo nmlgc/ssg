@@ -49,7 +49,7 @@ bool DDrawSaveSurface(const PATH_LITERAL s, IDirectDrawSurface* surf)
 		-static_cast<int32_t>(desc.dwHeight)
 	};
 	const std::span<const std::byte> pixels = {
-		reinterpret_cast<const std::byte *>(desc.lpSurface),
+		static_cast<const std::byte *>(desc.lpSurface),
 		size_t(desc.lPitch * desc.dwHeight),
 	};
 	const auto ret = BMPSave(s, size, 1, bpp, palette, pixels);

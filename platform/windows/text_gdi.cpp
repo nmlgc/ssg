@@ -20,7 +20,7 @@ TEXTRENDER_GDI_SESSION_BASE::TEXTRENDER_GDI_SESSION_BASE(
 	//   rectangle.
 	const PIXEL_LTRB ltrb = rect;
 	const RECT r = { ltrb.left, ltrb.top, ltrb.right, ltrb.bottom };
-	auto black = reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
+	auto black = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
 	const auto rect_filled_with_black = FillRect(hdc, &r, black);
 	const auto background_mode_set_to_transparent = SetBkMode(hdc, TRANSPARENT);
 	assert(rect_filled_with_black);

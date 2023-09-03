@@ -50,7 +50,7 @@ public:
 	}
 
 	BIT_DEVICE_READ(const void* mem,size_t size) :
-		buffer({ reinterpret_cast<const uint8_t *>(mem), size }) {
+		buffer({ static_cast<const uint8_t *>(mem), size }) {
 	}
 
 	// Returns 0xFF if we're at the end of the stream.

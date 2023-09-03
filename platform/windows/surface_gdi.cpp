@@ -88,7 +88,7 @@ bool SURFACE_GDI::Save(const PATH_LITERAL s) const
 		palette = bgra;
 	}
 	const std::span<const std::byte> pixels = {
-		reinterpret_cast<const std::byte *>(dib.dsBm.bmBits),
+		static_cast<const std::byte *>(dib.dsBm.bmBits),
 		size_t(dib.dsBm.bmWidthBytes * dib.dsBm.bmHeight)
 	};
 	return BMPSave(

@@ -178,7 +178,7 @@ PIXEL_LTWH TEXTRENDER_PACKED::Subrect(
 TEXTRENDER_RECT_ID TEXTRENDER_PACKED::Register(const PIXEL_SIZE& size)
 {
 	rects.emplace_back(Insert(size));
-	return TEXTRENDER_RECT_ID(rects.size() - 1);
+	return static_cast<TEXTRENDER_RECT_ID>(rects.size() - 1);
 }
 
 bool TEXTRENDER_PACKED::Wipe()

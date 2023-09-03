@@ -64,13 +64,13 @@ static const char ATAN256[]={
 long __fastcall sinl(uint8_t deg,int length)
 {
 	//return ((long)sinm(deg)*length)/256;
-	return ((long)sinm(deg)*length)>>8;
+	return ((static_cast<long>(sinm(deg)) * length) >> 8);
 }
 
 long __fastcall cosl(uint8_t deg,int length)
 {
 	//return ((long)cosm(deg)*length)/256;
-	return ((long)cosm(deg)*length)>>8;
+	return ((static_cast<long>(cosm(deg)) * length) >> 8);
 }
 
 // length*256/(SIN(deg)>0 ? SIN(deg) : 256) //

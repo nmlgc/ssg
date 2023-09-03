@@ -16,9 +16,9 @@ PALETTE PALETTE::Fade(uint8_t alpha, uint8_t first, uint8_t last) const
 	const auto src_end = (cbegin() + last + 1);
 	for(auto src_it = (cbegin() + first); src_it < src_end; src_it++) {
 		ret[src_it - cbegin()] = RGBA{
-			.r = uint8_t( (src_it->r * a16) / 255 ),
-			.g = uint8_t( (src_it->g * a16) / 255 ),
-			.b = uint8_t( (src_it->b * a16) / 255 ),
+			.r = static_cast<uint8_t>((src_it->r * a16) / 255),
+			.g = static_cast<uint8_t>((src_it->g * a16) / 255),
+			.b = static_cast<uint8_t>((src_it->b * a16) / 255),
 		};
 	}
 	return ret;

@@ -51,7 +51,7 @@ bool SURFACE_GDI::Save(const PATH_LITERAL s) const
 		);
 
 		auto* info = reinterpret_cast<BMP_INFOHEADER *>(info_buf.data());
-		std::span<BGRA> palette = {
+		const std::span<BGRA> palette = {
 			reinterpret_cast<BGRA *>(&info[1]), palette_size
 		};
 

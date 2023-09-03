@@ -50,7 +50,7 @@ static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
 
 static size_t LoadInplace(std::span<uint8_t> buf, HANDLE&& handle)
 {
-	auto ret = HandleRead(buf, handle);
+	const auto ret = HandleRead(buf, handle);
 	CloseHandle(handle);
 	return ret;
 }
@@ -59,7 +59,7 @@ static bool WriteAndClose(
 	HANDLE&& handle, std::span<const BYTE_BUFFER_BORROWED> bufs
 )
 {
-	auto ret = [&]() {
+	const auto ret = [&]() {
 		for(const auto& buf : bufs) {
 			if(!HandleWrite(handle, buf)) {
 				return false;
@@ -145,7 +145,7 @@ public:
 
 	bool Seek(int64_t offset, SEEK_WHENCE whence) override {
 		DWORD origin;
-		LARGE_INTEGER offset_large = { .QuadPart = offset };
+		const LARGE_INTEGER offset_large = { .QuadPart = offset };
 		switch(whence) {
 		case SEEK_WHENCE::BEGIN:  	origin = FILE_BEGIN;  	break;
 		case SEEK_WHENCE::CURRENT:	origin = FILE_CURRENT;	break;

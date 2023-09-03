@@ -56,7 +56,7 @@ template <
 	template <typename T> std::optional<std::span<transfer_const<T>>> next(
 		size_t n = 1
 	) {
-		auto cursor_new = (cursor + (sizeof(T) * n));
+		const auto cursor_new = (cursor + (sizeof(T) * n));
 		if((cursor_new > this->size()) || (cursor_new < cursor)) {
 			return std::nullopt;
 		}

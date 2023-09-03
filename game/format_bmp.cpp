@@ -9,7 +9,7 @@
 
 constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp)
 {
-	auto ret = [bpp]() -> uint16_t {
+	const auto ret = [bpp]() -> uint16_t {
 		if(bpp <= 4) {
 			return (1 << 4);
 		} else if(bpp <= 8) {
@@ -89,7 +89,7 @@ bool BMPSave(
 	std::span<const std::byte> pixels
 )
 {
-	BMP_INFOHEADER header_info = {
+	const BMP_INFOHEADER header_info = {
 		.biSize = sizeof(BMP_INFOHEADER),
 		.biWidth = size.w,
 		.biHeight = size.h,

@@ -21,8 +21,8 @@ TEXTRENDER_GDI_SESSION_BASE::TEXTRENDER_GDI_SESSION_BASE(
 	const PIXEL_LTRB ltrb = rect;
 	const RECT r = { ltrb.left, ltrb.top, ltrb.right, ltrb.bottom };
 	auto black = reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
-	auto rect_filled_with_black = FillRect(hdc, &r, black);
-	auto background_mode_set_to_transparent = SetBkMode(hdc, TRANSPARENT);
+	const auto rect_filled_with_black = FillRect(hdc, &r, black);
+	const auto background_mode_set_to_transparent = SetBkMode(hdc, TRANSPARENT);
 	assert(rect_filled_with_black);
 	assert(background_mode_set_to_transparent);
 }
@@ -44,7 +44,7 @@ void TEXTRENDER_GDI_SESSION_BASE::SetFont(size_t id)
 
 void TEXTRENDER_GDI_SESSION_BASE::SetColor(const RGBA& color)
 {
-	COLORREF color_gdi = RGB(color.r, color.g, color.b);
+	const COLORREF color_gdi = RGB(color.r, color.g, color.b);
 	if(color_cur != color_gdi) {
 		SetTextColor(hdc, color_gdi);
 		color_cur = color_gdi;

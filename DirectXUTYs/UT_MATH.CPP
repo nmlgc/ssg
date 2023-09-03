@@ -76,14 +76,14 @@ long __fastcall cosl(uint8_t deg,int length)
 // length*256/(SIN(deg)>0 ? SIN(deg) : 256) //
 long __fastcall sinDiv(uint8_t deg, int length)
 {
-	int sind = sinm(deg);
+	const int sind = sinm(deg);
 	return (length<<8) / (sind>0 ? sind : 256);
 }
 
 // length*256/(COS(deg)>0 ? COS(deg) : 256) //
 long __fastcall cosDiv(uint8_t deg, int length)
 {
-	int cosd = cosm(deg);
+	const int cosd = cosm(deg);
 	return (length<<8) / (cosd>0 ? cosd : 256);
 }
 

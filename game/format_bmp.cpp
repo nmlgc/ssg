@@ -60,7 +60,7 @@ std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
 		assert(!"Needs a palette, but doesn't contain a full one?");
 		return std::nullopt;
 	}
-	auto& palette = maybe_palette.value();
+	auto palette = maybe_palette.value();
 
 	// [header_info.biSizeImage] can be 0, so we have to manually calculate the
 	// actual size allocated by CreateDIBSection() by DWORD-aligning the row
@@ -75,7 +75,7 @@ std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
 		assert(!"Does not contain all pixels?");
 		return std::nullopt;
 	}
-	auto& pixels = maybe_pixels.value();
+	auto pixels = maybe_pixels.value();
 
 	return BMP_OWNED{ std::move(buffer), header_info, palette, pixels };
 }

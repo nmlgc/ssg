@@ -276,7 +276,7 @@ PACKFILE_READ FilStartR(const PATH_LITERAL s)
 	if(!maybe_info) {
 		return {};
 	}
-	const auto& info = maybe_info.value();
+	const auto info = maybe_info.value();
 
 	// Checksums
 	fil_checksum_t total_checksum = 0;

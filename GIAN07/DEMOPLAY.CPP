@@ -135,7 +135,7 @@ bool DemoplayLoad(int stage)
 		if(!maybe_inputs) {
 			return false;
 		}
-		const auto& inputs = maybe_inputs.value();
+		const auto inputs = maybe_inputs.value();
 		memcpy(DemoBuffer, inputs.data(), inputs.size_bytes());
 	}
 	return DemoplayLoadSetup();

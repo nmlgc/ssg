@@ -50,7 +50,7 @@ typedef struct tagMSG_WINDOW{
 
 	void MsgBlank() {
 		Line = 0;
-		for(auto& msg : Msg) {
+		for(auto msg : Msg) {
 			msg = {};
 		}
 		Text.clear();
@@ -351,7 +351,7 @@ void MWinDraw(void)
 			// セットされたフォントで描画
 			s.SetFont(MsgWindow.FontID);
 			for(auto i = 0; i < MsgWindow.Line; i++) {
-				const auto& line = MsgWindow.Msg[i];
+				const auto line = MsgWindow.Msg[i];
 
 				// 一応安全対策
 				if(line.empty()) {
@@ -442,7 +442,7 @@ void MWinMsg(std::string_view s)
 	}
 
 	MsgWindow.Text.clear();
-	for(const auto& s : MsgWindow.Msg) {
+	for(const auto s : MsgWindow.Msg) {
 		MsgWindow.Text += s;
 		MsgWindow.Text += '\n';
 	}

@@ -124,7 +124,7 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, BYTE id, int max)
 	if(!maybe_data) {
 		return false;
 	}
-	const auto& data = maybe_data.value();
+	const auto data = maybe_data.value();
 
 	p->data = (BYTE *)LocalAlloc(LPTR,datalen);
 	memcpy(p->data, data.data(), data.size_bytes());

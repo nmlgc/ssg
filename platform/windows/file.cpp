@@ -102,7 +102,7 @@ BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
 		return {};
 	}
 
-	return std::move(buf);
+	return buf;
 }
 
 bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)

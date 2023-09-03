@@ -100,7 +100,7 @@ void DemoplaySaveDemo(void)
 	DemoBuffer[DemoBufPtr] = KEY_ESC;
 	DemoInfo.DataSize = DemoBufPtr+1;
 
-	PATH_CODEPOINT fn[] = _PATH("STG_Demo.DAT");
+	PATH_CODEUNIT fn[] = _PATH("STG_Demo.DAT");
 	fn[3] = ('0' + GameStage);
 
 	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {

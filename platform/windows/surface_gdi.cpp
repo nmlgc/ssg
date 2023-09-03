@@ -9,7 +9,7 @@
 #include <array>
 #include <assert.h>
 
-SURFACE_GDI::SURFACE_GDI() :
+SURFACE_GDI::SURFACE_GDI() noexcept :
 	dc(CreateCompatibleDC(GetDC(nullptr)))
 {
 }
@@ -101,7 +101,7 @@ bool SURFACE_GDI::Save(const PATH_LITERAL s) const
 	);
 }
 
-void SURFACE_GDI::Delete()
+void SURFACE_GDI::Delete() noexcept
 {
 	if(img) {
 		SelectObject(dc, stock_img);

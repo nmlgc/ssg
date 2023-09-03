@@ -83,7 +83,7 @@ struct PACKFILE_READ {
 	const BYTE_BUFFER_OWNED packfile;
 	const std::span<const PBG_FILEINFO> info;
 
-	PACKFILE_READ(std::nullptr_t null = nullptr) {
+	PACKFILE_READ(std::nullptr_t null = nullptr) noexcept {
 	}
 
 	PACKFILE_READ(

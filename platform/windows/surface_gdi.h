@@ -24,7 +24,7 @@ public:
 	// Always has any valid [img] selected into it.
 	HDC dc;
 
-	SURFACE_GDI();
+	SURFACE_GDI() noexcept;
 	SURFACE_GDI(const SURFACE_GDI&) = delete;
 	SURFACE_GDI& operator=(const SURFACE_GDI&) = delete;
 	~SURFACE_GDI();
@@ -35,5 +35,5 @@ public:
 	// Saves [img] to a .BMP file with the given name.
 	bool Save(const PATH_LITERAL s) const;
 
-	void Delete();
+	void Delete() noexcept;
 };

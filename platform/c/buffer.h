@@ -34,7 +34,7 @@ struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 		BYTE_BUFFER_BORROWED(std::span<const T>{ val.data(), val.size() }) {
 	}
 
-	BYTE_BUFFER_BORROWED(const std::string_view str) :
+	BYTE_BUFFER_BORROWED(const std::string_view str) noexcept :
 		span({ reinterpret_cast<const uint8_t *>(str.data()), str.length() }) {
 	}
 };
@@ -76,7 +76,7 @@ private:
 
 public:
 	// Creates an empty buffer, with no allocation.
-	BYTE_BUFFER_OWNED(std::nullptr_t null = nullptr) :
+	BYTE_BUFFER_OWNED(std::nullptr_t null = nullptr) noexcept :
 		std::unique_ptr<uint8_t[]>(null),
 		size_(0) {
 	}

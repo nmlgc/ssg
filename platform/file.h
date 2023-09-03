@@ -67,7 +67,7 @@ enum class SEEK_WHENCE {
 
 struct FILE_STREAM {
 	virtual ~FILE_STREAM() {};
-	virtual explicit operator bool() = 0;
+	virtual explicit operator bool() noexcept = 0;
 };
 
 struct FILE_STREAM_SEEK : FILE_STREAM {

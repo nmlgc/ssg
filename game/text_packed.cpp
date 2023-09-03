@@ -27,9 +27,9 @@ struct created_splits {
 		return created_splits();
 	}
 
-	template <class... Args>
-	created_splits(Args&&... args) : spaces({ std::forward<Args>(args)... }) {
-		count = sizeof...(Args);
+	template <class... Args> created_splits(Args&&... args) noexcept :
+		count(sizeof...(Args)),
+		spaces({ std::forward<Args>(args)... }) {
 	}
 
 	explicit operator bool() const {

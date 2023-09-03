@@ -118,7 +118,7 @@ struct WORLD_POINT {
 	WORLD_COORD x;
 	WORLD_COORD y;
 
-	WORLD_POINT() {
+	WORLD_POINT() noexcept {
 	}
 
 	// World-space points should never be constructed from integer literals.

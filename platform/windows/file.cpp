@@ -139,7 +139,7 @@ public:
 		}
 	}
 
-	explicit operator bool() override {
+	explicit operator bool() noexcept override {
 		return (handle != INVALID_HANDLE_VALUE);
 	};
 

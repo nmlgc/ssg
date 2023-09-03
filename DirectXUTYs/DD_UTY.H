@@ -90,7 +90,7 @@ public:
 		}
 
 	public:
-		constexpr BITDEPTH() :
+		constexpr BITDEPTH() noexcept :
 			bpp(0) {
 		}
 		constexpr BITDEPTH(const BITDEPTH& other) = default;

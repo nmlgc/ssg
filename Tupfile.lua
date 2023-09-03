@@ -108,11 +108,14 @@ main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, {
 	}
 })
 
-main_src += tup.glob("game/*.cpp")
-main_src += tup.glob("platform/windows/*.cpp")
+modern_src += tup.glob("game/*.cpp")
+modern_src += tup.glob("platform/windows/*.cpp")
 main_src += tup.glob("DirectXUTYs/*.CPP")
 main_src += tup.glob("DirectXUTYs/*.cpp")
 main_src += tup.glob("GIAN07/*.cpp")
 main_src += tup.glob("GIAN07/*.CPP")
 main_src += "MAIN/MAIN.CPP"
-exe(main_cfg, cxx(main_cfg, main_src), "GIAN07")
+
+main_obj = (cxx(main_cfg, modern_src) + cxx(main_cfg, main_src))
+
+exe(main_cfg, main_obj, "GIAN07")

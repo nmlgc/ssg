@@ -66,6 +66,6 @@ void TEXTRENDER_GDI_SESSION_BASE::Put(
 		.right = (rect.left + rect.w),
 		.bottom = (rect.top + rect.h),
 	};
-	const UINT flags = (DT_LEFT | DT_TOP | DT_SINGLELINE);
+	constexpr UINT flags = (DT_LEFT | DT_TOP | DT_SINGLELINE);
 	DrawTextA(hdc, str.data(), str.size(), &r, flags);
 }

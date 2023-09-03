@@ -28,7 +28,7 @@ static HANDLE OpenWrite(const PATH_LITERAL s, DWORD disposition)
 
 static size_t HandleRead(std::span<uint8_t> buf, HANDLE handle)
 {
-	DWORD bytes_read;
+	[[gsl::suppress(type.5)]] DWORD bytes_read;
 	if((handle == INVALID_HANDLE_VALUE) || !ReadFile(
 		handle, buf.data(), buf.size_bytes(), &bytes_read, nullptr
 	)) {
@@ -39,7 +39,7 @@ static size_t HandleRead(std::span<uint8_t> buf, HANDLE handle)
 
 static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
 {
-	DWORD bytes_written;
+	[[gsl::suppress(type.5)]] DWORD bytes_written;
 	if((handle == INVALID_HANDLE_VALUE) || !WriteFile(
 		handle, buf.data(), buf.size_bytes(), &bytes_written, nullptr
 	)) {
@@ -144,7 +144,7 @@ public:
 	};
 
 	bool Seek(int64_t offset, SEEK_WHENCE whence) override {
-		DWORD origin;
+		DWORD origin = FILE_BEGIN;
 		const LARGE_INTEGER offset_large = { .QuadPart = offset };
 		switch(whence) {
 		case SEEK_WHENCE::BEGIN:  	origin = FILE_BEGIN;  	break;
@@ -155,7 +155,7 @@ public:
 	};
 
 	std::optional<int64_t> Tell() override {
-		LARGE_INTEGER ret;
+		[[gsl::suppress(type.5)]] LARGE_INTEGER ret;
 		if(!SetFilePointerEx(handle, { 0 }, &ret, FILE_CURRENT)) {
 			return std::nullopt;
 		}

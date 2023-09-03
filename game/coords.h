@@ -118,6 +118,7 @@ struct WORLD_POINT {
 	WORLD_COORD x;
 	WORLD_COORD y;
 
+	[[gsl::suppress(type.6)]]
 	WORLD_POINT() noexcept {
 	}
 

@@ -16,7 +16,7 @@ class SURFACE_GDI : public SURFACE {
 public:
 	// Required for unselecting [img] prior to deleting it. Could have probably
 	// been `static`, but let's keep it correct for now.
-	HGDIOBJ stock_img;
+	HGDIOBJ stock_img = nullptr;
 
 	// Source bitmap data, if any.
 	HBITMAP img = nullptr;

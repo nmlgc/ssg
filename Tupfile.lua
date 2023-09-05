@@ -89,6 +89,30 @@ sdl_dll = (
 )
 -- ---
 
+-- Static analysis using the C++ Core Guideline checker plugin.
+ANALYSIS_CFLAGS = (
+	"/analyze:autolog- /analyze:plugin EspXEngine.dll " ..
+	"/external:W0 /external:anglebrackets /analyze:external- " ..
+
+	-- Critical warnings
+	"/we26819 " .. -- Unannotated fallthrough between switch labels
+
+	-- Disabled warnings
+	"/wd4834 " .. -- Discarding `[[nodiscard]]` (C6031 covers this and more)
+	"/wd26432 " .. -- Rule of Five boilerplate
+	"/wd26440 " .. -- `noexcept` all the things
+	"/wd26481 " .. -- Don't use pointer arithmetic
+	"/wd26482 " .. -- Only index into arrays using constant expressions
+	"/wd26490 " .. -- Don't use `reinterpret_cast`
+	"/wd26429 /wd26446 /wd26472 /wd26821" -- Guideline Support Library
+)
+
+ANALYSIS = {
+	buildtypes = {
+		release = { cflags = ANALYSIS_CFLAGS },
+	},
+}
+
 main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, {
 	base = {
 		cflags = (
@@ -108,6 +132,7 @@ main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, {
 	}
 })
 
+modern_cfg = main_cfg:branch(tup.getconfig("BUILDTYPE"), ANALYSIS)
 modern_src += tup.glob("game/*.cpp")
 modern_src += tup.glob("platform/windows/*.cpp")
 main_src += tup.glob("DirectXUTYs/*.CPP")
@@ -116,6 +141,6 @@ main_src += tup.glob("GIAN07/*.cpp")
 main_src += tup.glob("GIAN07/*.CPP")
 main_src += "MAIN/MAIN.CPP"
 
-main_obj = (cxx(main_cfg, modern_src) + cxx(main_cfg, main_src))
+main_obj = (cxx(modern_cfg, modern_src) + cxx(main_cfg, main_src))
 
 exe(main_cfg, main_obj, "GIAN07")

@@ -207,11 +207,9 @@ int32_t isqrt(int32_t s)
 	// we need to round down. By once again taking the difference between the
 	// two squares (2𝓃 + 1), and halving it to arrive at the arithmetic mean
 	// between the two, we get (𝓃 + 0.5), which we can round up to (𝓃 + 1).
-	//
-	// Note that [root_plus_1] being unsigned turns this into an unsigned
-	// comparison, so it will evaluate to `false` if [s] is ≤ 0 (and
-	// [root_plus_1], consequently, is 0 as well).
-	if((((root_plus_1 * root_plus_1) - root_plus_1) + 1) > s) {
+	// The remaining [error] already tells us the negated difference between
+	// [root_plus_1]² and [s].
+	if((-error >= root_plus_1) && (s > 0)) {
 		return (root_plus_1 - 1);
 	}
 	return root_plus_1;

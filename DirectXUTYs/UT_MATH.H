@@ -45,7 +45,8 @@ uint8_t __stdcall atan8(int x,int y);				// ３２ビット版です
 
 
 // 平方根(整数版) //
-int isqrt(int s);
+// Calculates √[s], rounded to the nearest integer.
+int32_t isqrt(int32_t s);
 
 
 // 乱数 //

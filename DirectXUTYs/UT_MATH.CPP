@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "UT_MATH.H"
+#include <type_traits>
 #pragma message(PBGWIN_UT_MATH_H)
 
 
@@ -165,30 +166,55 @@ void __fastcall rnd_seed_set(uint32_t val)
 	random_seed = val;
 }
 
-int isqrt(int s)
+int32_t isqrt(int32_t s)
 {
-	_asm{
-			MOV		ECX,s
-			MOV		EBX,ECX
-			MOV		EAX,1
-			JMP		SHORT CHK
-		LP1:
-			SUB		ECX,EAX
-			ADD		EAX,2
-		CHK:
-			OR		ECX,ECX
-			JGE		LP1
-			SAR		EAX,1
-			MOV		ECX,EAX
-			IMUL	ECX
-			SUB		EAX,ECX
-			INC		EAX
-			CMP		EAX,EBX
-			JBE		FIN
-			DEC		ECX
-		FIN:
-			MOV		EAX,ECX
+	auto error = s;
+
+	// Continuously subtract integer squares (1², 2², 3³, …) from [s] until [s]
+	// is smaller.
+	// This can be done without multiplications by considering the difference
+	// between two consecutive integer squares (𝓃 and 𝓃+1):
+	//
+	// 	d(𝓃) = ((𝓃 + 1)² - 𝓃²) = (2𝓃 + 1)
+	//
+	// Defined recursively:
+	//
+	// 	d(0) = 1
+	// 	d(𝓃) = (2𝓃 + 1)
+	// 	d(𝓃 + 1) = (2(𝓃 + 1) + 1),	multiplied out:
+	// 	d(𝓃 + 1) = (2𝓃 + 2 + 1),  	and with d(𝓃) = (2𝓃 + 1) extracted:
+	// 	d(𝓃 + 1) = (d(𝓃) + 2)
+	//
+	// That is, start with 1, and add 2 on every iteration.
+	//
+	// This is a descending variant of the addition-based linear search
+	// algorithm found on Wikipedia:
+	//
+	// 	https://en.wikipedia.org/w/index.php?title=Integer_square_root&oldid=1174298171#Linear_search_using_addition
+	//
+	// By deriving the loop count from the accumulator, this variant saves one
+	// variable. It also adds 1 to the result we would otherwise get from the
+	// Wikipedia algorithm, which always rounds up the result to the next
+	// higher integer root.
+	std::make_unsigned_t<decltype(s)> acc = 1;
+	while(error >= 0) {
+		error -= acc;
+		acc += 2;
 	}
+	auto root_plus_1 = (acc >> 1); // = number of iterations
+
+	// If [s] is closer to ([root_plus_1] - 1)² than it is to [root_plus_1]²,
+	// we need to round down. By once again taking the difference between the
+	// two squares (2𝓃 + 1), and halving it to arrive at the arithmetic mean
+	// between the two, we get (𝓃 + 0.5), which we can round up to (𝓃 + 1).
+	//
+	// Note that [root_plus_1] being unsigned turns this into an unsigned
+	// comparison, so it will evaluate to `false` if [s] is ≤ 0 (and
+	// [root_plus_1], consequently, is 0 as well).
+	if((((root_plus_1 * root_plus_1) - root_plus_1) + 1) > s) {
+		return (root_plus_1 - 1);
+	}
+	return root_plus_1;
 }
 
 uint16_t __fastcall rnd(void)

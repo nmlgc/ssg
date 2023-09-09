@@ -6,6 +6,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include "platform/file.h"
+#include <assert.h>
 #include <windows.h>
 
 static HANDLE OpenRead(const PATH_LITERAL s)
@@ -131,17 +132,12 @@ struct FILE_STREAM_WIN32 : public FILE_STREAM_WRITE {
 public:
 	FILE_STREAM_WIN32(HANDLE handle) :
 		handle(handle) {
+		assert(handle != INVALID_HANDLE_VALUE);
 	}
 
 	~FILE_STREAM_WIN32() {
-		if(*this) {
-			CloseHandle(handle);
-		}
+		CloseHandle(handle);
 	}
-
-	explicit operator bool() noexcept override {
-		return (handle != INVALID_HANDLE_VALUE);
-	};
 
 	bool Seek(int64_t offset, SEEK_WHENCE whence) override {
 		DWORD origin = FILE_BEGIN;
@@ -169,8 +165,12 @@ public:
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const PATH_LITERAL s)
 {
+	auto handle = OpenWrite(s, CREATE_ALWAYS);
+	if(handle == INVALID_HANDLE_VALUE) {
+		return nullptr;
+	}
 	return std::unique_ptr<FILE_STREAM_WIN32>(
-		new (std::nothrow) FILE_STREAM_WIN32(OpenWrite(s, CREATE_ALWAYS))
+		new (std::nothrow) FILE_STREAM_WIN32(handle)
 	);
 }
 // -------

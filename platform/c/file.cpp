@@ -4,6 +4,7 @@
  */
 
 #include "platform/file.h"
+#include <assert.h>
 #include <io.h>
 
 static size_t LoadInplace(std::span<uint8_t> buf, FILE*&& fp)
@@ -90,17 +91,12 @@ struct FILE_STREAM_C : public FILE_STREAM_WRITE {
 public:
 	FILE_STREAM_C(FILE* fp) :
 		fp(fp) {
+		assert(fp != nullptr);
 	}
 
 	~FILE_STREAM_C() {
-		if(fp) {
-			fclose(fp);
-		}
+		fclose(fp);
 	}
-
-	explicit operator bool() override {
-		return (fp != nullptr);
-	};
 
 	bool Seek(int64_t offset, SEEK_WHENCE whence) override {
 		int origin;
@@ -127,8 +123,10 @@ public:
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const PATH_LITERAL s)
 {
-	return std::unique_ptr<FILE_STREAM_C>(new (std::nothrow) FILE_STREAM_C(
-		fopen(s, "wb")
-	));
+	auto* fp = fopen(s, "wb");
+	if(!fp) {
+		return nullptr;
+	}
+	return std::unique_ptr<FILE_STREAM_C>(new (std::nothrow) FILE_STREAM_C(fp));
 }
 // -------

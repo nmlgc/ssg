@@ -8,8 +8,7 @@
 #pragma message(PBGWIN_UT_MATH_H)
 
 
-#define RANDH	0x015a
-#define RANDL	0x4e35
+constexpr uint32_t RAND_A = 22695477; // 0x015a4e35
 
 static uint32_t random_seed; // 乱数のたね //
 //uint32_t random_ref;
@@ -223,22 +222,6 @@ int32_t isqrt(int32_t s)
 
 uint16_t __fastcall rnd(void)
 {
-	_asm{
-		MOV	AX,RANDL
-		MUL	word ptr random_seed+2
-		MOV	CX,AX
-		MOV	AX,RANDH
-		MUL	word ptr random_seed
-		ADD	CX,AX
-		MOV	AX,RANDL
-		MUL	word ptr random_seed
-		ADD	AX,1
-		ADC	DX,CX
-		MOV	word ptr random_seed,AX
-		MOV	AX,DX
-		MOV	word ptr random_seed+2,AX
-		AND	AH,7fh
-
-		//MOV	result,AX
-	}
+	random_seed = ((random_seed * RAND_A) + 1);
+	return ((random_seed >> 16) & 0x7FFF);
 }

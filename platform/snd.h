@@ -32,6 +32,10 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
 void SndPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
 void SndStop(uint8_t id);
 
+// Pause or resume all playing sounds if the window loses focus //
+void SndPauseAll();
+void SndResumeAll();
+
 inline void SndStopAll(void)
 {
 	for(auto i = 0; i < SND_OBJ_MAX; i++) {

@@ -261,6 +261,17 @@ void SndStop(uint8_t id)
 	}
 }
 
+// These are no-ops – by default, DirectSound pauses and resumes all playing
+// buffers as the window loses and regains focus. This behavior can be changed
+// by setting the DSBCAPS_GLOBALFOCUS flag on a buffer, but none of our buffers
+// do so yet.
+void SndPauseAll()
+{
+}
+void SndResumeAll()
+{
+}
+
 bool SndFillBuffer(IDirectSoundBuffer *ds, uint8_t *data, size_t size)
 {
 	LPVOID	pMem1,pMem2;

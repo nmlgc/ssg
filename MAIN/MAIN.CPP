@@ -4,6 +4,7 @@
 #include "DirectXUTYs/DI_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "strings/title.h"
+#include "platform/snd.h"
 #include "platform/unicode.h"
 #include <direct.h>
 
@@ -99,10 +100,12 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if(bIsActive){
 				bMouseVisible = FALSE;
 				Mid_Play();
+				SndResumeAll();
 			}
 			else{
 				bMouseVisible = TRUE;
 				Mid_Stop();
+				SndPauseAll();
 			}
 		break;
 

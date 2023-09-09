@@ -168,51 +168,57 @@ void __fastcall rnd_seed_set(uint32_t val)
 
 int32_t isqrt(int32_t s)
 {
+	// Near-constant-time integer square root algorithm, adapted from
+	//
+	// 	https://en.wikipedia.org/w/index.php?title=Methods_of_computing_square_roots&oldid=1170166684#Binary_numeral_system_(base_2)
+	//
+	// The linear ASM algorithm used by the original game takes ~15 hours on an
+	// Intel Core i5 8400T to run over the entire domain from 0 to (2³¹ - 1).
+	// In contrast, this one takes just 50 seconds to cover the same domain and
+	// return the same results. Interestingly, it's not *that* much slower than
+	// the simple floating-point version
+	//
+	// 	 round(sqrt(s))
+	//
+	// which compiles down to the SSE `SQRTSD` instruction, and takes ~48
+	// seconds for the entire domain on the same hardware.
+	// (We need to use the `double` variant to ensure that we can fit every
+	// signed 32-bit integer.)
+	if(s <= 0) {
+		return 0;
+	}
+
 	auto error = s;
+	decltype(s) root = 0;
 
-	// Continuously subtract integer squares (1², 2², 3³, …) from [s] until [s]
-	// is smaller.
-	// This can be done without multiplications by considering the difference
-	// between two consecutive integer squares (𝓃 and 𝓃+1):
-	//
-	// 	d(𝓃) = ((𝓃 + 1)² - 𝓃²) = (2𝓃 + 1)
-	//
-	// Defined recursively:
-	//
-	// 	d(0) = 1
-	// 	d(𝓃) = (2𝓃 + 1)
-	// 	d(𝓃 + 1) = (2(𝓃 + 1) + 1),	multiplied out:
-	// 	d(𝓃 + 1) = (2𝓃 + 2 + 1),  	and with d(𝓃) = (2𝓃 + 1) extracted:
-	// 	d(𝓃 + 1) = (d(𝓃) + 2)
-	//
-	// That is, start with 1, and add 2 on every iteration.
-	//
-	// This is a descending variant of the addition-based linear search
-	// algorithm found on Wikipedia:
-	//
-	// 	https://en.wikipedia.org/w/index.php?title=Integer_square_root&oldid=1174298171#Linear_search_using_addition
-	//
-	// By deriving the loop count from the accumulator, this variant saves one
-	// variable. It also adds 1 to the result we would otherwise get from the
-	// Wikipedia algorithm, which always rounds up the result to the next
-	// higher integer root.
-	std::make_unsigned_t<decltype(s)> acc = 1;
-	while(error >= 0) {
-		error -= acc;
-		acc += 2;
+	// Start at the highest power of 4 ≤[s]
+	std::make_unsigned<decltype(s)>::type d = (1 << ((sizeof(s) * 8) - 2));
+	while (d > s) {
+		d >>= 2;
 	}
-	auto root_plus_1 = (acc >> 1); // = number of iterations
 
-	// If [s] is closer to ([root_plus_1] - 1)² than it is to [root_plus_1]²,
-	// we need to round down. By once again taking the difference between the
-	// two squares (2𝓃 + 1), and halving it to arrive at the arithmetic mean
-	// between the two, we get (𝓃 + 0.5), which we can round up to (𝓃 + 1).
-	// The remaining [error] already tells us the negated difference between
-	// [root_plus_1]² and [s].
-	if((-error >= root_plus_1) && (s > 0)) {
-		return (root_plus_1 - 1);
+	while(d != 0) {
+		if(error >= (root + d)) {
+			error -= (root + d);
+			root = ((root >> 1) + d);
+		} else {
+			root >>= 1;
+		}
+		d >>= 2;
 	}
-	return root_plus_1;
+
+	// [error] is now equal to ([s] - [root]²), and can help us to determine
+	// whether we need to round up to the next integer root.
+	// The difference between two consecutive integer squares (𝓃 and 𝓃+1) is
+	//
+	// 	((𝓃+1)² - 𝓃²) = (2𝓃 + 1)
+	//
+	// Since we only need half of the difference to arrive at the arithmetic
+	// mean, we get (𝓃 + 0.5), which we can round up to a >𝓃 comparison.
+	if(error > root) {
+		return (root + 1);
+	}
+	return root;
 }
 
 uint16_t __fastcall rnd(void)

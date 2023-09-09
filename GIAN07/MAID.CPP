@@ -359,11 +359,7 @@ extern void MaidMove(void)
 		else {
 			MaidTamaSet();
 			if (Viv.muteki){
-				int i;
 				fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
-
-				for(i=0; i<50; i++)
-					fragment_set(Viv.x,Viv.y,FRG_HEART);
 				SndPlay(SOUND_ID_DEAD);
 			}
 		}

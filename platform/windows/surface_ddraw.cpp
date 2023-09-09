@@ -7,9 +7,9 @@
 #include <array>
 #include <ddraw.h>
 
-bool DDrawSaveSurface(const PATH_LITERAL s, IDirectDrawSurface* surf)
+bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
 {
-	if(!surf) {
+	if(!surf || !stream) {
 		return false;
 	}
 	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
@@ -52,7 +52,7 @@ bool DDrawSaveSurface(const PATH_LITERAL s, IDirectDrawSurface* surf)
 		static_cast<const std::byte *>(desc.lpSurface),
 		size_t(desc.lPitch * desc.dwHeight),
 	};
-	const auto ret = BMPSave(s, size, 1, bpp, palette, pixels);
+	const auto ret = BMPSave(stream, size, 1, bpp, palette, pixels);
 	surf->Unlock(nullptr);
 	return ret;
 }

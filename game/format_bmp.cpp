@@ -81,7 +81,7 @@ std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
 }
 
 bool BMPSave(
-	const PATH_LITERAL s,
+	FILE_STREAM_WRITE* stream,
 	PIXEL_SIZE size,
 	uint16_t planes,
 	uint16_t bpp,
@@ -109,8 +109,6 @@ bool BMPSave(
 		.bfReserved2 = 0,
 		.bfOffBits = pixel_offset,
 	};
-	auto stream = FileStreamWrite(s);
-	assert(stream);
 	return (
 		stream &&
 		stream->Write(header_file) &&

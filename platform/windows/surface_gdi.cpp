@@ -29,8 +29,12 @@ static_assert(offsetof(RGBQUAD, rgbGreen) == offsetof(BGRA, g));
 static_assert(offsetof(RGBQUAD, rgbRed) == offsetof(BGRA, r));
 static_assert(offsetof(RGBQUAD, rgbReserved) == offsetof(BGRA, a));
 
-bool SURFACE_GDI::Save(const PATH_LITERAL s) const
+bool SURFACE_GDI::Save(FILE_STREAM_WRITE* stream) const
 {
+	if(!stream) {
+		return false;
+	}
+
 	DIBSECTION dib;
 	if(!GetObject(img, sizeof(DIBSECTION), &dib)) {
 		return false;
@@ -77,7 +81,7 @@ bool SURFACE_GDI::Save(const PATH_LITERAL s) const
 			return false;
 		}
 		return BMPSave(
-			s, size, info->biPlanes, info->biBitCount, palette, pixels
+			stream, size, info->biPlanes, info->biBitCount, palette, pixels
 		);
 	}
 
@@ -95,7 +99,7 @@ bool SURFACE_GDI::Save(const PATH_LITERAL s) const
 		size_t(dib.dsBm.bmWidthBytes * dib.dsBm.bmHeight)
 	};
 	return BMPSave(
-		s,
+		stream,
 		{ dib.dsBmih.biWidth, dib.dsBmih.biHeight },
 		dib.dsBmih.biPlanes,
 		dib.dsBmih.biBitCount,

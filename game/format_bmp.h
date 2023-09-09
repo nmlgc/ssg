@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include "platform/buffer.h"
-#include "platform/unicode.h"
+#include "platform/file.h"
 #include "game/coords.h"
 
 // Platform-independent .BMP header types
@@ -73,7 +72,7 @@ constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp);
 std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer);
 
 bool BMPSave(
-	const PATH_LITERAL s,
+	FILE_STREAM_WRITE* stream,
 	PIXEL_SIZE size,
 	uint16_t planes,
 	uint16_t bpp,

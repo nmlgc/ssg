@@ -32,8 +32,8 @@ public:
 	// Calls Delete() and reinitializes [img].
 	bool Load(BMP_OWNED bmp);
 
-	// Saves [img] to a .BMP file with the given name.
-	bool Save(const PATH_LITERAL s) const;
+	// Saves [img] as a .BMP file to the given stream.
+	bool Save(FILE_STREAM_WRITE*) const;
 
 	void Delete() noexcept;
 };

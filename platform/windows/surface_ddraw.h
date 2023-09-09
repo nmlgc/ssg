@@ -13,4 +13,4 @@ struct SURFACE_DDRAW : public SURFACE_GDI {
 	IDirectDrawSurface* surf = nullptr;
 };
 
-bool DDrawSaveSurface(const PATH_LITERAL s, IDirectDrawSurface* surf);
+bool DDrawSaveSurface(FILE_STREAM_WRITE*, IDirectDrawSurface*);

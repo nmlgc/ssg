@@ -495,6 +495,6 @@ static void _LLaserHitCheck(LLASER_DATA *lp)
 		evade_add(LLASER_EVADE);
 	}
 	if(length>0 && width<=(lp->w)){
-		MaidDead();
+		Viv.tamahit = 1;
 	}
 }

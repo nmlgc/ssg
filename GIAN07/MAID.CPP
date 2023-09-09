@@ -351,7 +351,7 @@ extern void MaidMove(void)
 
 	// Check if VIVIT was hit by a bullet, and decrease the deathbomb timer.
 	if (Viv.tamahit){
-		if (Viv.deathbomb == 6){
+		if (Viv.deathbomb == VIVBOMBTIMER_VAL){
 			fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
 			SndPlay(SOUND_ID_DEAD);
 		}
@@ -361,7 +361,7 @@ extern void MaidMove(void)
 			MaidDead();
 		}
 		else {
-			MaidTamaSet();
+			MaidTamaSet();	
 		}
 	}
 	else {

@@ -452,7 +452,7 @@ static void __fastcall laser_hitchk(LASER_DATA *lp)
 			}
 */
 			if(length>0 && length<=(lp->l) && w1<=(lp->w)){
-				MaidDead();
+				Viv.tamahit = 1;
 			}
 			else if(length>0 && length<=(lp->l) && w1<=(lp->w+LASER_EVADE_WIDTH)){
 				if(lp->evade) evade_add(0);

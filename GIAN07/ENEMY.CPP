@@ -142,7 +142,7 @@ void enemy_move(void)
 			// サボテンヒットチェック //
 			if(HITCHK(e->x,Viv.x,e->g_width) && HITCHK(e->y,Viv.y,e->g_height) && Viv.muteki==0){
 				// ここら辺で敵にダメージを与えるとおもしろいかも？ //
-				if(e->flag&EF_HITSB) MaidDead();
+				if(e->flag&EF_HITSB) Viv.tamahit = 1;
 			}
 
 			// 範囲外チェック //

@@ -181,7 +181,7 @@ void HLaserMove(void)
 			// 当たり判定 //
 			if(HITCHK(x,Viv.x,HOMINGL_WIDTH*2/3) && HITCHK(y,Viv.y,HOMINGL_WIDTH*2/3)){
 			//	hl->State = HLS_DEAD;	// こいつは消去
-				MaidDead();				// 殺っておしまい
+				Viv.tamahit = 1;			// 殺っておしまい
 			}
 		}
 		if(ev_flag) evade_add(1);

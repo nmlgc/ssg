@@ -163,9 +163,11 @@ public:
 	};
 };
 
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const PATH_LITERAL s)
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
+	const PATH_LITERAL s, bool fail_if_exists
+)
 {
-	auto handle = OpenWrite(s, CREATE_ALWAYS);
+	auto handle = OpenWrite(s, (fail_if_exists ? CREATE_NEW : CREATE_ALWAYS));
 	if(handle == INVALID_HANDLE_VALUE) {
 		return nullptr;
 	}

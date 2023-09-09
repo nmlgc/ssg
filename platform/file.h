@@ -81,5 +81,7 @@ struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {
 	[[nodiscard]] virtual bool Write(BYTE_BUFFER_BORROWED buf) = 0;
 };
 
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const PATH_LITERAL s);
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
+	const PATH_LITERAL s, bool fail_if_exists = false
+);
 // -------

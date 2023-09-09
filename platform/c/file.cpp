@@ -121,9 +121,11 @@ public:
 	};
 };
 
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(const PATH_LITERAL s)
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
+	const PATH_LITERAL s, bool fail_if_exists
+)
 {
-	auto* fp = fopen(s, "wb");
+	auto* fp = fopen(s, (fail_if_exists ? "wxb" : "wb"));
 	if(!fp) {
 		return nullptr;
 	}

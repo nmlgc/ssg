@@ -105,7 +105,7 @@ void MaidTamaSet(void)
 	// 発射し、そうでなければ、単にリターンする。                             //
 	// なお、弾のセットには TAMA.cpp 内の関数と互換のものを使用する           //
 
-	if((Key_Data&KEY_TAMA) && Viv.toge_time==0 && Viv.muteki<MAID_MOVE_DISABLE_TIME){
+	if((Key_Data&KEY_TAMA) && Viv.toge_time==0 && Viv.muteki<MAID_MOVE_DISABLE_TIME && !Viv.tamahit){
 		Viv.toge_time = MAID_TAMA_START;
 	}
 
@@ -118,6 +118,8 @@ void MaidTamaSet(void)
 		Viv.bomb_time = MaidBombTime[Viv.weapon&3];		// 装備ごとに変更せよ
 		Viv.muteki    = BOMBMUTEKI_VAL;
 		Viv.bomb--;
+		Viv.tamahit = 0;
+		Viv.deathbomb = VIVBOMBTIMER_VAL;
 		PlayRankAdd(-500);					// 難易度ダウン
 	}
 

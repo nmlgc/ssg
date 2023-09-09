@@ -298,7 +298,8 @@ extern void MaidMove(void)
 		}
 	}
 
-	if(Viv.muteki < MAID_MOVE_DISABLE_TIME){
+
+	if((Viv.muteki < MAID_MOVE_DISABLE_TIME) && !Viv.tamahit){
 		vx = vy = 0;
 		v = (Key_Data & KEY_SHIFT) ? (VivSpeed/3) : VivSpeed;
 		if(Key_Data & KEY_UP)		vy-=v;
@@ -348,8 +349,30 @@ extern void MaidMove(void)
 	Viv.opx = Viv.x + Viv.vx;
 	Viv.opy = Viv.y + Viv.vy + 64*6;
 
-	// 弾＆ボムのセット //
-	MaidTamaSet();
+	// Check if VIVIT was hit by a bullet, and decrease the deathbomb timer.
+	if (Viv.tamahit){
+		Viv.deathbomb--;
+		if (Viv.deathbomb <= 0){
+			Viv.tamahit--;
+			MaidDead();
+		}
+		else {
+			MaidTamaSet();
+			if (Viv.muteki){
+				int i;
+				fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
+
+				for(i=0; i<50; i++)
+					fragment_set(Viv.x,Viv.y,FRG_HEART);
+				SndPlay(SOUND_ID_DEAD);
+			}
+		}
+	}
+	else {
+		// 弾＆ボムのセット //
+		MaidTamaSet();
+	}
+
 
 	if(Viv.bomb_time){
 		tama_clear();
@@ -384,6 +407,8 @@ extern void MaidSet(void)
 	Viv.GrpID     = 1;
 
 	Viv.muteki    = VIVDEAD_VAL;
+	Viv.deathbomb = VIVBOMBTIMER_VAL;
+	Viv.tamahit   = 0;
 
 	Viv.bGameOver = FALSE;
 
@@ -413,6 +438,8 @@ extern void MaidNextStage(void)
 	Viv.lay_grp   = 0;
 
 	Viv.muteki    = VIVDEAD_VAL;
+	Viv.tamahit = 0;
+	Viv.deathbomb = VIVBOMBTIMER_VAL;
 	Viv.bomb_time = 0;
 	Viv.ShiftCounter = 0;
 
@@ -450,6 +477,7 @@ extern void MaidDead(void)
 
 	Viv.bomb = ConfigDat.BombStock.v;
 	Viv.muteki = VIVDEAD_VAL;
+	Viv.deathbomb = VIVBOMBTIMER_VAL;
 
 	PlayRankAdd(-2560);
 

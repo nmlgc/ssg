@@ -17,6 +17,7 @@
 // サボテン定数 //
 #define VIVDEAD_VAL		(300)		// びびっとの死亡時間．．．
 #define VIVMUTEKI_VAL	(180)			// びびっとの無敵時間
+#define VIVBOMBTIMER_VAL (6)        // Frames from getting hit to dying.
 
 #define MAID_MOVE_DISABLE_TIME		(250-100)		// 行動不能な時間
 
@@ -68,6 +69,8 @@ typedef struct
 	WORD bomb_time;		// ボムウェイト用
 	WORD exp2;			// 経験値増加抑制用
 	WORD muteki;		// 無敵フラグ(0:off !0:無敵時間カウンタ)
+	WORD tamahit;       // Was VIVIT hit by a bullet?
+	WORD deathbomb;     // Frames counted until death.
 	WORD lay_time;		// レーザーの発射タイミング用
 	BYTE lay_grp;		// レーザーのグラフィック用
 	BYTE toge_time;		// "とげ" の発射タイミング用

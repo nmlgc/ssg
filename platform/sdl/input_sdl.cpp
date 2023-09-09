@@ -57,6 +57,8 @@ template <class BindingID, class Bits> void Key_Check(
 
 struct JOYPAD {
 	SDL_Joystick* joystick;
+	uint8_t axis_x;
+	uint8_t axis_y;
 	INPUT_PAD_BUTTON button_pressed_last = 0;
 	uint8_t buttons_held = 0;
 };
@@ -69,7 +71,55 @@ void Pad_Open(int device_index)
 	if(!joystick) {
 		return;
 	}
-	Pads.emplace_back(JOYPAD{ .joystick = joystick });
+
+	// SDL provides two abstractions for joypads:
+	//
+	// • SDL_Joystick, which uses numbered axes or buttons with no semantic
+	//   meaning, but works with every joypad ever
+	// • SDL_GameController, which provides a standardized interface for the
+	//   typical kind of modern gamepad with two analog sticks, a D-pad, and at
+	//   least 4 face and 2 shoulder buttons, but doesn't work with joypads
+	//   that don't match this standard
+	//
+	// For buttons, SDL_Joystick's numbered IDs are exactly what we want. WinMM
+	// does the same, and the Joy Pad menu is designed around that. For axes,
+	// however, there is no UI, and SDL_Joystick provides no way of identifying
+	// which axis IDs correspond to a joypad's "main" X/Y axis, so we can only
+	// guess. Luckily, all joypads we've tested map their main X axis to ID 0
+	// and their main Y axis to ID 1.
+	//
+	// But we can still *try* opening a joypad via SDL_GameController. If that
+	// succeeds, we can correct this initial guess with the actual SDL_Joystick
+	// axis IDs (= the "bind") for the standard X and Y axes:
+	//
+	// 	https://discourse.libsdl.org/t/difference-between-joysticks-and-game-controllers/24028/2
+	decltype(JOYPAD::axis_x) axis_x = 0;
+	decltype(JOYPAD::axis_y) axis_y = 1;
+
+	if(SDL_IsGameController(device_index)) {
+		auto* controller = SDL_GameControllerOpen(device_index);
+		if(controller) {
+			SDL_GameControllerButtonBind bind;
+			bind = SDL_GameControllerGetBindForAxis(
+				controller, SDL_CONTROLLER_AXIS_LEFTX
+			);
+			if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+				axis_x = bind.value.axis;
+			}
+			bind = SDL_GameControllerGetBindForAxis(
+				controller, SDL_CONTROLLER_AXIS_LEFTY
+			);
+			if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+				axis_y = bind.value.axis;
+			}
+			SDL_GameControllerClose(controller);
+		}
+	}
+	Pads.emplace_back(JOYPAD{
+		.joystick = joystick,
+		.axis_x = axis_x,
+		.axis_y = axis_y,
+	});
 }
 
 std::vector<JOYPAD>::iterator Pad_Find(SDL_JoystickID id)
@@ -109,16 +159,18 @@ void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 	) == 1) {
 		switch(event.type) {
 		case SDL_JOYAXISMOTION: {
+			auto& pad = *Pad_Find(event.jaxis.which);
+
 			// The original WinMM backend did this without even taking the
 			// range reported by joyGetDevCaps() into account. However, that
 			// function returns a range of [0, 65535] with all joypads I've
 			// tried, which matches SDL's fixed [-32768, 32767] range, so we
 			// can do it here as well.
 			const auto v = (event.jaxis.value >> 11);
-			if(event.jaxis.axis == 0) {
+			if(event.jaxis.axis == pad.axis_x) {
 				Pad_Data &= ~(KEY_LEFT | KEY_RIGHT);
 				Pad_Data |= ((v <= -4) ? KEY_LEFT : ((v >= 4) ? KEY_RIGHT : 0));
-			} else if(event.jaxis.axis == 1) {
+			} else if(event.jaxis.axis == pad.axis_y) {
 				Pad_Data &= ~(KEY_UP | KEY_DOWN);
 				Pad_Data |= ((v <= -4) ? KEY_UP : ((v >= 4) ? KEY_DOWN : 0));
 			}

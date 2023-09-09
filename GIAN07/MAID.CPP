@@ -353,7 +353,7 @@ extern void MaidMove(void)
 	if (Viv.tamahit){
 		Viv.deathbomb--;
 		if (Viv.deathbomb <= 0){
-			Viv.tamahit--;
+			Viv.tamahit = 0;
 			MaidDead();
 		}
 		else {
@@ -478,6 +478,7 @@ extern void MaidDead(void)
 	Viv.bomb = ConfigDat.BombStock.v;
 	Viv.muteki = VIVDEAD_VAL;
 	Viv.deathbomb = VIVBOMBTIMER_VAL;
+	Viv.tamahit = 0;
 
 	PlayRankAdd(-2560);
 

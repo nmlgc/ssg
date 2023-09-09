@@ -291,7 +291,7 @@ void tama_move(void)
 			}
 			if(HITCHK(t->x,Viv.x,TAMA_HITX) && HITCHK(t->y,Viv.y,TAMA_HITY) && !Viv.tamahit){
 				t->flag = TF_DELETE;
-				Viv.tamahit++;
+				Viv.tamahit = 1;
 			}
 		}
 		else{
@@ -317,7 +317,7 @@ void tama_move(void)
 			}
 			if(HITCHK(t->x,Viv.x,TAMA_HITX) && HITCHK(t->y,Viv.y,TAMA_HITY) && !Viv.tamahit){
 				t->flag = TF_DELETE;
-				Viv.tamahit++;
+				Viv.tamahit = 1;
 			}
 		}
 		else{

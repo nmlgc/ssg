@@ -4,6 +4,8 @@
 /*                                                                           */
 
 #include "UT_MATH.H"
+#include <array>
+#include <stdlib.h>
 #include <type_traits>
 #pragma message(PBGWIN_UT_MATH_H)
 
@@ -41,7 +43,7 @@ extern const signed int *COS256 = &SIN256[64];
 
 
 ////ａｔａｎテーブル////
-static const char ATAN256[]={
+static const std::array<uint8_t, 256> ATAN256 = {
 	0, 0, 0, 0, 1, 1, 1, 1,  1, 1, 2, 2, 2, 2, 2, 2,
 	3, 3, 3, 3, 3, 3, 3, 4,  4, 4, 4, 4, 4, 5, 5, 5,
 	5, 5, 5, 6, 6, 6, 6, 6,  6, 6, 7, 7, 7, 7, 7, 7,
@@ -89,75 +91,44 @@ long __fastcall cosDiv(uint8_t deg, int length)
 
 uint8_t __stdcall atan8(int x,int y)
 {
-	_asm{
-			PUSH	ESI
-
-			MOV		ECX,y			; ECX := y
-			MOV		ESI,x			; ESI := x
-			MOV		EAX,ECX
-			OR		EAX,ESI
-			JZ		FINISH
-
-			MOV		EAX,ECX
-			CDQ
-			XOR		EAX,EDX
-			SUB		EAX,EDX
-			MOV		EBX,EAX			; EBX := ABS(y)
-
-			MOV		EAX,ESI
-			CDQ
-			XOR		EAX,EDX
-			SUB		EAX,EDX
-			MOV		EDX,EAX			; EDX := ABS(x)
-
-			CMP		EDX,EBX
-			JE		JP_E
-			JL		JP_L
-
-			XCHG	EBX,EDX			; EBX := ABS(x) , EDX := ABS(y)
-			MOV		EAX,EDX
-			SHR		EDX,24
-			SHL		EAX,8
-			DIV		EBX
-			MOV		EBX,offset ATAN256
-			XLATB
-			JMP		LAST_C0
-			EVEN
-
-	JP_E:
-			MOV		AL,32
-			JMP		LAST_C0
-			EVEN
-
-	JP_L:
-			MOV		EAX,EDX
-			SHR		EDX,24
-			SHL		EAX,8
-			DIV		EBX
-			MOV		EBX,offset ATAN256
-			XLATB
-			NEG		AL
-			ADD		AL,64
-
-			// EBP = x , ECX = y
-	LAST_C0:
-			XOR		AH,AH
-			OR		ESI,ESI
-			JGE		LAST_C1
-			NEG		AX
-			ADD		AX,128
-
-	LAST_C1:
-			OR		ECX,ECX
-			JGE		LAST_C2
-			NEG		AL
-
-	LAST_C2:
-			XOR		AH,AH			; RETURN が BYTE だから必要ないのだが...
-
-	FINISH:
-			POP		ESI
+	if((x | y) == 0) {
+		return 0x00;
 	}
+	// Calculate the tangent as if it were in the 4th quadrant.
+	// Bug: If [x] or [y] is -INT_MAX, abs() will be a no-op and the comparison
+	// below will be inverted. This also no longer protects against a division
+	// by 0 and subsequent crash if the other coordinate is 0. Could have been
+	// easily fixed by assigning to unsigned variables instead.
+	const int x_abs = abs(x);
+	const int y_abs = abs(y);
+
+	// Scale the smaller one and divide by the larger one to ensure that the
+	// resulting index stays between 0 and ATAN256.size(). The resulting index
+	// is also truncated to 8 bits to ensure that negative results wrap around
+	// correctly.
+	// Ironically, the division in the original code was in fact both unsigned
+	// *and* zero-extended to 64 bits, which ensured that all possible 32-bit
+	// integers can fit after the scaling.
+	static_assert(ATAN256.size() == 256);
+	const uint64_t x_abs_wide = static_cast<unsigned int>(x_abs);
+	const uint64_t y_abs_wide = static_cast<unsigned int>(y_abs);
+	uint8_t ret = 0x20; // used if [x_abs] == [y_abs]
+	if(x_abs > y_abs) {
+		const uint8_t array_i = ((y_abs_wide * ATAN256.size()) / x_abs_wide);
+		ret = (0x00 + ATAN256[array_i]);
+	} else if(x_abs < y_abs) {
+		const uint8_t array_i = ((x_abs_wide * ATAN256.size()) / y_abs_wide);
+		ret = (0x40 - ATAN256[array_i]);
+	}
+
+	// Flip the result into the other quadrants if necessary.
+	if(x < 0) {
+		ret = (0x80 - ret);
+	}
+	if(y < 0) {
+		ret = -ret;
+	}
+	return ret;
 }
 
 void __fastcall rnd_seed_set(uint32_t val)

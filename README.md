@@ -34,11 +34,12 @@ To build:
 The binary will be put into the `bin/` subdirectory, where you can also place the game's original data files.
 
 By default, both Debug and Release configurations are built.
-If you only need one of them and want to speed up the build process, you can deactivate either one by creating a file named `tup.config` in the root directory of this repository:
+If you only need one of them and want to speed up the build process, you can pick a single one by creating a file named `tup.config` in the root directory of this repository:
 
 ```sh
-CONFIG_DEBUG=n   # deactivates Debug mode if present
-CONFIG_RELEASE=n # deactivates Release mode if present
+CONFIG_BUILDTYPE=debug   # builds only in Debug mode
+CONFIG_BUILDTYPE=release # builds only in Release mode
+CONFIG_BUILDTYPE=        # builds in both modes
 ```
 
 ## Debugging

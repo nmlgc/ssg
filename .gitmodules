@@ -3,3 +3,7 @@
 	url = https://github.com/libsdl-org/SDL
 	branch = SDL2
 	shallow = true
+[submodule "libs/tupblocks"]
+	path = libs/tupblocks
+	url = https://github.com/nmlgc/tupblocks
+	shallow = true

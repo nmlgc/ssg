@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "DD_CLIP2D.H"
+#include <limits>
 #include <string.h>
 
 
@@ -15,10 +16,9 @@
 //// [構造体] ////
 
 typedef struct tagLINE_WORK{
-	int	x;	// 開始ｘ座標
-	int	dlx;	// 誤差変数加算値
-	int	s;	// 誤差変数
-	int	d;	// 最小ｘ移動量
+	uint64_t	x;	// Upper 32 bits: 開始ｘ座標, lower 32 bits: 誤差変数
+	uint32_t	dlx;	// 誤差変数加算値
+	uint32_t	d;	// 最小ｘ移動量
 } LINE_WORK;
 
 
@@ -28,43 +28,21 @@ typedef struct tagLINE_WORK{
 // DDA 構造体のセット //
 inline void SetLineWork(LINE_WORK *w, int x1, int x2, int dy)
 {
-	int	x, dlx, s, d;
-
-	_asm {
-		PUSH	ESI
-
-		MOV 	EDX,x1
-		MOV 	EAX,x2
-		MOV 	ECX,dy
-
-		MOV 	x,EDX
-
-		SUB 	EAX,EDX
-		CMP 	ECX,1
-		ADC 	ECX,0
-		CDQ
-		IDIV	ECX
-		CMP 	EDX,80000000H
-		ADC 	EAX,-1
-		MOV 	d,EAX
-		CMP 	EDX,80000000H
-		CMC
-		SBB 	ESI,ESI
-		ADD 	EDX,ESI
-		XOR 	EDX,ESI
-		XOR 	EAX,EAX
-		DIV 	ECX
-		ADD 	EAX,ESI
-		XOR 	EAX,ESI
-		MOV	dlx,EAX
-		MOV	s,80000000H
-		POP 	ESI
+	if(dy == 0) {
+		dy++;
 	}
-
-	w->x = x;
-	w->dlx = dlx;
-	w->s = s;
-	w->d = d;
+	const auto dx = (x2 - x1);
+	const auto d = (dx / dy);
+	const auto err = (dx % dy);
+	const auto dy_unsigned = std::make_unsigned_t<decltype(dy)>(dy);
+	if(err < 0) {
+		w->d = (d - 1);
+		w->dlx = -((static_cast<uint64_t>(-err) << 32) / dy_unsigned);
+	} else {
+		w->d = d;
+		w->dlx = ((static_cast<uint64_t>(err) << 32) / dy_unsigned);
+	}
+	w->x = ((static_cast<uint64_t>(x1) << 32) | 0x80000000);
 }
 
 
@@ -188,34 +166,16 @@ int DrawTrapezoid(int y, int dy)
 		return y;
 	}
 
-	int		left_x = TZOID_A.x;
-	int		det_x  = TZOID_B.x;// - left_x;
+	auto left_x = TZOID_A.x;
+	auto det_x  = TZOID_B.x; // - left_x;
+	const auto left_step = ((uint64_t(TZOID_A.d) << 32) + TZOID_A.dlx);
+	const auto det_step  = ((uint64_t(TZOID_B.d) << 32) + TZOID_B.dlx);
 
 	do{
-		GrpHLineX(left_x,det_x,y);
+		GrpHLineX((left_x >> 32), (det_x >> 32), y);
 
-		_asm{
-			//MOV		EAX,TZOID_B.dlx
-			//ADD		TZOID_B.s,EAX
-			MOV		EAX,TZOID_B.s
-			ADD		EAX,TZOID_B.dlx
-			MOV		TZOID_B.s,EAX
-
-			MOV		EAX,TZOID_B.x
-			ADC		EAX,TZOID_B.d
-			MOV		TZOID_B.x,EAX
-			MOV		det_x,EAX
-
-			//MOV		EAX,TZOID_A.dlx
-			//ADD		TZOID_A.s,EAX
-			MOV		EAX,TZOID_A.s
-			ADD		EAX,TZOID_A.dlx
-			MOV		TZOID_A.s,EAX
-
-			MOV		EAX,left_x
-			ADC		EAX,TZOID_A.d
-			MOV		left_x,EAX
-		}
+		left_x += left_step;
+		det_x  += det_step;
 
 		//det_x -= left_x;
 		y++;
@@ -223,6 +183,7 @@ int DrawTrapezoid(int y, int dy)
 	while((--dy)>=0);
 
 	TZOID_A.x = left_x;
+	TZOID_B.x = det_x;
 
 	return y;
 }

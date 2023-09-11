@@ -6,7 +6,6 @@
 #include "DD_UTY.H"
 #include "DD_GRP2D.H"
 #include "DD_CLIP2D.H"		// 図形クリッピング用関数群
-#include "D2_Polygon.H"		// ポリゴン描画
 #include <ddraw.h>
 
 #pragma message(PBGWIN_DD_GRP2D_H)

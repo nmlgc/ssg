@@ -17,7 +17,7 @@
 ///// [ヘッダファイル] /////
 #include "game/coords.h"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/UT_MATH.H"
+#include "game/ut_math.h"
 
 
 

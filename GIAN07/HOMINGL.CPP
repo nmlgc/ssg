@@ -7,7 +7,7 @@
 #include "GIAN.H"
 #include "MAID.H"
 #include "platform/snd.h"
-#include "DirectXUTYs/UT_MATH.H"
+#include "game/ut_math.h"
 
 #define HOMINGL_WIDTH	(8*64)
 

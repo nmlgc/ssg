@@ -23,7 +23,7 @@
 #include "ECL.H"
 #include "TAMA.H"
 #include "LASER.H"
-#include "DirectXUTYs/UT_MATH.H"
+#include "game/ut_math.h"
 #include "platform/buffer.h"
 #include <array>
 

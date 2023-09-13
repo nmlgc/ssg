@@ -6,7 +6,7 @@
 #include "BOMBEFC.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/UT_MATH.H"
+#include "game/ut_math.h"
 
 
 BombEfcCtrl		BombEfc[EXBOMB_MAX];

@@ -3,7 +3,7 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "UT_MATH.H"
+#include "ut_math.h"
 #include <array>
 #include <stdlib.h>
 #include <type_traits>
@@ -109,6 +109,8 @@ uint8_t __stdcall atan8(int x,int y)
 	// Ironically, the division in the original code was in fact both unsigned
 	// *and* zero-extended to 64 bits, which ensured that all possible 32-bit
 	// integers can fit after the scaling.
+	// (Strictly speaking, the divisor was still only 32-bit, but both Visual
+	// Studio and Clang compile this into a 64-bit/64-bit division these days.)
 	static_assert(ATAN256.size() == 256);
 	const uint64_t x_abs_wide = static_cast<unsigned int>(x_abs);
 	const uint64_t y_abs_wide = static_cast<unsigned int>(y_abs);
@@ -184,7 +186,8 @@ int32_t isqrt(int32_t s)
 	// 	((𝓃+1)² - 𝓃²) = (2𝓃 + 1)
 	//
 	// Since we only need half of the difference to arrive at the arithmetic
-	// mean, we get (𝓃 + 0.5), which we can round up to a >𝓃 comparison.
+	// mean, we get (𝓃 + 0.5). And since we use integers, we can round this up
+	// to a ≥(𝓃+1) comparison, which can be further simplified to >𝓃.
 	if(error > root) {
 		return (root + 1);
 	}

@@ -5,7 +5,7 @@
 
 #include "DD_UTY.H"
 #include "DD_GRP3D.H"
-#include "UT_MATH.H"
+#include "game/ut_math.h"
 #include <d3d.h>
 #pragma message(PBGWIN_DD_GRP3D_H)
 

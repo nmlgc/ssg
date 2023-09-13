@@ -5,7 +5,7 @@
 
 #include "LENS.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/UT_MATH.H"
+#include "game/ut_math.h"
 #include <assert.h>
 #include <ddraw.h>
 

@@ -1,5 +1,10 @@
 @echo off
 
+if "%VCINSTALLDIR%" == "" (
+	echo Error: The build must be run from within Visual Studio's `x64_x86 Cross Tools Command Prompt`.
+	exit 1
+)
+
 : `git submodule` is quite slow on Windows, so it's a good idea to just call it
 : a single time in the optimal case.
 for /f "delims=" %%s in ('git submodule status') do call:check_submodule "%%s"

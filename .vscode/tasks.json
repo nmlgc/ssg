@@ -6,10 +6,17 @@
 		{
 			"label": "Build",
 			"type": "shell",
-			"command": "./build.bat",
+			"command": "build.bat",
 			"group": {
 				"kind": "build",
 				"isDefault": true
+			},
+			"options": {
+				// CMD most likely starts up much faster than PowerShell.
+				"shell": {
+					"executable": "cmd",
+					"args": ["/d", "/c"]
+				}
 			}
 		}
 	]

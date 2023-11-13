@@ -57,13 +57,17 @@ typedef struct{
 
 
 
-typedef struct {
+struct MID_TRACK {
 	std::span<const uint8_t> data;
 	const uint8_t* work;
 	int	count;
 	bool	play;
 	BYTE	status;
-} MID_TRACK;
+
+	// Reads a MIDI variable-length quantity and advances [work] accordingly.
+	// Used for both delta times and multi-byte event lengths.
+	uint32_t ConsumeVLQ(void);
+};
 
 struct MID_SEQUENCE {
 	BYTE_BUFFER_OWNED smf = nullptr;
@@ -81,7 +85,6 @@ static void Mid_GMReset(void);
 static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
-static uint32_t GetWaitCount(const uint8_t** data);
 static void  Mid_Parse(MID_TRACK *track);
 static void MidFadeIOFunc(void);
 
@@ -286,23 +289,21 @@ static BOOL Mid_Init(void)
 	for(auto& t : Mid_Seq.tracks) {
 		t.work  = t.data.data();
 		t.play  = true;
-		t.count = GetWaitCount(&t.work);	// 初期ウェイトカウントを読むの
+		t.count = t.ConsumeVLQ();	// 初期ウェイトカウントを読むの
 	}
 
 	return TRUE;
 }
 
-static uint32_t GetWaitCount(const uint8_t** data)
+uint32_t MID_TRACK::ConsumeVLQ(void)
 {
-	BYTE	temp;
-	DWORD	ret = 0;
-
-	do{
-		temp = **data;
-		++*data;
-		ret = (ret<<7)+(temp&0x7f);
-	}while(temp&0x80);
-
+	uint8_t temp = 0;
+	uint32_t ret = 0;
+	do {
+		temp = *work;
+		work++;
+		ret = ((ret << 7) | (temp & 0x7f));
+	} while(temp & 0x80);
 	return ret;
 }
 
@@ -371,7 +372,7 @@ static void Mid_Parse(MID_TRACK *track)
 	switch(st2){
 		case(0xf0):					// ？バイト
 			if(st1 == 0xf0){			// エクスクルーシブ
-				const auto countwork = GetWaitCount(&(track->work));
+				const auto countwork = track->ConsumeVLQ();
 				auto* msg = static_cast<uint8_t *>(_malloca(countwork + 1));
 				if(!msg) {
 					break;
@@ -385,7 +386,7 @@ static void Mid_Parse(MID_TRACK *track)
 			}
 			else{						// 制御用データ(出力のないものだけ出力)
 				BYTE code = *(track->work++);
-				countwork = GetWaitCount(&(track->work));
+				countwork = track->ConsumeVLQ();
 				if(code==0x2f){			// トラック終了
 					track->play = FALSE;
 					return;
@@ -453,7 +454,7 @@ static void Mid_Parse(MID_TRACK *track)
 	}
 
 	track->status = st1;
-	count = GetWaitCount(&(track->work));
+	count = track->ConsumeVLQ();
 	track->count += count;
 }
 

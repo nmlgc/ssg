@@ -3,7 +3,6 @@
 /*                                                                           */
 /*                                                                           */
 
-#define PBGMIDI_SOURCE_COMPILE
 #include "platform/file.h"
 #include "PBGMIDI.H"
 #pragma message(PBGWIN_PBGMIDI_H)
@@ -38,15 +37,13 @@ static BYTE			Mid_MulTempo = MID_STDTEMPO;
 DWORD				Mid_PlayTime = 0;
 
 
-BOOL Mid_Start(WORD fnmode,WORD plmode)
+bool Mid_Start(void)
 {
 	MIDIOUTCAPS		caps;
 	int				i;
 	UINT			mret;
 
 	// 各変数の初期化 //
-	Mid_Dev.fnmode  = fnmode;
-	Mid_Dev.plmode  = plmode;
 	Mid_Dev.mp      = NULL;
 	Mid_Dev.nDevice = midiOutGetNumDevs()+1;	// 一つだけ多く準備する
 	Mid_Dev.NowID   = -1 + 1;					// -1: MIDI_MAPPER
@@ -98,8 +95,13 @@ void Mid_End(void)
 
 void Mid_Play(void)
 {
-	if(Mid_Data.data==NULL)       return;
-	if(Mid_Dev.state==MIDST_PLAY) return;
+	if(
+		(Mid_Dev.mp == nullptr) ||
+		(Mid_Data.data == nullptr) ||
+		(Mid_Dev.state == MIDST_PLAY)
+	) {
+		return;
+	}
 
 	Mid_Dev.FadeFlag  = 0;
 	Mid_Dev.MaxVolume = 127;
@@ -108,23 +110,17 @@ void Mid_Play(void)
 
 	Mid_Init();
 
-	switch(Mid_Dev.fnmode){
-		case(MIDFN_CALLBACK):
-			Mid_GMReset();
-			timeGetDevCaps(&Mid_Time.caps,sizeof(TIMECAPS));
-			timeBeginPeriod(Mid_Time.caps.wPeriodMin);
-			Mid_Time.delay  = 10;
-			Mid_Time.htimer = timeSetEvent(Mid_Time.delay,Mid_Time.caps.wPeriodMin,
-												CBMid_TimeFunc,0,TIME_PERIODIC);
-		break;
-
-		case(MIDFN_MIDLOOP):
-			Mid_GMReset();
-		break;
-
-		default:
-		return;
-	}
+	Mid_GMReset();
+	timeGetDevCaps(&Mid_Time.caps,sizeof(TIMECAPS));
+	timeBeginPeriod(Mid_Time.caps.wPeriodMin);
+	Mid_Time.delay  = 10;
+	Mid_Time.htimer = timeSetEvent(
+		Mid_Time.delay,
+		Mid_Time.caps.wPeriodMin,
+		CBMid_TimeFunc,
+		0,
+		TIME_PERIODIC
+	);
 
 	Mid_Dev.state = MIDST_PLAY;
 }
@@ -138,18 +134,8 @@ void Mid_Stop(void)
 	Mid_PlayTime     = 0;
 	Mid_Dev.FadeFlag = 0;
 
-	switch(Mid_Dev.fnmode){
-		case(MIDFN_CALLBACK):
-			timeKillEvent(Mid_Time.htimer);
-			timeEndPeriod(Mid_Time.caps.wPeriodMin);
-		break;
-
-		case(MIDFN_MIDLOOP):
-		break;
-
-		default:
-		return;
-	}
+	timeKillEvent(Mid_Time.htimer);
+	timeEndPeriod(Mid_Time.caps.wPeriodMin);
 
 	for(i=0;i<16;i++){
 		Mid_ShortMsg(0xb0+i,0x7b,0x00);		// オール・ノート・オフ
@@ -222,15 +208,6 @@ void Mid_FadeOut(BYTE speed)
 
 	// MaxVolume,FadeWait に 1 だけ加算しているのは、０除算防止のため //
 	Mid_Dev.FadeWait  = ((256-speed)*4)/(Mid_Dev.MaxVolume+1) + 1;
-}
-
-void Mid_Pan(char pan)
-{
-	int		i;
-	int		value = 0x40 + pan;
-
-	for(i=0;i<16;i++)
-		Mid_ShortMsg(0xb0+i,0x0a,value);
 }
 
 static void Mid_ShortMsg(BYTE d1,BYTE d2,BYTE d3)
@@ -358,8 +335,6 @@ static BOOL Mid_Init(void)
 
 	Mid_Data.playcount1 = 0;
 	Mid_Data.playcount2 = 0;
-	Mid_Data.fticks     = 0;
-	Mid_Data.nticks     = 0;
 
 	for(i=0;i<Mid_Data.track;i++){
 		p = &(Mid_Data.data[i]);
@@ -421,40 +396,6 @@ static void MidFadeIOFunc(void)
 	Mid_Dev.FadeCount++;
 }
 
-void Mid_LoopFunc(DWORD time)
-{
-	int			i;
-	BOOL		flag = FALSE;
-	MID_TRACK	*p;
-	DWORDLONG	now  = Mid_Data.playcount2 + (DWORDLONG)Mid_Data.playcount1*Mid_Data.timebase*1000/Mid_Data.tempo;
-
-	if(Mid_Dev.mp     == NULL) return;
-	if(Mid_Data.data  == NULL) return;
-	if(Mid_Dev.fnmode != MIDFN_MIDLOOP) return;
-
-	Mid_PlayTime += time;
-
-	for(i=0;i<Mid_Data.track;i++){
-		p = &(Mid_Data.data[i]);
-		if(p->play){
-			flag = TRUE;
-			while(p->play && p->count<=now)
-				Mid_Parse(p);
-		}
-	}
-
-	Mid_Data.playcount1+=((time*Mid_MulTempo)>>7);
-
-	MidFadeIOFunc();
-
-	if(!flag){
-		switch(Mid_Dev.plmode){
-			case(MIDPL_NORM):Mid_Init();	break;
-			case(MIDPL_STOP):Mid_Stop();	break;
-		}
-	}
-}
-
 static void CALLBACK CBMid_TimeFunc(UINT uID,UINT uMsg,DWORD dwUser,DWORD dw1,DWORD dw2)
 {
 	int			i;
@@ -475,18 +416,10 @@ static void CALLBACK CBMid_TimeFunc(UINT uID,UINT uMsg,DWORD dwUser,DWORD dw1,DW
 
 	Mid_Data.playcount1+=((Mid_Time.delay*Mid_MulTempo)>>7);
 
-//	Mid_Data.nticks = (Mid_Time.delay*1000 + Mid_Data.fticks) / Mid_Data.tempo;
-//	Mid_Data.fticks = Mid_Time.delay*1000 % Mid_Data.tempo;
-//	Mid_Data.nticks  = (Mid_Data.fticks + Mid_PlayTime * Mid_Data.timebase * 1000) / Mid_Data.tempo;
-//	Mid_Data.fticks += (Mid_Data.timebase * Mid_PlayTime * 1000) - (Mid_Data.nticks * Mid_Data.tempo);
-
 	MidFadeIOFunc();
 
 	if(!flag){
-		switch(Mid_Dev.plmode){
-			case(MIDPL_NORM):Mid_Init();	break;
-			case(MIDPL_STOP):Mid_Stop();	break;
-		}
+		Mid_Init();
 	}
 }
 
@@ -625,25 +558,4 @@ char *Mid_GetTitle(void)
 	}
 
 	return temp;
-}
-
-
-// playcount1 の取得 //
-DWORDLONG Mid_GetPlaycount1(void)
-{
-	return Mid_Data.playcount1;
-}
-
-
-// playcount2 の取得 //
-DWORDLONG Mid_GetPlaycount2(void)
-{
-	return Mid_Data.playcount2;
-}
-
-
-// 全情報を取得 //
-void Mid_GetData(MID_DATA *pData)
-{
-	*pData = Mid_Data;
 }

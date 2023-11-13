@@ -524,7 +524,7 @@ static bool SndFnMIDI(INPUT_BITS key)
 			}
 			else{
 				// 成功した場合にだけ有効にする //
-				if(Mid_Start(MIDFN_CALLBACK,MIDPL_NORM)){
+				if(Mid_Start()) {
 					ConfigDat.SoundFlags.v |= SNDF_MIDI_ENABLE;
 				}
 			}

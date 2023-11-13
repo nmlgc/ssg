@@ -69,9 +69,8 @@ bool XInit(void)
 	}
 
 	// ＭＩＤＩの初期化 //
-	// MIDFN_MIDLOOP を使用すべきか //
 	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
-		if(!Mid_Start(MIDFN_CALLBACK, MIDPL_NORM)) {
+		if(!Mid_Start()) {
 			ConfigDat.SoundFlags.v &= (~SNDF_MIDI_ENABLE);
 		}
 	}

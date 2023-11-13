@@ -21,14 +21,6 @@
 #include "platform/buffer.h"
 
 
-#define MIDFN_NOPLAY	0x00	// 再生しない
-#define MIDFN_CALLBACK	0x01	// CALLBACK_FN を使用して再生
-#define MIDFN_MIDLOOP	0x02	// ゲーム等の一定スピードのループで再生
-#define MIDFN_STREAM	0x04	// MIDI_STREAM を使用して再生(予約のみ)
-
-#define MIDPL_NORM		0x00	// 曲の最後にきたら最初に戻って再生
-#define MIDPL_STOP		0x01	// 曲の最後にきたら停止
-
 #define MIDST_STOP		0x00	// 停止している
 #define MIDST_PLAY		0x01	// 再生中
 #define MIDST_PAUSE		0x02	// 一時停止
@@ -40,8 +32,6 @@
 typedef struct{
 	HMIDIOUT	mp;					// 出力デバイスのハンドル
 	WORD		state;				// 現在の状態
-	WORD		fnmode;				// MIDI再生に使用する関数
-	WORD		plmode;				// 曲の最後に達したときどうするか
 	int			nDevice;			// デバイス数
 	int			NowID;				// 現在のデバイスのＩＤ
 	char		**name;				// デバイス名
@@ -90,8 +80,6 @@ typedef struct {
 	int			tempo;
 	DWORDLONG	playcount1;
 	DWORDLONG	playcount2;
-	DWORDLONG	fticks;
-	DWORDLONG	nticks;
 	MID_TRACK	*data;
 } MID_DATA;
 
@@ -104,7 +92,7 @@ typedef struct {
 
 
 //// 関数 ////
-BOOL Mid_Start(WORD fnmode,WORD plmode);	// ＭＩＤＩ関連初期化
+bool Mid_Start(void);	// ＭＩＤＩ関連初期化
 void Mid_End(void);							// ＭＩＤＩ関連おしまい
 void Mid_Play(void);						// 再生する
 void Mid_Stop(void);						// 停止する
@@ -112,21 +100,13 @@ BOOL Mid_Free(void);						// データ解放する
 void Mid_Volume(BYTE volume);				// マスターボリュームを変更する
 void Mid_Tempo(char tempo);					// テンポを変更する
 void Mid_FadeOut(BYTE speed);				// フェードアウト(数字が大きいほど早い)
-void Mid_Pan(char pan);						// 全てのチャンネルのパンを変更する(無駄関数)
 BOOL Mid_ChgDev(char pos);					// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 
-void Mid_LoopFunc(DWORD time);				// 一定間隔ループを自前で生成して再生するとき使用
 char *Mid_GetTitle(void);					// この曲のお名前は？
 
 void Mid_TableInit(void);					// 各種テーブルの初期化
-
-DWORDLONG Mid_GetPlaycount1(void);		// playcount1 の取得
-DWORDLONG Mid_GetPlaycount2(void);		// playcount2 の取得
-DWORDLONG Mid_GetTicks(void);			// tick の取得
-
-void Mid_GetData(MID_DATA *pData);		// 全情報を取得
 
 
 

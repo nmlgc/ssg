@@ -8,6 +8,8 @@
 #include "platform/unicode.h"
 #include "game/input.h"
 #include <direct.h>
+#include <windows.h>
+#include <mmsystem.h>
 
 #pragma comment(lib, "user32.lib")
 

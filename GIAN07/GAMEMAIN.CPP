@@ -14,6 +14,7 @@
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
 #include "game/input.h"
+#include <mmsystem.h>
 
 
 DWORD		DrawCount = 0;

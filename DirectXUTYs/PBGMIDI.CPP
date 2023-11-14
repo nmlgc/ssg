@@ -6,6 +6,7 @@
 #include "platform/file.h"
 #include "PBGMIDI.H"
 #include "game/endian.h"
+#include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
 
 #pragma comment(lib, "winmm.lib")
@@ -98,16 +99,16 @@ static void Mid_ShortMsg(BYTE d1,BYTE d2,BYTE d3);	// ショートメッセー�
 MID_DEVICE	Mid_Dev;
 static MID_DATA		Mid_Data;
 static TIME_DATA	Mid_Time;
-WORD				Mid_PlayTable[16][128];			// スペアナ用
-WORD				Mid_PlayTable2[16][128];		// レベルメーター用
-BYTE				Mid_NoteTable[16][128];			// ノート表示用
-BYTE				Mid_NoteWTable[16][128];		// ノート表示用(2)
-BYTE				Mid_PanpodTable[16];			// パンポット
-BYTE				Mid_ExpressionTable[16];		// エクスプレッション
-BYTE				Mid_VolumeTable[16];			// ボリューム
+uint8_t Mid_PlayTable[16][128];	// スペアナ用
+uint8_t Mid_PlayTable2[16][128];	// レベルメーター用
+uint8_t Mid_NoteTable[16][128];	// ノート表示用
+uint8_t Mid_NoteWTable[16][128];	// ノート表示用(2)
+uint8_t Mid_PanpodTable[16];	// パンポット
+uint8_t Mid_ExpressionTable[16];	// エクスプレッション
+uint8_t Mid_VolumeTable[16];	// ボリューム
 
 static BYTE			Mid_MulTempo = MID_STDTEMPO;
-DWORD				Mid_PlayTime = 0;
+uint32_t Mid_PlayTime = 0;
 
 
 bool Mid_Start(void)
@@ -321,7 +322,7 @@ void Mid_GMReset(void)
 	while(timeGetTime()-time<=50);
 }
 
-BOOL Mid_ChgDev(char pos)
+bool Mid_ChgDev(char pos)
 {
 	int		i,temp;
 	UINT	mret;
@@ -427,7 +428,7 @@ static BOOL Mid_Init(void)
 	return TRUE;
 }
 
-BOOL Mid_Free(void)
+bool Mid_Free(void)
 {
 	int i;
 

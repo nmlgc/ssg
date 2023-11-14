@@ -865,8 +865,7 @@ static void SetSndItem(void)
 {
 	const char	*EorD[2] = {" 使用する ","使用しない"};
 	static int now;
-	char	*ptr,buf[1000];
-	int		l;
+	char	buf[1000];
 	static BYTE time = 0;
 
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
@@ -875,15 +874,16 @@ static void SetSndItem(void)
 
 	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
 		time+=16;
-		ptr = Mid_Dev.name[Mid_Dev.NowID];
-		l = strlen(ptr);
-		if(l>18){
-			sprintf(buf,"     %s     %s",ptr,ptr);
-			if(time==0) now = (now+1)%(l+5);
+		const auto dev = Mid_DevName();
+		if(dev.size() > 18) {
+			sprintf(buf, "     %s     %s", dev.data(), dev.data());
+			if(time == 0) {
+				now = ((now + 1) % (dev.size() + 5));
+			}
 		}
 		else{
 			now = 0;
-			strcpy(buf,ptr);
+			strcpy(buf, dev.data());
 		}
 		sprintf(SndTitle[2],">%.18s",buf+now);
 	}

@@ -269,6 +269,11 @@ BOOL Mid_ChgDev(char pos)
 	return FALSE;
 }
 
+Narrow::string_view Mid_DevName(void)
+{
+	return { Mid_Dev.name[Mid_Dev.NowID] };
+}
+
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 {
 	MID_TRACKST			midtrack;

@@ -34,11 +34,11 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 void MUSICROOM_TEXT::PrerenderMidDev() const
 {
 	TextObj.Prerender(mid_dev, [](GIAN_TEXTRENDER_SESSION auto& s) {
-		const char* dev = Mid_Dev.name[Mid_Dev.NowID];
+		const auto dev = Mid_DevName();
 
 		s.SetFont(GIAN_FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
-		s.Put({ 0, 0 }, { dev, (std::min)(strlen(dev), 13u) });
+		s.Put({ 0, 0 }, { dev.data(), (std::min)(dev.size(), 13u) });
 	});
 }
 

@@ -18,6 +18,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include "game/endian.h"
+#include "game/narrow.h"
 #include "platform/buffer.h"
 
 
@@ -101,6 +102,9 @@ void Mid_Volume(BYTE volume);				// マスターボリュームを変更する
 void Mid_Tempo(char tempo);					// テンポを変更する
 void Mid_FadeOut(BYTE speed);				// フェードアウト(数字が大きいほど早い)
 BOOL Mid_ChgDev(char pos);					// 出力デバイスを変更する
+
+// Returns the name of the current MIDI device.
+Narrow::string_view Mid_DevName(void);
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 

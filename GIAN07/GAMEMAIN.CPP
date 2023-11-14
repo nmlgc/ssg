@@ -1430,7 +1430,7 @@ void MusicRoomProc(bool&)
 	}
 
 	// フェードなどで停止した場合 //
-	if(Mid_Dev.state==MIDST_STOP){
+	if(Mid_Dev.state == MID_BACKEND_STATE::STOP) {
 		Mid_TableInit();
 	}
 

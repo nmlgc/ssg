@@ -98,7 +98,7 @@ void Mid_Play(void)
 	if(
 		(Mid_Dev.mp == nullptr) ||
 		(Mid_Data.data == nullptr) ||
-		(Mid_Dev.state == MIDST_PLAY)
+		(Mid_Dev.state == MID_BACKEND_STATE::PLAY)
 	) {
 		return;
 	}
@@ -122,14 +122,16 @@ void Mid_Play(void)
 		TIME_PERIODIC
 	);
 
-	Mid_Dev.state = MIDST_PLAY;
+	Mid_Dev.state = MID_BACKEND_STATE::PLAY;
 }
 
 void Mid_Stop(void)
 {
 	int i;
 
-	if(Mid_Dev.state==MIDST_STOP) return;
+	if(Mid_Dev.state == MID_BACKEND_STATE::STOP) {
+		return;
+	}
 
 	Mid_PlayTime     = 0;
 	Mid_Dev.FadeFlag = 0;
@@ -143,7 +145,7 @@ void Mid_Stop(void)
 	}
 
 	midiOutReset(Mid_Dev.mp);
-	Mid_Dev.state = MIDST_STOP;
+	Mid_Dev.state = MID_BACKEND_STATE::STOP;
 }
 
 // 各種テーブルの初期化 //

@@ -22,9 +22,11 @@
 #include "platform/buffer.h"
 
 
-#define MIDST_STOP		0x00	// 停止している
-#define MIDST_PLAY		0x01	// 再生中
-#define MIDST_PAUSE		0x02	// 一時停止
+enum class MID_BACKEND_STATE : uint8_t {
+	STOP,	// 停止している
+	PLAY,	// 再生中
+	PAUSE,	// 一時停止
+};
 
 #define MID_STDTEMPO	(1<<7)	// 標準のテンポ
 
@@ -32,7 +34,6 @@
 //// みでぃ用構造体 ////
 typedef struct{
 	HMIDIOUT	mp;					// 出力デバイスのハンドル
-	WORD		state;				// 現在の状態
 	int			nDevice;			// デバイス数
 	int			NowID;				// 現在のデバイスのＩＤ
 	char		**name;				// デバイス名
@@ -44,6 +45,7 @@ typedef struct{
 
 	BYTE		MaxVolume;			// ボリュームの最大値(メッセージでも変化,0-127)
 	BYTE		NowVolume;			// 現在のボリューム(0-127)
+	MID_BACKEND_STATE	state;	// 現在の状態
 } MID_DEVICE;
 
 #pragma pack(push, 1)

@@ -568,7 +568,7 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 		case 0x51: { // テンポ
 			uint32_t tempo_new = 0;
 			for(const auto byte : event.extra_data) {
-				tempo_new += ((tempo_new << 8) + byte);
+				tempo_new = ((tempo_new << 8) + byte);
 			}
 			tempo.qn_duration = std::chrono::duration_cast<MID_REALTIME>(
 				std::chrono::microseconds{ tempo_new }

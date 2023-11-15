@@ -6,6 +6,7 @@
 #include "PBGMIDI.H"
 #include "game/endian.h"
 #include "platform/midi_backend.h"
+#include <algorithm>
 #include <assert.h>
 #include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
@@ -79,6 +80,20 @@ typedef struct{
 
 
 
+struct MID_TEMPO {
+	MID_REALTIME qn_duration;
+	uint16_t ppqn;
+
+	MID_REALTIME RealtimeFromDelta(int32_t delta) const {
+		// Let's round to average out any truncated nanoseconds...
+		const auto qn_times_delta = (qn_duration * delta);
+		return ((delta > 0)
+			? ((qn_times_delta + MID_REALTIME(ppqn / 2)) / ppqn)
+			: ((qn_times_delta - MID_REALTIME(ppqn / 2)) / ppqn)
+		);
+	}
+};
+
 struct MID_EVENT {
 	// An exact `enum class` value for easy `switch`ing.
 	MID_EVENT_KIND kind;
@@ -126,32 +141,36 @@ public:
 struct MID_TRACK {
 	std::span<const uint8_t> data;
 	MID_TRACK_ITERATOR it;
-	int count;
+	MID_PULSE next_pulse = 0;
+
+	// Time until the next MIDI event. The MIDI events add their delta time
+	// converted into seconds according to the current tempo, and the play
+	// callback subtracts its interval. If ≤0, the next event is processed.
+	MID_REALTIME next_time = 0s;
+
 	bool play;
+
+	// Reads a MIDI delta time from the iterator and updates [next_time] and
+	// [next_pulse] accordingly.
+	void ConsumeDelta(const MID_TEMPO& tempo);
 };
 
 struct MID_SEQUENCE {
 	BYTE_BUFFER_OWNED smf = nullptr;
 	std::unique_ptr<MID_TRACK[]> track_buf = nullptr;
 	std::span<MID_TRACK> tracks;
-	int	timebase;
-
-	// Length of a quarter note. No need to use the 64 bits of
-	// `std::chrono::microseconds` if MIDI just uses 28.
-	std::chrono::duration<uint32_t, std::micro> tempo;
-
-	std::chrono::milliseconds playcount1;
-	DWORDLONG	playcount2;
+	MID_TEMPO tempo = { .qn_duration = 1s /* 60 BPM */ };
 
 	// Applies the event to the sequence state and consumes the following delta
 	// time on the given track.
 	void Process(MID_TRACK& track, const MID_EVENT& event);
+
+	void Rewind(void);
 };
 
 
 // ローカルな関数 //
 static void Mid_GMReset(void);
-static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
 static void MidFadeIOFunc(void);
@@ -197,7 +216,10 @@ void Mid_Play(void)
 	Mid_Dev.NowVolume = 127;
 	Mid_Volume(Mid_Dev.NowVolume);
 
-	Mid_Init();
+	Mid_Seq.Rewind();
+	for(auto& t : Mid_Seq.tracks) {
+		t.next_time = 0s;
+	}
 
 	Mid_GMReset();
 	MidBackend_StartTimer();
@@ -316,8 +338,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	}
 	const auto midmain = maybe_midmain.value()[0];
 
-	Mid_Seq.timebase = midmain.timebase;
-	Mid_Seq.tempo = 1s; // 60 BPM
+	Mid_Seq.tempo.ppqn = midmain.timebase;
 
 	Mid_Seq.track_buf = std::unique_ptr<MID_TRACK[]>(
 		new (std::nothrow) MID_TRACK[midmain.track]
@@ -341,26 +362,24 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 		track.data = maybe_data.value();
 	}
 
-	Mid_Init();
+	Mid_Seq.Rewind();
 	return true;
 }
 
-static BOOL Mid_Init(void)
+void MID_SEQUENCE::Rewind(void)
 {
 	//Mid_Fade = 0;
 	//Mid_MulTempo = MID_STDTEMPO;
-	Mid_PlayTime    = 0s;
 
-	Mid_Seq.playcount1 = 0s;
-	Mid_Seq.playcount2 = 0;
-
+	Mid_PlayTime = 0s;
 	for(auto& t : Mid_Seq.tracks) {
+		// We do *not* reset [next_time] here. This preserves the overshot
+		// amount of time when we rewind at the end of the track.
 		t.it = { t.data };
-		t.play  = true;
-		t.count = t.it.ConsumeVLQ();	// 初期ウェイトカウントを読むの
+		t.play = true;
+		t.next_pulse = 0;
+		t.ConsumeDelta(tempo);
 	}
-
-	return TRUE;
 }
 
 uint32_t MID_TRACK_ITERATOR::ConsumeVLQ(void)
@@ -376,6 +395,17 @@ uint32_t MID_TRACK_ITERATOR::ConsumeVLQ(void)
 		ret = ((ret << 7) | (temp & 0x7f));
 	} while(temp & 0x80);
 	return ret;
+}
+
+void MID_TRACK::ConsumeDelta(const MID_TEMPO& time)
+{
+	const auto delta = it.ConsumeVLQ();
+	if(delta == -1) {
+		play = false;
+		return;
+	}
+	next_pulse += delta;
+	next_time += time.RealtimeFromDelta(delta);
 }
 
 std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
@@ -454,36 +484,43 @@ static void MidFadeIOFunc(void)
 
 void Mid_Proc(MID_REALTIME delta)
 {
-	BOOL		flag = FALSE;
-	const auto delta_ms = std::chrono::round<std::chrono::milliseconds>(delta);
-	const auto now = (Mid_Seq.playcount2 + (
-		(Mid_Seq.playcount1 * Mid_Seq.timebase) / Mid_Seq.tempo
-	));
+	const auto interval = ((delta * Mid_MulTempo) / MID_STDTEMPO);
 
+	// Advance the timer of all tracks first. Must be done before we process
+	// anything because tempo events on other tracks will need to resynchronize
+	// the timer.
 	for(auto& p : Mid_Seq.tracks) {
 		if(p.play) {
-			flag = TRUE;
-			while(p.play && (p.count <= now)) {
-				const auto maybe_event = p.it.ConsumeEvent();
-				if(!maybe_event) {
-					p.play = false;
-					continue;
-				}
-				const auto& event = maybe_event.value();
-				Mid_Seq.Process(p, event);
-				event.Send();
-			}
+			p.next_time -= interval;
 		}
 	}
 
-	Mid_PlayTime += delta_ms;
+	// Process all events.
+	for(auto& p : Mid_Seq.tracks) {
+		while(p.play && (p.next_time <= 0s)) {
+			const auto maybe_event = p.it.ConsumeEvent();
+			if(!maybe_event) {
+				p.play = false;
+				continue;
+			}
+			const auto& event = maybe_event.value();
+			Mid_Seq.Process(p, event);
+			event.Send();
+		}
+	}
 
-	Mid_Seq.playcount1 += ((delta_ms * Mid_MulTempo) / MID_STDTEMPO);
+	// Check if we're done. (We might have processed the final End of Track
+	// event in the loop above.)
+	const bool still_playing = std::ranges::any_of(
+		Mid_Seq.tracks, &MID_TRACK::play
+	);
+
+	Mid_PlayTime += std::chrono::round<decltype(Mid_PlayTime)>(delta);
 
 	MidFadeIOFunc();
 
-	if(!flag){
-		Mid_Init();
+	if(!still_playing) {
+		Mid_Seq.Rewind();
 	}
 }
 
@@ -529,13 +566,28 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 			return;
 
 		case 0x51: { // テンポ
-			playcount2 += ((playcount1 * timebase) / tempo);
-			playcount1 = 0s;
 			uint32_t tempo_new = 0;
 			for(const auto byte : event.extra_data) {
 				tempo_new += ((tempo_new << 8) + byte);
 			}
-			tempo = decltype(tempo){ tempo_new };
+			tempo.qn_duration = std::chrono::duration_cast<MID_REALTIME>(
+				std::chrono::microseconds{ tempo_new }
+			);
+
+			// Recalculate the next tick on all tracks, preserving the amount
+			// of time we've overshot when reaching this one.
+			for(auto& other : tracks) {
+				// Note that this is also correct in case [other] still has to
+				// process multiple events before [track.next_pulse]. In this
+				// case, all of these events *must* be processed now, which we
+				// ensure by calculating the new [next_time] at the current
+				// tempo.
+				const auto delta = (other.next_pulse - track.next_pulse);
+				other.next_time = (
+					track.next_time + tempo.RealtimeFromDelta(delta)
+				);
+			}
+			break;
 		}
 
 		default:
@@ -588,7 +640,7 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 		break;
 	}
 
-	track.count += track.it.ConsumeVLQ();
+	track.ConsumeDelta(tempo);
 }
 
 Any::string_view Mid_GetTitle(void)

@@ -27,6 +27,10 @@ enum class MID_BACKEND_STATE : uint8_t {
 	PAUSE,	// 一時停止
 };
 
+// A position within a MIDI sequence. We need negative numbers for proper
+// distance calculations.
+using MID_PULSE = int64_t;
+
 // Sufficiently precise realtime values for MIDI event timing. Signed 64-bit
 // integers can fit the highest possible tempo × delta time value at nanosecond
 // precision (0xFF'FF'FF × 0xF'FF'FF'FF × 10³) , with one bit to spare.

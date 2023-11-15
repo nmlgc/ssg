@@ -1370,7 +1370,6 @@ void MusicRoomProc(bool&)
 {
 	PIXEL_LTRB	src;
 	char	buf[100];
-	int		m,s;
 	int		i;
 	static WORD Old_Key;
 	static BYTE DevChgWait;
@@ -1441,13 +1440,14 @@ void MusicRoomProc(bool&)
 		GrpDrawSpect(352,128);
 		GrpDrawNote();
 
-		m = (Mid_PlayTime/1000)/60;
-		s = (Mid_PlayTime/1000)%60;
+		const auto millis = Mid_PlayTime.count();
+		const auto m = ((millis / 1000) / 60);
+		const auto s = ((millis / 1000) % 60);
 		sprintf(buf,"%02d : %02d",m,s);
 		GrpPut7B(560,40+2+2,buf);
 		//TextOut(hdc,561,40+2,buf,strlen(buf));
 
-		sprintf(buf,"%07d",Mid_PlayTime);
+		sprintf(buf, "%07d", millis);
 		GrpPut7B(560,64+2+2,buf);
 		//TextOut(hdc,561,64+2,buf,strlen(buf));
 

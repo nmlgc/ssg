@@ -17,6 +17,7 @@
 
 #include "game/narrow.h"
 #include "platform/buffer.h"
+#include <chrono>
 #include <stdint.h>
 
 
@@ -25,6 +26,13 @@ enum class MID_BACKEND_STATE : uint8_t {
 	PLAY,	// 再生中
 	PAUSE,	// 一時停止
 };
+
+// Sufficiently precise realtime values for MIDI event timing. Signed 64-bit
+// integers can fit the highest possible tempo × delta time value at nanosecond
+// precision (0xFF'FF'FF × 0xF'FF'FF'FF × 10³) , with one bit to spare.
+// (Nanoseconds only add a factor of 10³ here because tempo values already use
+// microseconds.)
+using MID_REALTIME = std::chrono::nanoseconds;
 
 //// 関数 ////
 bool Mid_Start(void);	// ＭＩＤＩ関連初期化
@@ -45,9 +53,9 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 
 const char* Mid_GetTitle(void);	// この曲のお名前は？
 
-// Processes and outputs the next [delta] milliseconds of the currently loaded
-// MIDI sequence.
-void Mid_Proc(unsigned int delta);
+// Processes and outputs the next time [delta] of the currently loaded MIDI
+// sequence.
+void Mid_Proc(MID_REALTIME delta);
 
 void Mid_TableInit(void);					// 各種テーブルの初期化
 
@@ -61,7 +69,7 @@ extern uint8_t	Mid_NoteWTable[16][128];	// ノート表示用(2)
 extern uint8_t	Mid_PanpodTable[16];	// パンポット
 extern uint8_t	Mid_ExpressionTable[16];	// エクスプレッション
 extern uint8_t	Mid_VolumeTable[16];	// ボリューム
-extern uint32_t	Mid_PlayTime;
+extern std::chrono::duration<int32_t, std::milli> Mid_PlayTime;
 
 
 #endif

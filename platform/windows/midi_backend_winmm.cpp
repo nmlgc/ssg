@@ -11,6 +11,8 @@
 
 #pragma comment(lib, "winmm.lib")
 
+using namespace std::chrono_literals;
+
 using DEVICE_NAME = std::array<char, MAXPNAMELEN>;
 
 typedef struct {
@@ -23,7 +25,7 @@ typedef struct {
 	//// たいまー用構造体 ////
 	UINT	htimer;
 	TIMECAPS	caps;
-	UINT	delay;
+	std::chrono::duration<uint32_t, std::milli> delay;
 } MID_WINMM;
 
 // グローバル＆名前空間でローカルな変数 //
@@ -130,9 +132,9 @@ void MidBackend_StartTimer(void)
 {
 	timeGetDevCaps(&Mid_WinMM.caps, sizeof(TIMECAPS));
 	timeBeginPeriod(Mid_WinMM.caps.wPeriodMin);
-	Mid_WinMM.delay  = 10;
+	Mid_WinMM.delay  = 10ms;
 	Mid_WinMM.htimer = timeSetEvent(
-		Mid_WinMM.delay,
+		Mid_WinMM.delay.count(),
 		Mid_WinMM.caps.wPeriodMin,
 		CBMid_TimeFunc,
 		0,

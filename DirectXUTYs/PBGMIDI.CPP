@@ -12,6 +12,8 @@
 
 #define MID_STDTEMPO	(1<<7)	// 標準のテンポ
 
+using namespace std::chrono_literals;
+
 
 // MIDI protocol
 // -------------
@@ -74,8 +76,12 @@ struct MID_SEQUENCE {
 	std::unique_ptr<MID_TRACK[]> track_buf = nullptr;
 	std::span<MID_TRACK> tracks;
 	int	timebase;
-	int	tempo;
-	DWORDLONG	playcount1;
+
+	// Length of a quarter note. No need to use the 64 bits of
+	// `std::chrono::microseconds` if MIDI just uses 28.
+	std::chrono::duration<uint32_t, std::micro> tempo;
+
+	std::chrono::milliseconds playcount1;
 	DWORDLONG	playcount2;
 };
 
@@ -100,7 +106,7 @@ uint8_t Mid_ExpressionTable[16];	// エクスプレッション
 uint8_t Mid_VolumeTable[16];	// ボリューム
 
 static BYTE			Mid_MulTempo = MID_STDTEMPO;
-uint32_t Mid_PlayTime = 0;
+std::chrono::duration<int32_t, std::milli> Mid_PlayTime = 0s;
 
 
 bool Mid_Start(void)
@@ -142,7 +148,7 @@ void Mid_Stop(void)
 		return;
 	}
 
-	Mid_PlayTime     = 0;
+	Mid_PlayTime     = 0s;
 	Mid_Dev.FadeFlag = 0;
 
 	MidBackend_StopTimer();
@@ -249,7 +255,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	const auto midmain = maybe_midmain.value()[0];
 
 	Mid_Seq.timebase = midmain.timebase;
-	Mid_Seq.tempo    = 1000000;
+	Mid_Seq.tempo = 1s; // 60 BPM
 
 	Mid_Seq.track_buf = std::unique_ptr<MID_TRACK[]>(
 		new (std::nothrow) MID_TRACK[midmain.track]
@@ -281,9 +287,9 @@ static BOOL Mid_Init(void)
 {
 	//Mid_Fade = 0;
 	//Mid_MulTempo = MID_STDTEMPO;
-	Mid_PlayTime    = 0;
+	Mid_PlayTime    = 0s;
 
-	Mid_Seq.playcount1 = 0;
+	Mid_Seq.playcount1 = 0s;
 	Mid_Seq.playcount2 = 0;
 
 	for(auto& t : Mid_Seq.tracks) {
@@ -330,13 +336,13 @@ static void MidFadeIOFunc(void)
 	Mid_Dev.FadeCount++;
 }
 
-void Mid_Proc(unsigned int delta)
+void Mid_Proc(MID_REALTIME delta)
 {
 	BOOL		flag = FALSE;
-	const auto now = (Mid_Seq.playcount2 +
-		((DWORDLONG)Mid_Seq.playcount1 * Mid_Seq.timebase * 1000) /
-		Mid_Seq.tempo
-	);
+	const auto delta_ms = std::chrono::round<std::chrono::milliseconds>(delta);
+	const auto now = (Mid_Seq.playcount2 + (
+		(Mid_Seq.playcount1 * Mid_Seq.timebase) / Mid_Seq.tempo
+	));
 
 	for(auto& p : Mid_Seq.tracks) {
 		if(p.play) {
@@ -347,9 +353,9 @@ void Mid_Proc(unsigned int delta)
 		}
 	}
 
-	Mid_PlayTime += delta;
+	Mid_PlayTime += delta_ms;
 
-	Mid_Seq.playcount1 += ((delta * Mid_MulTempo) >> 7);
+	Mid_Seq.playcount1 += ((delta_ms * Mid_MulTempo) / MID_STDTEMPO);
 
 	MidFadeIOFunc();
 
@@ -392,12 +398,16 @@ static void Mid_Parse(MID_TRACK *track)
 					return;
 				}
 				else if(code==0x51){	// テンポ
-					Mid_Seq.playcount2 += (((DWORDLONG)Mid_Seq.playcount1 * Mid_Seq.timebase * 1000) / Mid_Seq.tempo);
-					Mid_Seq.playcount1 = 0;
-					Mid_Seq.tempo      = 0;
+					Mid_Seq.playcount2 += (
+						(Mid_Seq.playcount1 * Mid_Seq.timebase) / Mid_Seq.tempo
+					);
+					Mid_Seq.playcount1 = 0s;
+					uint32_t tempo = 0;
 					for(decltype(countwork) i = 0; i < countwork; i++) {
-						Mid_Seq.tempo += ((Mid_Seq.tempo << 8) + (*(track->work++)));
+						tempo += ((tempo << 8) + (*(track->work++)));
 					}
+					Mid_Seq.tempo = decltype(Mid_Seq.tempo){ tempo };
+
 					// ここに謎の一行があります //
 					break;
 				}

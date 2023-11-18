@@ -112,6 +112,13 @@ struct MID_EVENT {
 		return (status & 0xf);
 	}
 
+	bool IsNoteOff(void) const {
+		return (
+			(kind == MID_EVENT_KIND::NOTE_OFF) ||
+			((kind == MID_EVENT_KIND::NOTE_ON) && (extra_data[1] == 0))
+		);
+	}
+
 	// Converts the event to a raw MIDI message and sends that to the output
 	// device.
 	void Send(void) const;
@@ -126,6 +133,10 @@ public:
 	MID_TRACK_ITERATOR(const MID_TRACK_ITERATOR& other) = default;
 	MID_TRACK_ITERATOR(const std::span<const uint8_t> data) :
 		cursor(data), status(0x00) {
+	}
+
+	explicit operator bool() const {
+		return (cursor.data() != nullptr);
 	}
 
 	// Reads a MIDI variable-length quantity and advances [work] accordingly.
@@ -148,11 +159,20 @@ struct MID_TRACK {
 	// callback subtracts its interval. If ≤0, the next event is processed.
 	MID_REALTIME next_time = 0s;
 
+	// [it] and [next_pulse] for the first event after the loop start point.
+	MID_TRACK_ITERATOR loop_it;
+	MID_PULSE loop_pulse = 0;
+
+	// Only necessary for resynchronizing [next_time] after a tempo change on
+	// another track.
+	MID_PULSE prev_pulse = 0;
+	uint32_t next_delta = 0;
+
 	bool play = true;
 
 	// Reads a MIDI delta time from the iterator and updates [next_time] and
 	// [next_pulse] accordingly.
-	void ConsumeDelta(const MID_TEMPO& tempo);
+	void ConsumeDelta(const MID_TEMPO& tempo, const MID_LOOP& loop);
 };
 
 struct MID_SEQUENCE {
@@ -160,6 +180,7 @@ struct MID_SEQUENCE {
 	std::unique_ptr<MID_TRACK[]> track_buf = nullptr;
 	std::span<MID_TRACK> tracks;
 	MID_TEMPO tempo = { .qn_duration = 1s /* 60 BPM */ };
+	MID_LOOP loop;
 
 	// Applies the event to the sequence state and consumes the following delta
 	// time on the given track.
@@ -363,6 +384,11 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	return true;
 }
 
+void Mid_SetLoop(const MID_LOOP& loop)
+{
+	Mid_Seq.loop = loop;
+}
+
 void MID_SEQUENCE::Rewind(void)
 {
 	//Mid_Fade = 0;
@@ -375,8 +401,28 @@ void MID_SEQUENCE::Rewind(void)
 		t.it = { t.data };
 		t.play = true;
 		t.next_pulse = 0;
-		t.ConsumeDelta(tempo);
+		t.loop_it = {};
+		t.loop_pulse = 0;
+		t.next_delta = 0;
+		t.prev_pulse = 0;
+		t.ConsumeDelta(tempo, loop);
 	}
+}
+
+// Loops [track] from [cur_pulse] to the loop start point.
+static void TrackLoop(
+	MID_TRACK& track,
+	const MID_TEMPO& tempo,
+	const MID_LOOP& loop,
+	MID_PULSE cur_pulse
+)
+{
+	track.next_delta = (
+		(loop.end - cur_pulse) + (track.loop_pulse - loop.start)
+	);
+	track.it = track.loop_it;
+	track.next_pulse = track.loop_pulse;
+	track.next_time += tempo.RealtimeFromDelta(track.next_delta);
 }
 
 uint32_t MID_TRACK_ITERATOR::ConsumeVLQ(void)
@@ -394,15 +440,34 @@ uint32_t MID_TRACK_ITERATOR::ConsumeVLQ(void)
 	return ret;
 }
 
-void MID_TRACK::ConsumeDelta(const MID_TEMPO& time)
+void MID_TRACK::ConsumeDelta(const MID_TEMPO& tempo, const MID_LOOP& loop)
 {
-	const auto delta = it.ConsumeVLQ();
-	if(delta == -1) {
+	prev_pulse = next_pulse;
+	next_delta = it.ConsumeVLQ();
+	if(next_delta == -1) {
 		play = false;
 		return;
 	}
-	next_pulse += delta;
-	next_time += time.RealtimeFromDelta(delta);
+	next_pulse += next_delta;
+	if(loop) {
+		if(!loop_it) {
+			if(next_pulse >= loop.end) {
+				// The track won't play an event until after the loop, so we
+				// can immediately shut it down.
+				play = false;
+			} else if(next_pulse >= loop.start) {
+				// Set loop start point
+				loop_it = it;
+				loop_pulse = next_pulse;
+			}
+		} else if(next_pulse == loop.end) {
+			// Handled in the timing loop.
+		} else if(next_pulse > loop.end) {
+			TrackLoop(*this, tempo, loop, prev_pulse);
+			return;
+		}
+	}
+	next_time += tempo.RealtimeFromDelta(next_delta);
 }
 
 std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
@@ -501,8 +566,20 @@ void Mid_Proc(MID_REALTIME delta)
 				continue;
 			}
 			const auto& event = maybe_event.value();
-			Mid_Seq.Process(p, event);
-			event.Send();
+
+			// We should have looped at this exact point, but doing that would
+			// skip any Note Off messages that occur exactly at the loop end
+			// point. Process only those and ignore everything else.
+			if(
+				Mid_Seq.loop &&
+				(p.next_pulse == Mid_Seq.loop.end) &&
+				!event.IsNoteOff()
+			) {
+				p.ConsumeDelta(Mid_Seq.tempo, Mid_Seq.loop);
+			} else {
+				Mid_Seq.Process(p, event);
+				event.Send();
+			}
 		}
 	}
 
@@ -559,7 +636,12 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 	case MID_EVENT_KIND::META: // 制御用データ(出力のないものだけ出力)
 		switch(event.meta) {
 		case 0x2f: // トラック終了
-			track.play = false;
+			if(track.loop_it) {
+				// Rewind to the first note after the loop
+				TrackLoop(track, tempo, loop, track.next_pulse);
+			} else {
+				track.play = false;
+			}
 			return;
 
 		case 0x51: { // テンポ
@@ -579,7 +661,16 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 				// case, all of these events *must* be processed now, which we
 				// ensure by calculating the new [next_time] at the current
 				// tempo.
-				const auto delta = (other.next_pulse - track.next_pulse);
+
+				// This can be different than [next_pulse] if that track
+				// already looped back.
+				const auto other_unlooped_next_pulse = (
+					other.prev_pulse + other.next_delta
+				);
+				const auto delta = ((track.next_pulse >= other.prev_pulse)
+					? (other_unlooped_next_pulse - track.next_pulse)
+					: (other.next_pulse - track.next_pulse)
+				);
 				other.next_time = (
 					track.next_time + tempo.RealtimeFromDelta(delta)
 				);
@@ -637,7 +728,7 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 		break;
 	}
 
-	track.ConsumeDelta(tempo);
+	track.ConsumeDelta(tempo, loop);
 }
 
 Any::string_view Mid_GetTitle(void)

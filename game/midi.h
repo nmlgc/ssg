@@ -38,6 +38,15 @@ using MID_PULSE = int64_t;
 // microseconds.)
 using MID_REALTIME = std::chrono::nanoseconds;
 
+struct MID_LOOP {
+	MID_PULSE start = 0;
+	MID_PULSE end = 0;
+
+	explicit operator bool() const {
+		return (start != end);
+	}
+};
+
 //// 関数 ////
 bool Mid_Start(void);	// ＭＩＤＩ関連初期化
 void Mid_End(void);							// ＭＩＤＩ関連おしまい
@@ -54,6 +63,9 @@ void Mid_FadeOut(uint8_t speed);	// フェードアウト(数字が大きいほ�
 bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
+
+// Sets a loop point for the currently loaded sequence.
+void Mid_SetLoop(const MID_LOOP& loop);
 
 Any::string_view Mid_GetTitle(void);	// この曲のお名前は？
 

@@ -96,6 +96,10 @@ struct MID_EVENT {
 		assert(kind < MID_EVENT_KIND::SYSEX);
 		return (status & 0xf);
 	}
+
+	// Converts the event to a raw MIDI message and sends that to the output
+	// device.
+	void Send(void) const;
 };
 
 struct MID_TRACK {
@@ -125,6 +129,10 @@ struct MID_SEQUENCE {
 
 	std::chrono::milliseconds playcount1;
 	DWORDLONG	playcount2;
+
+	// Applies the event to the sequence state and consumes the following delta
+	// time on the given track.
+	void Process(MID_TRACK& track, const MID_EVENT& event);
 };
 
 
@@ -133,7 +141,6 @@ static void Mid_GMReset(void);
 static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
-static void Mid_Process(MID_TRACK& track, const MID_EVENT& event);
 static void MidFadeIOFunc(void);
 
 // グローバル＆名前空間でローカルな変数 //
@@ -434,7 +441,8 @@ void Mid_Proc(MID_REALTIME delta)
 			flag = TRUE;
 			while(p.play && (p.count <= now)) {
 				const auto event = p.ConsumeEvent();
-				Mid_Process(p, event);
+				Mid_Seq.Process(p, event);
+				event.Send();
 			}
 		}
 	}
@@ -450,23 +458,41 @@ void Mid_Proc(MID_REALTIME delta)
 	}
 }
 
-static void Mid_Process(MID_TRACK& track, const MID_EVENT& event)
+void MID_EVENT::Send(void) const
 {
-	switch(event.kind) {
+	switch(kind) {
 	case MID_EVENT_KIND::SYSEX: { // エクスクルーシブ
-		auto* msg = static_cast<uint8_t *>(
-			_malloca(event.extra_data.size() + 1)
-		);
+		auto* msg = static_cast<uint8_t *>(_malloca(extra_data.size() + 1));
 		if(!msg) {
 			break;
 		}
 		msg[0] = 0xf0;
-		std::ranges::copy(event.extra_data, (msg + 1));
-		MidBackend_Out({ msg, (event.extra_data.size() + 1) });
+		std::ranges::copy(extra_data, (msg + 1));
+		MidBackend_Out({ msg, (extra_data.size() + 1) });
 		_freea(msg);
 		break;
 	}
 
+	// ３バイト： コントロールチェンジ or 発音 or 変更 or ノートオフ
+	case MID_EVENT_KIND::CONTROLLER:
+	case MID_EVENT_KIND::NOTE_ON:
+	case MID_EVENT_KIND::NOTE_AFTERTOUCH:
+	case MID_EVENT_KIND::NOTE_OFF:
+	case MID_EVENT_KIND::PITCH_BEND:
+		MidBackend_Out(status, extra_data[0], extra_data[1]);
+		break;
+
+	// ２バイト
+	case MID_EVENT_KIND::PROGRAM_CHANGE:
+	case MID_EVENT_KIND::CHANNEL_AFTERTOUCH:
+		MidBackend_Out(status, extra_data[0]);
+		break;
+	}
+}
+
+void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
+{
+	switch(event.kind) {
 	case MID_EVENT_KIND::META: // 制御用データ(出力のないものだけ出力)
 		switch(event.meta) {
 		case 0x2f: // トラック終了
@@ -474,16 +500,13 @@ static void Mid_Process(MID_TRACK& track, const MID_EVENT& event)
 			return;
 
 		case 0x51: { // テンポ
-			Mid_Seq.playcount2 += (
-				(Mid_Seq.playcount1 * Mid_Seq.timebase) / Mid_Seq.tempo
-			);
-			Mid_Seq.playcount1 = 0s;
-			uint32_t tempo = 0;
+			playcount2 += ((playcount1 * timebase) / tempo);
+			playcount1 = 0s;
+			uint32_t tempo_new = 0;
 			for(const auto byte : event.extra_data) {
-				tempo += ((tempo << 8) + byte);
+				tempo_new += ((tempo_new << 8) + byte);
 			}
-			Mid_Seq.tempo = decltype(Mid_Seq.tempo){ tempo };
-			break;
+			tempo = decltype(tempo){ tempo_new };
 		}
 
 		default:
@@ -504,8 +527,9 @@ static void Mid_Process(MID_TRACK& track, const MID_EVENT& event)
 		case 0x0b: // エクスプレッション
 			Mid_ExpressionTable[event.Channel()] = event.extra_data[1];
 			break;
+		default:
+			break;
 		}
-		MidBackend_Out(event.status, event.extra_data[0], event.extra_data[1]);
 		break;
 
 	case MID_EVENT_KIND::NOTE_OFF: // ノートオフ
@@ -528,18 +552,10 @@ static void Mid_Process(MID_TRACK& track, const MID_EVENT& event)
 		if(Mid_NoteTable[channel][note]) {
 			Mid_NoteWTable[channel][note] = 5;
 		}
-
-		MidBackend_Out(event.status, note, vel);
 		break;
 	}
 
-	case MID_EVENT_KIND::PITCH_BEND: // ３バイト
-		MidBackend_Out(event.status, event.extra_data[0], event.extra_data[1]);
-		break;
-
-	case MID_EVENT_KIND::PROGRAM_CHANGE:
-	case MID_EVENT_KIND::CHANNEL_AFTERTOUCH: // ２バイト
-		MidBackend_Out(event.status, event.extra_data[0]);
+	default:
 		break;
 	}
 

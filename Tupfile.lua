@@ -129,7 +129,6 @@ main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, {
 	},
 	buildtypes = {
 		debug = { cflags = "/DPBG_DEBUG" },
-		release = { cflags = "/DNDEBUG" },
 	}
 })
 

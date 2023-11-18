@@ -6,6 +6,7 @@
 #include "PBGMIDI.H"
 #include "game/endian.h"
 #include "platform/midi_backend.h"
+#include <assert.h>
 #include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
 
@@ -13,6 +14,25 @@
 #define MID_STDTEMPO	(1<<7)	// 標準のテンポ
 
 using namespace std::chrono_literals;
+
+// MIDI protocol
+// -------------
+
+// Valid values for the upper nibble of the MIDI status byte.
+enum class MID_EVENT_KIND : uint8_t {
+	NOTE_OFF = 0x80,
+	NOTE_ON = 0x90,
+	NOTE_AFTERTOUCH = 0xA0,
+	CONTROLLER = 0xB0,
+	PROGRAM_CHANGE = 0xC0,
+	CHANNEL_AFTERTOUCH = 0xD0,
+	PITCH_BEND = 0xE0,
+	SYSEX = 0xF0,
+	META = 0xFF,
+
+	FIRST = NOTE_OFF,
+};
+// -------------
 
 
 // MIDI protocol
@@ -59,6 +79,25 @@ typedef struct{
 
 
 
+struct MID_EVENT {
+	// An exact `enum class` value for easy `switch`ing.
+	MID_EVENT_KIND kind;
+
+	// Raw MIDI status byte, including the channel if <0xF0.
+	uint8_t status;
+
+	// Meta event code; only valid if ([status] == MID_EVENT_KIND::META).
+	uint8_t meta;
+
+	// Extra data after the status byte. *Not* a complete raw MIDI message!
+	std::span<const uint8_t> extra_data;
+
+	uint8_t Channel(void) const {
+		assert(kind < MID_EVENT_KIND::SYSEX);
+		return (status & 0xf);
+	}
+};
+
 struct MID_TRACK {
 	std::span<const uint8_t> data;
 	const uint8_t* work;
@@ -69,6 +108,9 @@ struct MID_TRACK {
 	// Reads a MIDI variable-length quantity and advances [work] accordingly.
 	// Used for both delta times and multi-byte event lengths.
 	uint32_t ConsumeVLQ(void);
+
+	// Reads the next MIDI event and advances [work] according to its size.
+	MID_EVENT ConsumeEvent(void);
 };
 
 struct MID_SEQUENCE {
@@ -91,7 +133,7 @@ static void Mid_GMReset(void);
 static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
-static void  Mid_Parse(MID_TRACK *track);
+static void Mid_Process(MID_TRACK& track, const MID_EVENT& event);
 static void MidFadeIOFunc(void);
 
 // グローバル＆名前空間でローカルな変数 //
@@ -313,6 +355,49 @@ uint32_t MID_TRACK::ConsumeVLQ(void)
 	return ret;
 }
 
+MID_EVENT MID_TRACK::ConsumeEvent(void)
+{
+	if(*(work) >= std::to_underlying(MID_EVENT_KIND::FIRST)) {
+		status = *(work);
+		work++;
+	}
+	assert(status >= std::to_underlying(MID_EVENT_KIND::FIRST));
+	const auto kind = ((status > std::to_underlying(MID_EVENT_KIND::SYSEX))
+		? MID_EVENT_KIND::META
+		: static_cast<MID_EVENT_KIND>(status & 0xf0)
+	);
+
+	size_t extra_data_size = 0;
+	uint8_t meta = 0;
+	switch(kind) {
+	case MID_EVENT_KIND::NOTE_OFF:
+	case MID_EVENT_KIND::NOTE_ON:
+	case MID_EVENT_KIND::NOTE_AFTERTOUCH:
+	case MID_EVENT_KIND::CONTROLLER:
+	case MID_EVENT_KIND::PITCH_BEND:
+		extra_data_size = 2;
+		break;
+	case MID_EVENT_KIND::PROGRAM_CHANGE:
+	case MID_EVENT_KIND::CHANNEL_AFTERTOUCH:
+		extra_data_size = 1;
+		break;
+	case MID_EVENT_KIND::SYSEX:
+		extra_data_size = ConsumeVLQ();
+		break;
+	case MID_EVENT_KIND::META:
+		meta = *(work++);
+		extra_data_size = ConsumeVLQ();
+		break;
+	default:
+		assert(!"Unimplemented MIDI system message");
+		break;
+	}
+	const MID_EVENT ret = { kind, status, meta, { work, extra_data_size } };
+	work += extra_data_size;
+	return ret;
+}
+
+
 static void MidFadeIOFunc(void)
 {
 	if(Mid_Dev.FadeFlag==0) return;
@@ -348,7 +433,8 @@ void Mid_Proc(MID_REALTIME delta)
 		if(p.play) {
 			flag = TRUE;
 			while(p.play && (p.count <= now)) {
-				Mid_Parse(&p);
+				const auto event = p.ConsumeEvent();
+				Mid_Process(p, event);
 			}
 		}
 	}
@@ -364,108 +450,100 @@ void Mid_Proc(MID_REALTIME delta)
 	}
 }
 
-static void Mid_Parse(MID_TRACK *track)
+static void Mid_Process(MID_TRACK& track, const MID_EVENT& event)
 {
-	int	count, countwork;
-	BYTE	st1,st2;
-	BYTE	data[4] = {0,0,0,0};
-
-	st1 = *(track->work);
-	if(st1<0x80)	st1 = track->status;
-	else			track->work++;
-	st2 = st1 & 0xf0;
-
-	switch(st2){
-		case(0xf0):					// ？バイト
-			if(st1 == 0xf0){			// エクスクルーシブ
-				const auto countwork = track->ConsumeVLQ();
-				auto* msg = static_cast<uint8_t *>(_malloca(countwork + 1));
-				if(!msg) {
-					break;
-				}
-				msg[0] = 0xf0;
-				for(auto i = decltype(countwork){ 0 }; i < countwork; i++) {
-					msg[i + 1] = *(track->work++);
-				}
-				MidBackend_Out({ msg, (countwork + 1) });
-				_freea(msg);
-			}
-			else{						// 制御用データ(出力のないものだけ出力)
-				BYTE code = *(track->work++);
-				countwork = track->ConsumeVLQ();
-				if(code==0x2f){			// トラック終了
-					track->play = FALSE;
-					return;
-				}
-				else if(code==0x51){	// テンポ
-					Mid_Seq.playcount2 += (
-						(Mid_Seq.playcount1 * Mid_Seq.timebase) / Mid_Seq.tempo
-					);
-					Mid_Seq.playcount1 = 0s;
-					uint32_t tempo = 0;
-					for(decltype(countwork) i = 0; i < countwork; i++) {
-						tempo += ((tempo << 8) + (*(track->work++)));
-					}
-					Mid_Seq.tempo = decltype(Mid_Seq.tempo){ tempo };
-
-					// ここに謎の一行があります //
-					break;
-				}
-				else					// その他(読み飛ばし)
-					track->work += countwork;
-			}
-		break;
-
-		case(0xb0):				// コントロールチェンジ
-			switch(*(track->work)){
-				case(0x07):	// ボリューム
-					Mid_VolumeTable[st1&0x0f] = *(track->work+1);
-				break;
-
-				case(0x0a):	// パンポット
-					Mid_PanpodTable[st1&0x0f] = *(track->work+1);
-				break;
-
-				case(0x0b):	// エクスプレッション
-					Mid_ExpressionTable[st1&0x0f] = *(track->work+1);
-				break;
-			}
-
-			data[0] = st1;
-			data[1] = *(track->work++);
-			data[2] = *(track->work++);
-			MidBackend_Out(data[0], data[1], data[2]);
-		break;
-
-		case(0x80):					// ノートオフ
-			Mid_NoteTable[st1&0x0f][*(track->work)]  = 0;
-
-		case(0x90):case(0xa0):		// ３バイト：発音 or 変更
-			if(Mid_PlayTable[st1&0x0f][*(track->work)] < *(track->work+1)){
-				Mid_PlayTable[st1&0x0f][*(track->work)]  = *(track->work+1);
-				Mid_PlayTable2[st1&0x0f][*(track->work)] = *(track->work+1);
-			}
-			//Mid_PlayTable[st1&0x0f][*(track->work)]  += *(track->work+1);
-			//Mid_PlayTable2[st1&0x0f][*(track->work)] += *(track->work+1);
-			Mid_NoteTable[st1&0x0f][*(track->work)]  = *(track->work+1);
-			if(Mid_NoteTable[st1&0x0f][*(track->work)])
-				Mid_NoteWTable[st1&0x0f][*(track->work)] = 5;
-
-		case(0xe0):		// ３バイト
-			data[0] = st1;
-			data[1] = *(track->work++);
-			data[2] = *(track->work++);
-			MidBackend_Out(data[0], data[1], data[2]);
-		break;
-
-		case(0xc0):case(0xd0):				// ２バイト
-			MidBackend_Out(st1, *(track->work++));
+	switch(event.kind) {
+	case MID_EVENT_KIND::SYSEX: { // エクスクルーシブ
+		auto* msg = static_cast<uint8_t *>(
+			_malloca(event.extra_data.size() + 1)
+		);
+		if(!msg) {
+			break;
+		}
+		msg[0] = 0xf0;
+		std::ranges::copy(event.extra_data, (msg + 1));
+		MidBackend_Out({ msg, (event.extra_data.size() + 1) });
+		_freea(msg);
 		break;
 	}
 
-	track->status = st1;
-	count = track->ConsumeVLQ();
-	track->count += count;
+	case MID_EVENT_KIND::META: // 制御用データ(出力のないものだけ出力)
+		switch(event.meta) {
+		case 0x2f: // トラック終了
+			track.play = false;
+			return;
+
+		case 0x51: { // テンポ
+			Mid_Seq.playcount2 += (
+				(Mid_Seq.playcount1 * Mid_Seq.timebase) / Mid_Seq.tempo
+			);
+			Mid_Seq.playcount1 = 0s;
+			uint32_t tempo = 0;
+			for(const auto byte : event.extra_data) {
+				tempo += ((tempo << 8) + byte);
+			}
+			Mid_Seq.tempo = decltype(Mid_Seq.tempo){ tempo };
+			break;
+		}
+
+		default:
+			break;
+		}
+
+		// ここに謎の一行があります //
+		break;
+
+	case MID_EVENT_KIND::CONTROLLER: // コントロールチェンジ
+		switch(event.extra_data[0]) {
+		case 0x07: // ボリューム
+			Mid_VolumeTable[event.Channel()] = event.extra_data[1];
+			break;
+		case 0x0a: // パンポット
+			Mid_PanpodTable[event.Channel()] = event.extra_data[1];
+			break;
+		case 0x0b: // エクスプレッション
+			Mid_ExpressionTable[event.Channel()] = event.extra_data[1];
+			break;
+		}
+		MidBackend_Out(event.status, event.extra_data[0], event.extra_data[1]);
+		break;
+
+	case MID_EVENT_KIND::NOTE_OFF: // ノートオフ
+		Mid_NoteTable[event.Channel()][event.extra_data[0]]  = 0;
+		break;
+
+	case MID_EVENT_KIND::NOTE_ON:
+	case MID_EVENT_KIND::NOTE_AFTERTOUCH: { // ３バイト：発音 or 変更
+		const auto channel = event.Channel();
+		const auto note = event.extra_data[0];
+		const auto vel = event.extra_data[1];
+
+		if(Mid_PlayTable[channel][note] < vel) {
+			Mid_PlayTable[channel][note]  = vel;
+			Mid_PlayTable2[channel][note] = vel;
+		}
+		// Mid_PlayTable[channel][note]  += vel;
+		// Mid_PlayTable2[channel][note] += vel;
+		Mid_NoteTable[channel][note]  = vel;
+		if(Mid_NoteTable[channel][note]) {
+			Mid_NoteWTable[channel][note] = 5;
+		}
+
+		MidBackend_Out(event.status, note, vel);
+		break;
+	}
+
+	case MID_EVENT_KIND::PITCH_BEND: // ３バイト
+		MidBackend_Out(event.status, event.extra_data[0], event.extra_data[1]);
+		break;
+
+	case MID_EVENT_KIND::PROGRAM_CHANGE:
+	case MID_EVENT_KIND::CHANNEL_AFTERTOUCH: // ２バイト
+		MidBackend_Out(event.status, event.extra_data[0]);
+		break;
+	}
+
+	track.count += track.ConsumeVLQ();
 }
 
 const char* Mid_GetTitle(void)

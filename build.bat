@@ -27,7 +27,32 @@ exit /b
 
 :init
 	git submodule init %module%
-	git submodule update %module%
+	if not exist %module:/=\%.sparse-checkout (
+		: Do a regular submodule checkout
+		git submodule update %module%
+		exit /b
+	)
+
+	for /f "delims=" %%i in (
+		'git submodule status --cached %module%'
+	) do set hash="%%i"
+
+	: Do a manual sparse checkout by
+	: 1) setting up the repo from scratch to emulate `git submodule`'s shallow
+	:    cloning of only the given ref,
+	git -C %module% init
+	for /f "delims=" %%f in (
+		'git config submodule.%module%.url'
+	) do git -C %module% remote add origin %%f
+	git -C %module% fetch --depth=1 --filter=blob:none origin %hash:~2,40%
+
+	: 2) setting the sparse-checkout parameters, and
+	git -C %module% sparse-checkout set --stdin < %module:/=\%.sparse-checkout
+	git -C %module% reset --hard %hash:~2,40%
+
+	: 3) converting the result back into a submodule.
+	: Can we declaratively specify all that in .gitmodules somehow, please?
+	git submodule absorbgitdirs %module%
 	exit /b
 
 :mismatch

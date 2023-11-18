@@ -12,3 +12,7 @@
 	path = libs/tupblocks
 	url = https://github.com/nmlgc/tupblocks
 	shallow = true
+[submodule "libs/BLAKE3"]
+	path = libs/BLAKE3
+	url = https://github.com/BLAKE3-team/BLAKE3
+	shallow = true

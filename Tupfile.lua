@@ -93,6 +93,48 @@ sdl_dll = (
 )
 -- ---
 
+-- BLAKE3
+-- ------
+
+BLAKE3 = sourcepath("libs/BLAKE3/c/")
+BLAKE3_COMPILE = {
+	base = {
+		objdir = "BLAKE3/",
+
+		-- Visual C++ has no SSE4.1 flag, and I don't trust the /arch:AVX option
+		cflags = "/DBLAKE3_NO_SSE41",
+	}
+}
+BLAKE3_LINK = { base = { cflags = ("-I" .. BLAKE3.root) } }
+
+blake3_src += BLAKE3.join("blake3.c")
+blake3_src += BLAKE3.join("blake3_dispatch.c")
+blake3_src += BLAKE3.join("blake3_portable.c")
+
+blake3_modern_cfg = CONFIG:branch("", BLAKE3_COMPILE, { base = {
+	objdir = "modern/",
+} })
+
+-- Each optimized version must be built with the matching Visual C++ `/arch`
+-- flag. This is not only necessary for the compiler to actually emit the
+-- intended instructions, but also prevents newer instruction sets from
+-- accidentally appearing in older code. (For example, globally setting
+-- `/arch:AVX512` for all of these files would cause AVX-512 instructions to
+-- also appear in the AVX2 version, breaking it on those CPUs.)
+-- That's why they recommend the ASM versions, but they're 64-bit-exclusive…
+blake3_arch_cfgs = {
+	blake3_modern_cfg:branch("", { base = { cflags = "/arch:SSE2" } }),
+	blake3_modern_cfg:branch("", { base = { cflags = "/arch:AVX2" } }),
+	blake3_modern_cfg:branch("", { base = { cflags = "/arch:AVX512" } }),
+}
+blake3_modern_obj = (
+	cxx(blake3_modern_cfg, blake3_src) +
+	cxx(blake3_arch_cfgs[1], BLAKE3.join("blake3_sse2.c")) +
+	cxx(blake3_arch_cfgs[2], BLAKE3.join("blake3_avx2.c")) +
+	cxx(blake3_arch_cfgs[3], BLAKE3.join("blake3_avx512.c"))
+)
+-- ------
+
 -- Static analysis using the C++ Core Guideline checker plugin.
 ANALYSIS_CFLAGS = (
 	"/analyze:autolog- /analyze:plugin EspXEngine.dll " ..
@@ -118,7 +160,7 @@ ANALYSIS = {
 	},
 }
 
-main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, {
+main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, BLAKE3_LINK, {
 	base = {
 		cflags = (
 			"/std:c++latest " ..
@@ -154,4 +196,8 @@ main_sdl_src += "MAIN/main_sdl.cpp"
 main_sdl_src += tup.glob("platform/miniaudio/*.cpp")
 main_sdl_src += tup.glob("platform/sdl/*.cpp")
 main_sdl_obj = cxx(main_sdl_cfg, main_sdl_src)
-exe(main_sdl_cfg, (main_sdl_obj + main_obj + sdl_dll), "GIAN07")
+exe(
+	main_sdl_cfg,
+	(main_sdl_obj + main_obj + blake3_modern_obj + sdl_dll),
+	"GIAN07"
+)

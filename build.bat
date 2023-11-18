@@ -18,17 +18,19 @@ exit /b
 	for /f "tokens=2 delims= " %%i IN ("%~1") DO set module=%%i
 	if "%status%" == "-" (
 		: Submodule not initialized
-		git submodule init %module%
-		git submodule update %module%
-		exit /b
-	) else if not "%status%" == "+" (
-		: Submodule not changed
-		exit /b
+		goto init
+	) else if "%status%" == "+" (
+		goto mismatch
 	)
+	: Submodule not changed
+	exit /b
 
-	: Everything in (brackets) is treated as a single line where all variables
-	: are expanded immediately, so we want to keep this branch outside of
-	: brackets to have the %hash_recorded% variable work as intended.
+:init
+	git submodule init %module%
+	git submodule update %module%
+	exit /b
+
+:mismatch
 	for /f "delims=" %%i in (
 		'git submodule status --cached %module%'
 	) do set hash_recorded="%%i"
@@ -45,4 +47,3 @@ exit /b
 	echo Otherwise, resolve the conflict manually.
 	echo Exiting the build process just to be safe.
 	exit 1
-

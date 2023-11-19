@@ -58,21 +58,21 @@ typedef struct{
 
 
 typedef struct {
-	BOOL	play;
+	std::span<const uint8_t> data;
+	const uint8_t* work;
 	int	count;
-	int	size;
+	bool	play;
 	BYTE	status;
-	LPBYTE	data;
-	LPBYTE	work;
 } MID_TRACK;
 
 struct MID_SEQUENCE {
-	int	track;
+	BYTE_BUFFER_OWNED smf = nullptr;
+	std::unique_ptr<MID_TRACK[]> track_buf = nullptr;
+	std::span<MID_TRACK> tracks;
 	int	timebase;
 	int	tempo;
 	DWORDLONG	playcount1;
 	DWORDLONG	playcount2;
-	MID_TRACK	*data;
 };
 
 
@@ -81,7 +81,7 @@ static void Mid_GMReset(void);
 static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
-static DWORD GetWaitCount(LPBYTE *data);
+static uint32_t GetWaitCount(const uint8_t** data);
 static void  Mid_Parse(MID_TRACK *track);
 static void MidFadeIOFunc(void);
 
@@ -115,7 +115,7 @@ void Mid_Play(void)
 {
 	if(
 		!MidBackend_DeviceName() ||
-		(Mid_Seq.data == nullptr) ||
+		Mid_Seq.tracks.empty() ||
 		(Mid_Dev.state == MID_BACKEND_STATE::PLAY)
 	) {
 		return;
@@ -225,11 +225,10 @@ bool Mid_ChgDev(char pos)
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 {
-	SMF_TRACK	midtrack;
+	Mid_Seq = {};
+	Mid_Seq.smf = std::move(buffer);
 
-	Mid_Free();
-
-	auto cursor = buffer.cursor();
+	auto cursor = Mid_Seq.smf.cursor();
 	const auto maybe_midhead = cursor.next<SMF_FILE>();
 	if(!maybe_midhead) {
 		return false;
@@ -246,34 +245,29 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	}
 	const auto midmain = maybe_midmain.value()[0];
 
-	Mid_Seq.track    = midmain.track;
 	Mid_Seq.timebase = midmain.timebase;
 	Mid_Seq.tempo    = 1000000;
 
-	Mid_Seq.data = (MID_TRACK *)LocalAlloc(
-		LPTR, (sizeof(MID_TRACK) * Mid_Seq.track)
+	Mid_Seq.track_buf = std::unique_ptr<MID_TRACK[]>(
+		new (std::nothrow) MID_TRACK[midmain.track]
 	);
-	ZeroMemory(Mid_Seq.data, (sizeof(MID_TRACK) * Mid_Seq.track));
+	if(!Mid_Seq.track_buf) {
+		return false;
+	}
+	Mid_Seq.tracks = { Mid_Seq.track_buf.get(), midmain.track };
 
-	for(int i = 0; i < Mid_Seq.track; i++){
+	for(auto& track : Mid_Seq.tracks) {
 		const auto maybe_midtrack = cursor.next<SMF_TRACK>();
 		if(!maybe_midtrack) {
 			return false;
 		}
 		const auto midtrack = maybe_midtrack.value()[0];
 
-		auto& pt = Mid_Seq.data[i];
-		pt.size = midtrack.size;
-		pt.data = (BYTE *)LocalAlloc(LPTR,pt.size);
-		pt.play = TRUE;
-
-		const auto maybe_data = cursor.next<uint8_t>(pt.size);
+		const auto maybe_data = cursor.next<uint8_t>(midtrack.size);
 		if(!maybe_data) {
 			return false;
 		}
-		const auto data = maybe_data.value();
-
-		memcpy(pt.data, data.data(), data.size_bytes());
+		track.data = maybe_data.value();
 	}
 
 	Mid_Init();
@@ -282,8 +276,6 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 
 static BOOL Mid_Init(void)
 {
-	MID_TRACK	*p;
-
 	//Mid_Fade = 0;
 	//Mid_MulTempo = MID_STDTEMPO;
 	Mid_PlayTime    = 0;
@@ -291,34 +283,16 @@ static BOOL Mid_Init(void)
 	Mid_Seq.playcount1 = 0;
 	Mid_Seq.playcount2 = 0;
 
-	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
-		p = &(Mid_Seq.data[i]);
-		p->work  = p->data;
-		p->play  = TRUE;
-		p->count = GetWaitCount(&(p->work));		// 初期ウェイトカウントを読むの
+	for(auto& t : Mid_Seq.tracks) {
+		t.work  = t.data.data();
+		t.play  = true;
+		t.count = GetWaitCount(&t.work);	// 初期ウェイトカウントを読むの
 	}
 
 	return TRUE;
 }
 
-bool Mid_Free(void)
-{
-	if(Mid_Seq.data == NULL) {
-		return false;
-	}
-
-	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
-		LocalFree(Mid_Seq.data[i].data);
-	}
-
-	LocalFree(Mid_Seq.data);
-	Mid_Seq.data  = nullptr;
-	Mid_Seq.track = 0;
-
-	return TRUE;
-}
-
-static DWORD GetWaitCount(LPBYTE *data)
+static uint32_t GetWaitCount(const uint8_t** data)
 {
 	BYTE	temp;
 	DWORD	ret = 0;
@@ -358,18 +332,17 @@ static void MidFadeIOFunc(void)
 void Mid_Proc(unsigned int delta)
 {
 	BOOL		flag = FALSE;
-	MID_TRACK	*p;
 	const auto now = (Mid_Seq.playcount2 +
 		((DWORDLONG)Mid_Seq.playcount1 * Mid_Seq.timebase * 1000) /
 		Mid_Seq.tempo
 	);
 
-	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
-		p = &(Mid_Seq.data[i]);
-		if(p->play){
+	for(auto& p : Mid_Seq.tracks) {
+		if(p.play) {
 			flag = TRUE;
-			while(p->play && p->count<=now)
-				Mid_Parse(p);
+			while(p.play && (p.count <= now)) {
+				Mid_Parse(&p);
+			}
 		}
 	}
 
@@ -454,7 +427,7 @@ static void Mid_Parse(MID_TRACK *track)
 		break;
 
 		case(0x80):					// ノートオフ
-			Mid_NoteTable[st1&0x0f][*(track->work)]  = *(track->work+1) = 0;
+			Mid_NoteTable[st1&0x0f][*(track->work)]  = 0;
 
 		case(0x90):case(0xa0):		// ３バイト：発音 or 変更
 			if(Mid_PlayTable[st1&0x0f][*(track->work)] < *(track->work+1)){
@@ -484,16 +457,15 @@ static void Mid_Parse(MID_TRACK *track)
 	track->count += count;
 }
 
-char *Mid_GetTitle(void)
+const char* Mid_GetTitle(void)
 {
 	static char temp[1000];
-	BYTE *p;
 
 	memset(temp,0,1000);
 
 	// 通常のファイル用 たまに変なファイルだと間違ったものを表示するが... //
-	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
-		p = Mid_Seq.data[i].data;
+	for(const auto& track : Mid_Seq.tracks) {
+		const auto* p = track.data.data();
 		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
 			if(p[0]==0xff && p[1]==0x03){
 				memcpy(temp,p+3,p[2]);
@@ -504,12 +476,12 @@ char *Mid_GetTitle(void)
 	}
 
 	// タイトルのはずなのに別のところに記述しているファイル用 //
-	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
-		p = Mid_Seq.data[i].data;
+	for(const auto& track : Mid_Seq.tracks) {
+		const auto* p = track.data.data();
 		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
 			if(p[0]==0xff && p[1]==0x01){
 				memcpy(temp,p+3,p[2]);
-				return reinterpret_cast<char *>(p+3);
+				return reinterpret_cast<const char *>(p+3);
 			}
 			p++;
 		}

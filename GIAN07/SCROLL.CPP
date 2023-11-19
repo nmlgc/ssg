@@ -138,7 +138,6 @@ static void enemy_set(void)
 	int			x,y;
 	BYTE		id;
 	BOOL		bFlag = TRUE;
-	char		*mtitle;
 	BYTE		*cmd;
 	DWORD		temp;
 //	BIT_DEVICE	*in;				// やばやば...
@@ -274,7 +273,7 @@ static void enemy_set(void)
 					Mid_Stop();
 					if(LoadMusic(cmd[1])){
 						Mid_Play();
-						mtitle = Mid_GetTitle();
+						const auto mtitle = Mid_GetTitle();
 						if(mtitle) {
 							// ♪ in Shift-JIS. Since this codepoint is still
 							// combined with the Shift-JIS music titles baked

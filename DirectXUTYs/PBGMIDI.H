@@ -36,7 +36,6 @@ void Mid_Play(void);						// 再生する
 // Stops backend output and resets the tables.
 void Mid_Stop(void);						// 停止する
 
-bool Mid_Free(void);	// データ解放する
 void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
 void Mid_Tempo(char tempo);					// テンポを変更する
 void Mid_FadeOut(uint8_t speed);	// フェードアウト(数字が大きいほど早い)
@@ -44,7 +43,7 @@ bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 
-char *Mid_GetTitle(void);					// この曲のお名前は？
+const char* Mid_GetTitle(void);	// この曲のお名前は？
 
 // Processes and outputs the next [delta] milliseconds of the currently loaded
 // MIDI sequence.

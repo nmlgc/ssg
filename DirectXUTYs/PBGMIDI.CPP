@@ -16,8 +16,6 @@ static void Mid_GMReset(void);
 static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
-static WORD  ConvWord(WORD data);
-static DWORD ConvDWord(DWORD data);
 static DWORD GetWaitCount(LPBYTE *data);
 static void  CALLBACK CBMid_TimeFunc(UINT uID,UINT uMsg,DWORD dwUser,DWORD dw1,DWORD dw2);
 static void  Mid_Parse(MID_TRACK *track);
@@ -309,7 +307,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	}
 	const auto& midhead = maybe_midhead.value()[0];
 
-	if(midhead.MThd != mmioFOURCC('M','T','h','d')) {
+	if(midhead.MThd != 0x4D546864) { // "MThd"
 		return false;
 	}
 
@@ -319,9 +317,8 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	}
 	const auto midmain = maybe_midmain.value()[0];
 
-	Mid_Data.format   = ConvWord(midmain.format);
-	Mid_Data.track    = ConvWord(midmain.track);
-	Mid_Data.timebase = ConvWord(midmain.timebase);
+	Mid_Data.track    = midmain.track;
+	Mid_Data.timebase = midmain.timebase;
 	Mid_Data.tempo    = 1000000;
 
 	Mid_Data.data = (MID_TRACK *)LocalAlloc(LPTR,sizeof(MID_TRACK)*Mid_Data.track);
@@ -335,7 +332,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 		const auto midtrack = maybe_midtrack.value()[0];
 
 		auto& pt = Mid_Data.data[i];
-		pt.size = ConvDWord(midtrack.size);
+		pt.size = midtrack.size;
 		pt.data = (BYTE *)LocalAlloc(LPTR,pt.size);
 		pt.play = TRUE;
 
@@ -390,28 +387,6 @@ BOOL Mid_Free(void)
 	Mid_Data.track = 0;
 
 	return TRUE;
-}
-
-static WORD ConvWord(WORD data)
-{
-	WORD temp;
-
-	((BYTE *)&temp)[0] = ((BYTE *)&data)[1];
-	((BYTE *)&temp)[1] = ((BYTE *)&data)[0];
-
-	return temp;
-}
-
-static DWORD ConvDWord(DWORD data)
-{
-	DWORD temp;
-
-	((BYTE *)&temp)[0] = ((BYTE *)&data)[3];
-	((BYTE *)&temp)[1] = ((BYTE *)&data)[2];
-	((BYTE *)&temp)[2] = ((BYTE *)&data)[1];
-	((BYTE *)&temp)[3] = ((BYTE *)&data)[0];
-
-	return temp;
 }
 
 static DWORD GetWaitCount(LPBYTE *data)

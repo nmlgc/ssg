@@ -7,6 +7,7 @@
 
 #include "platform/file.h"
 #include "game/coords.h"
+#include "game/endian.h"
 
 // Platform-independent .BMP header types
 // --------------------------------------
@@ -16,27 +17,27 @@
 // Same as the standard Win32 BITMAPFILEHEADER structure, renamed to avoid
 // collisions.
 struct BMP_FILEHEADER {
-	uint16_t bfType;
-	uint32_t bfSize;
-	uint16_t bfReserved1;
-	uint16_t bfReserved2;
-	uint32_t bfOffBits;
+	U16LE bfType;
+	U32LE bfSize;
+	U16LE bfReserved1;
+	U16LE bfReserved2;
+	U32LE bfOffBits;
 };
 
 // Same as the standard Win32 BITMAPINFOHEADER structure, renamed to avoid
 // collisions.
 struct BMP_INFOHEADER {
-	uint32_t biSize;
-	int32_t biWidth;
-	int32_t biHeight;
-	uint16_t biPlanes;
-	uint16_t biBitCount;
-	uint32_t biCompression;
-	uint32_t biSizeImage;
-	int32_t biXPelsPerMeter;
-	int32_t biYPelsPerMeter;
-	uint32_t biClrUsed;
-	uint32_t biClrImportant;
+	U32LE biSize;
+	I32LE biWidth;
+	I32LE biHeight;
+	U16LE biPlanes;
+	U16LE biBitCount;
+	U32LE biCompression;
+	U32LE biSizeImage;
+	I32LE biXPelsPerMeter;
+	I32LE biYPelsPerMeter;
+	U32LE biClrUsed;
+	U32LE biClrImportant;
 
 	uint32_t Stride() const {
 		return ((((biWidth * biBitCount) + 31u) & ~31) / 8u);

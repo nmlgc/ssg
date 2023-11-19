@@ -7,6 +7,7 @@
 
 #include "platform/buffer.h"
 #include "platform/unicode.h"
+#include "game/endian.h"
 #include <array>
 
 // Format
@@ -19,14 +20,14 @@ constexpr const std::array<char, 4> PBG_HEADNAME = { 'P', 'B', 'G', 0x1A };
 
 struct PBG_FILEHEAD {
 	std::array<char, PBG_HEADNAME.size()> name = PBG_HEADNAME;
-	fil_checksum_t sum = 0;
-	fil_no_t n = 0;
+	ENDIAN_LITTLE<fil_checksum_t> sum = 0;
+	ENDIAN_LITTLE<fil_no_t> n = 0;
 };
 
 struct PBG_FILEINFO {
-	fil_size_t size_uncompressed;
-	fil_size_t offset;
-	fil_checksum_t checksum_compressed;
+	ENDIAN_LITTLE<fil_size_t> size_uncompressed;
+	ENDIAN_LITTLE<fil_size_t> offset;
+	ENDIAN_LITTLE<fil_checksum_t> checksum_compressed;
 };
 // ------
 

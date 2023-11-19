@@ -38,10 +38,10 @@ std::optional<BYTE_BUFFER_BORROWED> FilFileGetCompressed(
 	if(filno >= info.size()) {
 		return std::nullopt;
 	}
-	const auto start = info[filno].offset;
+	const size_t start = info[filno].offset;
 	const auto end = ((filno == (info.size() - 1))
 		? packfile.size()
-		: info[filno + 1].offset
+		: size_t{ info[filno + 1].offset }
 	);
 	if((start >= packfile.size()) || (end > packfile.size())) {
 		return std::nullopt;
@@ -117,7 +117,9 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 		return nullptr;
 	}
 
-	BYTE_BUFFER_OWNED uncompressed = { info[filno].size_uncompressed };
+	BYTE_BUFFER_OWNED uncompressed = {
+		size_t{ info[filno].size_uncompressed }
+	};
 	if(!uncompressed) {
 		return nullptr;
 	}
@@ -213,6 +215,7 @@ bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
 {
 	PBG_FILEHEAD head = { .n = files.size() };
 	std::vector<PBG_FILEINFO> info(files.size());
+	fil_checksum_t sum = 0; // in native byte order
 
 	auto write_header = [&head, &info](FILE_STREAM_WRITE &stream) {
 		return (stream.Write(head) && stream.Write(info));
@@ -240,7 +243,7 @@ bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
 		info[i].offset = maybe_offset.value();
 		info[i].size_uncompressed = files[i].size();
 		info[i].checksum_compressed = FilChecksumAddFile(
-			head.sum, info[i].offset, info[i].size_uncompressed, compressed
+			sum, info[i].offset, info[i].size_uncompressed, compressed
 		);
 		if(!stream->Write(compressed)) {
 			return false;
@@ -248,6 +251,7 @@ bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
 	}
 
 	// Write real header
+	head.sum = sum;
 	return (stream->Seek(0, SEEK_WHENCE::BEGIN) && write_header(*stream));
 }
 

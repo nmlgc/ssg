@@ -17,6 +17,7 @@
 
 #include <windows.h>
 #include <mmsystem.h>
+#include "game/endian.h"
 #include "platform/buffer.h"
 
 
@@ -54,21 +55,25 @@ typedef struct{
 	BYTE		NowVolume;			// 現在のボリューム(0-127)
 } MID_DEVICE;
 
+#pragma pack(push, 1)
+
 typedef struct {
-	DWORD	MThd;
-	DWORD	size;
+	U32BE	MThd;
+	U32BE	size;
 } MID_FILEST;
 
 typedef struct {
-	WORD	format;
-	WORD	track;
-	WORD	timebase;
+	U16BE	format;
+	U16BE	track;
+	U16BE	timebase;
 } MID_MAINST;
 
 typedef struct {
-	DWORD	MTrk;
-	DWORD	size;
+	U32BE	MTrk;
+	U32BE	size;
 } MID_TRACKST;
+
+#pragma pack(pop)
 
 typedef struct {
 	BOOL	play;
@@ -80,7 +85,6 @@ typedef struct {
 } MID_TRACK;
 
 typedef struct {
-	int			format;
 	int			track;
 	int			timebase;
 	int			tempo;

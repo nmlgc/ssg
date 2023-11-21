@@ -13,6 +13,7 @@
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
 #include "platform/input.h"
+#include "platform/midi_backend.h"
 #include <numeric>
 
 
@@ -872,9 +873,10 @@ static void SetSndItem(void)
 	sprintf(SndTitle[0], "WAVE [%s]", SetFlagsMacro(EorD, ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE));
 	sprintf(SndTitle[1], "MIDI [%s]", SetFlagsMacro(EorD, ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE));
 
-	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+	const auto maybe_dev = MidBackend_DeviceName();
+	if((ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) && maybe_dev) {
 		time+=16;
-		const auto dev = Mid_DevName();
+		const auto dev = maybe_dev.value();
 		if(dev.size() > 18) {
 			sprintf(buf, "     %s     %s", dev.data(), dev.data());
 			if(time == 0) {

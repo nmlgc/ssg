@@ -29,20 +29,26 @@ enum class MID_BACKEND_STATE : uint8_t {
 //// 関数 ////
 bool Mid_Start(void);	// ＭＩＤＩ関連初期化
 void Mid_End(void);							// ＭＩＤＩ関連おしまい
+
+// Starts outputting the loaded MIDI to the backend.
 void Mid_Play(void);						// 再生する
+
+// Stops backend output and resets the tables.
 void Mid_Stop(void);						// 停止する
+
 bool Mid_Free(void);	// データ解放する
 void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
 void Mid_Tempo(char tempo);					// テンポを変更する
 void Mid_FadeOut(uint8_t speed);	// フェードアウト(数字が大きいほど早い)
 bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 
-// Returns the name of the current MIDI device.
-Narrow::string_view Mid_DevName(void);
-
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 
 char *Mid_GetTitle(void);					// この曲のお名前は？
+
+// Processes and outputs the next [delta] milliseconds of the currently loaded
+// MIDI sequence.
+void Mid_Proc(unsigned int delta);
 
 void Mid_TableInit(void);					// 各種テーブルの初期化
 

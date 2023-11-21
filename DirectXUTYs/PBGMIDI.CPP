@@ -3,14 +3,11 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "platform/file.h"
 #include "PBGMIDI.H"
 #include "game/endian.h"
-#include <array>
+#include "platform/midi_backend.h"
 #include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
-
-#pragma comment(lib, "winmm.lib")
 
 
 #define MID_STDTEMPO	(1<<7)	// 標準のテンポ
@@ -46,15 +43,8 @@ typedef struct {
 // -------------------------
 
 
-using DEVICE_NAME = std::array<char, MAXPNAMELEN>;
-
 //// みでぃ用構造体 ////
 typedef struct{
-	HMIDIOUT	mp;	// 出力デバイスのハンドル
-	unsigned int	nDevice;	// デバイス数
-	int	NowID;	// 現在のデバイスのＩＤ
-	DEVICE_NAME*	name;	// デバイス名
-
 	// 以下は外部から変更＆参照しないこと //
 	DWORD	FadeCount;	// フェードＩ／Ｏカウンタ
 	char	FadeFlag;	// フェードＩ／Ｏフラグ(In or Out or 無し)
@@ -85,13 +75,6 @@ typedef struct {
 	MID_TRACK	*data;
 } MID_DATA;
 
-//// たいまー用構造体 ////
-typedef struct {
-	UINT	htimer;
-	TIMECAPS	caps;
-	UINT	delay;
-} TIME_DATA;
-
 
 // ローカルな関数 //
 static void Mid_GMReset(void);
@@ -99,15 +82,12 @@ static BOOL Mid_Init(void);
 
 // さらに？ローカルな関数 //
 static DWORD GetWaitCount(LPBYTE *data);
-static void  CALLBACK CBMid_TimeFunc(UINT uID,UINT uMsg,DWORD dwUser,DWORD dw1,DWORD dw2);
 static void  Mid_Parse(MID_TRACK *track);
 static void MidFadeIOFunc(void);
-static void Mid_ShortMsg(BYTE d1,BYTE d2,BYTE d3);	// ショートメッセージを出力する
 
 // グローバル＆名前空間でローカルな変数 //
 MID_DEVICE	Mid_Dev;
 static MID_DATA		Mid_Data;
-static TIME_DATA	Mid_Time;
 uint8_t Mid_PlayTable[16][128];	// スペアナ用
 uint8_t Mid_PlayTable2[16][128];	// レベルメーター用
 uint8_t Mid_NoteTable[16][128];	// ノート表示用
@@ -122,69 +102,19 @@ uint32_t Mid_PlayTime = 0;
 
 bool Mid_Start(void)
 {
-	int				i;
-	UINT			mret;
-
-	// 各変数の初期化 //
-	Mid_Dev.mp      = NULL;
-	Mid_Dev.nDevice = midiOutGetNumDevs()+1;	// 一つだけ多く準備する
-	Mid_Dev.NowID   = -1 + 1;					// -1: MIDI_MAPPER
-
-	// デバイスが存在しないならリターン //
-	constexpr auto device_cap = (
-		(std::numeric_limits<size_t>::max)() / sizeof(DEVICE_NAME)
-	);
-	if((Mid_Dev.nDevice > 0) && (Mid_Dev.nDevice < device_cap)) {
-		Mid_Dev.name = static_cast<DEVICE_NAME *>(LocalAlloc(
-			LPTR, (sizeof(DEVICE_NAME) * Mid_Dev.nDevice)
-		));
-	}
-	if(!Mid_Dev.name) {
-		return FALSE;
-	}
-
-	// デバイス名格納用のメモリ確保＆セット //
-	for(i=0;i<Mid_Dev.nDevice;i++){
-		[[gsl::suppress(type.5)]] MIDIOUTCAPS caps;
-		midiOutGetDevCaps(i-1,&caps,sizeof(MIDIOUTCAPS));
-		std::ranges::copy(caps.szPname, Mid_Dev.name[i].begin());
-	}
-
-	// 使用できるデバイスを探す(最初がMIDI_MAPPERなのがポイントだ!) //
-	for(i=0;i<Mid_Dev.nDevice;i++){
-		Mid_Dev.NowID = i;
-		mret = midiOutOpen(&Mid_Dev.mp,Mid_Dev.NowID-1,0,0,CALLBACK_NULL);
-		if(mret==MMSYSERR_NOERROR) return TRUE;
-	}
-
-	// 使用できるデバイスが存在しないとき //
-	Mid_End();
-	return FALSE;
+	return MidBackend_Init();
 }
 
 void Mid_End(void)
 {
-	int i;
-
 	Mid_Stop();
-
-	if(Mid_Dev.mp) {
-		Mid_Dev.mp = nullptr;
-		midiOutClose(Mid_Dev.mp);
-	}
-
-	if(Mid_Dev.name){
-		LocalFree(Mid_Dev.name);
-		Mid_Dev.name    = NULL;
-	}
-
-	Mid_Dev.nDevice = Mid_Dev.NowID   = 0;
+	MidBackend_Cleanup();
 }
 
 void Mid_Play(void)
 {
 	if(
-		(Mid_Dev.mp == nullptr) ||
+		!MidBackend_DeviceName() ||
 		(Mid_Data.data == nullptr) ||
 		(Mid_Dev.state == MID_BACKEND_STATE::PLAY)
 	) {
@@ -199,17 +129,7 @@ void Mid_Play(void)
 	Mid_Init();
 
 	Mid_GMReset();
-	timeGetDevCaps(&Mid_Time.caps,sizeof(TIMECAPS));
-	timeBeginPeriod(Mid_Time.caps.wPeriodMin);
-	Mid_Time.delay  = 10;
-	Mid_Time.htimer = timeSetEvent(
-		Mid_Time.delay,
-		Mid_Time.caps.wPeriodMin,
-		CBMid_TimeFunc,
-		0,
-		TIME_PERIODIC
-	);
-
+	MidBackend_StartTimer();
 	Mid_Dev.state = MID_BACKEND_STATE::PLAY;
 }
 
@@ -222,16 +142,15 @@ void Mid_Stop(void)
 	Mid_PlayTime     = 0;
 	Mid_Dev.FadeFlag = 0;
 
-	timeKillEvent(Mid_Time.htimer);
-	timeEndPeriod(Mid_Time.caps.wPeriodMin);
+	MidBackend_StopTimer();
+	MidBackend_Panic();
 
 	Mid_TableInit();
 	for(auto i = 0; i < MIDI_CHANNELS; i++) {
-		Mid_ShortMsg(0xb0+i,0x7b,0x00);		// オール・ノート・オフ
-		Mid_ShortMsg(0xb0+i,0x78,0x00);		// オール・サウンド・オフ
+		MidBackend_Out((0xb0 + i), 0x7b, 0x00);	// オール・ノート・オフ
+		MidBackend_Out((0xb0 + i), 0x78, 0x00);	// オール・サウンド・オフ
 	}
 
-	midiOutReset(Mid_Dev.mp);
 	Mid_Dev.state = MID_BACKEND_STATE::STOP;
 }
 
@@ -257,26 +176,8 @@ void Mid_Volume(BYTE volume)
 	// マスター・ボリューム : F0 7F 7F 04 01 VolumeLowByte VolumeHighByte F7   //
 	// 下位バイトは SC-88ST Pro では 00 として扱われるらしい(取扱説明書より) //
 
-	BYTE	msg[8] = {0xf0,0x7f,0x7f,0x04,0x01,0x00,0x00,0xf7};
-	MIDIHDR	mh;
-/*
-	union{
-		DWORD	dd;
-		struct{
-			WORD	d1;
-			WORD	d2;
-		}w;
-	} temp;
-*/
-	msg[6] = volume;
-
-	mh.dwFlags        = 0;
-	mh.dwOffset       = 0;
-	mh.lpData         = reinterpret_cast<LPSTR>(msg);
-	mh.dwBufferLength = mh.dwBytesRecorded = 8;
-	midiOutPrepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-	midiOutLongMsg(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-	midiOutUnprepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
+	uint8_t msg[8] = { 0xf0, 0x7f, 0x7f, 0x04, 0x01, 0x00, volume, 0xf7 };
+	MidBackend_Out(msg);
 
 	// これより下は削った方が良いかも //
 	//temp.w.d1 = temp.w.d2 = volume;
@@ -297,35 +198,13 @@ void Mid_FadeOut(BYTE speed)
 	Mid_Dev.FadeWait  = ((256-speed)*4)/(Mid_Dev.MaxVolume+1) + 1;
 }
 
-static void Mid_ShortMsg(BYTE d1,BYTE d2,BYTE d3)
-{
-	BYTE	data[4];
-
-	data[0] = d1;
-	data[1] = d2;
-	data[2] = d3;
-	data[3] = 0;
-
-	midiOutShortMsg(Mid_Dev.mp,*((DWORD *)data));
-}
-
 void Mid_GMReset(void)
 {
 	// GM SystemOn : F0H 7EH 7FH 09H 01H F7H //
 
 	DWORD	time;
-	BYTE	msg[6] = {0xf0,0x7e,0x7f,0x09,0x01,0xf7};
-	MIDIHDR	mh;
-
-	mh.dwFlags        = 0;
-	mh.dwOffset       = 0;
-	mh.dwBufferLength = mh.dwBytesRecorded = 11;
-
-	mh.lpData         = reinterpret_cast<LPSTR>(msg);
-	mh.dwBufferLength = mh.dwBytesRecorded = 6;
-	midiOutPrepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-	midiOutLongMsg(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-	midiOutUnprepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
+	uint8_t msg[6] = { 0xf0, 0x7e, 0x7f, 0x09, 0x01, 0xf7 };
+	MidBackend_Out(msg);
 
 	// ここで50ms以上待つこと! //
 	time = timeGetTime();
@@ -334,31 +213,14 @@ void Mid_GMReset(void)
 
 bool Mid_ChgDev(char pos)
 {
-	int		i,temp;
-	UINT	mret;
-
 	// 各関数に合わせて停止処理を行う //
 	Mid_Stop();
 
-	midiOutClose(Mid_Dev.mp);
-
-	temp = Mid_Dev.nDevice + Mid_Dev.NowID + ((pos<0) ? -1 : 1);
-	for(i=0;i<Mid_Dev.nDevice;i++){
-		Mid_Dev.NowID = (pos<0) ? (temp-i)%(Mid_Dev.nDevice) : (temp+i)%(Mid_Dev.nDevice);
-		mret = midiOutOpen(&Mid_Dev.mp,Mid_Dev.NowID-1,0,0,CALLBACK_NULL);
-		if(mret==MMSYSERR_NOERROR){
-			Mid_Play();
-			return TRUE;
-		}
+	const auto ret = MidBackend_DeviceChange(pos);
+	if(ret) {
+		Mid_Play();
 	}
-
-	// あり得ないはずだが... //
-	return FALSE;
-}
-
-Narrow::string_view Mid_DevName(void)
-{
-	return { Mid_Dev.name[Mid_Dev.NowID].data() };
+	return ret;
 }
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)
@@ -470,14 +332,17 @@ static DWORD GetWaitCount(LPBYTE *data)
 
 static void MidFadeIOFunc(void)
 {
-	int		track;
-
 	if(Mid_Dev.FadeFlag==0) return;
 
 	if(Mid_Dev.FadeCount % Mid_Dev.FadeWait == 0){
 		Mid_Dev.NowVolume += Mid_Dev.FadeFlag;
-		for(track=0;track<16;track++)
-			Mid_ShortMsg(0xb0+track,0x07,Mid_VolumeTable[track]*Mid_Dev.NowVolume/(Mid_Dev.MaxVolume+1));
+		for(int track = 0; track < 16; track++) {
+			const uint8_t volume = (
+				(Mid_VolumeTable[track] * Mid_Dev.NowVolume) /
+				(Mid_Dev.MaxVolume + 1)
+			);
+			MidBackend_Out((0xb0 + track), 0x07, volume);
+		}
 		//Mid_Volume(Mid_Dev.NowVolume);
 		if(Mid_Dev.NowVolume==0 || Mid_Dev.NowVolume==Mid_Dev.MaxVolume){
 			Mid_Dev.FadeFlag = 0;
@@ -488,7 +353,7 @@ static void MidFadeIOFunc(void)
 	Mid_Dev.FadeCount++;
 }
 
-static void CALLBACK CBMid_TimeFunc(UINT uID,UINT uMsg,DWORD dwUser,DWORD dw1,DWORD dw2)
+void Mid_Proc(unsigned int delta)
 {
 	int			i;
 	BOOL		flag = FALSE;
@@ -504,9 +369,9 @@ static void CALLBACK CBMid_TimeFunc(UINT uID,UINT uMsg,DWORD dwUser,DWORD dw1,DW
 		}
 	}
 
-	Mid_PlayTime += Mid_Time.delay;
+	Mid_PlayTime += delta;
 
-	Mid_Data.playcount1+=((Mid_Time.delay*Mid_MulTempo)>>7);
+	Mid_Data.playcount1 += ((delta * Mid_MulTempo) >> 7);
 
 	MidFadeIOFunc();
 
@@ -529,18 +394,17 @@ static void Mid_Parse(MID_TRACK *track)
 	switch(st2){
 		case(0xf0):					// ？バイト
 			if(st1 == 0xf0){			// エクスクルーシブ
-				MIDIHDR mh;
-				countwork         = GetWaitCount(&(track->work));
-				mh.lpData         = reinterpret_cast<LPSTR>(LocalAlloc(LPTR,countwork+1));
-				mh.lpData[0]      = (BYTE)0xf0;
-				mh.dwFlags        = mh.dwOffset = 0;
-				mh.dwBufferLength = mh.dwBytesRecorded = countwork+1;
-				for(i=0;i<countwork;i++)
-					mh.lpData[i+1] = *(track->work++);
-				midiOutPrepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-				midiOutLongMsg(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-				midiOutUnprepareHeader(Mid_Dev.mp,&mh,sizeof(MIDIHDR));
-				LocalFree(mh.lpData);
+				const auto countwork = GetWaitCount(&(track->work));
+				auto* msg = static_cast<uint8_t *>(_malloca(countwork + 1));
+				if(!msg) {
+					break;
+				}
+				msg[0] = 0xf0;
+				for(auto i = decltype(countwork){ 0 }; i < countwork; i++) {
+					msg[i + 1] = *(track->work++);
+				}
+				MidBackend_Out({ msg, (countwork + 1) });
+				_freea(msg);
 			}
 			else{						// 制御用データ(出力のないものだけ出力)
 				BYTE code = *(track->work++);
@@ -581,7 +445,7 @@ static void Mid_Parse(MID_TRACK *track)
 			data[0] = st1;
 			data[1] = *(track->work++);
 			data[2] = *(track->work++);
-			midiOutShortMsg(Mid_Dev.mp,*((DWORD *)data));
+			MidBackend_Out(data[0], data[1], data[2]);
 		break;
 
 		case(0x80):					// ノートオフ
@@ -602,13 +466,11 @@ static void Mid_Parse(MID_TRACK *track)
 			data[0] = st1;
 			data[1] = *(track->work++);
 			data[2] = *(track->work++);
-			midiOutShortMsg(Mid_Dev.mp,*((DWORD *)data));
+			MidBackend_Out(data[0], data[1], data[2]);
 		break;
 
 		case(0xc0):case(0xd0):				// ２バイト
-			data[0] = st1;
-			data[1] = *(track->work++);
-			midiOutShortMsg(Mid_Dev.mp,*((DWORD *)data));
+			MidBackend_Out(st1, *(track->work++));
 		break;
 	}
 

@@ -6,6 +6,7 @@
 #include "MUSIC.H"
 #include "FONTUTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
+#include "platform/midi_backend.h"
 
 std::optional<MUSICROOM_TEXT> MusicRoomText;
 
@@ -34,8 +35,11 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 void MUSICROOM_TEXT::PrerenderMidDev() const
 {
 	TextObj.Prerender(mid_dev, [](GIAN_TEXTRENDER_SESSION auto& s) {
-		const auto dev = Mid_DevName();
-
+		const auto maybe_dev = MidBackend_DeviceName();
+		if(!maybe_dev) {
+			return;
+		}
+		const auto dev = maybe_dev.value();
 		s.SetFont(GIAN_FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
 		s.Put({ 0, 0 }, { dev.data(), (std::min)(dev.size(), 13u) });

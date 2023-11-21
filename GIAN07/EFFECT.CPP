@@ -699,7 +699,7 @@ void ObjectLockDraw(void)
 
 
 #include "DirectXUTYs/DD_GRP3D.H"
-#include "DirectXUTYs/PBGMIDI.H"
+#include "game/midi.h"
 // スペアナ描画 //
 void GrpDrawSpect(int x, int y)
 {

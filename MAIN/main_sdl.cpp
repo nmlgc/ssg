@@ -21,10 +21,10 @@
 #include "GIAN07/CONFIG.H"
 #include "GIAN07/ENTRY.H"
 #include "GIAN07/GAMEMAIN.H"
-#include "DirectXUTYs/PBGMIDI.H"
 #include "platform/input.h"
 #include "platform/snd.h"
 #include "game/defer.h"
+#include "game/midi.h"
 #include "strings/title.h"
 
 // Still required for:

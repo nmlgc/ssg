@@ -8,11 +8,11 @@
 #include "GIAN07/GAMEMAIN.H"
 #include "GIAN07/LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/PBGMIDI.H"
 #include "platform/input.h"
 #include "platform/path.h"
 #include "platform/snd.h"
 #include "game/coords.h"
+#include "game/midi.h"
 #include "game/screenshot.h"
 #include <filesystem>
 

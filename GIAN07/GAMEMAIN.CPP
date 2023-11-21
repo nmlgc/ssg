@@ -11,9 +11,9 @@
 #include "LEVEL.H"
 #include "MUSIC.H"
 #include "SCORE.H"
-#include "DirectXUTYs/PBGMIDI.H"
 #include "platform/snd.h"
 #include "game/input.h"
+#include "game/midi.h"
 #include <mmsystem.h>
 
 

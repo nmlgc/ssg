@@ -3,13 +3,12 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "PBGMIDI.H"
+#include "game/midi.h"
 #include "game/endian.h"
 #include "platform/midi_backend.h"
 #include <algorithm>
 #include <thread>
 #include <assert.h>
-#include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
 
 
@@ -70,12 +69,12 @@ typedef struct {
 //// みでぃ用構造体 ////
 typedef struct{
 	// 以下は外部から変更＆参照しないこと //
-	DWORD	FadeCount;	// フェードＩ／Ｏカウンタ
+	unsigned int	FadeCount;	// フェードＩ／Ｏカウンタ
 	char	FadeFlag;	// フェードＩ／Ｏフラグ(In or Out or 無し)
 	int	FadeWait;	// フェードＩ／Ｏウェイト
 
-	BYTE	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
-	BYTE	NowVolume;	// 現在のボリューム(0-127)
+	uint8_t	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
+	uint8_t	NowVolume;	// 現在のボリューム(0-127)
 	MID_BACKEND_STATE	state;	// 現在の状態
 } MID_DEVICE;
 
@@ -149,7 +148,7 @@ struct MID_TRACK {
 	// callback subtracts its interval. If ≤0, the next event is processed.
 	MID_REALTIME next_time = 0s;
 
-	bool play;
+	bool play = true;
 
 	// Reads a MIDI delta time from the iterator and updates [next_time] and
 	// [next_pulse] accordingly.
@@ -187,7 +186,7 @@ uint8_t Mid_PanpodTable[16];	// パンポット
 uint8_t Mid_ExpressionTable[16];	// エクスプレッション
 uint8_t Mid_VolumeTable[16];	// ボリューム
 
-static BYTE			Mid_MulTempo = MID_STDTEMPO;
+static uint8_t Mid_MulTempo = MID_STDTEMPO;
 std::chrono::duration<int32_t, std::milli> Mid_PlayTime = 0s;
 
 
@@ -265,7 +264,7 @@ void Mid_TableInit(void)
 	}
 }
 
-void Mid_Volume(BYTE volume)
+void Mid_Volume(uint8_t volume)
 {
 	// マスター・ボリューム : F0 7F 7F 04 01 VolumeLowByte VolumeHighByte F7   //
 	// 下位バイトは SC-88ST Pro では 00 として扱われるらしい(取扱説明書より) //
@@ -283,7 +282,7 @@ void Mid_Tempo(char tempo)
 	Mid_MulTempo = MID_STDTEMPO + tempo;
 }
 
-void Mid_FadeOut(BYTE speed)
+void Mid_FadeOut(uint8_t speed)
 {
 	Mid_Dev.FadeFlag  = -1;
 	Mid_Dev.FadeCount = 0;

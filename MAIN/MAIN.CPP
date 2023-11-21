@@ -1,12 +1,12 @@
 #include "../GIAN07/CONFIG.H"
 #include "../GIAN07/ENTRY.H"
 #include "../GIAN07/GAMEMAIN.H"
-#include "DirectXUTYs/PBGMIDI.H"
 #include "strings/title.h"
 #include "platform/input.h"
 #include "platform/snd.h"
 #include "platform/unicode.h"
 #include "game/input.h"
+#include "game/midi.h"
 #include <direct.h>
 #include <windows.h>
 #include <mmsystem.h>

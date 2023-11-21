@@ -5,7 +5,6 @@
 
 #include "MUSIC.H"
 #include "FONTUTY.H"
-#include "DirectXUTYs/PBGMIDI.H"
 #include "platform/midi_backend.h"
 
 std::optional<MUSICROOM_TEXT> MusicRoomText;

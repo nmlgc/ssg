@@ -4,7 +4,7 @@
  */
 
 #include "platform/midi_backend.h"
-#include "DirectXUTYs/PBGMIDI.H"
+#include "game/midi.h"
 #include <array>
 #include <windows.h>
 #include <mmeapi.h>

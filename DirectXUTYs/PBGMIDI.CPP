@@ -66,14 +66,14 @@ typedef struct {
 	LPBYTE	work;
 } MID_TRACK;
 
-typedef struct {
+struct MID_SEQUENCE {
 	int	track;
 	int	timebase;
 	int	tempo;
 	DWORDLONG	playcount1;
 	DWORDLONG	playcount2;
 	MID_TRACK	*data;
-} MID_DATA;
+};
 
 
 // ローカルな関数 //
@@ -87,7 +87,7 @@ static void MidFadeIOFunc(void);
 
 // グローバル＆名前空間でローカルな変数 //
 MID_DEVICE	Mid_Dev;
-static MID_DATA		Mid_Data;
+static MID_SEQUENCE Mid_Seq;
 uint8_t Mid_PlayTable[16][128];	// スペアナ用
 uint8_t Mid_PlayTable2[16][128];	// レベルメーター用
 uint8_t Mid_NoteTable[16][128];	// ノート表示用
@@ -115,7 +115,7 @@ void Mid_Play(void)
 {
 	if(
 		!MidBackend_DeviceName() ||
-		(Mid_Data.data == nullptr) ||
+		(Mid_Seq.data == nullptr) ||
 		(Mid_Dev.state == MID_BACKEND_STATE::PLAY)
 	) {
 		return;
@@ -246,21 +246,23 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	}
 	const auto midmain = maybe_midmain.value()[0];
 
-	Mid_Data.track    = midmain.track;
-	Mid_Data.timebase = midmain.timebase;
-	Mid_Data.tempo    = 1000000;
+	Mid_Seq.track    = midmain.track;
+	Mid_Seq.timebase = midmain.timebase;
+	Mid_Seq.tempo    = 1000000;
 
-	Mid_Data.data = (MID_TRACK *)LocalAlloc(LPTR,sizeof(MID_TRACK)*Mid_Data.track);
-	ZeroMemory(Mid_Data.data,sizeof(MID_TRACK)*Mid_Data.track);
+	Mid_Seq.data = (MID_TRACK *)LocalAlloc(
+		LPTR, (sizeof(MID_TRACK) * Mid_Seq.track)
+	);
+	ZeroMemory(Mid_Seq.data, (sizeof(MID_TRACK) * Mid_Seq.track));
 
-	for(int i = 0; i < Mid_Data.track; i++){
+	for(int i = 0; i < Mid_Seq.track; i++){
 		const auto maybe_midtrack = cursor.next<SMF_TRACK>();
 		if(!maybe_midtrack) {
 			return false;
 		}
 		const auto midtrack = maybe_midtrack.value()[0];
 
-		auto& pt = Mid_Data.data[i];
+		auto& pt = Mid_Seq.data[i];
 		pt.size = midtrack.size;
 		pt.data = (BYTE *)LocalAlloc(LPTR,pt.size);
 		pt.play = TRUE;
@@ -281,17 +283,16 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 static BOOL Mid_Init(void)
 {
 	MID_TRACK	*p;
-	int 		i;
 
 	//Mid_Fade = 0;
 	//Mid_MulTempo = MID_STDTEMPO;
 	Mid_PlayTime    = 0;
 
-	Mid_Data.playcount1 = 0;
-	Mid_Data.playcount2 = 0;
+	Mid_Seq.playcount1 = 0;
+	Mid_Seq.playcount2 = 0;
 
-	for(i=0;i<Mid_Data.track;i++){
-		p = &(Mid_Data.data[i]);
+	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
+		p = &(Mid_Seq.data[i]);
 		p->work  = p->data;
 		p->play  = TRUE;
 		p->count = GetWaitCount(&(p->work));		// 初期ウェイトカウントを読むの
@@ -302,16 +303,17 @@ static BOOL Mid_Init(void)
 
 bool Mid_Free(void)
 {
-	int i;
+	if(Mid_Seq.data == NULL) {
+		return false;
+	}
 
-	if(Mid_Data.data == NULL) return FALSE;
+	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
+		LocalFree(Mid_Seq.data[i].data);
+	}
 
-	for(i=0;i<Mid_Data.track;i++)
-		LocalFree(Mid_Data.data[i].data);
-
-	LocalFree(Mid_Data.data);
-	Mid_Data.data  = NULL;
-	Mid_Data.track = 0;
+	LocalFree(Mid_Seq.data);
+	Mid_Seq.data  = nullptr;
+	Mid_Seq.track = 0;
 
 	return TRUE;
 }
@@ -355,13 +357,15 @@ static void MidFadeIOFunc(void)
 
 void Mid_Proc(unsigned int delta)
 {
-	int			i;
 	BOOL		flag = FALSE;
 	MID_TRACK	*p;
-	DWORDLONG	now  = Mid_Data.playcount2 + (DWORDLONG)Mid_Data.playcount1*Mid_Data.timebase*1000/Mid_Data.tempo;
+	const auto now = (Mid_Seq.playcount2 +
+		((DWORDLONG)Mid_Seq.playcount1 * Mid_Seq.timebase * 1000) /
+		Mid_Seq.tempo
+	);
 
-	for(i=0;i<Mid_Data.track;i++){
-		p = &(Mid_Data.data[i]);
+	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
+		p = &(Mid_Seq.data[i]);
 		if(p->play){
 			flag = TRUE;
 			while(p->play && p->count<=now)
@@ -371,7 +375,7 @@ void Mid_Proc(unsigned int delta)
 
 	Mid_PlayTime += delta;
 
-	Mid_Data.playcount1 += ((delta * Mid_MulTempo) >> 7);
+	Mid_Seq.playcount1 += ((delta * Mid_MulTempo) >> 7);
 
 	MidFadeIOFunc();
 
@@ -382,7 +386,7 @@ void Mid_Proc(unsigned int delta)
 
 static void Mid_Parse(MID_TRACK *track)
 {
-	int		i,count,countwork;
+	int	count, countwork;
 	BYTE	st1,st2;
 	BYTE	data[4] = {0,0,0,0};
 
@@ -414,11 +418,12 @@ static void Mid_Parse(MID_TRACK *track)
 					return;
 				}
 				else if(code==0x51){	// テンポ
-					Mid_Data.playcount2 += (DWORDLONG)Mid_Data.playcount1*Mid_Data.timebase*1000/Mid_Data.tempo;
-					Mid_Data.playcount1 = 0;
-					Mid_Data.tempo      = 0;
-					for(i=0;i<countwork;i++)
-						Mid_Data.tempo += (Mid_Data.tempo<<8)+(*(track->work++));
+					Mid_Seq.playcount2 += (((DWORDLONG)Mid_Seq.playcount1 * Mid_Seq.timebase * 1000) / Mid_Seq.tempo);
+					Mid_Seq.playcount1 = 0;
+					Mid_Seq.tempo      = 0;
+					for(decltype(countwork) i = 0; i < countwork; i++) {
+						Mid_Seq.tempo += ((Mid_Seq.tempo << 8) + (*(track->work++)));
+					}
 					// ここに謎の一行があります //
 					break;
 				}
@@ -482,14 +487,13 @@ static void Mid_Parse(MID_TRACK *track)
 char *Mid_GetTitle(void)
 {
 	static char temp[1000];
-	int i;
 	BYTE *p;
 
 	memset(temp,0,1000);
 
 	// 通常のファイル用 たまに変なファイルだと間違ったものを表示するが... //
-	for(i=0;i<Mid_Data.track;i++){
-		p = Mid_Data.data[i].data;
+	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
+		p = Mid_Seq.data[i].data;
 		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
 			if(p[0]==0xff && p[1]==0x03){
 				memcpy(temp,p+3,p[2]);
@@ -500,8 +504,8 @@ char *Mid_GetTitle(void)
 	}
 
 	// タイトルのはずなのに別のところに記述しているファイル用 //
-	for(i=0;i<Mid_Data.track;i++){
-		p = Mid_Data.data[i].data;
+	for(decltype(Mid_Seq.track) i = 0; i < Mid_Seq.track; i++) {
+		p = Mid_Seq.data[i].data;
 		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
 			if(p[0]==0xff && p[1]==0x01){
 				memcpy(temp,p+3,p[2]);

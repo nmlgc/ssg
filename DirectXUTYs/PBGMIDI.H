@@ -17,7 +17,6 @@
 
 #include <windows.h>
 #include <mmsystem.h>
-#include "game/endian.h"
 #include "game/narrow.h"
 #include "platform/buffer.h"
 
@@ -27,72 +26,6 @@ enum class MID_BACKEND_STATE : uint8_t {
 	PLAY,	// 再生中
 	PAUSE,	// 一時停止
 };
-
-#define MID_STDTEMPO	(1<<7)	// 標準のテンポ
-
-
-//// みでぃ用構造体 ////
-typedef struct{
-	HMIDIOUT	mp;					// 出力デバイスのハンドル
-	int			nDevice;			// デバイス数
-	int			NowID;				// 現在のデバイスのＩＤ
-	char		**name;				// デバイス名
-
-	// 以下は外部から変更＆参照しないこと //
-	DWORD		FadeCount;			// フェードＩ／Ｏカウンタ
-	char		FadeFlag;			// フェードＩ／Ｏフラグ(In or Out or 無し)
-	int			FadeWait;			// フェードＩ／Ｏウェイト
-
-	BYTE		MaxVolume;			// ボリュームの最大値(メッセージでも変化,0-127)
-	BYTE		NowVolume;			// 現在のボリューム(0-127)
-	MID_BACKEND_STATE	state;	// 現在の状態
-} MID_DEVICE;
-
-#pragma pack(push, 1)
-
-typedef struct {
-	U32BE	MThd;
-	U32BE	size;
-} MID_FILEST;
-
-typedef struct {
-	U16BE	format;
-	U16BE	track;
-	U16BE	timebase;
-} MID_MAINST;
-
-typedef struct {
-	U32BE	MTrk;
-	U32BE	size;
-} MID_TRACKST;
-
-#pragma pack(pop)
-
-typedef struct {
-	BOOL	play;
-	int		count;
-	int		size;
-	BYTE	status;
-	LPBYTE	data;
-	LPBYTE	work;
-} MID_TRACK;
-
-typedef struct {
-	int			track;
-	int			timebase;
-	int			tempo;
-	DWORDLONG	playcount1;
-	DWORDLONG	playcount2;
-	MID_TRACK	*data;
-} MID_DATA;
-
-//// たいまー用構造体 ////
-typedef struct {
-	UINT		htimer;
-	TIMECAPS	caps;
-	UINT		delay;
-} TIME_DATA;
-
 
 //// 関数 ////
 bool Mid_Start(void);	// ＭＩＤＩ関連初期化
@@ -117,7 +50,6 @@ void Mid_TableInit(void);					// 各種テーブルの初期化
 
 
 //// グローバル変数 ////
-extern MID_DEVICE	Mid_Dev;
 extern WORD			Mid_PlayTable[16][128];
 extern WORD			Mid_PlayTable2[16][128];		// レベルメーター用
 extern BYTE			Mid_NoteTable[16][128];			// ノート表示用

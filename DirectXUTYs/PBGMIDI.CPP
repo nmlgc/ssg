@@ -5,9 +5,82 @@
 
 #include "platform/file.h"
 #include "PBGMIDI.H"
+#include "game/endian.h"
 #pragma message(PBGWIN_PBGMIDI_H)
 
 #pragma comment(lib, "winmm.lib")
+
+
+#define MID_STDTEMPO	(1<<7)	// 標準のテンポ
+
+
+// Standard MIDI File format
+// -------------------------
+#pragma pack(push, 1)
+
+typedef struct {
+	U32BE	MThd;
+	U32BE	size;
+} SMF_FILE;
+
+typedef struct {
+	U16BE	format;
+	U16BE	track;
+	U16BE	timebase;
+} SMF_MAIN;
+
+typedef struct {
+	U32BE	MTrk;
+	U32BE	size;
+} SMF_TRACK;
+
+#pragma pack(pop)
+// -------------------------
+
+
+//// みでぃ用構造体 ////
+typedef struct{
+	HMIDIOUT	mp;	// 出力デバイスのハンドル
+	int	nDevice;	// デバイス数
+	int	NowID;	// 現在のデバイスのＩＤ
+	char	**name;	// デバイス名
+
+	// 以下は外部から変更＆参照しないこと //
+	DWORD	FadeCount;	// フェードＩ／Ｏカウンタ
+	char	FadeFlag;	// フェードＩ／Ｏフラグ(In or Out or 無し)
+	int	FadeWait;	// フェードＩ／Ｏウェイト
+
+	BYTE	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
+	BYTE	NowVolume;	// 現在のボリューム(0-127)
+	MID_BACKEND_STATE	state;	// 現在の状態
+} MID_DEVICE;
+
+
+
+typedef struct {
+	BOOL	play;
+	int	count;
+	int	size;
+	BYTE	status;
+	LPBYTE	data;
+	LPBYTE	work;
+} MID_TRACK;
+
+typedef struct {
+	int	track;
+	int	timebase;
+	int	tempo;
+	DWORDLONG	playcount1;
+	DWORDLONG	playcount2;
+	MID_TRACK	*data;
+} MID_DATA;
+
+//// たいまー用構造体 ////
+typedef struct {
+	UINT	htimer;
+	TIMECAPS	caps;
+	UINT	delay;
+} TIME_DATA;
 
 
 // ローカルな関数 //
@@ -279,12 +352,12 @@ Narrow::string_view Mid_DevName(void)
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 {
-	MID_TRACKST			midtrack;
+	SMF_TRACK	midtrack;
 
 	Mid_Free();
 
 	auto cursor = buffer.cursor();
-	const auto maybe_midhead = cursor.next<MID_FILEST>();
+	const auto maybe_midhead = cursor.next<SMF_FILE>();
 	if(!maybe_midhead) {
 		return false;
 	}
@@ -294,7 +367,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 		return false;
 	}
 
-	const auto maybe_midmain = cursor.next<MID_MAINST>();
+	const auto maybe_midmain = cursor.next<SMF_MAIN>();
 	if(!maybe_midmain) {
 		return false;
 	}
@@ -308,7 +381,7 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer)
 	ZeroMemory(Mid_Data.data,sizeof(MID_TRACK)*Mid_Data.track);
 
 	for(int i = 0; i < Mid_Data.track; i++){
-		const auto maybe_midtrack = cursor.next<MID_TRACKST>();
+		const auto maybe_midtrack = cursor.next<SMF_TRACK>();
 		if(!maybe_midtrack) {
 			return false;
 		}

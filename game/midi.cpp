@@ -92,6 +92,9 @@ struct MID_TEMPO {
 			: ((qn_times_delta - MID_REALTIME(ppqn / 2)) / ppqn)
 		);
 	}
+	int32_t DeltaFromRealtime(MID_REALTIME realtime) const {
+		return ((realtime * ppqn) / qn_duration);
+	}
 };
 
 struct MID_EVENT {
@@ -208,7 +211,7 @@ uint8_t Mid_ExpressionTable[16];	// エクスプレッション
 uint8_t Mid_VolumeTable[16];	// ボリューム
 
 static uint8_t Mid_MulTempo = MID_STDTEMPO;
-std::chrono::duration<int32_t, std::milli> Mid_PlayTime = 0s;
+MID_PLAYTIME Mid_PlayTime;
 
 
 bool Mid_Start(void)
@@ -253,7 +256,7 @@ void Mid_Stop(void)
 		return;
 	}
 
-	Mid_PlayTime     = 0s;
+	Mid_PlayTime = {};
 	Mid_Dev.FadeFlag = 0;
 
 	MidBackend_StopTimer();
@@ -394,7 +397,7 @@ void MID_SEQUENCE::Rewind(void)
 	//Mid_Fade = 0;
 	//Mid_MulTempo = MID_STDTEMPO;
 
-	Mid_PlayTime = 0s;
+	Mid_PlayTime = {};
 	for(auto& t : Mid_Seq.tracks) {
 		// We do *not* reset [next_time] here. This preserves the overshot
 		// amount of time when we rewind at the end of the track.
@@ -547,6 +550,8 @@ static void MidFadeIOFunc(void)
 void Mid_Proc(MID_REALTIME delta)
 {
 	const auto interval = ((delta * Mid_MulTempo) / MID_STDTEMPO);
+	auto& time = Mid_PlayTime;
+	MID_PULSE pulse_sync = 0;
 
 	// Advance the timer of all tracks first. Must be done before we process
 	// anything because tempo events on other tracks will need to resynchronize
@@ -556,6 +561,8 @@ void Mid_Proc(MID_REALTIME delta)
 			p.next_time -= interval;
 		}
 	}
+	time.realtime += std::chrono::round<decltype(time.realtime)>(delta);
+	time.realtime_since_last_event += interval;
 
 	// Process all events.
 	for(auto& p : Mid_Seq.tracks) {
@@ -577,6 +584,10 @@ void Mid_Proc(MID_REALTIME delta)
 			) {
 				p.ConsumeDelta(Mid_Seq.tempo, Mid_Seq.loop);
 			} else {
+				if(p.next_pulse > pulse_sync) {
+					pulse_sync = p.next_pulse;
+					time.realtime_since_last_event = -p.next_time;
+				}
 				Mid_Seq.Process(p, event);
 				event.Send();
 			}
@@ -589,7 +600,15 @@ void Mid_Proc(MID_REALTIME delta)
 		Mid_Seq.tracks, &MID_TRACK::play
 	);
 
-	Mid_PlayTime += std::chrono::round<decltype(Mid_PlayTime)>(delta);
+	if(pulse_sync != 0) {
+		time.pulse_of_last_event_processed = pulse_sync;
+	}
+	if(time.realtime >= 0s) {
+		time.pulse_interpolated = (
+			time.pulse_of_last_event_processed +
+			Mid_Seq.tempo.DeltaFromRealtime(time.realtime_since_last_event)
+		);
+	}
 
 	MidFadeIOFunc();
 

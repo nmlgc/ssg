@@ -1440,14 +1440,14 @@ void MusicRoomProc(bool&)
 		GrpDrawSpect(352,128);
 		GrpDrawNote();
 
-		const auto millis = Mid_PlayTime.count();
+		const auto millis = Mid_PlayTime.realtime.count();
 		const auto m = ((millis / 1000) / 60);
 		const auto s = ((millis / 1000) % 60);
 		sprintf(buf,"%02d : %02d",m,s);
 		GrpPut7B(560,40+2+2,buf);
 		//TextOut(hdc,561,40+2,buf,strlen(buf));
 
-		sprintf(buf, "%07d", millis);
+		sprintf(buf, "%07lld", Mid_PlayTime.pulse_interpolated);
 		GrpPut7B(560,64+2+2,buf);
 		//TextOut(hdc,561,64+2,buf,strlen(buf));
 

@@ -47,6 +47,17 @@ struct MID_LOOP {
 	}
 };
 
+struct MID_PLAYTIME {
+	MID_PULSE pulse_of_last_event_processed = 0;
+	MID_PULSE pulse_interpolated = 0;
+
+	// Total playback realtime of the current sequence.
+	std::chrono::duration<int32_t, std::milli> realtime = (
+		std::chrono::duration<int32_t, std::milli>::zero()
+	);
+	MID_REALTIME realtime_since_last_event = MID_REALTIME::zero();
+};
+
 //// 関数 ////
 bool Mid_Start(void);	// ＭＩＤＩ関連初期化
 void Mid_End(void);							// ＭＩＤＩ関連おしまい
@@ -85,7 +96,7 @@ extern uint8_t	Mid_NoteWTable[16][128];	// ノート表示用(2)
 extern uint8_t	Mid_PanpodTable[16];	// パンポット
 extern uint8_t	Mid_ExpressionTable[16];	// エクスプレッション
 extern uint8_t	Mid_VolumeTable[16];	// ボリューム
-extern std::chrono::duration<int32_t, std::milli> Mid_PlayTime;
+extern MID_PLAYTIME Mid_PlayTime;
 
 
 #endif

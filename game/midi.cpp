@@ -259,7 +259,6 @@ void Mid_Stop(void)
 		return;
 	}
 
-	Mid_PlayTime = {};
 	Mid_Dev.FadeDuration = 0s;
 
 	MidBackend_StopTimer();
@@ -625,6 +624,14 @@ void Mid_Proc(MID_REALTIME delta)
 	if(pulse_sync != 0) {
 		time.pulse_of_last_event_processed = pulse_sync;
 	}
+
+	// If the track doesn't loop, the timer should stop in place.
+	if(!still_playing && (Mid_Seq.loop.end == -1)) {
+		Mid_Stop();
+		time.pulse_interpolated = time.pulse_of_last_event_processed;
+		return;
+	}
+
 	if(time.realtime >= 0s) {
 		time.pulse_interpolated = (
 			time.pulse_of_last_event_processed +

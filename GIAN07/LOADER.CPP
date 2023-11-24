@@ -17,6 +17,30 @@
 #include <assert.h>
 #include <ddraw.h>
 
+// Hardcoded loop points for ZUN's original MIDI files
+// ---------------------------------------------------
+
+struct MID_LOOP_FOR_HASH {
+	HASH hash;
+	MID_LOOP loop;
+};
+
+static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 0>({{
+}});
+
+bool LoadMIDIWithPotentialLoop(BYTE_BUFFER_OWNED buf, const HASH& hash)
+{
+	const auto ret = Mid_Load(std::move(buf));
+	if(!ret) {
+		return false;
+	}
+	const auto loop_it = LOOPS.Lookup(hash);
+	if(loop_it != LOOPS.end()) {
+		Mid_SetLoop(loop_it->loop);
+	}
+	return ret;
+}
+// ---------------------------------------------------
 
 // Packfile loading //
 bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
@@ -93,7 +117,12 @@ namespace DAT {
 		if(MusicInitThread.joinable()) {
 			MusicInitThread.join();
 		}
-		return Mid_Load(MusicPack.MemExpand(filno));
+		if(filno >= MusicHashes.size()) {
+			return false;
+		}
+		return LoadMIDIWithPotentialLoop(
+			MusicPack.MemExpand(filno), MusicHashes[filno]
+		);
 	}
 }
 // -------------- //

@@ -25,7 +25,57 @@ struct MID_LOOP_FOR_HASH {
 	MID_LOOP loop;
 };
 
-static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 0>({{
+// These loop points were detected using https://github.com/nmlgc/mly, with the
+// command line
+//
+// 	<file.mid mly loop-find
+//
+// unless otherwise specified.
+static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 20>({{
+	// Original soundtrack (MUSIC.DAT)
+	// -------------------------------
+
+	/* #01 秋霜玉　～ Clockworks */
+	{ "04a44d2751f0cc155b9dbcabf7886bf999801f27f31ffee8566a18449e95ba4f"_B3, {  16557,  94317 } },
+	/* #02 フォルスストロベリー */
+	{ "e040b0ae4a9a36be23f88d5b0f66c6c5e60f0dfe648404c143f9095b75d1f036"_B3, {  75361, 183841 } },
+	/* #03 プリムローズシヴァ */
+	{ "4727240794872e31d2591850b0d662af13fa25a77d9798c925cca61da114df43"_B3, {  31561,  93001 } },
+	/* #04 幻想帝都 */
+	{ "d01300e4053bb07abc909fba83b0b1addb00104ee1ac3c9ad981e348b9c66622"_B3, {   4800,  89280 } },
+	/* #05 ディザストラスジェミニ */
+	{ "694543bea96390d6a6e85771e19561853515f456839f2672516516a6fbd074a4"_B3, {   1184,  77984 } },
+	/* #06 華の幻想　紅夢の宙 */
+	{ "b58f7178ca77351f8d014efce152c50f6057adabbd969efe93610b65161f2a2e"_B3, {  73666, 181186 } },
+	/* #07 天空アーミー */
+	{ "ac10269db4ad75f752fe8a52531238871baf8dcd87f6b2e90d130645e9bf0841"_B3, {   8640, 104640 } },
+	/* #08 スプートニク幻夜 */
+	{ "c8402fa2769f9341fb71db27d24550d5e534a652e71a2f21e45417a3a5764f3a"_B3, {  31606, 158326 } },
+	/* #09 機械サーカス　～ Reverie */
+	{ "bde78f7de7bb640ce3e65589b7ccc79b4b702a32475c902eaf04170b6b1da538"_B3, {    961,  93121 } },
+	/* #10 カナベラルの夢幻少女 */
+	{ "c804078d44983f3163220d51f22c035dddc19e78e5bbd129564bcb66447096ae"_B3, { 108481, 223681 } },
+	/* #11 魔法少女十字軍 */
+	{ "203b58f72fe30a532575de19ba58de11d0836d20c033eead82c4d4575f359ad1"_B3, {   8641, 127681 } },
+	/* #12 アンティークテラー */
+	{ "0a0a45aa7bae3a6b7ebb082970960e1679c4ae4ce5c3e011d12e73899b99390f"_B3, {   1198, 140398 } },
+	/* #13 夢機械　～ Innocent Power */
+	{ "052382df9912024fc1bcb11c60ca4555998d7206be2f7beefddef22e80ad5e3d"_B3, {    961,  62401 } },
+	/* #14 幻想科学 ～ Doll's Phantom */
+	{ "0b8a97180a2229c42d22556c734668c8c9ccec9d1f32e0c936d7e7bb7a1fddab"_B3, {  75601, 185041 } },
+	/* #15 少女神性　～ Pandora's Box */
+	{ "109d226ed66538074c2e15d4637631e77506321a66b644e627c77fd91d94ce3e"_B3, {  90510, 183630 } },
+	/* #16 シルクロードアリス */
+	{ "46c876e99f605c5c8e5957d6adcecc2231c5e795f7284cca7f496a42a3758b2f"_B3, {   6721, 141121 } },
+	/* #17 魔女達の舞踏会　～ Magus */
+	{ "a0a5ccd7c1b0e78c0365f5290fbf453ddc3d97298a1cf1f6ccc66365785d69c4"_B3, {    961,  77761 } },
+	/* #18 二色蓮花蝶　～ Ancients */
+	{ "67b2b4690067193ea1703569eaa0eeada59a6577ff10f4e0fb7f7b0e55559435"_B3, {   2880, 144960 } },
+	/* #19 ハーセルヴス */
+	{ "f8cfe5c314ad1d8b7ed435cd876dae2b7750c00f03c1fa9a748428344feaa27e"_B3, {  86401, 101761 } },
+	/* #20 タイトルドメイド */
+	{ "4931e9b4220ecd94d6006fec0805c882f3409840af15dc5a5336d36a65e4e70f"_B3, {    961,  43201 } },
+	// -------------------------------
 }});
 
 bool LoadMIDIWithPotentialLoop(BYTE_BUFFER_OWNED buf, const HASH& hash)

@@ -31,7 +31,7 @@ struct MID_LOOP_FOR_HASH {
 // 	<file.mid mly loop-find
 //
 // unless otherwise specified.
-static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 20>({{
+static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 36>({{
 	// Original soundtrack (MUSIC.DAT)
 	// -------------------------------
 
@@ -76,6 +76,70 @@ static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 20>({{
 	/* #20 タイトルドメイド */
 	{ "4931e9b4220ecd94d6006fec0805c882f3409840af15dc5a5336d36a65e4e70f"_B3, {    961,  43201 } },
 	// -------------------------------
+
+	// Arranged soundtrack (https://www16.big.or.jp/~zun/html/music_old.html)
+	// ----------------------------------------------------------------------
+
+	/* #01 秋霜玉　～ Clockworks */
+	{ "02838ce71bcb2922278d86331af10caebb893ad4dbd7bf66771501dd16640fda"_B3, {  16321,  94081 } },
+	/* #02 フォルスストロベリー
+		<ssg_02.mid mly cut 466: | mly loop-unfold 240: | mly loop-find */
+	{ "2cada452b1d1d1cbcff2e2f2430217fcbbcf4887e44dcbbd7c48d99ee39771f4"_B3, {  75361, 183841 } },
+	/* #03 プリムローズシヴァ */
+	{ "63b0ed5d24e83b20ca603052e01a427477a89d9ec1903b188bd184eed09cf034"_B3, {    961,  62401 } },
+	/* #04 幻想帝都
+		<ssg_04.mid mly smf0 | mly loop-find */
+	{ "2232a7c30b6bee76709342c62997fafab08a483fcde9d3595ba3b0e5d1819d18"_B3, {   4800,  89280 } },
+	/* #05 ディザストラスジェミニ
+		<ssg_05.mid mly smf0 | mly cut 386: | mly loop-unfold 226: | mly loop-find */
+	{ "26b734bec6e53b3ca02ce82d67f5bc2473f892ac7bc3b0f92703f66e55bfef17"_B3, {  62520, 139320 } },
+	/* #06 華の幻想　紅夢の宙
+		<ssg_06.mid mly cut 494: | mly loop-unfold 270: | mly loop-find */
+	{ "6e53bcd7c38a0e54d167d673ecbf0b47404442832c55b858c22edb1b63747939"_B3, {  73681, 181201 } },
+	/* #07 天空アーミー */
+	{ "adba179af78f437b209eef82dc5f043087dfc42f8e584bd7688a57f510a3c26a"_B3, {   8640, 104640 } },
+	/* #08 スプートニク幻夜 */
+	{ "75087ec2ce1237d6dfe62e543d174b558343a8d2b09a0e7e767f0fead08644ea"_B3, {  31606, 158326 } },
+	/* #09 機械サーカス　～ Reverie
+		Every supposed loop modulates up by a semitone 16 measures before it
+		ends and remains in that new key at the start of the next loop, so the
+		piece technically doesn't loop at all. The original stays in G♯m
+		throughout. */
+
+	/* #10 カナベラルの夢幻少女
+		<ssg_10.mid mly smf0 | mly loop-find */
+	{ "d959e251a069bb198c8c79dcdd61dacfdbb63041bd163018bf4befd3331d30d1"_B3, {    961, 116161 } },
+	/* #11 魔法少女十字軍 */
+	{ "b70b6b7ed80b1c605a4b97b26a9d1c564ecab3699e980ba512b40e947260e77c"_B3, {   8641, 127681 } },
+	/* #12 アンティークテラー
+		<ssg_12.mid mly cut 602: | mly loop-unfold 312: | mly loop-find */
+	{ "15eca8c0ea2e60e752a93cbcb09043a7213b4b7993b8493d529a4cd440176c63"_B3, {  16081, 155281 } },
+	/* #13 夢機械　～ Innocent Power
+		Has a unique ending section that starts in Gm and then modulates
+		through Em and Fm before it fades out on F♯m. */
+
+	/* #14 幻想科学 ～ Doll's Phantom
+		<ssg_14.mid mly cut 550: | mly loop-unfold 322: | mly loop-find */
+	{ "3b94f8d5b87cfc2db73dee57744d2de5a4a0daa67cb8b122b0fef26f4fc5cd63"_B3, {  75601, 185041 } },
+	/* #15 少女神性　～ Pandora's Box
+		<ssg_15.mid mly cut 522: | mly loop-unfold 328: | mly loop-find */
+	{ "7728681d569155c34a71e28e3c75fc104d7b439835fb33fad2a94b6c46e8fe59"_B3, {  90220, 183340 } },
+	/* #16 シルクロードアリス
+		<ssg_16.mid mly cut 624: | mly loop-unfold 344: | mly loop-find */
+	{ "384f15ef0325b4806f878e5144cccf2a502217705106e2b7e918a4106554e74c"_B3, {  30721, 165121 } },
+	/* #17 魔女達の舞踏会
+		Has a unique 8-bar ending section that first appears in Cm and then
+		loops in C♯m while fading out. The fade starts during the first loop,
+		so we can't loop this section in-game (unless Romantique Tp were to
+		re-record it without the fade). */
+
+	/* #18 二色蓮花蝶　～ Ancients */
+	{ "9a695e4659a1293e2d08fe287eb55f4dc6279beab2317004ae520029e552d602"_B3, {   3841, 145921 } },
+	/* #19 ハーセルヴス
+		Features a unique and very beautiful ending section. Let's let it
+		fade out to silence for dramatic effect. */
+	{ "0f29ba3a086246621cf0624638a044fc6c6622fee49744da66cf4ae8641d3475"_B3, {     -1,     -1 } },
+	// ----------------------------------------------------------------------
 }});
 
 bool LoadMIDIWithPotentialLoop(BYTE_BUFFER_OWNED buf, const HASH& hash)

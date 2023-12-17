@@ -79,8 +79,12 @@ sdl_src += SDL.join("src/thread/generic/SDL_syscond.c")
 sdl_winmain_src += SDL.glob("src/main/windows/*.c")
 
 sdl_cfg = CONFIG:branch("", SDL_COMPILE, SDL_LINK)
+sdl_mslibc_cfg = sdl_cfg:branch("", {
+	buildtypes = { release = { cflags = flag_remove("/GL") } }
+})
 sdl_obj = (
 	cxx(sdl_cfg, sdl_src) +
+	cxx(sdl_mslibc_cfg, SDL.join("src/stdlib/SDL_mslibc.c")) +
 	rc(sdl_cfg, SDL.join("src/main/windows/version.rc"))
 )
 sdl_dll = (

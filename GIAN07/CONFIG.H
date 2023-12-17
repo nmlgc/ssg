@@ -58,7 +58,13 @@ template <typename T> concept CONFIG_OPTION = requires(
 	{ t.Write(cursor_write) } -> std::same_as<bool>;
 };
 
-constexpr auto ValidateAlways = [](auto v) { return true; };
+bool ValidateAlways(auto v) { return true; };
+template <typename T, T Max> constexpr bool ValidateBelow(T v) {
+	return (v <= Max);
+}
+template <uint8_t Mask> constexpr bool ValidateFlag(uint8_t v) {
+	return !(v & Mask);
+}
 
 // Option class, with optional validation of the value against a supported
 // static range.
@@ -108,15 +114,13 @@ typedef struct tagCONFIG_DATA{
 		typename T, bool (*Validate)(T) = ValidateAlways
 	> using OPTION = CONFIG_OPTION_VALUE<T, Validate>;
 
-	template <typename T, T Max> using OPTION_BELOW = OPTION<T, [](auto v) {
-		return (v <= Max);
-	}>;
-
+	template <typename T, T Max> using OPTION_BELOW = OPTION<
+		T, ValidateBelow<T, Max>
+	>;
 	template <uint8_t Max> using OPTION_U8_BELOW = OPTION_BELOW<uint8_t, Max>;
-
-	template <uint8_t Mask> using OPTION_FLAGS = OPTION<uint8_t, [](auto v) {
-		return !(v & Mask);
-	}>;
+	template <uint8_t Mask> using OPTION_FLAGS = OPTION<
+		uint8_t, ValidateFlag<Mask>
+	>;
 
 	// 32 is the WinMM joy button limit //
 	using OPTION_WINMM_PAD = OPTION_BELOW<INPUT_PAD_BUTTON, 32>;

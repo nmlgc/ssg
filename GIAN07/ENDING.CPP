@@ -6,8 +6,7 @@
 #include "ENDING.H"
 #include "FONTUTY.H"
 #include "GIAN.H"
-#include "LOADER.H"
-#include "game/midi.h"
+#include "game/bgm.h"
 
 
 typedef struct tagEndingGrpInfo {
@@ -108,7 +107,7 @@ bool EndingInit(void)
 
 	if(!LoadGraph(GRAPH_ID_ENDING)) return FALSE;
 	if(!LoadStageData(GRAPH_ID_ENDING)) return FALSE;
-	Mid_Stop();
+	BGM_Stop();
 
 
 	GrpGetPalette(pal);
@@ -466,7 +465,7 @@ void EndingSCLDecode()
 			return;
 
 			case(SCL_MUSIC):
-				if(LoadMusic(cmd[1])) Mid_Play();
+				BGM_Switch(cmd[1]);
 				SCL_Now += 2;
 			break;
 

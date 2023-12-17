@@ -64,8 +64,6 @@ extern const uint8_t& Mid_TempoNum;
 extern const uint8_t& Mid_TempoDenom;
 
 //// 関数 ////
-bool Mid_Start(void);	// ＭＩＤＩ関連初期化
-void Mid_End(void);							// ＭＩＤＩ関連おしまい
 
 // Starts outputting the loaded MIDI to the backend.
 void Mid_Play(void);						// 再生する
@@ -81,7 +79,6 @@ void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
 VOLUME Mid_GetFadeVolume(void);
 
 void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration);
-bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 

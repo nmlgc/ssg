@@ -23,8 +23,8 @@
 #include "GIAN07/GAMEMAIN.H"
 #include "platform/input.h"
 #include "platform/snd_backend.h"
+#include "game/bgm.h"
 #include "game/defer.h"
-#include "game/midi.h"
 #include "strings/title.h"
 
 // Still required for:
@@ -75,12 +75,12 @@ int Run()
 			case SDL_WINDOWEVENT: {
 				switch(event.window.event) {
 				case SDL_WINDOWEVENT_FOCUS_LOST:
-					Mid_Pause();
+					BGM_Pause();
 					SndBackend_PauseAll();
 					active = false;
 					break;
 				case SDL_WINDOWEVENT_FOCUS_GAINED:
-					Mid_Resume();
+					BGM_Resume();
 					SndBackend_ResumeAll();
 					active = true;
 					break;

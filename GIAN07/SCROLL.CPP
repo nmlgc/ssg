@@ -10,7 +10,6 @@
 #include "LEVEL.H"
 #include "game/bgm.h"
 #include "game/input.h"
-#include "game/midi.h"
 #include "game/snd.h"
 
 
@@ -271,10 +270,10 @@ static void enemy_set(void)
 			case(SCL_MUSIC):
 //				if(!(/*DemoplaySaveEnable||*/DemoplayLoadEnable)){
 				if(!IsDemoplay){
-					Mid_Stop();
-					if(LoadMusic(cmd[1])){
-						Mid_Play();
-						const auto mtitle = Mid_GetTitle();
+					BGM_Stop();
+					if(BGM_Switch(cmd[1])){
+						BGM_Play();
+						const auto mtitle = BGM_Title();
 						if(!mtitle.empty()) {
 							// ♪ in Shift-JIS. Since this codepoint is still
 							// combined with the Shift-JIS music titles baked
@@ -305,7 +304,7 @@ static void enemy_set(void)
 				break;
 
 				case(SEFC_WARNSTOP):	Snd_SEStop(8);	break;	// Warning 停止
-				case(SEFC_MUSICFADE):	BGM_FadeOut(120);				break;	// 曲の停止
+				case(SEFC_MUSICFADE):	BGM_FadeOut(120);	break;	// 曲の停止
 				case(SEFC_STG2BOSS):	ScrollCommand(SCMD_STG2BOSS);	break;	// ２面ボスScroll
 				case(SEFC_RASTERON):	ScrollCommand(SCMD_RASTER_ON);	break;	// ラスターON
 				case(SEFC_RASTEROFF):	ScrollCommand(SCMD_RASTER_OFF);	break;	// ラスターOFF

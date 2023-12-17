@@ -1002,7 +1002,7 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
 
 
 // ｎ番目の曲をロードする //
-bool LoadMusic(int no)
+bool LoadMusic(unsigned int no)
 {
 	return DAT::LoadMusic(no);
 }

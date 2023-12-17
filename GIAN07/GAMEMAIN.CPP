@@ -449,9 +449,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 	GameMain = NameRegistProc;
 
 	if(bNeedChgMusic){
-		Mid_Stop();
-		LoadMusic(19);
-		Mid_Play();
+		BGM_Switch(19);
 	}
 
 	return TRUE;
@@ -809,7 +807,7 @@ extern bool MusicRoomInit(void)
 	// outside of the Music Room.
 	Mid_TableInit();
 /*
-	Mid_Stop();
+	BGM_Stop();
 */
 	if(!LoadMusicRoomComment(0)){
 		DebugOut(u8"ENEMY.DAT がはかいされています");
@@ -823,7 +821,7 @@ extern bool MusicRoomInit(void)
 		return FALSE;
 	}
 */
-//	Mid_Play();
+//	BGM_Play();
 
 	GameMain = MusicRoomProc;
 
@@ -873,9 +871,7 @@ extern bool GameExit(bool bNeedChgMusic)
 
 	if(GameMain != DemoProc){
 		if(bNeedChgMusic){
-			Mid_Stop();
-			LoadMusic(0);
-			Mid_Play();
+			BGM_Switch(0);
 		}
 	}
 
@@ -1383,11 +1379,10 @@ void MusicRoomProc(bool&)
 			case(KEY_RIGHT):
 				MidiPlayID+=2;
 			case(KEY_LEFT):
-				Mid_Stop();
+				BGM_Stop();
 				MidiPlayID = (MidiPlayID+MusicNum-1)%MusicNum;
-				LoadMusic(MidiPlayID);
+				BGM_Switch(MidiPlayID);
 				LoadMusicRoomComment(MidiPlayID);
-				Mid_Play();
 			break;
 		}
 
@@ -1413,7 +1408,7 @@ void MusicRoomProc(bool&)
 
 	if(SystemKey_Data & SYSKEY_BGM_DEVICE) {
 		if(DevChgWait==0){
-			Mid_ChgDev(1);
+			BGM_ChangeMIDIDevice(1);
 			if(MusicRoomText) {
 				MusicRoomText.value().PrerenderMidDev();
 			}
@@ -1436,7 +1431,7 @@ void MusicRoomProc(bool&)
 		GrpDrawSpect(352,128);
 		GrpDrawNote();
 
-		const auto millis = Mid_PlayTime.realtime.count();
+		const auto millis = BGM_PlayTime().count();
 		const auto m = ((millis / 1000) / 60);
 		const auto s = ((millis / 1000) % 60);
 		sprintf(buf,"%02d : %02d",m,s);

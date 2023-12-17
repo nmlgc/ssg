@@ -12,7 +12,6 @@
 #include "platform/path.h"
 #include "game/bgm.h"
 #include "game/coords.h"
-#include "game/midi.h"
 #include "game/screenshot.h"
 #include "game/snd.h"
 #include <filesystem>
@@ -35,6 +34,12 @@ const int SND_X_MID = PixelToWorld(320);
 
 const int SND_X_PER_DECIBEL = PixelToWorld(25);
 // -----------------------------------------------------------
+
+// MUSIC.DAT loaders
+// -----------------
+
+bool (*const BGM_MidLoadOriginal)(unsigned int id) = LoadMusic;
+// -----------------
 
 bool XInit(void)
 {
@@ -82,9 +87,8 @@ void XCleanup(void)
 {
 	ConfigSave();
 	DxObj.Cleanup();
+	BGM_Cleanup();
 	Snd_Cleanup();
-	Mid_Stop();
-	Mid_End();
 	Key_End();
 }
 

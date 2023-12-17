@@ -5,9 +5,39 @@
 
 #pragma once
 
+#include "game/narrow.h"
+#include <chrono>
 #include <stdint.h>
 
+// Loads the BGM with the given 0-based [id] from the game's original BGM data
+// source.
+extern bool (*const BGM_MidLoadOriginal)(unsigned int id);
+
 bool BGM_Init(void);
+void BGM_Cleanup(void);
+
+// General queries
+// ---------------
+
+std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void);
+Narrow::string_view BGM_Title(void);
+// ---------------
+
+bool BGM_ChangeMIDIDevice(int8_t direction); // 出力デバイスを変更する
+
+// Playback
+// --------
+
+// Stops the currently playing BGM, then loads and plays the track with the
+// given 0-based [id]. Returns `true` if the BGM was changed successfully.
+bool BGM_Switch(unsigned int id);
+
+void BGM_Play(void);
+void BGM_Stop(void);
+
+void BGM_Pause(void);
+void BGM_Resume(void);
+// --------
 
 // Volume control
 // --------------

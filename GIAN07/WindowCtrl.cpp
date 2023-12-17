@@ -13,6 +13,7 @@
 #include "platform/input.h"
 #include "platform/midi_backend.h"
 #include "platform/input.h"
+#include "game/bgm.h"
 #include "game/midi.h"
 #include "game/snd.h"
 #include <numeric>
@@ -515,14 +516,13 @@ static bool SndFnBGM(INPUT_BITS key)
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
 			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
-				Mid_End();
-				Snd_BGMCleanup();
+				BGM_Cleanup();
 				ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 			}
 			else{
 				// 成功した場合にだけ有効にする //
-				if(Snd_BGMInit() | Mid_Start()) {
-					Mid_Play();
+				if(BGM_Init()) {
+					BGM_Play();
 					ConfigDat.SoundFlags.v |= SNDF_BGM_ENABLE;
 				}
 			}
@@ -542,13 +542,13 @@ static bool SndFnMIDIDev(INPUT_BITS key)
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
 			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
-				Mid_ChgDev(1);
+				BGM_ChangeMIDIDevice(1);
 			}
 		break;
 
 		case(KEY_LEFT):
 			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
-				Mid_ChgDev(-1);
+				BGM_ChangeMIDIDevice(-1);
 			}
 		break;
 	}

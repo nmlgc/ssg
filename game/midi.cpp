@@ -214,17 +214,6 @@ uint8_t Mid_VolumeTable[16];	// ボリューム
 MID_PLAYTIME Mid_PlayTime;
 
 
-bool Mid_Start(void)
-{
-	return MidBackend_Init();
-}
-
-void Mid_End(void)
-{
-	Mid_Stop();
-	MidBackend_Cleanup();
-}
-
 void Mid_Play(void)
 {
 	if(
@@ -348,18 +337,6 @@ void Mid_GMReset(void)
 
 	// ここで50ms以上待つこと! //
 	std::this_thread::sleep_for(50ms);
-}
-
-bool Mid_ChgDev(char pos)
-{
-	// 各関数に合わせて停止処理を行う //
-	Mid_Stop();
-
-	const auto ret = MidBackend_DeviceChange(pos);
-	if(ret) {
-		Mid_Play();
-	}
-	return ret;
 }
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)

@@ -5,8 +5,8 @@
 #include "platform/input.h"
 #include "platform/snd_backend.h"
 #include "platform/unicode.h"
+#include "game/bgm.h"
 #include "game/input.h"
-#include "game/midi.h"
 #include <direct.h>
 #include <windows.h>
 #include <mmsystem.h>
@@ -92,12 +92,12 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 			bIsActive = (BOOL)wParam;
 			if(bIsActive){
 				bMouseVisible = FALSE;
-				Mid_Pause();
+				BGM_Pause();
 				SndBackend_PauseAll();
 			}
 			else{
 				bMouseVisible = TRUE;
-				Mid_Resume();
+				BGM_Resume();
 				SndBackend_ResumeAll();
 			}
 		break;

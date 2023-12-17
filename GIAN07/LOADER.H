@@ -87,7 +87,7 @@ typedef struct tagENDING_GRP{
 bool LoadStageData(uint8_t stage);	// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする
 bool LoadGraph(int stage);	// あるステージのグラフィックをロードする
 bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする
-bool LoadMusic(int no);	// ｎ番目の曲をロードする
+bool LoadMusic(unsigned int id);	// ｎ番目の曲をロードする
 bool LoadSound(void);	// 全ての Sound データをロードする
 bool LoadMusicRoomComment(int no);	// MusicRoom のコメントをロードする
 

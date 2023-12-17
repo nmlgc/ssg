@@ -6,8 +6,8 @@
 #pragma once
 
 #include "LEVEL.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/input.h"
+#include "game/pixelformat.h"
 #include "platform/buffer.h"
 
 // フラグ //

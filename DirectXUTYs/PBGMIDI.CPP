@@ -50,7 +50,6 @@ BOOL Mid_Start(WORD fnmode,WORD plmode)
 	Mid_Dev.mp      = NULL;
 	Mid_Dev.nDevice = midiOutGetNumDevs()+1;	// 一つだけ多く準備する
 	Mid_Dev.NowID   = -1 + 1;					// -1: MIDI_MAPPER
-	Mid_PlayTime    = 0;
 
 	// デバイスが存在しないならリターン //
 	if(Mid_Dev.nDevice)
@@ -84,7 +83,6 @@ void Mid_End(void)
 	int i;
 
 	Mid_Stop();
-	Mid_Free();
 
 	if(Mid_Dev.mp) midiOutClose(Mid_Dev.mp);
 

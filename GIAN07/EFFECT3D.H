@@ -110,7 +110,7 @@ typedef struct tagRock3D {
 	int		x, y, z;		// 現在の座標
 	int		vx, vy;			// 速度XY成分(2D-平面上)
 
-	DWORD	count;			// カウンタ
+	uint32_t	count;	// カウンタ
 	int		v;				// 速度
 
 	char	a;				// 加速度

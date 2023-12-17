@@ -448,7 +448,7 @@ void MWinMsg(std::string_view s)
 }
 
 // 顔をセットする //
-void MWinFace(BYTE faceID)
+void MWinFace(uint8_t faceID)
 {
 	if(MsgWindow.State==MWIN_DEAD) return;		// 表示不可
 	if(faceID/FACE_NUMX>=FACE_MAX) return;		// あり得ない数字
@@ -467,7 +467,7 @@ void MWinFace(BYTE faceID)
 }
 
 // コマンドを送る //
-void MWinCmd(BYTE cmd)
+void MWinCmd(uint8_t cmd)
 {
 	int		temp,i;
 	int		Ysize = 0;

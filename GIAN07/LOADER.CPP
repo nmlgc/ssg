@@ -99,7 +99,7 @@ extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
 };
 
 
-DWORD		MusicNum = 0;			// 曲数
+uint32_t	MusicNum = 0;	// 曲数
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
 ENDING_GRP	EndingGrp[ENDING_PIC_MAX];	// エンディング用
 
@@ -123,7 +123,7 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n);
 
 
 // あるステージのグラフィックをロードする //
-BOOL LoadGraph(int stage)
+bool LoadGraph(int stage)
 {
 //	bIsBombPalette = FALSE;
 
@@ -277,7 +277,7 @@ extern void LoadPaletteFromEnemy(void)
 }
 
 // ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする //
-BOOL LoadStageData(BYTE stage)
+bool LoadStageData(uint8_t stage)
 {
 	int				i;
 
@@ -808,7 +808,7 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
 
 
 // ｎ番目の曲をロードする //
-extern BOOL LoadMusic(int no)
+bool LoadMusic(int no)
 {
 	BOOL flag;
 
@@ -820,7 +820,7 @@ extern BOOL LoadMusic(int no)
 }
 
 // 全てのSoundデータをロードする //
-BOOL LoadSound(void)
+bool LoadSound(void)
 {
 	const auto in = FilStartR(_PATH("SOUND.DAT"));
 
@@ -852,7 +852,7 @@ BOOL LoadSound(void)
 
 
 // MusicRoom のコメントをロードする //
-extern BOOL LoadMusicRoomComment(int no)
+bool LoadMusicRoomComment(int no)
 {
 	if(no < 0 || no > 19) return FALSE;
 	if(!MusicRoomText) {

@@ -75,7 +75,7 @@ typedef struct tagWINDOW_INFO{
 	// 特殊処理用コールバック関数(未使用ならNULL)
 	bool	(*CallBackFn)(INPUT_BITS);
 
-	BYTE			NumItems;				// 項目数(<ITEM_MAX)
+	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
 	tagWINDOW_INFO	*ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
 
 	// Returns the maximum number of items among all submenus.
@@ -87,14 +87,14 @@ typedef struct tagWINDOW_SYSTEM{
 	WINDOW_INFO		Parent;					// 親ウィンドウ
 	int				x,y;					// ウィンドウ左上の座標
 	PIXEL_COORD	W;
-	DWORD			Count;					// フレームカウンタ
-	BYTE			Select[WINDOW_DEPTH];	// 選択中の項目スタック
-	BYTE			SelectDepth;			// 選択中の項目に対するＳＰ
-	BYTE			State;					// 状態
+	uint32_t	Count;	// フレームカウンタ
+	uint8_t	Select[WINDOW_DEPTH];	// 選択中の項目スタック
+	uint8_t	SelectDepth;	// 選択中の項目に対するＳＰ
+	uint8_t	State;	// 状態
 
 	INPUT_BITS	OldKey;	// 前に押されていたキー
-	BYTE			KeyCount;				// キーボードウェイト
-	BOOL			FirstWait;				// 最初のキー解放待ち
+	uint8_t	KeyCount;	// キーボードウェイト
+	bool	FirstWait;	// 最初のキー解放待ち
 
 	TEXTRENDER_RECT_ID	TRRs[1 + WINITEM_MAX]; // Initialized by Init().
 
@@ -127,8 +127,8 @@ void MWinMove(void);			// メッセージウィンドウを動作させる(後�
 void MWinDraw(void);			// メッセージウィンドウを描画する(上に同じ)
 
 void MWinMsg(std::string_view str);	// メッセージ文字列を送る
-void MWinFace(BYTE faceID);		// 顔をセットする
-void MWinCmd(BYTE cmd);			// コマンドを送る
+void MWinFace(uint8_t faceID);	// 顔をセットする
+void MWinCmd(uint8_t cmd);	// コマンドを送る
 
 void MWinHelp(WINDOW_SYSTEM *ws);		// メッセージウィンドウにヘルプ文字列を送る
 

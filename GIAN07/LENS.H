@@ -25,7 +25,7 @@ struct LensInfo {
 
 	SURFACE_DDRAW*	gTemp;	// データ一時待避用Surface(できればSysMemory)
 	size_t	gPitch;		// Surface の横幅
-	//BYTE		gID;		// SurfaceID (DD_UTY の関数に対する)
+	// uint8_t	gID;	// SurfaceID (DD_UTY の関数に対する)
 
 	// GrpLock() 系関数 : レンズボールを描画する //
 	void Draw(WINDOW_POINT center);

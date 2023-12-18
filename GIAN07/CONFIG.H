@@ -17,8 +17,8 @@ constexpr uint8_t GRPF_WINDOW_UPPER	= 0x02;	// メッセージウィンドウを
 constexpr uint8_t GRPF_MSG_DISABLE	= 0x04;	// 会話シーンを省略
 
 constexpr uint8_t SNDF_MASK	= (~0x03);
-constexpr uint8_t SNDF_MIDI_ENABLE	= 0x01;	// ＭＩＤＩが有効
-constexpr uint8_t SNDF_WAVE_ENABLE	= 0x02;	// ＷＡＶＥが有効
+constexpr uint8_t SNDF_BGM_ENABLE	= 0x01;
+constexpr uint8_t SNDF_SE_ENABLE	= 0x02;
 
 constexpr uint8_t INPF_MASK	= (~0x07);
 constexpr uint8_t INPF_JOYPAD_ENABLE	= 0x01;	// パッドが有効
@@ -149,10 +149,8 @@ typedef struct tagCONFIG_DATA{
 	// グラフィックに関するフラグ
 	OPTION_FLAGS<GRPF_MASK> GraphFlags = { 0 };
 
-	// サウンド・ＭＩＤＩ関連 //
-	OPTION_FLAGS<SNDF_MASK> SoundFlags = {
-		(SNDF_WAVE_ENABLE | SNDF_MIDI_ENABLE)
-	};
+	// サウンド・ＢＧＭ関連 //
+	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };
 
 	// 入力に関するフラグ
 	OPTION_FLAGS<INPF_MASK> InputFlags = { INPF_Z_MSKIP_ENABLE };

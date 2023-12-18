@@ -34,8 +34,8 @@ static bool GrpFnSkip(INPUT_BITS key);
 static bool GrpFnBpp(INPUT_BITS key);
 static bool GrpFnWinLocate(INPUT_BITS key);
 
-static bool SndFnWAVE(INPUT_BITS key);
-static bool SndFnMIDI(INPUT_BITS key);
+static bool SndFnSE(INPUT_BITS key);
+static bool SndFnBGM(INPUT_BITS key);
 static bool SndFnMIDIDev(INPUT_BITS key);
 
 static bool InpFnMsgSkip(INPUT_BITS key);
@@ -141,10 +141,10 @@ WINDOW_INFO GrpItem[5] = {
 	{"Exit"		,"一つ前のメニューにもどります"		,CWinExitFn,0,0},
 };
 
-char	SndTitle[4][24];
+char	SndTitle[4][26];
 WINDOW_INFO SndItem[4] = {
-	{SndTitle[0],"WAVEを鳴らすかどうかの設定"	,SndFnWAVE,0,0},
-	{SndTitle[1],"MIDIを鳴らすかどうかの設定"	,SndFnMIDI,0,0},
+	{ SndTitle[0],	"SEを鳴らすかどうかの設定",	SndFnSE },
+	{ SndTitle[1],	"BGMを鳴らすかどうかの設定",	SndFnBGM },
 	{SndTitle[2],"MIDI Port (保存はされません)"	,SndFnMIDIDev,0,0},
 	{"Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
 };
@@ -187,7 +187,7 @@ WINDOW_INFO CfgItem[6] = {
 #endif
 
 	{" Graphic"		,"グラフィックに関する設定"		,0,5-1,/*GrpItem,*/GrpItem+1,GrpItem+2,GrpItem+3,GrpItem+4},
-	{" Sound / Music"	,"ＳＥ／ＭＩＤＩに関する設定"	,0,4,SndItem,SndItem+1,SndItem+2,SndItem+3},
+	{" Sound / Music"	,"ＳＥ／ＢＧＭに関する設定"	,0,4,SndItem,SndItem+1,SndItem+2,SndItem+3},
 	{" Input"		,"入力デバイスに関する設定"		,0,4,InpItem,InpItem+1,InpItem+2,InpItem+3},
 	{" Replay", "リプレイに関する設定", 0, 3, CfgRep, CfgRep+1, CfgRep+2},
 	{" Exit"			,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
@@ -476,7 +476,7 @@ static bool GrpFnWinLocate(INPUT_BITS key)
 	return TRUE;
 }
 
-static bool SndFnWAVE(INPUT_BITS key)
+static bool SndFnSE(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
@@ -488,17 +488,17 @@ static bool SndFnWAVE(INPUT_BITS key)
 			//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
 			// DebugOut(buf);
 
-			if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
-				ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+			if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
+				ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 				SndCleanup();
 			}
 			else{
-				ConfigDat.SoundFlags.v |= SNDF_WAVE_ENABLE;
+				ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;
 
 				if(!SndInit()) {
-					ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+					ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 				} else if(!LoadSound()) {
-					ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+					ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 					SndCleanup();
 				}
 			}
@@ -512,21 +512,21 @@ static bool SndFnWAVE(INPUT_BITS key)
 	return TRUE;
 }
 
-static bool SndFnMIDI(INPUT_BITS key)
+static bool SndFnBGM(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_BOMB):case(KEY_ESC):
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 				Mid_End();
-				ConfigDat.SoundFlags.v &= (~SNDF_MIDI_ENABLE);
+				ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 			}
 			else{
 				// 成功した場合にだけ有効にする //
 				if(Mid_Start()) {
-					ConfigDat.SoundFlags.v |= SNDF_MIDI_ENABLE;
+					ConfigDat.SoundFlags.v |= SNDF_BGM_ENABLE;
 				}
 			}
 		break;
@@ -544,13 +544,13 @@ static bool SndFnMIDIDev(INPUT_BITS key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 				Mid_ChgDev(1);
 			}
 		break;
 
 		case(KEY_LEFT):
-			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 				Mid_ChgDev(-1);
 			}
 		break;
@@ -687,7 +687,7 @@ static bool MusicFn(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
-			if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 				MusicRoomInit();
 			}
 		default:
@@ -869,12 +869,14 @@ static void SetSndItem(void)
 	char	buf[1000];
 	static BYTE time = 0;
 
-#define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
-	sprintf(SndTitle[0], "WAVE [%s]", SetFlagsMacro(EorD, ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE));
-	sprintf(SndTitle[1], "MIDI [%s]", SetFlagsMacro(EorD, ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE));
+	const auto sound_active = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
+	const auto bgm_active = (ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE);
+
+	sprintf(SndTitle[0], "Sound  [%s]", EorD[!sound_active]);
+	sprintf(SndTitle[1], "BGM    [%s]", EorD[!bgm_active]);
 
 	const auto maybe_dev = MidBackend_DeviceName();
-	if((ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) && maybe_dev) {
+	if(bgm_active && maybe_dev) {
 		time+=16;
 		const auto dev = maybe_dev.value();
 		if(dev.size() > 18) {
@@ -890,8 +892,7 @@ static void SetSndItem(void)
 		sprintf(SndTitle[2],">%.18s",buf+now);
 	}
 	else
-		sprintf(SndTitle[2],"      ^^^^^^^^^^");
-#undef SetFlagsMacro
+		sprintf(SndTitle[2],"        ^^^^^^^^^^");
 }
 
 static void SetInpItem(void)

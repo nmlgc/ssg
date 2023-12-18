@@ -58,20 +58,20 @@ bool XInit(void)
 	}
 
 	// サウンドの初期化 //
-	if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
+	if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
 		// 何らかの理由で使用できなければ、Disable とする //
 		if(!SndInit()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+			ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 		} else if(!LoadSound()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
+			ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 			SndCleanup();
 		}
 	}
 
-	// ＭＩＤＩの初期化 //
-	if(ConfigDat.SoundFlags.v & SNDF_MIDI_ENABLE) {
+	// ＢＧＭの初期化 //
+	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 		if(!Mid_Start()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_MIDI_ENABLE);
+			ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 		}
 	}
 

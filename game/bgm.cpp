@@ -16,6 +16,8 @@ using namespace std::chrono_literals;
 // -----
 
 uint8_t BGM_Tempo_Num = BGM_TEMPO_DENOM;
+
+static bool Enabled = false;
 // -----
 
 // External dependencies
@@ -28,7 +30,8 @@ const uint8_t& Mid_TempoDenom = BGM_TEMPO_DENOM;
 bool BGM_Init(void)
 {
 	BGM_SetTempo(0);
-	return (MidBackend_Init() | Snd_BGMInit());
+	Enabled = (MidBackend_Init() | Snd_BGMInit());
+	return Enabled;
 }
 
 void BGM_Cleanup(void)
@@ -36,6 +39,12 @@ void BGM_Cleanup(void)
 	BGM_Stop();
 	MidBackend_Cleanup();
 	Snd_BGMCleanup();
+	Enabled = false;
+}
+
+bool BGM_Enabled(void)
+{
+	return Enabled;
 }
 
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void)

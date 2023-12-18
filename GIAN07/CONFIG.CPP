@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include "platform/file.h"
 #include "CONFIG.H"
+#include "game/bgm.h"
+#include "platform/file.h"
 
 ///// Constants /////
 constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
@@ -197,6 +198,9 @@ extern void ConfigLoad()
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
+	ConfigDat.SoundFlags.v &= ~SNDF_BGM_ENABLE;
+	ConfigDat.SoundFlags.v |= (BGM_Enabled() * SNDF_BGM_ENABLE);
+
 	// Backwards compatibility with 秋霜CFG.DAT
 	VERSION_ORIGINAL.BitDepth8Or16.v = ((ConfigDat.BitDepth.v.value() > 16)
 		? BITDEPTHS::find_if([](auto bpp) { return (bpp == 16); })

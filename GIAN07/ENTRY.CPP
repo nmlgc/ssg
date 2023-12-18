@@ -67,9 +67,7 @@ bool XInit(void)
 
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
-		if(!BGM_Init()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
-		}
+		BGM_Init();
 	}
 
 	// Call a different *Init() function here to quickly test a different //

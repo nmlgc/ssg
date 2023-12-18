@@ -515,15 +515,13 @@ static bool SndFnBGM(INPUT_BITS key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
+			if(BGM_Enabled()) {
 				BGM_Cleanup();
-				ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 			}
 			else{
 				// 成功した場合にだけ有効にする //
 				if(BGM_Init()) {
 					BGM_Play();
-					ConfigDat.SoundFlags.v |= SNDF_BGM_ENABLE;
 				}
 			}
 		break;
@@ -541,13 +539,13 @@ static bool SndFnMIDIDev(INPUT_BITS key)
 		return FALSE;
 
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
+			if(BGM_Enabled()) {
 				BGM_ChangeMIDIDevice(1);
 			}
 		break;
 
 		case(KEY_LEFT):
-			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
+			if(BGM_Enabled()) {
 				BGM_ChangeMIDIDevice(-1);
 			}
 		break;
@@ -684,7 +682,7 @@ static bool MusicFn(INPUT_BITS key)
 {
 	switch(key){
 		case(KEY_RETURN):case(KEY_TAMA):
-			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
+			if(BGM_Enabled()) {
 				MusicRoomInit();
 			}
 		default:
@@ -867,7 +865,7 @@ static void SetSndItem(void)
 	static BYTE time = 0;
 
 	const auto sound_active = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
-	const auto bgm_active = (ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE);
+	const auto bgm_active = BGM_Enabled();
 
 	sprintf(SndTitle[0], "Sound  [%s]", EorD[!sound_active]);
 	sprintf(SndTitle[1], "BGM    [%s]", EorD[!bgm_active]);

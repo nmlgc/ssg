@@ -19,6 +19,7 @@ void BGM_Cleanup(void);
 // General queries
 // ---------------
 
+bool BGM_Enabled(void);
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void);
 Narrow::string_view BGM_Title(void);
 // ---------------

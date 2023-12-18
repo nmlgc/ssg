@@ -108,7 +108,7 @@ bool SndBackend_Init(void)
 
 	const auto fail = [](std::u8string_view error) {
 		DebugOut(error);
-		SndCleanup();
+		SndBackend_Cleanup();
 		return false;
 	};
 
@@ -128,20 +128,25 @@ bool SndBackend_Init(void)
 
 void SndBackend_Cleanup(void)
 {
-	int		i;
-
-	// ここで SE_STRUCT 関連の解放を行う //
-	for(i=0;i<SND_OBJ_MAX;i++){
-		SndRelease(i);
-	}
-
-	// 念のため... //
-	for(i=0;i<SND_OBJ_MAX;i++) Snd_OBJ[i] = NULL;
-
 	// ＤＳオブジェクトを解放 //
 	if(Snd_DS) {
 		Snd_DS->Release();
 		Snd_DS = nullptr;
+	}
+}
+
+bool SndBackend_SEInit(void)
+{
+	return true;
+}
+
+void SndBackend_SECleanup(void)
+{
+	// ここで SE_STRUCT 関連の解放を行う //
+	for(auto i = 0; i < SND_OBJ_MAX; i++) {
+		SndRelease(i);
+		// 念のため... //
+		Snd_OBJ[i] = nullptr;
 	}
 }
 

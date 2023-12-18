@@ -81,7 +81,7 @@ void XCleanup(void)
 {
 	ConfigSave();
 	DxObj.Cleanup();
-	SndCleanup();
+	Snd_Cleanup();
 	Mid_Stop();
 	Mid_End();
 	Key_End();

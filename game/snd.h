@@ -7,6 +7,7 @@
 
 
 // ヘッダファイル //
+#include "game/enum_flags.h"
 #include "platform/buffer.h"
 #include <stdint.h>
 
@@ -21,10 +22,10 @@ using SND_INSTANCE_ID = uint8_t;
 extern const int SND_X_MID;
 extern const int SND_X_PER_DECIBEL;
 
+void Snd_Cleanup(void);
 
-// 初期化など //
-bool SndInit(void);
-void SndCleanup(void);
+bool Snd_SEInit(void);
+void Snd_SECleanup(void);
 
 bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
 

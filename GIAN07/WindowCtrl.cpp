@@ -491,7 +491,7 @@ static bool SndFnSE(INPUT_BITS key)
 
 			if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
 				ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-				SndCleanup();
+				Snd_SECleanup();
 			}
 			else{
 				ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;

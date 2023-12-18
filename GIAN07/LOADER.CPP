@@ -1012,7 +1012,7 @@ bool LoadSound(void)
 {
 	// サウンドの初期化 //
 	// 何らかの理由で使用できなければ、Disable とする //
-	if(!(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) || !SndInit()) {
+	if(!(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) || !Snd_SEInit()) {
 		ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 		return false;
 	}
@@ -1044,7 +1044,7 @@ bool LoadSound(void)
 	}
 
 	ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-	SndCleanup();
+	Snd_SECleanup();
 	return FALSE;
 }
 

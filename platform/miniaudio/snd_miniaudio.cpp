@@ -74,10 +74,19 @@ bool SndBackend_Init(void)
 
 void SndBackend_Cleanup(void)
 {
+	ma_engine_uninit(&Engine);
+}
+
+bool SndBackend_SEInit(void)
+{
+	return true;
+}
+
+void SndBackend_SECleanup(void)
+{
 	for(auto& se : SndObj) {
 		se.Clear();
 	}
-	ma_engine_uninit(&Engine);
 }
 
 bool SndBackend_SELoad(

@@ -12,7 +12,7 @@
 			"program": "${workspaceFolder}/bin/GIAN07d.exe",
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/bin/",
-			"externalConsole": false
+			"console": "internalConsole"
 		},
 		{
 			"name": "Release",
@@ -22,7 +22,7 @@
 			"program": "${workspaceFolder}/bin/GIAN07.exe",
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/bin/",
-			"externalConsole": false
+			"console": "internalConsole"
 		}
 	]
 }

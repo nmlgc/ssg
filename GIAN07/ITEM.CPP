@@ -77,7 +77,7 @@ void ItemMove(void)
 		if(HITCHK(ip->x,Viv.x,ITEM_HITX) && HITCHK(ip->y,Viv.y,ITEM_HITY)){
 			switch(ip->type){
 				case(ITEM_SCORE):
-					SndPlay(SOUND_ID_SELECT, ip->x);
+					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
 					PlayRankAdd((SY_MAX-Viv.y)>>10);
 					score_add(point);
 					StringEffect2(ip->x,ip->y,point);
@@ -88,13 +88,13 @@ void ItemMove(void)
 				break;
 
 				case(ITEM_EXTEND):
-					SndPlay(SOUND_ID_SELECT, ip->x);
+					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
 					StringEffect(180+64,80,"E x t e n d  !");
 					Viv.left++;
 				break;
 
 				case(ITEM_BOMB):
-					SndPlay(SOUND_ID_SELECT, ip->x);
+					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
 					StringEffect(120+64,80,"B o m b   E x t e n d  !");
 					Viv.bomb++;
 				break;

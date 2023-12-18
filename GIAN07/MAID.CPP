@@ -432,7 +432,7 @@ extern void MaidDead(void)
 	for(i=0; i<50; i++)
 		fragment_set(Viv.x,Viv.y,FRG_HEART);
 
-	SndPlay(SOUND_ID_DEAD);
+	Snd_SEPlay(SOUND_ID_DEAD);
 
 	// 座標系セット //
 	Viv.x         = Viv.opx = SX_START;
@@ -489,7 +489,7 @@ extern void evade_addEx(int x, int y, uint8_t n)
 
 	if(n){
 		if(Viv.BuzzSound == FALSE){
-			SndPlay(SOUND_ID_BUZZ, x);
+			Snd_SEPlay(SOUND_ID_BUZZ, x);
 			Viv.BuzzSound = TRUE;
 		}
 		fragment_set(x,y,FRG_EVADE);

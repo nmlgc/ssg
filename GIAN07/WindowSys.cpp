@@ -595,20 +595,20 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	switch(Key_Data){
 		case(KEY_UP):		// 一つ上の項目へ
 			ws->Select[Depth] = (ws->Select[Depth]+p->NumItems-1)%(p->NumItems);
-			SndPlay(SOUND_ID_SELECT);
+			Snd_SEPlay(SOUND_ID_SELECT);
 		return;
 
 		case(KEY_DOWN):		// 一つ下の項目へ
 			ws->Select[Depth] = (ws->Select[Depth]+1)%(p->NumItems);
-			SndPlay(SOUND_ID_SELECT);
+			Snd_SEPlay(SOUND_ID_SELECT);
 		return;
 
 		case(KEY_ESC):case(KEY_BOMB):
-			SndPlay(SOUND_ID_CANCEL);
+			Snd_SEPlay(SOUND_ID_CANCEL);
 		break;
 
 		case(KEY_TAMA):case(KEY_RETURN):case(KEY_LEFT):case(KEY_RIGHT):
-			SndPlay(SOUND_ID_SELECT);
+			Snd_SEPlay(SOUND_ID_SELECT);
 		break;
 	}
 

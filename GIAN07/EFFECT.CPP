@@ -136,7 +136,7 @@ void CEffectSet(int x, int y, uint8_t type)
 
 	switch(type){
 		case(CEFC_STAR):
-			SndPlay(SOUND_ID_TAMEFAST);
+			Snd_SEPlay(SOUND_ID_TAMEFAST);
 			ce->rmax = ce->r = 400;
 		break;
 
@@ -630,7 +630,7 @@ void ObjectLockOn(int *x, int *y, int wx64, int hx64)
 	l->count = 30;
 
 	l->state = LOCKON_01;
-	//SndPlay(SOUND_ID_SELECT);
+	// Snd_SEPlay(SOUND_ID_SELECT);
 }
 
 // ロックオンアニメーション動作 //

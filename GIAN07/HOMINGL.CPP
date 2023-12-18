@@ -126,7 +126,7 @@ void HLaserMove(void)
 
 				if(abs(deg2)<8){
 					hl->Type = HL_NONE;
-					SndPlay(17, hl->p[hl->Current].x);
+					Snd_SEPlay(17, hl->p[hl->Current].x);
 				}
 				else{
 					if(hl->v > 2*64)

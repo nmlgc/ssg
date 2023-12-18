@@ -80,7 +80,7 @@ void SndCleanup(void)
 	ma_engine_uninit(&Engine);
 }
 
-bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
+bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 {
 	if(id >= SND_OBJ_MAX) {
 		return false;
@@ -144,7 +144,7 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 	return true;
 }
 
-void SndPlay(uint8_t id, int x, bool loop)
+void Snd_SEPlay(uint8_t id, int x, bool loop)
 {
 	if(id >= SND_OBJ_MAX) {
 		return;
@@ -170,7 +170,7 @@ void SndPlay(uint8_t id, int x, bool loop)
 	se.now = ((se.now + 1) % se.max);
 }
 
-void SndStop(uint8_t id)
+void Snd_SEStop(uint8_t id)
 {
 	if(id >= SND_OBJ_MAX) {
 		return;

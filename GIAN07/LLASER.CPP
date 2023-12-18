@@ -74,7 +74,7 @@ bool LLaserSet(uint8_t id)
 
 	lp->flag = LLF_LINE;
 
-	//SndPlay(1, LaserCmd.x);
+	// Snd_SEPlay(1, LaserCmd.x);
 
 	return TRUE;
 }
@@ -88,7 +88,7 @@ extern void LLaserOpen(ENEMY_DATA *e,BYTE id)
 		lp = LLaser+i;
 		if((lp->e==e) && (lp->EnemyID==id || id==ECLCST_LLASERALL) && lp->flag!=LLF_DISABLE){
 			lp->flag = LLF_OPEN;
-			SndPlay(2, lp->x, true);
+			Snd_SEPlay(2, lp->x, true);
 		}
 	}
 }
@@ -107,7 +107,7 @@ extern void LLaserClose(ENEMY_DATA *e,BYTE id)
 		lp = LLaser+i;
 		if((lp->e==e) && (lp->EnemyID==id)){
 			lp->flag = LLF_CLOSE;
-			SndStop(2);
+			Snd_SEStop(2);
 		}
 	}
 }
@@ -121,7 +121,7 @@ extern void LLaserLine(ENEMY_DATA *e,BYTE id)
 		lp = LLaser+i;
 		if((lp->e==e) && (lp->EnemyID==id ||id==ECLCST_LLASERALL)){
 			lp->flag = LLF_CLOSEL;
-			SndStop(2);
+			Snd_SEStop(2);
 		}
 	}
 }
@@ -194,7 +194,7 @@ extern void LLaserForceClose(ENEMY_DATA *e)
 		// (参考) すでにクローズ状態であっても LLaserClose() は問題を発生させない //
 		if(lp->e==e){
 			lp->flag = LLF_CLOSE;
-			SndStop(2);
+			Snd_SEStop(2);
 			//LLaserClose(i);
 		}
 	}
@@ -426,7 +426,7 @@ extern void LLaserClear(void)
 			LLaser[i].flag = LLF_CLOSE;
 	}
 
-	SndStop(2);
+	Snd_SEStop(2);
 }
 
 extern void LLaserSetup(void)
@@ -439,7 +439,7 @@ extern void LLaserSetup(void)
 		LLaser[i].e    = NULL;
 	}
 
-	SndStop(2);
+	Snd_SEStop(2);
 }
 
 static void _LLaserPointSet(LLASER_DATA *lp)

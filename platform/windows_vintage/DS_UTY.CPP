@@ -146,7 +146,7 @@ void SndCleanup(void)
 }
 
 // ＷＡＶファイルロード(ある制限があるが...) //
-bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
+bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 {
 	LPSE_STRUCT		p;
 	HRESULT			dsrval;
@@ -226,7 +226,7 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 	return TRUE;
 }
 
-void SndPlay(uint8_t id, int x, bool loop)
+void Snd_SEPlay(uint8_t id, int x, bool loop)
 {
 	HRESULT	dsrval;
 	DWORD	st;
@@ -247,7 +247,7 @@ void SndPlay(uint8_t id, int x, bool loop)
 	se->now = (se->now+1)%(se->max);
 }
 
-void SndStop(uint8_t id)
+void Snd_SEStop(uint8_t id)
 {
 	int i;
 	LPSE_STRUCT se;

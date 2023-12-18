@@ -109,20 +109,20 @@ void ScoreNameProc(bool&)
 			if(InputLocked) {
 				break;
 			}
-			SndPlay(SOUND_ID_CANCEL);
+			Snd_SEPlay(SOUND_ID_CANCEL);
 			GameExit(FALSE);
 		return;
 
 		case(KEY_UP):case(KEY_LEFT):
 			if(ScoreString[4].bMoveEnable) break;
-			SndPlay(SOUND_ID_SELECT);
+			Snd_SEPlay(SOUND_ID_SELECT);
 			CurrentDif  = (CurrentDif+4)%5;
 			CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
 		break;
 
 		case(KEY_DOWN):		case(KEY_RIGHT):
 			if(ScoreString[4].bMoveEnable) break;
-			SndPlay(SOUND_ID_SELECT);
+			Snd_SEPlay(SOUND_ID_SELECT);
 			CurrentDif  = (CurrentDif+1)%5;
 			CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
 		break;
@@ -259,35 +259,35 @@ void NameRegistProc(bool&)
 		switch(Key_Data){
 			case(KEY_UP):
 				y = (y+2)%3;
-				SndPlay(SOUND_ID_SELECT);
+				Snd_SEPlay(SOUND_ID_SELECT);
 			break;
 
 			case(KEY_DOWN):
 				y = (y+1)%3;
-				SndPlay(SOUND_ID_SELECT);
+				Snd_SEPlay(SOUND_ID_SELECT);
 			break;
 
 			case(KEY_LEFT):
 				if(y==2 && x>20)	x = (x-2)%26;
 				else				x = (x+25)%26;
-				SndPlay(SOUND_ID_SELECT);
+				Snd_SEPlay(SOUND_ID_SELECT);
 			break;
 
 			case(KEY_RIGHT):
 				if(y==2 && x>=20)	x = (x+2)%26;
 				else				x = (x+1)%26;
-				SndPlay(SOUND_ID_SELECT);
+				Snd_SEPlay(SOUND_ID_SELECT);
 			break;
 
 			case(KEY_BOMB):
-				SndPlay(SOUND_ID_CANCEL);
+				Snd_SEPlay(SOUND_ID_CANCEL);
 			goto BACK_NR_PROC;
 
 			case(KEY_TAMA):case(KEY_RETURN):
 				if(InputLocked) {
 					break;
 				}
-				SndPlay(SOUND_ID_SELECT);
+				Snd_SEPlay(SOUND_ID_SELECT);
 
 				// 最後の文字まで来ていた場合 //
 				if(strlen(ScoreString[CurrentRank-1].Name)==NR_NAME_LEN-1){
@@ -427,8 +427,8 @@ bool NameRegistInit(bool bNeedChgMusic)
 	else                              CurrentName.Stage = GameStage;
 
 	// デバッグ用... //
-	SndStop(8);			// ワーニング音を止める
-	SndStopAll();
+	Snd_SEStop(8);	// ワーニング音を止める
+	Snd_SEStopAll();
 
 	// ハイスコアで無いならばタイトルに移行する //
 	CurrentRank = (BYTE)SetScoreString(&CurrentName, CurrentLevel());
@@ -855,7 +855,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	GrpSetClip(0,0,640,480);
 
 	LLaserSetup();		// 音を止める
-	SndStop(8);			// ワーニング音を止めるのだ
+	Snd_SEStop(8);	// ワーニング音を止めるのだ
 
 	//LoadFace(0,0);
 	MWinForceClose();
@@ -1093,7 +1093,7 @@ void WeaponSelectProc(bool&)
 		else      Viv.weapon = (Viv.weapon+1)%3;
 		spd = 0;
 		deg = 0;
-		SndPlay(SOUND_ID_BUZZ);
+		Snd_SEPlay(SOUND_ID_BUZZ);
 	}
 
 	if(WeaponKeyWait){
@@ -1135,7 +1135,7 @@ void WeaponSelectProc(bool&)
 			MaidTamaIndSet();
 			count = 0;
 
-			SndPlay(SOUND_ID_SELECT);
+			Snd_SEPlay(SOUND_ID_SELECT);
 			if(GameStage != GRAPH_ID_EXSTAGE){
 			#ifdef PBG_DEBUG
 				GameStage = DebugDat.StgSelect;
@@ -1178,7 +1178,7 @@ void WeaponSelectProc(bool&)
 
 		case(KEY_ESC):case(KEY_BOMB):
 			if(spd) break;
-			SndPlay(SOUND_ID_CANCEL);
+			Snd_SEPlay(SOUND_ID_CANCEL);
 			GameExit(FALSE);
 		return;
 	}

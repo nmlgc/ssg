@@ -330,7 +330,7 @@ void MLaserSet(uint16_t time)
 
 	if(Viv.lay_time == 0){
 		Viv.lay_time = time;
-		SndPlay(SOUND_ID_SBLASER, Viv.x);
+		Snd_SEPlay(SOUND_ID_SBLASER, Viv.x);
 	}
 }
 

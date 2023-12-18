@@ -298,12 +298,12 @@ static void enemy_set(void)
 				switch(cmd[1]){
 				case(SEFC_WARN):
 					//effect_set(0,0,EFC_WARNBOSS,GameStage);
-					SndPlay(8, GX_MID, true);
+					Snd_SEPlay(8, GX_MID, true);
 					WarningEffectSet();
 					//StringEffect3(GameStage);
 				break;
 
-				case(SEFC_WARNSTOP):	SndStop(8);						break;	// Warning 停止
+				case(SEFC_WARNSTOP):	Snd_SEStop(8);	break;	// Warning 停止
 				case(SEFC_MUSICFADE):	Mid_FadeOut(120);				break;	// 曲の停止
 				case(SEFC_STG2BOSS):	ScrollCommand(SCMD_STG2BOSS);	break;	// ２面ボスScroll
 				case(SEFC_RASTERON):	ScrollCommand(SCMD_RASTER_ON);	break;	// ラスターON

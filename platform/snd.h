@@ -26,19 +26,19 @@ extern const int SND_X_PER_DECIBEL;
 bool SndInit(void);
 void SndCleanup(void);
 
-bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
+bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
 
 // 再生＆停止 //
-void SndPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
-void SndStop(uint8_t id);
+void Snd_SEPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
+void Snd_SEStop(uint8_t id);
 
 // Pause or resume all playing sounds if the window loses focus //
 void SndPauseAll();
 void SndResumeAll();
 
-inline void SndStopAll(void)
+inline void Snd_SEStopAll(void)
 {
 	for(auto i = 0; i < SND_OBJ_MAX; i++) {
-		SndStop(i);
+		Snd_SEStop(i);
 	}
 }

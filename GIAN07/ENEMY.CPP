@@ -207,7 +207,7 @@ extern void enemy_clear(void)
 			e->hp    = 0;
 			e->count = 0;
 			if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-			SndPlay(SOUND_ID_BOMB, e->x);
+			Snd_SEPlay(SOUND_ID_BOMB, e->x);
 		}
 		else{
 			// 描画しないタイプの敵の消去の仕方は他の場合と異なり、 //
@@ -248,7 +248,7 @@ bool enemy_damage(int x,int y,int damage)
 			else{
 				e->IsDamaged = ((e->count) & 1);
 				if(e->hp<=damage){
-					SndPlay(SOUND_ID_BOMB, e->x);
+					Snd_SEPlay(SOUND_ID_BOMB, e->x);
 					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 					PowerUp((BYTE)e->hp);			// パワーアップ
 					e->hp    = 0;
@@ -258,7 +258,7 @@ bool enemy_damage(int x,int y,int damage)
 					if(e->item) ItemSet(e->x,e->y,e->item);
 				}
 				else{
-					SndPlay(SOUND_ID_HIT, e->x);
+					Snd_SEPlay(SOUND_ID_HIT, e->x);
 					PowerUp(damage);	// ここでもパワーアップ
 					e->hp -= damage;
 				}
@@ -285,7 +285,7 @@ bool enemy_damage2(int x,int y,int damage)
 			else{
 				e->IsDamaged = ((e->count) & 1);
 				if(e->hp<=damage){
-					SndPlay(SOUND_ID_BOMB, e->x);
+					Snd_SEPlay(SOUND_ID_BOMB, e->x);
 					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 					PowerUp((BYTE)e->hp);			// パワーアップ
 					e->hp    = 0;
@@ -295,7 +295,7 @@ bool enemy_damage2(int x,int y,int damage)
 					if(e->item) ItemSet(e->x,e->y,e->item);
 				}
 				else{
-					SndPlay(SOUND_ID_HIT, e->x);
+					Snd_SEPlay(SOUND_ID_HIT, e->x);
 					PowerUp(damage);	// ここでもパワーアップ
 					e->hp -= damage;
 				}
@@ -324,7 +324,7 @@ extern VOID enemy_damage3(int x,int y,BYTE d)
 			else{
 				e->IsDamaged = ((e->count) & 1);
 				if(e->hp<=damage){
-					SndPlay(SOUND_ID_BOMB, e->x);
+					Snd_SEPlay(SOUND_ID_BOMB, e->x);
 					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 					PowerUp((BYTE)e->hp);			// パワーアップ
 					e->hp    = 0;
@@ -334,7 +334,7 @@ extern VOID enemy_damage3(int x,int y,BYTE d)
 					if(e->item) ItemSet(e->x,e->y,e->item);
 				}
 				else{
-					SndPlay(SOUND_ID_HIT, e->x);
+					Snd_SEPlay(SOUND_ID_HIT, e->x);
 					PowerUp(damage);	// ここでもパワーアップ
 					e->hp -= damage;
 				}
@@ -358,7 +358,7 @@ extern void enemy_damage4(int damage)
 			else{
 				e->IsDamaged = ((e->count) & 1);
 				if(e->hp<=damage){
-					SndPlay(SOUND_ID_BOMB, e->x);
+					Snd_SEPlay(SOUND_ID_BOMB, e->x);
 					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 					PowerUp((BYTE)e->hp);			// パワーアップ
 					e->hp    = 0;
@@ -368,7 +368,7 @@ extern void enemy_damage4(int damage)
 					if(e->item) ItemSet(e->x,e->y,e->item);
 				}
 				else{
-					SndPlay(SOUND_ID_HIT, e->x);
+					Snd_SEPlay(SOUND_ID_HIT, e->x);
 					PowerUp(damage);	// ここでもパワーアップ
 					e->hp -= damage;
 				}
@@ -1601,7 +1601,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_PSE):			// 効果音を鳴らす
 			ECL_DEBUG("ECL_PSE",0);
-			SndPlay(cmd[1], e->x);
+			Snd_SEPlay(cmd[1], e->x);
 			bRetFlag = FALSE;
 		break;
 

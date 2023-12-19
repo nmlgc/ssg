@@ -126,7 +126,7 @@ bool FileAppend(
 // Streams
 // -------
 
-struct FILE_STREAM_WIN32 : public FILE_STREAM_WRITE {
+struct FILE_STREAM_WIN32 : public FILE_STREAM_READ, FILE_STREAM_WRITE {
 	HANDLE handle;
 
 public:
@@ -158,10 +158,25 @@ public:
 		return ret.QuadPart;
 	};
 
+	size_t Read(std::span<uint8_t> buf) override {
+		return HandleRead(buf, handle);
+	}
+
 	bool Write(BYTE_BUFFER_BORROWED buf) override {
 		return HandleWrite(handle, buf);
 	};
 };
+
+std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s)
+{
+	auto handle = OpenRead(s);
+	if(handle == INVALID_HANDLE_VALUE) {
+		return nullptr;
+	}
+	return std::unique_ptr<FILE_STREAM_WIN32>(
+		new (std::nothrow) FILE_STREAM_WIN32(handle)
+	);
+}
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, bool fail_if_exists

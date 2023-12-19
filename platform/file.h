@@ -76,11 +76,19 @@ struct FILE_STREAM_SEEK : FILE_STREAM {
 	virtual std::optional<int64_t> Tell() = 0;
 };
 
+struct FILE_STREAM_READ : FILE_STREAM_SEEK {
+	// Tries to fill [buf] with bytes read from the current file position, and
+	// returns the number of bytes read. Successful if the returned value is
+	// equal to [buf.size_bytes()].
+	[[nodiscard]] virtual size_t Read(std::span<uint8_t> buf) = 0;
+};
+
 struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {
 	// Retuns `true` if the buffer was written successfully.
 	[[nodiscard]] virtual bool Write(BYTE_BUFFER_BORROWED buf) = 0;
 };
 
+std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s);
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, bool fail_if_exists = false
 );

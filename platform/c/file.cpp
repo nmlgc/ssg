@@ -85,7 +85,7 @@ bool FileAppend(
 // Streams
 // -------
 
-struct FILE_STREAM_C : public FILE_STREAM_WRITE {
+struct FILE_STREAM_C : public FILE_STREAM_READ, FILE_STREAM_WRITE {
 	FILE* fp;
 
 public:
@@ -116,10 +116,23 @@ public:
 		return ret;
 	};
 
+	size_t Read(std::span<uint8_t> buf) override {
+		return fread(buf.data(), 1, buf.size_bytes(), fp);
+	}
+
 	bool Write(BYTE_BUFFER_BORROWED buf) override {
 		return (fwrite(buf.data(), buf.size(), 1, fp) == 1);
 	};
 };
+
+std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s)
+{
+	auto* fp = fopen(s, "rb");
+	if(!fp) {
+		return nullptr;
+	}
+	return std::unique_ptr<FILE_STREAM_C>(new (std::nothrow) FILE_STREAM_C(fp));
+}
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, bool fail_if_exists

@@ -209,7 +209,11 @@ main_src += tup.glob("DirectXUTYs/*.cpp")
 main_src += tup.glob("GIAN07/*.cpp")
 main_src += tup.glob("GIAN07/*.CPP")
 
-main_obj = (cxx(modern_cfg, modern_src) + cxx(main_cfg, main_src))
+main_obj = (
+	cxx(modern_cfg, modern_src) +
+	cxx(modern_cfg:branch("", XIPH_LINK), "game/codecs/vorbis.cpp") +
+	cxx(main_cfg, main_src)
+)
 
 main_sdl_cfg = main_cfg:branch("", ANALYSIS, {
 	base = { lflags = "/SUBSYSTEM:windows" }
@@ -219,6 +223,7 @@ main_sdl_src += "MAIN/main_sdl.cpp"
 main_sdl_src += tup.glob("platform/miniaudio/*.cpp")
 main_sdl_src += tup.glob("platform/sdl/*.cpp")
 main_sdl_obj = cxx(main_sdl_cfg, main_sdl_src)
+main_sdl_obj = (main_sdl_obj + xiph_obj)
 exe(
 	main_sdl_cfg,
 	(main_sdl_obj + main_obj + blake3_modern_obj + sdl_dll),

@@ -202,6 +202,7 @@ main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, BLAKE3_LINK, {
 
 modern_cfg = main_cfg:branch(tup.getconfig("BUILDTYPE"), ANALYSIS)
 modern_src += tup.glob("game/*.cpp")
+modern_src += "game/codecs/flac.cpp"
 modern_src += tup.glob("platform/windows/*.cpp")
 main_src += tup.glob("DirectXUTYs/*.CPP")
 main_src += tup.glob("DirectXUTYs/*.cpp")

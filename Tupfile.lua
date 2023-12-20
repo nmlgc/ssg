@@ -93,6 +93,28 @@ sdl_dll = (
 )
 -- ---
 
+-- libogg and libvorbis
+-- --------------------
+
+LIBOGG = sourcepath("libs/libogg/")
+LIBVORBIS = sourcepath("libs/libvorbis/")
+
+XIPH_LINK = { base = { cflags = string.format(
+	"-I%sinclude -I%sinclude", LIBOGG.root, LIBVORBIS.root
+)} }
+libogg_cfg = CONFIG:branch("", XIPH_LINK, { base = { objdir = "libogg/" } })
+libogg_src += LIBOGG.glob("src/*.c")
+
+libvorbis_cfg = CONFIG:branch("", XIPH_LINK, { base = {
+	objdir = "libvorbis/"
+} })
+libvorbis_src += (LIBVORBIS.glob("lib/*.c") - {
+	"barkmel.c$", "misc.c$", "psytune.c$", "tone.c$", "vorbisenc.c$"
+})
+
+xiph_obj = (cxx(libogg_cfg, libogg_src) + cxx(libvorbis_cfg, libvorbis_src))
+-- --------------------
+
 -- BLAKE3
 -- ------
 

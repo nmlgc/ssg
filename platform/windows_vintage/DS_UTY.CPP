@@ -159,6 +159,19 @@ void SndBackend_SECleanup(void)
 	}
 }
 
+bool SndBackend_BGMLoad(std::shared_ptr<BGM::TRACK> track)
+{
+	return false;
+}
+
+void SndBackend_BGMPlay(void)
+{
+}
+
+void SndBackend_BGMStop(void)
+{
+}
+
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndBackend_SELoad(
 	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max

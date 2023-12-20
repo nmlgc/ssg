@@ -16,6 +16,13 @@ bool SndBackend_BGMInit(void);
 // The platform-independent layer always calls this before SndBackend_Cleanup().
 void SndBackend_BGMCleanup(void);
 
+namespace BGM {
+	struct TRACK;
+}
+bool SndBackend_BGMLoad(std::shared_ptr<BGM::TRACK> track);
+void SndBackend_BGMPlay(void);
+void SndBackend_BGMStop(void);
+
 // The platform-independent layer always calls this after SndBackend_Init().
 bool SndBackend_SEInit(void);
 

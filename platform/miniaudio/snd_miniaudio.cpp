@@ -17,9 +17,79 @@
 
 #include <libs/miniaudio/miniaudio.h>
 
+#include "game/bgm_track.h"
 #include "game/defer.h"
 #include "platform/snd_backend.h"
 #include <ranges>
+
+struct BGM_OBJ {
+	ma_data_source_base data_source{};
+	ma_sound sound{};
+	std::shared_ptr<BGM::TRACK> track = nullptr;
+
+	bool Clear() {
+		if(track) {
+			ma_sound_uninit(&sound);
+			ma_data_source_uninit(&data_source);
+			track = nullptr;
+		}
+		return false;
+	}
+};
+
+static_assert(
+	(offsetof(BGM_OBJ, data_source) == 0),
+	"The `ma_data_source_base` object must come first in the structure"
+);
+
+static ma_result BGM_GetDataFormat(
+	ma_data_source* pDataSource,
+	ma_format* pFormat,
+	ma_uint32* pChannels,
+	ma_uint32* pSampleRate,
+	ma_channel* pChannelMap,
+	size_t channelMapCap
+) {
+	const auto* bgm = static_cast<BGM_OBJ *>(pDataSource);
+	if(!bgm->track) {
+		return MA_UNAVAILABLE;
+	}
+	switch(bgm->track->pcmf.format) {
+	case PCM_SAMPLE_FORMAT::S16:	*pFormat = ma_format_s16;	break;
+	case PCM_SAMPLE_FORMAT::S32:	*pFormat = ma_format_s32;	break;
+	}
+	*pChannels = bgm->track->pcmf.channels;
+	*pSampleRate = bgm->track->pcmf.samplingrate;
+	return MA_SUCCESS;
+}
+
+static ma_result BGM_Read(
+	ma_data_source* pDataSource,
+	void* pFramesOut,
+	ma_uint64 frameCount,
+	ma_uint64* pFramesRead
+) {
+	const auto* bgm = static_cast<BGM_OBJ *>(pDataSource);
+	if(!bgm->track) {
+		return MA_UNAVAILABLE;
+	}
+	const auto sample_size = bgm->track->pcmf.SampleSize();
+
+	if((frameCount * sample_size) > (std::numeric_limits<size_t>::max)()) {
+		return MA_TOO_BIG;
+	}
+	const size_t buf_size = (frameCount * sample_size);
+	if(!bgm->track->Decode({static_cast<std::byte *>(pFramesOut), buf_size})) {
+		return MA_INVALID_DATA;
+	}
+	*pFramesRead = frameCount;
+	return MA_SUCCESS;
+}
+
+static const ma_data_source_vtable BGM_VTABLE = {
+	.onRead = BGM_Read,
+	.onGetDataFormat = BGM_GetDataFormat,
+};
 
 struct RESAMPLED_INSTANCE {
 	ma_audio_buffer_ref data_source{};
@@ -54,6 +124,7 @@ struct SE {
 };
 
 static ma_engine Engine;
+static BGM_OBJ BGMObj;
 static SE SndObj[SND_OBJ_MAX];
 
 float x_to_linear(int x)
@@ -84,6 +155,50 @@ bool SndBackend_BGMInit(void)
 
 void SndBackend_BGMCleanup(void)
 {
+	BGMObj.Clear();
+}
+
+bool SndBackend_BGMLoad(std::shared_ptr<BGM::TRACK> track)
+{
+	ma_result result = MA_SUCCESS;
+
+	BGMObj.Clear();
+	BGMObj.track = track;
+
+	auto config = ma_data_source_config_init();
+	config.vtable = &BGM_VTABLE;
+
+	result = ma_data_source_init(&config, &BGMObj.data_source);
+	if(result != MA_SUCCESS) {
+		return result;
+	}
+	result = ma_sound_init_from_data_source(
+		&Engine,
+		&BGMObj.data_source,
+		MA_SOUND_FLAG_NO_SPATIALIZATION,
+		nullptr,
+		&BGMObj.sound
+	);
+	if(result != MA_SUCCESS) {
+		return BGMObj.Clear();
+	}
+	return true;
+}
+
+void SndBackend_BGMPlay(void)
+{
+	if(!BGMObj.track) {
+		return;
+	}
+	ma_sound_start(&BGMObj.sound);
+}
+
+void SndBackend_BGMStop(void)
+{
+	if(!BGMObj.track) {
+		return;
+	}
+	ma_sound_stop(&BGMObj.sound);
 }
 
 bool SndBackend_SEInit(void)

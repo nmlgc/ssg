@@ -11,7 +11,9 @@
 #include "LOADER.H"
 #include "LZ_UTY.H"
 #include "platform/snd.h"
+#include "game/hash.h"
 #include "game/midi.h"
+#include <future>
 #include <assert.h>
 #include <ddraw.h>
 
@@ -35,11 +37,6 @@ bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
 	return DxObj.SurfaceLoad(surf_id, std::move(bmp));
 }
 
-bool PMid_Load(const PACKFILE_READ &in, fil_no_t filno)
-{
-	return Mid_Load(in.MemExpand(filno));
-}
-
 bool SndWAVLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
 {
 	return SndWAVLoad(in.MemExpand(filno), id, max);
@@ -49,9 +46,8 @@ bool SndWAVLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
 // -------------- //
 // Caching every .DAT file is not only tedious due to the data structures
 // involved, but also wrong because replays exist and can be overwritten during
-// the lifespan of a process. Since we only actively need these two (plus
-// MUSIC.DAT, which needs to be accessible inside LoadMusic()), we can gain
-// enough of a load time reduction just by writing two wrapper functions.
+// the lifespan of a process. Since we only actively need these three, we can
+// gain enough of a load time reduction just by writing two wrapper functions.
 
 BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno)
 {
@@ -63,6 +59,42 @@ BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
 {
 	static const auto in = FilStartR(_PATH("GRAPH.DAT"));
 	return GrpBMPLoadP(in, filno, surf_id);
+}
+
+// For MUSIC.DAT, we want to start asynchronously calculating all hashes once
+// the process starts.
+namespace DAT {
+	PACKFILE_READ MusicPack;
+	std::vector<HASH> MusicHashes;
+
+	auto MusicInitThread = std::jthread([](std::stop_token st) {
+		MusicPack = FilStartR(_PATH("MUSIC.DAT"));
+		MusicNum = MusicPack.info.size();
+		MusicHashes.reserve(MusicNum);
+
+		for(auto i = 0; i < MusicNum; i++) {
+			if(st.stop_requested()) {
+				break;
+			}
+			if(const auto file = MusicPack.MemExpand(i)) {
+				if(st.stop_requested()) {
+					break;
+				}
+				MusicHashes.emplace_back(Hash({ file.get(), file.size() }));
+			} else {
+				assert(!"Failure extracting BGM file?");
+			}
+		}
+	});
+
+	// ｎ番目の曲をロードする //
+	bool LoadMusic(fil_no_t filno)
+	{
+		if(MusicInitThread.joinable()) {
+			MusicInitThread.join();
+		}
+		return Mid_Load(MusicPack.MemExpand(filno));
+	}
 }
 // -------------- //
 
@@ -810,13 +842,7 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
 // ｎ番目の曲をロードする //
 bool LoadMusic(int no)
 {
-	BOOL flag;
-
-	static const auto in = FilStartR(_PATH("MUSIC.DAT"));
-	flag = PMid_Load(in,no);
-	MusicNum = in.info.size();
-
-	return flag;
+	return DAT::LoadMusic(no);
 }
 
 // 全てのSoundデータをロードする //

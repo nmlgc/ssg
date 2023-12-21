@@ -5,6 +5,7 @@
 
 #include "game/midi.h"
 #include "game/endian.h"
+#include "game/volume.h"
 #include "platform/midi_backend.h"
 #include <algorithm>
 #include <thread>
@@ -69,15 +70,18 @@ typedef struct {
 //// みでぃ用構造体 ////
 struct MID_DEVICE {
 	// 以下は外部から変更＆参照しないこと //
-	unsigned int	FadeCount;	// フェードＩ／Ｏカウンタ
-	char	FadeFlag;	// フェードＩ／Ｏフラグ(In or Out or 無し)
-	int	FadeWait;	// フェードＩ／Ｏウェイト
+	MID_REALTIME FadeProgress;
+	MID_REALTIME FadeDuration;
+	VOLUME FadeStartVolume;
+	VOLUME FadeEndVolume;
 
-	uint8_t	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
-	uint8_t	NowVolume;	// 現在のボリューム(0-127)
+	VOLUME	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
+	VOLUME	NowVolume;	// 現在のボリューム(0-127)
 	MID_BACKEND_STATE	state;	// 現在の状態
 
-	void FadeIO(void);
+	VOLUME VolumeFor(decltype(MIDI_CHANNELS) ch) const;
+	void ApplyVolume(void) const;
+	void FadeIO(MID_REALTIME delta);
 };
 
 
@@ -234,7 +238,7 @@ void Mid_Play(void)
 		return;
 	}
 
-	Mid_Dev.FadeFlag  = 0;
+	Mid_Dev.FadeDuration = 0s;
 	Mid_Dev.MaxVolume = 127;
 	Mid_Dev.NowVolume = 127;
 	Mid_Volume(Mid_Dev.NowVolume);
@@ -256,7 +260,7 @@ void Mid_Stop(void)
 	}
 
 	Mid_PlayTime = {};
-	Mid_Dev.FadeFlag = 0;
+	Mid_Dev.FadeDuration = 0s;
 
 	MidBackend_StopTimer();
 	MidBackend_Panic();
@@ -307,11 +311,16 @@ void Mid_Tempo(char tempo)
 
 void Mid_FadeOut(uint8_t speed)
 {
-	Mid_Dev.FadeFlag  = -1;
-	Mid_Dev.FadeCount = 0;
+	// pbg quirk: The original game always reduced the volume by 1 on the first
+	// call to FadeIO() after the start of the fade. This allowed you to hold
+	// the fade button in the Music Room for a faster fade-out.
+	Mid_Dev.FadeStartVolume = (Mid_Dev.NowVolume - 1);
 
-	// MaxVolume,FadeWait に 1 だけ加算しているのは、０除算防止のため //
-	Mid_Dev.FadeWait  = ((256-speed)*4)/(Mid_Dev.MaxVolume+1) + 1;
+	Mid_Dev.FadeEndVolume = 0;
+	Mid_Dev.FadeProgress = 0s;
+	Mid_Dev.FadeDuration = (10ms * Mid_Dev.MaxVolume * (
+		((((256 - speed) * 4) / (Mid_Dev.MaxVolume + 1)) + 1)
+	));
 }
 
 void Mid_GMReset(void)
@@ -523,26 +532,41 @@ std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
 }
 
 
-void MID_DEVICE::FadeIO(void)
+VOLUME MID_DEVICE::VolumeFor(decltype(MIDI_CHANNELS) ch) const
 {
-	if(FadeFlag==0) return;
+	return ((Mid_VolumeTable[ch] * NowVolume) / (MaxVolume + 1));
+}
 
-	if((FadeCount % FadeWait) == 0){
-		NowVolume += FadeFlag;
-		for(int track = 0; track < 16; track++) {
-			const uint8_t volume = (
-				(Mid_VolumeTable[track] * NowVolume) / (MaxVolume + 1)
-			);
-			MidBackend_Out((0xb0 + track), 0x07, volume);
-		}
-		// Mid_Volume(NowVolume);
-		if((NowVolume == 0) || (NowVolume == MaxVolume)) {
-			FadeFlag = 0;
-			Mid_Stop();
+void MID_DEVICE::ApplyVolume(void) const
+{
+	for(auto ch = decltype(MIDI_CHANNELS){0}; ch < MIDI_CHANNELS; ch++) {
+		MidBackend_Out((0xb0 + ch), 0x07, VolumeFor(ch));
+	}
+}
+
+void MID_DEVICE::FadeIO(MID_REALTIME delta)
+{
+	if(FadeDuration == 0s) {
+		return;
+	}
+	FadeProgress += delta;
+
+	const auto fade_delta = (int{ FadeEndVolume } - FadeStartVolume);
+	const uint8_t new_volume = (
+		FadeStartVolume + ((fade_delta * FadeProgress) / FadeDuration)
+	);
+	if(new_volume != NowVolume) {
+		NowVolume = new_volume;
+
+		ApplyVolume();
+
+		if(NowVolume == FadeEndVolume) {
+			FadeDuration = 0s;
+			if(NowVolume == 0) {
+				Mid_Stop();
+			}
 		}
 	}
-
-	FadeCount++;
 }
 
 void Mid_Proc(MID_REALTIME delta)
@@ -608,7 +632,7 @@ void Mid_Proc(MID_REALTIME delta)
 		);
 	}
 
-	Mid_Dev.FadeIO();
+	Mid_Dev.FadeIO(delta);
 
 	if(!still_playing) {
 		Mid_Seq.Rewind();

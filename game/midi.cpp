@@ -67,7 +67,7 @@ typedef struct {
 
 
 //// みでぃ用構造体 ////
-typedef struct{
+struct MID_DEVICE {
 	// 以下は外部から変更＆参照しないこと //
 	unsigned int	FadeCount;	// フェードＩ／Ｏカウンタ
 	char	FadeFlag;	// フェードＩ／Ｏフラグ(In or Out or 無し)
@@ -76,7 +76,9 @@ typedef struct{
 	uint8_t	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
 	uint8_t	NowVolume;	// 現在のボリューム(0-127)
 	MID_BACKEND_STATE	state;	// 現在の状態
-} MID_DEVICE;
+
+	void FadeIO(void);
+};
 
 
 
@@ -195,9 +197,6 @@ struct MID_SEQUENCE {
 
 // ローカルな関数 //
 static void Mid_GMReset(void);
-
-// さらに？ローカルな関数 //
-static void MidFadeIOFunc(void);
 
 // グローバル＆名前空間でローカルな変数 //
 MID_DEVICE	Mid_Dev;
@@ -524,27 +523,26 @@ std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
 }
 
 
-static void MidFadeIOFunc(void)
+void MID_DEVICE::FadeIO(void)
 {
-	if(Mid_Dev.FadeFlag==0) return;
+	if(FadeFlag==0) return;
 
-	if(Mid_Dev.FadeCount % Mid_Dev.FadeWait == 0){
-		Mid_Dev.NowVolume += Mid_Dev.FadeFlag;
+	if((FadeCount % FadeWait) == 0){
+		NowVolume += FadeFlag;
 		for(int track = 0; track < 16; track++) {
 			const uint8_t volume = (
-				(Mid_VolumeTable[track] * Mid_Dev.NowVolume) /
-				(Mid_Dev.MaxVolume + 1)
+				(Mid_VolumeTable[track] * NowVolume) / (MaxVolume + 1)
 			);
 			MidBackend_Out((0xb0 + track), 0x07, volume);
 		}
-		//Mid_Volume(Mid_Dev.NowVolume);
-		if(Mid_Dev.NowVolume==0 || Mid_Dev.NowVolume==Mid_Dev.MaxVolume){
-			Mid_Dev.FadeFlag = 0;
+		// Mid_Volume(NowVolume);
+		if((NowVolume == 0) || (NowVolume == MaxVolume)) {
+			FadeFlag = 0;
 			Mid_Stop();
 		}
 	}
 
-	Mid_Dev.FadeCount++;
+	FadeCount++;
 }
 
 void Mid_Proc(MID_REALTIME delta)
@@ -610,7 +608,7 @@ void Mid_Proc(MID_REALTIME delta)
 		);
 	}
 
-	MidFadeIOFunc();
+	Mid_Dev.FadeIO();
 
 	if(!still_playing) {
 		Mid_Seq.Rewind();

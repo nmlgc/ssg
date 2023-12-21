@@ -75,12 +75,12 @@ int Run()
 			case SDL_WINDOWEVENT: {
 				switch(event.window.event) {
 				case SDL_WINDOWEVENT_FOCUS_LOST:
-					Mid_Stop();
+					Mid_Pause();
 					SndPauseAll();
 					active = false;
 					break;
 				case SDL_WINDOWEVENT_FOCUS_GAINED:
-					Mid_Play();
+					Mid_Resume();
 					SndResumeAll();
 					active = true;
 					break;

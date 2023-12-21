@@ -92,12 +92,12 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 			bIsActive = (BOOL)wParam;
 			if(bIsActive){
 				bMouseVisible = FALSE;
-				Mid_Play();
+				Mid_Pause();
 				SndResumeAll();
 			}
 			else{
 				bMouseVisible = TRUE;
-				Mid_Stop();
+				Mid_Resume();
 				SndPauseAll();
 			}
 		break;

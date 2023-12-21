@@ -68,6 +68,8 @@ void Mid_Play(void);						// 再生する
 // Stops backend output and resets the tables.
 void Mid_Stop(void);						// 停止する
 
+void Mid_Pause(void);
+void Mid_Resume(void);
 void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
 void Mid_Tempo(char tempo);					// テンポを変更する
 void Mid_FadeOut(uint8_t speed);	// フェードアウト(数字が大きいほど早い)

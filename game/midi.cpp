@@ -273,6 +273,33 @@ void Mid_Stop(void)
 	Mid_Dev.state = MID_BACKEND_STATE::STOP;
 }
 
+void Mid_Pause(void)
+{
+	if(Mid_Dev.state != MID_BACKEND_STATE::PLAY) {
+		return;
+	}
+	Mid_Dev.state = MID_BACKEND_STATE::PAUSE;
+	MidBackend_StopTimer();
+
+	// Set volume on all channels to 0 while leaving all notes playing.
+	// Not perfect, as sustained notes will continue to be sampled and will
+	// play at a different sample position once we resume, but it's better than
+	// the alternative of cutting off any playing notes altogether.
+	for(auto i = decltype(MIDI_CHANNELS){0}; i < MIDI_CHANNELS; i++) {
+		MidBackend_Out((0xb0 + i), 0x07, 0);
+	}
+}
+
+void Mid_Resume(void)
+{
+	if(Mid_Dev.state != MID_BACKEND_STATE::PAUSE) {
+		return;
+	}
+	Mid_Dev.ApplyVolume();
+	MidBackend_StartTimer();
+	Mid_Dev.state = MID_BACKEND_STATE::PLAY;
+}
+
 // 各種テーブルの初期化 //
 void Mid_TableInit(void)
 {

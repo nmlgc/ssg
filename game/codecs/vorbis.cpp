@@ -79,7 +79,9 @@ PCM_PART_VORBIS::~PCM_PART_VORBIS()
 	ov_clear(&vf);
 }
 
-std::unique_ptr<BGM::PCM_PART> Vorbis_Open(FILE_STREAM_READ& stream)
+std::unique_ptr<BGM::PCM_PART> Vorbis_Open(
+	FILE_STREAM_READ& stream, std::optional<BGM::METADATA_CALLBACK> on_metadata
+)
 {
 	OggVorbis_File vf = { 0 };
 	const auto ret = ov_open_callbacks(
@@ -90,6 +92,23 @@ std::unique_ptr<BGM::PCM_PART> Vorbis_Open(FILE_STREAM_READ& stream)
 	}
 	assert(vf.vi->rate >= 0);
 	assert(vf.vi->channels >= 0);
+
+	if(on_metadata) {
+		const auto* vc = ov_comment(&vf, -1);
+		if(vc) {
+			for(decltype(vc->comments) i = 0; i < vc->comments; i++) {
+				// Why signed!?
+				const auto len = vc->comment_lengths[i];
+				if(vc->comment_lengths[i] < 2) {
+					continue;
+				}
+				BGM::OnVorbisComment(on_metadata.value(), {
+					reinterpret_cast<const char8_t *>(vc->user_comments[i]),
+					static_cast<size_t>(len),
+				});
+			}
+		}
+	}
 
 	const auto samplingrate = static_cast<uint32_t>(vf.vi->rate);
 	const auto channels = static_cast<uint16_t>(vf.vi->channels);

@@ -9,15 +9,34 @@
 #include "game/pcm.h"
 #include "platform/file.h"
 #include <stdint.h>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <span>
 
 namespace BGM {
+
+// Metadata
+// --------
+
+struct TRACK_METADATA {
+};
+
+// Vorbis comments are specified to use UTF-8.
+using METADATA_CALLBACK = std::function<void(
+	const std::u8string_view tag, const std::u8string_view value
+)>;
+
+// Calls [func] for the given Vorbis comment.
+void OnVorbisComment(METADATA_CALLBACK func, const std::u8string_view comment);
+// --------
 
 // Base class for a track
 // ----------------------
 
 struct TRACK {
+	const TRACK_METADATA metadata;
+
 	// Target format that this track is decoded to.
 	const PCM_FORMAT pcmf;
 
@@ -31,7 +50,8 @@ struct TRACK {
 	// filled with zeroes.
 	bool Decode(std::span<std::byte> buf);
 
-	TRACK(const PCM_FORMAT& pcmf) : pcmf(pcmf) {
+	TRACK(TRACK_METADATA&& metadata, const PCM_FORMAT& pcmf) :
+		metadata(metadata), pcmf(pcmf) {
 	}
 
 	virtual ~TRACK() {}
@@ -71,12 +91,13 @@ struct TRACK_PCM : public TRACK {
 	virtual size_t DecodeSingle(std::span<std::byte> buf) override;
 
 	TRACK_PCM(
+		TRACK_METADATA&& metadata,
 		std::unique_ptr<FILE_STREAM_READ> intro_stream,
 		std::unique_ptr<FILE_STREAM_READ> loop_stream,
 		std::unique_ptr<PCM_PART> intro_part,
 		std::unique_ptr<PCM_PART> loop_part
 	) :
-		TRACK(intro_part->pcmf),
+		TRACK(std::move(metadata), intro_part->pcmf),
 		intro_stream(std::move(intro_stream)),
 		loop_stream(std::move(loop_stream)),
 		intro_part(std::move(intro_part)),
@@ -90,7 +111,9 @@ struct TRACK_PCM : public TRACK {
 
 // Tries to opens [stream] as a part of a modded track, using a specific codec.
 // `TRACK_PCM` retains ownership of [stream].
-using PCM_PART_OPEN = std::unique_ptr<PCM_PART>(FILE_STREAM_READ& stream);
+using PCM_PART_OPEN = std::unique_ptr<PCM_PART>(
+	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
+);
 // ----------------------------
 
 // Tries to open a waveform track whose name starts with [base_fn] and has one

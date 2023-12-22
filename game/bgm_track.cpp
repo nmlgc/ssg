@@ -10,6 +10,15 @@
 
 namespace BGM {
 
+void OnVorbisComment(METADATA_CALLBACK func, const std::u8string_view comment)
+{
+	const auto eq_i = comment.find('=');
+	if(eq_i == std::u8string_view::npos) {
+		return;
+	}
+	func(comment.substr(0, eq_i), comment.substr(eq_i + 1));
+}
+
 bool TRACK::Decode(std::span<std::byte> buf)
 {
 	size_t offset = 0;
@@ -46,8 +55,12 @@ struct CODEC_PCM {
 	PCM_PART_OPEN& open;
 };
 
-std::unique_ptr<PCM_PART> FLAC_Open(FILE_STREAM_READ& stream);
-std::unique_ptr<PCM_PART> Vorbis_Open(FILE_STREAM_READ& stream);
+std::unique_ptr<PCM_PART> FLAC_Open(
+	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
+);
+std::unique_ptr<PCM_PART> Vorbis_Open(
+	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
+);
 
 // Sorted in order of preference.
 static constexpr const CODEC_PCM CODECS_PCM[] = {
@@ -82,8 +95,13 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 
 		std::unique_ptr<PCM_PART> intro_part;
 		std::unique_ptr<PCM_PART> loop_part;
+		TRACK_METADATA meta;
 
-		intro_part = codec.open(*(intro_stream.get()));
+		intro_part = codec.open(
+			*(intro_stream.get()),
+			[&](auto tag, auto value) {
+			}
+		);
 		if(!intro_part) {
 			continue;
 		}
@@ -93,7 +111,7 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 		fn += codec.ext;
 		auto loop_stream = FileStreamRead(fn.c_str());
 		if(loop_stream) {
-			loop_part = codec.open(*(loop_stream.get()));
+			loop_part = codec.open(*(loop_stream.get()), std::nullopt);
 			if(!loop_part) {
 				continue;
 			}
@@ -103,6 +121,7 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 			}
 		}
 		return std::make_unique<TRACK_PCM>(
+			std::move(meta),
 			std::move(intro_stream),
 			std::move(loop_stream),
 			std::move(intro_part),

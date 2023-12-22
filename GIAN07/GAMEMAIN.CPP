@@ -1443,7 +1443,6 @@ void MusicRoomProc(bool&)
 
 		BlitBG({   0,   0, 504, 392 });	// From keyboard to spectrum analyzer
 		BlitBG({ 504,   0, 136,  59 });	// Down to PASSED TIME
-		BlitBG({ 504,  59, 136,  24 });	// MIDI TIMER
 		BlitBG({ 504, 108, 136, 284 });	// Everything below MIDI DEVICE
 
 		BlitLegend({   0,  0, 176,  40 });	// Left side
@@ -1465,9 +1464,12 @@ void MusicRoomProc(bool&)
 		GrpPut7B(560,40+2+2,buf);
 		//TextOut(hdc,561,40+2,buf,strlen(buf));
 
-		sprintf(buf, "%07lld", Mid_PlayTime.pulse_interpolated);
-		GrpPut7B(560,64+2+2,buf);
-		//TextOut(hdc,561,64+2,buf,strlen(buf));
+		if(Mid_Loaded()) {
+			BlitBG({ 504,  59, 136,  24 });	// MIDI TIMER
+			sprintf(buf, "%07lld", Mid_PlayTime.pulse_interpolated);
+			GrpPut7B(560,64+2+2,buf);
+			//TextOut(hdc,561,64+2,buf,strlen(buf));
+		}
 
 		sprintf(buf, "%3d", BGM_GetTempo());
 		GrpPut7B(560,112+2+2,buf);

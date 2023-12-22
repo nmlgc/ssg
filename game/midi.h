@@ -85,6 +85,8 @@ bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 // Sets a loop point for the currently loaded sequence.
 void Mid_SetLoop(const MID_LOOP& loop);
 
+bool Mid_Loaded(void);
+
 Any::string_view Mid_GetTitle(void);	// この曲のお名前は？
 
 // Processes and outputs the next time [delta] of the currently loaded MIDI

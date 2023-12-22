@@ -394,6 +394,11 @@ void Mid_SetLoop(const MID_LOOP& loop)
 	Mid_Seq.loop = loop;
 }
 
+bool Mid_Loaded(void)
+{
+	return !Mid_Seq.tracks.empty();
+}
+
 void MID_SEQUENCE::Rewind(void)
 {
 	//Mid_Fade = 0;

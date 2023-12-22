@@ -83,6 +83,15 @@ bool BGM_GainApply(void)
 	return GainApply;
 }
 
+BGM_PLAYING BGM_Playing(void)
+{
+	return (
+		(!Enabled || !Playing) ? BGM_PLAYING::NONE :
+		Waveform ? BGM_PLAYING::WAVEFORM :
+		BGM_PLAYING::MIDI
+	);
+}
+
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void)
 {
 	if(Waveform) {

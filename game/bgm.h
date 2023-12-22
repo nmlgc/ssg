@@ -27,10 +27,17 @@ void BGM_Cleanup(void);
 // General queries
 // ---------------
 
+enum class BGM_PLAYING {
+	NONE,
+	WAVEFORM,
+	MIDI,
+};
+
 bool BGM_Enabled(void);
 bool BGM_LoadedOriginalMIDI(void);
 bool BGM_HasGainFactor(void);
 bool BGM_GainApply(void);
+BGM_PLAYING BGM_Playing(void);
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void);
 Narrow::string_view BGM_Title(void);
 // ---------------

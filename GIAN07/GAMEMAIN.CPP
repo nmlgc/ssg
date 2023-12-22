@@ -1370,11 +1370,12 @@ void PauseProc(bool&)
 // 音楽室 //
 void MusicRoomProc(bool&)
 {
-	PIXEL_LTRB	src;
 	char	buf[100];
 	int		i;
 	static WORD Old_Key;
 	static BYTE DevChgWait;
+
+	const auto playing = BGM_Playing();
 
 	if(Key_Data!=Old_Key){
 		switch(Key_Data){
@@ -1413,7 +1414,7 @@ void MusicRoomProc(bool&)
 		BGM_FadeOut(120);
 	}
 
-	if(SystemKey_Data & SYSKEY_BGM_DEVICE) {
+	if((playing == BGM_PLAYING::MIDI) && (SystemKey_Data & SYSKEY_BGM_DEVICE)) {
 		if(DevChgWait==0){
 			BGM_ChangeMIDIDevice(1);
 			if(MusicRoomText) {
@@ -1429,11 +1430,30 @@ void MusicRoomProc(bool&)
 
 	if(IsDraw()){
 		GrpCls();
-		src = { 0,   0, 640, 392 };
-		GrpBlt(&src, 0, 0, GrMusic);
 
-		src = { 0, 392, 640, 432 };
-		GrpBlt(&src, 8, 410, GrMusic);
+		auto BlitBG = [](const PIXEL_LTWH& rect) {
+			PIXEL_LTRB src = rect;
+			GrpBlt(&src, src.left, src.top, GrMusic);
+		};
+
+		auto BlitLegend = [](const PIXEL_LTWH& rect) {
+			PIXEL_LTRB src = (rect + PIXEL_POINT{ 0, 392 });
+			GrpBlt(&src, (8 + rect.left), (410 + rect.top), GrMusic);
+		};
+
+		BlitBG({   0,   0, 504, 392 });	// From keyboard to spectrum analyzer
+		BlitBG({ 504,   0, 136,  59 });	// Down to PASSED TIME
+		BlitBG({ 504,  59, 136,  24 });	// MIDI TIMER
+		BlitBG({ 504, 108, 136, 284 });	// Everything below MIDI DEVICE
+
+		BlitLegend({   0,  0, 176,  40 });	// Left side
+		BlitLegend({ 176, 11, 464,  29 });	// Right side without device key
+
+		if(playing == BGM_PLAYING::MIDI) {
+			BlitBG({ 504, 83, 136, 25 });   	// MIDI DEVICE
+			BlitLegend({ 176, 0, 176, 11 });	// Device change key
+		}
+
 		//GrpDrawSpect(0,480);
 		GrpDrawSpect(352,128);
 		GrpDrawNote();
@@ -1457,7 +1477,9 @@ void MusicRoomProc(bool&)
 		if(MusicRoomText) {
 			const auto text = MusicRoomText.value();
 
-			TextObj.Blit({ (540 +  2), ( 96 -  3) }, text.mid_dev);
+			if(playing == BGM_PLAYING::MIDI) {
+				TextObj.Blit({ (540 + 2), (96 - 3) }, text.mid_dev);
+			}
 			TextObj.Blit({  400,       (144 +  2) }, text.title);
 			TextObj.Blit({ (400 - 40), (144 + 30) }, text.comment);
 			TextObj.Blit({ (200 - 50),  460       }, text.version);

@@ -66,6 +66,10 @@ struct PIXEL_LTWH {
 	PIXEL_COORD top;
 	PIXEL_COORD w;
 	PIXEL_COORD h;
+
+	PIXEL_LTWH operator +(const PIXEL_POINT& other) const {
+		return { (left + other.x), (top + other.y), w, h };
+	}
 };
 
 // Left-top-right-bottom rectangle in unscaled pixel space. Relative to any

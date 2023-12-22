@@ -139,6 +139,7 @@ void Mid_Stop(void)
 	timeKillEvent(Mid_Time.htimer);
 	timeEndPeriod(Mid_Time.caps.wPeriodMin);
 
+	Mid_TableInit();
 	for(i=0;i<16;i++){
 		Mid_ShortMsg(0xb0+i,0x7b,0x00);		// オール・ノート・オフ
 		Mid_ShortMsg(0xb0+i,0x78,0x00);		// オール・サウンド・オフ

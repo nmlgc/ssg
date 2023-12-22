@@ -805,6 +805,8 @@ extern bool MusicRoomInit(void)
 
 	Mid_Tempo(0);
 
+	// Still necessary because the note arrays aren't actually processed
+	// outside of the Music Room.
 	Mid_TableInit();
 /*
 	Mid_Stop();
@@ -1383,7 +1385,6 @@ void MusicRoomProc(bool&)
 				MidiPlayID+=2;
 			case(KEY_LEFT):
 				Mid_Stop();
-				Mid_TableInit();
 				MidiPlayID = (MidiPlayID+MusicNum-1)%MusicNum;
 				LoadMusic(MidiPlayID);
 				LoadMusicRoomComment(MidiPlayID);
@@ -1420,18 +1421,12 @@ void MusicRoomProc(bool&)
 			if(MusicRoomText) {
 				MusicRoomText.value().PrerenderMidDev();
 			}
-			Mid_TableInit();
 			DevChgWait = 1;
 		}
 	}
 	else{
 		// 押されていなければ再び有効化する //
 		DevChgWait = 0;
-	}
-
-	// フェードなどで停止した場合 //
-	if(Mid_Dev.state == MID_BACKEND_STATE::STOP) {
-		Mid_TableInit();
 	}
 
 	if(IsDraw()){

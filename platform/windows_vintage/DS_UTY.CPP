@@ -181,6 +181,10 @@ void SndBackend_BGMUpdateVolume(void)
 {
 }
 
+void SndBackend_BGMUpdateTempo(void)
+{
+}
+
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndBackend_SELoad(
 	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max

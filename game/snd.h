@@ -22,6 +22,9 @@ using SND_INSTANCE_ID = uint8_t;
 extern const int SND_X_MID;
 extern const int SND_X_PER_DECIBEL;
 
+extern const uint8_t& Snd_BGMTempoNum;
+extern const uint8_t& Snd_BGMTempoDenom;
+
 void Snd_Cleanup(void);
 
 // BGM

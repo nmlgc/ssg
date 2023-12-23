@@ -38,6 +38,9 @@ static std::shared_ptr<BGM::TRACK> Waveform; // nullptr = playing MIDI
 
 const uint8_t& Mid_TempoNum = BGM_Tempo_Num;
 const uint8_t& Mid_TempoDenom = BGM_TEMPO_DENOM;
+
+const uint8_t& Snd_BGMTempoNum = BGM_Tempo_Num;
+const uint8_t& Snd_BGMTempoDenom = BGM_TEMPO_DENOM;
 // ---------------------
 
 bool BGM_Init(void)
@@ -163,6 +166,7 @@ bool BGM_Switch(unsigned int id)
 	const auto ret = BGM_Load(id);
 	if(ret) {
 		LoadedNum = (id + 1);
+		BGM_SetTempo(BGM_GetTempo());
 		BGM_Play();
 	}
 	return ret;
@@ -249,6 +253,7 @@ void BGM_SetTempo(int8_t tempo)
 {
 	tempo = std::clamp(tempo, BGM_TEMPO_MIN, BGM_TEMPO_MAX);
 	BGM_Tempo_Num = (BGM_TEMPO_DENOM + tempo);
+	SndBackend_BGMUpdateTempo();
 }
 
 void BGM_PackSet(const std::u8string_view pack)

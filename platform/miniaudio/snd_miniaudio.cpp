@@ -218,6 +218,15 @@ void SndBackend_BGMUpdateVolume(void)
 	ma_sound_set_volume(&BGMObj.sound, Snd_BGMGainFactor);
 }
 
+void SndBackend_BGMUpdateTempo(void)
+{
+	if(!BGMObj.track) {
+		return;
+	}
+	const auto t = (static_cast<float>(Snd_BGMTempoNum) / Snd_BGMTempoDenom);
+	ma_sound_set_pitch(&BGMObj.sound, t);
+}
+
 bool SndBackend_SEInit(void)
 {
 	return true;

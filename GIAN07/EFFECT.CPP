@@ -242,7 +242,7 @@ void SetMusicTitle(int y, Narrow::string_view s)
 	const auto extent = DrawGrdFont(MTitleRect, s);
 
 	// 曲のタイトルが長すぎる場合、どうしましょう？ //
-	auto x = (640 - 128 - 32 - min(extent.w, 216));
+	auto x = (std::max)((640 - 128 - 32 - extent.w), 128);
 
 	SEffect[n].cmd  = SEFC_MTITLE1;
 	SEffect[n].x    = (x<<6);// + (64*2)*16;

@@ -51,7 +51,9 @@ extern void GrpPutScore(int x, int y, char *s);	// 得点アイテムのスコ�
 extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画する
 
 // グラデーション付きフォントを描画する
-PIXEL_SIZE DrawGrdFont(TEXTRENDER_RECT_ID rect_id, Narrow::string_view str);
+PIXEL_SIZE DrawGrdFont(
+	TEXTRENDER_RECT_ID rect_id, std::span<const Narrow::string_view> strs
+);
 
 
 #endif

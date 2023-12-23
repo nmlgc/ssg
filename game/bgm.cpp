@@ -77,6 +77,10 @@ Narrow::string_view BGM_Title(void)
 	while(trim_leading(ret, " ") || trim_leading(ret, "\x81\x40")) {
 	};
 
+	// The original MIDI sequence titles also come with lots of *trailing*
+	// whitespace. Adding 1 also turns `npos` to 0.
+	ret = ret.substr(0, (ret.find_last_not_of(" ") + 1));
+
 	return ret;
 }
 

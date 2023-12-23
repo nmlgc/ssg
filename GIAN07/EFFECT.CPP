@@ -239,7 +239,10 @@ void SetMusicTitle(int y, Narrow::string_view s)
 	}
 	if(n==SEFFECT_MAX) return;
 
-	const auto extent = DrawGrdFont(MTitleRect, s);
+	// Print the ♪ separately, since it can be combined with a music title in
+	// any encoding.
+	const std::array<Narrow::string_view, 2> strs = { "♪ ", s };
+	const auto extent = DrawGrdFont(MTitleRect, strs);
 
 	// 曲のタイトルが長すぎる場合、どうしましょう？ //
 	auto x = (std::max)((640 - 128 - 32 - extent.w), 128);

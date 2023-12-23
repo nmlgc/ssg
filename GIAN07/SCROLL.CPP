@@ -141,7 +141,6 @@ static void enemy_set(void)
 	BYTE		*cmd;
 	DWORD		temp;
 //	BIT_DEVICE	*in;				// やばやば...
-	char		buf[100];
 	BOOL		CtrlFlag = FALSE;
 
 	while(bFlag){
@@ -275,15 +274,8 @@ static void enemy_set(void)
 						BGM_Play();
 						const auto mtitle = BGM_Title();
 						if(!mtitle.empty()) {
-							// ♪ in Shift-JIS. Since this codepoint is still
-							// combined with the Shift-JIS music titles baked
-							// into the MIDI files, we have to spell out its
-							// bytes to ensure that the entire string stays in
-							// the same encoding even if we compile with UTF-8
-							// literals.
-							sprintf(buf, "\x81\xF4 %.100s", mtitle.data());
+							SetMusicTitle(460, mtitle);
 						}
-						SetMusicTitle(460,buf);
 					}
 				}
 				SCL_Now += 2;

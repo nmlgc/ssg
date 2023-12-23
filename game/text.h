@@ -27,6 +27,10 @@ template <class T, class FontID> concept TEXTRENDER_SESSION = (
 		t.SetFont(font);
 		t.SetColor(color);
 
+		// Calculates the width and height of [str] as rendered with the
+		// current font.
+		{ t.Extent(str) } -> std::same_as<PIXEL_SIZE>;
+
 		// Text display with the current color and font. [str] can be either
 		// UTF-8 or Shift-JIS.
 		t.Put(topleft_rel, str);
@@ -59,6 +63,7 @@ template <class FontID> struct TEXTRENDER_SESSION_FUNC_ARCHETYPE {
 // Concept for a text rendering backend.
 template <class T, class FontID> concept TEXTRENDER = requires(
 	T t,
+	FontID font,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
 	Narrow::string_view contents,
@@ -85,6 +90,10 @@ template <class T, class FontID> concept TEXTRENDER = requires(
 	// the surface with the necessary size, but retaining all registered
 	// rectangles. Necessary for mode switches.
 	t.WipeBeforeNextRender();
+
+	// Calculates the width and height of [contents] as rendered with the given
+	// font.
+	{ t.TextExtent(font, contents) } -> std::same_as<PIXEL_SIZE>;
 
 	// Retained interface
 	// ------------------

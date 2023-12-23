@@ -48,6 +48,12 @@ struct PIXEL_SIZE {
 		return { (w / divisor), (h / divisor) };
 	}
 
+	PIXEL_SIZE& operator +=(const PIXEL_SIZE& other) {
+		w += other.w;
+		h += other.h;
+		return *this;
+	}
+
 	std::strong_ordering operator <=>(const PIXEL_SIZE& other) const = default;
 };
 

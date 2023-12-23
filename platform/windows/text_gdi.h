@@ -15,6 +15,10 @@
 // void*.
 #include <windows.h>
 
+PIXEL_SIZE TextGDIExtent(
+	HDC hdc, std::optional<HFONT> font, Narrow::string_view str
+);
+
 // Un-templated session code
 class TEXTRENDER_GDI_SESSION_BASE {
 protected:
@@ -34,6 +38,7 @@ public:
 	HDC hdc;
 
 	void SetColor(const RGBA& color);
+	PIXEL_SIZE Extent(Narrow::string_view str);
 	void Put(
 		const PIXEL_POINT& topleft_rel,
 		Narrow::string_view str,
@@ -102,6 +107,10 @@ public:
 		// This also skips the needless creation of an uninitialized surface
 		// during DirectDraw's init function.
 		surf.size = { 0, 0 };
+	}
+
+	PIXEL_SIZE TextExtent(FontID font, Narrow::string_view str) {
+		return TextGDIExtent(surf.dc, fonts[font], str);
 	}
 
 	bool Prerender(

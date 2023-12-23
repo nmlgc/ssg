@@ -13,8 +13,6 @@
 #pragma message(PBGWIN_PBGMIDI_H)
 
 
-#define MID_STDTEMPO	(1<<7)	// 標準のテンポ
-
 using namespace std::chrono_literals;
 
 // MIDI protocol
@@ -213,7 +211,6 @@ uint8_t Mid_PanpodTable[16];	// パンポット
 uint8_t Mid_ExpressionTable[16];	// エクスプレッション
 uint8_t Mid_VolumeTable[16];	// ボリューム
 
-static uint8_t Mid_MulTempo = MID_STDTEMPO;
 MID_PLAYTIME Mid_PlayTime;
 
 
@@ -330,11 +327,6 @@ void Mid_Volume(uint8_t volume)
 	//midiOutSetVolume(Mid_Dev.mp,temp.dd);
 }
 
-void Mid_Tempo(char tempo)
-{
-	Mid_MulTempo = MID_STDTEMPO + tempo;
-}
-
 void Mid_FadeOut(uint8_t speed)
 {
 	// pbg quirk: The original game always reduced the volume by 1 on the first
@@ -429,7 +421,7 @@ void Mid_SetLoop(const MID_LOOP& loop)
 void MID_SEQUENCE::Rewind(void)
 {
 	//Mid_Fade = 0;
-	//Mid_MulTempo = MID_STDTEMPO;
+	// BGM_SetTempo(0);
 
 	Mid_PlayTime = {};
 	for(auto& t : Mid_Seq.tracks) {
@@ -597,7 +589,7 @@ void MID_DEVICE::FadeIO(MID_REALTIME delta)
 
 void Mid_Proc(MID_REALTIME delta)
 {
-	const auto interval = ((delta * Mid_MulTempo) / MID_STDTEMPO);
+	const auto interval = ((delta * Mid_TempoNum) / Mid_TempoDenom);
 	auto& time = Mid_PlayTime;
 	MID_PULSE pulse_sync = 0;
 

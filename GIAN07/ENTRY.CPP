@@ -10,6 +10,7 @@
 #include "DirectXUTYs/DD_UTY.H"
 #include "platform/input.h"
 #include "platform/path.h"
+#include "game/bgm.h"
 #include "game/coords.h"
 #include "game/midi.h"
 #include "game/screenshot.h"
@@ -61,7 +62,7 @@ bool XInit(void)
 
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
-		if(!Mid_Start() && !Snd_BGMInit()) {
+		if(!BGM_Init()) {
 			ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 		}
 	}

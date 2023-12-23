@@ -11,6 +11,7 @@
 #include "LEVEL.H"
 #include "MUSIC.H"
 #include "SCORE.H"
+#include "game/bgm.h"
 #include "game/input.h"
 #include "game/midi.h"
 #include "game/snd.h"
@@ -19,7 +20,6 @@
 
 DWORD		DrawCount = 0;
 DWORD		MidiPlayID = 0;
-char		MidiTempo  = 0;
 DWORD		DemoTimer  = 0;
 BYTE		WeaponKeyWait = 0;
 int	GameOverTimer = 0;
@@ -487,7 +487,7 @@ void GameSTD_Init(void)
 	WarningEffectInit();
 	//WarningEffectSet();
 
-	Mid_Tempo(0);
+	BGM_SetTempo(0);
 
 	//DrawCount = 0;
 }
@@ -802,9 +802,8 @@ extern bool MusicRoomInit(void)
 	GrpSetClip(0,0,640,480);
 
 	MidiPlayID = 0;
-	MidiTempo = 0;
 
-	Mid_Tempo(0);
+	BGM_SetTempo(0);
 
 	// Still necessary because the note arrays aren't actually processed
 	// outside of the Music Room.
@@ -1397,17 +1396,14 @@ void MusicRoomProc(bool&)
 
 	switch(Key_Data){
 		case(KEY_UP):
-			if(MidiTempo<100) MidiTempo++;
-			Mid_Tempo(MidiTempo);
+			BGM_SetTempo(BGM_GetTempo() + 1);
 		break;
 		case(KEY_DOWN):
-			if(MidiTempo>-100) MidiTempo--;
-			Mid_Tempo(MidiTempo);
+			BGM_SetTempo(BGM_GetTempo() - 1);
 		break;
 
 		case(KEY_SHIFT):
-			MidiTempo = 0;
-			Mid_Tempo(0);
+			BGM_SetTempo(0);
 		break;
 	}
 
@@ -1451,7 +1447,7 @@ void MusicRoomProc(bool&)
 		GrpPut7B(560,64+2+2,buf);
 		//TextOut(hdc,561,64+2,buf,strlen(buf));
 
-		sprintf(buf,"%3d",MidiTempo);
+		sprintf(buf, "%3d", BGM_GetTempo());
 		GrpPut7B(560,112+2+2,buf);
 		//TextOut(hdc,561,112+2,buf,strlen(buf));
 		//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));

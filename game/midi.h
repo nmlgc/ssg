@@ -58,6 +58,10 @@ struct MID_PLAYTIME {
 	MID_REALTIME realtime_since_last_event = MID_REALTIME::zero();
 };
 
+// External dependencies
+extern const uint8_t& Mid_TempoNum;
+extern const uint8_t& Mid_TempoDenom;
+
 //// 関数 ////
 bool Mid_Start(void);	// ＭＩＤＩ関連初期化
 void Mid_End(void);							// ＭＩＤＩ関連おしまい
@@ -71,7 +75,6 @@ void Mid_Stop(void);						// 停止する
 void Mid_Pause(void);
 void Mid_Resume(void);
 void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
-void Mid_Tempo(char tempo);					// テンポを変更する
 void Mid_FadeOut(uint8_t speed);	// フェードアウト(数字が大きいほど早い)
 bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 

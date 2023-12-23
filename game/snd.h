@@ -27,6 +27,8 @@ void Snd_Cleanup(void);
 // BGM
 // ---
 
+extern float Snd_BGMGainFactor;
+
 bool Snd_BGMInit(void);
 void Snd_BGMCleanup(void);
 // ---

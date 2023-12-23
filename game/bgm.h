@@ -47,6 +47,10 @@ void BGM_Resume(void);
 // Volume control
 // --------------
 
+// Changes the gain apply flag, and applies the result to any currently playing
+// waveform track.
+void BGM_SetGainApply(bool apply);
+
 // フェードアウト(数字が大きいほど早い)
 void BGM_FadeOut(uint8_t speed);
 // --------------

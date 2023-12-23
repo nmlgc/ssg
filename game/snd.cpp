@@ -8,6 +8,8 @@
 #include "platform/snd_backend.h"
 #include <assert.h>
 
+float Snd_BGMGainFactor = 1.0f;
+
 static enum class SND_SYS {
 	_HAS_BITFLAG_OPERATORS,
 	NOTHING = 0x0,

@@ -28,6 +28,8 @@ void SndBackend_BGMStop(void);
 // BGM track for.
 std::chrono::milliseconds SndBackend_BGMPlayTime(void);
 
+void SndBackend_BGMUpdateVolume(void);
+
 // The platform-independent layer always calls this after SndBackend_Init().
 bool SndBackend_SEInit(void);
 

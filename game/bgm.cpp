@@ -170,6 +170,7 @@ bool BGM_Switch(unsigned int id)
 
 void BGM_Play(void)
 {
+	BGM_SetGainApply(true);
 	if(Waveform) {
 		SndBackend_BGMPlay();
 	} else {
@@ -203,6 +204,17 @@ void BGM_Resume(void)
 	// Same as for pausing; /s/paus/resum/g, /s/loses/regains/
 	if(!Waveform) {
 		Mid_Resume();
+	}
+}
+
+void BGM_SetGainApply(bool apply)
+{
+	if(Waveform) {
+		Snd_BGMGainFactor = (apply
+			? Waveform->metadata.gain_factor.value_or(1.0f)
+			: 1.0f
+		);
+		SndBackend_BGMUpdateVolume();
 	}
 }
 

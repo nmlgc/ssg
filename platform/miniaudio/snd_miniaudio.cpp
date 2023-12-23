@@ -210,6 +210,14 @@ std::chrono::milliseconds SndBackend_BGMPlayTime(void)
 	return std::chrono::milliseconds{ ret };
 }
 
+void SndBackend_BGMUpdateVolume(void)
+{
+	if(!BGMObj.track) {
+		return;
+	}
+	ma_sound_set_volume(&BGMObj.sound, Snd_BGMGainFactor);
+}
+
 bool SndBackend_SEInit(void)
 {
 	return true;

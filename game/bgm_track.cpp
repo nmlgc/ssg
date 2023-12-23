@@ -5,9 +5,11 @@
  */
 
 #include "game/bgm_track.h"
+#include "game/narrow.h"
 #include "game/volume.h"
 #include <assert.h>
 #include <algorithm>
+#include <charconv>
 
 namespace BGM {
 
@@ -169,6 +171,16 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 			[&](auto tag, auto value) {
 				if(meta.title.empty() && TagEquals(tag, u8"TITLE")) {
 					meta.title = value;
+					return;
+				}
+				if(!meta.gain_factor && TagEquals(tag, u8"GAIN FACTOR")) {
+					const auto first = Narrow::string_view(value).data();
+					const auto last = (first + value.size());
+					float parsed = 0;
+					const auto r = std::from_chars(first, last, parsed);
+					if(r.ptr == last) {
+						meta.gain_factor = parsed;
+					}
 					return;
 				}
 			}

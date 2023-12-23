@@ -102,19 +102,32 @@ struct MID_EVENT {
 	void Send(void) const;
 };
 
-struct MID_TRACK {
-	std::span<const uint8_t> data;
-	const uint8_t* work;
-	int	count;
-	bool	play;
-	BYTE	status;
+class MID_TRACK_ITERATOR {
+	BYTE_BUFFER_CURSOR<const uint8_t> cursor;
+	uint8_t status = 0x00;
+
+public:
+	MID_TRACK_ITERATOR() = default;
+	MID_TRACK_ITERATOR(const MID_TRACK_ITERATOR& other) = default;
+	MID_TRACK_ITERATOR(const std::span<const uint8_t> data) :
+		cursor(data), status(0x00) {
+	}
 
 	// Reads a MIDI variable-length quantity and advances [work] accordingly.
-	// Used for both delta times and multi-byte event lengths.
+	// Used for both delta times and multi-byte event lengths. Returns -1 if
+	// the end of the track was reached in the middle of the parsed value.
 	uint32_t ConsumeVLQ(void);
 
 	// Reads the next MIDI event and advances [work] according to its size.
-	MID_EVENT ConsumeEvent(void);
+	// Returns std::nullopt if the end of the sequence has been reached.
+	std::optional<MID_EVENT> ConsumeEvent(void);
+};
+
+struct MID_TRACK {
+	std::span<const uint8_t> data;
+	MID_TRACK_ITERATOR it;
+	int count;
+	bool play;
 };
 
 struct MID_SEQUENCE {
@@ -342,31 +355,39 @@ static BOOL Mid_Init(void)
 	Mid_Seq.playcount2 = 0;
 
 	for(auto& t : Mid_Seq.tracks) {
-		t.work  = t.data.data();
+		t.it = { t.data };
 		t.play  = true;
-		t.count = t.ConsumeVLQ();	// 初期ウェイトカウントを読むの
+		t.count = t.it.ConsumeVLQ();	// 初期ウェイトカウントを読むの
 	}
 
 	return TRUE;
 }
 
-uint32_t MID_TRACK::ConsumeVLQ(void)
+uint32_t MID_TRACK_ITERATOR::ConsumeVLQ(void)
 {
 	uint8_t temp = 0;
 	uint32_t ret = 0;
 	do {
-		temp = *work;
-		work++;
+		const auto maybe_temp = cursor.next<uint8_t>(1);
+		if(!maybe_temp) {
+			return (std::numeric_limits<uint32_t>::max)();
+		}
+		temp = maybe_temp.value()[0];
 		ret = ((ret << 7) | (temp & 0x7f));
 	} while(temp & 0x80);
 	return ret;
 }
 
-MID_EVENT MID_TRACK::ConsumeEvent(void)
+std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
 {
-	if(*(work) >= std::to_underlying(MID_EVENT_KIND::FIRST)) {
-		status = *(work);
-		work++;
+	const auto maybe_status = cursor.next<uint8_t>(1);
+	if(!maybe_status) {
+		return std::nullopt;
+	}
+	if(maybe_status.value()[0] >= std::to_underlying(MID_EVENT_KIND::FIRST)) {
+		status = maybe_status.value()[0];
+	} else {
+		cursor.cursor--;
 	}
 	assert(status >= std::to_underlying(MID_EVENT_KIND::FIRST));
 	const auto kind = ((status > std::to_underlying(MID_EVENT_KIND::SYSEX))
@@ -374,7 +395,7 @@ MID_EVENT MID_TRACK::ConsumeEvent(void)
 		: static_cast<MID_EVENT_KIND>(status & 0xf0)
 	);
 
-	size_t extra_data_size = 0;
+	std::optional<std::span<const uint8_t>> extra_data = std::nullopt;
 	uint8_t meta = 0;
 	switch(kind) {
 	case MID_EVENT_KIND::NOTE_OFF:
@@ -382,26 +403,29 @@ MID_EVENT MID_TRACK::ConsumeEvent(void)
 	case MID_EVENT_KIND::NOTE_AFTERTOUCH:
 	case MID_EVENT_KIND::CONTROLLER:
 	case MID_EVENT_KIND::PITCH_BEND:
-		extra_data_size = 2;
+		extra_data = cursor.next<uint8_t>(2);
 		break;
 	case MID_EVENT_KIND::PROGRAM_CHANGE:
 	case MID_EVENT_KIND::CHANNEL_AFTERTOUCH:
-		extra_data_size = 1;
+		extra_data = cursor.next<uint8_t>(1);
 		break;
 	case MID_EVENT_KIND::SYSEX:
-		extra_data_size = ConsumeVLQ();
+		extra_data = cursor.next<uint8_t>(ConsumeVLQ());
 		break;
 	case MID_EVENT_KIND::META:
-		meta = *(work++);
-		extra_data_size = ConsumeVLQ();
+		meta = cursor.next<uint8_t>(1)
+			.transform([](auto v) { return v[0]; })
+			.value_or(0);
+		extra_data = cursor.next<uint8_t>(ConsumeVLQ());
 		break;
 	default:
 		assert(!"Unimplemented MIDI system message");
 		break;
 	}
-	const MID_EVENT ret = { kind, status, meta, { work, extra_data_size } };
-	work += extra_data_size;
-	return ret;
+	if(!extra_data) {
+		return std::nullopt;
+	}
+	return MID_EVENT{ kind, status, meta, extra_data.value() };
 }
 
 
@@ -440,7 +464,12 @@ void Mid_Proc(MID_REALTIME delta)
 		if(p.play) {
 			flag = TRUE;
 			while(p.play && (p.count <= now)) {
-				const auto event = p.ConsumeEvent();
+				const auto maybe_event = p.it.ConsumeEvent();
+				if(!maybe_event) {
+					p.play = false;
+					continue;
+				}
+				const auto& event = maybe_event.value();
 				Mid_Seq.Process(p, event);
 				event.Send();
 			}
@@ -559,7 +588,7 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 		break;
 	}
 
-	track.count += track.ConsumeVLQ();
+	track.count += track.it.ConsumeVLQ();
 }
 
 const char* Mid_GetTitle(void)

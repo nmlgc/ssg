@@ -254,9 +254,10 @@ TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
 	DxObj, GrText, GDIFonts.fonts
 };
 
-void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, Narrow::string_view str)
+PIXEL_SIZE DrawGrdFont(TEXTRENDER_RECT_ID rect_id, Narrow::string_view str)
 {
-	TextObj.Prerender(rect_id, [&str](GIAN_TEXTRENDER_SESSION auto& s) {
+	PIXEL_SIZE extent = { 0, 0 };
+	TextObj.Prerender(rect_id, [&](GIAN_TEXTRENDER_SESSION auto& s) {
 		// The MIDI sequence titles passed to this function tend to come with
 		// lots of trailing whitespace. Adding 1 also turns `npos` to 0.
 		str = str.substr(0, (str.find_last_not_of(" ") + 1));
@@ -272,6 +273,7 @@ void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, Narrow::string_view str)
 		s.Put({ 1, 2 }, str, RGBA{   0,   0, 128 });
 		s.Put({ 1, 1 }, str, RGBA{ 255, 255, 255 });
 		s.Put({ 0, 1 }, str, RGBA{ 255, 255, 255 });
+		extent += s.Extent(str);
 
 		constexpr auto FSIZE = 8;
 		const PIXEL_COORD w = (str.size() * 16);
@@ -286,4 +288,5 @@ void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, Narrow::string_view str)
 			}
 		}
 	});
+	return extent;
 }

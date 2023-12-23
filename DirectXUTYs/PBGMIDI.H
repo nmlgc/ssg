@@ -51,7 +51,7 @@ bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
 
-const char* Mid_GetTitle(void);	// この曲のお名前は？
+Any::string_view Mid_GetTitle(void);	// この曲のお名前は？
 
 // Processes and outputs the next time [delta] of the currently loaded MIDI
 // sequence.

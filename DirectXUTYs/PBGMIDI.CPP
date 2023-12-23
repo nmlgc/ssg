@@ -591,35 +591,38 @@ void MID_SEQUENCE::Process(MID_TRACK& track, const MID_EVENT& event)
 	track.count += track.it.ConsumeVLQ();
 }
 
-const char* Mid_GetTitle(void)
+Any::string_view Mid_GetTitle(void)
 {
-	static char temp[1000];
+	std::optional<MID_EVENT> maybe_ev;
 
-	memset(temp,0,1000);
+	const auto extra_data_as_string_view = [](const MID_EVENT& ev) {
+		const auto* str = reinterpret_cast<const char *>(ev.extra_data.data());
+		return Any::string_view{ str, ev.extra_data.size() };
+	};
 
 	// 通常のファイル用 たまに変なファイルだと間違ったものを表示するが... //
 	for(const auto& track : Mid_Seq.tracks) {
-		const auto* p = track.data.data();
-		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
-			if(p[0]==0xff && p[1]==0x03){
-				memcpy(temp,p+3,p[2]);
-				return temp;
+		MID_TRACK_ITERATOR it = { track.data };
+		while((it.ConsumeVLQ() != -1) && (maybe_ev = it.ConsumeEvent())) {
+			const auto& ev = maybe_ev.value();
+			// Sequence Name
+			if((ev.kind == MID_EVENT_KIND::META) && (ev.meta == 0x03)) {
+				return extra_data_as_string_view(ev);
 			}
-			p++;
 		}
 	}
 
 	// タイトルのはずなのに別のところに記述しているファイル用 //
 	for(const auto& track : Mid_Seq.tracks) {
-		const auto* p = track.data.data();
-		while(!(p[0]==0xff && p[1]==0x2f && p[2]==0x00)){
-			if(p[0]==0xff && p[1]==0x01){
-				memcpy(temp,p+3,p[2]);
-				return reinterpret_cast<const char *>(p+3);
+		MID_TRACK_ITERATOR it = { track.data };
+		while((it.ConsumeVLQ() != -1) && (maybe_ev = it.ConsumeEvent())) {
+			const auto& ev = maybe_ev.value();
+			// Text Event
+			if((ev.kind == MID_EVENT_KIND::META) && (ev.meta == 0x01)) {
+				return extra_data_as_string_view(ev);
 			}
-			p++;
 		}
 	}
 
-	return temp;
+	return {};
 }

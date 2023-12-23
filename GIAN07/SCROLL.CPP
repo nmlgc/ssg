@@ -274,14 +274,14 @@ static void enemy_set(void)
 					if(LoadMusic(cmd[1])){
 						Mid_Play();
 						const auto mtitle = Mid_GetTitle();
-						if(mtitle) {
+						if(!mtitle.empty()) {
 							// ♪ in Shift-JIS. Since this codepoint is still
 							// combined with the Shift-JIS music titles baked
 							// into the MIDI files, we have to spell out its
 							// bytes to ensure that the entire string stays in
 							// the same encoding even if we compile with UTF-8
 							// literals.
-							sprintf(buf, "\x81\xF4 %.100s", mtitle);
+							sprintf(buf, "\x81\xF4 %.100s", mtitle.data());
 						}
 						SetMusicTitle(460,buf);
 					}

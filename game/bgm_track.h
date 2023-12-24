@@ -87,6 +87,14 @@ struct TRACK_PCM : public TRACK {
 
 	virtual ~TRACK_PCM() {}
 };
+
+// Tries to opens [stream] as a part of a modded track, using a specific codec.
+// `TRACK_PCM` retains ownership of [stream].
+using PCM_PART_OPEN = std::unique_ptr<PCM_PART>(FILE_STREAM_READ& stream);
 // ----------------------------
+
+// Tries to open a waveform track whose name starts with [base_fn] and has one
+// of the supported codec extensions.
+std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn);
 
 } // namespace BGM

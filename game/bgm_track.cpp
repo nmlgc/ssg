@@ -38,4 +38,78 @@ size_t TRACK_PCM::DecodeSingle(std::span<std::byte> buf)
 	return ret;
 }
 
+// Codecs
+// ------
+
+struct CODEC_PCM {
+	std::u8string_view ext;
+	PCM_PART_OPEN& open;
+};
+
+std::unique_ptr<PCM_PART> FLAC_Open(FILE_STREAM_READ& stream);
+std::unique_ptr<PCM_PART> Vorbis_Open(FILE_STREAM_READ& stream);
+
+// Sorted in order of preference.
+static constexpr const CODEC_PCM CODECS_PCM[] = {
+	{ u8".flac", FLAC_Open },
+	{ u8".ogg", Vorbis_Open },
+};
+// ------
+
+static constexpr std::u8string_view LOOP_INFIX = u8".loop";
+static constexpr size_t EXT_CAP = std::ranges::max_element(
+	CODECS_PCM, [](const auto& a, const auto& b) {
+		return (a.ext.size() < b.ext.size());
+	}
+)->ext.size();
+
+std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
+{
+	const size_t base_len = base_fn.size();
+	const size_t fn_len = (LOOP_INFIX.size() + EXT_CAP);
+	std::u8string fn;
+	fn.resize_and_overwrite((base_len + fn_len), [&](char8_t* buf, size_t len) {
+		std::ranges::copy(base_fn, buf);
+		return base_len;
+	});
+	for(const auto& codec : CODECS_PCM) {
+		fn.resize(base_len);
+		fn += codec.ext;
+		auto intro_stream = FileStreamRead(fn.c_str());
+		if(!intro_stream) {
+			continue;
+		}
+
+		std::unique_ptr<PCM_PART> intro_part;
+		std::unique_ptr<PCM_PART> loop_part;
+
+		intro_part = codec.open(*(intro_stream.get()));
+		if(!intro_part) {
+			continue;
+		}
+
+		fn.resize(base_len);
+		fn += LOOP_INFIX;
+		fn += codec.ext;
+		auto loop_stream = FileStreamRead(fn.c_str());
+		if(loop_stream) {
+			loop_part = codec.open(*(loop_stream.get()));
+			if(!loop_part) {
+				continue;
+			}
+			if(intro_part->pcmf != loop_part->pcmf) {
+				assert(!"PCM format mismatch between intro and loop parts!");
+				continue;
+			}
+		}
+		return std::make_unique<TRACK_PCM>(
+			std::move(intro_stream),
+			std::move(loop_stream),
+			std::move(intro_part),
+			std::move(loop_part)
+		);
+	}
+	return nullptr;
+}
+
 } // namespace BGM

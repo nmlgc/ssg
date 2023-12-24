@@ -164,6 +164,7 @@ ANALYSIS_CFLAGS = (
 
 	-- Critical warnings
 	"/we26819 " .. -- Unannotated fallthrough between switch labels
+	"/we26427 " .. -- Static initialization order fiasco
 
 	-- Disabled warnings
 	"/wd4834 " .. -- Discarding `[[nodiscard]]` (C6031 covers this and more)

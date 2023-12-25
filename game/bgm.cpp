@@ -70,7 +70,10 @@ std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void)
 
 Narrow::string_view BGM_Title(void)
 {
-	auto ret = Mid_GetTitle();
+	auto ret = ((Waveform && !Waveform->metadata.title.empty())
+		? Narrow::string_view(Waveform->metadata.title)
+		: Mid_GetTitle()
+	);
 
 	// pbg bug: Four of the original track titles start with leading fullwidth
 	// spaces:

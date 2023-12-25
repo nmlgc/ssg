@@ -136,6 +136,13 @@ static constexpr size_t EXT_CAP = std::ranges::max_element(
 	}
 )->ext.size();
 
+static bool TagEquals(const std::u8string_view a, const std::u8string_view b)
+{
+	return std::ranges::equal(a, b, [](char a, char b) {
+		return (toupper(a) == toupper(b));
+	});
+}
+
 std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 {
 	const size_t base_len = base_fn.size();
@@ -160,6 +167,10 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 		intro_part = codec.open(
 			*(intro_stream.get()),
 			[&](auto tag, auto value) {
+				if(meta.title.empty() && TagEquals(tag, u8"TITLE")) {
+					meta.title = value;
+					return;
+				}
 			}
 		);
 		if(!intro_part) {

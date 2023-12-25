@@ -23,6 +23,7 @@ using SAMPLE_COUNT = uint32_t;
 // --------
 
 struct TRACK_METADATA {
+	std::u8string title;
 };
 
 // Vorbis comments are specified to use UTF-8.

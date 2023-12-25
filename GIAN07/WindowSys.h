@@ -239,6 +239,16 @@ void CWinMove(WINDOW_SYSTEM *ws);				// コマンドウィンドウを１フレ�
 void CWinDraw(WINDOW_SYSTEM *ws);				// コマンドウィンドウの描画
 bool CWinExitFn(INPUT_BITS key);	// コマンド [Exit] のデフォルト処理関数
 
+// Returns the delta that this key would apply to a numeric option value.
+constexpr int_fast8_t CWinOptionKeyDelta(INPUT_BITS key)
+{
+	return (
+		((key == KEY_RETURN) || (key == KEY_TAMA) || (key == KEY_RIGHT)) ? 1 :
+		(key == KEY_LEFT) ? -1 :
+		0
+	);
+}
+
 // Calculates the rendered width of the given text in the menu item font,
 // without any padding.
 PIXEL_SIZE CWinTextExtent(Narrow::string_view str);
@@ -246,6 +256,22 @@ PIXEL_SIZE CWinTextExtent(Narrow::string_view str);
 // Calculates the rendered width of a whole padded menu item with the given
 // text.
 PIXEL_SIZE CWinItemExtent(Narrow::string_view str);
+
+template <typename ChoiceFunc> static bool OptionFN(
+	INPUT_BITS key, void setitem(void), ChoiceFunc on_return_tama_right_left
+)
+{
+	// It's a menu, we don't care about performance, and switch tables with
+	// these constants add an entire 256-byte table to every function on
+	// modern compilers, even in Release builds.
+	if((key == KEY_BOMB) || (key == KEY_ESC)) {
+		return false;
+	} else if(CWinOptionKeyDelta(key)) {
+		on_return_tama_right_left();
+	}
+	setitem();
+	return true;
+}
 
 // メッセージウィンドウ処理 //
 

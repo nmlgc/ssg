@@ -64,12 +64,12 @@ static bool ContinueFnNo(INPUT_BITS key);
 
 static bool ScoreFn(INPUT_BITS key);
 
-static bool SetDifItem(void);
-static bool SetGrpItem(void);
+static void SetDifItem(void);
+static void SetGrpItem(void);
 static void SetSndItem(void);
 static void SetInpItem(void);
 static void SetIKeyItem(void);
-static bool SetCfgRepItem(void);
+static void SetCfgRepItem(void);
 
 static bool RFnStg1(INPUT_BITS key);
 static bool RFnStg2(INPUT_BITS key);
@@ -80,25 +80,16 @@ static bool RFnStg6(INPUT_BITS key);
 static bool RFnStgEx(INPUT_BITS key);
 
 static bool RingFN(
-	bool onchange(void), uint8_t& var, INPUT_BITS key, uint8_t min, uint8_t max
+	void setitem(void), uint8_t& var, INPUT_BITS key, uint8_t min, uint8_t max
 )
 {
-	switch(key) {
-	case(KEY_BOMB):
-	case(KEY_ESC):
-		return false;
-
-	case(KEY_RETURN):
-	case(KEY_TAMA):
-	case(KEY_RIGHT):
-		var = ((var == max) ? min : (var + 1));
-		break;
-
-	case(KEY_LEFT):
-		var = ((var <= min) ? max : (var - 1));
-		break;
-	}
-	return onchange();
+	return OptionFN(key, setitem, [&]() {
+		if(key == KEY_LEFT) {
+			var = ((var <= min) ? max : (var - 1));
+		} else {
+			var = ((var == max) ? min : (var + 1));
+		}
+	});
 }
 
 template <size_t N> struct LABELS {
@@ -316,19 +307,9 @@ static bool DifFnDifficulty(INPUT_BITS key)
 #ifdef PBG_DEBUG
 static bool DifFnMsgDisplay(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(DebugDat.MsgDisplay) DebugDat.MsgDisplay = false;
-			else                    DebugDat.MsgDisplay = true;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return OptionFN(key, SetDifItem, [] {
+		DebugDat.MsgDisplay = !DebugDat.MsgDisplay;
+	});
 }
 
 static bool DifFnStgSelect(INPUT_BITS key)
@@ -338,71 +319,41 @@ static bool DifFnStgSelect(INPUT_BITS key)
 
 static bool DifFnHit(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(DebugDat.Hit) DebugDat.Hit = false;
-			else             DebugDat.Hit = true;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return OptionFN(key, SetDifItem, [] {
+		DebugDat.Hit = !DebugDat.Hit;
+	});
 }
 
 static bool DifFnDemo(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(DebugDat.DemoSave) DebugDat.DemoSave = false;
-			else                  DebugDat.DemoSave = true;
-		break;
-	}
-
-	SetDifItem();
-
-	return TRUE;
+	return OptionFN(key, SetDifItem, [] {
+		DebugDat.DemoSave = !DebugDat.DemoSave;
+	});
 }
 
 #endif // PBG_DEBUG
 
 static bool GrpFnChgDevice(INPUT_BITS key)
 {
-	int				flag = 0;
+	return OptionFN(key, SetGrpItem, [&]() {
+		int flag = ((key == KEY_LEFT) ? -1 : 2);
+		// 一つしかデバイスが存在しないときは変更できない //
+		if(DxEnumNow <= 1) {
+			return;
+		}
 
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
+		// 次のデバイスへ //
+		uint8_t device_id_new = (
+			(ConfigDat.DeviceID.v + DxEnumNow + flag) % DxEnumNow
+		);
 
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):	flag = 2;
-		case(KEY_LEFT):										flag -= 1;
-
-			// 一つしかデバイスが存在しないときは変更できない //
-			if(DxEnumNow<=1) break;
-
-			// 次のデバイスへ //
-			uint8_t device_id_new = (
-				(ConfigDat.DeviceID.v + DxEnumNow + flag) % DxEnumNow
-			);
-
-			// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
-			TextObj.WipeBeforeNextRender();
-			if(DxObj.Init(device_id_new, ConfigDat.BitDepth.v)) {
-				ConfigDat.DeviceID.v = device_id_new;
-				//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
-			}
-		break;
-	}
-
-	SetGrpItem();
-
-	return TRUE;
+		// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
+		TextObj.WipeBeforeNextRender();
+		if(DxObj.Init(device_id_new, ConfigDat.BitDepth.v)) {
+			ConfigDat.DeviceID.v = device_id_new;
+			// GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
+		}
+	});
 }
 
 static bool GrpFnSkip(INPUT_BITS key)
@@ -412,29 +363,19 @@ static bool GrpFnSkip(INPUT_BITS key)
 
 static bool GrpFnBpp(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
+	return OptionFN(key, SetGrpItem, [&]() {
+		auto bitdepth_new = ConfigDat.BitDepth.v.cycle(key == KEY_LEFT);
 
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT): {
-			auto bitdepth_new = ConfigDat.BitDepth.v.cycle(key == KEY_LEFT);
+		// この部分に本当ならエラーチェックが必要 //
+		TextObj.WipeBeforeNextRender();
+		if(DxObj.Init(ConfigDat.DeviceID.v, bitdepth_new)) {
+			ConfigDat.BitDepth.v = bitdepth_new;
+			// GrpSetPalette(DxObj.pe);
+			LoadPaletteFrom(GrTitle);
 
-			// この部分に本当ならエラーチェックが必要 //
-			TextObj.WipeBeforeNextRender();
-			if(DxObj.Init(ConfigDat.DeviceID.v, bitdepth_new)) {
-				ConfigDat.BitDepth.v = bitdepth_new;
-				//GrpSetPalette(DxObj.pe);
-				LoadPaletteFrom(GrTitle);
-
-				//GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
-			}
-		break;
+			// GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 		}
-	}
-
-	SetGrpItem();
-
-	return TRUE;
+	});
 }
 
 static bool GrpFnWinLocate(INPUT_BITS key)
@@ -447,147 +388,78 @@ static bool GrpFnWinLocate(INPUT_BITS key)
 	}
 	if(i >= 3) i=0;
 
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			ConfigDat.GraphFlags.v = flags[(i + 1) % 3];
-		break;
-/*
-			if(ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) {
-				ConfigDat.GraphFlags.v &= (~GRPF_WINDOW_UPPER);
-			} else {
-				ConfigDat.GraphFlags.v |= GRPF_WINDOW_UPPER;
-			}
-		break;
-*/
-		case(KEY_LEFT):
+	return OptionFN(key, SetGrpItem, [&] {
+		if(key == KEY_LEFT) {
 			ConfigDat.GraphFlags.v = flags[(i + 2) % 3];
-		break;
-	}
-
-	SetGrpItem();
-
-	return TRUE;
+		} else {
+			ConfigDat.GraphFlags.v = flags[(i + 1) % 3];
+		}
+	});
 }
 
 static bool SndFnSE(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
+	return OptionFN(key, SetSndItem, [] {
+		//extern INPUT_OBJ InputObj;
+		//char buf[100];
+		//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
+		// DebugOut(buf);
 
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			//extern INPUT_OBJ InputObj;
-			//char buf[100];
-			//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-			// DebugOut(buf);
-
-			if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
-				ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-				Snd_SECleanup();
-			}
-			else{
-				ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;
-				LoadSound();
-			}
-			//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-			// DebugOut(buf);
-		break;
-	}
-
-	SetSndItem();
-
-	return TRUE;
+		if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
+			ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
+			Snd_SECleanup();
+		} else {
+			ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;
+			LoadSound();
+		}
+		//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
+		// DebugOut(buf);
+	});
 }
 
 static bool SndFnBGM(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(BGM_Enabled()) {
-				BGM_Cleanup();
+	return OptionFN(key, SetSndItem, [] {
+		if(BGM_Enabled()) {
+			BGM_Cleanup();
+		} else {
+			// 成功した場合にだけ有効にする //
+			if(BGM_Init()) {
+				BGM_Switch(0);
 			}
-			else{
-				// 成功した場合にだけ有効にする //
-				if(BGM_Init()) {
-					BGM_Switch(0);
-				}
-			}
-		break;
-	}
-
-	SetSndItem();
-
-	return TRUE;
+		}
+	});
 }
 
 static bool SndFnMIDIDev(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):
-			if(BGM_Enabled()) {
-				BGM_ChangeMIDIDevice(1);
-			}
-		break;
-
-		case(KEY_LEFT):
-			if(BGM_Enabled()) {
-				BGM_ChangeMIDIDevice(-1);
-			}
-		break;
-	}
-
-	SetSndItem();
-
-	return TRUE;
+	return OptionFN(key, SetSndItem, [&] {
+		if(BGM_Enabled()) {
+			BGM_ChangeMIDIDevice((key == KEY_LEFT) ? -1 : 1);
+		}
+	});
 }
 
 static bool InpFnMsgSkip(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
-				ConfigDat.InputFlags.v &= (~INPF_Z_MSKIP_ENABLE);
-			} else {
-				ConfigDat.InputFlags.v |= INPF_Z_MSKIP_ENABLE;
-			}
-		break;
-	}
-
-	SetInpItem();
-
-	return TRUE;
+	return OptionFN(key, SetInpItem, [] {
+		if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
+			ConfigDat.InputFlags.v &= (~INPF_Z_MSKIP_ENABLE);
+		} else {
+			ConfigDat.InputFlags.v |= INPF_Z_MSKIP_ENABLE;
+		}
+	});
 }
 
 static bool InpFnZSpeedDown(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
-				ConfigDat.InputFlags.v &= (~INPF_Z_SPDDOWN_ENABLE);
-			} else {
-				ConfigDat.InputFlags.v |= INPF_Z_SPDDOWN_ENABLE;
-			}
-		break;
-	}
-
-	SetInpItem();
-
-	return TRUE;
+	return OptionFN(key, SetInpItem, [] {
+		if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
+			ConfigDat.InputFlags.v &= (~INPF_Z_SPDDOWN_ENABLE);
+		} else {
+			ConfigDat.InputFlags.v |= INPF_Z_SPDDOWN_ENABLE;
+		}
+	});
 }
 
 
@@ -776,22 +648,13 @@ static bool CfgRepStgSelect(INPUT_BITS key)
 
 static bool CfgRepSave(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
-			ConfigDat.StageSelect.v = ((ConfigDat.StageSelect.v) ? 0 : 1);
-		break;
-	}
-
-	SetCfgRepItem();
-
-	return TRUE;
+	return OptionFN(key, SetCfgRepItem, [] {
+		ConfigDat.StageSelect.v = ((ConfigDat.StageSelect.v) ? 0 : 1);
+	});
 }
 
 
-static bool SetCfgRepItem(void)
+static void SetCfgRepItem(void)
 {
 	if(0 == ConfigDat.StageSelect.v) {
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[false]);
@@ -801,11 +664,10 @@ static bool SetCfgRepItem(void)
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[true]);
 		sprintf(CfgRepTitle[1], "StageSelect [  %d  ]", ConfigDat.StageSelect.v);
 	}
-	return true;
 }
 
 
-static bool SetDifItem(void)
+static void SetDifItem(void)
 {
 	const char *DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic"};
 /*
@@ -823,10 +685,9 @@ static bool SetDifItem(void)
 	sprintf(DifTitle[6], "Hit       %s", CHOICE_OFF_ON[DebugDat.Hit]);
 	sprintf(DifTitle[7], "DemoSave  %s", CHOICE_OFF_ON[DebugDat.DemoSave]);
 #endif
-	return true;
 }
 
-static bool SetGrpItem(void)
+static void SetGrpItem(void)
 {
 	const char	*UorD[3]  = {"上のほう","下のほう","描画せず"};
 	const char	*DMode[4] = {"おまけ","60Fps","30Fps","20Fps"};
@@ -845,7 +706,6 @@ static bool SetGrpItem(void)
 	}
 
 	sprintf(GrpTitle[3],"MsgWindow[%s]", UorD[i]);
-	return true;
 }
 
 static void SetSndItem(void)

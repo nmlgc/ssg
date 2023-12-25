@@ -6,11 +6,17 @@
 #include "game/bgm.h"
 #include "game/midi.h"
 #include "game/snd.h"
+#include "game/string_format.h"
 #include "game/volume.h"
+#include "platform/file.h"
 #include "platform/midi_backend.h"
+#include "platform/path.h"
 #include <algorithm>
 
 using namespace std::chrono_literals;
+
+static constexpr std::u8string_view BGM_ROOT = u8"bgm/";
+static constexpr std::u8string_view EXT_MID = u8".mid";
 
 // State
 // -----
@@ -18,6 +24,8 @@ using namespace std::chrono_literals;
 uint8_t BGM_Tempo_Num = BGM_TEMPO_DENOM;
 
 static bool Enabled = false;
+
+static std::u8string PackPath;
 // -----
 
 // External dependencies
@@ -107,6 +115,21 @@ bool BGM_ChangeMIDIDevice(int8_t direction)
 
 static bool BGM_Load(unsigned int id)
 {
+	if(!PackPath.empty()) {
+		const auto prefix_len = PackPath.size();
+		StringCatNum<2>((id + 1), PackPath);
+
+		bool mid_new = false;
+		if(!mid_new) {
+			PackPath += EXT_MID;
+			mid_new = BGM_MidLoadBuffer(FileLoad(PackPath.c_str()));
+		}
+
+		PackPath.resize(prefix_len);
+		if(mid_new) {
+			return true;
+		}
+	}
 	return BGM_MidLoadOriginal(id);
 }
 
@@ -166,4 +189,25 @@ void BGM_SetTempo(int8_t tempo)
 {
 	tempo = std::clamp(tempo, BGM_TEMPO_MIN, BGM_TEMPO_MAX);
 	BGM_Tempo_Num = (BGM_TEMPO_DENOM + tempo);
+}
+
+void BGM_PackSet(const std::u8string_view pack)
+{
+	if(!pack.empty()) {
+		const auto path_data = PathForData();
+		const auto root_len = (path_data.size() + BGM_ROOT.size());
+		const auto pack_len = (pack.size() + 1);
+		const auto file_len = (STRING_NUM_CAP<unsigned int> + EXT_MID.size());
+		const auto len = (root_len + pack_len + file_len + 1);
+		PackPath.resize_and_overwrite(len, [&](char8_t* buf, size_t len) {
+			std::ranges::in_out_result p = { path_data.begin(), buf };
+			p = std::ranges::copy(path_data, p.out);
+			p = std::ranges::copy(BGM_ROOT, p.out);
+			p = std::ranges::copy(pack, p.out);
+			*(p.out++) = '/';
+			return (p.out - buf);
+		});
+	} else {
+		PackPath.clear();
+	}
 }

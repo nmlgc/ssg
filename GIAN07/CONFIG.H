@@ -199,6 +199,7 @@ typedef struct tagCONFIG_DATA{
 
 	// サウンド・ＢＧＭ関連 //
 	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };
+	OPTION_UTF8 BGMPack;
 
 	// 入力に関するフラグ
 	OPTION_FLAGS<INPF_MASK> InputFlags = { INPF_Z_MSKIP_ENABLE };

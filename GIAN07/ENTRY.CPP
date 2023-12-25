@@ -39,6 +39,7 @@ const int SND_X_PER_DECIBEL = PixelToWorld(25);
 // -----------------
 
 bool (*const BGM_MidLoadOriginal)(unsigned int id) = LoadMusic;
+bool (*const BGM_MidLoadBuffer)(BYTE_BUFFER_OWNED) = LoadMIDIBuffer;
 // -----------------
 
 bool XInit(void)
@@ -69,6 +70,7 @@ bool XInit(void)
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 		BGM_Init();
 	}
+	BGM_PackSet(ConfigDat.BGMPack.v);
 
 	// Call a different *Init() function here to quickly test a different //
 	// game state. //

@@ -6,12 +6,16 @@
 #pragma once
 
 #include "game/narrow.h"
+#include "platform/buffer.h"
 #include <chrono>
 #include <stdint.h>
 
 // Loads the BGM with the given 0-based [id] from the game's original BGM data
 // source.
 extern bool (*const BGM_MidLoadOriginal)(unsigned int id);
+
+// Loads MIDI BGM from the given byte buffer.
+extern bool (*const BGM_MidLoadBuffer)(BYTE_BUFFER_OWNED);
 
 bool BGM_Init(void);
 void BGM_Cleanup(void);
@@ -57,3 +61,9 @@ static constexpr int8_t BGM_TEMPO_MAX =  100;
 int8_t BGM_GetTempo(void);
 void BGM_SetTempo(int8_t tempo);	// テンポを変更する
 // -------------
+
+// BGM pack management
+// -------------------
+
+void BGM_PackSet(const std::u8string_view pack);
+// -------------------

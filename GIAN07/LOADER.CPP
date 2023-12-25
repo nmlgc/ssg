@@ -1007,6 +1007,12 @@ bool LoadMusic(unsigned int no)
 	return DAT::LoadMusic(no);
 }
 
+bool LoadMIDIBuffer(BYTE_BUFFER_OWNED buf)
+{
+	const auto hash = Hash(buf.cursor());
+	return LoadMIDIWithPotentialLoop(std::move(buf), hash);
+}
+
 // 全てのSoundデータをロードする //
 bool LoadSound(void)
 {

@@ -118,6 +118,8 @@ template <size_t N> struct LABELS {
 
 
 ///// [グローバル変数(公開せず)] /////
+static constexpr const char* CHOICE_OFF_ON[2]  = { "[O F F]", "[ O N ]" };
+static constexpr const char* CHOICE_USE[2] = { " 使用する ", "使用しない" };
 
 char	DifTitle[9][20];
 WINDOW_INFO DifItem[] = {
@@ -791,14 +793,12 @@ static bool CfgRepSave(INPUT_BITS key)
 
 static bool SetCfgRepItem(void)
 {
-	const char *SWItem[2]  = {"[ O N ]","[O F F]"};
-
 	if(0 == ConfigDat.StageSelect.v) {
-		sprintf(CfgRepTitle[0], "ReplaySave  %s", SWItem[1]);
+		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[false]);
 		strcpy(CfgRepTitle[1], "StageSelect [無 効]");
 	}
 	else{
-		sprintf(CfgRepTitle[0], "ReplaySave  %s", SWItem[0]);
+		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[true]);
 		sprintf(CfgRepTitle[1], "StageSelect [  %d  ]", ConfigDat.StageSelect.v);
 	}
 	return true;
@@ -808,7 +808,6 @@ static bool SetCfgRepItem(void)
 static bool SetDifItem(void)
 {
 	const char *DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic"};
-	const char *SWItem[2]  = {"[ O N ]","[O F F]"};
 /*
 	{DifTitle[4],	"[DebugMode] 画面に情報を表示するか",	DifFnMsgDisplay,0,0},
 	{DifTitle[5],	"[DebugMode] ステージセレクト",	DifFnStgSelect,0,0},
@@ -819,10 +818,10 @@ static bool SetDifItem(void)
 	sprintf(DifTitle[2], "Difficulty[%s]", DifItem[ConfigDat.GameLevel.v]);
 
 #ifdef PBG_DEBUG
-	sprintf(DifTitle[4],"DebugOut  %s",SWItem[DebugDat.MsgDisplay ? 0 : 1]);
-	sprintf(DifTitle[5],"StgSelect [  %d  ]",DebugDat.StgSelect);
-	sprintf(DifTitle[6],"Hit       %s",SWItem[DebugDat.Hit ? 0 : 1]);
-	sprintf(DifTitle[7],"DemoSave  %s",SWItem[DebugDat.DemoSave ? 0 : 1]);
+	sprintf(DifTitle[4], "DebugOut  %s", CHOICE_OFF_ON[DebugDat.MsgDisplay]);
+	sprintf(DifTitle[5], "StgSelect [  %d  ]", DebugDat.StgSelect);
+	sprintf(DifTitle[6], "Hit       %s", CHOICE_OFF_ON[DebugDat.Hit]);
+	sprintf(DifTitle[7], "DemoSave  %s", CHOICE_OFF_ON[DebugDat.DemoSave]);
 #endif
 	return true;
 }
@@ -851,7 +850,6 @@ static bool SetGrpItem(void)
 
 static void SetSndItem(void)
 {
-	const char	*EorD[2] = {" 使用する ","使用しない"};
 	static int now;
 	char	buf[1000];
 	static BYTE time = 0;
@@ -859,8 +857,8 @@ static void SetSndItem(void)
 	const auto sound_active = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
 	const auto bgm_active = BGM_Enabled();
 
-	sprintf(SndTitle[0], "Sound  [%s]", EorD[!sound_active]);
-	sprintf(SndTitle[1], "BGM    [%s]", EorD[!bgm_active]);
+	sprintf(SndTitle[0], "Sound  [%s]", CHOICE_USE[!sound_active]);
+	sprintf(SndTitle[1], "BGM    [%s]", CHOICE_USE[!bgm_active]);
 
 	const auto maybe_dev = MidBackend_DeviceName();
 	if(bgm_active && maybe_dev) {

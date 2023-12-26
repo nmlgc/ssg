@@ -55,7 +55,17 @@ template <typename R> std::optional<R> WithUTF16(
 	std::u8string_view str, std::invocable<const std::wstring_view> auto&& func
 )
 {
-	return WithUTF16(str, func, 0);
+	return WithUTF16<R>(str, func, 0);
+}
+
+// Wrapper for null-terminated strings that are guaranteed to be UTF-8.
+template <typename R> std::optional<R> WithUTF16(
+	const char8_t* str, std::invocable<const std::wstring_view> auto&& func
+)
+{
+	// The terminating \0 must be part of the view.
+	const size_t len = (strlen(reinterpret_cast<const char*>(str)) + 1);
+	return WithUTF16<R>({ str, len }, func);
 }
 
 }

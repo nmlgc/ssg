@@ -5,6 +5,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#include "platform/windows/utf.h"
 #include "platform/file.h"
 #include <assert.h>
 #include <windows.h>
@@ -76,6 +77,13 @@ size_t FileLoadInplace(std::span<uint8_t> buf, const PATH_LITERAL s)
 	return LoadInplace(buf, OpenRead(s));
 }
 
+size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s)
+{
+	return UTF::WithUTF16<size_t>(s, [&](const std::wstring_view str_w) {
+		return FileLoadInplace(buf, str_w.data());
+	}).value_or(0);
+}
+
 BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
 {
 	auto handle = OpenRead(s);
@@ -106,9 +114,25 @@ BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
 	return buf;
 }
 
+BYTE_BUFFER_OWNED FileLoad(const char8_t* s, size_t size_limit)
+{
+	return UTF::WithUTF16<BYTE_BUFFER_OWNED>(
+		s, [&](const std::wstring_view str_w) {
+			return FileLoad(str_w.data(), size_limit);
+		}
+	).value_or(nullptr);
+}
+
 bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 {
 	return WriteAndClose(OpenWrite(s, CREATE_ALWAYS), bufs);
+}
+
+bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
+{
+	return UTF::WithUTF16<bool>(s, [&](const std::wstring_view str_w) {
+		return FileWrite(str_w.data(), bufs);
+	}).value_or(false);
 }
 
 bool FileAppend(
@@ -121,6 +145,13 @@ bool FileAppend(
 		(SetFilePointer(handle, 0, 0, FILE_END) != INVALID_SET_FILE_POINTER) &&
 		WriteAndClose(std::move(handle), bufs)
 	);
+}
+
+bool FileAppend(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
+{
+	return UTF::WithUTF16<bool>(s, [&](const std::wstring_view str_w) {
+		return FileAppend(str_w.data(), bufs);
+	}).value_or(false);
 }
 
 // Streams
@@ -178,6 +209,15 @@ std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s)
 	);
 }
 
+std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s)
+{
+	return UTF::WithUTF16<std::unique_ptr<FILE_STREAM_READ>>(
+		s, [](const std::wstring_view str_w) {
+			return FileStreamRead(str_w.data());
+		}
+	).value_or(nullptr);
+}
+
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, bool fail_if_exists
 )
@@ -189,5 +229,16 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	return std::unique_ptr<FILE_STREAM_WIN32>(
 		new (std::nothrow) FILE_STREAM_WIN32(handle)
 	);
+}
+
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
+	const char8_t* s, bool fail_if_exists
+)
+{
+	return UTF::WithUTF16<std::unique_ptr<FILE_STREAM_WRITE>>(
+		s, [](const std::wstring_view str_w) {
+			return FileStreamWrite(str_w.data(), true);
+		}
+	).value_or(nullptr);
 }
 // -------

@@ -14,6 +14,7 @@
 [[nodiscard]] size_t FileLoadInplace(
 	std::span<uint8_t> buf, const PATH_LITERAL s
 );
+[[nodiscard]] size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s);
 
 // Loads the file with the given name into a newly allocated buffer, if
 // possible.
@@ -21,16 +22,23 @@ BYTE_BUFFER_OWNED FileLoad(
 	const PATH_LITERAL s,
 	size_t size_limit = (std::numeric_limits<size_t>::max)()
 );
+BYTE_BUFFER_OWNED FileLoad(
+	const char8_t* s, size_t size_limit = (std::numeric_limits<size_t>::max)()
+);
 
 // Saves the given sequence of buffers to the file with the given name,
 // overwriting the file if it already exists. Returns `true` on success.
 bool FileWrite(
 	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
 );
+bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs);
 
 // Saves the given buffer to the file with the given name, overwriting the file
 // if it already exists. Returns `true` on success.
 static bool FileWrite(const PATH_LITERAL s, const BYTE_BUFFER_BORROWED buf) {
+	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
+}
+static bool FileWrite(const char8_t* s, const BYTE_BUFFER_BORROWED buf) {
 	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
 }
 
@@ -39,10 +47,14 @@ static bool FileWrite(const PATH_LITERAL s, const BYTE_BUFFER_BORROWED buf) {
 bool FileAppend(
 	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
 );
+bool FileAppend(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs);
 
 // Appends the given buffer to the end of the given file. Returns `true` on
 // success.
 static bool FileAppend(const PATH_LITERAL s, const BYTE_BUFFER_BORROWED buf) {
+	return FileAppend(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
+}
+static bool FileAppend(const char8_t* s, const BYTE_BUFFER_BORROWED buf) {
 	return FileAppend(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
 }
 
@@ -77,7 +89,12 @@ struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {
 };
 
 std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s);
+std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s);
+
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, bool fail_if_exists = false
+);
+std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
+	const char8_t* s, bool fail_if_exists = false
 );
 // -------

@@ -1,5 +1,5 @@
 /*
- *   Unicode types for native system APIs (generic narrow/UTF-8 version)
+ *   Unicode types for native system APIs (generic narrow/bag-of-bytes version)
  *
  */
 

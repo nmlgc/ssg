@@ -11,16 +11,19 @@
 #include "game/ut_math.h"
 
 
-// Coordinates
-// -----------
+// Constants
+// ---------
 
+constexpr auto CWIN_FONT = GIAN_FONT_ID::SMALL;
+
+constexpr PIXEL_COORD CWIN_ITEM_LEFT = 8;
 constexpr PIXEL_COORD CWIN_ITEM_H = 16;
 
 constexpr PIXEL_COORD FACE_W = 96;
 constexpr PIXEL_COORD FACE_H = 96;
 
 constexpr PIXEL_POINT MSG_TEXT_TOPLEFT = { FACE_W, 8 };
-// -----------
+// ---------
 
 ///// [構造体] /////
 
@@ -186,7 +189,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	const auto trr = ws->TRRs[0];
 	const Narrow::string_view str = p->Title;
 	TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
-		s.SetFont(GIAN_FONT_ID::SMALL);
+		s.SetFont(CWIN_FONT);
 		s.Put({ 1, 0 }, str, RGBA{ 128, 128, 128 });
 		s.Put({ 0, 0 }, str, RGBA{ 255, 255, 255 });
 	});
@@ -196,9 +199,9 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 		const auto trr = ws->TRRs[1 + i];
 		const Narrow::string_view str = p->ItemPtr[i]->Title;
 		TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
-			s.SetFont(GIAN_FONT_ID::SMALL);
-			s.Put({ (8 + 1), 0 }, str, RGBA{ 128, 128, 128 });
-			s.Put({ (8 + 0), 0 }, str, RGBA{ 255, 255, 255 });
+			s.SetFont(CWIN_FONT);
+			s.Put({ (CWIN_ITEM_LEFT + 1), 0 }, str, RGBA{ 128, 128, 128 });
+			s.Put({ (CWIN_ITEM_LEFT + 0), 0 }, str, RGBA{ 255, 255, 255 });
 		});
 		topleft.y += CWIN_ITEM_H;
 	}

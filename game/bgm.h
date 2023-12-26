@@ -65,5 +65,6 @@ void BGM_SetTempo(int8_t tempo);	// テンポを変更する
 // BGM pack management
 // -------------------
 
+// Restarts any currently playing BGM when switching to a different [pack].
 void BGM_PackSet(const std::u8string_view pack);
 // -------------------

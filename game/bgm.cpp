@@ -24,6 +24,8 @@ static constexpr std::u8string_view EXT_MID = u8".mid";
 uint8_t BGM_Tempo_Num = BGM_TEMPO_DENOM;
 
 static bool Enabled = false;
+static bool Playing = false;
+static unsigned int LoadedNum = 0; // 0 = nothing
 
 static std::u8string PackPath;
 // -----
@@ -107,7 +109,7 @@ bool BGM_ChangeMIDIDevice(int8_t direction)
 	Mid_Stop();
 
 	const auto ret = MidBackend_DeviceChange(direction);
-	if(ret) {
+	if(ret && Playing) {
 		Mid_Play();
 	}
 	return ret;
@@ -141,6 +143,7 @@ bool BGM_Switch(unsigned int id)
 	BGM_Stop();
 	const auto ret = BGM_Load(id);
 	if(ret) {
+		LoadedNum = (id + 1);
 		BGM_Play();
 	}
 	return ret;
@@ -149,11 +152,13 @@ bool BGM_Switch(unsigned int id)
 void BGM_Play(void)
 {
 	Mid_Play();
+	Playing = true;
 }
 
 void BGM_Stop(void)
 {
 	Mid_Stop();
+	Playing = false;
 }
 
 void BGM_Pause(void)
@@ -193,9 +198,17 @@ void BGM_SetTempo(int8_t tempo)
 
 void BGM_PackSet(const std::u8string_view pack)
 {
+	const std::u8string_view cur = PackPath;
 	if(!pack.empty()) {
 		const auto path_data = PathForData();
 		const auto root_len = (path_data.size() + BGM_ROOT.size());
+		if(
+			(cur.size() > root_len) &&
+			(cur.substr(root_len, pack.size()) == pack) &&
+			(cur[root_len + pack.size()] == '/') // !!!
+		) {
+			return;
+		}
 		const auto pack_len = (pack.size() + 1);
 		const auto file_len = (STRING_NUM_CAP<unsigned int> + EXT_MID.size());
 		const auto len = (root_len + pack_len + file_len + 1);
@@ -208,6 +221,13 @@ void BGM_PackSet(const std::u8string_view pack)
 			return (p.out - buf);
 		});
 	} else {
+		if(cur.empty()) {
+			return;
+		}
 		PackPath.clear();
+	}
+
+	if((LoadedNum != 0) && Playing) {
+		BGM_Switch(LoadedNum - 1);
 	}
 }

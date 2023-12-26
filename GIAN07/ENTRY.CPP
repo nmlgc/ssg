@@ -10,9 +10,11 @@
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/PBGMIDI.H"
 #include "platform/input.h"
+#include "platform/path.h"
 #include "platform/snd.h"
 #include "game/coords.h"
 #include "game/screenshot.h"
+#include <filesystem>
 
 // Mapping world coordinates to a position in the stereo field
 // -----------------------------------------------------------
@@ -35,6 +37,8 @@ const int SND_X_PER_DECIBEL = PixelToWorld(25);
 
 bool XInit(void)
 {
+	std::filesystem::current_path(PathForData());
+
 	DebugSetup();
 
 	// コンフィグをロードする //

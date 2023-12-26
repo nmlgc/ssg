@@ -29,7 +29,7 @@ BOOL	bMouseVisible;
 DWORD	WaitTime;
 
 
-int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
+int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nShowCmd)
 {
 	MSG			msg;
 	DWORD		tempdw;
@@ -40,18 +40,6 @@ int __stdcall WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLin
 		SetForegroundWindow(old_gian);
 		SendMessageW(old_gian,WM_SYSCOMMAND,SC_RESTORE,0);
 		return FALSE;
-	}
-
-	// 引数があった場合、カレントディレクトリが変わってしまうので... //
-	if(*lpCmdLine){
-		char temp[1000],*p;
-		strcpy(temp,GetCommandLine()+1);
-		if((p=strchr(temp,'\"')) && (strchr(temp,'\\'))){
-			while(*p!='\\') p--;
-			*(p+1)='\0';
-			_chdir(temp);
-		}
-		else return FALSE;
 	}
 
 	if(!AppInit(hInstance,nShowCmd)){

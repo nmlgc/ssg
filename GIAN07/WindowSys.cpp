@@ -150,6 +150,15 @@ void CWinMove(WINDOW_SYSTEM *ws)
 // コマンドウィンドウの描画 //
 void CWinDraw(WINDOW_SYSTEM *ws)
 {
+	struct COLOR_PAIR {
+		RGBA shadow;
+		RGBA text;
+	};
+
+	static constexpr ENUMARRAY<COLOR_PAIR, WINDOW_INFO::STATE> COL = {{
+		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255, 255 } }, // Regular
+		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255,  70 } }, // Highlight
+	}};
 	WINDOW_INFO		*p;
 	int				i;
 	HDC				hdc;
@@ -189,19 +198,22 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	const auto trr = ws->TRRs[0];
 	const Narrow::string_view str = p->Title;
 	TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+		const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
-		s.Put({ 1, 0 }, str, RGBA{ 128, 128, 128 });
-		s.Put({ 0, 0 }, str, RGBA{ 255, 255, 255 });
+		s.Put({ 1, 0 }, str, col.shadow);
+		s.Put({ 0, 0 }, str, col.text);
 	});
 	topleft.y += (CWIN_ITEM_H + 1); // ???
 
 	for(i = 0; i < p->NumItems; i++) {
 		const auto trr = ws->TRRs[1 + i];
-		const Narrow::string_view str = p->ItemPtr[i]->Title;
+		const auto* item = p->ItemPtr[i];
+		const Narrow::string_view str = item->Title;
 		TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+			const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
 			s.SetFont(CWIN_FONT);
-			s.Put({ (CWIN_ITEM_LEFT + 1), 0 }, str, RGBA{ 128, 128, 128 });
-			s.Put({ (CWIN_ITEM_LEFT + 0), 0 }, str, RGBA{ 255, 255, 255 });
+			s.Put({ (CWIN_ITEM_LEFT + 1), 0 }, str, col.shadow);
+			s.Put({ (CWIN_ITEM_LEFT + 0), 0 }, str, col.text);
 		});
 		topleft.y += CWIN_ITEM_H;
 	}

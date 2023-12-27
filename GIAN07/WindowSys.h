@@ -69,6 +69,12 @@
 
 // 子ウィンドウの情報 //
 struct WINDOW_INFO {
+	enum class STATE : uint8_t {
+		REGULAR = 0,
+		HIGHLIGHT = 1,
+		COUNT,
+	};
+
 	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
 	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
 
@@ -76,6 +82,7 @@ struct WINDOW_INFO {
 	bool	(*CallBackFn)(INPUT_BITS);
 
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
+	STATE	State = STATE::REGULAR;
 	WINDOW_INFO*	ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
 
 	constexpr WINDOW_INFO(

@@ -120,112 +120,104 @@ template <size_t N> struct LABELS {
 ///// [グローバル変数(公開せず)] /////
 
 char	DifTitle[9][20];
-WINDOW_INFO DifItem[9] = {
-	{DifTitle[0],"残り人数?を設定します"		,DifFnPlayerStock,0,0},
-	{DifTitle[1],"ボムの数を設定します"			,DifFnBombStock,0,0},
-	{DifTitle[2],"難易度を設定します"			,DifFnDifficulty,0,0},
+WINDOW_INFO DifItem[] = {
+	{ DifTitle[0],	"残り人数?を設定します",	DifFnPlayerStock },
+	{ DifTitle[1],	"ボムの数を設定します",	DifFnBombStock },
+	{ DifTitle[2],	"難易度を設定します",	DifFnDifficulty },
 #ifdef PBG_DEBUG
-	{"-------------------","",0,0,0},
-	{DifTitle[4],"[DebugMode] 画面に情報を表示するか"	,DifFnMsgDisplay,0,0},
-	{DifTitle[5],"[DebugMode] ステージセレクト"			,DifFnStgSelect,0,0},
-	{DifTitle[6],"[DebugMode] 当たり判定"				,DifFnHit,0,0},
-	{DifTitle[7],"[DebugMode] デモプレイセーブ"			,DifFnDemo,0,0},
+	{ "-------------------" },
+	{ DifTitle[4],	"[DebugMode] 画面に情報を表示するか",	DifFnMsgDisplay },
+	{ DifTitle[5],	"[DebugMode] ステージセレクト",	DifFnStgSelect },
+	{ DifTitle[6],	"[DebugMode] 当たり判定",	DifFnHit },
+	{ DifTitle[7],	"[DebugMode] デモプレイセーブ",	DifFnDemo },
 #endif
-	{"Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
 char	GrpTitle[5][50];
-WINDOW_INFO GrpItem[5] = {
-	{GrpTitle[0],"ビデオカードの選択"				,GrpFnChgDevice,0,0},
-	{GrpTitle[1],"描画スキップの設定です"			,GrpFnSkip,0,0},
-	{GrpTitle[2],"使用する色数を指定します"			,GrpFnBpp,0,0},
-	{GrpTitle[3],"ウィンドウの表示位置を決めます"	,GrpFnWinLocate,0,0},
-	{"Exit"		,"一つ前のメニューにもどります"		,CWinExitFn,0,0},
+WINDOW_INFO GrpItem[] = {
+	// { GrpTitle[0],	"ビデオカードの選択",	GrpFnChgDevice },
+	{ GrpTitle[1],	"描画スキップの設定です",	GrpFnSkip },
+	{ GrpTitle[2],	"使用する色数を指定します",	GrpFnBpp },
+	{ GrpTitle[3],	"ウィンドウの表示位置を決めます",	GrpFnWinLocate },
+	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
 char	SndTitle[4][26];
-WINDOW_INFO SndItem[4] = {
+WINDOW_INFO SndItem[] = {
 	{ SndTitle[0],	"SEを鳴らすかどうかの設定",	SndFnSE },
 	{ SndTitle[1],	"BGMを鳴らすかどうかの設定",	SndFnBGM },
-	{SndTitle[2],"MIDI Port (保存はされません)"	,SndFnMIDIDev,0,0},
-	{"Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+	{ SndTitle[2],	"MIDI Port (保存はされません)",	SndFnMIDIDev },
+	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
-WINDOW_INFO InpKey[5] = {
-	{IKeyTitle[0],InpHelp, InpFnKeyTama,0,0},
-	{IKeyTitle[1],InpHelp, InpFnKeyBomb,0,0},
-	{IKeyTitle[2],InpHelp, InpFnKeyShift,0,0},
-	{IKeyTitle[3],InpHelp, InpFnKeyCancel,0,0},
-	{" Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+WINDOW_INFO InpKey[] = {
+	{ IKeyTitle[0],	InpHelp,	InpFnKeyTama },
+	{ IKeyTitle[1],	InpHelp,	InpFnKeyBomb },
+	{ IKeyTitle[2],	InpHelp,	InpFnKeyShift },
+	{ IKeyTitle[3],	InpHelp,	InpFnKeyCancel },
+	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
 char	InpTitle[23];
 char	InpTitle2[23];
-WINDOW_INFO	InpItem[4] = {
-	{InpTitle, "弾キーのメッセージスキップ設定"	,InpFnMsgSkip,0,0},
-	{InpTitle2,"弾キーの押しっぱなしで低速移動", InpFnZSpeedDown, 0, 0},
-//		8,InpKey,InpKey+1,InpKey+2,InpKey+3,InpKey+4,InpKey+5,InpKey+6,InpKey+7},
-	{"Joy Pad"	,"パッドの設定をします"		,0,5,InpKey,InpKey+1,InpKey+2,InpKey+3,InpKey+4},
-	{"Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+WINDOW_INFO InpItem[] = {
+	{ InpTitle,	"弾キーのメッセージスキップ設定",	InpFnMsgSkip },
+	{ InpTitle2,	"弾キーの押しっぱなしで低速移動",	InpFnZSpeedDown },
+	{ "Joy Pad",	"パッドの設定をします",	InpKey },
+	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
 
 char CfgRepTitle[2][23];
 
-WINDOW_INFO CfgRep[3] = {
-	{CfgRepTitle[0], "リプレイ用データの保存", CfgRepSave, 0, 0},
-	{CfgRepTitle[1], "ステージセレクト"      , CfgRepStgSelect, 0, 0},
-	{"Exit"		,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+WINDOW_INFO CfgRep[] = {
+	{ CfgRepTitle[0],	"リプレイ用データの保存",	CfgRepSave },
+	{ CfgRepTitle[1],	"ステージセレクト",	CfgRepStgSelect },
+	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
-WINDOW_INFO CfgItem[6] = {
-	{" Difficulty"	,"難易度に関する設定"
-#ifdef PBG_DEBUG
-		,0,9,DifItem,DifItem+1,DifItem+2,DifItem+3,DifItem+4,DifItem+5,DifItem+6,DifItem+7,DifItem+8},
-#else
-		,0,4,DifItem,DifItem+1,DifItem+2,DifItem+3,DifItem+4},
-#endif
-
-	{" Graphic"		,"グラフィックに関する設定"		,0,5-1,/*GrpItem,*/GrpItem+1,GrpItem+2,GrpItem+3,GrpItem+4},
-	{" Sound / Music"	,"ＳＥ／ＢＧＭに関する設定"	,0,4,SndItem,SndItem+1,SndItem+2,SndItem+3},
-	{" Input"		,"入力デバイスに関する設定"		,0,4,InpItem,InpItem+1,InpItem+2,InpItem+3},
-	{" Replay", "リプレイに関する設定", 0, 3, CfgRep, CfgRep+1, CfgRep+2},
-	{" Exit"			,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+WINDOW_INFO CfgItem[] = {
+	{ " Difficulty",	"難易度に関する設定",	DifItem },
+	{ " Graphic",	"グラフィックに関する設定",	GrpItem },
+	{ " Sound / Music",	"ＳＥ／ＢＧＭに関する設定",	SndItem },
+	{ " Input",	"入力デバイスに関する設定",	InpItem },
+	{ " Replay",	"リプレイに関する設定",	CfgRep },
+	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
-WINDOW_INFO RepItem[8] = {
-	{" Stage 1 デモ再生", "ステージ１のリプレイ", RFnStg1, 0, 0},
-	{" Stage 2 デモ再生", "ステージ２のリプレイ", RFnStg2, 0, 0},
-	{" Stage 3 デモ再生", "ステージ３のリプレイ", RFnStg3, 0, 0},
-	{" Stage 4 デモ再生", "ステージ４のリプレイ", RFnStg4, 0, 0},
-	{" Stage 5 デモ再生", "ステージ５のリプレイ", RFnStg5, 0, 0},
-	{" Stage 6 デモ再生", "ステージ６のリプレイ", RFnStg6, 0, 0},
-	{" ExStage デモ再生", "エキストラステージのリプレイ", RFnStgEx, 0, 0},
-	{" Exit"	  ,"一つ前のメニューにもどります"	,CWinExitFn,0,0},
+WINDOW_INFO RepItem[] = {
+	{ " Stage 1 デモ再生",	"ステージ１のリプレイ",	RFnStg1 },
+	{ " Stage 2 デモ再生",	"ステージ２のリプレイ",	RFnStg2 },
+	{ " Stage 3 デモ再生",	"ステージ３のリプレイ",	RFnStg3 },
+	{ " Stage 4 デモ再生",	"ステージ４のリプレイ",	RFnStg4 },
+	{ " Stage 5 デモ再生",	"ステージ５のリプレイ",	RFnStg5 },
+	{ " Stage 6 デモ再生",	"ステージ６のリプレイ",	RFnStg6 },
+	{ " ExStage デモ再生",	"エキストラステージのリプレイ",	RFnStgEx },
+	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
-WINDOW_INFO MainItem[7] = {
-//	{"   Game  Start"	,"ゲームを開始します(使用不可)",0,0,0},
-	{"   Game  Start"	,"ゲームを開始します"		,MainFnGameStart,0,0},
-	{"   Extra Start"	,"ゲームを開始します(Extra)",MainFnExStart,0,0},
-	{"   Replay"		,"リプレイを開始します"		,0,8,RepItem,RepItem+1,RepItem+2,RepItem+3,RepItem+4,RepItem+5,RepItem+6,RepItem+7},
-	{"   Config"		,"各種設定を変更します"		,0,6,CfgItem,CfgItem+1,CfgItem+2,CfgItem+3,CfgItem+4,CfgItem+5},
-	{"   Score"			,"スコアの表示をします"		,ScoreFn,0,0},
-	{"   Music"			,"音楽室に入ります"			,MusicFn,0,0},
-//	{"   Exit"			,"ゲームを終了します"		,CWinExitFn,0,0}
-	{"   Exit"			,"ゲームを終了します"		,CWinExitFn,0,0}
+WINDOW_INFO MainItem[] = {
+	// { "   Game  Start",	"ゲームを開始します(使用不可)" },
+	{ "   Game  Start",	"ゲームを開始します",	MainFnGameStart },
+	{ "   Extra Start",	"ゲームを開始します(Extra)",	MainFnExStart },
+	{ "   Replay",	"リプレイを開始します",	RepItem },
+	{ "   Config",	"各種設定を変更します",	CfgItem },
+	{ "   Score",	"スコアの表示をします",	ScoreFn },
+	{ "   Music",	"音楽室に入ります",	MusicFn },
+	{ "   Exit",	"ゲームを終了します",	CWinExitFn }
 };
 
-WINDOW_INFO ExitYesNoItem[2] = {
-	{"   お っ け ～ ","",ExitFnYes,0,0},
-	{"   だ め だ め","",ExitFnNo ,0,0}
+WINDOW_INFO ExitYesNoItem[] = {
+	{ "   お っ け ～ ",	"",	ExitFnYes },
+	{ "   だ め だ め",	"",	ExitFnNo }
 };
 
-WINDOW_INFO ContinueYesNoItem[2] = {
-	{"   お っ け ～","",ContinueFnYes,0,0},
-	{"   や だ や だ","",ContinueFnNo ,0,0}
+WINDOW_INFO ContinueYesNoItem[] = {
+	{ "   お っ け ～",	"",	ContinueFnYes },
+	{ "   や だ や だ",	"",	ContinueFnNo }
 };
 
 
@@ -257,7 +249,7 @@ void InitMainWindow(void)
 	SetIKeyItem();
 	SetCfgRepItem();
 
-//	{"   Config"		,"各種設定を変更します"		,0,6,CfgItem,CfgItem+1,CfgItem+2,CfgItem+3,CfgItem+4,CfgItem+5},
+	//	{ "   Config",	"各種設定を変更します",	CfgItem },
 
 	// エキストラステージが選択できる場合には発生！ //
 	if(ConfigDat.ExtraStgFlags.v) {
@@ -818,9 +810,9 @@ static bool SetDifItem(void)
 	const char *DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic"};
 	const char *SWItem[2]  = {"[ O N ]","[O F F]"};
 /*
-	{DifTitle[4],"[DebugMode] 画面に情報を表示するか"	,DifFnMsgDisplay,0,0},
-	{DifTitle[5],"[DebugMode] ステージセレクト"			,DifFnStgSelect,0,0},
-	{DifTitle[6],"[DebugMode] 当たり判定"				,DifFnHit,0,0},
+	{DifTitle[4],	"[DebugMode] 画面に情報を表示するか",	DifFnMsgDisplay,0,0},
+	{DifTitle[5],	"[DebugMode] ステージセレクト",	DifFnStgSelect,0,0},
+	{DifTitle[6],	"[DebugMode] 当たり判定",	DifFnHit,0,0},
 */
 	sprintf(DifTitle[0], "PlayerStock [ %d ]", (ConfigDat.PlayerStock.v + 1));	// +1 に注意
 	sprintf(DifTitle[1], "BombStock   [ %d ]", ConfigDat.BombStock.v);

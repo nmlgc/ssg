@@ -68,7 +68,7 @@
 ///// [構造体] /////
 
 // 子ウィンドウの情報 //
-typedef struct tagWINDOW_INFO{
+struct WINDOW_INFO {
 	const char		*Title;			// タイトル文字列へのポインタ(実体ではない！)
 	const char		*Help;			// ヘルプ文字列へのポインタ(これも実体ではない)
 
@@ -76,11 +76,30 @@ typedef struct tagWINDOW_INFO{
 	bool	(*CallBackFn)(INPUT_BITS);
 
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
-	tagWINDOW_INFO	*ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
+	WINDOW_INFO*	ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
+
+	constexpr WINDOW_INFO(
+		const char* title = "",
+		const char* help = "",
+		decltype(CallBackFn) callback_fn = nullptr
+	) :
+		Title(title), Help(help), CallBackFn(callback_fn), NumItems(0)
+	{
+	}
+
+	constexpr WINDOW_INFO(
+		const char* title, const char* help, std::span<WINDOW_INFO> children
+	) :
+		Title(title), Help(help), CallBackFn(nullptr), NumItems(children.size())
+	{
+		for(size_t i = 0; auto& item : children) {
+			ItemPtr[i++] = &item;
+		}
+	}
 
 	// Returns the maximum number of items among all submenus.
 	uint8_t MaxItems() const;
-} WINDOW_INFO;
+};
 
 // ウィンドウ群 //
 typedef struct tagWINDOW_SYSTEM{

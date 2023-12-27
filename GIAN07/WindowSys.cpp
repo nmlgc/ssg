@@ -33,6 +33,7 @@ typedef struct tagMSG_WINDOW{
 	WINDOW_LTRB	NowSize;	// ウィンドウの現在のサイズ
 	PIXEL_POINT	TextTopleft;
 
+	MSG_WINDOW_FLAGS	Flags;
 	GIAN_FONT_ID	FontID;	// 使用するフォント
 	uint8_t	FontDy;	// フォントのＹ増量値
 	uint8_t	State;	// 状態
@@ -270,6 +271,7 @@ PIXEL_SIZE CWinItemExtent(Narrow::string_view str)
 void MWinInit(const WINDOW_LTRB& rc, MSG_WINDOW_FLAGS flags)
 {
 	MsgWindow.MaxSize = rc;
+	MsgWindow.Flags = flags;
 	MsgWindow.TextTopleft = {
 		.x = ((flags & MSG_WINDOW_FLAGS::WITH_FACE) ? FACE_W : 8),
 		.y = 8,
@@ -412,11 +414,15 @@ void MWinDraw(void)
 					continue;
 				}
 				const PIXEL_COORD top = (i * MsgWindow.FontDy);
+				const auto left = ((MsgWindow.Flags & MSG_WINDOW_FLAGS::CENTER)
+					? TextLayoutXCenter(s, line)
+					: 0
+				);
 
 				// 灰色で１どっとずらして描画
-				s.Put({ 1, top }, line, RGBA{ 128, 128, 128 });
+				s.Put({ (left + 1), top }, line, RGBA{ 128, 128, 128 });
 				// 白で表示すべき位置に表示
-				s.Put({ 0, top }, line, RGBA{ 255, 255, 255 });
+				s.Put({ (left + 0), top }, line, RGBA{ 255, 255, 255 });
 			}
 		});
 	}

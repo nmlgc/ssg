@@ -855,9 +855,9 @@ extern bool GameExit(bool bNeedChgMusic)
 	LLaserSetup();		// 音を止める
 	Snd_SEStop(8);	// ワーニング音を止めるのだ
 
-	//LoadFace(0,0);
+	const auto flags = MSG_WINDOW_FLAGS::CENTER;
 	MWinForceClose();
-	MWinInit({ (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 });
+	MWinInit({ (128 + 8), (400 + 16 + 20), (640 - 128 - 8), 480 }, flags);
 	MWinOpen();
 	//MWinFace(0);
 

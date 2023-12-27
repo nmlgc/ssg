@@ -252,6 +252,7 @@ PIXEL_SIZE CWinItemExtent(Narrow::string_view str);
 enum class MSG_WINDOW_FLAGS : uint8_t {
 	NONE = 0x0,
 	WITH_FACE = 0x1,	// Pads all text to leave room for a face portrait.
+	CENTER = 0x2,	// Horizontally centers all text.
 	_HAS_BITFLAG_OPERATORS,
 };
 

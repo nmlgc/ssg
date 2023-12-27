@@ -5,6 +5,8 @@
 
 #include "MUSIC.H"
 #include "FONTUTY.H"
+#include "game/bgm.h"
+#include "game/string_format.h"
 #include "platform/midi_backend.h"
 
 std::optional<MUSICROOM_TEXT> MusicRoomText;
@@ -59,14 +61,22 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 
 	auto cursor = buffer.cursor();
 	TextObj.Prerender(title, [&](GIAN_TEXTRENDER_SESSION auto& s) {
-		const auto maybe_title = cursor.next<LINE>();
-		if(!maybe_title) {
-			return;
-		}
-		const auto& title = maybe_title.value()[0];
+		// Skip the title in the comment and take it from the BGM instead.
+		cursor.next<LINE>();
 
-		char buf[4 + sizeof(title.c) + 1];
-		sprintf(buf, "#%02d %.26s", (number + 1), title.c);
+		const auto& title = BGM_Title();
+		Narrow::string buf;
+		const auto len = (
+			1 + STRING_NUM_CAP<decltype(number)> + 1 + title.size()
+		);
+		buf.resize_and_overwrite(len, [&](decltype(buf)::value_type* p, auto) {
+			const auto* start = p;
+			*(p++) = '#';
+			p = StringCopyNum<2>((number + 1), p);
+			*(p++) = ' ';
+			p = std::ranges::copy(title, p).out;
+			return (p - start);
+		});
 		s.SetFont(GIAN_FONT_ID::NORMAL);
 		s.Put({ 1, 0 }, buf, ColorHighlight);
 		s.Put({ 0, 0 }, buf, ColorDefault);

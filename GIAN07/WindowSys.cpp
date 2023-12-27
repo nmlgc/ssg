@@ -611,12 +611,12 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		case(KEY_UP):		// 一つ上の項目へ
 			ws->Select[Depth] = (ws->Select[Depth]+p->NumItems-1)%(p->NumItems);
 			Snd_SEPlay(SOUND_ID_SELECT);
-		return;
+			break;
 
 		case(KEY_DOWN):		// 一つ下の項目へ
 			ws->Select[Depth] = (ws->Select[Depth]+1)%(p->NumItems);
 			Snd_SEPlay(SOUND_ID_SELECT);
-		return;
+			break;
 
 		case(KEY_ESC):case(KEY_BOMB):
 			Snd_SEPlay(SOUND_ID_CANCEL);

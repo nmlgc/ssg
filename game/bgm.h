@@ -73,6 +73,13 @@ void BGM_SetTempo(int8_t tempo);	// テンポを変更する
 // BGM pack management
 // -------------------
 
+// Returns whether at least one BGM pack exists under the BGM root directory.
+// The result is cached and invalidated whenever BGM is paused.
+bool BGM_PacksAvailable(bool invalidate_cache = false);
+
+size_t BGM_PackCount(void);
+void BGM_PackForeach(void func(const std::u8string&& str));
+
 // Restarts any currently playing BGM when switching to a different [pack].
 void BGM_PackSet(const std::u8string_view pack);
 // -------------------

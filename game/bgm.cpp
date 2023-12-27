@@ -14,6 +14,8 @@
 #include "platform/path.h"
 #include "platform/snd_backend.h"
 #include <algorithm>
+#include <filesystem>
+#include <ranges>
 
 using namespace std::chrono_literals;
 
@@ -29,6 +31,7 @@ static bool Enabled = false;
 static bool Playing = false;
 static unsigned int LoadedNum = 0; // 0 = nothing
 
+static std::optional<bool> PacksAvailable = std::nullopt;
 static std::u8string PackPath;
 static std::shared_ptr<BGM::TRACK> Waveform; // nullptr = playing MIDI
 // -----
@@ -258,6 +261,57 @@ void BGM_SetTempo(int8_t tempo)
 	tempo = std::clamp(tempo, BGM_TEMPO_MIN, BGM_TEMPO_MAX);
 	BGM_Tempo_Num = (BGM_TEMPO_DENOM + tempo);
 	SndBackend_BGMUpdateTempo();
+}
+
+static std::filesystem::directory_iterator DataPathIterator(
+	const std::filesystem::path& subpath
+)
+{
+	namespace fs = std::filesystem;
+
+	std::error_code ec;
+	fs::directory_iterator it(
+		(fs::path(PathForData()) / subpath),
+		fs::directory_options::skip_permission_denied,
+		ec
+	);
+	if(ec) {
+		return fs::directory_iterator{};
+	}
+	return it;
+}
+
+static auto BGM_PackIterator(void)
+{
+	return (DataPathIterator(BGM_ROOT) | std::views::filter([](const auto& d) {
+		return d.is_directory();
+	}));
+}
+
+bool BGM_PacksAvailable(bool invalidate_cache)
+{
+	if(PacksAvailable.has_value() && !invalidate_cache) {
+		return PacksAvailable.value();
+	}
+	// empty() is not implemented for filtered views?
+	for(const auto& entry : BGM_PackIterator()) {
+		PacksAvailable = true;
+		return true;
+	}
+	PacksAvailable = false;
+	return false;
+}
+
+size_t BGM_PackCount(void)
+{
+	return std::ranges::distance(BGM_PackIterator());
+}
+
+void BGM_PackForeach(void func(const std::u8string&& str))
+{
+	for(const auto& entry : BGM_PackIterator()) {
+		func(entry.path().filename().u8string());
+	}
 }
 
 void BGM_PackSet(const std::u8string_view pack)

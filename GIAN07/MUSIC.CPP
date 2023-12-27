@@ -83,6 +83,9 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 	});
 
 	TextObj.Prerender(comment, [&cursor](GIAN_TEXTRENDER_SESSION auto& s) {
+		if(!BGM_LoadedOriginalMIDI()) {
+			return;
+		}
 		int y = 0;
 		s.SetFont(GIAN_FONT_ID::SMALL);
 		s.SetColor(ColorDefault);

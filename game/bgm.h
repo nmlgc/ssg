@@ -28,6 +28,7 @@ void BGM_Cleanup(void);
 // ---------------
 
 bool BGM_Enabled(void);
+bool BGM_LoadedOriginalMIDI(void);
 bool BGM_HasGainFactor(void);
 bool BGM_GainApply(void);
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void);

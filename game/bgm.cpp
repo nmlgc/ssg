@@ -29,6 +29,7 @@ uint8_t BGM_Tempo_Num = BGM_TEMPO_DENOM;
 
 static bool Enabled = false;
 static bool Playing = false;
+static bool LoadedOriginalMIDI = false;
 static bool GainApply = true;
 static unsigned int LoadedNum = 0; // 0 = nothing
 
@@ -65,6 +66,11 @@ void BGM_Cleanup(void)
 bool BGM_Enabled(void)
 {
 	return Enabled;
+}
+
+bool BGM_LoadedOriginalMIDI(void)
+{
+	return LoadedOriginalMIDI;
 }
 
 bool BGM_HasGainFactor(void)
@@ -144,6 +150,7 @@ bool BGM_ChangeMIDIDevice(int8_t direction)
 static bool BGM_Load(unsigned int id)
 {
 	if(!PackPath.empty()) {
+		LoadedOriginalMIDI = false;
 		const auto prefix_len = PackPath.size();
 		StringCatNum<2>((id + 1), PackPath);
 
@@ -160,6 +167,7 @@ static bool BGM_Load(unsigned int id)
 		if(waveform_new && Waveform->metadata.source_midi) {
 			const auto& hash = Waveform->metadata.source_midi.value();
 			mid_new = BGM_MidLoadByHash(hash);
+			LoadedOriginalMIDI = mid_new;
 		}
 		if(!mid_new) {
 			PackPath += EXT_MID;
@@ -171,7 +179,8 @@ static bool BGM_Load(unsigned int id)
 			return true;
 		}
 	}
-	return BGM_MidLoadOriginal(id);
+	LoadedOriginalMIDI = BGM_MidLoadOriginal(id);
+	return LoadedOriginalMIDI;
 }
 
 bool BGM_Switch(unsigned int id)

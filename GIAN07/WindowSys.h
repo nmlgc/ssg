@@ -249,8 +249,16 @@ PIXEL_SIZE CWinItemExtent(Narrow::string_view str);
 
 // メッセージウィンドウ処理 //
 
+enum class MSG_WINDOW_FLAGS : uint8_t {
+	NONE = 0x0,
+	WITH_FACE = 0x1,	// Pads all text to leave room for a face portrait.
+	_HAS_BITFLAG_OPERATORS,
+};
+
 // Prepares text rendering for a window with the given dimensions.
-void MWinInit(const WINDOW_LTRB& rc);
+void MWinInit(
+	const WINDOW_LTRB& rc, MSG_WINDOW_FLAGS flags = MSG_WINDOW_FLAGS::NONE
+);
 
 void MWinOpen(void);	// メッセージウィンドウをオープンする
 void MWinClose(void);			// メッセージウィンドウをクローズする

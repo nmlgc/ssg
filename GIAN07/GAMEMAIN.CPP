@@ -531,10 +531,11 @@ bool GameInit(void(*NextProc)(bool& quit))
 		// ウィンドウの表示位置を設定する //
 		// Replays don't show dialog, so this is the only place where we need
 		// to do this.
+		const auto flags = MSG_WINDOW_FLAGS::WITH_FACE;
 		if(ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) {
-			MWinInit({ 128,  16, (640 - 128),  96 });
+			MWinInit({ 128,  16, (640 - 128),  96 }, flags);
 		} else if(!(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)) {
-			MWinInit({ 128, 400, (640 - 128), 480 });
+			MWinInit({ 128, 400, (640 - 128), 480 }, flags);
 		}
 
 		// These windows can also only show up outside of replays.

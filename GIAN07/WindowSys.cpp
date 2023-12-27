@@ -7,6 +7,7 @@
 #include "LOADER.H"
 #include "FONTUTY.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "game/enum_flags.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
 
@@ -22,8 +23,6 @@ constexpr PIXEL_COORD CWIN_MAX_H = ((WINITEM_MAX + 1) * CWIN_ITEM_H);
 
 constexpr PIXEL_COORD FACE_W = 96;
 constexpr PIXEL_COORD FACE_H = 96;
-
-constexpr PIXEL_POINT MSG_TEXT_TOPLEFT = { FACE_W, 8 };
 // ---------
 
 ///// [構造体] /////
@@ -32,6 +31,7 @@ constexpr PIXEL_POINT MSG_TEXT_TOPLEFT = { FACE_W, 8 };
 typedef struct tagMSG_WINDOW{
 	WINDOW_LTRB	MaxSize;	// ウィンドウの最終的な大きさ
 	WINDOW_LTRB	NowSize;	// ウィンドウの現在のサイズ
+	PIXEL_POINT	TextTopleft;
 
 	GIAN_FONT_ID	FontID;	// 使用するフォント
 	uint8_t	FontDy;	// フォントのＹ増量値
@@ -267,10 +267,14 @@ PIXEL_SIZE CWinItemExtent(Narrow::string_view str)
 	return ret;
 }
 
-void MWinInit(const WINDOW_LTRB& rc)
+void MWinInit(const WINDOW_LTRB& rc, MSG_WINDOW_FLAGS flags)
 {
 	MsgWindow.MaxSize = rc;
-	MsgWindow.TRR = TextObj.Register(rc.Size() - MSG_TEXT_TOPLEFT);
+	MsgWindow.TextTopleft = {
+		.x = ((flags & MSG_WINDOW_FLAGS::WITH_FACE) ? FACE_W : 8),
+		.y = 8,
+	};
+	MsgWindow.TRR = TextObj.Register(rc.Size() - MsgWindow.TextTopleft);
 }
 
 void MWinOpen(void)
@@ -394,7 +398,7 @@ void MWinDraw(void)
 	// 文字列を表示するのはウィンドウが[FREE]である場合だけ        //
 	// -> こうしないと文字列用 Surface を作成することになるので... //
 	if((MsgWindow.State == MWIN_FREE) && MsgWindow.TRR) {
-		const auto topleft = (WINDOW_POINT{ x, y } + MSG_TEXT_TOPLEFT);
+		const auto topleft = (WINDOW_POINT{ x, y } + MsgWindow.TextTopleft);
 		const auto trr = MsgWindow.TRR.value();
 		const auto& text = MsgWindow.Text;
 		TextObj.Render(topleft, trr, text, [](GIAN_TEXTRENDER_SESSION auto& s) {
@@ -503,6 +507,8 @@ void MWinFace(uint8_t faceID)
 {
 	if(MsgWindow.State==MWIN_DEAD) return;		// 表示不可
 	if(faceID/FACE_NUMX>=FACE_MAX) return;		// あり得ない数字
+
+	assert(MsgWindow.TextTopleft.x == FACE_W);
 
 	if(MsgWindow.FaceState==MFACE_NONE){
 		MsgWindow.FaceState = MFACE_OPEN;

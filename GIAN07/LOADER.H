@@ -7,6 +7,7 @@
 #define PBGWIN_LOADER_H		"LOADER : Version 0.10 : Update 2000/02/18"
 //#pragma message(PBGWIN_LOADER_H)
 
+#include "game/hash.h"
 #include "DirectXUTYs/DD_UTY.H"
 
 
@@ -88,6 +89,7 @@ bool LoadStageData(uint8_t stage);	// ＥＣＬ&ＳＣＬデータ列をメモ�
 bool LoadGraph(int stage);	// あるステージのグラフィックをロードする
 bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする
 bool LoadMusic(unsigned int id);	// ｎ番目の曲をロードする
+bool LoadMusicByHash(const HASH& hash);
 bool LoadMIDIBuffer(BYTE_BUFFER_OWNED);
 bool LoadSound(void);	// 全ての Sound データをロードする
 bool LoadMusicRoomComment(int no);	// MusicRoom のコメントをロードする

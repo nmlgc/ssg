@@ -143,6 +143,10 @@ static bool BGM_Load(unsigned int id)
 
 		// Try loading a MIDI
 		bool mid_new = false;
+		if(waveform_new && Waveform->metadata.source_midi) {
+			const auto& hash = Waveform->metadata.source_midi.value();
+			mid_new = BGM_MidLoadByHash(hash);
+		}
 		if(!mid_new) {
 			PackPath += EXT_MID;
 			mid_new = BGM_MidLoadBuffer(FileLoad(PackPath.c_str()));

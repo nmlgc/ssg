@@ -7,6 +7,7 @@
 #pragma once
 
 #include "game/pcm.h"
+#include "game/hash.h"
 #include "platform/file.h"
 #include <stdint.h>
 #include <chrono>
@@ -24,6 +25,9 @@ using SAMPLE_COUNT = uint32_t;
 
 struct TRACK_METADATA {
 	std::u8string title;
+
+	// Hash of a MIDI file inside `MUSIC.DAT` that this track is a recording of.
+	std::optional<HASH> source_midi;
 
 	// Gain to apply to the track.
 	std::optional<float> gain_factor;

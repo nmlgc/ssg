@@ -257,6 +257,18 @@ namespace DAT {
 			MusicPack.MemExpand(filno), MusicHashes[filno]
 		);
 	}
+
+	bool LoadMusicByHash(const HASH& hash)
+	{
+		if(MusicInitThread.joinable()) {
+			MusicInitThread.join();
+		}
+		const auto ret = std::ranges::find(MusicHashes, hash);
+		if(ret == MusicHashes.cend()) {
+			return false;
+		}
+		return LoadMusic(ret - MusicHashes.begin());
+	}
 }
 // -------------- //
 
@@ -1005,6 +1017,11 @@ static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
 bool LoadMusic(unsigned int no)
 {
 	return DAT::LoadMusic(no);
+}
+
+bool LoadMusicByHash(const HASH& hash)
+{
+	return DAT::LoadMusicByHash(hash);
 }
 
 bool LoadMIDIBuffer(BYTE_BUFFER_OWNED buf)

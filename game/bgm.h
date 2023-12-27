@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "game/hash.h"
 #include "game/narrow.h"
 #include "platform/buffer.h"
 #include <chrono>
@@ -16,6 +17,9 @@ extern bool (*const BGM_MidLoadOriginal)(unsigned int id);
 
 // Loads MIDI BGM from the given byte buffer.
 extern bool (*const BGM_MidLoadBuffer)(BYTE_BUFFER_OWNED);
+
+// Loads the source MIDI via its hash from the game's original BGM data source.
+extern bool (*const BGM_MidLoadByHash)(const HASH& hash);
 
 bool BGM_Init(void);
 void BGM_Cleanup(void);

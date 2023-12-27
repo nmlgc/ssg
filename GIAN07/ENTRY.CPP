@@ -40,6 +40,7 @@ const int SND_X_PER_DECIBEL = PixelToWorld(25);
 
 bool (*const BGM_MidLoadOriginal)(unsigned int id) = LoadMusic;
 bool (*const BGM_MidLoadBuffer)(BYTE_BUFFER_OWNED) = LoadMIDIBuffer;
+bool (*const BGM_MidLoadByHash)(const HASH& hash) = LoadMusicByHash;
 // -----------------
 
 bool XInit(void)

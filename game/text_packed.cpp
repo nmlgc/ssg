@@ -184,7 +184,7 @@ TEXTRENDER_RECT_ID TEXTRENDER_PACKED::Register(const PIXEL_SIZE& size)
 bool TEXTRENDER_PACKED::Wipe()
 {
 	for(auto& rect : rects) {
-		rect.contents.clear();
+		rect.contents = std::nullopt;
 	}
 	return true;
 }

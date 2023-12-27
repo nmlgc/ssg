@@ -15,7 +15,7 @@ class TEXTRENDER_PACKED {
 protected:
 	struct RECT_AND_CONTENTS {
 		PIXEL_LTWH rect;
-		Narrow::string contents;
+		std::optional<Narrow::string> contents;
 	};
 
 	PIXEL_SIZE bounds = {};

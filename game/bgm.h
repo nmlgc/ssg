@@ -81,5 +81,7 @@ size_t BGM_PackCount(void);
 void BGM_PackForeach(void func(const std::u8string&& str));
 
 // Restarts any currently playing BGM when switching to a different [pack].
-void BGM_PackSet(const std::u8string_view pack);
+// Returns `false` if the given [pack] doesn't exist, and switches to the empty
+// pack in that case.
+bool BGM_PackSet(const std::u8string_view pack);
 // -------------------

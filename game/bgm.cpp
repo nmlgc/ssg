@@ -314,7 +314,7 @@ void BGM_PackForeach(void func(const std::u8string&& str))
 	}
 }
 
-void BGM_PackSet(const std::u8string_view pack)
+bool BGM_PackSet(const std::u8string_view pack)
 {
 	const std::u8string_view cur = PackPath;
 	if(!pack.empty()) {
@@ -325,7 +325,7 @@ void BGM_PackSet(const std::u8string_view pack)
 			(cur.substr(root_len, pack.size()) == pack) &&
 			(cur[root_len + pack.size()] == '/') // !!!
 		) {
-			return;
+			return true;
 		}
 		const auto pack_len = (pack.size() + 1);
 		const auto file_len = (STRING_NUM_CAP<unsigned int> + EXT_MID.size());
@@ -338,9 +338,17 @@ void BGM_PackSet(const std::u8string_view pack)
 			*(p.out++) = '/';
 			return (p.out - buf);
 		});
+
+		// Check if this path exists
+		std::error_code ec;
+		const auto found = std::filesystem::is_directory(PackPath, ec);
+		if(ec || !found) {
+			PackPath.clear();
+			return false;
+		}
 	} else {
 		if(cur.empty()) {
-			return;
+			return true;
 		}
 		PackPath.clear();
 	}
@@ -348,4 +356,5 @@ void BGM_PackSet(const std::u8string_view pack)
 	if((LoadedNum != 0) && Playing) {
 		BGM_Switch(LoadedNum - 1);
 	}
+	return true;
 }

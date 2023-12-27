@@ -71,7 +71,9 @@ bool XInit(void)
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 		BGM_Init();
 	}
-	BGM_PackSet(ConfigDat.BGMPack.v);
+	if(!BGM_PackSet(ConfigDat.BGMPack.v)) {
+		ConfigDat.BGMPack.v.clear();
+	}
 
 	// Call a different *Init() function here to quickly test a different //
 	// game state. //

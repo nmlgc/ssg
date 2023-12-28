@@ -6,6 +6,7 @@
 #include "platform/file.h"
 #include "PBGMIDI.H"
 #include "game/endian.h"
+#include <array>
 #include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
 
@@ -14,6 +15,12 @@
 
 #define MID_STDTEMPO	(1<<7)	// 標準のテンポ
 
+
+// MIDI protocol
+// -------------
+
+static constexpr uint8_t MIDI_CHANNELS = 16;
+// -------------
 
 // Standard MIDI File format
 // -------------------------
@@ -39,12 +46,14 @@ typedef struct {
 // -------------------------
 
 
+using DEVICE_NAME = std::array<char, MAXPNAMELEN>;
+
 //// みでぃ用構造体 ////
 typedef struct{
 	HMIDIOUT	mp;	// 出力デバイスのハンドル
-	int	nDevice;	// デバイス数
+	unsigned int	nDevice;	// デバイス数
 	int	NowID;	// 現在のデバイスのＩＤ
-	char	**name;	// デバイス名
+	DEVICE_NAME*	name;	// デバイス名
 
 	// 以下は外部から変更＆参照しないこと //
 	DWORD	FadeCount;	// フェードＩ／Ｏカウンタ
@@ -113,7 +122,6 @@ uint32_t Mid_PlayTime = 0;
 
 bool Mid_Start(void)
 {
-	MIDIOUTCAPS		caps;
 	int				i;
 	UINT			mret;
 
@@ -123,18 +131,23 @@ bool Mid_Start(void)
 	Mid_Dev.NowID   = -1 + 1;					// -1: MIDI_MAPPER
 
 	// デバイスが存在しないならリターン //
-	if(Mid_Dev.nDevice)
-		Mid_Dev.name = (char **)LocalAlloc(LPTR,sizeof(char *)*(Mid_Dev.nDevice));
-	else{
-		Mid_Dev.name = NULL;
+	constexpr auto device_cap = (
+		(std::numeric_limits<size_t>::max)() / sizeof(DEVICE_NAME)
+	);
+	if((Mid_Dev.nDevice > 0) && (Mid_Dev.nDevice < device_cap)) {
+		Mid_Dev.name = static_cast<DEVICE_NAME *>(LocalAlloc(
+			LPTR, (sizeof(DEVICE_NAME) * Mid_Dev.nDevice)
+		));
+	}
+	if(!Mid_Dev.name) {
 		return FALSE;
 	}
 
 	// デバイス名格納用のメモリ確保＆セット //
 	for(i=0;i<Mid_Dev.nDevice;i++){
+		[[gsl::suppress(type.5)]] MIDIOUTCAPS caps;
 		midiOutGetDevCaps(i-1,&caps,sizeof(MIDIOUTCAPS));
-		Mid_Dev.name[i] = (char *)LocalAlloc(LPTR,MAXPNAMELEN);
-		strcpy(Mid_Dev.name[i],caps.szPname);
+		std::ranges::copy(caps.szPname, Mid_Dev.name[i].begin());
 	}
 
 	// 使用できるデバイスを探す(最初がMIDI_MAPPERなのがポイントだ!) //
@@ -155,12 +168,13 @@ void Mid_End(void)
 
 	Mid_Stop();
 
-	if(Mid_Dev.mp) midiOutClose(Mid_Dev.mp);
+	if(Mid_Dev.mp) {
+		Mid_Dev.mp = nullptr;
+		midiOutClose(Mid_Dev.mp);
+	}
 
 	if(Mid_Dev.name){
-		for(i=0;i<Mid_Dev.nDevice;i++) LocalFree(Mid_Dev.name[i]);
 		LocalFree(Mid_Dev.name);
-		Mid_Dev.mp      = NULL;
 		Mid_Dev.name    = NULL;
 	}
 
@@ -201,8 +215,6 @@ void Mid_Play(void)
 
 void Mid_Stop(void)
 {
-	int i;
-
 	if(Mid_Dev.state == MID_BACKEND_STATE::STOP) {
 		return;
 	}
@@ -214,7 +226,7 @@ void Mid_Stop(void)
 	timeEndPeriod(Mid_Time.caps.wPeriodMin);
 
 	Mid_TableInit();
-	for(i=0;i<16;i++){
+	for(auto i = 0; i < MIDI_CHANNELS; i++) {
 		Mid_ShortMsg(0xb0+i,0x7b,0x00);		// オール・ノート・オフ
 		Mid_ShortMsg(0xb0+i,0x78,0x00);		// オール・サウンド・オフ
 	}
@@ -226,10 +238,8 @@ void Mid_Stop(void)
 // 各種テーブルの初期化 //
 void Mid_TableInit(void)
 {
-	int		i,j;
-
-	for(i=0;i<16;i++){
-		for(j=0;j<128;j++){
+	for(auto i = 0; i < MIDI_CHANNELS; i++) {
+		for(auto j = 0; j < 128; j++) {
 			Mid_PlayTable[i][j]  = 0;
 			Mid_PlayTable2[i][j] = 0;
 			Mid_NoteTable[i][j]  = 0;
@@ -348,7 +358,7 @@ bool Mid_ChgDev(char pos)
 
 Narrow::string_view Mid_DevName(void)
 {
-	return { Mid_Dev.name[Mid_Dev.NowID] };
+	return { Mid_Dev.name[Mid_Dev.NowID].data() };
 }
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)

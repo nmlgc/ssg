@@ -29,6 +29,11 @@ template <
 
 	size_t cursor = 0;
 
+	// Required to work around a C26495 false positive, for some reason?
+	BYTE_BUFFER_CURSOR(const std::span<ConstOrNonConstByte> other) :
+		std::span<ConstOrNonConstByte>(other) {
+	}
+
 	// Reads up to [n] contiguous values of type T from the active cursor
 	// position if possible. If the function returns a valid span, all [n]
 	// objects are safe to access.
@@ -39,6 +44,7 @@ template <
 		if((cursor_new > this->size()) || (cursor_new < cursor)) {
 			return std::nullopt;
 		}
+		[[gsl::suppress(type.1)]]
 		auto ret = std::span<transfer_const<T>>{
 			reinterpret_cast<transfer_const<T> *>(this->data() + cursor), n
 		};

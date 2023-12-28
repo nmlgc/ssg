@@ -82,7 +82,7 @@ bool XInit(void)
 		return false;
 	}
 
-	ScreenshotSetPrefix(_PATH("秋霜"));
+	ScreenshotSetPrefix(u8"秋霜");
 
 	return true;
 }

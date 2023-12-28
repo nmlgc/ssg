@@ -8,15 +8,7 @@
 #include <memory>
 #include <optional>
 #include <span>
-#include <type_traits>
 #include <vector>
-
-// We really do not want to accidentally call reinterpret_cast<uint8_t *>() on
-// a raw reference to something like an STL type. (Too bad that this doesn't
-// catch std::span.)
-template <typename T> concept SERIALIZABLE = (
-	!std::is_pointer_v<T> && std::is_trivially_copyable_v<T>
-);
 
 struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 	using span::span;

@@ -15,18 +15,6 @@
 	std::span<uint8_t> buf, const PATH_LITERAL s
 );
 
-// Loads an instance of the given type from the first sizeof(T) bytes of the
-// given file, if possible.
-template <SERIALIZABLE T> std::optional<T> FileLoad(const PATH_LITERAL s) {
-	T ret;
-	if(FileLoadInplace(
-		{ reinterpret_cast<uint8_t *>(&ret), sizeof(ret) }, s
-	) != sizeof(T)) {
-		return std::nullopt;
-	}
-	return ret;
-}
-
 // Loads the file with the given name into a newly allocated buffer, if
 // possible.
 BYTE_BUFFER_OWNED FileLoad(

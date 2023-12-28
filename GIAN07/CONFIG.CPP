@@ -166,14 +166,14 @@ CONFIG_DATA ConfigDat;
 #ifdef PBG_DEBUG
 static void DebugInit(void)
 {
-	const auto maybe_loaded = FileLoad<DEBUG_DATA>(DBG_FN);
-	if(!maybe_loaded) {
+	const auto loaded_bytes = FileLoadInplace(
+		{ reinterpret_cast<uint8_t *>(&DebugDat), sizeof(DebugDat) }, DBG_FN
+	);
+	if(loaded_bytes != sizeof(DebugDat)) {
 		DebugDat.Hit        = true;
 		DebugDat.MsgDisplay = true;
 		DebugDat.DemoSave   = false;
 		DebugDat.StgSelect  = 1;
-	} else {
-		DebugDat = maybe_loaded.value();
 	}
 }
 #endif

@@ -99,10 +99,10 @@ static bool RingFN(
 }
 
 template <size_t N> struct LABELS {
-	const std::array<std::string_view, N> str;
+	const std::array<Narrow::string_view, N> str;
 	const size_t w;
 
-	constexpr LABELS(std::array<std::string_view, N> strs) :
+	constexpr LABELS(std::array<Narrow::string_view, N> strs) :
 		str(strs),
 		w(std::reduce(
 			strs.begin(), strs.end(), size_t{}, [](auto cur, const auto& str) {
@@ -906,7 +906,7 @@ static void SetInpItem(void)
 static void SetIKeyItem(void)
 {
 	constexpr LABELS<4> labels = {{ "Shot", "Bomb", "SpeedDown", "ESC" }};
-	auto set = [](char* buf, std::string_view label, INPUT_PAD_BUTTON v) {
+	auto set = [](char* buf, Narrow::string_view label, INPUT_PAD_BUTTON v) {
 		if(v > 0) {
 			sprintf(buf, "%-*s[Button%2d]", labels.w, label.data(), v);
 		} else {

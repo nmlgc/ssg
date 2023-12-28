@@ -126,7 +126,7 @@ void MWinForceClose(void);		// メッセージウィンドウを強制クロー�
 void MWinMove(void);			// メッセージウィンドウを動作させる(後で上と統合する)
 void MWinDraw(void);			// メッセージウィンドウを描画する(上に同じ)
 
-void MWinMsg(std::string_view str);	// メッセージ文字列を送る
+void MWinMsg(Narrow::string_view str);	// メッセージ文字列を送る
 void MWinFace(uint8_t faceID);	// 顔をセットする
 void MWinCmd(uint8_t cmd);	// コマンドを送る
 

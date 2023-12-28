@@ -254,7 +254,7 @@ TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
 	DxObj, GrText, GDIFonts.fonts
 };
 
-void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, std::string_view str)
+void DrawGrdFont(TEXTRENDER_RECT_ID rect_id, Narrow::string_view str)
 {
 	TextObj.Prerender(rect_id, [&str](GIAN_TEXTRENDER_SESSION auto& s) {
 		// The MIDI sequence titles passed to this function tend to come with

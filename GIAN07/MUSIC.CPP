@@ -49,7 +49,7 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 	struct LINE {
 		char c[19 * 2];
 
-		operator std::string_view() const {
+		operator Narrow::string_view() const {
 			return { c, sizeof(c) };
 		}
 	};

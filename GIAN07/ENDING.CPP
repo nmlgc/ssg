@@ -39,7 +39,7 @@ typedef struct tagEndingStTask{
 } EndingStTask;
 
 typedef struct tagEndingText {
-	std::string_view Text[10];	// 表示するテキストへのポインタ
+	Narrow::string_view Text[10];	// 表示するテキストへのポインタ
 	int		NumText;		// 現在格納されているテキストの数
 	TEXTRENDER_RECT_ID Rect;
 	bool Rerender;

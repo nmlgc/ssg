@@ -7,8 +7,8 @@
 #define PBGWIN_EFFECT_H		"EFFECT : Version 0.20 : Update 2000/02/23"
 //#pragma message(PBGWIN_EFFECT_H)
 
+#include "game/narrow.h"
 #include <stdint.h>
-#include <string_view>
 
 
 
@@ -98,7 +98,7 @@ void SEffectInit(void);	// エフェクトの初期化を行う
 void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
 void StringEffect2(int x, int y, uint32_t point);	// 得点表示エフェクト
 void StringEffect3(void);	// ゲームオーバーの表示
-void SetMusicTitle(int y, std::string_view s);	// 曲名の表示
+void SetMusicTitle(int y, Narrow::string_view s);	// 曲名の表示
 
 void SEffectMove(void);	// エフェクトを動かす(仕様変更の可能性があります)
 void SEffectDraw(void);	// エフェクトを描画する(仕様変更の可能性があります)

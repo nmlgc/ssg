@@ -229,7 +229,7 @@ void StringEffect3(void)
 }
 
 // 曲名の表示 //
-void SetMusicTitle(int y, std::string_view s)
+void SetMusicTitle(int y, Narrow::string_view s)
 {
 	int	n;
 

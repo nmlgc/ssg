@@ -8,6 +8,7 @@
 #include "game/coords.h"
 #include "game/enum_array.h"
 #include "game/graphics.h"
+#include "game/narrow.h"
 #include <optional>
 #include <string_view>
 
@@ -19,7 +20,7 @@ template <class T, class FontID> concept TEXTRENDER_SESSION = (
 	ENUMARRAY_ID<FontID> && requires (
 		T t,
 		PIXEL_POINT topleft_rel,
-		std::string_view str,
+		Narrow::string_view str,
 		RGBA color,
 		FontID font
 	) {
@@ -60,7 +61,7 @@ template <class T, class FontID> concept TEXTRENDER = requires(
 	T t,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
-	std::string_view contents,
+	Narrow::string_view contents,
 	TEXTRENDER_RECT_ID rect_id,
 	TEXTRENDER_SESSION_FUNC_ARCHETYPE<FontID>& func,
 	std::optional<PIXEL_LTWH> subrect

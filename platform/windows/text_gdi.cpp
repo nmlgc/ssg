@@ -54,7 +54,7 @@ void TEXTRENDER_GDI_SESSION_BASE::SetColor(const RGBA& color)
 
 void TEXTRENDER_GDI_SESSION_BASE::Put(
 	const PIXEL_POINT& topleft_rel,
-	std::string_view str,
+	Narrow::string_view str,
 	std::optional<RGBA> color
 )
 {

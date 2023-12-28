@@ -40,10 +40,10 @@ typedef struct tagMSG_WINDOW{
 	uint8_t	FaceState;	// 顔の状態
 	uint8_t	FaceTime;	// 顔表示用カウンタ
 
-	std::string_view	Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
+	Narrow::string_view	Msg[MSG_HEIGHT];	// 表示するメッセージへのポインタ
 
 	// Contains all text from [Msg], concatenated with '\n'.
-	std::string	Text;
+	Narrow::string	Text;
 
 	std::optional<TEXTRENDER_RECT_ID>	TRR;
 
@@ -184,7 +184,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	// 文字列の描画 //
 	WINDOW_POINT topleft = { ws->x, ws->y };
 	const auto trr = ws->TRRs[0];
-	const std::string_view str = p->Title;
+	const Narrow::string_view str = p->Title;
 	TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
 		s.SetFont(GIAN_FONT_ID::SMALL);
 		s.Put({ 1, 0 }, str, RGBA{ 128, 128, 128 });
@@ -194,7 +194,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 
 	for(i = 0; i < p->NumItems; i++) {
 		const auto trr = ws->TRRs[1 + i];
-		const std::string_view str = p->ItemPtr[i]->Title;
+		const Narrow::string_view str = p->ItemPtr[i]->Title;
 		TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
 			s.SetFont(GIAN_FONT_ID::SMALL);
 			s.Put({ (8 + 1), 0 }, str, RGBA{ 128, 128, 128 });
@@ -424,7 +424,7 @@ void MWinDraw(void)
 	}
 }
 
-void MWinMsg(std::string_view s)
+void MWinMsg(Narrow::string_view s)
 {
 	int			Line,i;
 

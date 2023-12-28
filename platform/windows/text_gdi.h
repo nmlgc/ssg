@@ -36,7 +36,7 @@ public:
 	void SetColor(const RGBA& color);
 	void Put(
 		const PIXEL_POINT& topleft_rel,
-		std::string_view str,
+		Narrow::string_view str,
 		std::optional<RGBA> color = std::nullopt
 	);
 
@@ -131,7 +131,7 @@ public:
 	bool Render(
 		WINDOW_POINT dst,
 		TEXTRENDER_RECT_ID rect_id,
-		std::string_view contents,
+		Narrow::string_view contents,
 		TEXTRENDER_SESSION_FUNC<SESSION, FontID> auto func,
 		std::optional<PIXEL_LTWH> subrect = std::nullopt
 	) {

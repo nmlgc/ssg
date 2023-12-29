@@ -11,12 +11,13 @@ static constexpr std::u8string_view EXT = u8".BMP";
 
 static NUM_TYPE Num = 0;
 static std::u8string Buf;
-static std::u8string::iterator BufPastPrefix;
 
 void ScreenshotSetPrefix(std::u8string_view prefix)
 {
-	Buf.resize((prefix.length() + STRING_NUM_CAP<NUM_TYPE> + EXT.size() + 1));
-	BufPastPrefix = std::copy(prefix.begin(), prefix.end(), Buf.begin());
+	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + EXT.size());
+	Buf.resize_and_overwrite(cap, [&](decltype(Buf)::value_type* p, size_t) {
+		return (std::ranges::copy(prefix, p).out - p);
+	});
 }
 
 std::unique_ptr<FILE_STREAM_WRITE> ScreenshotNextStream()
@@ -27,10 +28,11 @@ std::unique_ptr<FILE_STREAM_WRITE> ScreenshotNextStream()
 
 	// Prevent the theoretical infinite loop...
 	while(Num < (std::numeric_limits<decltype(Num)>::max)()) {
-		auto buf_p = StringCopyNum<4>(Num++, BufPastPrefix);
-		buf_p = std::copy(EXT.begin(), EXT.end(), buf_p);
-		*(buf_p++) = '\0';
-		auto ret = FileStreamWrite(Buf.data(), true);
+		const auto prefix_len = Buf.size();
+		StringCatNum<4>(Num++, Buf);
+		Buf += EXT;
+		auto ret = FileStreamWrite(Buf.c_str(), true);
+		Buf.resize(prefix_len);
 		if(ret) {
 			return ret;
 		}

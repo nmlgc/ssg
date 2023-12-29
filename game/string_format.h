@@ -6,7 +6,7 @@
 #pragma once
 
 #include <array>
-#include <iterator>
+#include <string>
 
 // Number of decimal digits required to store the highest value of the given
 // type.
@@ -33,8 +33,9 @@ template <size_t Width, class T, std::incrementable I> I StringCopyNum(
 	return out;
 }
 
-template <size_t Width, class T, class S> typename S::iterator StringCopyNum(
-	T num, typename S::iterator out
+template <size_t Width, class T> std::u8string& StringCatNum(
+	T num, std::u8string& out
 ) {
-	return StringCopyNum<Width, typename S::iterator, T>(out, num);
+	String::Num<Width, T> n = { num };
+	return out.append(reinterpret_cast<char8_t *>(n.str.data()), n.len);
 }

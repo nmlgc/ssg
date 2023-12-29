@@ -19,6 +19,45 @@ void OnVorbisComment(METADATA_CALLBACK func, const std::u8string_view comment)
 	func(comment.substr(0, eq_i), comment.substr(eq_i + 1));
 }
 
+void ApplyVolumeError(std::span<std::byte>, uint16_t, TRACK_VOL&)
+{
+	assert(!"missing fade implementation");
+}
+
+void TRACK_VOL::SetVolumeLinear(float v)
+{
+	volume_linear = v;
+}
+
+template <class BitDepth> static void ApplyVolume(
+	std::span<std::byte> buf, uint16_t channels, TRACK_VOL& vol
+)
+{
+	const auto samples = std::span<BitDepth>{
+		reinterpret_cast<BitDepth *>(buf.data()),
+		(buf.size_bytes() / sizeof(BitDepth))
+	};
+	auto it = samples.begin();
+
+	// Slow path if we're fading
+	if(vol.fade_remaining > 0) {
+		while((vol.fade_remaining > 0) && (it != samples.end())) {
+			for(decltype(channels) c = 0; c < channels; c++) {
+				*(it++) *= vol.FadeVolumeLinear();
+			}
+			vol.fade_remaining--;
+			vol.SetVolumeLinear(vol.fade_end +
+				((vol.fade_delta * vol.fade_remaining) / vol.fade_duration)
+			);
+		}
+	}
+
+	// Fast path for constant volume
+	while(it != samples.end()) {
+		*(it++) *= vol.FadeVolumeLinear();
+	}
+}
+
 bool TRACK::Decode(std::span<std::byte> buf)
 {
 	size_t offset = 0;
@@ -32,7 +71,26 @@ bool TRACK::Decode(std::span<std::byte> buf)
 		offset += ret;
 		size_left -= ret;
 	}
+
+	if(vol.FadeVolumeLinear() != 1.0f) {
+		const auto apply_volume = (
+			(pcmf.format == PCM_SAMPLE_FORMAT::S16) ? ApplyVolume<int16_t> :
+			(pcmf.format == PCM_SAMPLE_FORMAT::S32) ? ApplyVolume<int32_t> :
+			ApplyVolumeError
+		);
+		apply_volume(buf, pcmf.channels, vol);
+	}
 	return true;
+}
+
+void TRACK::FadeOut(float volume_start, std::chrono::milliseconds duration)
+{
+	const auto sample_count = ((duration.count() * pcmf.samplingrate) / 1000);
+	vol.SetVolumeLinear(volume_start);
+	vol.fade_delta = (volume_start - vol.fade_end);
+	vol.fade_end = 0.0f;
+	vol.fade_duration = sample_count;
+	vol.fade_remaining = sample_count;
 }
 
 size_t TRACK_PCM::DecodeSingle(std::span<std::byte> buf)

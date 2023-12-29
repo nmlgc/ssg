@@ -209,12 +209,20 @@ void BGM_FadeOut(uint8_t speed)
 	// call to the MIDI FadeIO() method after the start of the fade. This
 	// allowed you to hold the fade button in the Music Room for a faster
 	// fade-out.
-	const auto volume_start = (Mid_GetFadeVolume() - 1);
+	const VOLUME volume_cur = (Waveform
+		? VolumeDiscrete(Waveform->FadeVolumeLinear())
+		: Mid_GetFadeVolume()
+	);
+	const auto volume_start = (volume_cur - 1);
 
 	const auto duration = (
 		10ms * VOLUME_MAX * ((((256 - speed) * 4) / (VOLUME_MAX + 1)) + 1)
 	);
-	Mid_FadeOut(volume_start, duration);
+	if(Waveform) {
+		Waveform->FadeOut(VolumeLinear(volume_start), duration);
+	} else {
+		Mid_FadeOut(volume_start, duration);
+	}
 }
 
 int8_t BGM_GetTempo(void)

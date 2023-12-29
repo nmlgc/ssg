@@ -9,12 +9,15 @@
 #include "game/pcm.h"
 #include "platform/file.h"
 #include <stdint.h>
+#include <chrono>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <span>
 
 namespace BGM {
+
+using SAMPLE_COUNT = uint32_t;
 
 // Metadata
 // --------
@@ -34,7 +37,26 @@ void OnVorbisComment(METADATA_CALLBACK func, const std::u8string_view comment);
 // Base class for a track
 // ----------------------
 
+class TRACK_VOL {
+	float volume_linear = 1.0f;
+
+public:
+	float fade_delta = 0.0f;
+	float fade_end = 0.0f;
+	SAMPLE_COUNT fade_remaining = 0;
+	SAMPLE_COUNT fade_duration = 0;
+
+	auto FadeVolumeLinear() const {
+		return volume_linear;
+	}
+	void SetVolumeLinear(float v);
+};
+
 struct TRACK {
+protected:
+	TRACK_VOL vol;
+
+public:
 	const TRACK_METADATA metadata;
 
 	// Target format that this track is decoded to.
@@ -49,6 +71,13 @@ struct TRACK {
 	// in case of an unrecoverable decoding error, in which case [buf] is
 	// filled with zeroes.
 	bool Decode(std::span<std::byte> buf);
+
+	auto FadeVolumeLinear() const {
+		return vol.FadeVolumeLinear();
+	}
+
+	// Starts a fade-out that takes the given number of milliseconds.
+	void FadeOut(float volume_start, std::chrono::milliseconds duration);
 
 	TRACK(TRACK_METADATA&& metadata, const PCM_FORMAT& pcmf) :
 		metadata(metadata), pcmf(pcmf) {

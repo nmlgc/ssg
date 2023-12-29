@@ -8,6 +8,7 @@
 #include "DEMOPLAY.H"
 #include "GIAN.H"
 #include "LEVEL.H"
+#include "game/bgm.h"
 #include "game/input.h"
 #include "game/midi.h"
 #include "game/snd.h"
@@ -304,7 +305,7 @@ static void enemy_set(void)
 				break;
 
 				case(SEFC_WARNSTOP):	Snd_SEStop(8);	break;	// Warning 停止
-				case(SEFC_MUSICFADE):	Mid_FadeOut(120);				break;	// 曲の停止
+				case(SEFC_MUSICFADE):	BGM_FadeOut(120);				break;	// 曲の停止
 				case(SEFC_STG2BOSS):	ScrollCommand(SCMD_STG2BOSS);	break;	// ２面ボスScroll
 				case(SEFC_RASTERON):	ScrollCommand(SCMD_RASTER_ON);	break;	// ラスターON
 				case(SEFC_RASTEROFF):	ScrollCommand(SCMD_RASTER_OFF);	break;	// ラスターOFF

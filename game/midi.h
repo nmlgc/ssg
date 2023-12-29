@@ -16,6 +16,7 @@
 
 
 #include "game/narrow.h"
+#include "game/volume.h"
 #include "platform/buffer.h"
 #include <chrono>
 #include <stdint.h>
@@ -75,7 +76,11 @@ void Mid_Stop(void);						// 停止する
 void Mid_Pause(void);
 void Mid_Resume(void);
 void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
-void Mid_FadeOut(uint8_t speed);	// フェードアウト(数字が大きいほど早い)
+
+// Returns the current (not maximum) MIDI master volume.
+VOLUME Mid_GetFadeVolume(void);
+
+void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration);
 bool Mid_ChgDev(char pos);	// 出力デバイスを変更する
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer

@@ -6,7 +6,10 @@
 #include "game/bgm.h"
 #include "game/midi.h"
 #include "game/snd.h"
+#include "game/volume.h"
 #include <algorithm>
+
+using namespace std::chrono_literals;
 
 // State
 // -----
@@ -25,6 +28,20 @@ bool BGM_Init(void)
 {
 	BGM_SetTempo(0);
 	return (Mid_Start() && Snd_BGMInit());
+}
+
+void BGM_FadeOut(uint8_t speed)
+{
+	// pbg quirk: The original game always reduced the volume by 1 on the first
+	// call to the MIDI FadeIO() method after the start of the fade. This
+	// allowed you to hold the fade button in the Music Room for a faster
+	// fade-out.
+	const auto volume_start = (Mid_GetFadeVolume() - 1);
+
+	const auto duration = (
+		10ms * VOLUME_MAX * ((((256 - speed) * 4) / (VOLUME_MAX + 1)) + 1)
+	);
+	Mid_FadeOut(volume_start, duration);
 }
 
 int8_t BGM_GetTempo(void)

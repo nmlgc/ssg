@@ -327,18 +327,17 @@ void Mid_Volume(uint8_t volume)
 	//midiOutSetVolume(Mid_Dev.mp,temp.dd);
 }
 
-void Mid_FadeOut(uint8_t speed)
+VOLUME Mid_GetFadeVolume(void)
 {
-	// pbg quirk: The original game always reduced the volume by 1 on the first
-	// call to FadeIO() after the start of the fade. This allowed you to hold
-	// the fade button in the Music Room for a faster fade-out.
-	Mid_Dev.FadeStartVolume = (Mid_Dev.NowVolume - 1);
+	return Mid_Dev.NowVolume;
+}
 
+void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration)
+{
+	Mid_Dev.FadeStartVolume = volume_start;
 	Mid_Dev.FadeEndVolume = 0;
 	Mid_Dev.FadeProgress = 0s;
-	Mid_Dev.FadeDuration = (10ms * Mid_Dev.MaxVolume * (
-		((((256 - speed) * 4) / (Mid_Dev.MaxVolume + 1)) + 1)
-	));
+	Mid_Dev.FadeDuration = duration;
 }
 
 void Mid_GMReset(void)

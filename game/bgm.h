@@ -9,6 +9,13 @@
 
 bool BGM_Init(void);
 
+// Volume control
+// --------------
+
+// フェードアウト(数字が大きいほど早い)
+void BGM_FadeOut(uint8_t speed);
+// --------------
+
 // Tempo control
 // -------------
 

@@ -526,7 +526,7 @@ bool GameInit(void(*NextProc)(bool& quit))
 {
 	TextObj.Clear();
 	if(NextProc != DemoProc) {
-		Mid_FadeOut(240);
+		BGM_FadeOut(240);
 		MTitleInit();
 	}
 	if(NextProc == GameProc) {
@@ -1408,7 +1408,7 @@ void MusicRoomProc(bool&)
 	}
 
 	if(SystemKey_Data & SYSKEY_BGM_FADE) {
-		Mid_FadeOut(120);
+		BGM_FadeOut(120);
 	}
 
 	if(SystemKey_Data & SYSKEY_BGM_DEVICE) {

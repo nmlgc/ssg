@@ -65,6 +65,10 @@ const struct VERSION_ORIGINAL {
 	// re-locking the Extra Stage even if the checksum was correct.
 	static inline CONFIG_OPTION_VALUE<BITDEPTH> BitDepth8Or16;
 
+	// The original build of the game only supported the MIDI and WAVE activity
+	// bits.
+	static inline CONFIG_OPTION_VALUE<uint8_t> SoundFlags;
+
 	static inline CONFIG_OPTION_VALUE<uint32_t> CheckSum;
 	static inline CONFIG_OPTION_VALUE<uint8_t> PaddingByte;
 
@@ -76,7 +80,7 @@ const struct VERSION_ORIGINAL {
 		BitDepth8Or16,
 		ConfigDat.FPSDivisor,
 		ConfigDat.GraphFlags,
-		ConfigDat.SoundFlags,
+		SoundFlags,
 		ConfigDat.InputFlags,
 		ConfigDat.DebugFlags,
 		ConfigDat.PadTama,
@@ -208,15 +212,17 @@ extern void ConfigLoad()
 // コンフィグの内容を保存する //
 extern void ConfigSave(void)
 {
-	ConfigDat.SoundFlags.v &= ~SNDF_BGM_ENABLE;
-	ConfigDat.SoundFlags.v |= (BGM_Enabled() * SNDF_BGM_ENABLE);
-
 	// Backwards compatibility with 秋霜CFG.DAT
 	VERSION_ORIGINAL.BitDepth8Or16.v = ((ConfigDat.BitDepth.v.value() > 16)
 		? BITDEPTHS::find_if([](auto bpp) { return (bpp == 16); })
 		: ConfigDat.BitDepth.v
 	);
+	VERSION_ORIGINAL.SoundFlags.v  = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
+	VERSION_ORIGINAL.SoundFlags.v |= (BGM_Enabled() * SNDF_BGM_ENABLE);
 	VERSION_ORIGINAL.CheckSum.v = VERSION_ORIGINAL.CheckSumCalculate();
+
+	ConfigDat.SoundFlags.v = VERSION_ORIGINAL.SoundFlags.v;
+	ConfigDat.SoundFlags.v |= (!BGM_GainApply() * SNDF_BGM_NOT_VOL_NORM);
 
 	std::apply([](const auto&... version) {
 		(..., VersionSave(version));

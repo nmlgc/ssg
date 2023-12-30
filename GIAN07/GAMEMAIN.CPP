@@ -861,11 +861,6 @@ extern bool GameExit(bool bNeedChgMusic)
 	MWinOpen();
 	//MWinFace(0);
 
-	InitMainWindow();
-	MainWindow.Open({ 400, 250 }, 0);
-	// MainWindow.Open({ 150, 200 }, 0);
-	// MainWindow.Open({ 250, 150 }, 0);
-
 	DemoTimer = 0;
 
 	GameStage = 0;
@@ -875,6 +870,13 @@ extern bool GameExit(bool bNeedChgMusic)
 			BGM_Switch(0);
 		}
 	}
+
+	// Must come after the BGM switch to correctly initialize the sound
+	// configuration menu.
+	InitMainWindow();
+	MainWindow.Open({ 400, 250 }, 0);
+	// MainWindow.Open({ 150, 200 }, 0);
+	// MainWindow.Open({ 250, 150 }, 0);
 
 	GameMain  = TitleProc;
 

@@ -74,6 +74,7 @@ bool XInit(void)
 	if(!BGM_PackSet(ConfigDat.BGMPack.v)) {
 		ConfigDat.BGMPack.v.clear();
 	}
+	BGM_SetGainApply(!(ConfigDat.SoundFlags.v & SNDF_BGM_NOT_VOL_NORM));
 
 	// Call a different *Init() function here to quickly test a different //
 	// game state. //

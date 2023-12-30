@@ -29,6 +29,7 @@ uint8_t BGM_Tempo_Num = BGM_TEMPO_DENOM;
 
 static bool Enabled = false;
 static bool Playing = false;
+static bool GainApply = true;
 static unsigned int LoadedNum = 0; // 0 = nothing
 
 static std::optional<bool> PacksAvailable = std::nullopt;
@@ -64,6 +65,16 @@ void BGM_Cleanup(void)
 bool BGM_Enabled(void)
 {
 	return Enabled;
+}
+
+bool BGM_HasGainFactor(void)
+{
+	return (Waveform && Waveform->metadata.gain_factor.has_value());
+}
+
+bool BGM_GainApply(void)
+{
+	return GainApply;
 }
 
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void)
@@ -181,7 +192,7 @@ bool BGM_Switch(unsigned int id)
 
 void BGM_Play(void)
 {
-	BGM_SetGainApply(true);
+	BGM_SetGainApply(GainApply);
 	if(Waveform) {
 		SndBackend_BGMPlay();
 	} else {
@@ -224,6 +235,7 @@ void BGM_Resume(void)
 
 void BGM_SetGainApply(bool apply)
 {
+	GainApply = apply;
 	if(Waveform) {
 		Snd_BGMGainFactor = (apply
 			? Waveform->metadata.gain_factor.value_or(1.0f)

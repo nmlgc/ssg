@@ -5,6 +5,7 @@
  */
 
 #include "game/bgm_track.h"
+#include "game/volume.h"
 #include <assert.h>
 #include <algorithm>
 
@@ -27,6 +28,7 @@ void ApplyVolumeError(std::span<std::byte>, uint16_t, TRACK_VOL&)
 void TRACK_VOL::SetVolumeLinear(float v)
 {
 	volume_linear = v;
+	volume_factor = VolumeFactorSquare(v);
 }
 
 template <class BitDepth> static void ApplyVolume(
@@ -43,7 +45,7 @@ template <class BitDepth> static void ApplyVolume(
 	if(vol.fade_remaining > 0) {
 		while((vol.fade_remaining > 0) && (it != samples.end())) {
 			for(decltype(channels) c = 0; c < channels; c++) {
-				*(it++) *= vol.FadeVolumeLinear();
+				*(it++) *= vol.FadeVolumeFactor();
 			}
 			vol.fade_remaining--;
 			vol.SetVolumeLinear(vol.fade_end +
@@ -54,7 +56,7 @@ template <class BitDepth> static void ApplyVolume(
 
 	// Fast path for constant volume
 	while(it != samples.end()) {
-		*(it++) *= vol.FadeVolumeLinear();
+		*(it++) *= vol.FadeVolumeFactor();
 	}
 }
 

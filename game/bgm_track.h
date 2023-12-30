@@ -39,6 +39,7 @@ void OnVorbisComment(METADATA_CALLBACK func, const std::u8string_view comment);
 
 class TRACK_VOL {
 	float volume_linear = 1.0f;
+	float volume_factor = 1.0f;
 
 public:
 	float fade_delta = 0.0f;
@@ -46,9 +47,16 @@ public:
 	SAMPLE_COUNT fade_remaining = 0;
 	SAMPLE_COUNT fade_duration = 0;
 
+	// Value for a volume control with perceived linear loudness.
 	auto FadeVolumeLinear() const {
 		return volume_linear;
 	}
+
+	// Multiplication factor for PCM samples.
+	auto FadeVolumeFactor() const {
+		return volume_factor;
+	}
+
 	void SetVolumeLinear(float v);
 };
 

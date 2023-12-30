@@ -87,6 +87,11 @@ uint8_t WINDOW_INFO::MaxItems() const
 	return ret;
 }
 
+void WINDOW_INFO::SetActive(bool active)
+{
+	State = (active ? STATE::REGULAR : STATE::DISABLED);
+}
+
 void WINDOW_SYSTEM::Init(PIXEL_COORD w)
 {
 	W = w;
@@ -158,6 +163,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	static constexpr ENUMARRAY<COLOR_PAIR, WINDOW_INFO::STATE> COL = {{
 		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255, 255 } }, // Regular
 		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255,  70 } }, // Highlight
+		COLOR_PAIR{ {  96,  96,  96 }, { 192, 192, 192 } }, // Disabled
 	}};
 	WINDOW_INFO		*p;
 	int				i;
@@ -207,14 +213,19 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 
 	for(i = 0; i < p->NumItems; i++) {
 		const auto trr = ws->TRRs[1 + i];
-		const auto* item = p->ItemPtr[i];
+		auto* item = p->ItemPtr[i];
 		const Narrow::string_view str = item->Title;
-		TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
-			const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
+		const Narrow::string_view c = ((item->State == item->StatePrev)
+			? str
+			: ""
+		);
+		TextObj.Render(topleft, trr, c, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+			const auto& col = COL[item->State];
 			s.SetFont(CWIN_FONT);
 			s.Put({ (CWIN_ITEM_LEFT + 1), 0 }, str, col.shadow);
 			s.Put({ (CWIN_ITEM_LEFT + 0), 0 }, str, col.text);
 		});
+		item->StatePrev = item->State;
 		topleft.y += CWIN_ITEM_H;
 	}
 }
@@ -565,8 +576,7 @@ static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws)
 // キーボード入力を処理する //
 static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 {
-	WINDOW_INFO		*p,*p2;
-	int				Depth;
+	using STATE = WINDOW_INFO::STATE;
 
 	if(ws->FirstWait){
 		if(Key_Data) return;
@@ -579,6 +589,15 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		ws->KeyCount = 0;
 		return;
 	}
+
+	// アクティブなウィンドウを検索する //
+	auto* p = CWinSearchActive(ws);
+	auto Depth = ws->SelectDepth;
+
+	// アクティブな項目をセットする //
+	auto* p2 = p->ItemPtr[ws->Select[Depth]];
+
+	assert(p2->State != STATE::DISABLED);
 
 	// キーボードの過剰なリピート防止 //
 	switch(ws->OldKey){
@@ -602,19 +621,21 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 
 	ws->OldKey = Key_Data;
 
-	// アクティブなウィンドウを検索する //
-	p     = CWinSearchActive(ws);
-	Depth = ws->SelectDepth;
-
 	// 一部のキーボード入力を処理する(KEY_UP/KEY_DOWN) //
 	switch(Key_Data){
-		case(KEY_UP):		// 一つ上の項目へ
-			ws->Select[Depth] = (ws->Select[Depth]+p->NumItems-1)%(p->NumItems);
+		case(KEY_UP): // 一つ上の項目へ
+			do {
+				ws->Select[Depth] = (
+					(ws->Select[Depth] + p->NumItems - 1) % p->NumItems
+				);
+			} while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED);
 			Snd_SEPlay(SOUND_ID_SELECT);
 			break;
 
-		case(KEY_DOWN):		// 一つ下の項目へ
-			ws->Select[Depth] = (ws->Select[Depth]+1)%(p->NumItems);
+		case(KEY_DOWN): // 一つ下の項目へ
+			do {
+				ws->Select[Depth] = ((ws->Select[Depth] + 1) % p->NumItems);
+			} while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED);
 			Snd_SEPlay(SOUND_ID_SELECT);
 			break;
 
@@ -626,9 +647,6 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 			Snd_SEPlay(SOUND_ID_SELECT);
 		break;
 	}
-
-	// アクティブな項目をセットする //
-	p2 = p->ItemPtr[ws->Select[Depth]];
 
 	if(p2->CallBackFn != NULL){
 		// コールバック動作時の処理 //

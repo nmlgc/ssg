@@ -72,6 +72,7 @@ struct WINDOW_INFO {
 	enum class STATE : uint8_t {
 		REGULAR = 0,
 		HIGHLIGHT = 1,
+		DISABLED = 2,
 		COUNT,
 	};
 
@@ -81,8 +82,12 @@ struct WINDOW_INFO {
 	// 特殊処理用コールバック関数(未使用ならNULL)
 	bool	(*CallBackFn)(INPUT_BITS);
 
-	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
 	STATE	State = STATE::REGULAR;
+
+	// Required for forcing the item to be re-rendered after a state change.
+	STATE	StatePrev = STATE::COUNT;
+
+	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
 	WINDOW_INFO*	ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
 
 	constexpr WINDOW_INFO(
@@ -92,6 +97,9 @@ struct WINDOW_INFO {
 	) :
 		Title(title), Help(help), CallBackFn(callback_fn), NumItems(0)
 	{
+		if(!callback_fn) {
+			State = STATE::DISABLED;
+		}
 	}
 
 	constexpr WINDOW_INFO(
@@ -108,6 +116,8 @@ struct WINDOW_INFO {
 
 	// Returns the maximum number of items among all submenus.
 	uint8_t MaxItems() const;
+
+	void SetActive(bool active);
 };
 
 // ウィンドウ群 //

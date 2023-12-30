@@ -877,9 +877,11 @@ static void SetSndItem(void)
 			strcpy(buf, dev.data());
 		}
 		sprintf(SndTitle[2],">%.18s",buf+now);
-	}
-	else
+		SndItem[2].State = WINDOW_INFO::STATE::REGULAR;
+	} else {
 		sprintf(SndTitle[2],"        ^^^^^^^^^^");
+		SndItem[2].State = WINDOW_INFO::STATE::DISABLED;
+	}
 }
 
 static void SetInpItem(void)

@@ -112,6 +112,9 @@ static bool BGM_Load(unsigned int id)
 
 bool BGM_Switch(unsigned int id)
 {
+	if(!Enabled) {
+		return false;
+	}
 	BGM_Stop();
 	const auto ret = BGM_Load(id);
 	if(ret) {

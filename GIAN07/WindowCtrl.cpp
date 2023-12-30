@@ -521,7 +521,7 @@ static bool SndFnBGM(INPUT_BITS key)
 			else{
 				// 成功した場合にだけ有効にする //
 				if(BGM_Init()) {
-					BGM_Play();
+					BGM_Switch(0);
 				}
 			}
 		break;

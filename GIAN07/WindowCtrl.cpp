@@ -136,13 +136,18 @@ WINDOW_INFO GrpItem[] = {
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
-char	SndTitle[4][26];
+static char SndTitleSE[26];
+static char SndTitleBGM[26];
+static char SndTitleMIDIPort[26];
 WINDOW_INFO SndItem[] = {
-	{ SndTitle[0],	"SEを鳴らすかどうかの設定",	SndFnSE },
-	{ SndTitle[1],	"BGMを鳴らすかどうかの設定",	SndFnBGM },
-	{ SndTitle[2],	"MIDI Port (保存はされません)",	SndFnMIDIDev },
+	{ SndTitleSE,	"SEを鳴らすかどうかの設定",	SndFnSE },
+	{ SndTitleBGM,	"BGMを鳴らすかどうかの設定",	SndFnBGM },
+	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+static auto& SndItemSE = SndItem[0];
+static auto& SndItemBGM = SndItem[1];
+static auto& SndItemMIDIPort = SndItem[2];
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
@@ -717,8 +722,8 @@ static void SetSndItem(void)
 	const auto sound_active = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
 	const auto bgm_active = BGM_Enabled();
 
-	sprintf(SndTitle[0], "Sound  [%s]", CHOICE_USE[!sound_active]);
-	sprintf(SndTitle[1], "BGM    [%s]", CHOICE_USE[!bgm_active]);
+	sprintf(SndTitleSE,  "Sound  [%s]", CHOICE_USE[!sound_active]);
+	sprintf(SndTitleBGM, "BGM    [%s]", CHOICE_USE[!bgm_active]);
 
 	const auto maybe_dev = MidBackend_DeviceName();
 	if(bgm_active && maybe_dev) {
@@ -734,11 +739,11 @@ static void SetSndItem(void)
 			now = 0;
 			strcpy(buf, dev.data());
 		}
-		sprintf(SndTitle[2],">%.18s",buf+now);
-		SndItem[2].State = WINDOW_INFO::STATE::REGULAR;
+		sprintf(SndTitleMIDIPort, ">%.18s", (buf + now));
+		SndItemMIDIPort.State = WINDOW_INFO::STATE::REGULAR;
 	} else {
-		sprintf(SndTitle[2],"        ^^^^^^^^^^");
-		SndItem[2].State = WINDOW_INFO::STATE::DISABLED;
+		sprintf(SndTitleMIDIPort, "        ^^^^^^^^^^");
+		SndItemMIDIPort.State = WINDOW_INFO::STATE::DISABLED;
 	}
 }
 

@@ -912,7 +912,7 @@ static void SetSndItem(void)
 		sprintf(SndTitleMIDIPort, ">%.18s", (buf + now));
 		SndItemMIDIPort.State = WINDOW_INFO::STATE::REGULAR;
 	} else {
-		sprintf(SndTitleMIDIPort, "        ^^^^^^^^^^");
+		strcpy(SndTitleMIDIPort, ">");
 		SndItemMIDIPort.State = WINDOW_INFO::STATE::DISABLED;
 	}
 }

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "game/snd.h"
+#include <chrono>
 
 bool SndBackend_Init(void);
 void SndBackend_Cleanup(void);
@@ -22,6 +23,10 @@ namespace BGM {
 bool SndBackend_BGMLoad(std::shared_ptr<BGM::TRACK> track);
 void SndBackend_BGMPlay(void);
 void SndBackend_BGMStop(void);
+
+// Returns the amount of milliseconds that the subsystem has been playing the
+// BGM track for.
+std::chrono::milliseconds SndBackend_BGMPlayTime(void);
 
 // The platform-independent layer always calls this after SndBackend_Init().
 bool SndBackend_SEInit(void);

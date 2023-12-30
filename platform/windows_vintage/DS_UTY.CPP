@@ -172,6 +172,11 @@ void SndBackend_BGMStop(void)
 {
 }
 
+std::chrono::milliseconds SndBackend_BGMPlayTime(void)
+{
+	return std::chrono::milliseconds::zero();
+}
+
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndBackend_SELoad(
 	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max

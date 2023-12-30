@@ -201,6 +201,15 @@ void SndBackend_BGMStop(void)
 	ma_sound_stop(&BGMObj.sound);
 }
 
+std::chrono::milliseconds SndBackend_BGMPlayTime(void)
+{
+	if(!BGMObj.track) {
+		return std::chrono::milliseconds::zero();
+	}
+	const auto ret = ma_sound_get_time_in_milliseconds(&BGMObj.sound);
+	return std::chrono::milliseconds{ ret };
+}
+
 bool SndBackend_SEInit(void)
 {
 	return true;

@@ -4,6 +4,7 @@
  */
 
 #include "game/bgm.h"
+#include "game/bgm_track.h"
 #include "game/midi.h"
 #include "game/snd.h"
 #include "game/string_format.h"
@@ -11,6 +12,7 @@
 #include "platform/file.h"
 #include "platform/midi_backend.h"
 #include "platform/path.h"
+#include "platform/snd_backend.h"
 #include <algorithm>
 
 using namespace std::chrono_literals;
@@ -28,6 +30,7 @@ static bool Playing = false;
 static unsigned int LoadedNum = 0; // 0 = nothing
 
 static std::u8string PackPath;
+static std::shared_ptr<BGM::TRACK> Waveform; // nullptr = playing MIDI
 // -----
 
 // External dependencies
@@ -59,6 +62,9 @@ bool BGM_Enabled(void)
 
 std::chrono::duration<int32_t, std::milli> BGM_PlayTime(void)
 {
+	if(Waveform) {
+		return SndBackend_BGMPlayTime();
+	}
 	return Mid_PlayTime.realtime;
 }
 
@@ -109,7 +115,7 @@ bool BGM_ChangeMIDIDevice(int8_t direction)
 	Mid_Stop();
 
 	const auto ret = MidBackend_DeviceChange(direction);
-	if(ret && Playing) {
+	if(ret && Playing && !Waveform) {
 		Mid_Play();
 	}
 	return ret;
@@ -121,6 +127,15 @@ static bool BGM_Load(unsigned int id)
 		const auto prefix_len = PackPath.size();
 		StringCatNum<2>((id + 1), PackPath);
 
+		// Try loading a waveform track
+		bool waveform_new = false;
+		if(Waveform = BGM::TrackOpen(PackPath)) {
+			if(SndBackend_BGMLoad(Waveform)) {
+				waveform_new = true;
+			}
+		}
+
+		// Try loading a MIDI
 		bool mid_new = false;
 		if(!mid_new) {
 			PackPath += EXT_MID;
@@ -128,7 +143,7 @@ static bool BGM_Load(unsigned int id)
 		}
 
 		PackPath.resize(prefix_len);
-		if(mid_new) {
+		if(waveform_new || mid_new) {
 			return true;
 		}
 	}
@@ -141,6 +156,7 @@ bool BGM_Switch(unsigned int id)
 		return false;
 	}
 	BGM_Stop();
+	Waveform = nullptr;
 	const auto ret = BGM_Load(id);
 	if(ret) {
 		LoadedNum = (id + 1);
@@ -151,24 +167,40 @@ bool BGM_Switch(unsigned int id)
 
 void BGM_Play(void)
 {
-	Mid_Play();
+	if(Waveform) {
+		SndBackend_BGMPlay();
+	} else {
+		Mid_Play();
+	}
 	Playing = true;
 }
 
 void BGM_Stop(void)
 {
-	Mid_Stop();
+	if(Waveform) {
+		SndBackend_BGMStop();
+	} else {
+		Mid_Stop();
+	}
 	Playing = false;
 }
 
 void BGM_Pause(void)
 {
-	Mid_Pause();
+	// Waveform tracks are automatically paused as part of the Snd subsystem
+	// once the game window loses focus. We might need independent pausing in
+	// the future?
+	if(!Waveform) {
+		Mid_Pause();
+	}
 }
 
 void BGM_Resume(void)
 {
-	Mid_Resume();
+	// Same as for pausing; /s/paus/resum/g, /s/loses/regains/
+	if(!Waveform) {
+		Mid_Resume();
+	}
 }
 
 void BGM_FadeOut(uint8_t speed)

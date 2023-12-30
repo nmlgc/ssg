@@ -19,6 +19,19 @@ namespace Narrow {
 
 class string_view;
 
+struct literal {
+	const char* ptr;
+
+	constexpr literal() noexcept = delete;
+	constexpr literal(const char* other) noexcept : ptr(other) {
+	}
+
+	// Encoding-erasing conversions from UTF-8 are OK.
+	literal(const std::u8string& other) noexcept :
+		ptr(reinterpret_cast<const char *>(other.c_str())) {
+	}
+};
+
 class string : public std::string {
 	using std::string::string;
 
@@ -41,6 +54,10 @@ public:
 	// This asserts that [other]'s encoding is either of the two.
 	constexpr string_view(Any::string_view other) noexcept :
 		std::string_view(other) {
+	}
+
+	constexpr string_view(const literal& other) noexcept :
+		std::string_view(other.ptr) {
 	}
 
 	// Encoding-erasing conversions from UTF-8 are OK...

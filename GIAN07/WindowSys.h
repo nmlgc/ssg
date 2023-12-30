@@ -69,8 +69,8 @@
 
 // 子ウィンドウの情報 //
 struct WINDOW_INFO {
-	const char		*Title;			// タイトル文字列へのポインタ(実体ではない！)
-	const char		*Help;			// ヘルプ文字列へのポインタ(これも実体ではない)
+	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
+	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
 
 	// 特殊処理用コールバック関数(未使用ならNULL)
 	bool	(*CallBackFn)(INPUT_BITS);
@@ -79,8 +79,8 @@ struct WINDOW_INFO {
 	WINDOW_INFO*	ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
 
 	constexpr WINDOW_INFO(
-		const char* title = "",
-		const char* help = "",
+		const Narrow::literal title = "",
+		const Narrow::literal help = "",
 		decltype(CallBackFn) callback_fn = nullptr
 	) :
 		Title(title), Help(help), CallBackFn(callback_fn), NumItems(0)
@@ -88,7 +88,9 @@ struct WINDOW_INFO {
 	}
 
 	constexpr WINDOW_INFO(
-		const char* title, const char* help, std::span<WINDOW_INFO> children
+		const Narrow::literal title,
+		const Narrow::literal help,
+		std::span<WINDOW_INFO> children
 	) :
 		Title(title), Help(help), CallBackFn(nullptr), NumItems(children.size())
 	{

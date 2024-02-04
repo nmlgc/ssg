@@ -124,6 +124,7 @@ struct SE {
 };
 
 static ma_engine Engine;
+static ma_sound_group SEGroup;
 static BGM_OBJ BGMObj;
 static SE SndObj[SND_OBJ_MAX];
 
@@ -229,7 +230,10 @@ void SndBackend_BGMUpdateTempo(void)
 
 bool SndBackend_SEInit(void)
 {
-	return true;
+	const auto ret = ma_sound_group_init(
+		&Engine, MA_SOUND_FLAG_NO_PITCH, nullptr, &SEGroup
+	);
+	return (ret == MA_SUCCESS);
 }
 
 void SndBackend_SECleanup(void)
@@ -237,6 +241,7 @@ void SndBackend_SECleanup(void)
 	for(auto& se : SndObj) {
 		se.Clear();
 	}
+	ma_sound_group_uninit(&SEGroup);
 }
 
 bool SndBackend_SELoad(
@@ -295,7 +300,7 @@ bool SndBackend_SELoad(
 			&Engine,
 			&instance.data_source,
 			(MA_SOUND_FLAG_NO_PITCH | MA_SOUND_FLAG_NO_SPATIALIZATION),
-			nullptr,
+			&SEGroup,
 			&instance.sound
 		);
 		if(result != MA_SUCCESS) {

@@ -18,6 +18,7 @@ constexpr auto CWIN_FONT = GIAN_FONT_ID::SMALL;
 
 constexpr PIXEL_COORD CWIN_ITEM_LEFT = 8;
 constexpr PIXEL_COORD CWIN_ITEM_H = 16;
+constexpr PIXEL_COORD CWIN_MAX_H = ((WINITEM_MAX + 1) * CWIN_ITEM_H);
 
 constexpr PIXEL_COORD FACE_W = 96;
 constexpr PIXEL_COORD FACE_H = 96;
@@ -118,6 +119,17 @@ void WINDOW_SYSTEM::Open(WINDOW_POINT topleft, int select)
 	KeyCount = CWIN_KEYWAIT;
 
 	FirstWait = true;
+}
+
+void WINDOW_SYSTEM::OpenCentered(PIXEL_COORD w, int select)
+{
+	// Shifting it down by 9 pixels avoids the clash with the background image
+	// gradient.
+	WINDOW_POINT topleft = {
+		(320 - (w / 2)),
+		(73 + (CWIN_MAX_H / 2) - (((Parent.NumItems + 1) * CWIN_ITEM_H) / 2))
+	};
+	return Open(topleft, select);
 }
 
 // コマンドウィンドウを１フレーム動作させる //

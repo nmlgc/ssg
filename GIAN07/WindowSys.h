@@ -141,6 +141,8 @@ typedef struct tagWINDOW_SYSTEM{
 
 	// コマンドウィンドウの初期化 //
 	void Open(WINDOW_POINT topleft, int select);
+
+	void OpenCentered(PIXEL_COORD w, int select);
 } WINDOW_SYSTEM;
 
 

@@ -58,6 +58,10 @@ void BGM_Pause(void);
 void BGM_Resume(void);
 // --------
 
+// Processes all MIDI events of a playing waveform track's source MIDI that
+// have occurred since the last call to this function.
+void BGM_UpdateMIDITables(void);
+
 // Volume control
 // --------------
 

@@ -1303,6 +1303,9 @@ void TitleProc(bool& quit)
 		quit = true;
 	}
 */
+	// Running this here to prevent MIDI processing from jumping over a large
+	// number of events once the player enters the Music Room.
+	BGM_UpdateMIDITables();
 
 	if(Key_Data==0) DemoTimer += 1;
 	else            DemoTimer  = 0;
@@ -1413,6 +1416,8 @@ void MusicRoomProc(bool&)
 	if(SystemKey_Data & SYSKEY_BGM_FADE) {
 		BGM_FadeOut(120);
 	}
+
+	BGM_UpdateMIDITables();
 
 	if((playing == BGM_PLAYING::MIDI) && (SystemKey_Data & SYSKEY_BGM_DEVICE)) {
 		if(DevChgWait==0){

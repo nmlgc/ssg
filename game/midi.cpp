@@ -570,6 +570,10 @@ void MID_DEVICE::FadeIO(MID_REALTIME delta)
 
 void Mid_Proc(MID_REALTIME delta)
 {
+	if(!Mid_Loaded()) {
+		return;
+	}
+
 	const auto interval = ((delta * Mid_TempoNum) / Mid_TempoDenom);
 	auto& time = Mid_PlayTime;
 	MID_PULSE pulse_sync = 0;
@@ -610,7 +614,9 @@ void Mid_Proc(MID_REALTIME delta)
 					time.realtime_since_last_event = -p.next_time;
 				}
 				Mid_Seq.Process(p, event);
-				event.Send();
+				if(Mid_Dev.state == MID_BACKEND_STATE::PLAY) {
+					event.Send();
+				}
 			}
 		}
 	}

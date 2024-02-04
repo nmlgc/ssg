@@ -32,6 +32,7 @@ static bool Playing = false;
 static bool LoadedOriginalMIDI = false;
 static bool GainApply = true;
 static unsigned int LoadedNum = 0; // 0 = nothing
+static std::chrono::milliseconds MIDITableUpdatePrev;
 
 static std::optional<bool> PacksAvailable = std::nullopt;
 static std::u8string PackPath;
@@ -213,6 +214,7 @@ void BGM_Play(void)
 	BGM_SetGainApply(GainApply);
 	if(Waveform) {
 		SndBackend_BGMPlay();
+		MIDITableUpdatePrev = decltype(MIDITableUpdatePrev)::zero();
 	} else {
 		Mid_Play();
 	}
@@ -223,6 +225,10 @@ void BGM_Stop(void)
 {
 	if(Waveform) {
 		SndBackend_BGMStop();
+
+		// Just in case MIDI is running in update-only mode and the tables are
+		// being observed. Would regularly be called by Mid_Stop().
+		Mid_TableInit();
 	} else {
 		Mid_Stop();
 	}
@@ -248,6 +254,25 @@ void BGM_Resume(void)
 	// Same as for pausing; /s/paus/resum/g, /s/loses/regains/
 	if(!Waveform) {
 		Mid_Resume();
+	}
+}
+
+void BGM_UpdateMIDITables(void)
+{
+	if(Waveform && Playing) {
+		// This is the only per-frame update function in the current
+		// architecture that can actually stop playback at the end of a fade.
+		// Coincidentally, the MIDI tables are the only place where this
+		// matters, and true stopping could be observed.
+		if(Waveform->FadeVolumeLinear() <= 0.0f) {
+			BGM_Stop();
+			return;
+		}
+
+		const auto now = SndBackend_BGMPlayTime();
+		const auto delta = (now - MIDITableUpdatePrev);
+		MIDITableUpdatePrev = now;
+		Mid_Proc(delta);
 	}
 }
 

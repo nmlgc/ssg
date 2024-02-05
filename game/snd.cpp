@@ -12,7 +12,8 @@ static enum class SND_SYS {
 	_HAS_BITFLAG_OPERATORS,
 	NOTHING = 0x0,
 	SYSTEM = 0x1,
-	SE = 0x2,
+	BGM = 0x2,
+	SE = 0x4,
 } Initialized;
 
 bool Snd_SystemInit(void)
@@ -49,6 +50,7 @@ void Snd_Cleanup(SND_SYS sys)
 	};
 
 	cleanup_sys(sys, SND_SYS::SE, SndBackend_SECleanup);
+	cleanup_sys(sys, SND_SYS::BGM, SndBackend_BGMCleanup);
 
 	// Silly double negation to work around C26813...
 	if(~Initialized == ~SND_SYS::SYSTEM) {
@@ -59,12 +61,22 @@ void Snd_Cleanup(SND_SYS sys)
 
 void Snd_Cleanup(void)
 {
-	Snd_Cleanup(SND_SYS::SE);
+	Snd_Cleanup(SND_SYS::BGM | SND_SYS::SE);
+}
+
+bool Snd_BGMInit(void)
+{
+	return Snd_SubsystemInit(SND_SYS::BGM, SndBackend_BGMInit);
 }
 
 bool Snd_SEInit(void)
 {
 	return Snd_SubsystemInit(SND_SYS::SE, SndBackend_SEInit);
+}
+
+void Snd_BGMCleanup(void)
+{
+	Snd_Cleanup(SND_SYS::BGM);
 }
 
 void Snd_SECleanup(void)

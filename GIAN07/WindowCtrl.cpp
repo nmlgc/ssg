@@ -516,11 +516,12 @@ static bool SndFnBGM(INPUT_BITS key)
 		case(KEY_RETURN):case(KEY_TAMA):case(KEY_RIGHT):case(KEY_LEFT):
 			if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 				Mid_End();
+				Snd_BGMCleanup();
 				ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 			}
 			else{
 				// 成功した場合にだけ有効にする //
-				if(Mid_Start()) {
+				if(Snd_BGMInit() | Mid_Start()) {
 					ConfigDat.SoundFlags.v |= SNDF_BGM_ENABLE;
 				}
 			}

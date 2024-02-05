@@ -24,6 +24,13 @@ extern const int SND_X_PER_DECIBEL;
 
 void Snd_Cleanup(void);
 
+// BGM
+// ---
+
+bool Snd_BGMInit(void);
+void Snd_BGMCleanup(void);
+// ---
+
 bool Snd_SEInit(void);
 void Snd_SECleanup(void);
 

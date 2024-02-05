@@ -61,7 +61,7 @@ bool XInit(void)
 
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
-		if(!Mid_Start()) {
+		if(!Mid_Start() && !Snd_BGMInit()) {
 			ConfigDat.SoundFlags.v &= (~SNDF_BGM_ENABLE);
 		}
 	}

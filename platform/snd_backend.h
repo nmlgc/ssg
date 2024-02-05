@@ -11,6 +11,12 @@ bool SndBackend_Init(void);
 void SndBackend_Cleanup(void);
 
 // The platform-independent layer always calls this after SndBackend_Init().
+bool SndBackend_BGMInit(void);
+
+// The platform-independent layer always calls this before SndBackend_Cleanup().
+void SndBackend_BGMCleanup(void);
+
+// The platform-independent layer always calls this after SndBackend_Init().
 bool SndBackend_SEInit(void);
 
 // The platform-independent layer always calls this before SndBackend_Cleanup().

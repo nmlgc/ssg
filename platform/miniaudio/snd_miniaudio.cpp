@@ -77,6 +77,15 @@ void SndBackend_Cleanup(void)
 	ma_engine_uninit(&Engine);
 }
 
+bool SndBackend_BGMInit(void)
+{
+	return true;
+}
+
+void SndBackend_BGMCleanup(void)
+{
+}
+
 bool SndBackend_SEInit(void)
 {
 	return true;

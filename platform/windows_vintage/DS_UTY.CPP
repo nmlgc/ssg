@@ -135,6 +135,15 @@ void SndBackend_Cleanup(void)
 	}
 }
 
+bool SndBackend_BGMInit(void)
+{
+	return false;
+}
+
+void SndBackend_BGMCleanup(void)
+{
+}
+
 bool SndBackend_SEInit(void)
 {
 	return true;

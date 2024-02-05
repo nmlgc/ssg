@@ -522,6 +522,7 @@ static bool SndFnBGM(INPUT_BITS key)
 			else{
 				// 成功した場合にだけ有効にする //
 				if(Snd_BGMInit() | Mid_Start()) {
+					Mid_Play();
 					ConfigDat.SoundFlags.v |= SNDF_BGM_ENABLE;
 				}
 			}

@@ -13,9 +13,11 @@
 #include "platform/input.h"
 #include "platform/midi_backend.h"
 #include "platform/input.h"
+#include "platform/urlopen.h"
 #include "game/bgm.h"
 #include "game/midi.h"
 #include "game/snd.h"
+#include "game/string_format.h"
 #include <numeric>
 
 
@@ -38,6 +40,7 @@ static bool GrpFnWinLocate(INPUT_BITS key);
 
 static bool SndFnSE(INPUT_BITS key);
 static bool SndFnBGM(INPUT_BITS key);
+static bool SndFnBGMPack(INPUT_BITS key);
 static bool SndFnMIDIDev(INPUT_BITS key);
 
 static bool InpFnMsgSkip(INPUT_BITS key);
@@ -112,6 +115,39 @@ template <size_t N> struct LABELS {
 static constexpr const char* CHOICE_OFF_ON[2]  = { "[O F F]", "[ O N ]" };
 static constexpr const char* CHOICE_USE[2] = { " 使用する ", "使用しない" };
 
+namespace BGMPack {
+	void Open(void);
+
+	constexpr const char* SOUNDTRACK_URL = (
+		"https://github.com/nmlgc/BGMPacks/releases/tag/P0269"
+	);
+	constexpr const char* HELP_DOWNLOAD = (
+		"収録のサントラをダウンロードします"
+	);
+	constexpr const char* HELP_SET = "BGMパックのメニューを開きます";
+
+	constexpr Narrow::string_view TITLE = " BGM pack";
+	constexpr Narrow::string_view TITLE_FMT = " BGM pack (%zu/%zu)";
+	constexpr Narrow::string_view TITLE_NONE = "<使用しない>";
+	constexpr Narrow::string_view TITLE_DOWNLOAD = "<Download>";
+	constexpr auto HELP_NONE = "デフォルトのMIDIサントラに戻ります";
+
+	char Title[TITLE_FMT.size() + (STRING_NUM_CAP<size_t> * 2)];
+
+	std::vector<std::u8string> Packs;
+	size_t SelAtOpen = 0;
+
+	// Scroll functions
+	// ----------------
+
+	static size_t ListSize(void) {
+		return (1 + Packs.size() + 1);
+	}
+	static void Generate(WINDOW_INFO& ret, size_t generated, size_t selected);
+	static bool Handle(INPUT_BITS key, size_t selected);
+	// ----------------
+}
+
 char	DifTitle[9][20];
 WINDOW_INFO DifItem[] = {
 	{ DifTitle[0],	"残り人数?を設定します",	DifFnPlayerStock },
@@ -138,16 +174,19 @@ WINDOW_INFO GrpItem[] = {
 
 static char SndTitleSE[26];
 static char SndTitleBGM[26];
+static char SndTitleBGMPack[26];
 static char SndTitleMIDIPort[26];
 WINDOW_INFO SndItem[] = {
 	{ SndTitleSE,	"SEを鳴らすかどうかの設定",	SndFnSE },
 	{ SndTitleBGM,	"BGMを鳴らすかどうかの設定",	SndFnBGM },
+	{ SndTitleBGMPack,	BGMPack::HELP_DOWNLOAD,	SndFnBGMPack },
 	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 static auto& SndItemSE = SndItem[0];
 static auto& SndItemBGM = SndItem[1];
-static auto& SndItemMIDIPort = SndItem[2];
+static auto& SndItemBGMPack = SndItem[2];
+static auto& SndItemMIDIPort = SndItem[3];
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
@@ -223,6 +262,10 @@ WINDOW_INFO ContinueYesNoItem[] = {
 WINDOW_SYSTEM MainWindow;
 WINDOW_SYSTEM ExitWindow;
 WINDOW_SYSTEM ContinueWindow;
+WINDOW_SYSTEM BGMPackWindow;
+WINDOW_SCROLL<
+	BGMPackWindow, BGMPack::ListSize, BGMPack::Generate, BGMPack::Handle
+> BGMPackScroll;
 
 
 
@@ -434,6 +477,97 @@ static bool SndFnBGM(INPUT_BITS key)
 			}
 		}
 	});
+}
+
+static bool SndFnBGMPack(INPUT_BITS key)
+{
+	return OptionFN(key, SetSndItem, [] {
+		if(!BGM_PacksAvailable()) {
+			URLOpen(BGMPack::SOUNDTRACK_URL);
+		} else {
+			BGMPack::Open();
+		}
+	});
+}
+
+namespace BGMPack {
+	size_t SelNone(void) {
+		return 0;
+	}
+	size_t SelDownload(void) {
+		return (ListSize() - 1);
+	}
+
+	static void Open(void)
+	{
+		PIXEL_COORD w = CWinItemExtent(TITLE_FMT).w;
+		w = (std::max)(w, CWinTextExtent(TITLE_DOWNLOAD).w);
+		w = (std::max)(w, CWinTextExtent(TITLE_NONE).w);
+		Packs.clear();
+		Packs.reserve(BGM_PackCount());
+		BGM_PackForeach([](const auto&& str) {
+			Packs.emplace_back(std::move(str));
+		});
+		std::ranges::sort(Packs);
+		SelAtOpen = SelNone();
+		for(size_t i = 1; const auto& pack : Packs) {
+			if(pack == ConfigDat.BGMPack.v) {
+				SelAtOpen = i;
+			}
+			w = (std::max)(w, CWinItemExtent(pack).w);
+			i++;
+		}
+		w = (std::min)(w, 640);
+
+		BGMPackScroll.Init(Title, SelAtOpen, w, &MainWindow);
+		BGMPackWindow.OpenCentered(w, BGMPackWindow.Select[0]);
+	}
+
+	static void Generate(WINDOW_INFO& ret, size_t generated, size_t selected)
+	{
+		const auto sel_none = SelNone();
+		const auto sel_download = SelDownload();
+		if(generated == sel_none) {
+			ret.Title = TITLE_NONE.data();
+			ret.Help = HELP_NONE;
+		} else if(generated == sel_download) {
+			ret.Title = TITLE_DOWNLOAD.data();
+			ret.Help = HELP_DOWNLOAD;
+		} else {
+			ret.Title = Packs[generated - 1];
+			ret.Help = "";
+		}
+		ret.State = ((generated == SelAtOpen)
+			? WINDOW_INFO::STATE::HIGHLIGHT
+			: WINDOW_INFO::STATE::REGULAR
+		);
+		if(generated == selected) {
+			if((generated == sel_none) || (generated == sel_download)) {
+				std::ranges::copy(TITLE, Title).out[0] = '\0';
+			} else {
+				sprintf(Title, TITLE_FMT.data(), generated, Packs.size());
+			}
+		}
+	}
+
+	static bool Handle(INPUT_BITS key, size_t selected)
+	{
+		if((key == KEY_TAMA) || (key == KEY_RETURN)) {
+			if(selected == SelDownload()) {
+				URLOpen(BGMPack::SOUNDTRACK_URL);
+			} else {
+				if(selected == SelNone()) {
+					ConfigDat.BGMPack.v.clear();
+				} else {
+					ConfigDat.BGMPack.v = Packs[selected - 1];
+				}
+				SetSndItem();
+				BGM_PackSet(ConfigDat.BGMPack.v);
+			}
+			return false;
+		}
+		return true;
+	}
 }
 
 static bool SndFnMIDIDev(INPUT_BITS key)
@@ -722,8 +856,28 @@ static void SetSndItem(void)
 	const auto sound_active = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
 	const auto bgm_active = BGM_Enabled();
 
+	// Additionally purge the cache at the initialization of the main menu,
+	// and when moving between options.
+	if(
+		(MainWindow.State == CWIN_DEAD) ||
+		(MainWindow.OldKey == KEY_UP) ||
+		(MainWindow.OldKey == KEY_DOWN)
+	) {
+		BGM_PacksAvailable(true);
+	}
+
 	sprintf(SndTitleSE,  "Sound  [%s]", CHOICE_USE[!sound_active]);
 	sprintf(SndTitleBGM, "BGM    [%s]", CHOICE_USE[!bgm_active]);
+	if(!BGM_PacksAvailable()) {
+		sprintf(SndTitleBGMPack, "BGMPack[ Download ]");
+		SndItemBGMPack.Help = BGMPack::HELP_DOWNLOAD;
+	} else if(ConfigDat.BGMPack.v.empty()) {
+		sprintf(SndTitleBGMPack, "BGMPack[%s]", CHOICE_USE[1]);
+		SndItemBGMPack.Help = BGMPack::HELP_SET;
+	} else {
+		sprintf(SndTitleBGMPack, "BGMPack[   ....   ]");
+		SndItemBGMPack.Help = BGMPack::HELP_SET;
+	}
 
 	const auto maybe_dev = MidBackend_DeviceName();
 	if(bgm_active && maybe_dev) {

@@ -1311,8 +1311,12 @@ void TitleProc(bool& quit)
 		return;
 	}
 
-	CWinMove(&MainWindow);
-	MWinHelp(&MainWindow);
+	auto* window_active = ((BGMPackWindow.State != CWIN_DEAD)
+		? &BGMPackWindow
+		: &MainWindow
+	);
+	CWinMove(window_active);
+	MWinHelp(window_active);
 	MWinMove();
 	if(GameMain!=TitleProc) return;
 
@@ -1333,7 +1337,7 @@ void TitleProc(bool& quit)
 		GrpBlt(&src, 0, 42, GrTitle);
 		// GrpBlt(&src, (320 - 175), 77, GrTitle);
 		MWinDraw();
-		CWinDraw(&MainWindow);
+		CWinDraw(window_active);
 		#ifdef PBG_DEBUG
 			OutputDebugMsg();
 		#endif

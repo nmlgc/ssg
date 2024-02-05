@@ -202,6 +202,10 @@ void BGM_Stop(void)
 
 void BGM_Pause(void)
 {
+	// This is called when the window loses focus. Maybe the user will add a
+	// BGM pack before coming back?
+	PacksAvailable = std::nullopt;
+
 	// Waveform tracks are automatically paused as part of the Snd subsystem
 	// once the game window loses focus. We might need independent pausing in
 	// the future?

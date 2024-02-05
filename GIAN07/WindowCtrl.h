@@ -25,6 +25,7 @@
 
 ///// [グローバル変数] /////
 extern struct tagWINDOW_SYSTEM MainWindow;
+extern struct tagWINDOW_SYSTEM BGMPackWindow;
 extern struct tagWINDOW_SYSTEM ExitWindow;
 extern struct tagWINDOW_SYSTEM ContinueWindow;
 

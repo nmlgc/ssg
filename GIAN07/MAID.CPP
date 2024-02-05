@@ -7,7 +7,7 @@
 #include "CONFIG.H"
 #include "GIAN.H"
 #include "DirectXUTYs/DD_GRP3D.H"
-#include "platform/snd.h"
+#include "game/snd.h"
 #include "game/input.h"
 
 

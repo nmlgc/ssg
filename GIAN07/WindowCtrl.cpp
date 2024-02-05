@@ -12,8 +12,9 @@
 #include "DirectXUTYs/DD_UTY.H"
 #include "platform/input.h"
 #include "platform/midi_backend.h"
-#include "platform/snd.h"
+#include "platform/input.h"
 #include "game/midi.h"
+#include "game/snd.h"
 #include <numeric>
 
 

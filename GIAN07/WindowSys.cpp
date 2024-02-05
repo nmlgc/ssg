@@ -7,8 +7,8 @@
 #include "LOADER.H"
 #include "FONTUTY.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "game/snd.h"
 #include "game/ut_math.h"
-#include "platform/snd.h"
 
 
 // Coordinates

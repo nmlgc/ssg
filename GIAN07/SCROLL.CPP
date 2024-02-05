@@ -8,9 +8,9 @@
 #include "DEMOPLAY.H"
 #include "GIAN.H"
 #include "LEVEL.H"
-#include "platform/snd.h"
 #include "game/input.h"
 #include "game/midi.h"
+#include "game/snd.h"
 
 
 

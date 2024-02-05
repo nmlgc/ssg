@@ -10,9 +10,9 @@
 #include "MUSIC.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
-#include "platform/snd.h"
 #include "game/hash.h"
 #include "game/midi.h"
+#include "game/snd.h"
 #include <future>
 #include <assert.h>
 #include <ddraw.h>

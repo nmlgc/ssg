@@ -5,8 +5,8 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
-#include "platform/snd.h"
 #include "game/input.h"
+#include "game/snd.h"
 
 
 ///// [ひみつの関数] /////

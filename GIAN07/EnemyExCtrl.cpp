@@ -8,7 +8,7 @@
 #include "LOADER.H"
 #include "MAID.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "platform/snd.h"
+#include "game/snd.h"
 
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 

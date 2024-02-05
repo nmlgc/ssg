@@ -3,7 +3,7 @@
 #include "../GIAN07/GAMEMAIN.H"
 #include "strings/title.h"
 #include "platform/input.h"
-#include "platform/snd.h"
+#include "platform/snd_backend.h"
 #include "platform/unicode.h"
 #include "game/input.h"
 #include "game/midi.h"
@@ -93,12 +93,12 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 			if(bIsActive){
 				bMouseVisible = FALSE;
 				Mid_Pause();
-				SndResumeAll();
+				SndBackend_PauseAll();
 			}
 			else{
 				bMouseVisible = TRUE;
 				Mid_Resume();
-				SndPauseAll();
+				SndBackend_ResumeAll();
 			}
 		break;
 

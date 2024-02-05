@@ -18,7 +18,7 @@
 #include <libs/miniaudio/miniaudio.h>
 
 #include "game/defer.h"
-#include "platform/snd.h"
+#include "platform/snd_backend.h"
 #include <ranges>
 
 struct RESAMPLED_INSTANCE {
@@ -67,12 +67,12 @@ float x_to_linear(int x)
 	);
 }
 
-bool SndInit(void)
+bool SndBackend_Init(void)
 {
 	return (ma_engine_init(nullptr, &Engine) == MA_SUCCESS);
 }
 
-void SndCleanup(void)
+void SndBackend_Cleanup(void)
 {
 	for(auto& se : SndObj) {
 		se.Clear();
@@ -80,7 +80,9 @@ void SndCleanup(void)
 	ma_engine_uninit(&Engine);
 }
 
-bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
+bool SndBackend_SELoad(
+	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max
+)
 {
 	if(id >= SND_OBJ_MAX) {
 		return false;
@@ -144,7 +146,7 @@ bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 	return true;
 }
 
-void Snd_SEPlay(uint8_t id, int x, bool loop)
+void SndBackend_SEPlay(uint8_t id, int x, bool loop)
 {
 	if(id >= SND_OBJ_MAX) {
 		return;
@@ -170,7 +172,7 @@ void Snd_SEPlay(uint8_t id, int x, bool loop)
 	se.now = ((se.now + 1) % se.max);
 }
 
-void Snd_SEStop(uint8_t id)
+void SndBackend_SEStop(uint8_t id)
 {
 	if(id >= SND_OBJ_MAX) {
 		return;
@@ -182,12 +184,12 @@ void Snd_SEStop(uint8_t id)
 	}
 }
 
-void SndPauseAll(void)
+void SndBackend_PauseAll(void)
 {
 	ma_engine_stop(&Engine);
 }
 
-void SndResumeAll(void)
+void SndBackend_ResumeAll(void)
 {
 	ma_engine_start(&Engine);
 }

@@ -10,10 +10,10 @@
 #include "DirectXUTYs/DD_UTY.H"
 #include "platform/input.h"
 #include "platform/path.h"
-#include "platform/snd.h"
 #include "game/coords.h"
 #include "game/midi.h"
 #include "game/screenshot.h"
+#include "game/snd.h"
 #include <filesystem>
 
 // Mapping world coordinates to a position in the stereo field

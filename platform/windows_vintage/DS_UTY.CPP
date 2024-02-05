@@ -7,7 +7,7 @@
 
 #include <dsound.h>
 #include "platform/file.h"
-#include "platform/snd.h"
+#include "platform/snd_backend.h"
 #include "DirectXUTYs/DX_ERROR.H"	// エラー処理用関数
 #pragma message("DS_UTY : Version 0.03 : Update 2000/02/04")
 
@@ -102,7 +102,7 @@ LPDIRECTSOUND			Snd_DS = NULL;
 LPSE_STRUCT				Snd_OBJ[SND_OBJ_MAX];
 
 
-bool SndInit(void)
+bool SndBackend_Init(void)
 {
 	HRESULT		dsrval;
 
@@ -126,7 +126,7 @@ bool SndInit(void)
 	return TRUE;
 }
 
-void SndCleanup(void)
+void SndBackend_Cleanup(void)
 {
 	int		i;
 
@@ -146,7 +146,9 @@ void SndCleanup(void)
 }
 
 // ＷＡＶファイルロード(ある制限があるが...) //
-bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
+bool SndBackend_SELoad(
+	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max
+)
 {
 	LPSE_STRUCT		p;
 	HRESULT			dsrval;
@@ -226,7 +228,7 @@ bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 	return TRUE;
 }
 
-void Snd_SEPlay(uint8_t id, int x, bool loop)
+void SndBackend_SEPlay(uint8_t id, int x, bool loop)
 {
 	HRESULT	dsrval;
 	DWORD	st;
@@ -247,7 +249,7 @@ void Snd_SEPlay(uint8_t id, int x, bool loop)
 	se->now = (se->now+1)%(se->max);
 }
 
-void Snd_SEStop(uint8_t id)
+void SndBackend_SEStop(uint8_t id)
 {
 	int i;
 	LPSE_STRUCT se;
@@ -268,10 +270,10 @@ void Snd_SEStop(uint8_t id)
 // buffers as the window loses and regains focus. This behavior can be changed
 // by setting the DSBCAPS_GLOBALFOCUS flag on a buffer, but none of our buffers
 // do so yet.
-void SndPauseAll()
+void SndBackend_PauseAll()
 {
 }
-void SndResumeAll()
+void SndBackend_ResumeAll()
 {
 }
 

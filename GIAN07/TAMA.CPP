@@ -6,7 +6,7 @@
 #include "TAMA.H"
 #include "GIAN.H"
 #include "LEVEL.H"
-#include "platform/snd.h"
+#include "game/snd.h"
 
 
 ////グローバル変数////

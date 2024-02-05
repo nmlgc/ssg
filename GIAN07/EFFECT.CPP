@@ -5,7 +5,7 @@
 
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "platform/snd.h"
+#include "game/snd.h"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];

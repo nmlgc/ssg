@@ -31,14 +31,4 @@ bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
 // 再生＆停止 //
 void Snd_SEPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
 void Snd_SEStop(uint8_t id);
-
-// Pause or resume all playing sounds if the window loses focus //
-void SndPauseAll();
-void SndResumeAll();
-
-inline void Snd_SEStopAll(void)
-{
-	for(auto i = 0; i < SND_OBJ_MAX; i++) {
-		Snd_SEStop(i);
-	}
-}
+void Snd_SEStopAll(void);

@@ -6,7 +6,7 @@
 #include "ITEM.H"
 #include "GIAN.H"
 #include "GIAN07/entity.h"
-#include "platform/snd.h"
+#include "game/snd.h"
 
 
 

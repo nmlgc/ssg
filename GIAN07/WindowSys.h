@@ -152,6 +152,13 @@ void CWinMove(WINDOW_SYSTEM *ws);				// コマンドウィンドウを１フレ�
 void CWinDraw(WINDOW_SYSTEM *ws);				// コマンドウィンドウの描画
 bool CWinExitFn(INPUT_BITS key);	// コマンド [Exit] のデフォルト処理関数
 
+// Calculates the rendered width of the given text in the menu item font,
+// without any padding.
+PIXEL_SIZE CWinTextExtent(Narrow::string_view str);
+
+// Calculates the rendered width of a whole padded menu item with the given
+// text.
+PIXEL_SIZE CWinItemExtent(Narrow::string_view str);
 
 // メッセージウィンドウ処理 //
 

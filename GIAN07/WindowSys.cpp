@@ -242,6 +242,19 @@ bool CWinExitFn(INPUT_BITS key)
 	}
 }
 
+PIXEL_SIZE CWinTextExtent(Narrow::string_view str)
+{
+	return TextObj.TextExtent(GIAN_FONT_ID::SMALL, str);
+}
+
+PIXEL_SIZE CWinItemExtent(Narrow::string_view str)
+{
+	auto ret = CWinTextExtent(str);
+	ret.w += CWIN_ITEM_LEFT;
+	ret.h = CWIN_ITEM_H;
+	return ret;
+}
+
 void MWinInit(const WINDOW_LTRB& rc)
 {
 	MsgWindow.MaxSize = rc;

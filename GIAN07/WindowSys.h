@@ -147,6 +147,91 @@ typedef struct tagWINDOW_SYSTEM{
 
 
 
+// Turns [Sys] into a vertically scrolling window, with elements generated on
+// the fly.
+// Unfortunately has to be a template because [WINDOW_SYSTEM::CallBackFn]
+// doesn't take a reference to a window system object.
+template <
+	WINDOW_SYSTEM& Sys,
+	size_t (*ListSize)(),
+	void (*Generate)(WINDOW_INFO& ret, size_t generated, size_t selected),
+	bool (*Handle)(INPUT_BITS key, size_t selected)
+> class WINDOW_SCROLL {
+	// Rewritten when scrolling.
+	static inline WINDOW_INFO Item[WINITEM_MAX] = {};
+
+	static inline size_t Sel = 0;
+	static inline WINDOW_SYSTEM* ReturnTo = nullptr;
+
+	static void Scroll(void)
+	{
+		const auto total = ListSize();
+		const auto visible = Sys.Parent.NumItems;
+		const auto visible_half = (Sys.Parent.NumItems / 2);
+		size_t generated_i = (
+			(Sel < visible_half) ? 0 :
+			(Sel >= (total - visible_half)) ? (total - visible) :
+			(Sel - visible_half)
+		);
+		for(auto item_i = decltype(visible){0}; item_i < visible; item_i++) {
+			Item[item_i].CallBackFn = Fn;
+			Generate(Item[item_i], generated_i, Sel);
+			if(generated_i == Sel) {
+				Sys.Select[0] = item_i;
+			}
+			generated_i++;
+		}
+	}
+
+	static bool Fn(INPUT_BITS key)
+	{
+		if(key == KEY_UP) {
+			if(Sel == 0) {
+				Sel = ListSize();
+			}
+			Sel--;
+			Scroll();
+		} else if(key == KEY_DOWN) {
+			Sel++;
+			if(Sel >= ListSize()) {
+				Sel = 0;
+			}
+			Scroll();
+		} else if((key == KEY_BOMB) || (key == KEY_ESC)) {
+			Sys.State = CWIN_DEAD;
+			if(ReturnTo) {
+				ReturnTo->OldKey = key;
+			}
+			return false;
+		}
+		return Handle(key, Sel);
+	}
+
+public:
+	static void Init(
+		const Narrow::literal title,
+		size_t sel,
+		PIXEL_COORD w,
+		WINDOW_SYSTEM* return_to
+	)
+	{
+		assert(sel < ListSize());
+
+		ReturnTo = return_to;
+		Sys.Parent.Title = title;
+		Sys.Parent.Help = "";
+		Sys.Parent.NumItems = (std::min)(ListSize(), size_t{ WINITEM_MAX });
+		Sys.Parent.CallBackFn = Fn;
+		for(size_t i = 0; i < Sys.Parent.NumItems; i++) {
+			Sys.Parent.ItemPtr[i] = &Item[i];
+		}
+		Scroll();
+		Sys.Init(w);
+	}
+};
+
+
+
 ///// [ 関数 ] /////
 
 // コマンドウィンドウ処理 //

@@ -76,6 +76,14 @@ struct WINDOW_INFO {
 		COUNT,
 	};
 
+	enum class FLAGS : uint8_t {
+		_HAS_BITFLAG_OPERATORS,
+		NONE = 0x00,
+
+		// Shortens the key repeat times for option items.
+		FAST_REPEAT = 0x01,
+	};
+
 	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
 	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
 
@@ -87,15 +95,22 @@ struct WINDOW_INFO {
 	// Required for forcing the item to be re-rendered after a state change.
 	STATE	StatePrev = STATE::COUNT;
 
+	FLAGS	Flags = FLAGS::NONE;
+
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
 	WINDOW_INFO*	ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
 
 	constexpr WINDOW_INFO(
 		const Narrow::literal title = "",
 		const Narrow::literal help = "",
-		decltype(CallBackFn) callback_fn = nullptr
+		decltype(CallBackFn) callback_fn = nullptr,
+		FLAGS flags = FLAGS::NONE
 	) :
-		Title(title), Help(help), CallBackFn(callback_fn), NumItems(0)
+		Title(title),
+		Help(help),
+		CallBackFn(callback_fn),
+		NumItems(0),
+		Flags(flags)
 	{
 		if(!callback_fn) {
 			State = STATE::DISABLED;
@@ -132,6 +147,7 @@ typedef struct tagWINDOW_SYSTEM{
 
 	INPUT_BITS	OldKey;	// 前に押されていたキー
 	uint8_t	KeyCount;	// キーボードウェイト
+	uint8_t	FastRepeatWait;	// Current wait time for FAST_REPEAT items
 	bool	FirstWait;	// 最初のキー解放待ち
 
 	TEXTRENDER_RECT_ID	TRRs[1 + WINITEM_MAX]; // Initialized by Init().

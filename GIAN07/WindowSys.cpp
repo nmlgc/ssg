@@ -614,6 +614,7 @@ static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws)
 static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 {
 	using STATE = WINDOW_INFO::STATE;
+	using FLAGS = WINDOW_INFO::FLAGS;
 
 	if(ws->FirstWait){
 		if(Key_Data) return;
@@ -637,23 +638,37 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	assert(p2->State != STATE::DISABLED);
 
 	// キーボードの過剰なリピート防止 //
-	switch(ws->OldKey){
-		// 一定間隔でリピートを許可するキー //
-		case(KEY_UP):case(KEY_DOWN):case(KEY_LEFT):case(KEY_RIGHT):
-			if(ws->KeyCount){
-				ws->KeyCount--;
-				if(ws->KeyCount==0) ws->OldKey=0;
-			}
-			else ws->KeyCount = CWIN_KEYWAIT;
+	if(ws->KeyCount) {
+		ws->KeyCount--;
+		if(ws->KeyCount == 0) {
+			ws->OldKey = 0;
+		}
 		return;
-
+	} else if(
+		(p2->Flags & FLAGS::FAST_REPEAT) && CWinOptionKeyDelta(ws->OldKey)
+	) {
+		ws->KeyCount = ws->FastRepeatWait;
+		ws->FastRepeatWait = (std::max)((ws->FastRepeatWait - 2), 0);
+		if(ws->KeyCount == 0) {
+			ws->OldKey = 0;
+		}
+		return;
+	} else if(
+		(ws->OldKey == KEY_UP) || (ws->OldKey == KEY_DOWN) ||
+		(ws->OldKey == KEY_LEFT) || (ws->OldKey == KEY_RIGHT)
+	) {
+		ws->KeyCount = CWIN_KEYWAIT;
+		return;
+	} else if(
+		(ws->OldKey == KEY_TAMA) || (ws->OldKey == KEY_BOMB) ||
+		(ws->OldKey == KEY_RETURN) || (ws->OldKey == KEY_ESC)
+	) {
 		// いかなる場合もリピートを許可しないキー //
-		case(KEY_TAMA):case(KEY_BOMB):case(KEY_RETURN):case(KEY_ESC):
-			if(Key_Data == ws->OldKey) return;
-
-		default:
-			ws->KeyCount = 0;
-		break;
+		if(Key_Data == ws->OldKey) {
+			return;
+		}
+	} else {
+		ws->KeyCount = 0;
 	}
 
 	ws->OldKey = Key_Data;
@@ -683,6 +698,10 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		case(KEY_TAMA):case(KEY_RETURN):case(KEY_LEFT):case(KEY_RIGHT):
 			Snd_SEPlay(SOUND_ID_SELECT);
 		break;
+
+		case(0):
+			ws->FastRepeatWait = CWIN_KEYWAIT;
+			break;
 	}
 
 	if(p2->CallBackFn != NULL){

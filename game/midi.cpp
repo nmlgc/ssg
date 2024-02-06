@@ -73,8 +73,9 @@ struct MID_DEVICE {
 	VOLUME FadeStartVolume;
 	VOLUME FadeEndVolume;
 
-	VOLUME	MaxVolume;	// ボリュームの最大値(メッセージでも変化,0-127)
-	VOLUME	NowVolume;	// 現在のボリューム(0-127)
+	// 現在のボリューム(0-127). *Always* between 0 and 127.
+	VOLUME	FadeNowVolume;
+
 	MID_BACKEND_STATE	state;	// 現在の状態
 
 	VOLUME VolumeFor(decltype(MIDI_CHANNELS) ch) const;
@@ -225,8 +226,7 @@ void Mid_Play(void)
 	}
 
 	Mid_Dev.FadeDuration = 0s;
-	Mid_Dev.MaxVolume = 127;
-	Mid_Dev.NowVolume = 127;
+	Mid_Dev.FadeNowVolume = VOLUME_MAX;
 
 	// マスター・ボリューム : F0 7F 7F 04 01 VolumeLowByte VolumeHighByte F7 //
 	// 下位バイトは SC-88ST Pro では 00 として扱われるらしい(取扱説明書より) //
@@ -236,9 +236,7 @@ void Mid_Play(void)
 	// before the GM System On below has no effect because the latter also
 	// resets the Master Volume. This might not necessarily be true on Roland
 	// synths though, so let's better keep this relic from the original code.
-	uint8_t msg[8] = {
-		0xf0, 0x7f, 0x7f, 0x04, 0x01, 0x00, Mid_Dev.MaxVolume, 0xf7
-	};
+	uint8_t msg[8] = { 0xf0, 0x7f, 0x7f, 0x04, 0x01, 0x00, VOLUME_MAX, 0xf7 };
 	MidBackend_Out(msg);
 
 	Mid_Seq.Rewind();
@@ -317,7 +315,7 @@ void Mid_TableInit(void)
 
 VOLUME Mid_GetFadeVolume(void)
 {
-	return Mid_Dev.NowVolume;
+	return Mid_Dev.FadeNowVolume;
 }
 
 void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration)
@@ -532,7 +530,7 @@ std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
 
 VOLUME MID_DEVICE::VolumeFor(decltype(MIDI_CHANNELS) ch) const
 {
-	return ((Mid_VolumeTable[ch] * NowVolume) / (MaxVolume + 1));
+	return ((Mid_VolumeTable[ch] * FadeNowVolume) / (VOLUME_MAX + 1));
 }
 
 void MID_DEVICE::ApplyVolume(void) const
@@ -553,14 +551,14 @@ void MID_DEVICE::FadeIO(MID_REALTIME delta)
 	const uint8_t new_volume = (
 		FadeStartVolume + ((fade_delta * FadeProgress) / FadeDuration)
 	);
-	if(new_volume != NowVolume) {
-		NowVolume = new_volume;
+	if(new_volume != FadeNowVolume) {
+		FadeNowVolume = new_volume;
 
 		ApplyVolume();
 
-		if(NowVolume == FadeEndVolume) {
+		if(FadeNowVolume == FadeEndVolume) {
 			FadeDuration = 0s;
-			if(NowVolume == 0) {
+			if(FadeNowVolume == 0) {
 				Mid_Stop();
 			}
 		}

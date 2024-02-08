@@ -666,6 +666,13 @@ void MID_EVENT::Send(void) const
 
 	// ３バイト： コントロールチェンジ or 発音 or 変更 or ノートオフ
 	case MID_EVENT_KIND::CONTROLLER:
+		if(extra_data[0] == 0x07) {
+			MidBackend_Out(status, 0x07, Mid_Dev.VolumeFor(Channel()));
+		} else {
+			MidBackend_Out(status, extra_data[0], extra_data[1]);
+		}
+		break;
+
 	case MID_EVENT_KIND::NOTE_ON:
 	case MID_EVENT_KIND::NOTE_AFTERTOUCH:
 	case MID_EVENT_KIND::NOTE_OFF:

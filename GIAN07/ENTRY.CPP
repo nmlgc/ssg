@@ -35,6 +35,12 @@ const int SND_X_MID = PixelToWorld(320);
 const int SND_X_PER_DECIBEL = PixelToWorld(25);
 // -----------------------------------------------------------
 
+// Volume controls
+// ---------------
+
+const VOLUME& Snd_VolumeSE = ConfigDat.SEVolume.v;
+// ---------------
+
 // MUSIC.DAT loaders
 // -----------------
 

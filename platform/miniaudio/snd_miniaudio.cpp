@@ -244,6 +244,11 @@ void SndBackend_SECleanup(void)
 	ma_sound_group_uninit(&SEGroup);
 }
 
+void SndBackend_SEUpdateVolume(void)
+{
+	ma_sound_group_set_volume(&SEGroup, VolumeFactorSquare(Snd_VolumeSE));
+}
+
 bool SndBackend_SELoad(
 	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max
 )

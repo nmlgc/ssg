@@ -9,6 +9,7 @@
 #include "game/endian.h"
 #include "game/input.h"
 #include "game/pixelformat.h"
+#include "game/volume.h"
 #include "platform/buffer.h"
 #include "platform/unicode.h"
 
@@ -203,6 +204,7 @@ typedef struct tagCONFIG_DATA{
 
 	// サウンド・ＢＧＭ関連 //
 	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };
+	OPTION_BELOW<VOLUME, VOLUME_MAX> SEVolume = { VOLUME_MAX / 2 };
 	OPTION_UTF8 BGMPack;
 
 	// 入力に関するフラグ

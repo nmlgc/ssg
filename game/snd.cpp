@@ -39,6 +39,7 @@ bool Snd_SubsystemInit(SND_SYS sys, bool (&SubsystemInit)(void))
 		return false;
 	}
 	Initialized |= sys;
+	Snd_UpdateVolumes();
 	return true;
 }
 
@@ -64,6 +65,13 @@ void Snd_Cleanup(SND_SYS sys)
 void Snd_Cleanup(void)
 {
 	Snd_Cleanup(SND_SYS::BGM | SND_SYS::SE);
+}
+
+void Snd_UpdateVolumes(void)
+{
+	if(Initialized & SND_SYS::SE) {
+		SndBackend_SEUpdateVolume();
+	}
 }
 
 bool Snd_BGMInit(void)

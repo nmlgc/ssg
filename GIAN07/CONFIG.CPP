@@ -147,6 +147,7 @@ const struct VERSION_01 {
 
 	static constexpr CONFIG_OPTION_ARRAY Options = {
 		VERSION_00.Options,
+		ConfigDat.SEVolume,
 		ConfigDat.BGMPack,
 	};
 } VERSION_01;

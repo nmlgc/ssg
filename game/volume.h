@@ -51,3 +51,8 @@ constexpr float VolumeFactorSquare(float linear)
 	// for note *velocity*...
 	return (linear * linear);
 }
+
+constexpr float VolumeFactorSquare(VOLUME discrete)
+{
+	return VolumeFactorSquare(VolumeLinear(discrete));
+}

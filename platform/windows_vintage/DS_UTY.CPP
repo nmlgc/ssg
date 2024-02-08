@@ -98,6 +98,15 @@ bool SndFillBuffer(IDirectSoundBuffer *ds, uint8_t *data, size_t size);
 // サウンド停止用補助関数 //
 static void _Snd_Stop(LPSE_STRUCT se,int no);
 
+static LONG DS_Volume(VOLUME discrete)
+{
+	const auto db = VolumeDBSquare(VolumeLinear(discrete));
+	const LONG ds_db = (db * (-DSBVOLUME_MIN / 100));
+	constexpr LONG MIN = DSBVOLUME_MIN;
+	constexpr LONG MAX = DSBVOLUME_MAX;
+	return (std::min)((std::max)(ds_db, MIN), MAX);
+}
+
 LPDIRECTSOUND			Snd_DS = NULL;
 LPSE_STRUCT				Snd_OBJ[SND_OBJ_MAX];
 
@@ -183,6 +192,19 @@ void SndBackend_BGMUpdateVolume(void)
 
 void SndBackend_BGMUpdateTempo(void)
 {
+}
+
+void SndBackend_SEUpdateVolume(void)
+{
+	const auto ds_volume = DS_Volume(Snd_VolumeSE);
+	for(const auto* se : Snd_OBJ) {
+		if(!se) {
+			continue;
+		}
+		for(decltype(se->max) i = 0; i < se->max; i++) {
+			se->buf[i]->SetVolume(ds_volume);
+		}
+	}
 }
 
 // ＷＡＶファイルロード(ある制限があるが...) //

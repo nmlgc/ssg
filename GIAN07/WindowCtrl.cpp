@@ -40,6 +40,7 @@ static bool GrpFnWinLocate(INPUT_BITS key);
 
 static bool SndFnSE(INPUT_BITS key);
 static bool SndFnBGM(INPUT_BITS key);
+static bool SndFnSEVol(INPUT_BITS key);
 static bool SndFnBGMGain(INPUT_BITS key);
 static bool SndFnBGMPack(INPUT_BITS key);
 static bool SndFnMIDIDev(INPUT_BITS key);
@@ -174,14 +175,18 @@ WINDOW_INFO GrpItem[] = {
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
+constexpr auto VOLUME_FLAGS = WINDOW_INFO::FLAGS::FAST_REPEAT;
+
 static char SndTitleSE[26];
 static char SndTitleBGM[26];
+static char SndTitleSEVol[26];
 static char SndTitleBGMGain[26];
 static char SndTitleBGMPack[26];
 static char SndTitleMIDIPort[26];
 WINDOW_INFO SndItem[] = {
 	{ SndTitleSE,	"SEを鳴らすかどうかの設定",	SndFnSE },
 	{ SndTitleBGM,	"BGMを鳴らすかどうかの設定",	SndFnBGM },
+	{ SndTitleSEVol, "効果音の音量", SndFnSEVol, VOLUME_FLAGS },
 	{ SndTitleBGMGain,	"毎に曲から音量の違うことが外します",	SndFnBGMGain },
 	{ SndTitleBGMPack,	BGMPack::HELP_DOWNLOAD,	SndFnBGMPack },
 	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
@@ -189,9 +194,10 @@ WINDOW_INFO SndItem[] = {
 };
 static auto& SndItemSE = SndItem[0];
 static auto& SndItemBGM = SndItem[1];
-static auto& SndItemBGMGain = SndItem[2];
-static auto& SndItemBGMPack = SndItem[3];
-static auto& SndItemMIDIPort = SndItem[4];
+static auto& SndItemSEVol = SndItem[2];
+static auto& SndItemBGMGain = SndItem[3];
+static auto& SndItemBGMPack = SndItem[4];
+static auto& SndItemMIDIPort = SndItem[5];
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
@@ -482,6 +488,18 @@ static bool SndFnBGM(INPUT_BITS key)
 			}
 		}
 	});
+}
+
+static bool SndFnSEVol(INPUT_BITS key)
+{
+	if(const auto delta = CWinOptionKeyDelta(key)) {
+		ConfigDat.SEVolume.v = std::clamp(
+			(ConfigDat.SEVolume.v + delta), 0, int(VOLUME_MAX)
+		);
+		Snd_UpdateVolumes();
+	}
+	SetSndItem();
+	return ((key != KEY_BOMB) && (key != KEY_ESC));
 }
 
 static bool SndFnBGMPack(INPUT_BITS key)
@@ -879,10 +897,12 @@ static void SetSndItem(void)
 	}
 
 	const auto norm_choice = CHOICE_OFF_ON_NARROW[BGM_GainApply()];
+	SndItemSEVol.SetActive(sound_active);
 	SndItemBGMGain.SetActive(bgm_active && BGM_HasGainFactor());
 
 	sprintf(SndTitleSE,      "Sound  [%s]", CHOICE_USE[!sound_active]);
 	sprintf(SndTitleBGM,     "BGM    [%s]", CHOICE_USE[!bgm_active]);
+	sprintf(SndTitleSEVol,   "SoundVolume [ %3d ]", ConfigDat.SEVolume.v);
 	sprintf(SndTitleBGMGain, "BGMVolNormalize%s", norm_choice);
 	if(!BGM_PacksAvailable()) {
 		sprintf(SndTitleBGMPack, "BGMPack[ Download ]");

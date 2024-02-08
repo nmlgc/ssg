@@ -1063,6 +1063,9 @@ bool LoadSound(void)
 		if(!Snd_SELoadP(in,SOUND_ID_HLASER, SOUND_ID_HLASER, SNDMAX_HLASER))	break;
 		if(!Snd_SELoadP(in,SOUND_ID_TAMEFAST, SOUND_ID_TAMEFAST, SNDMAX_TAMEFAST))	break;
 		if(!Snd_SELoadP(in,SOUND_ID_WARP, SOUND_ID_WARP, SNDMAX_WARP))	break;
+
+		// DirectSound can only apply volume onto loaded buffers.
+		Snd_UpdateVolumes();
 		return TRUE;
 	}
 

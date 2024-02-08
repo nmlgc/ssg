@@ -69,6 +69,8 @@ void BGM_UpdateMIDITables(void);
 // waveform track.
 void BGM_SetGainApply(bool apply);
 
+void BGM_UpdateVolume(void);
+
 // フェードアウト(数字が大きいほど早い)
 void BGM_FadeOut(uint8_t speed);
 // --------------

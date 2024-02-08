@@ -60,6 +60,7 @@ struct MID_PLAYTIME {
 };
 
 // External dependencies
+extern const VOLUME& Mid_Volume;
 extern const uint8_t& Mid_TempoNum;
 extern const uint8_t& Mid_TempoDenom;
 
@@ -77,6 +78,7 @@ void Mid_Resume(void);
 // Returns the current (not maximum) MIDI master volume.
 VOLUME Mid_GetFadeVolume(void);
 
+void Mid_UpdateVolume(void);
 void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration);
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer

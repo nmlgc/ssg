@@ -288,6 +288,15 @@ void BGM_SetGainApply(bool apply)
 	}
 }
 
+void BGM_UpdateVolume(void)
+{
+	if(Waveform) {
+		SndBackend_BGMUpdateVolume();
+	} else {
+		Mid_UpdateVolume();
+	}
+}
+
 void BGM_FadeOut(uint8_t speed)
 {
 	// pbg quirk: The original game always reduced the volume by 1 on the first

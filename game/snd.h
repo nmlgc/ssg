@@ -26,6 +26,7 @@ extern const int SND_X_PER_DECIBEL;
 extern const uint8_t& Snd_BGMTempoNum;
 extern const uint8_t& Snd_BGMTempoDenom;
 
+extern const VOLUME& Snd_VolumeBGM;
 extern const VOLUME& Snd_VolumeSE;
 
 void Snd_Cleanup(void);

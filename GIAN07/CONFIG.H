@@ -204,7 +204,8 @@ typedef struct tagCONFIG_DATA{
 
 	// サウンド・ＢＧＭ関連 //
 	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };
-	OPTION_BELOW<VOLUME, VOLUME_MAX> SEVolume = { VOLUME_MAX / 2 };
+	OPTION_BELOW<VOLUME, VOLUME_MAX> SEVolume  = { (VOLUME_MAX * 4) / 10 };
+	OPTION_BELOW<VOLUME, VOLUME_MAX> BGMVolume = { (VOLUME_MAX * 4) / 10 };
 	OPTION_UTF8 BGMPack;
 
 	// 入力に関するフラグ

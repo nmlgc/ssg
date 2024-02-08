@@ -216,7 +216,9 @@ void SndBackend_BGMUpdateVolume(void)
 	if(!BGMObj.track) {
 		return;
 	}
-	ma_sound_set_volume(&BGMObj.sound, Snd_BGMGainFactor);
+	ma_sound_set_volume(
+		&BGMObj.sound, (Snd_BGMGainFactor * VolumeFactorSquare(Snd_VolumeBGM))
+	);
 }
 
 void SndBackend_BGMUpdateTempo(void)

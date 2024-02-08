@@ -318,6 +318,11 @@ VOLUME Mid_GetFadeVolume(void)
 	return Mid_Dev.FadeNowVolume;
 }
 
+void Mid_UpdateVolume(void)
+{
+	Mid_Dev.ApplyVolume();
+}
+
 void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration)
 {
 	Mid_Dev.FadeStartVolume = volume_start;
@@ -530,7 +535,10 @@ std::optional<MID_EVENT> MID_TRACK_ITERATOR::ConsumeEvent(void)
 
 VOLUME MID_DEVICE::VolumeFor(decltype(MIDI_CHANNELS) ch) const
 {
-	return ((Mid_VolumeTable[ch] * FadeNowVolume) / (VOLUME_MAX + 1));
+	return (
+		(Mid_VolumeTable[ch] * FadeNowVolume * Mid_Volume) /
+		((VOLUME_MAX + 1) * (VOLUME_MAX + 1))
+	);
 }
 
 void MID_DEVICE::ApplyVolume(void) const

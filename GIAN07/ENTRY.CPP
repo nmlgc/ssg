@@ -38,6 +38,8 @@ const int SND_X_PER_DECIBEL = PixelToWorld(25);
 // Volume controls
 // ---------------
 
+const VOLUME& Mid_Volume = ConfigDat.BGMVolume.v;
+const VOLUME& Snd_VolumeBGM = ConfigDat.BGMVolume.v;
 const VOLUME& Snd_VolumeSE = ConfigDat.SEVolume.v;
 // ---------------
 

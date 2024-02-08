@@ -69,6 +69,9 @@ void Snd_Cleanup(void)
 
 void Snd_UpdateVolumes(void)
 {
+	if(Initialized & SND_SYS::BGM) {
+		SndBackend_BGMUpdateVolume();
+	}
 	if(Initialized & SND_SYS::SE) {
 		SndBackend_SEUpdateVolume();
 	}

@@ -17,6 +17,8 @@ bool SndBackend_BGMInit(void);
 // The platform-independent layer always calls this before SndBackend_Cleanup().
 void SndBackend_BGMCleanup(void);
 
+void SndBackend_BGMUpdateVolume(void);
+
 namespace BGM {
 	struct TRACK;
 }

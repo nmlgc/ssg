@@ -73,7 +73,6 @@ void Mid_Stop(void);						// 停止する
 
 void Mid_Pause(void);
 void Mid_Resume(void);
-void Mid_Volume(uint8_t volume);	// マスターボリュームを変更する
 
 // Returns the current (not maximum) MIDI master volume.
 VOLUME Mid_GetFadeVolume(void);

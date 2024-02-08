@@ -74,6 +74,13 @@ static BOOL Mid_Init_unused(void)
 	return Mid_Init();
 }
 
+void Mid_Volume_unused(BYTE volume)
+{
+	// これより下は削った方が良いかも //
+	//temp.w.d1 = temp.w.d2 = volume;
+	//midiOutSetVolume(Mid_Dev.mp,temp.dd);
+}
+
 void Mid_Pan(char pan)
 {
 	int		i;

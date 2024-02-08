@@ -227,7 +227,19 @@ void Mid_Play(void)
 	Mid_Dev.FadeDuration = 0s;
 	Mid_Dev.MaxVolume = 127;
 	Mid_Dev.NowVolume = 127;
-	Mid_Volume(Mid_Dev.NowVolume);
+
+	// マスター・ボリューム : F0 7F 7F 04 01 VolumeLowByte VolumeHighByte F7 //
+	// 下位バイトは SC-88ST Pro では 00 として扱われるらしい(取扱説明書より) //
+	//
+	// On both the Microsoft GS Wavetable Synth and all Yamaha XG synths I
+	// tested on, sending a MIDI Universal Realtime Master Volume message right
+	// before the GM System On below has no effect because the latter also
+	// resets the Master Volume. This might not necessarily be true on Roland
+	// synths though, so let's better keep this relic from the original code.
+	uint8_t msg[8] = {
+		0xf0, 0x7f, 0x7f, 0x04, 0x01, 0x00, Mid_Dev.MaxVolume, 0xf7
+	};
+	MidBackend_Out(msg);
 
 	Mid_Seq.Rewind();
 	for(auto& t : Mid_Seq.tracks) {
@@ -301,19 +313,6 @@ void Mid_TableInit(void)
 		Mid_ExpressionTable[i] = 0x7f;
 		Mid_VolumeTable[i]     = 0x64;
 	}
-}
-
-void Mid_Volume(uint8_t volume)
-{
-	// マスター・ボリューム : F0 7F 7F 04 01 VolumeLowByte VolumeHighByte F7   //
-	// 下位バイトは SC-88ST Pro では 00 として扱われるらしい(取扱説明書より) //
-
-	uint8_t msg[8] = { 0xf0, 0x7f, 0x7f, 0x04, 0x01, 0x00, volume, 0xf7 };
-	MidBackend_Out(msg);
-
-	// これより下は削った方が良いかも //
-	//temp.w.d1 = temp.w.d2 = volume;
-	//midiOutSetVolume(Mid_Dev.mp,temp.dd);
 }
 
 VOLUME Mid_GetFadeVolume(void)

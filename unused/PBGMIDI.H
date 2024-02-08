@@ -22,6 +22,8 @@
 #define MIDPL_NORM		0x00	// 曲の最後にきたら最初に戻って再生
 #define MIDPL_STOP		0x01	// 曲の最後にきたら停止
 
+void Mid_Volume(BYTE volume);	// マスターボリュームを変更する
+
 // Why would you ever do this?! It's going to annoy every headphone user, and
 // some channels will override this position sooner or later with a CC #10
 // inside the MIDI sequence anyway. A 無駄関数 indeed.

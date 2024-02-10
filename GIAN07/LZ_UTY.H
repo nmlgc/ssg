@@ -97,6 +97,10 @@ struct PACKFILE_READ {
 	}
 
 	BYTE_BUFFER_OWNED MemExpand(fil_no_t filno) const;
+
+	explicit operator bool() const {
+		return packfile.get();
+	}
 };
 
 struct PACKFILE_WRITE {

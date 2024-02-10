@@ -10,6 +10,7 @@
 #include "MUSIC.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
+#include "game/enum_array.h"
 #include "game/hash.h"
 #include "game/midi.h"
 #include "game/snd.h"
@@ -201,39 +202,53 @@ bool Snd_SELoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
 
 // Packfile cache //
 // -------------- //
-// Caching every .DAT file is not only tedious due to the data structures
-// involved, but also wrong because replays exist and can be overwritten during
-// the lifespan of a process. Since we only actively need these three, we can
-// gain enough of a load time reduction just by writing two wrapper functions.
 
-BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno)
-{
-	static const auto in = FilStartR(_PATH("ENEMY.DAT"));
-	return in.MemExpand(filno);
-}
-
-BYTE_BUFFER_OWNED DATGraphLoad(fil_no_t filno, BYTE surf_id)
-{
-	static const auto in = FilStartR(_PATH("GRAPH.DAT"));
-	return GrpBMPLoadP(in, filno, surf_id);
-}
-
-// For MUSIC.DAT, we want to start asynchronously calculating all hashes once
-// the process starts.
 namespace DAT {
-	PACKFILE_READ MusicPack;
+	enum class PACK_ID : uint8_t {
+		ENEMY,
+		GRAPH,
+		GRAPH2,
+		MUSIC,
+		SOUND,
+		COUNT,
+	};
+
+	constexpr ENUMARRAY<PATH_LITERAL, PACK_ID> BASENAMES = {{
+		_PATH("ENEMY.DAT"),
+		_PATH("GRAPH.DAT"),
+		_PATH("GRAPH2.DAT"),
+		_PATH("MUSIC.DAT"),
+		_PATH("SOUND.DAT"),
+	}};
+
+	struct PACK {
+		PACKFILE_READ pack;
+	};
+	ENUMARRAY<PACK, PACK_ID> Packs;
+
+	// For MUSIC.DAT, we want to start asynchronously calculating all hashes
+	// once the process starts.
 	std::vector<HASH> MusicHashes;
 
+	const PACKFILE_READ& Packfile(PACK_ID pack)
+	{
+		auto& ret = Packs[pack].pack;
+		if(!ret) {
+			ret = FilStartR(BASENAMES[pack]);
+		}
+		return ret;
+	}
+
 	auto MusicInitThread = std::jthread([](std::stop_token st) {
-		MusicPack = FilStartR(_PATH("MUSIC.DAT"));
-		MusicNum = MusicPack.info.size();
+		const auto& pack = Packfile(PACK_ID::MUSIC);
+		MusicNum = pack.info.size();
 		MusicHashes.reserve(MusicNum);
 
 		for(auto i = 0; i < MusicNum; i++) {
 			if(st.stop_requested()) {
 				break;
 			}
-			if(const auto file = MusicPack.MemExpand(i)) {
+			if(const auto file = pack.MemExpand(i)) {
 				if(st.stop_requested()) {
 					break;
 				}
@@ -254,7 +269,7 @@ namespace DAT {
 			return false;
 		}
 		return LoadMIDIWithPotentialLoop(
-			MusicPack.MemExpand(filno), MusicHashes[filno]
+			Packfile(PACK_ID::MUSIC).MemExpand(filno), MusicHashes[filno]
 		);
 	}
 
@@ -333,36 +348,45 @@ bool LoadGraph(int stage)
 {
 //	bIsBombPalette = FALSE;
 
+	const auto& graph = DAT::Packfile(DAT::PACK_ID::GRAPH);
+
 	// 音楽室用 //
 	if(stage==GRAPH_ID_MUSICROOM){
-		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
-		if(!DATGraphLoad(19+4,SURFACE_ID_MUSIC))		return FALSE;
-		return TRUE;
+		return (
+			GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM) &&
+			GrpBMPLoadP(graph, (19 + 4), SURFACE_ID_MUSIC)
+		);
 	}
 	// タイトル画面用 //
 	if(stage==GRAPH_ID_TITLE){
-		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
-		if(!DATGraphLoad(20+4,SURFACE_ID_MUSIC))		return FALSE;
+		return (
+			GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM) &&
+			GrpBMPLoadP(graph, (20 + 4), SURFACE_ID_MUSIC)
+		);
 		//LoadPaletteFrom(GrEnemy);
-		return TRUE;
 	}
 	// お名前登録画面用 //
 	if(stage==GRAPH_ID_NAMEREGIST){
-		if(!DATGraphLoad(0,SURFACE_ID_SYSTEM))		return FALSE;
-		if(!DATGraphLoad(21+4,SURFACE_ID_NAMEREG))	return FALSE;
-		return TRUE;
+		return (
+			GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM) &&
+			GrpBMPLoadP(graph, (21 + 4), SURFACE_ID_NAMEREG)
+		);
 	}
 	// 西方Ｐｒｏｊｅｃｔ表示用 //
 	if(stage==GRAPH_ID_SPROJECT){
-		if(!DATGraphLoad(31,SURFACE_ID_SPROJECT))		return FALSE;
+		if(!GrpBMPLoadP(graph, 31, SURFACE_ID_SPROJECT)) {
+			return false;
+		}
 		GrpGetPalette(SProjectPalette);
 
-		//if(!DATGraphLoad(21+4,SURFACE_ID_NAMEREG))	return FALSE;
+		// if(!GrpBMPLoadP(graph, (21 + 4), SURFACE_ID_NAMEREG)) {
+		// 	return false;
+		// }
 		return TRUE;
 	}
 	// エンディング全画像ロード(パレット含む) //
 	if(stage==GRAPH_ID_ENDING){
-		const auto in = FilStartR(_PATH("GRAPH2.DAT"));
+		const auto& in = DAT::Packfile(DAT::PACK_ID::GRAPH2);
 
 		if(!GrpBMPLoadP(in, 0, SURFACE_ID_ENDING_CREDITS)) {
 			return false;
@@ -379,49 +403,63 @@ bool LoadGraph(int stage)
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		if(!DATGraphLoad(   0, SURFACE_ID_SYSTEM))	return FALSE;
-		if(!DATGraphLoad(27+1, SURFACE_ID_ENEMY))	return FALSE;
+		if(!GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM)) {
+			return false;
+		}
+		if(!GrpBMPLoadP(graph, (27 + 1), SURFACE_ID_ENEMY)) {
+			return false;
+		}
 		GrpGetPalette(EnemyPalette);
 
-		if(!DATGraphLoad(  27, SURFACE_ID_MAPCHIP))	return FALSE;
+		if(!GrpBMPLoadP(graph, 27, SURFACE_ID_MAPCHIP)) {
+			return false;
+		}
 
 		// 諸事情により、ここにいるのです //
-		if(!DATGraphLoad(     26,SURFACE_ID_BOMBER))	return FALSE;
+		if(!GrpBMPLoadP(graph, 26, SURFACE_ID_BOMBER)) {
+			return false;
+		}
 
 		return TRUE;
 	}
 
 	// エキストラステージボス用(1) //
 	if(stage == GRAPH_ID_EXBOSS1){
-		if(!DATGraphLoad(29, SURFACE_ID_ENEMY))		return FALSE;
+		if(!GrpBMPLoadP(graph, 29, SURFACE_ID_ENEMY)) {
+			return false;
+		}
 		GrpGetPalette(EnemyPalette);
-
 		return TRUE;
 	}
 
 	// エキストラステージボス用(2) //
 	if(stage == GRAPH_ID_EXBOSS2){
-		if(!DATGraphLoad(30, SURFACE_ID_ENEMY))		return FALSE;
+		if(!GrpBMPLoadP(graph, 30, SURFACE_ID_ENEMY)) {
+			return false;
+		}
 		GrpGetPalette(EnemyPalette);
-
 		return TRUE;
 	}
 
 	if(stage<0 || stage>STAGE_MAX) return FALSE;
 
 	// マップチップのロードは後で変換すること //
-	if(!DATGraphLoad(       0,SURFACE_ID_SYSTEM))		return FALSE;
-	if(!DATGraphLoad(stage+ 0,SURFACE_ID_ENEMY))		return FALSE;
+	if(!GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM)) {
+		return false;
+	}
+	if(!GrpBMPLoadP(graph, (stage + 0), SURFACE_ID_ENEMY)) {
+		return false;
+	}
 	GrpGetPalette(EnemyPalette);
 
 	//DWORD MapChipID[6] = {7,7,8,9,10,11};	// 本当は STAGE_MAX とすべき
 	DWORD MapChipID[STAGE_MAX] = {7,8,9,10,11,12};
-	if(!DATGraphLoad(MapChipID[stage-1],SURFACE_ID_MAPCHIP))	return FALSE;
+	if(!GrpBMPLoadP(graph, MapChipID[stage - 1], SURFACE_ID_MAPCHIP)) {
+		return false;
+	}
 
 	// 諸事情により、ここにいるのです //
-	if(!DATGraphLoad(     26,SURFACE_ID_BOMBER))		return FALSE;
-
-	return TRUE;
+	return GrpBMPLoadP(graph, 26, SURFACE_ID_BOMBER);
 }
 
 bool LoadFace(uint8_t FaceID, uint8_t FileNo)
@@ -429,7 +467,8 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 	if(FaceID >= FACE_MAX) {
 		return false;
 	}
-	if(!DATGraphLoad((13 + FileNo), (SURFACE_ID_FACE + FaceID))) {
+	const auto& graph = DAT::Packfile(DAT::PACK_ID::GRAPH);
+	if(!GrpBMPLoadP(graph, (13 + FileNo), (SURFACE_ID_FACE + FaceID))) {
 		return false;
 	}
 
@@ -493,15 +532,30 @@ bool LoadStageData(uint8_t stage)
 	SCL_Head = nullptr;
 	ScrollInfo.DataHead = nullptr;
 
+	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
+
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		if((ECL_Head=DATEnemyLoad( 24))==NULL)				return FALSE;	// ECL Load
-		if((SCL_Head=DATEnemyLoad( 25))==NULL)				return FALSE;	// SCL Load
-		if((ScrollInfo.DataHead=DATEnemyLoad( 26))==NULL)	return FALSE;	// MapData Load
+		// ECL Load
+		if((ECL_Head = enemy.MemExpand(24)) == nullptr) {
+			return false;
+		}
+
+		// SCL Load
+		if((SCL_Head = enemy.MemExpand(25)) == nullptr) {
+			return false;
+		}
+
+		// MapData Load
+		if((ScrollInfo.DataHead = enemy.MemExpand(26)) == nullptr) {
+			return false;
+		}
 	}
 	else if(stage == GRAPH_ID_ENDING){
-		if((SCL_Head=DATEnemyLoad( 47))==NULL) return FALSE;	// SCL Load
-
+		// SCL Load
+		if((SCL_Head = enemy.MemExpand(47)) == nullptr) {
+			return false;
+		}
 		SCL_Now   = SCL_Head.get();
 		GameCount = 0;
 		return TRUE;
@@ -509,9 +563,21 @@ bool LoadStageData(uint8_t stage)
 	else{
 		// 各データをロードする //
 		if(stage<1 || stage>STAGE_MAX)								return FALSE;
-		if((ECL_Head=DATEnemyLoad(stage+0-1))==NULL)				return FALSE;	// ECL Load
-		if((SCL_Head=DATEnemyLoad(stage+6-1))==NULL)				return FALSE;	// SCL Load
-		if((ScrollInfo.DataHead=DATEnemyLoad(stage+12-1))==NULL)	return FALSE;	// MapData Load
+
+		// ECL Load
+		if((ECL_Head = enemy.MemExpand(stage + 0 - 1)) == nullptr) {
+			return false;
+		}
+
+		// SCL Load
+		if((SCL_Head = enemy.MemExpand(stage + 6 - 1)) == nullptr) {
+			return false;
+		}
+
+		// MapData Load
+		if((ScrollInfo.DataHead = enemy.MemExpand(stage + 12 - 1)) == nullptr) {
+			return false;
+		}
 	}
 
 	// スクロール用変数の初期化 //
@@ -1040,7 +1106,7 @@ bool LoadSound(void)
 		return false;
 	}
 
-	const auto in = FilStartR(_PATH("SOUND.DAT"));
+	const auto& in = DAT::Packfile(DAT::PACK_ID::SOUND);
 
 	while(1){
 		if(!Snd_SELoadP(in,SOUND_ID_KEBARI  ,SOUND_ID_KEBARI  ,SNDMAX_KEBARI  )) break;
@@ -1083,12 +1149,13 @@ bool LoadMusicRoomComment(int no)
 		return false;
 	}
 	const auto& text = MusicRoomText.value();
-	return text.PrerenderTitleAndComment(DATEnemyLoad(27 + no), no);
+	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
+	return text.PrerenderTitleAndComment(enemy.MemExpand(27 + no), no);
 }
 
 BYTE_BUFFER_OWNED LoadDemo(int stage)
 {
-	return DATEnemyLoad(stage - 1 + 18);
+	return DAT::Packfile(DAT::PACK_ID::ENEMY).MemExpand(stage - 1 + 18);
 }
 
 

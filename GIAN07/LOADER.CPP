@@ -1086,6 +1086,11 @@ bool LoadMusicRoomComment(int no)
 	return text.PrerenderTitleAndComment(DATEnemyLoad(27 + no), no);
 }
 
+BYTE_BUFFER_OWNED LoadDemo(int stage)
+{
+	return DATEnemyLoad(stage - 1 + 18);
+}
+
 
 /*
 // ボム用パレット属性に変更する //

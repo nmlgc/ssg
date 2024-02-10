@@ -114,11 +114,8 @@ void DemoplaySaveDemo(void)
 
 bool DemoplayLoadDemo(int stage)
 {
-	// Not too pretty… //
-	BYTE_BUFFER_OWNED DATEnemyLoad(fil_no_t filno);
-
 	// 展開 //
-	const auto temp = DATEnemyLoad(stage-1+18);
+	const auto temp = LoadDemo(stage);
 	auto temp_cursor = temp.cursor();
 	{
 		const auto maybe_info = temp_cursor.next<DEMOPLAY_INFO>();

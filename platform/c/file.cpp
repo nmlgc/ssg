@@ -45,13 +45,11 @@ size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s)
 	return FileLoadInplace(buf, reinterpret_cast<const PATH_LITERAL>(s));
 }
 
-BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
+static BYTE_BUFFER_OWNED FPReadAll(
+	FILE* fp, size_t size_limit = (std::numeric_limits<size_t>::max)()
+)
 {
-	auto fp = fopen(s, "rb");
-	if(!fp) {
-		return {};
-	}
-
+	assert(fp);
 	auto size64 = _filelengthi64(fileno(fp));
 	if(size64 > size_limit) {
 		return {};
@@ -62,12 +60,21 @@ BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
 	if(!buf) {
 		return {};
 	}
-
-	if(LoadInplace({ buf.get(), size }, std::move(fp)) != size) {
+	if(fread(buf.get(), 1, size, fp) != size) {
 		return {};
 	}
+	return buf;
+}
 
-	return std::move(buf);
+BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
+{
+	auto fp = fopen(s, "rb");
+	if(!fp) {
+		return {};
+	}
+	auto ret = FPReadAll(fp, size_limit);
+	fclose(fp);
+	return ret;
 }
 
 BYTE_BUFFER_OWNED FileLoad(const char8_t* s, size_t size_limit)
@@ -138,6 +145,13 @@ public:
 
 	size_t Read(std::span<uint8_t> buf) override {
 		return fread(buf.data(), 1, buf.size_bytes(), fp);
+	}
+
+	BYTE_BUFFER_OWNED ReadAll() override {
+		if(fseek(fp, 0, SEEK_SET)) {
+			return {};
+		}
+		return FPReadAll(fp);
 	}
 
 	bool Write(BYTE_BUFFER_BORROWED buf) override {

@@ -81,6 +81,10 @@ struct FILE_STREAM_READ : FILE_STREAM_SEEK {
 	// returns the number of bytes read. Successful if the returned value is
 	// equal to [buf.size_bytes()].
 	[[nodiscard]] virtual size_t Read(std::span<uint8_t> buf) = 0;
+
+	// Reads the entire file into a newly allocated buffer, leaving the read
+	// pointer at the end of the file.
+	[[nodiscard]] virtual BYTE_BUFFER_OWNED ReadAll() = 0;
 };
 
 struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {

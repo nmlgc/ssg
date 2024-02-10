@@ -84,34 +84,35 @@ size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s)
 	}).value_or(0);
 }
 
+static BYTE_BUFFER_OWNED HandleReadAll(
+	HANDLE handle, size_t size_limit = (std::numeric_limits<size_t>::max)()
+)
+{
+	LARGE_INTEGER size64;
+	if(!GetFileSizeEx(handle, &size64) || (size64.QuadPart > size_limit)) {
+		return {};
+	}
+	const size_t size = size64.QuadPart;
+
+	auto buf = BYTE_BUFFER_OWNED{ size };
+	if(!buf) {
+		return {};
+	}
+	if(HandleRead({ buf.get(), size }, handle) != size) {
+		return {};
+	}
+	return buf;
+}
+
 BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
 {
 	auto handle = OpenRead(s);
 	if(handle == INVALID_HANDLE_VALUE) {
 		return {};
 	}
-
-	auto fail = [&handle]() -> BYTE_BUFFER_OWNED {
-		CloseHandle(handle);
-		return {};
-	};
-
-	LARGE_INTEGER size64;
-	if(!GetFileSizeEx(handle, &size64) || (size64.QuadPart > size_limit)) {
-		return fail();
-	}
-	const size_t size = size64.QuadPart;
-
-	auto buf = BYTE_BUFFER_OWNED{ size };
-	if(!buf) {
-		return fail();
-	}
-
-	if(LoadInplace({ buf.get(), size }, std::move(handle)) != size) {
-		return {};
-	}
-
-	return buf;
+	auto ret = HandleReadAll(handle, size_limit);
+	CloseHandle(handle);
+	return ret;
 }
 
 BYTE_BUFFER_OWNED FileLoad(const char8_t* s, size_t size_limit)
@@ -191,6 +192,13 @@ public:
 
 	size_t Read(std::span<uint8_t> buf) override {
 		return HandleRead(buf, handle);
+	}
+
+	BYTE_BUFFER_OWNED ReadAll() override {
+		if(SetFilePointer(handle, 0, nullptr, FILE_BEGIN) != 0) {
+			return {};
+		}
+		return HandleReadAll(handle);
 	}
 
 	bool Write(BYTE_BUFFER_BORROWED buf) override {

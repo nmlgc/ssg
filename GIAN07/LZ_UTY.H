@@ -10,6 +10,8 @@
 #include "game/endian.h"
 #include <array>
 
+class FILE_STREAM_READ;
+
 // Format
 // ------
 
@@ -104,4 +106,6 @@ struct PACKFILE_WRITE {
 };
 
 BIT_FILE_READ BitFilCreateR(const PATH_LITERAL s);
+PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile);
+PACKFILE_READ FilStartR(std::unique_ptr<FILE_STREAM_READ> stream);
 PACKFILE_READ FilStartR(const PATH_LITERAL s);

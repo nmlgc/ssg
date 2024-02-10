@@ -263,9 +263,8 @@ BIT_FILE_READ BitFilCreateR(const PATH_LITERAL s)
 	return { FileLoad(s) };
 }
 
-PACKFILE_READ FilStartR(const PATH_LITERAL s)
+PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile)
 {
-	auto packfile = FileLoad(s);
 	auto packfile_cursor = packfile.cursor();
 
 	// PBG_FILEHEAD
@@ -307,4 +306,14 @@ PACKFILE_READ FilStartR(const PATH_LITERAL s)
 	}
 
 	return { std::move(packfile), info };
+}
+
+PACKFILE_READ FilStartR(std::unique_ptr<FILE_STREAM_READ> stream)
+{
+	return FilStartR(stream->ReadAll());
+}
+
+PACKFILE_READ FilStartR(const PATH_LITERAL s)
+{
+	return FilStartR(FileLoad(s));
 }

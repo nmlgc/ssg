@@ -82,6 +82,9 @@ struct WINDOW_INFO {
 
 		// Shortens the key repeat times for option items.
 		FAST_REPEAT = 0x01,
+
+		// Horizontally centered text.
+		CENTER = 0x02,
 	};
 
 	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)

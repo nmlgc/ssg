@@ -219,8 +219,13 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
 		const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
-		s.Put({ 1, 0 }, str, col.shadow);
-		s.Put({ 0, 0 }, str, col.text);
+
+		const auto left = ((p->Flags & WINDOW_INFO::FLAGS::CENTER)
+			? TextLayoutXCenter(s, str)
+			: 0
+		);
+		s.Put({ (left + 1), 0 }, str, col.shadow);
+		s.Put({ (left + 0), 0 }, str, col.text);
 	});
 	topleft.y += (CWIN_ITEM_H + 1); // ???
 
@@ -235,8 +240,15 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 		TextObj.Render(topleft, trr, c, [=](GIAN_TEXTRENDER_SESSION auto& s) {
 			const auto& col = COL[item->State];
 			s.SetFont(CWIN_FONT);
-			s.Put({ (CWIN_ITEM_LEFT + 1), 0 }, str, col.shadow);
-			s.Put({ (CWIN_ITEM_LEFT + 0), 0 }, str, col.text);
+
+			// Adding CWIN_ITEM_LEFT to centered text would throw it off-center,
+			// obviously.
+			const auto left = ((item->Flags & WINDOW_INFO::FLAGS::CENTER)
+				? TextLayoutXCenter(s, str)
+				: CWIN_ITEM_LEFT
+			);
+			s.Put({ (left + 1), 0 }, str, col.shadow);
+			s.Put({ (left + 0), 0 }, str, col.text);
 		});
 		item->StatePrev = item->State;
 		topleft.y += CWIN_ITEM_H;

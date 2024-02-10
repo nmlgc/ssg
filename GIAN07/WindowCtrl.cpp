@@ -287,23 +287,14 @@ WINDOW_SCROLL<
 // メインメニューの初期化 //
 void InitMainWindow(void)
 {
-	int			i;
-
-	MainWindow.Parent.Title      = "     Main Menu";
-	MainWindow.Parent.Help       = " ";			// ここは指定しても意味がない
-	MainWindow.Parent.NumItems   = 7;
-	MainWindow.Parent.CallBackFn = NULL;
-
-	for(i=0;i<MainWindow.Parent.NumItems;i++){
-		MainWindow.Parent.ItemPtr[i] = &MainItem[i];
-	}
-
 	SetDifItem();
 	SetGrpItem();
 	SetSndItem();
 	SetInpItem();
 	SetIKeyItem();
 	SetCfgRepItem();
+
+	MainWindow.Init("     Main Menu", MainItem, 140);
 
 	//	{ "   Config",	"各種設定を変更します",	CfgItem },
 
@@ -317,35 +308,17 @@ void InitMainWindow(void)
 		MainItem[3].NumItems = 5;
 		MainItem[3].ItemPtr[4] = CfgItem + 5;
 	}
-
-	MainWindow.Init(140);
 }
 
 
 void InitExitWindow(void)
 {
-	ExitWindow.Parent.Title     = "    終了するの？";
-	ExitWindow.Parent.Help      = " ";
-	ExitWindow.Parent.NumItems  = 2;
-	ExitWindow.Parent.CallBackFn = NULL;
-
-	ExitWindow.Parent.ItemPtr[0] = &ExitYesNoItem[0];
-	ExitWindow.Parent.ItemPtr[1] = &ExitYesNoItem[1];
-
-	ExitWindow.Init(140);
+	ExitWindow.Init("    終了するの？", ExitYesNoItem, 140);
 }
 
 void InitContinueWindow(void)
 {
-	ContinueWindow.Parent.Title     = " Ｃｏｎｔｉｎｕｅ？";
-	ContinueWindow.Parent.Help      = " ";
-	ContinueWindow.Parent.NumItems  = 2;
-	ContinueWindow.Parent.CallBackFn = NULL;
-
-	ContinueWindow.Parent.ItemPtr[0] = &ContinueYesNoItem[0];
-	ContinueWindow.Parent.ItemPtr[1] = &ContinueYesNoItem[1];
-
-	ContinueWindow.Init(140);
+	ContinueWindow.Init(" Ｃｏｎｔｉｎｕｅ？", ContinueYesNoItem, 140);
 }
 
 static bool DifFnPlayerStock(INPUT_BITS key)

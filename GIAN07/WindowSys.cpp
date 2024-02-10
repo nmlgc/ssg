@@ -106,6 +106,22 @@ void WINDOW_SYSTEM::Init(PIXEL_COORD w)
 	}
 }
 
+void WINDOW_SYSTEM::Init(
+	const Narrow::literal title, std::span<WINDOW_INFO> info, PIXEL_COORD w
+)
+{
+	Parent.Title      = title;
+	Parent.Help       = "";	// ここは指定しても意味がない
+	Parent.NumItems   = info.size();
+	Parent.CallBackFn = nullptr;
+
+	assert(info.size() <= WINITEM_MAX);
+	for(size_t i = 0; i < info.size(); i++) {
+		Parent.ItemPtr[i] = &info[i];
+	}
+	Init(w);
+}
+
 void WINDOW_SYSTEM::Open(WINDOW_POINT topleft, int select)
 {
 	x = topleft.x;

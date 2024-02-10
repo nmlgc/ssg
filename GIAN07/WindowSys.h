@@ -158,6 +158,14 @@ typedef struct tagWINDOW_SYSTEM{
 	// Prepares text rendering for a window with the given width.
 	void Init(PIXEL_COORD w);
 
+	// Initializes [Parent] using the given title and info span, and prepares
+	// text rendering for a window with the given width.
+	void Init(
+		const Narrow::literal title,
+		std::span<WINDOW_INFO> info,
+		PIXEL_COORD w
+	);
+
 	// コマンドウィンドウの初期化 //
 	void Open(WINDOW_POINT topleft, int select);
 

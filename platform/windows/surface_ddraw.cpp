@@ -5,6 +5,7 @@
 
 #include "platform/windows/surface_ddraw.h"
 #include <array>
+#include <assert.h>
 #include <ddraw.h>
 
 bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
@@ -37,6 +38,9 @@ bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
 	DDSURFACEDESC desc = { .dwSize = sizeof(desc) };
 	if(surf->Lock(nullptr, &desc, DDLOCK_WAIT, nullptr) != DD_OK) {
 		return false;
+	} else if(desc.lPitch < 0) {
+		assert(!"Negative pitch?");
+		return false;
 	}
 
 	const uint16_t bpp = desc.ddpfPixelFormat.dwRGBBitCount;
@@ -50,7 +54,7 @@ bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
 	};
 	const std::span<const std::byte> pixels = {
 		static_cast<const std::byte *>(desc.lpSurface),
-		size_t(desc.lPitch * desc.dwHeight),
+		static_cast<size_t>(desc.lPitch * desc.dwHeight),
 	};
 	const auto ret = BMPSave(stream, size, 1, bpp, palette, pixels);
 	surf->Unlock(nullptr);

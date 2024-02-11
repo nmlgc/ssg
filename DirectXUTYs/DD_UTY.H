@@ -271,8 +271,8 @@ typedef struct tagDDRAWENUM{
 	bool BitDepthSupported(uint8_t bpp) const {
 		switch(bpp) {
 		case  8:	return b8Bit;
-		case 16:	return (b16Bit && D3D->b16Bit);
-		case 32:	return (b32Bit && D3D->b32Bit);
+		case 16:	return (b16Bit && D3D[0].b16Bit);
+		case 32:	return (b32Bit && D3D[0].b32Bit);
 		default:	return false;
 		}
 	}

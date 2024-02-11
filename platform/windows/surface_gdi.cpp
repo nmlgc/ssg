@@ -40,6 +40,11 @@ bool SURFACE_GDI::Save(FILE_STREAM_WRITE* stream) const
 		return false;
 	}
 
+	if((dib.dsBm.bmHeight < 0) || (dib.dsBm.bmWidthBytes < 0)) {
+		assert(!"Negative height or stride?");
+		return false;
+	}
+
 	const auto bpp = (dib.dsBm.bmPlanes * dib.dsBm.bmBitsPixel);
 	const auto palette_size = BMPPaletteSizeFromBPP(bpp);
 
@@ -96,7 +101,9 @@ bool SURFACE_GDI::Save(FILE_STREAM_WRITE* stream) const
 	}
 	const std::span<const std::byte> pixels = {
 		static_cast<const std::byte *>(dib.dsBm.bmBits),
-		size_t(dib.dsBm.bmWidthBytes * dib.dsBm.bmHeight)
+
+		// Negative values are checked above.
+		static_cast<size_t>(dib.dsBm.bmWidthBytes * dib.dsBm.bmHeight)
 	};
 	return BMPSave(
 		stream,

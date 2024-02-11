@@ -495,13 +495,7 @@ static bool SndFnSE(INPUT_BITS key)
 			}
 			else{
 				ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;
-
-				if(!SndInit()) {
-					ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-				} else if(!LoadSound()) {
-					ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-					SndCleanup();
-				}
+				LoadSound();
 			}
 			//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
 			// DebugOut(buf);

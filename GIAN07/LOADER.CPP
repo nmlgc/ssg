@@ -1010,6 +1010,13 @@ bool LoadMusic(int no)
 // 全てのSoundデータをロードする //
 bool LoadSound(void)
 {
+	// サウンドの初期化 //
+	// 何らかの理由で使用できなければ、Disable とする //
+	if(!(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) || !SndInit()) {
+		ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
+		return false;
+	}
+
 	const auto in = FilStartR(_PATH("SOUND.DAT"));
 
 	while(1){
@@ -1035,6 +1042,9 @@ bool LoadSound(void)
 		if(!Snd_SELoadP(in,SOUND_ID_WARP, SOUND_ID_WARP, SNDMAX_WARP))	break;
 		return TRUE;
 	}
+
+	ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
+	SndCleanup();
 	return FALSE;
 }
 

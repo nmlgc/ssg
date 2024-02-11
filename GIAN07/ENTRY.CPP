@@ -57,16 +57,7 @@ bool XInit(void)
 		return false;
 	}
 
-	// サウンドの初期化 //
-	if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
-		// 何らかの理由で使用できなければ、Disable とする //
-		if(!SndInit()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-		} else if(!LoadSound()) {
-			ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-			SndCleanup();
-		}
-	}
+	LoadSound();
 
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {

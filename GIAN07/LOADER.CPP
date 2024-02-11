@@ -15,6 +15,7 @@
 #include "game/midi.h"
 #include "game/snd.h"
 #include <future>
+#include <ranges>
 #include <assert.h>
 #include <ddraw.h>
 
@@ -200,6 +201,8 @@ bool Snd_SELoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
 	return Snd_SELoad(in.MemExpand(filno), id, max);
 }
 
+bool LoadSound(const PACKFILE_READ& in);
+
 // Packfile cache //
 // -------------- //
 
@@ -221,8 +224,43 @@ namespace DAT {
 		_PATH("SOUND.DAT"),
 	}};
 
-	struct PACK {
+	// Packfiles can be in these four states:
+	//
+	// 1) `std::jthread` blank, `PACKFILE_READ` default-constructed:
+	//    Uninitialized, at the start of the process.
+	//
+	// 2) `std::jthread` joinable, `PACKFILE_READ` default-constructed:
+	//    In the process of loading the packfile and running any post-loading
+	//    code.
+	//
+	// 3) `std::jthread` blank, `PACKFILE_READ` empty:
+	//    Invalid packfile, after FilStartR() returned an error. Currently not
+	//    distinguished from 1), but we might in the future.
+	//
+	// 4) `std::jthread` blank, `PACKFILE_READ` valid:
+	//    Checksums are validated, and the packfile is ready for extraction.
+	//
+	// A single `std::variant` per pack might look like the better way to
+	// represent this, but actually comes with two drawbacks:
+	// • Since `std::jthread` rejoins on destruction, an attempt to change the
+	//   variant type from within the thread would deadlock the program.
+	// • Suddenly, we also have to handle the `valueless_by_exception` case in
+	//   the Packfile() function, which can then no longer return the neat
+	//   `const PACKFILE_READ&`.
+	class PACK {
+	private:
 		PACKFILE_READ pack;
+		std::jthread load_thread;
+
+	public:
+		bool Load(PACK_ID id);
+
+		const PACKFILE_READ& BlockUntilLoaded(void) {
+			if(load_thread.joinable()) {
+				load_thread.join();
+			}
+			return pack;
+		}
 	};
 	ENUMARRAY<PACK, PACK_ID> Packs;
 
@@ -230,25 +268,21 @@ namespace DAT {
 	// once the process starts.
 	std::vector<HASH> MusicHashes;
 
-	const PACKFILE_READ& Packfile(PACK_ID pack)
+	const PACKFILE_READ& Packfile(PACK_ID id)
 	{
-		auto& ret = Packs[pack].pack;
-		if(!ret) {
-			ret = FilStartR(BASENAMES[pack]);
-		}
-		return ret;
+		return Packs[id].BlockUntilLoaded();
 	}
 
-	auto MusicInitThread = std::jthread([](std::stop_token st) {
-		const auto& pack = Packfile(PACK_ID::MUSIC);
-		MusicNum = pack.info.size();
+	void LoadMusicHashes(const PACKFILE_READ& in, std::stop_token st)
+	{
+		MusicNum = in.info.size();
 		MusicHashes.reserve(MusicNum);
 
 		for(auto i = 0; i < MusicNum; i++) {
 			if(st.stop_requested()) {
 				break;
 			}
-			if(const auto file = pack.MemExpand(i)) {
+			if(const auto file = in.MemExpand(i)) {
 				if(st.stop_requested()) {
 					break;
 				}
@@ -257,27 +291,56 @@ namespace DAT {
 				assert(!"Failure extracting BGM file?");
 			}
 		}
-	});
+	};
+
+	bool PACK::Load(PACK_ID id)
+	{
+		if(pack) {
+			return true;
+		}
+		auto stream = FileStreamRead(BASENAMES[id]);
+		if(!stream) {
+			return false;
+		}
+		load_thread = std::jthread(
+			[this, stream = std::move(stream), id](std::stop_token st) mutable {
+				auto in = FilStartR(std::move(stream));
+				if(id == PACK_ID::MUSIC) {
+					LoadMusicHashes(in, st);
+				} else if(id == PACK_ID::SOUND) {
+					LoadSound(in);
+				}
+				pack = std::move(in);
+			}
+		);
+		return true;
+	}
+
+	bool Check(void)
+	{
+		bool ret = true;
+		for(const auto i : std::views::iota(0u, BASENAMES.size())) {
+			const auto id = DAT::PACK_ID(i);
+			ret &= Packs[id].Load(id);
+		}
+		return ret;
+	}
 
 	// ｎ番目の曲をロードする //
 	bool LoadMusic(fil_no_t filno)
 	{
-		if(MusicInitThread.joinable()) {
-			MusicInitThread.join();
-		}
+		const auto& music = Packs[PACK_ID::MUSIC].BlockUntilLoaded();
 		if(filno >= MusicHashes.size()) {
 			return false;
 		}
 		return LoadMIDIWithPotentialLoop(
-			Packfile(PACK_ID::MUSIC).MemExpand(filno), MusicHashes[filno]
+			music.MemExpand(filno), MusicHashes[filno]
 		);
 	}
 
 	bool LoadMusicByHash(const HASH& hash)
 	{
-		if(MusicInitThread.joinable()) {
-			MusicInitThread.join();
-		}
+		Packs[PACK_ID::MUSIC].BlockUntilLoaded();
 		const auto ret = std::ranges::find(MusicHashes, hash);
 		if(ret == MusicHashes.cend()) {
 			return false;
@@ -286,6 +349,15 @@ namespace DAT {
 	}
 }
 // -------------- //
+
+void LoaderInit(void)
+{
+	DAT::Check();
+
+	// Call a different *Init() function here to quickly test a different
+	// game state.
+	SProjectInit();
+}
 
 
 
@@ -1097,7 +1169,7 @@ bool LoadMIDIBuffer(BYTE_BUFFER_OWNED buf)
 }
 
 // 全てのSoundデータをロードする //
-bool LoadSound(void)
+bool LoadSound(const PACKFILE_READ& in)
 {
 	// サウンドの初期化 //
 	// 何らかの理由で使用できなければ、Disable とする //
@@ -1105,8 +1177,6 @@ bool LoadSound(void)
 		ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 		return false;
 	}
-
-	const auto& in = DAT::Packfile(DAT::PACK_ID::SOUND);
 
 	while(1){
 		if(!Snd_SELoadP(in,SOUND_ID_KEBARI  ,SOUND_ID_KEBARI  ,SNDMAX_KEBARI  )) break;
@@ -1138,6 +1208,11 @@ bool LoadSound(void)
 	ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 	Snd_SECleanup();
 	return FALSE;
+}
+
+bool LoadSound(void)
+{
+	return LoadSound(DAT::Packfile(DAT::PACK_ID::SOUND));
 }
 
 

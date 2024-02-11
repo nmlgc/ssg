@@ -85,6 +85,7 @@ typedef struct tagENDING_GRP{
 
 
 ///// [ 関数 ] /////
+void LoaderInit(void);
 bool LoadStageData(uint8_t stage);	// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする
 bool LoadGraph(int stage);	// あるステージのグラフィックをロードする
 bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする

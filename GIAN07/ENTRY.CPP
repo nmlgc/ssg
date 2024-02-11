@@ -73,8 +73,6 @@ bool XInit(void)
 		return false;
 	}
 
-	LoadSound();
-
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 		BGM_Init();
@@ -83,15 +81,8 @@ bool XInit(void)
 		ConfigDat.BGMPack.v.clear();
 	}
 	BGM_SetGainApply(!(ConfigDat.SoundFlags.v & SNDF_BGM_NOT_VOL_NORM));
-
-	// Call a different *Init() function here to quickly test a different //
-	// game state. //
-	if(!SProjectInit()) {
-		return false;
-	}
-
 	ScreenshotSetPrefix(u8"秋霜");
-
+	LoaderInit();
 	return true;
 }
 

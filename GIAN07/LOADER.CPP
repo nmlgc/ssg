@@ -386,9 +386,20 @@ namespace DAT_MISSING {
 	constexpr Narrow::string_view TITLE = "Missing game data files";
 
 	WINDOW_SYSTEM Window;
+	bool FoundAll = false;
+
+	bool FnRecheck(INPUT_BITS key) {
+		if((key == KEY_BOMB) || (key == KEY_ESC)) {
+			return false;
+		} else if(CWinOptionKeyDelta(key) && DAT::Check()) {
+			FoundAll = true;
+			return false;
+		}
+		return true;
+	}
 
 	constexpr auto CENTER = WINDOW_INFO::FLAGS::CENTER;
-	std::array<WINDOW_INFO, (DAT::BASENAMES.size() + 5)> Info = {{
+	std::array<WINDOW_INFO, (DAT::BASENAMES.size() + 6)> Info = {{
 		{ },
 		{ },
 		{ },
@@ -398,6 +409,7 @@ namespace DAT_MISSING {
 		{ },
 		{ "Must be provided from an original game copy.", "", nullptr, CENTER },
 		{ },
+		{ "Recheck", "", FnRecheck, CENTER },
 		{ "Quit", "", CWinExitFn, CENTER },
 	}};
 
@@ -405,7 +417,11 @@ namespace DAT_MISSING {
 	{
 		CWinMove(&Window);
 		if(Window.State == CWIN_DEAD) {
-			quit = true;
+			if(FoundAll) {
+				SProjectInit();
+			} else {
+				quit = true;
+			}
 		}
 		if(IsDraw()) {
 			GrpCls();
@@ -431,7 +447,7 @@ namespace DAT_MISSING {
 
 		Window.Parent.Flags = CENTER;
 		Window.Init(TITLE.data(), Info, w);
-		Window.OpenCentered(w, (Info.size() - 1));
+		Window.OpenCentered(w, (Info.size() - 2));
 		GameMain = Proc;
 	}
 }

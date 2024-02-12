@@ -4,7 +4,9 @@
  */
 
 #include "game/graphics.h"
+#include "DirectXUTYs/DD_UTY.H"
 #include <algorithm>
+#include <ranges>
 
 // Paletted graphics //
 // ----------------- //
@@ -22,5 +24,24 @@ PALETTE PALETTE::Fade(uint8_t alpha, uint8_t first, uint8_t last) const
 		};
 	}
 	return ret;
+}
+
+void Grp_PaletteSetDefault(void)
+{
+	if(DxObj.PixelFormat.IsChanneled()) {
+		return;
+	}
+	PALETTE palette = {0};
+	for(const auto r : std::views::iota(0, 6)) {
+		for(const auto g : std::views::iota(0, 6)) {
+			for(const auto b : std::views::iota(0, 6)) {
+				const auto col = RGB256(r, g, b);
+				palette[col].r = (r * (255 / 5));
+				palette[col].g = (g * (255 / 5));
+				palette[col].b = (b * (255 / 5));
+			}
+		}
+	}
+	GrpSetPalette(palette);
 }
 // ----------------- //

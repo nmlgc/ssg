@@ -44,8 +44,6 @@
 #define ALPHA_ONE		0x00			// 一種の加算α
 #define ALPHA_NORM		0x01			// ノーマルなSrc-α
 
-#define RGB256(r,g,b)	((r)+(g)*6+(b)*36+0x14)
-
 // Forward declarations //
 struct IDirectDraw2;
 struct IDirectDrawPalette;

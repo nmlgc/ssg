@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <assert.h>
 
 // Paletted graphics //
 // ----------------- //
@@ -25,4 +26,17 @@ struct PALETTE : public std::array<RGBA, 256> {
 	// unchanged.
 	PALETTE Fade(uint8_t alpha, uint8_t first = 0, uint8_t last = 255) const;
 };
+
+// Maps (6 * 6 * 6) = 216 RGB colors to standard palette indices.
+constexpr uint8_t RGB256(uint8_t r, uint8_t g, uint8_t b) {
+	assert(r < 6);
+	assert(g < 6);
+	assert(b < 6);
+	return (20 + r + (g * 6) + (b * 36));
+}
+
+// Sets a default palette covering 216 equally distributed RGB colors. Useful
+// for showing some text before loading any of the game's images that would
+// otherwise define a palette.
+void Grp_PaletteSetDefault(void);
 // ----------------- //

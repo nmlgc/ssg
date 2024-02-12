@@ -14,6 +14,7 @@
 #include "game/hash.h"
 #include "game/midi.h"
 #include "game/snd.h"
+#include "platform/path.h"
 #include <future>
 #include <ranges>
 #include <assert.h>
@@ -216,12 +217,12 @@ namespace DAT {
 		COUNT,
 	};
 
-	constexpr ENUMARRAY<PATH_LITERAL, PACK_ID> BASENAMES = {{
-		_PATH("ENEMY.DAT"),
-		_PATH("GRAPH.DAT"),
-		_PATH("GRAPH2.DAT"),
-		_PATH("MUSIC.DAT"),
-		_PATH("SOUND.DAT"),
+	constexpr ENUMARRAY<const std::u8string_view, PACK_ID> BASENAMES = {{
+		u8"ENEMY.DAT",
+		u8"GRAPH.DAT",
+		u8"GRAPH2.DAT",
+		u8"MUSIC.DAT",
+		u8"SOUND.DAT",
 	}};
 
 	// Packfiles can be in these four states:
@@ -251,9 +252,10 @@ namespace DAT {
 	private:
 		PACKFILE_READ pack;
 		std::jthread load_thread;
+		std::u8string filename;
 
 	public:
-		bool Load(PACK_ID id);
+		bool Load(std::u8string_view path_data, PACK_ID id);
 
 		const PACKFILE_READ& BlockUntilLoaded(void) {
 			if(load_thread.joinable()) {
@@ -293,12 +295,21 @@ namespace DAT {
 		}
 	};
 
-	bool PACK::Load(PACK_ID id)
+	bool PACK::Load(std::u8string_view path_data, PACK_ID id)
 	{
 		if(pack) {
 			return true;
+		} else if(filename.empty()) {
+			const auto& basename = BASENAMES[id];
+			const auto cap = (path_data.size() + basename.size());
+			filename.resize_and_overwrite(cap, [&](char8_t* buf, size_t) {
+				std::ranges::in_out_result p = { path_data.begin(), buf };
+				p = std::ranges::copy(path_data, p.out);
+				p = std::ranges::copy(basename, p.out);
+				return (p.out - buf);
+			});
 		}
-		auto stream = FileStreamRead(BASENAMES[id]);
+		auto stream = FileStreamRead(filename.c_str());
 		if(!stream) {
 			return false;
 		}
@@ -318,10 +329,11 @@ namespace DAT {
 
 	bool Check(void)
 	{
+		const auto path_data = PathForData();
 		bool ret = true;
 		for(const auto i : std::views::iota(0u, BASENAMES.size())) {
 			const auto id = DAT::PACK_ID(i);
-			ret &= Packs[id].Load(id);
+			ret &= Packs[id].Load(path_data, id);
 		}
 		return ret;
 	}

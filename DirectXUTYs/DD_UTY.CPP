@@ -392,20 +392,33 @@ void GrpGetPalette(PALETTE& pal)
 	pal = DxObj.Palette;
 }
 
-void GrpSetPalette(const PALETTE& pal)
+bool GrpSetPalette(const PALETTE& pal)
 {
 	// ８Ｂｉｔモード以外では、何もしないでリターンする //
-	if(DxObj.PixelFormat.IsChanneled()) return;
+	if(DxObj.PixelFormat.IsChanneled()) {
+		return true;
+	}
 
 	DxObj.Palette = pal;
 	DxObj.Palette[0] = { 0, 0, 0 };	// 強制的に色をセットしてしまう //
 
 	// パレットを変更
 	auto p = DxObj.PaletteForDDraw();
-	DxObj.Pal->SetEntries(0, 0, p.size(), p.data());
+	if(DxObj.Pal) {
+		DxObj.Pal->SetEntries(0, 0, p.size(), p.data());
+	} else {
+		const auto ddrval = DxObj.DD->CreatePalette(
+			(DDPCAPS_8BIT | DDPCAPS_ALLOW256), p.data(), &DxObj.Pal, nullptr
+		);
+		if(ddrval != DD_OK) {
+			return false;
+		}
+	}
+	DxObj.Prim->SetPalette(DxObj.Pal);
 	DxObj.bNeedChgPal = TRUE;
 
 	DisableAlphaTable();
+	return true;
 }
 
 bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
@@ -687,8 +700,6 @@ bool SURFACE_GDI::Load(BMP_OWNED bmp)
 
 bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 {
-	HRESULT ddrval;
-
 	if(!surf.surf || !surf.img) {
 		return true;
 	}
@@ -707,29 +718,16 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 				Palette[i] = { bgr.rgbRed, bgr.rgbGreen, bgr.rgbBlue };
 			}
 
-			if(Pal) {
-				Pal->Release();
-			}
-
-			ddrval = DD->CreatePalette(
-				(DDPCAPS_8BIT | DDPCAPS_ALLOW256),
-				PaletteForDDraw().data(),
-				&Pal,
-				nullptr
-			);
-			if(ddrval != DD_OK) {
+			RELEASE(Pal);
+			if(!GrpSetPalette(Palette)) {
 				return false;
 			}
-			Prim->SetPalette(Pal);
-			Back->SetPalette(Pal);
 			surf.surf->SetPalette(Pal);
 		}
 	}
 
 	// DIB から DC を作成 //
 	SurfaceEdit(surf, [](auto, auto) { return true; });
-
-	DisableAlphaTable();
 
 	// カラーキーをセットする //
 	return SurfaceSetColorKeyFromFirstPixel(surf);

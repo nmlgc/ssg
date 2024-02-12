@@ -200,7 +200,7 @@ bool GrpEnum(void);	// 使用できるデバイスを列挙する
 void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
 
 void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
-void GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
+bool GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)

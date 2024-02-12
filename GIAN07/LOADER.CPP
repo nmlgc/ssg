@@ -225,6 +225,9 @@ namespace DAT {
 		u8"SOUND.DAT",
 	}};
 
+	constexpr std::u8string_view NOT_FOUND = u8"☐ ";
+	constexpr std::u8string_view FOUND = u8"☑ ";
+
 	// Packfiles can be in these four states:
 	//
 	// 1) `std::jthread` blank, `PACKFILE_READ` default-constructed:
@@ -252,10 +255,13 @@ namespace DAT {
 	private:
 		PACKFILE_READ pack;
 		std::jthread load_thread;
-		std::u8string filename;
+		std::u8string filename_with_found_prefix;
 
 	public:
 		bool Load(std::u8string_view path_data, PACK_ID id);
+		const std::u8string& FilenameWithFoundPrefix(void) const {
+			return filename_with_found_prefix;
+		}
 
 		const PACKFILE_READ& BlockUntilLoaded(void) {
 			if(load_thread.joinable()) {
@@ -299,20 +305,29 @@ namespace DAT {
 	{
 		if(pack) {
 			return true;
-		} else if(filename.empty()) {
+		} else if(filename_with_found_prefix.empty()) {
+			static_assert(NOT_FOUND.size() == FOUND.size());
 			const auto& basename = BASENAMES[id];
-			const auto cap = (path_data.size() + basename.size());
-			filename.resize_and_overwrite(cap, [&](char8_t* buf, size_t) {
-				std::ranges::in_out_result p = { path_data.begin(), buf };
-				p = std::ranges::copy(path_data, p.out);
-				p = std::ranges::copy(basename, p.out);
-				return (p.out - buf);
-			});
+			const auto cap = (
+				NOT_FOUND.size() + path_data.size() + basename.size()
+			);
+			filename_with_found_prefix.resize_and_overwrite(
+				cap, [&](char8_t* buf, size_t) {
+					std::ranges::in_out_result p = { path_data.begin(), buf };
+					p = std::ranges::copy(NOT_FOUND, p.out);
+					p = std::ranges::copy(path_data, p.out);
+					p = std::ranges::copy(basename, p.out);
+					return (p.out - buf);
+				}
+			);
 		}
-		auto stream = FileStreamRead(filename.c_str());
+		auto stream = FileStreamRead(
+			filename_with_found_prefix.c_str() + NOT_FOUND.size()
+		);
 		if(!stream) {
 			return false;
 		}
+		std::ranges::copy(FOUND, filename_with_found_prefix.begin());
 		load_thread = std::jthread(
 			[this, stream = std::move(stream), id](std::stop_token st) mutable {
 				auto in = FilStartR(std::move(stream));
@@ -362,13 +377,75 @@ namespace DAT {
 }
 // -------------- //
 
+// Missing packfile screen
+// -----------------------
+
+extern bool IsDraw();
+
+namespace DAT_MISSING {
+	constexpr Narrow::string_view TITLE = "Missing game data files";
+
+	WINDOW_SYSTEM Window;
+
+	constexpr auto CENTER = WINDOW_INFO::FLAGS::CENTER;
+	std::array<WINDOW_INFO, (DAT::BASENAMES.size() + 5)> Info = {{
+		{ },
+		{ },
+		{ },
+		{ },
+		{ },
+		{ },
+		{ },
+		{ "Must be provided from an original game copy.", "", nullptr, CENTER },
+		{ },
+		{ "Quit", "", CWinExitFn, CENTER },
+	}};
+
+	void Proc(bool& quit)
+	{
+		CWinMove(&Window);
+		if(Window.State == CWIN_DEAD) {
+			quit = true;
+		}
+		if(IsDraw()) {
+			GrpCls();
+			CWinDraw(&Window);
+			GrpFlip();
+		}
+	}
+
+	void Init(void)
+	{
+		for(const auto i : std::views::iota(0u, DAT::BASENAMES.size())) {
+			const auto id = DAT::PACK_ID(i);
+			const auto& title = DAT::Packs[id].FilenameWithFoundPrefix();
+			Info[1 + i].Title = title;
+		}
+		const auto w = (std::max)(CWinTextExtent(TITLE).w, (std::ranges::max)(
+			Info | std::views::transform([](const auto& info) {
+				return (CWinItemExtent(info.Title).w + 8);
+			})
+		));
+
+		Grp_PaletteSetDefault();
+
+		Window.Parent.Flags = CENTER;
+		Window.Init(TITLE.data(), Info, w);
+		Window.OpenCentered(w, (Info.size() - 1));
+		GameMain = Proc;
+	}
+}
+// -----------------------
+
 void LoaderInit(void)
 {
-	DAT::Check();
-
-	// Call a different *Init() function here to quickly test a different
-	// game state.
-	SProjectInit();
+	if(!DAT::Check()) {
+		DAT_MISSING::Init();
+	} else {
+		// Call a different *Init() function here to quickly test a different
+		// game state.
+		SProjectInit();
+	}
 }
 
 

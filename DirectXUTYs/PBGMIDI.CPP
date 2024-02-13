@@ -7,6 +7,7 @@
 #include "game/endian.h"
 #include "platform/midi_backend.h"
 #include <algorithm>
+#include <thread>
 #include <assert.h>
 #include <windows.h>
 #pragma message(PBGWIN_PBGMIDI_H)
@@ -294,14 +295,11 @@ void Mid_FadeOut(BYTE speed)
 void Mid_GMReset(void)
 {
 	// GM SystemOn : F0H 7EH 7FH 09H 01H F7H //
-
-	DWORD	time;
 	uint8_t msg[6] = { 0xf0, 0x7e, 0x7f, 0x09, 0x01, 0xf7 };
 	MidBackend_Out(msg);
 
 	// ここで50ms以上待つこと! //
-	time = timeGetTime();
-	while(timeGetTime()-time<=50);
+	std::this_thread::sleep_for(50ms);
 }
 
 bool Mid_ChgDev(char pos)

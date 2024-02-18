@@ -106,18 +106,21 @@ bool SndInit(void)
 {
 	HRESULT		dsrval;
 
-	try{
-		dsrval = DirectSoundCreate(NULL,&Snd_DS,NULL);
-		if(dsrval != DS_OK) throw("DirectSoundCreate に失敗");
-
-		extern HWND hWndMain;
-		dsrval = Snd_DS->SetCooperativeLevel(hWndMain, DSSCL_NORMAL);
-		if(dsrval != DS_OK) throw("SetCooperativeLevel(DSound) に失敗");
-	}
-	catch(char *error){
+	const auto fail = [](std::u8string_view error) {
 		DebugOut(error);
 		SndCleanup();
-		return FALSE;
+		return false;
+	};
+
+	dsrval = DirectSoundCreate(nullptr, &Snd_DS, nullptr);
+	if(dsrval != DS_OK) {
+		return fail(u8"DirectSoundCreate に失敗");
+	}
+
+	extern HWND hWndMain;
+	dsrval = Snd_DS->SetCooperativeLevel(hWndMain, DSSCL_NORMAL);
+	if(dsrval != DS_OK) {
+		return fail(u8"SetCooperativeLevel(DSound) に失敗");
 	}
 
 	return TRUE;
@@ -204,12 +207,12 @@ bool SndWAVLoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 
 	dsrval = Snd_DS->CreateSoundBuffer(&dsBD,&p->buf[0],NULL);
 	if(dsrval != DS_OK){
-		DebugOut("CreateSoundBuffer に失敗");
+		DebugOut(u8"CreateSoundBuffer に失敗");
 		return FALSE;
 	}
 
 	if(!SndFillBuffer(p->buf[0],p->data,p->size)){
-		DebugOut("SndFillBuffer に失敗 (PBGUTY_X.LIB)");
+		DebugOut(u8"SndFillBuffer に失敗 (PBGUTY_X.LIB)");
 		return FALSE;
 	}
 

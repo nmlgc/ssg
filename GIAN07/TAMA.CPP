@@ -199,9 +199,9 @@ int __fastcall TamaSpeedEx(BYTE d)
 	int		delta;
 
 	switch(TamaCmd.v & 0xc0){
-		case(TAMASP_RND1): temp = rnd()%16-8 ; /*DebugOut("2");*/	break;
-		case(TAMASP_RND2): temp = rnd()%32-16; /*DebugOut("3");*/	break;
-		case(TAMASP_RND3): temp = rnd()%64-32; /*DebugOut("4");*/	break;
+		case(TAMASP_RND1): temp = rnd()%16-8 ; /* DebugOut(u8"2"); */	break;
+		case(TAMASP_RND2): temp = rnd()%32-16; /* DebugOut(u8"3"); */	break;
+		case(TAMASP_RND3): temp = rnd()%64-32; /* DebugOut(u8"4"); */	break;
 	}
 
 	// d と TamaCmd.d の値の離れ具合により、速度を変化させる //
@@ -749,7 +749,7 @@ BYTE __fastcall tama_dir(WORD i)
 			return deg + (i<<8)/TamaCmd.n;
 
 		case(TC_RND):
-			//DebugOut("1");
+			// DebugOut(u8"1");
 			return deg + rnd()%TamaCmd.dw - (TamaCmd.dw>>1);
 
 		default:
@@ -764,9 +764,9 @@ int __fastcall NewTamaSpeed(WORD i)
 
 	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
 	switch(TamaCmd.v & 0xc0){
-		case(TAMASP_RND1): temp = rnd()%16-8 ; /*DebugOut("2");*/	break;
-		case(TAMASP_RND2): temp = rnd()%32-16; /*DebugOut("3");*/	break;
-		case(TAMASP_RND3): temp = rnd()%64-32; /*DebugOut("4");*/	break;
+		case(TAMASP_RND1): temp = rnd()%16-8 ; /* DebugOut(u8"2"); */	break;
+		case(TAMASP_RND2): temp = rnd()%32-16; /* DebugOut(u8"3"); */	break;
+		case(TAMASP_RND3): temp = rnd()%64-32; /* DebugOut(u8"4"); */	break;
 	}
 
 	if(TamaCmd.cmd & TAMA_REN)
@@ -802,9 +802,9 @@ int __fastcall tama_speed(WORD i)
 
 	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
 	switch(TamaCmd.v & 0xc0){
-		case(TAMASP_RND1): temp = rnd()%16-8 ; /*DebugOut("2");*/	break;
-		case(TAMASP_RND2): temp = rnd()%32-16; /*DebugOut("3");*/	break;
-		case(TAMASP_RND3): temp = rnd()%64-32; /*DebugOut("4");*/	break;
+		case(TAMASP_RND1): temp = rnd()%16-8 ; /* DebugOut(u8"2"); */	break;
+		case(TAMASP_RND2): temp = rnd()%32-16; /* DebugOut(u8"3"); */	break;
+		case(TAMASP_RND3): temp = rnd()%64-32; /* DebugOut(u8"4"); */	break;
 	}
 
 	if(TamaCmd.cmd & TAMA_REN)

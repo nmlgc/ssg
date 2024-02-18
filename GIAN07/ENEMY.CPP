@@ -1688,7 +1688,7 @@ void parse_ECL(ENEMY_DATA *e)
 				case(ECLCST_TCMD_REP):
 					//char buf[100];
 					//sprintf(buf,"REP=%d [REG:%d]",dwTemp,cmd[2]);
-					//DebugOut(buf);
+					// DebugOut(buf);
 					e->t_cmd.rep= (BYTE)dwTemp;
 				break;	// 弾コマンド(繰り返し)
 
@@ -1699,7 +1699,7 @@ void parse_ECL(ENEMY_DATA *e)
 				case(ECLCST_ENEMY_D):	e->d = (BYTE)dwTemp;	break;		// 敵の角度
 
 				default:
-					DebugOut("ナゾのレジスタ指定++");
+					DebugOut(u8"ナゾのレジスタ指定++");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1713,7 +1713,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1727,7 +1727,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1741,7 +1741,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1755,7 +1755,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしいに
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1769,7 +1769,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしいに
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1802,7 +1802,7 @@ void parse_ECL(ENEMY_DATA *e)
 					break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1816,7 +1816,7 @@ void parse_ECL(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut("ナゾのレジスタ指定");
+					DebugOut(u8"ナゾのレジスタ指定");
 				break;
 			}
 			bRetFlag = FALSE;
@@ -1901,13 +1901,13 @@ extern void CheckECLInterrupt(ENEMY_DATA *e)
 			case(ECLVECT_HP):	// HPL 割り込み
 				//char buf[100];
 				//sprintf(buf,"hp = %d",e->hp);
-				//DebugOut(buf);
+				// DebugOut(buf);
 				if(e->hp <= e->Vect[ECLVECT_HP].value){
 					e->cmd = e->Vect[ECLVECT_HP].vect;
 					e->cmd_c = 0;		// コマンド繰り返しカウンタ
 					e->rep_c = 0;		// LOOP(旧REP)命令カウンタ
 					e->t_rep = 0;		// 自動弾発射タイミング(0:自動発射せず)
-					//DebugOut("受理");
+					// DebugOut(u8"受理");
 					return;
 				}
 			break;

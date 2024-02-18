@@ -352,7 +352,7 @@ static void _2DUpdateAlphaTable(void)
 		if(chk == AInfo[i].CheckValue){
 			AInfo[i].RefCount++;
 			AlphaTable = AlphaBuf[i];
-			//DebugOut("αテーブルキャッシュＯＫ");
+			// DebugOut(u8"αテーブルキャッシュＯＫ");
 			return;
 		}
 	}

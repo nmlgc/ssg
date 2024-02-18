@@ -86,7 +86,7 @@ extern bool ScoreNameInit(void)
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 
@@ -438,7 +438,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 
@@ -565,11 +565,11 @@ extern bool GameNextStage(void)
 	MaidNextStage();
 
 	if(!LoadGraph(GameStage)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 	if(!LoadStageData(GameStage)){
-		DebugOut("ENEMY.DAT が破壊されています");
+		DebugOut(u8"ENEMY.DAT が破壊されています");
 		return FALSE;
 	}
 
@@ -586,7 +586,7 @@ extern bool GameReplayInit(int Stage)
 	GameStage = Stage;
 
 	if(!DemoplayLoadReplay(GameStage)) {
-		//DebugOut("デモプレイデータが存在せず");
+		// DebugOut(u8"デモプレイデータが存在せず");
 		return FALSE;
 	}
 
@@ -597,12 +597,12 @@ extern bool GameReplayInit(int Stage)
 	GameSTD_Init();
 
 	if(!LoadGraph(GameStage)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		DemoplayCleanup();
 		return FALSE;
 	}
 	if(!LoadStageData(GameStage)){
-		DebugOut("ENEMY.DAT が破壊されています");
+		DebugOut(u8"ENEMY.DAT が破壊されています");
 		DemoplayCleanup();
 		return FALSE;
 	}
@@ -678,18 +678,18 @@ bool DemoInit(void)
 //	GameStage = 1;					// こっちはＨＰ体験版用         //
 
 	if(!DemoplayLoadDemo(GameStage)) {
-		//DebugOut("デモプレイデータが存在せず");
+		// DebugOut(u8"デモプレイデータが存在せず");
 		return FALSE;
 	}
 
 	PlayRankReset();
 
 	if(!LoadGraph(GameStage)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 	if(!LoadStageData(GameStage)){
-		DebugOut("ENEMY.DAT が破壊されています");
+		DebugOut(u8"ENEMY.DAT が破壊されています");
 		return FALSE;
 	}
 
@@ -767,7 +767,7 @@ void SProjectProc(bool&)
 bool SProjectInit(void)
 {
 	if(!LoadGraph(GRAPH_ID_SPROJECT)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 
@@ -794,7 +794,7 @@ extern bool MusicRoomInit(void)
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_MUSICROOM)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 
@@ -810,13 +810,13 @@ extern bool MusicRoomInit(void)
 	Mid_Stop();
 */
 	if(!LoadMusicRoomComment(0)){
-		DebugOut("ENEMY.DAT がはかいされています");
+		DebugOut(u8"ENEMY.DAT がはかいされています");
 		GameExit();
 		return FALSE;
 	}
 /*
 	if(!LoadMusic(0)){
-		DebugOut("MUSIC.DAT が破壊されています");
+		DebugOut(u8"MUSIC.DAT が破壊されています");
 		GameExit();
 		return FALSE;
 	}
@@ -846,7 +846,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	}
 
 	if(!LoadGraph(GRAPH_ID_TITLE)){
-		DebugOut("GRAPH.DAT が破壊されています");
+		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
 	GrpSetClip(0,0,640,480);
@@ -1162,11 +1162,11 @@ void WeaponSelectProc(bool&)
 			}
 
 			if(!LoadGraph(GameStage)){
-				DebugOut("GRAPH.DAT が破壊されています");
+				DebugOut(u8"GRAPH.DAT が破壊されています");
 				return;
 			}
 			if(!LoadStageData(GameStage)){
-				DebugOut("ENEMY.DAT が破壊されています");
+				DebugOut(u8"ENEMY.DAT が破壊されています");
 				return;
 			}
 

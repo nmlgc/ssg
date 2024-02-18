@@ -130,24 +130,21 @@ bool GrpEnum(void)
 	ZeroMemory(DxEnum, sizeof(DxEnum));
 	DxEnumNow = 0;
 
-	try{
-		// 列挙開始 //
-		dxret = DirectDrawEnumerate(DriverEnum,NULL);
-		if(dxret!=DD_OK) throw("DirectDrawEnumerate に失敗");
+	// 列挙開始 //
+	dxret = DirectDrawEnumerate(DriverEnum,NULL);
+	if(dxret != DD_OK) {
+		DebugOut(u8"DirectDrawEnumerate に失敗");
+		return false;
+	}
 
-		// 一応ダミー関数をセットしておく //
-		SetDummyFunc();
-	}
-	catch(char *error){
-		DebugOut(error);
-		return FALSE;
-	}
+	// 一応ダミー関数をセットしておく //
+	SetDummyFunc();
 
 	extern HWND hWndMain;
 	DxObj.hWnd = hWndMain;
 
 #ifdef _DEBUG
-	DebugOut("正常に列挙できたの");
+	DebugOut(u8"正常に列挙できたの");
 #endif
 
 	return TRUE;
@@ -255,7 +252,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 
 		throw(TRUE);
 	}
-	catch(char *error){
+	catch(std::u8string_view error) {
 		DebugOut(error);
 		Cleanup();
 		return FALSE;

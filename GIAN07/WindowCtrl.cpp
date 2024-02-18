@@ -485,7 +485,7 @@ static bool SndFnWAVE(INPUT_BITS key)
 			//extern INPUT_OBJ InputObj;
 			//char buf[100];
 			//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-			//DebugOut(buf);
+			// DebugOut(buf);
 
 			if(ConfigDat.SoundFlags.v & SNDF_WAVE_ENABLE) {
 				ConfigDat.SoundFlags.v &= (~SNDF_WAVE_ENABLE);
@@ -502,7 +502,7 @@ static bool SndFnWAVE(INPUT_BITS key)
 				}
 			}
 			//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-			//DebugOut(buf);
+			// DebugOut(buf);
 		break;
 	}
 

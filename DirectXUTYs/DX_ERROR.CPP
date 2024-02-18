@@ -39,7 +39,7 @@ extern void DebugCleanup(void)
 	ErrorActive = false;
 }
 
-extern void DebugOut(std::string_view s)
+extern void DebugOut(std::u8string_view s)
 {
 	using namespace std::string_view_literals;
 

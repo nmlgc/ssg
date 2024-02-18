@@ -104,8 +104,7 @@ void DemoplaySaveDemo(void)
 	fn[3] = ('0' + GameStage);
 
 	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {
-		DemoInfo,
-		std::span<INPUT_BITS>{ DemoBuffer, (DemoBufPtr + 1) },
+		std::span(&DemoInfo, 1), std::span(DemoBuffer, (DemoBufPtr + 1)),
 	};
 	FileWrite(fn, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
 
@@ -176,8 +175,7 @@ void DemoplaySaveReplay(void)
 
 	const auto demo_size = (sizeof(INPUT_BITS) * DemoInfo.DataSize);
 	PACKFILE_WRITE out = { {
-		DemoInfo,
-		std::span<INPUT_BITS>{ DemoBuffer, demo_size },
+		std::span(&DemoInfo, 1), std::span(DemoBuffer, demo_size),
 	} };
 
 	const auto fn = ReplayFN(GameStage);

@@ -209,6 +209,6 @@ extern void ConfigSave(void)
 	}, VERSIONS);
 
 #ifdef PBG_DEBUG
-	FileWrite(DBG_FN, DebugDat);
+	FileWrite(DBG_FN, std::span(&DebugDat, 1));
 #endif
 }

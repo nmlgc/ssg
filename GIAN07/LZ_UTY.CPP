@@ -218,7 +218,10 @@ bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
 	fil_checksum_t sum = 0; // in native byte order
 
 	auto write_header = [&head, &info](FILE_STREAM_WRITE &stream) {
-		return (stream.Write(head) && stream.Write(info));
+		return (
+			stream.Write(std::span(&head, 1)) &&
+			stream.Write(std::span(info))
+		);
 	};
 
 	auto stream = FileStreamWrite(s);

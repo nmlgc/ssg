@@ -111,9 +111,9 @@ bool BMPSave(
 	};
 	return (
 		stream &&
-		stream->Write(header_file) &&
-		stream->Write(header_info) &&
-		stream->Write(std::as_bytes(palette)) &&
+		stream->Write(std::span(&header_file, 1)) &&
+		stream->Write(std::span(&header_info, 1)) &&
+		stream->Write(palette) &&
 		stream->Write(pixels)
 	);
 }

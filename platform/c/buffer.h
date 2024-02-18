@@ -8,7 +8,6 @@
 #include <memory>
 #include <optional>
 #include <span>
-#include <string_view>
 #include <type_traits>
 #include <vector>
 
@@ -22,20 +21,8 @@ template <typename T> concept SERIALIZABLE = (
 struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 	using span::span;
 
-	template <SERIALIZABLE T> BYTE_BUFFER_BORROWED(const T& val) :
-		span(reinterpret_cast<const uint8_t *>(&val), sizeof(val)) {
-	}
-
 	template <typename T, size_t N> BYTE_BUFFER_BORROWED(std::span<T, N> val) :
 		span(reinterpret_cast<const uint8_t *>(val.data()), val.size_bytes()) {
-	}
-
-	template <SERIALIZABLE T> BYTE_BUFFER_BORROWED(const std::vector<T>& val) :
-		BYTE_BUFFER_BORROWED(std::span<const T>{ val.data(), val.size() }) {
-	}
-
-	BYTE_BUFFER_BORROWED(const std::string_view str) noexcept :
-		span({ reinterpret_cast<const uint8_t *>(str.data()), str.length() }) {
 	}
 };
 

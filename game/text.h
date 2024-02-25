@@ -24,6 +24,8 @@ template <class T, class FontID> concept TEXTRENDER_SESSION = (
 		RGBA color,
 		FontID font
 	) {
+		{ t.rect } -> std::same_as<const PIXEL_LTWH&>;
+
 		t.SetFont(font);
 		t.SetColor(color);
 
@@ -42,6 +44,11 @@ template <class T, class FontID> concept TEXTRENDER_SESSION = (
 		t.Put(topleft_rel, str, color);
 	}
 );
+
+// Horizontally [str] on [s]'s rectangle.
+PIXEL_COORD TextLayoutXCenter(auto& s, Narrow::string_view str) {
+	return ((s.rect.w - s.Extent(str).w) / 2);
+}
 
 // Concept that describes valid text rendering session functors in game code.
 template <typename F, class Session, class FontID>

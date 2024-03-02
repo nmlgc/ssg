@@ -143,11 +143,6 @@ main_src += tup.glob("GIAN07/*.CPP")
 
 main_obj = (cxx(modern_cfg, modern_src) + cxx(main_cfg, main_src))
 
-main_win32_src += "MAIN/MAIN.CPP"
-main_win32_src += tup.glob("platform/windows_vintage/*.CPP")
-main_win32_obj = cxx(main_cfg, main_win32_src)
-exe(main_cfg, (main_win32_obj + main_obj), "GIAN07_WIN32")
-
 main_sdl_cfg = main_cfg:branch("", ANALYSIS, {
 	base = { lflags = "/SUBSYSTEM:windows" }
 })

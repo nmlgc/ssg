@@ -5,24 +5,26 @@ tup.include("libs/tupblocks/Tuprules.lua")
 
 SDL = sourcepath("libs/SDL/")
 SDL_COMPILE = {
-	base = {
-		cflags = "/DDLL_EXPORT",
-		lflags = (
-			"advapi32.lib imm32.lib gdi32.lib kernel32.lib ole32.lib " ..
-			"oleaut32.lib setupapi.lib user32.lib version.lib winmm.lib"
-		),
-		objdir = "SDL/",
+	cflags = "/DDLL_EXPORT",
+	lflags = {
+		"advapi32.lib",
+		"imm32.lib",
+		"gdi32.lib",
+		"kernel32.lib",
+		"ole32.lib",
+		"oleaut32.lib",
+		"setupapi.lib",
+		"user32.lib",
+		"version.lib",
+		"winmm.lib",
+		debug = "ucrtd.lib",
+		release = "ucrt.lib",
 	},
-	buildtypes = {
-		debug = { lflags = "ucrtd.lib" },
-		release = { lflags = "ucrt.lib" },
-	}
+	objdir = "SDL/",
 }
 SDL_LINK = {
-	base = {
-		cflags = ("-I" .. SDL.join("include/")),
-		lflags = "shell32.lib", -- for SDL_main()'s CommandLineToArgvW()
-	},
+	cflags = ("-I" .. SDL.join("include/")),
+	lflags = "shell32.lib", -- for SDL_main()'s CommandLineToArgvW()
 }
 
 sdl_src += SDL.glob("src/*.c")
@@ -79,9 +81,7 @@ sdl_src += SDL.join("src/thread/generic/SDL_syscond.c")
 sdl_winmain_src += SDL.glob("src/main/windows/*.c")
 
 sdl_cfg = CONFIG:branch(SDL_COMPILE, SDL_LINK)
-sdl_mslibc_cfg = sdl_cfg:branch({
-	buildtypes = { release = { cflags = flag_remove("/GL") } }
-})
+sdl_mslibc_cfg = sdl_cfg:branch({ cflags = { release = flag_remove("/GL") } })
 sdl_obj = (
 	cxx(sdl_cfg, sdl_src) +
 	cxx(sdl_mslibc_cfg, SDL.join("src/stdlib/SDL_mslibc.c")) +
@@ -99,15 +99,13 @@ sdl_dll = (
 LIBOGG = sourcepath("libs/libogg/")
 LIBVORBIS = sourcepath("libs/libvorbis/")
 
-XIPH_LINK = { base = { cflags = string.format(
+XIPH_LINK = { cflags = string.format(
 	"-I%sinclude -I%sinclude", LIBOGG.root, LIBVORBIS.root
-)} }
-libogg_cfg = CONFIG:branch(XIPH_LINK, { base = { objdir = "libogg/" } })
+)}
+local libogg_cfg = CONFIG:branch(XIPH_LINK, { objdir = "libogg/" })
 libogg_src += LIBOGG.glob("src/*.c")
 
-libvorbis_cfg = CONFIG:branch(XIPH_LINK, { base = {
-	objdir = "libvorbis/"
-} })
+local libvorbis_cfg = CONFIG:branch(XIPH_LINK, { objdir = "libvorbis/" })
 libvorbis_src += (LIBVORBIS.glob("lib/*.c") - {
 	"barkmel.c$", "misc.c$", "psytune.c$", "tone.c$", "vorbisenc.c$"
 })
@@ -120,22 +118,18 @@ xiph_obj = (cxx(libogg_cfg, libogg_src) + cxx(libvorbis_cfg, libvorbis_src))
 
 BLAKE3 = sourcepath("libs/BLAKE3/c/")
 BLAKE3_COMPILE = {
-	base = {
-		objdir = "BLAKE3/",
+	objdir = "BLAKE3/",
 
-		-- Visual C++ has no SSE4.1 flag, and I don't trust the /arch:AVX option
-		cflags = "/DBLAKE3_NO_SSE41",
-	}
+	-- Visual C++ has no SSE4.1 flag, and I don't trust the /arch:AVX option
+	cflags = "/DBLAKE3_NO_SSE41",
 }
-BLAKE3_LINK = { base = { cflags = ("-I" .. BLAKE3.root) } }
+BLAKE3_LINK = { cflags = ("-I" .. BLAKE3.root) }
 
 blake3_src += BLAKE3.join("blake3.c")
 blake3_src += BLAKE3.join("blake3_dispatch.c")
 blake3_src += BLAKE3.join("blake3_portable.c")
 
-blake3_modern_cfg = CONFIG:branch(BLAKE3_COMPILE, { base = {
-	objdir = "modern/",
-} })
+local blake3_modern_cfg = CONFIG:branch(BLAKE3_COMPILE, { objdir = "modern/" })
 
 -- Each optimized version must be built with the matching Visual C++ `/arch`
 -- flag. This is not only necessary for the compiler to actually emit the
@@ -145,9 +139,9 @@ blake3_modern_cfg = CONFIG:branch(BLAKE3_COMPILE, { base = {
 -- also appear in the AVX2 version, breaking it on those CPUs.)
 -- That's why they recommend the ASM versions, but they're 64-bit-exclusive…
 blake3_arch_cfgs = {
-	blake3_modern_cfg:branch({ base = { cflags = "/arch:SSE2" } }),
-	blake3_modern_cfg:branch({ base = { cflags = "/arch:AVX2" } }),
-	blake3_modern_cfg:branch({ base = { cflags = "/arch:AVX512" } }),
+	blake3_modern_cfg:branch({ cflags = "/arch:SSE2" }),
+	blake3_modern_cfg:branch({ cflags = "/arch:AVX2" }),
+	blake3_modern_cfg:branch({ cflags = "/arch:AVX512" }),
 }
 blake3_modern_obj = (
 	cxx(blake3_modern_cfg, blake3_src) +
@@ -158,47 +152,43 @@ blake3_modern_obj = (
 -- ------
 
 -- Static analysis using the C++ Core Guideline checker plugin.
-ANALYSIS_CFLAGS = (
-	"/analyze:autolog- /analyze:plugin EspXEngine.dll " ..
-	"/external:W0 /external:anglebrackets /analyze:external- " ..
+local ANALYSIS = { cflags = { release = {
+	"/analyze:autolog-",
+	"/analyze:plugin EspXEngine.dll",
+	"/external:W0",
+	"/external:anglebrackets",
+	"/analyze:external-",
 
 	-- Critical warnings
-	"/we26819 " .. -- Unannotated fallthrough between switch labels
-	"/we26427 " .. -- Static initialization order fiasco
+	"/we26819", -- Unannotated fallthrough between switch labels
+	"/we26427", -- Static initialization order fiasco
 
 	-- Disabled warnings
-	"/wd4834 " .. -- Discarding `[[nodiscard]]` (C6031 covers this and more)
-	"/wd26408 " .. -- Avoid _malloca()
-	"/wd26432 " .. -- Rule of Five boilerplate
-	"/wd26440 " .. -- `noexcept` all the things
-	"/wd26481 " .. -- Don't use pointer arithmetic
-	"/wd26482 " .. -- Only index into arrays using constant expressions
-	"/wd26490 " .. -- Don't use `reinterpret_cast`
-	"/wd26429 /wd26446 /wd26472 /wd26821" -- Guideline Support Library
-)
-
-ANALYSIS = {
-	buildtypes = {
-		release = { cflags = ANALYSIS_CFLAGS },
-	},
-}
+	"/wd4834", -- Discarding `[[nodiscard]]` (C6031 covers this and more)
+	"/wd26408", -- Avoid _malloca()
+	"/wd26432", -- Rule of Five boilerplate
+	"/wd26440", -- `noexcept` all the things
+	"/wd26481", -- Don't use pointer arithmetic
+	"/wd26482", -- Only index into arrays using constant expressions
+	"/wd26490", -- Don't use `reinterpret_cast`
+	"/wd26429", -- Guideline Support Library
+	"/wd26446", -- …
+	"/wd26472", -- …
+	"/wd26821", -- …
+} } }
 
 main_cfg = CONFIG:branch(SDL_LINK, BLAKE3_LINK, {
-	base = {
-		cflags = (
-			"/std:c++latest " ..
-			"/DWIN32 " ..
-			"/I. " ..
-			"/EHsc " ..
-			"/source-charset:utf-8 " ..
-			"/execution-charset:utf-8"
-		),
-		lflags = "obj/dinput.lib",
-		objdir = "ssg/",
+	cflags = {
+		"/std:c++latest",
+		"/DWIN32",
+		"/I.",
+		"/EHsc",
+		"/source-charset:utf-8",
+		"/execution-charset:utf-8",
+		debug = "/DPBG_DEBUG",
 	},
-	buildtypes = {
-		debug = { cflags = "/DPBG_DEBUG" },
-	}
+	lflags = "obj/dinput.lib",
+	objdir = "ssg/",
 })
 
 modern_cfg = main_cfg:branch(ANALYSIS)
@@ -216,8 +206,8 @@ main_obj = (
 	cxx(main_cfg, main_src)
 )
 
-main_sdl_cfg = main_cfg:branch(ANALYSIS, {
-	base = { lflags = "/SUBSYSTEM:windows" }
+local main_sdl_cfg = main_cfg:branch(ANALYSIS, {
+	lflags = "/SUBSYSTEM:windows"
 })
 
 main_sdl_src += "MAIN/main_sdl.cpp"

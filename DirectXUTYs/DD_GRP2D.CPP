@@ -319,15 +319,15 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 
 	Dat64.dq  = *(DWORDLONG *)write;
 	switch(x2&7){
-		case 7:		Dat64.db6 = AlphaTable[Dat64.db6];
-		case 6:		Dat64.db5 = AlphaTable[Dat64.db5];
-		case 5:		Dat64.db4 = AlphaTable[Dat64.db4];
-		case 4:		Dat64.db3 = AlphaTable[Dat64.db3];
-		case 3:		Dat64.db2 = AlphaTable[Dat64.db2];
-		case 2:		Dat64.db1 = AlphaTable[Dat64.db1];
-		case 1:		Dat64.db0 = AlphaTable[Dat64.db0];
-					*(DWORDLONG *)write = Dat64.dq;
-		case 0:		return;
+		case 7:	Dat64.db6 = AlphaTable[Dat64.db6];	[[fallthrough]];
+		case 6:	Dat64.db5 = AlphaTable[Dat64.db5];	[[fallthrough]];
+		case 5:	Dat64.db4 = AlphaTable[Dat64.db4];	[[fallthrough]];
+		case 4:	Dat64.db3 = AlphaTable[Dat64.db3];	[[fallthrough]];
+		case 3:	Dat64.db2 = AlphaTable[Dat64.db2];	[[fallthrough]];
+		case 2:	Dat64.db1 = AlphaTable[Dat64.db1];	[[fallthrough]];
+		case 1:	Dat64.db0 = AlphaTable[Dat64.db0];
+			*(DWORDLONG *)write = Dat64.dq;	[[fallthrough]];
+		case 0:	return;
 	}
 }
 

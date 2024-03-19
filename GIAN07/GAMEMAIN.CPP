@@ -1371,7 +1371,7 @@ void MusicRoomProc(bool&)
 			return;
 
 			case(KEY_RIGHT):
-				MidiPlayID+=2;
+				MidiPlayID += 2; [[fallthrough]];
 			case(KEY_LEFT):
 				BGM_Stop();
 				MidiPlayID = (MidiPlayID+MusicNum-1)%MusicNum;

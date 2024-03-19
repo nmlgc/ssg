@@ -565,15 +565,16 @@ void MWinCmd(uint8_t cmd)
 
 	switch(cmd){
 		case(MWCMD_LARGEFONT):		// ラージフォントを使用する
-			Ysize +=  8;
+			Ysize +=  8; [[fallthrough]];
 		case(MWCMD_NORMALFONT):		// ノーマルフォントを使用する
-			Ysize +=  2;
+			Ysize +=  2; [[fallthrough]];
 		case(MWCMD_SMALLFONT):		// スモールフォントを使用する
 			Ysize += 14;
 			temp = MsgWindow.MaxSize.bottom - MsgWindow.MaxSize.top - 16;
 			MsgWindow.MaxLine = temp / Ysize;							// 表示可能最大行数
 			MsgWindow.FontDy  =(temp % Ysize)/(temp/Ysize)+Ysize + 1;	// Ｙ増量
 			MsgWindow.FontID  = GIAN_FONT_ID(cmd);	// 使用フォント
+			[[fallthrough]];
 
 		case(MWCMD_NEWPAGE):		// 改ページする
 			// 文字列無効化, 最初の行へ

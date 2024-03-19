@@ -206,7 +206,8 @@ extern void GrpPutMidNum(int x, int y, int n)
 struct GDI_FONTS {
 	ENUMARRAY<HFONT, GIAN_FONT_ID> fonts;
 
-	GDI_FONTS() {
+	GDI_FONTS() noexcept
+	{
 		LOGFONTW logfont = {
 			.lfEscapement = 0,
 			.lfOrientation = 0,

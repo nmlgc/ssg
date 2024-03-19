@@ -108,7 +108,7 @@ struct WINDOW_INFO {
 		const Narrow::literal help = "",
 		decltype(CallBackFn) callback_fn = nullptr,
 		FLAGS flags = FLAGS::NONE
-	) :
+	) noexcept :
 		Title(title),
 		Help(help),
 		CallBackFn(callback_fn),

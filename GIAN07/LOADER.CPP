@@ -626,8 +626,9 @@ bool LoadGraph(int stage)
 	}
 	GrpGetPalette(EnemyPalette);
 
-	//DWORD MapChipID[6] = {7,7,8,9,10,11};	// 本当は STAGE_MAX とすべき
-	DWORD MapChipID[STAGE_MAX] = {7,8,9,10,11,12};
+	// 本当は STAGE_MAX とすべき
+	// const fil_no_t MapChipID[STAGE_MAX] = { 7, 7, 8, 9, 10, 11 };
+	const fil_no_t MapChipID[STAGE_MAX] = { 7, 8, 9, 10, 11, 12 };
 	if(!GrpBMPLoadP(graph, MapChipID[stage - 1], SURFACE_ID_MAPCHIP)) {
 		return false;
 	}

@@ -30,7 +30,9 @@ static BYTE *__LSurfLock(LensInfo *LInfo)
 
 	memset(&ddsd,0,sizeof(DDSURFACEDESC));
 	ddsd.dwSize = sizeof(ddsd);
-	auto ddret = LInfo->gTemp->surf->Lock(nullptr, &ddsd, DDLOCK_WAIT, nullptr);
+	const auto ddret = LInfo->gTemp->surf->Lock(
+		nullptr, &ddsd, DDLOCK_WAIT, nullptr
+	);
 	if(ddret != DD_OK) return NULL;
 
 	// The pitch can be different from (width * BPP) here!
@@ -148,7 +150,7 @@ void LensInfo::Draw(WINDOW_POINT center)
 		(center.x - r), (center.y - r), (center.x + r), (center.y + r)
 	};
 	for(;;){
-		auto ddrval = gTemp->surf->BltFast(
+		const auto ddrval = gTemp->surf->BltFast(
 			0, 0, DxObj.Back, &src, DDBLTFAST_NOCOLORKEY
 		);
 		if(ddrval == DD_OK){

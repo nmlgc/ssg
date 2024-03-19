@@ -712,7 +712,9 @@ void GrpDrawSpect(int x, int y)
 	static WORD ftable3[128+8+8];
 	static BYTE ftable3flag;
 
-	PIXEL_LTRB	src = { (16 * 16), 0, ((16 * 16) + (8 * 21)), 8 };	// ,,,8*4
+	constexpr PIXEL_LTRB src = {
+		(16 * 16), 0, ((16 * 16) + (8 * 21)), 8
+	}; // ,,,8*4
 
 	ftable3flag = (ftable3flag+1)%5;
 
@@ -805,7 +807,7 @@ void GrpDrawNote(void)
 		{24,464,27,474},		// しろ
 	};
 
-	PIXEL_LTRB src2[12] = {
+	constexpr PIXEL_LTRB src2[12] = {
 		{ 0,464-24, 3,474-24},		// しろ
 		{ 0,456-24, 3,461-24},		// 黒
 
@@ -825,7 +827,7 @@ void GrpDrawNote(void)
 		{24,464-24,27,474-24},		// しろ
 	};
 
-	int destX[12] = {
+	constexpr int destX[12] = {
 		0,		// しろ
 		2,		// 黒
 

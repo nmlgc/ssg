@@ -54,7 +54,7 @@ uint8_t BIT_DEVICE_READ::GetBit()
 	if(cursor.byte >= buffer.size()) {
 		return 0xFF;
 	}
-	bool ret = ((buffer[cursor.byte] >> (7 - cursor.bit)) & 1);
+	const bool ret = ((buffer[cursor.byte] >> (7 - cursor.bit)) & 1);
 	cursor += 1;
 	return ret;
 }
@@ -136,7 +136,7 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 
 	BIT_DEVICE_READ device = { maybe_compressed.value() };
 	while(out_i < info[filno].size_uncompressed) {
-		bool is_literal = device.GetBit();
+		const bool is_literal = device.GetBit();
 		if(is_literal) {
 			output(device.GetBits(8));
 		} else {
@@ -146,8 +146,10 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 			} else {
 				seq_offset--;
 			}
-			auto seq_length = (device.GetBits(LZSS_SEQ_BITS) + LZSS_SEQ_MIN);
-			for(decltype(seq_length) i = 0; i < seq_length; i++) {
+			const auto seq_length = (
+				device.GetBits(LZSS_SEQ_BITS) + LZSS_SEQ_MIN
+			);
+			for(auto i = decltype(seq_length){0}; i < seq_length; i++) {
 				output(dict[seq_offset++ & LZSS_DICT_MASK]);
 			}
 		}

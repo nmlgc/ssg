@@ -514,7 +514,7 @@ void __fastcall _TamaEffectDraw(const TAMA_DATA *t)
 	};
 
 	PIXEL_LTRB	temp;
-	int		ptn = (t->count/4) % 5;
+	const int ptn = ((t->count / 4) % 5);
 	int		x,y;
 
 	x = (t->x >> 6) - Width[ptn];
@@ -759,7 +759,7 @@ BYTE __fastcall tama_dir(WORD i)
 int __fastcall NewTamaSpeed(WORD i)
 {
 	int temp = 0;						// ランダム要素の設定用
-	int vret = TamaSpeed; //SPEEDM(TamaCmd.v);		// 速度の基本値をセットする(GIAN.H)
+	const int vret = TamaSpeed; // SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
 
 	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
 	switch(TamaCmd.v & 0xc0){
@@ -797,7 +797,7 @@ int __fastcall LineCmdNewTamaSpeed(WORD i)
 int __fastcall tama_speed(WORD i)
 {
 	int temp = 0;						// ランダム要素の設定用
-	int vret = SPEEDM(TamaCmd.v);		// 速度の基本値をセットする(GIAN.H)
+	const int vret = SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
 
 	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
 	switch(TamaCmd.v & 0xc0){

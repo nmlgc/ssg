@@ -24,7 +24,7 @@ extern void StdStatusOutput(void)
 	static DWORD	fps,count;
 	static DWORD	time,temp;
 	//extern InputConfig			IConfig;
-	const char	*DItem[4] = {"Easy","Norm","Hard","Luna"};
+	const char *const DItem[4] = { "Easy", "Norm", "Hard", "Luna" };
 	char	buf[100];
 
 #ifdef PBG_DEBUG

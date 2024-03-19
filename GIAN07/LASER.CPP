@@ -585,8 +585,8 @@ static int __fastcall REFL_hit(const LASER_DATA *lp)
 	int i;
 
 	// レーザーの進行方向に対して先端??? //
-	long lx = lp->x + cosl(lp->d,lp->l);	// レーザーの判定ポイントX
-	long ly = lp->y + sinl(lp->d,lp->l);	// レーザーの判定ポイントY
+	const long lx = (lp->x + cosl(lp->d, lp->l)); // レーザーの判定ポイントX
+	const long ly = (lp->y + sinl(lp->d, lp->l)); // レーザーの判定ポイントY
 
 	long tx,ty;								// 演算用座標
 	long length,width;						// ヒットチェック用

@@ -104,7 +104,7 @@ bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
 {
 	for(;;) {
-		HRESULT ddrval = action();
+		const HRESULT ddrval = action();
 		if(ddrval == DD_OK) {
 			break;
 		}
@@ -224,7 +224,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		// 2Dの初期化はここでおしまい //
 		DeviceID = device_id;
 		PixelFormat = pixel_format;
-		if(PixelFormat.IsPalettized()) throw(TRUE);
+		if(PixelFormat.IsPalettized()) throw(true);
 
 		// Direct3D Object の取得 //
 		dxret = DD->QueryInterface(IID_IDirect3D2, (void **)&D3);
@@ -247,14 +247,14 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		dxret = D3Dev->SetCurrentViewport(View);
 		if(dxret!=D3D_OK) throw("SetCurrentViewport に失敗");
 
-		throw(TRUE);
+		throw(true);
 	}
-	catch(std::u8string_view error) {
+	catch(const std::u8string_view error) {
 		DebugOut(error);
 		Cleanup();
 		return FALSE;
 	}
-	catch(BOOL flag){
+	catch(const bool flag) {
 		if(pixel_format.IsPalettized()) {
 			_2DSetup();
 		} else {
@@ -399,7 +399,7 @@ bool GrpSetPalette(const PALETTE& pal)
 	DxObj.Palette[0] = { 0, 0, 0 };	// 強制的に色をセットしてしまう //
 
 	// パレットを変更
-	auto p = CastToPALETTEENTRY(DxObj.Palette);
+	const auto p = CastToPALETTEENTRY(DxObj.Palette);
 	if(DxObj.Pal) {
 		DxObj.Pal->SetEntries(0, 0, p.size(), p.data());
 	} else {
@@ -428,7 +428,7 @@ void GrpSetPaletteFrom(SURFACE_DDRAW& surf)
 		return;
 	}
 
-	auto p = CastToPALETTEENTRY(DxObj.Palette);
+	const auto p = CastToPALETTEENTRY(DxObj.Palette);
 	lpdp->GetEntries(0, 0, p.size(), p.data());
 	GrpSetPalette(DxObj.Palette);
 
@@ -452,7 +452,7 @@ bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
 	ddsd.dwHeight       = size.h;
 	ddsd.dwFlags        = DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-	auto dxval = DD->CreateSurface(&ddsd, &temp, nullptr);
+	const auto dxval = DD->CreateSurface(&ddsd, &temp, nullptr);
 	if(dxval != DD_OK) {
 		return false;
 	}
@@ -496,7 +496,7 @@ bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
 	auto& surf = DxSurf[surf_id];
-	PIXEL_SIZE bmp_size = {
+	const PIXEL_SIZE bmp_size = {
 		std::abs(bmp.info.biWidth), std::abs(bmp.info.biHeight),
 	};
 	if(surf.size != bmp_size) {
@@ -588,8 +588,8 @@ static void GrpFlipWnd(void)
 // クリッピングをかける
 bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 {
-	int w = src->right - src->left - 1;
-	int h = src->bottom - src->top - 1;
+	const PIXEL_COORD w = (src->right - src->left - 1);
+	const PIXEL_COORD h = (src->bottom - src->top - 1);
 
 	// 完全に外かな？ //
 	if((*x)>CLIP_X_MAX||(*y)>CLIP_Y_MAX||(*x)+w<CLIP_X_MIN||(*y)+h<CLIP_Y_MIN) return FALSE;
@@ -663,10 +663,10 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	}
 
 	// はじっこの色獲得＆カラーキー準備 //
-	DWORD temp = std::visit([&ddsd](auto pixel) {
+	const DWORD temp = std::visit([&ddsd](auto pixel) {
 		if(sizeof(decltype(pixel)) == 3) {
 			// これでいいのか？ //
-			auto* bytes = reinterpret_cast<uint8_t *>(ddsd.lpSurface);
+			const auto *bytes = reinterpret_cast<uint8_t *>(ddsd.lpSurface);
 			return (
 				bytes[0] + (DWORD{ bytes[1] } << 8) + (DWORD{ bytes[2] } << 16)
 			);
@@ -675,7 +675,7 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	}, PixelFormat);
 
 	// Unlock する //
-	auto dxval = surf.surf->Unlock(nullptr);
+	const auto dxval = surf.surf->Unlock(nullptr);
 
 	// カラーキーをセットする//
 	key.dwColorSpaceHighValue = temp;

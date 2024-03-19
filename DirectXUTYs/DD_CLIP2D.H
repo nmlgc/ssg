@@ -98,8 +98,8 @@ inline bool GrpLineCut(int *x1, int *y1, int *x2, int *y2, uint8_t outcode)
 // ReturnValue == FALSE : 完全に範囲外
 inline bool GrpLineClip(int *x1, int *y1, int *x2, int *y2)
 {
-	auto Outcode1 = GetLineOutcode(*x1, *y1);
-	auto Outcode2 = GetLineOutcode(*x2, *y2);
+	const auto Outcode1 = GetLineOutcode(*x1, *y1);
+	const auto Outcode2 = GetLineOutcode(*x2, *y2);
 
 	if((Outcode1 & Outcode2) != 0) {
 		return false;

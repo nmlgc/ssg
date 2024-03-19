@@ -157,7 +157,10 @@ void EndingProc(bool&)
 void EndingDraw(void)
 {
 	// 画面消去 //
-	DWORD cls_col = (DxObj.PixelFormat.IsPalettized() ? 255 : RGB(0,0,0));
+	const DWORD cls_col = (DxObj.PixelFormat.IsPalettized()
+		? 255
+		: RGB(0, 0, 0)
+	);
 	GrpClsEx(std::nullopt, cls_col);
 
 	// それぞれのグラフィックを描画するで //
@@ -234,7 +237,7 @@ void DrawGrpInfo()
 	if(!EGrpInfo.bWantDisp) return;
 
 	// 驚異の画像表示 //
-	PIXEL_LTRB src = { 0, 0, 320, 240 };
+	constexpr PIXEL_LTRB src = { 0, 0, 320, 240 };
 	GrpBltXC(
 		src, EGrpInfo.x, EGrpInfo.y, GrEndingPic[EGrpInfo.target - EndingGrp]
 	);

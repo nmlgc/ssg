@@ -372,7 +372,7 @@ static bool DifFnDemo(INPUT_BITS key)
 static bool GrpFnChgDevice(INPUT_BITS key)
 {
 	return OptionFN(key, SetGrpItem, [&]() {
-		int flag = ((key == KEY_LEFT) ? -1 : 2);
+		const int flag = ((key == KEY_LEFT) ? -1 : 2);
 		// 一つしかデバイスが存在しないときは変更できない //
 		if(DxEnumNow <= 1) {
 			return;
@@ -809,7 +809,7 @@ static void SetCfgRepItem(void)
 
 static void SetDifItem(void)
 {
-	const char *DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic"};
+	const char *const DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic" };
 /*
 	{DifTitle[4],	"[DebugMode] 画面に情報を表示するか",	DifFnMsgDisplay,0,0},
 	{DifTitle[5],	"[DebugMode] ステージセレクト",	DifFnStgSelect,0,0},
@@ -829,8 +829,8 @@ static void SetDifItem(void)
 
 static void SetGrpItem(void)
 {
-	const char	*UorD[3]  = {"上のほう","下のほう","描画せず"};
-	const char	*DMode[4] = {"おまけ","60Fps","30Fps","20Fps"};
+	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
+	const char *const DMode[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
 	int		i;
 
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])

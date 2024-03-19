@@ -186,10 +186,10 @@ extern void MaidDraw(void)
 	static BYTE draw_flag  = 0;
 	static BYTE draw_flag2 = 0;
 
-	int		x  = (Viv.x>>6)-16;
-	int		y  = (Viv.y>>6)-24;
-	int		ox = (Viv.opx>>6) - 12;
-	int		oy = (Viv.opy>>6) - 12;
+	const auto x  = ((Viv.x >> 6) - 16);
+	const auto y  = ((Viv.y >> 6) - 24);
+	const auto ox = ((Viv.opx >> 6) - 12);
+	const auto oy = ((Viv.opy >> 6) - 12);
 	PIXEL_LTRB	src;
 
 	draw_flag = 1 - draw_flag;
@@ -258,7 +258,7 @@ extern void StateDraw(void)
 extern void MaidMove(void)
 {
 	int		vx,vy,v;
-	int		VivSpeed = 64*18;
+	constexpr int VivSpeed = (64 * 18);
 	char		buf[100];
 
 	// かすり残り時間を減らす //

@@ -23,7 +23,7 @@ extern void DebugSetup()
 
 	_strdate(date.data());
 	_strtime(time.data());
-	auto len = snprintf(
+	const auto len = snprintf(
 		str.data(), str.size(), "[%s][%s]\n", date.data(), time.data()
 	);
 

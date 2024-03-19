@@ -71,7 +71,7 @@ static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
 
 void UpdateHoming(const ENEMY_DATA *e)
 {
-	int temp = Viv.y - e->y;
+	const int temp = (Viv.y - e->y);
 
 	if(temp<0) return;
 
@@ -304,7 +304,7 @@ extern VOID enemy_damage3(int x,int y,BYTE d)
 {
 	int				i;
 	//BOOL			ret_val = FALSE;
-	int				damage  = 8;
+	constexpr int damage = 8;
 
 	BossDamage3(x,y,d);
 
@@ -442,7 +442,7 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID)
 
 void EnemyAnimeMove(ENEMY_DATA *e)
 {
-	ANIME_DATA		*a = Anime+(e->anm_ptn);
+	const auto *a = &Anime[e->anm_ptn];
 
 	switch(a->mode){
 		case(ANM_NORM):

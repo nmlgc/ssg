@@ -142,7 +142,7 @@ void WINDOW_SYSTEM::OpenCentered(PIXEL_COORD w, int select)
 {
 	// Shifting it down by 9 pixels avoids the clash with the background image
 	// gradient.
-	WINDOW_POINT topleft = {
+	const WINDOW_POINT topleft = {
 		(320 - (w / 2)),
 		(73 + (CWIN_MAX_H / 2) - (((Parent.NumItems + 1) * CWIN_ITEM_H) / 2))
 	};
@@ -318,7 +318,7 @@ void MWinOpen(void)
 	MsgWindow.FaceTime  = 0;
 
 	// 矩形の初期値をセットする //
-	auto y_mid = ((MsgWindow.MaxSize.bottom + MsgWindow.MaxSize.top) / 2);
+	const auto y_mid = ((MsgWindow.MaxSize.bottom + MsgWindow.MaxSize.top) / 2);
 	MsgWindow.NowSize.left   = MsgWindow.MaxSize.left;
 	MsgWindow.NowSize.right  = MsgWindow.MaxSize.right;
 	MsgWindow.NowSize.top    = y_mid - 4;
@@ -408,10 +408,10 @@ void MWinDraw(void)
 	BYTE	alpha;
 	PIXEL_LTRB	src;
 
-	int		x = MsgWindow.NowSize.left;		// ウィンドウ左上Ｘ
-	int		y = MsgWindow.NowSize.top;		// ウィンドウ左上Ｙ
-	int		w = (MsgWindow.NowSize.right  - x);		// ウィンドウ幅
-	int		h = (MsgWindow.NowSize.bottom - y);		// ウィンドウ高さ
+	const auto x = MsgWindow.NowSize.left;	// ウィンドウ左上Ｘ
+	const auto y = MsgWindow.NowSize.top;	// ウィンドウ左上Ｙ
+	const auto w = (MsgWindow.NowSize.right - x); 	// ウィンドウ幅
+	const auto h = (MsgWindow.NowSize.bottom - y);	// ウィンドウ高さ
 	int		len,time,oy;
 
 	// メッセージウィンドウが死んでいたら何もしない //
@@ -658,11 +658,11 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	}
 
 	// アクティブなウィンドウを検索する //
-	auto* p = CWinSearchActive(ws);
+	const auto* p = CWinSearchActive(ws);
 	auto Depth = ws->SelectDepth;
 
 	// アクティブな項目をセットする //
-	auto* p2 = p->ItemPtr[ws->Select[Depth]];
+	const auto *p2 = p->ItemPtr[ws->Select[Depth]];
 
 	assert(p2->State != STATE::DISABLED);
 

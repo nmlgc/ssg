@@ -581,8 +581,8 @@ void InitStg4Rock(void)
 	int		i;
 	int		id = 2;
 	int		y  = 0;
-	int		dy = 500*64/4;
-	int		dy2 = dy/2;
+	constexpr int dy = (500 * (64 / 4));
+	constexpr int dy2 = (dy / 2);
 
 	for(i=0; i<ROCK_MAX; i++){
 		y = (i%4)*dy + (rnd()%dy2);
@@ -612,8 +612,8 @@ void InitStg4Rock(void)
 void MoveStg4Rock(void)
 {
 	int		i, y;
-	int		dy = 500*64/4;
-	int		dy2 = dy/2;
+	constexpr int dy = (500 * (64 / 4));
+	constexpr int dy2 = (dy / 2);
 	Rock3D	*p = Rock;
 
 	for(i=0; i<ROCK_MAX; i++, p++){

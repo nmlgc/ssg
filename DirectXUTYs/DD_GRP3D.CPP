@@ -291,9 +291,9 @@ void _3DFatCircleA(int x, int y, int r, int w)
 // グラデーション付き長方形(中心部が明るくなる) //
 void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 {
-	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
-	DWORD	c2 = RGB_MAKE(255,255,255);
-	DWORD	c3 = c1;//RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
+	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
+	constexpr DWORD c2 = RGB_MAKE(255, 255, 255);
+	const DWORD c3 = c1; //RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
 
 	if(!bLocked) return;
 	//AlphaEnable(TRUE);
@@ -315,9 +315,9 @@ void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 // グラデーション付き長方形(中心部が明るくなる) //
 void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p)
 {
-	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
-	DWORD	c2 = RGBA_MAKE(255,255,255,Col3D_A);
-	DWORD	c3 = c1;//RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
+	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
+	const DWORD c2 = RGBA_MAKE(255, 255, 255, Col3D_A);
+	const DWORD c3 = c1; // RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
 
 	if(!bLocked) return;
 	AlphaEnable(TRUE);
@@ -341,8 +341,8 @@ void GrpGrdPolygon(std::span<const WINDOW_POINT> p)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //
-	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
-	DWORD	c2 = RGB_MAKE(255,255,255);
+	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
+	constexpr DWORD c2 = RGB_MAKE(255, 255, 255);
 
 	if(!bLocked) return;
 	AlphaEnable(TRUE);

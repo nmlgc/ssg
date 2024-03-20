@@ -118,37 +118,30 @@ void fragment_set(int x,int y,BYTE cmd)
 
 void fragment_move(void)
 {
-	int i;
-	FRAGMENT_DATA *f = Fragment;
-
-	for(i=0;i<FRAGMENT_MAX;i++){
+	for(auto& it : Fragment) {
+		auto *f = &it;
 		if(f->count){
 			f->x += f->vx;
 			f->y += f->vy;
 			f->count--;
 		}
-		f++;
 	}
 }
 
 void fragment_draw(void)
 {
-	int i;
-	FRAGMENT_DATA *f = Fragment;
-
-	for(i=0;i<FRAGMENT_MAX;i++){
-		if(f->count)	_FDraw(f);
-		f++;
+	for(const auto& it : Fragment) {
+		if(it.count) {
+			_FDraw(&it);
+		}
 	}
 }
 
 void fragment_setup(void)
 {
-	int i;
-
-	for(i=0;i<FRAGMENT_MAX;i++){
+	for(auto& it : Fragment) {
 		//memset(Fragment+i,0,sizeof(FRAGMENT_DATA));
-		Fragment[i].count = 0;
+		it.count = 0;
 	}
 
 	FragmentPtr = 0;

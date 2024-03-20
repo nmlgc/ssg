@@ -257,26 +257,27 @@ void Init3DCube(void)
 		Cube[i].p.z = 0;
 	}
 
-	for(i=0; i<STAR_MAX; i++){
-		Star[i].x = (rnd()%(640-256))+128;
-		Star[i].y = -(rnd()%480);
-		Star[i].vy = rnd()%10 + 10;
+	for(auto& it : Star) {
+		it.x = ((rnd() % (640 - 256)) + 128);
+		it.y = -(rnd() % 480);
+		it.vy = ((rnd() % 10) + 10);
 	}
 }
 
 
 void Draw3DCube(void)
 {
-	int		i;
 	PIXEL_LTRB	rc;
 
-	for(i=0; i<STAR_MAX; i++){
+	for(const auto& it : Star) {
 		rc = PIXEL_LTWH{ 136, 272, 16, 24 };
-		GrpBlt(&rc,Star[i].x,Star[i].y,GrTama);
+		GrpBlt(&rc, it.x, it.y, GrTama);
 	}
 
 	GrpLock();
-	for(i=0; i<CUBE_MAX; i++) __Draw3DCube(Cube+i);
+	for(const auto& it : Cube) {
+		__Draw3DCube(&it);
+	}
 	GrpUnlock();
 }
 
@@ -309,12 +310,12 @@ void Move3DCube(void)
 		Transform3D(&Cube[i].p,dx>>8,dy>>8,dz>>8);
 	}
 
-	for(i=0; i<STAR_MAX; i++){
-		Star[i].y += Star[i].vy;
-		if(Star[i].y > 480){
-			Star[i].x  = (rnd()%(640-256))+128;
-			Star[i].y  = 0;
-			Star[i].vy = rnd()%10 + 10;
+	for(auto& it : Star) {
+		it.y += it.vy;
+		if(it.y > 480) {
+			it.x = ((rnd() % (640 - 256)) + 128);
+			it.y = 0;
+			it.vy = ((rnd() % 10) + 10);
 		}
 	}
 }
@@ -403,7 +404,7 @@ static void __Draw3DCube(const Cube3D *c)
 
 void InitEffectFakeECL(void)
 {
-	int		i,v;
+	int v;
 	BYTE	d;
 
 	WFLine.d  = 0;
@@ -411,41 +412,41 @@ void InitEffectFakeECL(void)
 	WFLine.oy = 480*64/2;
 	WFLine.w  = 30;
 
-	for(i=0; i<FAKE_ECLSTR_MAX; i++){
+	for(auto& it : FakeECLStr) {
 		d = rnd()%128;
 		v = rnd()%(64*5) + 64*5;
 
-		FakeECLStr[i].SrcX = (rnd()% 7) *  9 * 8;
-		FakeECLStr[i].SrcY = (rnd()%16) * 16;
-		FakeECLStr[i].x    = (28+rnd()%484)*64;
-		FakeECLStr[i].y    = -(rnd()%640)*64;
-		FakeECLStr[i].vx   = 0;//cosl(d, v);
-		FakeECLStr[i].vy   = v;//sinl(d, v);
+		it.SrcX = (((rnd() % 7) *  9) * 8);
+		it.SrcY = ((rnd() % 16) * 16);
+		it.x    = ((28 + (rnd() % 484)) * 64);
+		it.y    = -((rnd() % 640) * 64);
+		it.vx   = 0; //cosl(d, v);
+		it.vy   = v; //sinl(d, v);
 	}
 }
 
 void MoveEffectFakeECL(void)
 {
-	int		i,v;
+	int v;
 	BYTE	d;
 
 	WFLine.ox = (WFLine.ox+1)%64;
 	WFLine.oy = (WFLine.oy+62)%64;
 
-	for(i=0; i<FAKE_ECLSTR_MAX; i++){
-		FakeECLStr[i].x += FakeECLStr[i].vx;
-		FakeECLStr[i].y += FakeECLStr[i].vy;
+	for(auto& it : FakeECLStr) {
+		it.x += it.vx;
+		it.y += it.vy;
 
-		if(FakeECLStr[i].y >= 480*64){
+		if(it.y >= (480 * 64)) {
 			d = rnd()%128;
 			v = rnd()%(64*5) + 64*5;
 
-			FakeECLStr[i].SrcX = (rnd()% 7) *  9 * 8;
-			FakeECLStr[i].SrcY = (rnd()%16) * 16;
-			FakeECLStr[i].x    = (28+rnd()%484)*64;
-			FakeECLStr[i].y    = -(rnd()%640)*64;
-			FakeECLStr[i].vx   = 0;//cosl(d, v);
-			FakeECLStr[i].vy   = v;//sinl(d, v);
+			it.SrcX = (((rnd() % 7) *  9) * 8);
+			it.SrcY = ((rnd() % 16) * 16);
+			it.x    = ((28 + (rnd() % 484)) * 64);
+			it.y    = -((rnd() % 640) * 64);
+			it.vx   = 0; //cosl(d, v);
+			it.vy   = v; //sinl(d, v);
 		}
 	}
 }
@@ -480,9 +481,9 @@ void DrawEffectFakeECL(void)
 
 	GrpUnlock();
 
-	for(i=0; i<FAKE_ECLSTR_MAX; i++){
-		src = PIXEL_LTWH{ FakeECLStr[i].SrcX, FakeECLStr[i].SrcY, 72, 16 };
-		GrpBlt(&src, FakeECLStr[i].x>>6, FakeECLStr[i].y>>6, GrMap);
+	for(const auto& it : FakeECLStr) {
+		src = PIXEL_LTWH{it.SrcX, it.SrcY, 72, 16};
+		GrpBlt(&src, (it.x >> 6), (it.y >> 6), GrMap);
 	}
 
 	src = { 0, 272, 416, 352 };
@@ -611,12 +612,12 @@ void InitStg4Rock(void)
 
 void MoveStg4Rock(void)
 {
-	int		i, y;
+	int		y;
 	constexpr int dy = (500 * (64 / 4));
 	constexpr int dy2 = (dy / 2);
-	Rock3D	*p = Rock;
 
-	for(i=0; i<ROCK_MAX; i++, p++){
+	for(auto& it : Rock) {
+		auto *p = &it;
 		p->count++;
 
 		switch(p->State){
@@ -625,7 +626,7 @@ void MoveStg4Rock(void)
 			if(p->y > (250+40)*64){
 				p->x     = (rnd()%(500*64)-250*64);
 				p->y     = (-250-40-rnd()%250)*64;
-				p->vy    = (4-Rock[i].GrpID)*16;
+				p->vy    = ((4 - p->GrpID) * 16);
 				p->v     = p->vy;
 			}
 		break;
@@ -638,7 +639,7 @@ void MoveStg4Rock(void)
 			if(p->y > (250+40)*64){
 				p->x     = (rnd()%(500*64)-250*64);
 				p->y     = (-250-40-rnd()%250)*64;
-				p->vy    = (4-Rock[i].GrpID)*32 * 3;
+				p->vy    = ((4 - p->GrpID) * 32 * 3);
 				p->v     = p->vy;
 				p->a     = 0;
 			}
@@ -653,11 +654,11 @@ void MoveStg4Rock(void)
 				if(p->y > (250+40)*64 || p->y < (-250-40)*64){
 					p->x     = (rnd()%(500*64)-250*64);
 					p->y     = (-250-40-rnd()%250)*64;
-					p->vy    = (4-Rock[i].GrpID)*32;
+					p->vy    = ((4 - p->GrpID) * 32);
 					p->v     = p->vy;
 				}
 
-				p->vy    = (4-Rock[i].GrpID)*32;
+				p->vy    = ((4 - p->GrpID) * 32);
 				p->a     = 2;
 				p->v     = p->vy;
 				p->State = STG4ROCK_ACCMOVE1;
@@ -668,7 +669,7 @@ void MoveStg4Rock(void)
 			if(p->y > (250+40)*64 || p->y < (-250-40)*64){
 				p->x     = (rnd()%(500*64)-250*64);
 				p->y     = (250+40)*64+rnd()%250;
-				p->vy    = -(4-Rock[i].GrpID)*32 * 3;
+				p->vy    = (-(4 - p->GrpID) * 32 * 3);
 				p->v     = p->vy;
 				p->a     = 0;
 			}
@@ -684,13 +685,13 @@ void MoveStg4Rock(void)
 					p->x = (rnd()%(500*64)-250*64);		//
 					p->y = -250*64-y;						// 上の方なのだ
 
-					p->vy    = (4-Rock[i].GrpID)*32 * 3;
+					p->vy    = ((4 - p->GrpID) * 32 * 3);
 					p->v     = p->vy;
 					p->a     = 0;
 					p->State = STG4ROCK_ACCMOVE1;
 				}
 				else{
-					p->v = p->vy = (4-Rock[i].GrpID)*32 * 3;
+					p->v = p->vy = ((4 - p->GrpID) * 32 * 3);
 					p->a = 0;
 					p->State = STG4ROCK_ACCMOVE1;
 				}
@@ -701,7 +702,7 @@ void MoveStg4Rock(void)
 			if(p->y > (250+40)*64 || p->y < (-250-40)*64){
 				p->x     = (rnd()%(700*64)-350*64);
 				p->y     = (250+40)*64;
-				p->vy    = (4-Rock[i].GrpID)*32 * 3;
+				p->vy    = ((4 - p->GrpID) * 32 * 3);
 				p->v     = 10;
 				p->a     = -4;
 			}*/
@@ -714,7 +715,9 @@ void MoveStg4Rock(void)
 
 		case(STG4ROCK_END):
 			if(p->y > (500+40)*64) break;
-			else p->y += (4-Rock[i].GrpID)*32 * 6;
+			else {
+				p->y += ((4 - p->GrpID) * 32 * 6);
+			}
 		break;
 
 		default:
@@ -731,11 +734,10 @@ void DrawStg4Rock(void)
 	static int dy[3] = {64/2, 48/2, 32/2};
 
 	PIXEL_LTRB	temp;
-	Rock3D	*p = Rock;
+	int x, y;
 
-	int		x,y,i;
-
-	for(i=0; i<ROCK_MAX; i++, p++){
+	for(const auto& it : Rock) {
+		const auto *p = &it;
 		temp = src[p->GrpID];
 		x = (p->x + GX_MID)>>6;
 		y = (p->y + GY_MID)>>6;
@@ -746,45 +748,43 @@ void DrawStg4Rock(void)
 
 void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 {
-	int		i;
-	Rock3D	*p = Rock;
-
 	switch(Cmd){
-	case(STG4ROCK_LEAVE):
-		for(i=0; i<ROCK_MAX; i++, p++){
-			p->State = STG4ROCK_LEAVE;
+	case(STG4ROCK_LEAVE): {
+		for(auto& it : Rock) {
+			it.State = STG4ROCK_LEAVE;
 		}
-	break;
+	} break;
 
-	case(STG4ROCK_END):
-		for(i=0; i<ROCK_MAX; i++, p++){
-			p->State = STG4ROCK_END;
+	case(STG4ROCK_END): {
+		for(auto& it : Rock) {
+			it.State = STG4ROCK_END;
 		}
-	break;
+	} break;
 
-	case(STG4ROCK_ACCMOVE1):
-		for(i=0; i<ROCK_MAX; i++, p++){
-			p->State = STG4ROCK_ACCMOVE1;
-			p->a = p->v/24;//(3-p->GrpID)*3;
-			p->count = 0;
+	case(STG4ROCK_ACCMOVE1): {
+		for(auto& it : Rock) {
+			it.State = STG4ROCK_ACCMOVE1;
+			it.a = (it.v / 24); // ((3 - p->GrpID) * 3);
+			it.count = 0;
 		}
-	break;
+	} break;
 
-	case(STG4ROCK_ACCMOVE2):
-		for(i=0; i<ROCK_MAX; i++, p++){
-			p->State = STG4ROCK_ACCMOVE2;
-			p->a = p->v/12;24;//(3-p->GrpID)*3;
-			p->count = 0;
+	case(STG4ROCK_ACCMOVE2): {
+		for(auto& it : Rock) {
+			it.State = STG4ROCK_ACCMOVE2;
+			it.a = (it.v / 12);
+			24; // ((3 - p->GrpID) * 3);
+			it.count = 0;
 		}
-/*		for(i=0; i<ROCK_MAX; i++, p++){
-			p->State = STG4ROCK_ACCMOVE2;
-			p->a = -4;
-			p->count = 0;
-			p->v = 10;
-			p->d = Param;
+/*		for(auto& it : Rock) {
+			it.State = STG4ROCK_ACCMOVE2;
+			it.a = -4;
+			it.count = 0;
+			it.v = 10;
+			it.d = Param;
 		}
 */
-	break;
+	} break;
 
 	default:
 	break;
@@ -883,16 +883,16 @@ void DrawStg6Raster()
 		GrpBlt(&src, S6Star[i].x, S6Star[i].y, GrMap);
 	}
 
-	for(i=0; i<S6RASTER_MAX; i++){
-		x1 = Target[S6Ras[i].type].left;
-		x2 = Target[S6Ras[i].type].right;
-		oy = Target[S6Ras[i].type].top;
-		h  = Target[S6Ras[i].type].bottom - Target[S6Ras[i].type].top;
+	for(const auto& it : S6Ras) {
+		x1 = Target[it.type].left;
+		x2 = Target[it.type].right;
+		oy = Target[it.type].top;
+		h = (Target[it.type].bottom - Target[it.type].top);
 		w  = (x2 - x1)/2;
 		for(j=0; j<h; j+=2){
-			dx = sinl(S6Ras[i].deg + j, S6Ras[i].amp);
+			dx = sinl((it.deg + j), it.amp);
 			src = { x1, (j + oy), x2, (j + 2) };
-			GrpBlt(&src, S6Ras[i].x+dx-w, S6Ras[i].y+j, GrMap);
+			GrpBlt(&src, (it.x + dx - w), (it.y + j), GrMap);
 		}
 	}
 }

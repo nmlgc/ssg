@@ -413,9 +413,9 @@ void NameRegistProc(bool&)
 // お名前入力の初期化 //
 bool NameRegistInit(bool bNeedChgMusic)
 {
-	int		i;
-
-	for(i=0;i<NR_NAME_LEN;i++) CurrentName.Name[i] = '\0';
+	for(auto& it : CurrentName.Name) {
+		it = '\0';
+	}
 	CurrentName.Score  = Viv.score;
 	CurrentName.Evade  = Viv.evade_sum;
 	CurrentName.Weapon = Viv.weapon;

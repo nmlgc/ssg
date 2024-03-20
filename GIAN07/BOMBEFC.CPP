@@ -21,10 +21,8 @@ void _ExBombSTDMove(BombEfcCtrl *p);
 // 爆発系エフェクトの初期化 //
 void ExBombEfcInit(void)
 {
-	int				i;
-
-	for(i=0; i<EXBOMB_MAX; i++){
-		BombEfc[i].bIsUsed = FALSE;
+	for(auto& it : BombEfc) {
+		it.bIsUsed = false;
 	}
 }
 
@@ -64,14 +62,16 @@ void ExBombEfcSet(int x, int y, uint8_t type)
 // 爆発系エフェクトを描画する
 void ExBombEfcDraw(void)
 {
-	int				i;
+	for(auto& it : BombEfc) {
+		if(!it.bIsUsed) {
+			continue;
+		}
+		switch(it.type) {
+		case EXBOMB_STD:
+			_ExBombSTDDraw(&it);
+			break;
 
-	for(i=0; i<EXBOMB_MAX; i++){
-		if(!BombEfc[i].bIsUsed) continue;
-		switch(BombEfc[i].type){
-			case EXBOMB_STD:	_ExBombSTDDraw(BombEfc+i);	break;
-
-			default:
+		default:
 			return;
 		}
 	}
@@ -81,15 +81,17 @@ void ExBombEfcDraw(void)
 // 爆発系エフェクトを動作させる
 void ExBombEfcMove(void)
 {
-	int				i;
-
-	for(i=0; i<EXBOMB_MAX; i++){
-		if(!BombEfc[i].bIsUsed) continue;
-		BombEfc[i].count++;
-		switch(BombEfc[i].type){
-			case EXBOMB_STD:
-				_ExBombSTDMove(BombEfc+i);
-				if(BombEfc[i].count > 64*3+32) BombEfc[i].bIsUsed = FALSE;
+	for(auto& it : BombEfc) {
+		if(!it.bIsUsed) {
+			continue;
+		}
+		it.count++;
+		switch(it.type) {
+		case EXBOMB_STD:
+			_ExBombSTDMove(&it);
+			if(it.count > ((64 * 3) + 32)) {
+				it.bIsUsed = false;
+			}
 			break;
 
 			default:
@@ -118,12 +120,11 @@ void _ExBombSTDInit(BombEfcCtrl *p)
 
 void _ExBombSTDDraw(BombEfcCtrl *p)
 {
-	int			i, x, y, dx;
-	SpObj		*target;
+	int x, y, dx;
 
 	// Graphic 48 * 48 //
-	target = p->Obj;
-	for(i=0; i<EXBOMB_OBJMAX; i++, target++){
+	for(const auto& it : p->Obj) {
+		const auto *target = &it;
 		if(target->d <= 7*2){
 			x = (target->x >> 6) - 24;
 			y = (target->y >> 6) - 24;
@@ -137,18 +138,18 @@ void _ExBombSTDDraw(BombEfcCtrl *p)
 
 void _ExBombSTDMove(BombEfcCtrl *p)
 {
-	int			i, j, x, y, v, rv;
+	int j = 0;
+	int x, y, v, rv;
 	DWORD		t;
 	BYTE		d, rd;
-	SpObj		*target;
 
 	x = p->x;
 	y = p->y;
 	t = p->count;
 	v = sinl(t/2-64, 200*64)+(200*64);
 
-	target = p->Obj;
-	for(i=j=0; i<EXBOMB_OBJMAX; i++, target++){
+	for(auto& it : p->Obj) {
+		auto *target = &it;
 		if(target->d > 7*2){
 			if(t > 64*3) continue;
 			rd = rnd();

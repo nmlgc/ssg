@@ -889,8 +889,8 @@ bool ScrollInit(void)
 	ScrollInfo.RasterDeg   = 0;
 
 	// ラスタースクロールの初期化 //
-	for(i=0;i<31;i++){
-		ScrollInfo.RasterDx[i] = 0;
+	for(auto& it : ScrollInfo.RasterDx) {
+		it = 0;
 	}
 
 	// レイヤー情報のロード(長さからループ用変数を調整すること) //

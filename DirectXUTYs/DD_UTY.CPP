@@ -278,8 +278,6 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 
 void GRAPHICS_DDRAW::Cleanup(void)
 {
-	int		i;
-
 	RELEASE(View);
 	RELEASE(D3Dev);
 	RELEASE(D3);
@@ -288,8 +286,8 @@ void GRAPHICS_DDRAW::Cleanup(void)
 	RELEASE(Pal);
 
 	// ここではSurfaceのBMPを解放しないことに注意 //
-	for(i=0;i<SURFACE_MAX;i++){
-		RELEASE(DxSurf[i].surf);
+	for(auto& surf : DxSurf) {
+		RELEASE(surf.surf);
 	}
 
 	RELEASE(Back);
@@ -343,8 +341,6 @@ void GrpSetClip(int sx, int sy, int ex, int ey)
 
 bool GRAPHICS_DDRAW::Restore(void)
 {
-	int			i;
-
 	if(Prim) {
 		const auto dxval = Prim->Restore();
 		if(dxval!=DD_OK) return FALSE;
@@ -358,8 +354,8 @@ bool GRAPHICS_DDRAW::Restore(void)
 		if(dxval!=DD_OK) return FALSE;
 	}
 
-	for(i=0;i<SURFACE_MAX;i++){
-		if(!SurfaceRestore(DxSurf[i])) {
+	for(auto& surf : DxSurf) {
+		if(!SurfaceRestore(surf)) {
 			return false;
 		}
 	}

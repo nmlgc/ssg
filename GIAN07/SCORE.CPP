@@ -9,6 +9,7 @@
 #include <ranges>
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
+using NR_CONST_SCORE_LIST = std::span<const NR_NAME_DATA, NR_RANK_MAX>;
 
 // constexpr uint64_t PBG_MASK_VALUE = 0x342d3a4de92c68ba;
 // constexpr uint64_t PBG_MASK_VALUE = 0xe92cd3a4d8ba6342;
@@ -27,8 +28,8 @@ static void ReleaseScoreData(void);	// スコアデータを解放する
 static std::optional<NR_SCORE_LIST> GetNList(uint8_t Dif);	// 難易度でポインタを振り分ける
 static bool SetDefaultScoreData(void);	// スコアデータ初期値をセット
 
-static bool _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ& bd);
-static void _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE& bd);
+static bool _LoadSC(NR_SCORE_LIST NData, BIT_DEVICE_READ& bd);
+static void _SaveSC(NR_CONST_SCORE_LIST NData, BIT_DEVICE_WRITE& bd);
 
 template <std::unsigned_integral T> T _xGet(
 	BIT_DEVICE_READ& bd, uint64_t& ExMask
@@ -301,47 +302,46 @@ static bool SetDefaultScoreData(void)
 	return true;
 }
 
-static bool _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ& bd)
+static bool _LoadSC(NR_SCORE_LIST NData, BIT_DEVICE_READ& bd)
 {
-	int			i,j;
 	uint64_t CheckSum = 0;
 	uint64_t Mask = PBG_MASK_VALUE;
 	uint8_t flag = 0;
 
-	for(i=0; i<NR_RANK_MAX; i++){
+	for(auto& nd : NData) {
 		CheckSum = 0;
 		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// 名前を獲得する //
-		for(j=0; j<NR_NAME_LEN; j++){
-			NData[i].Name[j] = _xGet<uint8_t>(bd, Mask);
-			CheckSum += NData[i].Name[j];
+		for(auto& c : nd.Name) {
+			c = _xGet<uint8_t>(bd, Mask);
+			CheckSum += c;
 		}
 		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// 得点を獲得する //
-		NData[i].Score = _xGet<uint64_t>(bd, Mask);
-		CheckSum += NData[i].Score;
+		nd.Score = _xGet<uint64_t>(bd, Mask);
+		CheckSum += nd.Score;
 		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// かすりを獲得する //
-		NData[i].Evade = _xGet<uint32_t>(bd, Mask);
-		CheckSum += NData[i].Evade;
+		nd.Evade = _xGet<uint32_t>(bd, Mask);
+		CheckSum += nd.Evade;
 		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// ステージを獲得する //
-		NData[i].Stage = _xGet<uint8_t>(bd, Mask);
-		CheckSum += NData[i].Stage;
+		nd.Stage = _xGet<uint8_t>(bd, Mask);
+		CheckSum += nd.Stage;
 		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// ウエポンを獲得する //
-		NData[i].Weapon = _xGet<uint8_t>(bd, Mask);
-		CheckSum += NData[i].Weapon;
+		nd.Weapon = _xGet<uint8_t>(bd, Mask);
+		CheckSum += nd.Weapon;
 		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
@@ -354,42 +354,41 @@ static bool _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ& bd)
 	return true;
 }
 
-static void _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE& bd)
+static void _SaveSC(NR_CONST_SCORE_LIST NData, BIT_DEVICE_WRITE& bd)
 {
-	int			i,j;
 	uint64_t CheckSum = 0;
 	uint64_t Mask = PBG_MASK_VALUE;
 	uint8_t flag = 0;
 
-	for(i=0; i<NR_RANK_MAX; i++){
+	for(const auto& nd : NData) {
 		CheckSum = 0;
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 名前を出力する //
-		for(j=0; j<NR_NAME_LEN; j++){
-			CheckSum += NData[i].Name[j];
-			_xPut(bd, static_cast<unsigned char>(NData[i].Name[j]), Mask);
+		for(auto& c : nd.Name) {
+			CheckSum += c;
+			_xPut(bd, static_cast<unsigned char>(c), Mask);
 		}
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 得点を出力する //
-		CheckSum += NData[i].Score;
-		_xPut(bd, static_cast<uint64_t>(NData[i].Score), Mask);
+		CheckSum += nd.Score;
+		_xPut(bd, static_cast<uint64_t>(nd.Score), Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// かすりを出力する //
-		CheckSum += NData[i].Evade;
-		_xPut(bd, NData[i].Evade, Mask);
+		CheckSum += nd.Evade;
+		_xPut(bd, nd.Evade, Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ステージを出力する //
-		CheckSum += NData[i].Stage;
-		_xPut(bd, NData[i].Stage, Mask);
+		CheckSum += nd.Stage;
+		_xPut(bd, nd.Stage, Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ウエポンを出力する //
-		CheckSum += NData[i].Weapon;
-		_xPut(bd, NData[i].Weapon, Mask);
+		CheckSum += nd.Weapon;
+		_xPut(bd, nd.Weapon, Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// チェックサムを出力する //

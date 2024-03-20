@@ -81,11 +81,8 @@ bool LLaserSet(uint8_t id)
 
 extern void LLaserOpen(const ENEMY_DATA *e, uint8_t id)
 {
-	LLASER_DATA		*lp;
-	int				i;
-
-	for(i=0;i<LLASER_MAX;i++){
-		lp = LLaser+i;
+	for(auto& it : LLaser) {
+		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id || id==ECLCST_LLASERALL) && lp->flag!=LLF_DISABLE){
 			lp->flag = LLF_OPEN;
 			Snd_SEPlay(2, lp->x, true);
@@ -95,16 +92,13 @@ extern void LLaserOpen(const ENEMY_DATA *e, uint8_t id)
 
 extern void LLaserClose(const ENEMY_DATA *e, uint8_t id)
 {
-	LLASER_DATA		*lp;
-	int				i;
-
 	if(id==ECLCST_LLASERALL){
 		LLaserForceClose(e);
 		return;
 	}
 
-	for(i=0;i<LLASER_MAX;i++){
-		lp = LLaser+i;
+	for(auto& it : LLaser) {
+		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id)){
 			lp->flag = LLF_CLOSE;
 			Snd_SEStop(2);
@@ -114,11 +108,8 @@ extern void LLaserClose(const ENEMY_DATA *e, uint8_t id)
 
 extern void LLaserLine(const ENEMY_DATA *e, uint8_t id)
 {
-	LLASER_DATA		*lp;
-	int				i;
-
-	for(i=0;i<LLASER_MAX;i++){
-		lp = LLaser+i;
+	for(auto& it : LLaser) {
+		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id ||id==ECLCST_LLASERALL)){
 			lp->flag = LLF_CLOSEL;
 			Snd_SEStop(2);
@@ -138,11 +129,8 @@ static void _LLaserXYSet(int id)
 
 extern void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id)
 {
-	LLASER_DATA		*lp;
-	int				i;
-
-	for(i=0;i<LLASER_MAX;i++){
-		lp = LLaser+i;
+	for(auto& it : LLaser) {
+		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id ||id==ECLCST_LLASERALL)){
 			lp->d = d;
 
@@ -162,11 +150,8 @@ extern void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id)
 
 extern void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id)
 {
-	LLASER_DATA		*lp;
-	int				i;
-
-	for(i=0;i<LLASER_MAX;i++){
-		lp = LLaser+i;
+	for(auto& it : LLaser) {
+		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id ||id==ECLCST_LLASERALL)){
 			lp->d += d;
 
@@ -187,10 +172,9 @@ extern void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id)
 // 敵に関連づけられたレーザーを強制クローズ(Level2...) //
 extern void LLaserForceClose(const ENEMY_DATA *e)
 {
-	int				i;
-	LLASER_DATA		*lp;
+	for(auto& it : LLaser) {
+		auto *lp = &it;
 
-	for(i=0,lp=LLaser;i<LLASER_MAX;i++,lp++){
 		// (参考) すでにクローズ状態であっても LLaserClose() は問題を発生させない //
 		if(lp->e==e){
 			lp->flag = LLF_CLOSE;
@@ -287,9 +271,8 @@ extern void LLaserMove(void)
 
 extern void LLaserDraw(void)
 {
-	int				i,x,y;
+	int x, y;
 	BYTE			c;
-	LLASER_DATA		*lp;
 	WINDOW_POINT	p[4];
 	int				wx,wy,len;
 
@@ -317,7 +300,8 @@ extern void LLaserDraw(void)
 
 	GrpLock();
 
-	for(i=0,lp=LLaser;i<LLASER_MAX;i++,lp++){
+	for(const auto& it : LLaser) {
+		const auto *lp = &it;
 		c = lp->c;
 		switch(lp->flag){
 			// 太さを持った状態 //
@@ -418,12 +402,11 @@ extern void LLaserDraw(void)
 
 extern void LLaserClear(void)
 {
-	int i;
-
 	// 存在するレーザー全てを閉じる //
-	for(i=0;i<LLASER_MAX;i++){
-		if(LLaser[i].flag != LLF_DISABLE)
-			LLaser[i].flag = LLF_CLOSE;
+	for(auto& it : LLaser) {
+		if(it.flag != LLF_DISABLE) {
+			it.flag = LLF_CLOSE;
+		}
 	}
 
 	Snd_SEStop(2);
@@ -431,12 +414,10 @@ extern void LLaserClear(void)
 
 extern void LLaserSetup(void)
 {
-	int i;
-
-	for(i=0;i<LLASER_MAX;i++){
+	for(auto& it : LLaser) {
 		//memset(LLaser+i,0,sizeof(LLASER_DATA));
-		LLaser[i].flag = LLF_DISABLE;
-		LLaser[i].e    = NULL;
+		it.flag = LLF_DISABLE;
+		it.e    = nullptr;
 	}
 
 	Snd_SEStop(2);

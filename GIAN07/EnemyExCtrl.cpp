@@ -25,12 +25,10 @@ static void BitSTDRad(void);	// 基本的な半径処理
 // 蛇型の敵配列の初期化 //
 void SnakyInit(void)
 {
-	int		i;
-
 	// 全ての蛇さんをダメダメにするの //
-	for(i=0;i<SNAKE_MAX;i++){
-		SnakeData[i].bIsUse = FALSE;
-		SnakeData[i].Parent = NULL;
+	for(auto& it : SnakeData) {
+		it.bIsUse = false;
+		it.Parent = nullptr;
 	}
 }
 
@@ -80,12 +78,12 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 // 蛇型の敵の移動処理 //
 void SnakyMove(void)
 {
-	int				i,j;
-	SNAKYMOVE_DATA	*s;
+	int j;
 	ENEMY_DATA		*e;
 	BYTE			ptr;
 
-	for(i=0,s=SnakeData;i<SNAKE_MAX;i++,s++){
+	for(auto& it : SnakeData) {
+		auto *s = &it;
 		if(s->bIsUse==FALSE) continue;
 
 		// バッファ更新処理 //

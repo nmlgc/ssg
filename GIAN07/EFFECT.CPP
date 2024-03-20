@@ -22,19 +22,16 @@ extern void CircleFadeOut(int x, int y, int r);
 // 円エフェクトの初期化 //
 void CEffectInit(void)
 {
-	int		i;
-
-	for(i=0;i<CIRCLE_EFC_MAX;i++)
-		CEffect[i].type = CEFC_NONE;
+	for(auto& it : CEffect) {
+		it.type = CEFC_NONE;
+	}
 }
 
 // 円エフェクトを動かす //
 void CEffectMove(void)
 {
-	int					i;
-	CIRCLE_EFC_DATA		*ce;
-
-	for(i=0,ce=CEffect;i<CIRCLE_EFC_MAX;i++,ce++){
+	for(auto& it : CEffect) {
+		auto *ce = &it;
 		ce->count++;
 
 		switch(ce->type){
@@ -66,14 +63,14 @@ void CEffectMove(void)
 // 円エフェクトを描画する //
 void CEffectDraw(void)
 {
-	int					i, j, k, r;
+	int j, k, r;
 	int					x1, x2, y1, y2;
-	CIRCLE_EFC_DATA		*ce;
 	static BYTE dtable[4] = {0, 1, 3, 7};
 
 	GrpLock();
 
-	for(i=0,ce=CEffect;i<CIRCLE_EFC_MAX;i++,ce++){
+	for(const auto& it : CEffect) {
+		const auto *ce = &it;
 		switch(ce->type){
 			case(CEFC_STAR):
 				for(k=0; k<4; k++){
@@ -162,11 +159,9 @@ void MTitleInit(void)
 // エフェクトの初期化を行う //
 void SEffectInit(void)
 {
-	int		i;
-
-	for(i=0;i<SEFFECT_MAX;i++){
+	for(auto& it : SEffect) {
 		//memset(SEffect+i,0,sizeof(SEFFECT_DATA));
-		SEffect[i].cmd = SEFC_NONE;
+		it.cmd = SEFC_NONE;
 	}
 }
 
@@ -194,18 +189,18 @@ void StringEffect(int x, int y, const char *s)
 // 得点表示エフェクト //
 void StringEffect2(int x, int y, uint32_t point)
 {
-	int		i;
+	for(auto& it : SEffect) {
+		if(it.cmd != SEFC_NONE) {
+			continue;
+		}
 
-	for(i=0;i<SEFFECT_MAX;i++){
-		if(SEffect[i].cmd!=SEFC_NONE) continue;
-
-		SEffect[i].point = point;
-		SEffect[i].x     = x;
-		SEffect[i].y     = y;
-		SEffect[i].vx    = 0;
-		SEffect[i].vy    = -64*3+32;
-		SEffect[i].cmd   = SEFC_STR2;
-		SEffect[i].time  = 90;
+		it.point = point;
+		it.x     = x;
+		it.y     = y;
+		it.vx    = 0;
+		it.vy    = ((-64 * 3) + 32);
+		it.cmd   = SEFC_STR2;
+		it.time  = 90;
 		return;
 	}
 }
@@ -213,17 +208,17 @@ void StringEffect2(int x, int y, uint32_t point)
 // ゲームオーバーの表示 //
 void StringEffect3(void)
 {
-	int		i;
+	for(auto& it : SEffect) {
+		if(it.cmd != SEFC_NONE) {
+			continue;
+		}
 
-	for(i=0;i<SEFFECT_MAX;i++){
-		if(SEffect[i].cmd!=SEFC_NONE) continue;
-
-		SEffect[i].x     = GX_MID;
-		SEffect[i].y     = GY_MID-64*(60+40);
-		SEffect[i].vx    = 0;
-		SEffect[i].vy    = 0;
-		SEffect[i].cmd   = SEFC_GAMEOVER;
-		SEffect[i].time  = 120-35;//100;
+		it.x     = GX_MID;
+		it.y     = (GY_MID - (64 * (60 + 40)));
+		it.vx    = 0;
+		it.vy    = 0;
+		it.cmd   = SEFC_GAMEOVER;
+		it.time  = 120-35;//100;
 		return;
 	}
 }
@@ -258,12 +253,10 @@ void SetMusicTitle(int y, Narrow::string_view s)
 // エフェクトを動かす(仕様変更の可能性があります) //
 void SEffectMove(void)
 {
-	int				i;
-	SEFFECT_DATA	*e;
 	BYTE			deg;
 
-	for(i=0;i<SEFFECT_MAX;i++){
-		e = SEffect+i;
+	for(auto& it : SEffect) {
+		auto *e = &it;
 		switch(e->cmd){
 			case(SEFC_STR1):
 				e->x += e->vx;
@@ -335,16 +328,15 @@ void SEffectMove(void)
 // エフェクトを描画する(仕様変更の可能性があります) //
 void SEffectDraw(void)
 {
-	int				i,j,k;
+	int j, k;
 	int				x,y;
 	int				temp;
 	BYTE			degx = 0;
-	SEFFECT_DATA	*e;
 	PIXEL_LTWH src;
 	char			buf[20];
 
-	for(i=0;i<SEFFECT_MAX;i++){
-		e = SEffect+i;
+	for(const auto& it : SEffect) {
+		const auto *e = &it;
 		switch(e->cmd){
 			case(SEFC_STR1):case(SEFC_STR1_2):case(SEFC_STR1_3):
 				GrpPutc(e->x>>6,e->y>>6,e->c);
@@ -601,11 +593,9 @@ extern void CircleFadeOut(int x, int y, int r)
 // ロックオン配列を初期化 //
 void ObjectLockOnInit(void)
 {
-	int		i;
-
-	for(i=0;i<LOCKON_MAX;i++){
+	for(auto& it : LockInfo) {
 		//memset(LockInfo+i,0,sizeof(LOCKON_INFO));
-		LockInfo[i].state = LOCKON_NONE;
+		it.state = LOCKON_NONE;
 	}
 }
 
@@ -639,11 +629,8 @@ void ObjectLockOn(int *x, int *y, int wx64, int hx64)
 // ロックオンアニメーション動作 //
 void ObjectLockMove(void)
 {
-	LOCKON_INFO		*l;
-	int				i;
-
-	for(i=0;i<LOCKON_MAX;i++){
-		l = LockInfo + i;
+	for(auto& it : LockInfo) {
+		auto *l = &it;
 		switch(l->state){
 			case(LOCKON_01):
 				l->count--;
@@ -676,12 +663,10 @@ void ObjectLockMove(void)
 // ロックオン枠描画 //
 void ObjectLockDraw(void)
 {
-	LOCKON_INFO		*l;
-	int				i;
 	PIXEL_LTRB	temp;
 
-	for(i=0;i<LOCKON_MAX;i++){
-		l = LockInfo + i;
+	for(const auto& it : LockInfo) {
+		const auto *l = &it;
 		if(l->state!=LOCKON_NONE){
 			temp = { 208, 80, 272, 96 };
 			GrpBlt(&temp,((*(l->x))>>6)-8,((*(l->y))>>6)-8,GrTama);

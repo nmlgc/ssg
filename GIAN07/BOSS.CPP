@@ -79,16 +79,14 @@ static void BossSTDMove(BOSS_DATA *b);	// ノーマルECL互換の移動
 // ボスデータ配列を初期化する(中断、ステージクリア時に使用) //
 void BossDataInit(void)
 {
-	int			i;
-
-	for(i=0;i<BOSS_MAX;i++){
-		Boss[i].IsUsed   = 0;				// 要はこれをゼロにすれば良い
+	for(auto& it : Boss) {
+		it.IsUsed   = 0;	// 要はこれをゼロにすれば良い
 
 		// 特殊変数の初期化.... //
-		Boss[i].ExMove   = BossSTDMove;		// 特殊移動関数
-		Boss[i].ExCount  = 0;
-		Boss[i].ExState  = BEXST_NORM;		// 特殊状態変数
-		Boss[i].Hit      = NULL;			// 特殊当たり判定
+		it.ExMove   = BossSTDMove;	// 特殊移動関数
+		it.ExCount  = 0;
+		it.ExState  = BEXST_NORM;	// 特殊状態変数
+		it.Hit      = nullptr;	// 特殊当たり判定
 	}
 
 	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
@@ -107,7 +105,7 @@ void BossDataInit(void)
 // ボスをセットする //
 void BossSet(int x, int y, uint32_t BossID)
 {
-	int		i,n;
+	int n;
 	DWORD	HP_Sum = 0;
 
 	// ｘ６４座標に変換してボスをセットする //
@@ -123,9 +121,10 @@ void BossSet(int x, int y, uint32_t BossID)
 	parse_ECL(&(Boss[n].Edat));
 	//ObjectLockOn(&(Boss[n].Edat.x),&(Boss[n].Edat.y),Boss[n].Edat.g_width,Boss[n].Edat.g_height);
 
-	for(i=0;i<BOSS_MAX;i++){
-		if(Boss[i].IsUsed)
-			HP_Sum += Boss[i].Edat.hp;
+	for(const auto& it : Boss) {
+		if(it.IsUsed) {
+			HP_Sum += it.Edat.hp;
+		}
 	}
 
 	BossHPG_Open(HP_Sum);
@@ -136,7 +135,7 @@ void BossSet(int x, int y, uint32_t BossID)
 // ボスをセットする(ＥＣＬ用) //
 void BossSetEx(int x, int y, uint32_t BossID)
 {
-	int		i,n;
+	int n;
 	DWORD	HP_Sum = 0;
 
 	// ｘ６４座標に変換してボスをセットする //
@@ -152,9 +151,10 @@ void BossSetEx(int x, int y, uint32_t BossID)
 	parse_ECL(&(Boss[n].Edat));
 	//ObjectLockOn(&(Boss[n].Edat.x),&(Boss[n].Edat.y),Boss[n].Edat.g_width,Boss[n].Edat.g_height);
 
-	for(i=0;i<BOSS_MAX;i++){
-		if(Boss[i].IsUsed)
-			HP_Sum += Boss[i].Edat.hp;
+	for(const auto& it : Boss) {
+		if(it.IsUsed) {
+			HP_Sum += it.Edat.hp;
+		}
 	}
 
 	BossHPG_Update(HP_Sum);
@@ -165,15 +165,13 @@ void BossSetEx(int x, int y, uint32_t BossID)
 // ボスを動かす //
 void BossMove(void)
 {
-	int				i;
 	DWORD			HP_Sum = 0;
 	ENEMY_DATA		*e;
-	BOSS_DATA		*b;
 
 	HomingFlag = HOMING_DUMMY;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->IsUsed){
 			e = &(b->Edat);
 			e->IsDamaged = 0;
@@ -206,10 +204,9 @@ void BossMove(void)
 // ボスを描画する
 void BossDraw(void)
 {
-	int			i,j,x,y;
+	int j, x, y;
 	int			w,h,t;
 	ENEMY_DATA	*e;
-	BOSS_DATA	*b;
 	PIXEL_LTRB	*src;
 	PIXEL_LTRB	wing;
 /*
@@ -231,8 +228,8 @@ void BossDraw(void)
 */
 	BitLineDraw();
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->IsUsed){
 			e = &(b->Edat);
 
@@ -337,16 +334,17 @@ static void BossHPG_Move(uint32_t now)
 	BossHPG.Next = now;
 
 	switch(BossHPG.State){
-		case(BHPG_OPEN1):
-			for(i=0;i<BOSSHPG_HEIGHT;i++){
-				BossHPG.XTemp[i] -= 6;
-				if(BossHPG.XTemp[i]<=BOSSHPG_END_X){
-					BossHPG.XTemp[i] = BOSSHPG_END_X;
+		case(BHPG_OPEN1): {
+			for(auto& it : BossHPG.XTemp) {
+				it -= 6;
+				if(it <= BOSSHPG_END_X){
+					it = BOSSHPG_END_X;
 					ChkCount++;
 				}
 			}
 
 			if(ChkCount==BOSSHPG_HEIGHT) BossHPG.State = BHPG_OPEN2;
+		}
 		break;
 
 		case(BHPG_OPEN2):
@@ -486,12 +484,10 @@ void BossKillAll(void)
 	// 使用するが、当然のごとく、得点＆経験値？は入手できない                 //
 	// レーザークローズも忘れずに！！                                         //
 
-	int				i;
-	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->IsUsed){
 			e = &(b->Edat);
 			SnakyDelete(b);
@@ -557,15 +553,14 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 bool BossDamage(int x, int y, int damage)
 {
 	int				i;
-	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
 
 	i = (BitGetNum()>>1);
 	damage -= i;
 	if(damage <= 0) return FALSE;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->ExState == BEXST_SHILD1 || b->ExState == BEXST_SHILD2){
 			if(Viv.bomb_time) continue;
 		}
@@ -587,7 +582,6 @@ bool BossDamage(int x, int y, int damage)
 bool BossDamage2(int x, int y, int damage)
 {
 	int				i;
-	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
 	BOOL			ret_val = FALSE;
 
@@ -595,8 +589,8 @@ bool BossDamage2(int x, int y, int damage)
 	damage -= i;
 	if(damage <= 0) return FALSE;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->ExState == BEXST_SHILD1 || b->ExState == BEXST_SHILD2){
 			if(Viv.bomb_time) continue;
 		}
@@ -618,7 +612,6 @@ bool BossDamage2(int x, int y, int damage)
 void BossDamage3(int x, int y, uint8_t d)
 {
 	int				i;
-	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
 	//BOOL			ret_val = FALSE;
 	int				damage  = 2;
@@ -627,8 +620,8 @@ void BossDamage3(int x, int y, uint8_t d)
 	damage -= i;
 	if(damage <= 0) return;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->ExState == BEXST_SHILD1 || b->ExState == BEXST_SHILD2){
 			if(Viv.bomb_time) continue;
 		}
@@ -650,15 +643,14 @@ void BossDamage3(int x, int y, uint8_t d)
 void BossDamage4(int damage)
 {
 	int				i;
-	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
 
 	i = (BitGetNum()>>1);
 	damage -= i;
 	if(damage <= 0) return;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->ExState == BEXST_SHILD1 || b->ExState == BEXST_SHILD2){
 			if(Viv.bomb_time) continue;
 		}
@@ -798,13 +790,11 @@ static void BossSTDMove(BOSS_DATA *b)
 // ボスの体力の総和を求める //
 uint32_t GetBossHPSum(void)
 {
-	int				i;
 	DWORD			HP_Sum = 0;
 	ENEMY_DATA		*e;
-	BOSS_DATA		*b;
 
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
+	for(auto& it : Boss) {
+		auto *b = &it;
 		if(b->IsUsed){
 			e = &(b->Edat);
 			HP_Sum += e->hp;

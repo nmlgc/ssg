@@ -437,10 +437,8 @@ static void _2DUpdateAlphaTable(void)
 
 void DisableAlphaTable(void)
 {
-	int		i;
-
-	for(i=0; i<ATABLE_MAX; i++){
-		AInfo[i].CheckValue = 0xffffffff;	// 無効化する
+	for(auto& it : AInfo) {
+		it.CheckValue = 0xffffffff; // 無効化する
 	}
 
 	ATableRef = 0;

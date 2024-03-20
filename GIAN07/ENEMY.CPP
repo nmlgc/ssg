@@ -1819,10 +1819,8 @@ extern void CheckECLInterrupt(ENEMY_DATA *e)
 // 割り込みベクタの初期化 //
 extern void InitECLInterrupt(ENEMY_DATA *e)
 {
-	int			i;
-
-	for(i=0;i<ECLVECT_MAX;i++){
-		e->Vect[i].vect = 0;
+	for(auto& it : e->Vect) {
+		it.vect = 0;
 	}
 }
 

@@ -227,10 +227,10 @@ extern void GrpGetClip(WINDOW_LTRB *dest);	// クリッピング枠を取得す�
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
 // Always returns `true`. //
-bool GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+bool GrpBltX(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
-void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+void GrpBltXC(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
 
 #endif

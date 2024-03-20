@@ -59,7 +59,7 @@ extern void GrpPut16(int x, int y, const char *s)
 
 			tx = x;ty = y;
 			if(tx>=0 && tx<630)	// 安全対策???
-				GrpBltX(&src,tx,ty,GrTama);
+				GrpBltX(src, tx, ty, GrTama);
 		}
 	}
 }
@@ -154,7 +154,7 @@ extern void GrpPut7B(int x, int y, const char *s)
 		}
 
 		if((x >= 0) && (x < 630)) { // 安全対策???
-			GrpBltX(&src, x, y, GrMusic);
+			GrpBltX(src, x, y, GrMusic);
 		}
 	}
 }

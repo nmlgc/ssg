@@ -51,7 +51,7 @@ typedef struct tagNR_SCORE_STRING{
 
 ///// [ 関数 ] /////
 int  SetScoreString(NR_NAME_DATA *NData, uint8_t Dif);	// 現在のスコア列を取得する(Ret:下と同じ)
-int  IsHighScore(NR_NAME_DATA *NData, uint8_t Dif);	// ０：ハイスコアでない  それ以外：順位
+int  IsHighScore(const NR_NAME_DATA *NData, uint8_t Dif);	// ０：ハイスコアでない  それ以外：順位
 bool SaveScoreData(NR_NAME_DATA *NData, uint8_t Dif);	// スコアデータを書き出す
 
 

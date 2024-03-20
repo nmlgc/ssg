@@ -244,7 +244,7 @@ void BossDraw(void)
 				wing = PIXEL_LTWH{
 					(160 + ((e->count / 2) % 4) * 40), 80, 40, 40
 				};
-				GrpBltX(&wing,x-20,y-20,GrEnemy);	// クリッピングなし
+				GrpBltX(wing, (x - 20), (y - 20), GrEnemy); // クリッピングなし
 				continue;
 			}
 

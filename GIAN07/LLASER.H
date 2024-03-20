@@ -85,13 +85,13 @@ typedef struct{
 
 //// レーザー関数２ ////
 bool LLaserSet(uint8_t id);	// レーザーをセットする
-void LLaserOpen(ENEMY_DATA *e, uint8_t id);	// レーザーを開く
-void LLaserClose(ENEMY_DATA *e, uint8_t id);	// レーザーを閉じる
-void LLaserLine(ENEMY_DATA *e, uint8_t id);	// レーザーをライン状態にする
-void LLaserDegA(ENEMY_DATA *e, uint8_t d, uint8_t id);	// レーザーを角度絶対で回転
-void LLaserDegR(ENEMY_DATA *e, char d, uint8_t id);	// レーザーを角度相対で回転
+void LLaserOpen(const ENEMY_DATA *e, uint8_t id);	// レーザーを開く
+void LLaserClose(const ENEMY_DATA *e, uint8_t id);	// レーザーを閉じる
+void LLaserLine(const ENEMY_DATA *e, uint8_t id);	// レーザーをライン状態にする
+void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id);	// レーザーを角度絶対で回転
+void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id);	// レーザーを角度相対で回転
 
-extern void LLaserForceClose(ENEMY_DATA *e);	// 敵に関連づけられたレーザーを強制クローズ
+extern void LLaserForceClose(const ENEMY_DATA *e);	// 敵に関連づけられたレーザーを強制クローズ
 
 extern void LLaserMove(void);				// レーザーを動かす
 extern void LLaserDraw(void);				// レーザーを描画する

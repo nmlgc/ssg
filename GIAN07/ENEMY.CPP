@@ -69,7 +69,7 @@ static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
 
 
 
-void UpdateHoming(ENEMY_DATA *e)
+void UpdateHoming(const ENEMY_DATA *e)
 {
 	int temp = Viv.y - e->y;
 

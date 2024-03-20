@@ -65,7 +65,7 @@ static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR l
 static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo);
 
 // デバイスが求める性能を持っているか //
-static BOOL ConfirmDevice3D(LPD3DDEVICEDESC lpDesc);
+static bool ConfirmDevice3D(const D3DDEVICEDESC *lpDesc);
 
 // ダミー関数をセットする //
 static void SetDummyFunc(void);
@@ -617,9 +617,9 @@ bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 	return TRUE;
 }
 
-bool GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+bool GrpBltX(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
 {
-	RECT rect = { src->left, src->top, src->right, src->bottom };
+	RECT rect = { src.left, src.top, src.right, src.bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(
 			x, y, surf.surf, &rect, DDBLTFAST_SRCCOLORKEY
@@ -628,9 +628,9 @@ bool GrpBltX(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 	return true;
 }
 
-void GrpBltXC(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+void GrpBltXC(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
 {
-	RECT rect = { src->left, src->top, src->right, src->bottom };
+	RECT rect = { src.left, src.top, src.right, src.bottom };
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->BltFast(
 			x, y, surf.surf, &rect, DDBLTFAST_NOCOLORKEY
@@ -646,7 +646,7 @@ bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 	if(!GrpClip(src, &x, &y)) {
 		return false;
 	}
-	return GrpBltX(src, x, y, surf);
+	return GrpBltX(*src, x, y, surf);
 }
 
 // ビット深度によりカラーキーをセットする
@@ -891,7 +891,7 @@ static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR l
 	return D3DENUMRET_OK;
 }
 
-static BOOL ConfirmDevice3D(LPD3DDEVICEDESC lpDesc)
+static bool ConfirmDevice3D(const D3DDEVICEDESC *lpDesc)
 {
 	// 半透明をサポートしているかな？ //
 	// DX5 の HEL はサポートしていないので結局ハード側でサポートしていなければ //

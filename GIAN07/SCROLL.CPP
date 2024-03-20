@@ -26,7 +26,7 @@ SCL_INFO		SclInfo;			// ＳＣＬに関する情報
 PIXEL_LTRB	rcMapChip[1200];	// マップパーツＩＤに対する矩形
 
 static void enemy_set(void);			// 敵をセットする
-static void _PutEnemy(BYTE *p);			// p:SCL_ENEMY以降の敵配置データ
+static void _PutEnemy(const uint8_t *p);	// p:SCL_ENEMY以降の敵配置データ
 static void InitMapChipRect(void);		// スクロールに関する情報の初期化を行う
 
 static PBGMAP *ScNextLine(PBGMAP *p);		// 次の行にＧＯ！！
@@ -409,7 +409,7 @@ static void enemy_set(void)
 	}
 }
 
-static void _PutEnemy(BYTE *p)
+static void _PutEnemy(const uint8_t *p)
 {
 /*
  * [メモ]

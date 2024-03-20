@@ -67,7 +67,7 @@ extern HLaserInfo	HLaserCmd;			// ホーミングレーザーセット用デー�
 
 ///// [関数プロトタイプ] /////
 void HLaserInit(void);	// ホーミングレーザーの初期化を行う
-void HLaserSet(HLaserInfo *hinfo);	// ホーミングレーザーをセットする
+void HLaserSet(const HLaserInfo *hinfo);	// ホーミングレーザーをセットする
 void HLaserMove(void);	// ホーミングレーザーを動作させる
 void HLaserDraw(void);	// ホーミングレーザーを描画する
 void HLaserClear(void);	// ホーミングレーザーに消去エフェクトをセット

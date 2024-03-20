@@ -108,7 +108,7 @@ void SnakyMove(void)
 }
 
 // 蛇型の敵を殺す
-void SnakyDelete(BOSS_DATA *b)
+void SnakyDelete(const BOSS_DATA *b)
 {
 	int				i;
 	SNAKYMOVE_DATA	*s;

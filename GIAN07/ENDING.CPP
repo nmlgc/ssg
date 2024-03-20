@@ -236,7 +236,7 @@ void DrawGrpInfo()
 	// 驚異の画像表示 //
 	PIXEL_LTRB src = { 0, 0, 320, 240 };
 	GrpBltXC(
-		&src, EGrpInfo.x, EGrpInfo.y, GrEndingPic[EGrpInfo.target - EndingGrp]
+		src, EGrpInfo.x, EGrpInfo.y, GrEndingPic[EGrpInfo.target - EndingGrp]
 	);
 }
 

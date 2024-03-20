@@ -56,7 +56,7 @@ void HLaserInit(void)
 
 
 // ホーミングレーザーをセットする //
-void HLaserSet(HLaserInfo *hinfo)
+void HLaserSet(const HLaserInfo *hinfo)
 {
 	int			i,j;
 	BYTE		deg;

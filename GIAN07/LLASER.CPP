@@ -17,7 +17,7 @@ LLASER_CMD	LLaserCmd;
 
 //// ローカル関数 ////
 static void _LLaserPointSet(LLASER_DATA *lp);
-static void _LLaserHitCheck(LLASER_DATA *lp);
+static void _LLaserHitCheck(const LLASER_DATA *lp);
 static void _LLaserXYSet(int id);			// レーザーの座標をセットする
 
 
@@ -79,7 +79,7 @@ bool LLaserSet(uint8_t id)
 	return TRUE;
 }
 
-extern void LLaserOpen(ENEMY_DATA *e,BYTE id)
+extern void LLaserOpen(const ENEMY_DATA *e, uint8_t id)
 {
 	LLASER_DATA		*lp;
 	int				i;
@@ -93,7 +93,7 @@ extern void LLaserOpen(ENEMY_DATA *e,BYTE id)
 	}
 }
 
-extern void LLaserClose(ENEMY_DATA *e,BYTE id)
+extern void LLaserClose(const ENEMY_DATA *e, uint8_t id)
 {
 	LLASER_DATA		*lp;
 	int				i;
@@ -112,7 +112,7 @@ extern void LLaserClose(ENEMY_DATA *e,BYTE id)
 	}
 }
 
-extern void LLaserLine(ENEMY_DATA *e,BYTE id)
+extern void LLaserLine(const ENEMY_DATA *e, uint8_t id)
 {
 	LLASER_DATA		*lp;
 	int				i;
@@ -136,7 +136,7 @@ static void _LLaserXYSet(int id)
 	_LLaserPointSet(LLaser+id);			// p[4] をセット
 }
 
-extern void LLaserDegA(ENEMY_DATA *e,BYTE d,BYTE id)
+extern void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id)
 {
 	LLASER_DATA		*lp;
 	int				i;
@@ -160,7 +160,7 @@ extern void LLaserDegA(ENEMY_DATA *e,BYTE d,BYTE id)
 	}
 }
 
-extern void LLaserDegR(ENEMY_DATA *e,char d,BYTE id)
+extern void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id)
 {
 	LLASER_DATA		*lp;
 	int				i;
@@ -185,7 +185,7 @@ extern void LLaserDegR(ENEMY_DATA *e,char d,BYTE id)
 }
 
 // 敵に関連づけられたレーザーを強制クローズ(Level2...) //
-extern void LLaserForceClose(ENEMY_DATA *e)
+extern void LLaserForceClose(const ENEMY_DATA *e)
 {
 	int				i;
 	LLASER_DATA		*lp;
@@ -459,7 +459,7 @@ static void _LLaserPointSet(LLASER_DATA *lp)
 	pp[2].y += lp->infy;
 }
 
-static void _LLaserHitCheck(LLASER_DATA *lp)
+static void _LLaserHitCheck(const LLASER_DATA *lp)
 {
 //	long tx,ty,w1,w2,length;
 

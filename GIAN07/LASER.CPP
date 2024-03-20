@@ -113,13 +113,13 @@ static void luna_cmdL(void);						// 難易度：Ｌｕｎａｔｉｃ
 
 static BYTE __fastcall laser_dir(WORD i);				// レーザーの進行方向をセットする
 static void __fastcall slaser_pset(LASER_DATA *lp);		// ４点の座標をセットする(ショート用)
-static void __fastcall SLdraw( LASER_DATA *lp);			// ショートレーザー描画
+static void __fastcall SLdraw(const LASER_DATA *lp);	// ショートレーザー描画
 
 static void __fastcall Lmove(LASER_DATA *lp);			// 種類により分岐し座標を更新する
 static void __fastcall laser_hitchk(LASER_DATA *lp);	// レーザーの当たり判定
 
 static void __fastcall REFL_move(LASER_DATA *lp);		// 反射レーザーの移動
-static int  __fastcall REFL_hit(LASER_DATA *lp);		// ﾘﾌﾚｸﾀｰとの当たり判定(ﾋｯﾄ->非０)
+static int  __fastcall REFL_hit(const LASER_DATA *lp);	// ﾘﾌﾚｸﾀｰとの当たり判定(ﾋｯﾄ->非０)
 
 
 void laser_set(void)
@@ -366,7 +366,7 @@ static void __fastcall slaser_pset(LASER_DATA *lp)
 	lp->p[2].y += lp->ly;
 }
 
-static void __fastcall SLdraw(LASER_DATA *lp)
+static void __fastcall SLdraw(const LASER_DATA *lp)
 {
 	static WINDOW_POINT p[4];
 	int x,y;
@@ -578,7 +578,7 @@ static void __fastcall REFL_move(LASER_DATA *lp)
 	}
 }
 
-static int  __fastcall REFL_hit(LASER_DATA *lp)
+static int __fastcall REFL_hit(const LASER_DATA *lp)
 {
 	//REFLECTOR *rp;
 	LLASER_DATA *ll;

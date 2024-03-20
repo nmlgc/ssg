@@ -135,7 +135,7 @@ int SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
 
 
 // ０：ハイスコアでない  それ以外：順位 //
-int IsHighScore(NR_NAME_DATA *NData, uint8_t Dif)
+int IsHighScore(const NR_NAME_DATA *NData, uint8_t Dif)
 {
 	int				Rank;
 

@@ -103,7 +103,7 @@ LineList3D Warning[8] = {
 
 
 static void RollPoint(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
-static void __Draw3DCube(Cube3D *c);	// 汎用３Ｄキューブ描画
+static void __Draw3DCube(const Cube3D *c); // 汎用３Ｄキューブ描画
 
 
 
@@ -321,7 +321,7 @@ void Move3DCube(void)
 
 
 // 汎用３Ｄキューブ描画 //
-static void __Draw3DCube(Cube3D *c)
+static void __Draw3DCube(const Cube3D *c)
 {
 	// ３Ｄで透過色付きorアルファ比較ポリゴンを使えばもっともっと早いのだが... //
 	// ８ビット対応のため、まぁ仕方が無いか... //

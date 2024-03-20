@@ -160,7 +160,7 @@ __inline void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 	p->y = sinl(dz,temp.x) + cosl(dz,temp.y);
 }
 
-__inline void ShiftRight6Bit(Point3D *o, Point3D *p)
+__inline void ShiftRight6Bit(const Point3D *o, Point3D *p)
 {
 	p->x = ((p->x+o->x)>>6) + 320;
 	p->y = ((p->y+o->y)>>6) + 240;

@@ -30,7 +30,7 @@ static void luna_cmd(void);				// 難易度：Ｌｕｎａｔｉｃ
 int __fastcall NewTamaSpeed(WORD i);
 int __fastcall LineCmdNewTamaSpeed(WORD i);
 int __fastcall TamaSpeedEx(BYTE d);
-void __fastcall _TamaEffectDraw(TAMA_DATA *t);	// 弾をエフェクトとして描画？
+void __fastcall _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
 
 
 /*
@@ -463,7 +463,7 @@ void tama_draw(void)
 
 
 // 弾をエフェクトとして描画？ //
-void __fastcall _TamaEffectDraw(TAMA_DATA *t)
+void __fastcall _TamaEffectDraw(const TAMA_DATA *t)
 {
 #define RCSET(x, y, w) {(x), (y), (x+w), (y+w)}
 

@@ -180,14 +180,14 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID);
 // 強制的に ECL ブロック間を移動する //
 void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID);
 
-extern void UpdateHoming(ENEMY_DATA *e);		// ホーミング座標を更新する
+extern void UpdateHoming(const ENEMY_DATA *e);	// ホーミング座標を更新する
 extern void parse_ECL(ENEMY_DATA *e);			// 敵をＥＣＬに従って動かす
 extern void CheckECLInterrupt(ENEMY_DATA *e);	// 割り込みジャンプを調べる
 extern void InitECLInterrupt(ENEMY_DATA *e);	// 割り込みベクタの初期化
 
 
 // Vivit ナナメレーザーの当たり判定 //
-inline bool LaserHITCHK(ENEMY_DATA *e, int ox, int oy, uint8_t d)
+inline bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 {
 	int		tx,ty,l,w;
 	int		chkw;

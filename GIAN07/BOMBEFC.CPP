@@ -30,18 +30,16 @@ void ExBombEfcInit(void)
 // 爆発系エフェクトをセットする //
 void ExBombEfcSet(int x, int y, uint8_t type)
 {
-	int				i;
-	BombEfcCtrl		*p;
+	auto p = std::ranges::find_if(BombEfc, [](const auto& p) {
+		return !p.bIsUsed;
+	});
 
-	for(i=0; i<EXBOMB_MAX; i++){
-		if(FALSE == BombEfc[i].bIsUsed) break;
-	}
 	// 空いているオブジェクトが存在しない //
-	if(i == EXBOMB_MAX) return;
+	if(p == std::end(BombEfc)) {
+		return;
+	}
 
 	// ターゲット捕捉 //
-	p = BombEfc + i;
-
 	p->x     = x;
 	p->y     = y;
 	p->type  = type;

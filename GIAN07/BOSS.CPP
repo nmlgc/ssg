@@ -673,9 +673,7 @@ void BossDamage4(int damage)
 
 static int PutBoss(int x,int y,DWORD id)
 {
-	int				i;
 	DWORD			addr;
-	ENEMY_DATA		*e;
 
 	//if(EnemyNow+1>=ENEMY_MAX) return;
 	//e = Enemy+ (*(EnemyInd+EnemyNow));
@@ -684,14 +682,16 @@ static int PutBoss(int x,int y,DWORD id)
 	//e->x   = (*(short *)(&p[0]));	//((int)(*(short *)(&p[0])))*64;
 	//e->y   = (*(short *)(&p[2]));	//((int)(*(short *)(&p[2])))*64;
 
-	for(i=0;i<BOSS_MAX;i++){
-		if(!Boss[i].IsUsed) break;
-	}
+	auto it = std::ranges::find_if(Boss, [](const auto& it) {
+		return !it.IsUsed;
+	});
 
 	// まず、あり得ないのだが... //
-	if(i==BOSS_MAX) return BOSS_MAX;
+	if(it == std::end(Boss)) {
+		return BOSS_MAX;
+	}
 
-	e = &(Boss[i].Edat);
+	auto *e = &it->Edat;
 
 	addr   = 4 + (id<<2);			// ちと、やばいね...
 	InitEnemyDataX64(e,x,y,addr);
@@ -757,7 +757,7 @@ static int PutBoss(int x,int y,DWORD id)
 	// 割り込みベクタの初期化 //
 	InitECLInterrupt(e);
 */
-	return i;
+	return std::distance(Boss, it);
 }
 
 // ノーマルECL互換の移動 //
@@ -807,14 +807,12 @@ uint32_t GetBossHPSum(void)
 // ボス用割り込み処理 //
 void BossINT(ENEMY_DATA *e, uint8_t IntID)
 {
-	int			i;
-	BOSS_DATA	*b;
-
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
-		if((&(b->Edat)) == e) break;
+	auto b = std::ranges::find_if(Boss, [e](const auto& b) {
+		return ((&b.Edat) == e);
+	});
+	if(b == std::end(Boss)) {
+		return;
 	}
-	if(i==BOSS_MAX) return;
 
 	// 割り込み番号による分岐 //
 	switch(IntID){
@@ -854,14 +852,12 @@ void BossINT(ENEMY_DATA *e, uint8_t IntID)
 // ビット攻撃アドレス指定 //
 void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
 {
-	int			i;
-	BOSS_DATA	*b;
-
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
-		if((&(b->Edat)) == e) break;
+	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
+		return ((&b.Edat) == e);
+	});
+	if(b == std::end(Boss)) {
+		return;
 	}
-	if(i==BOSS_MAX) return;
 
 	BitSelectAttack(AtkID);
 }
@@ -869,14 +865,12 @@ void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
 // ビットにレーザーコマンドセット //
 void BossBitLaser(ENEMY_DATA *e, uint8_t LaserCmd)
 {
-	int			i;
-	BOSS_DATA	*b;
-
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
-		if((&(b->Edat)) == e) break;
+	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
+		return ((&b.Edat) == e);
+	});
+	if(b == std::end(Boss)) {
+		return;
 	}
-	if(i==BOSS_MAX) return;
 
 	BitLaserCommand(LaserCmd);
 }
@@ -884,14 +878,12 @@ void BossBitLaser(ENEMY_DATA *e, uint8_t LaserCmd)
 // ビット命令送信 //
 void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param)
 {
-	int			i;
-	BOSS_DATA	*b;
-
-	for(i=0;i<BOSS_MAX;i++){
-		b = Boss + i;
-		if((&(b->Edat)) == e) break;
+	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
+		return ((&b.Edat) == e);
+	});
+	if(b == std::end(Boss)) {
+		return;
 	}
-	if(i==BOSS_MAX) return;
 
 	BitSendCommand(Cmd, Param);
 }

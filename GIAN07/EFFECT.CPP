@@ -114,17 +114,12 @@ void CEffectDraw(void)
 // 円エフェクトをセットする //
 void CEffectSet(int x, int y, uint8_t type)
 {
-	int					i;
-	CIRCLE_EFC_DATA		*ce = NULL;
-
-	for(i=0;i<CIRCLE_EFC_MAX;i++){
-		if(CEffect[i].type == CEFC_NONE){
-			ce = CEffect + i;
-			break;
-		}
+	auto ce = std::ranges::find_if(CEffect, [](const auto& ce) {
+		return (ce.type == CEFC_NONE);
+	});
+	if(ce == std::end(CEffect)) {
+		return;
 	}
-
-	if(ce == NULL) return;
 
 	ce->x     = x >> 6;
 	ce->y     = y >> 6;
@@ -226,13 +221,13 @@ void StringEffect3(void)
 // 曲名の表示 //
 void SetMusicTitle(int y, Narrow::string_view s)
 {
-	int	n;
-
 	// 空きバッファ検索 //
-	for(n=0;n<SEFFECT_MAX;n++){
-		if(SEffect[n].cmd==SEFC_NONE) break;
+	auto e = std::ranges::find_if(SEffect, [](const auto& e) {
+		return (e.cmd == SEFC_NONE);
+	});
+	if(e == std::end(SEffect)) {
+		return;
 	}
-	if(n==SEFFECT_MAX) return;
 
 	// Print the ♪ separately, since it can be combined with a music title in
 	// any encoding.
@@ -242,12 +237,12 @@ void SetMusicTitle(int y, Narrow::string_view s)
 	// 曲のタイトルが長すぎる場合、どうしましょう？ //
 	auto x = (std::max)((640 - 128 - 32 - extent.w), 128);
 
-	SEffect[n].cmd  = SEFC_MTITLE1;
-	SEffect[n].x    = (x<<6);// + (64*2)*16;
-	SEffect[n].y    = y<<6;
-	SEffect[n].time = 64*2;
-	SEffect[n].vx   = extent.w;
-	SEffect[n].vy   = extent.h;
+	e->cmd  = SEFC_MTITLE1;
+	e->x    = (x << 6); // + ((64 * 2) * 16);
+	e->y    = (y << 6);
+	e->time = (64 * 2);
+	e->vx   = extent.w;
+	e->vy   = extent.h;
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
@@ -602,15 +597,12 @@ void ObjectLockOnInit(void)
 // 何かをロックオンする //
 void ObjectLockOn(int *x, int *y, int wx64, int hx64)
 {
-	LOCKON_INFO		*l;
-	int				i;
-
-	for(i=0;i<LOCKON_MAX;i++){
-		if(LockInfo[i].state==LOCKON_NONE) break;
+	auto l = std::ranges::find_if(LockInfo, [](const auto& l) {
+		return (l.state == LOCKON_NONE);
+	});
+	if(l == std::end(LockInfo)) {
+		return;
 	}
-	if(i==LOCKON_MAX) return;
-
-	l = LockInfo + i;
 
 	l->x = x;
 	l->y = y;

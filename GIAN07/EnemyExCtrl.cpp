@@ -36,17 +36,15 @@ void SnakyInit(void)
 void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 {
 	int				i;
-	SNAKYMOVE_DATA	*s;
 	DWORD			n;
 	ENEMY_DATA		*e;
 
-	for(i=0;i<SNAKE_MAX;i++){
-		if(SnakeData[i].bIsUse==FALSE){
-			s = SnakeData + i;
-			break;
-		}
+	auto s = std::ranges::find_if(SnakeData, [](const auto& s) {
+		return !s.bIsUse;
+	});
+	if(s == std::end(SnakeData)) {
+		return;
 	}
-	if(i==SNAKE_MAX) return;
 
 	s->bIsUse = TRUE;
 	s->Parent = b;
@@ -109,13 +107,14 @@ void SnakyMove(void)
 void SnakyDelete(const BOSS_DATA *b)
 {
 	int				i;
-	SNAKYMOVE_DATA	*s;
 	ENEMY_DATA		*e;
 
-	for(i=0,s=SnakeData;i<SNAKE_MAX;i++,s++){
-		if(s->Parent == b) break;
+	auto s = std::ranges::find_if(SnakeData, [b](const auto& s) {
+		return (s.Parent == b);
+	});
+	if(s == std::end(SnakeData)) {
+		return;
 	}
-	if(i==SNAKE_MAX) return;
 
 	for(i=0;i<s->Length;i++){
 		if(s->EnemyPtr[i]==NULL) break;

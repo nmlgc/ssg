@@ -23,17 +23,15 @@ static void _LLaserXYSet(int id);			// レーザーの座標をセットする
 
 bool LLaserSet(uint8_t id)
 {
-	LLASER_DATA		*lp;
-	int				i;
-
 	// この部分で空いているレーザーのサーチを行う             //
 	// もし、レーザーが見つからなければ、FALSE をリターンする //
 	// つまり、その場合は、参照カウントを増加させない         //
-	for(i=0;i<LLASER_MAX;i++){
-		lp = LLaser+i;
-		if(lp->flag == LLF_DISABLE) break;
+	auto lp = std::ranges::find_if(LLaser, [](const auto& lp) {
+		return (lp.flag == LLF_DISABLE);
+	});
+	if(lp == std::end(LLaser)) {
+		return false;
 	}
-	if(i>=LLASER_MAX) return FALSE;
 
 	lp->dx = LLaserCmd.dx;
 	lp->dy = LLaserCmd.dy;

@@ -8,6 +8,8 @@
 #include "SCORE.H"
 #include <windows.h>
 
+using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
+
 //#define PBG_MASK_VALUE		((DWORDLONG)0x342d3a4de92c68ba)
 //#define PBG_MASK_VALUE		((DWORDLONG)0xe92cd3a4d8ba6342)
 #define PBG_MASK_VALUE		((DWORDLONG)0xb97eb2c6542d3a41)
@@ -22,7 +24,7 @@ static std::unique_ptr<NR_SCORE_DATA> ScoreData = nullptr;
 
 static BOOL LoadScoreData(void);			// スコアデータを読み込む
 static void ReleaseScoreData(void);	// スコアデータを解放する
-static NR_NAME_DATA *SetNDataPtr(BYTE Dif);	// 難易度でポインタを振り分ける
+static std::optional<NR_SCORE_LIST> GetNList(uint8_t Dif);	// 難易度でポインタを振り分ける
 static BOOL SetDefaultScoreData(void);		// スコアデータ初期値をセット
 
 static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ &bd);
@@ -45,7 +47,6 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 {
 //	static char			*WTable[4] = {"WIDE ","HOMING","LASER","?????"};
 	NR_SCORE_STRING		*Res;
-	NR_NAME_DATA		*p;
 	int					i,num,rank;
 	__int64				temp;
 
@@ -63,11 +64,12 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 
 	// ポインタをセットするぞ //
 	if(!LoadScoreData()) return 0;
-	p = SetNDataPtr(Dif);
-	if(p == NULL){
+	auto maybe_p = GetNList(Dif);
+	if(!maybe_p) {
 		ReleaseScoreData();
 		return 0;
 	}
+	auto p = maybe_p.value();
 
 	if(rank!=0 && NData!=NULL){
 		// まずは、スコアを下方向に押し出すのだ //
@@ -111,18 +113,18 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 // ０：ハイスコアでない  それ以外：順位 //
 int IsHighScore(NR_NAME_DATA *NData, BYTE Dif)
 {
-	NR_NAME_DATA	*temp = NULL;
 	int				Rank;
 
 	// ロードできないので失敗！ //
 	if(!LoadScoreData()) return 0;
 
 	// 難易度でポインタを振り分ける //
-	temp = SetNDataPtr(Dif);
-	if(temp == NULL){
+	const auto maybe_temp = GetNList(Dif);
+	if(!maybe_temp) {
 		ReleaseScoreData();
 		return 0;
 	}
+	const auto temp = maybe_temp.value();
 
 	// 該当個所はあるかな？ //
 	for(Rank=0; Rank<NR_RANK_MAX ; Rank++){
@@ -144,8 +146,6 @@ int IsHighScore(NR_NAME_DATA *NData, BYTE Dif)
 bool SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 {
 	int				Rank;
-	int				i;
-	NR_NAME_DATA	*temp;
 
 	// スコアデータを読み込む //
 	Rank = IsHighScore(NData, Dif);
@@ -155,14 +155,15 @@ bool SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 
 	// ポインタをセットする //
 	if(!LoadScoreData()) return FALSE;
-	temp = SetNDataPtr(Dif);
-	if(temp == NULL){
+	auto maybe_temp = GetNList(Dif);
+	if(!maybe_temp) {
 		ReleaseScoreData();
 		return FALSE;
 	}
+	auto temp = maybe_temp.value();
 
 	// まずは、スコアを下方向に押し出す //
-	for(i=NR_RANK_MAX-1; i>=Rank; i--){
+	for(auto i = (temp.size() - 1); i >= Rank; i--) {
 		temp[i] = temp[i-1];		// 構造体から構造体への代入
 	}
 
@@ -228,9 +229,11 @@ static void ReleaseScoreData(void)
 
 
 // 難易度でポインタを振り分ける //
-static NR_NAME_DATA *SetNDataPtr(BYTE Dif)
+static std::optional<NR_SCORE_LIST> GetNList(uint8_t Dif)
 {
-	if(NULL == ScoreData) return NULL;
+	if(!ScoreData) {
+		return {};
+	}
 
 	switch(Dif){
 		case(GAME_EASY):	return ScoreData->Easy;
@@ -238,27 +241,27 @@ static NR_NAME_DATA *SetNDataPtr(BYTE Dif)
 		case(GAME_HARD):	return ScoreData->Hard;
 		case(GAME_LUNATIC):	return ScoreData->Lunatic;
 		case(GAME_EXTRA):	return ScoreData->Extra;
-		default:			return NULL;
+		default:
+			return {};
 	}
 }
 
 // スコアデータ初期値をセット //
 static BOOL SetDefaultScoreData(void)
 {
-	int				i,j;
-	NR_NAME_DATA	*temp;
-
 	if(NULL == ScoreData) return FALSE;
 
-	for(i=0; i<5; i++){
-		temp = SetNDataPtr(i);
-		if(temp == NULL) return FALSE;
-
-		for(j=0; j<NR_RANK_MAX; j++){
+	for(auto i = 0; i < (GAME_EXTRA + 1); i++) {
+		auto maybe_temp = GetNList(i);
+		if(!maybe_temp) {
+			return false;
+		}
+		auto temp = maybe_temp.value();
+		for(size_t j = 0; j < temp.size(); j++) {
 			strcpy(temp[j].Name, "????????");
-			temp[j].Score  = (NR_RANK_MAX-j) * 1200000;//1500000;
-			temp[j].Evade  = (NR_RANK_MAX-j) * 50;
-			temp[j].Stage  = (i<4) ? (NR_RANK_MAX-j) : 1;
+			temp[j].Score  = ((temp.size() - j) * 1200000); // 1500000;
+			temp[j].Evade  = ((temp.size() - j) * 50);
+			temp[j].Stage  = ((i < 4) ? (temp.size() - j) : 1);
 			temp[j].Weapon = j % 3;
 		}
 	}

@@ -1464,7 +1464,7 @@ void MusicRoomProc(bool&)
 		//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));
 
 		if(MusicRoomText) {
-			const auto text = MusicRoomText.value();
+			const auto& text = MusicRoomText.value();
 
 			if(playing == BGM_PLAYING::MIDI) {
 				TextObj.Blit({ (540 + 2), (96 - 3) }, text.mid_dev);

@@ -153,7 +153,7 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 		}
 	}
 
-	return std::move(uncompressed);
+	return uncompressed;
 }
 
 BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)

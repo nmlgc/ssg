@@ -337,7 +337,7 @@ void NameRegistProc(bool&)
 				ScoreString[CurrentRank-1].Name[NR_NAME_LEN-1] = '\0';
 
 				strcpy(CurrentName.Name, ScoreString[CurrentRank-1].Name);
-				// SaveScoreData(&CurrentName, CurrentLevel());
+				SaveScoreData(&CurrentName, CurrentLevel());
 
 				key_time = END_WAIT;
 				break;

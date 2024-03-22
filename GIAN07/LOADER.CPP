@@ -514,9 +514,7 @@ PALETTE SProjectPalette;
 
 
 // 秘密の関数 //
-static void SetAnimeRect(ANIME_DATA *anm, int x, int y, int w, int h);
 static void SetAnimeRect2(ANIME_DATA *anm, int x1, int y1, int x2, int y2);
-static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n);
 
 
 // あるステージのグラフィックをロードする //
@@ -733,77 +731,71 @@ bool LoadStageData(uint8_t stage)
 		case(GRAPH_ID_EXSTAGE):		// エキストラステージのグラフィック矩形
 			// Extra Boss I //
 			// 00 : ■Ａ　0 ～ 3   :  翼無し通常　（10fpp)
-			SetAnimeTH(Anime+0, 0, 0, 4);
+			Anime[0].SetSheet<4, 80>({ 0, 0 }, ANM_NORM);
 
 			// 01 : ■Ｂ　4 ～ 7   :  翼有り通常　（10fpp)
-			SetAnimeTH(Anime+1, 320, 0, 4);
+			Anime[1].SetSheet<4, 80>({ 320, 0 }, ANM_NORM);
 
 			// 02 : ■Ｃ　8 ～ 13  :  翼装着　（翼無し->有り）　（6fpp)
-			SetAnimeTH(Anime+2, 0, 80, 6);
-			Anime[2].mode = ANM_STOP;
+			Anime[2].SetSheet<6, 80>({ 0, 80 }, ANM_STOP);
 
 			// 03 : ■Ｄ　14 ～ 15 :  翼有り時攻撃（移動無し）　（6fpp)
-			SetAnimeTH(Anime+3, 480, 80, 2);
+			Anime[3].SetSheet<2, 80>({ 480, 80 }, ANM_NORM);
 
 			// 04 : ■Ｅ　16 ～ 17 :  翼装着時移動（もしくは移動攻撃）左　（6fpp)
-			SetAnimeTH(Anime+4, 0, 160, 2);
+			Anime[4].SetSheet<2, 80>({ 0, 160 }, ANM_NORM);
 
 			// 05 : ■Ｆ　18 ～ 19 :  翼装着時移動（もしくは移動攻撃）右　（6fpp)
-			SetAnimeTH(Anime+5, 160, 160, 2);
+			Anime[5].SetSheet<2, 80>({ 160, 160 }, ANM_NORM);
 
 			// 06 : ■Ｇ　24 ～ 30 :  段階変化　（翼有り->無し）　（6fpp)
-			SetAnimeTH(Anime+6, 0, 240, 6);
-			Anime[6].mode = ANM_STOP;
+			Anime[6].SetSheet<6, 80>({ 0, 240 }, ANM_STOP);
 
 			// 07 : ■20 : 通常時ダメージ用マスク　（翼有り、無し兼用）
-			SetAnimeTH(Anime+7, 320, 160, 1);
+			Anime[7].SetSheet<1, 80>({ 320, 160 }, ANM_NORM);
 
 			// 08 : ■21 : 停止攻撃時ダメージ用マスク　
-			SetAnimeTH(Anime+8, 400, 160, 1);
+			Anime[8].SetSheet<1, 80>({ 400, 160 }, ANM_NORM);
 
 			// 09 : ■22 : 移動時（左）ダメージ用マスク　
-			SetAnimeTH(Anime+9, 480, 160, 1);
+			Anime[9].SetSheet<1, 80>({ 480, 160 }, ANM_NORM);
 
 			// 10 : ■23 : 移動時（右）ダメージ用マスク　
-			SetAnimeTH(Anime+10, 560, 160, 1);
+			Anime[10].SetSheet<1, 80>({ 560, 160 }, ANM_NORM);
 
-			SetAnime32(0   , 320+32*0, 11, 4, ANM_NORM);
-			SetAnime32(0   , 320+32*1, 12, 4, ANM_NORM);
-			SetAnime32(0   , 320+32*2, 13, 4, ANM_NORM);
-			SetAnime32(0   , 320+32*3, 14, 4, ANM_NORM);
-			SetAnime32(0   , 320+32*4, 15, 4, ANM_NORM);
-			SetAnime32(32*4, 320     , 16, 4, ANM_NORM);
-			SetAnime32(32*4, 320+32*1, 17, 1, ANM_NORM);
+			Anime[11].SetSheet<4, 32>({        0, (320 + (32 * 0)) }, ANM_NORM);
+			Anime[12].SetSheet<4, 32>({        0, (320 + (32 * 1)) }, ANM_NORM);
+			Anime[13].SetSheet<4, 32>({        0, (320 + (32 * 2)) }, ANM_NORM);
+			Anime[14].SetSheet<4, 32>({        0, (320 + (32 * 3)) }, ANM_NORM);
+			Anime[15].SetSheet<4, 32>({        0, (320 + (32 * 4)) }, ANM_NORM);
+			Anime[16].SetSheet<4, 32>({ (32 * 4),  320             }, ANM_NORM);
+			Anime[17].SetSheet<1, 32>({ (32 * 4), (320 + (32 * 1)) }, ANM_NORM);
 
 			// Extra Boss II //
 			// 18 : ■Ａ : 停止アニメ　（10～12fpp)
-			SetAnimeTH(Anime+18, 0, 0, 4);
+			Anime[18].SetSheet<4, 80>({ 0, 0 }, ANM_NORM);
 
 			// 19 : ■Ｂ : 通常段階攻撃１　（?fpp)
-			SetAnimeTH(Anime+19, 320, 0, 4);
-			Anime[19].mode = ANM_STOP;
+			Anime[19].SetSheet<4, 80>({ 320, 0 }, ANM_STOP);
 
 			// 20 : ■Ｃ :  通常段階攻撃２　および、高速移動前溜めポーズ　（6fpp)
-			SetAnimeTH(Anime+20, 0, 80, 2);
+			Anime[20].SetSheet<2, 80>({ 0, 80 }, ANM_NORM);
 
 			// 21 : ■Ｄ : 魂状態（ショットに当たらない無敵） (1 ～ 2 fpp）
 			// (160,80), (200,80), (240,80), (280,80)
-			Anime[21].size = { 40, 40 };
-			Anime[21].n      = 4;
-			Anime[21].mode   = ANM_NORM;
-			for(i=0; i<4; i++)  Anime[21].ptn[i] = PIXEL_LTWH{ (160 + (i * 40)), 80, 40, 40 };
+			Anime[21].SetSheet<4, 40>({ 160, 80 }, ANM_NORM);
 
 			// 22 : ■Ｅ : ダメージマスク(A)
-			SetAnimeTH(Anime+22, 320, 80, 1);
+			Anime[22].SetSheet<1, 80>({ 320, 80 }, ANM_NORM);
 
 			// 23 : ■Ｅ : ダメージマスク(B)
-			SetAnimeTH(Anime+23, 400, 80, 1);
+			Anime[23].SetSheet<1, 80>({ 400, 80 }, ANM_NORM);
 
 			// 24 : ■Ｅ : ダメージマスク(G)
-			SetAnimeTH(Anime+24, 480, 80, 1);
+			Anime[24].SetSheet<1, 80>({ 480, 80 }, ANM_NORM);
 
 			// 25 : ■Ｅ : ダメージマスク(C)
-			SetAnimeTH(Anime+25, 560, 80, 1);
+			Anime[25].SetSheet<1, 80>({ 560, 80 }, ANM_NORM);
 
 			// 26 : ■Ｆ : 高速移動アニメ
 			Anime[26].size = { 80, 80 };
@@ -813,20 +805,20 @@ bool LoadStageData(uint8_t stage)
 				Anime[26].ptn[i] = PIXEL_LTWH{ ((i * 80) % 640), 160, 80, 80 };
 
 			// 27 : ■Ｇ : 通常段階攻撃２溜めポーズ　および、ワープ前後、
-			SetAnimeTH(Anime+27, 560, 320, 1);
+			Anime[27].SetSheet<1, 80>({ 560, 320 }, ANM_NORM);
 
 			// 28-32 : 陰陽玉ｘ５
-			SetAnime32(  0, 384   , 28, 8, ANM_NORM);
-			SetAnime32(  0, 384+32, 29, 8, ANM_NORM);
-			SetAnime32(  0, 384+64, 30, 8, ANM_NORM);
-			SetAnime32(256, 384+32, 31, 8, ANM_NORM);
-			SetAnime32(256, 384+64, 32, 8, ANM_NORM);
+			Anime[28].SetSheet<8, 32>({   0,  384       }, ANM_NORM);
+			Anime[29].SetSheet<8, 32>({   0, (384 + 32) }, ANM_NORM);
+			Anime[30].SetSheet<8, 32>({   0, (384 + 64) }, ANM_NORM);
+			Anime[31].SetSheet<8, 32>({ 256, (384 + 32) }, ANM_NORM);
+			Anime[32].SetSheet<8, 32>({ 256, (384 + 64) }, ANM_NORM);
 
-			SetAnime32(0,  0, 33, 16, ANM_DEG);
-			SetAnime32(0, 32, 34, 16, ANM_DEG);
-			SetAnime32(0, 64, 35, 16, ANM_DEG);
-			SetAnime32(0, 96, 36, 16, ANM_DEG);
-			SetAnime32(0,128, 37, 16, ANM_DEG);
+			Anime[33].SetSheetDeg<32>({ 0,   0 });
+			Anime[34].SetSheetDeg<32>({ 0,  32 });
+			Anime[35].SetSheetDeg<32>({ 0,  64 });
+			Anime[36].SetSheetDeg<32>({ 0,  96 });
+			Anime[37].SetSheetDeg<32>({ 0, 128 });
 
 			// レーザー発射物 //
 			Anime[38].size = { 40, 56 };
@@ -871,10 +863,10 @@ bool LoadStageData(uint8_t stage)
 			Anime[0].ptn[0] = {  0, 0,  72     , 56 };
 			Anime[0].ptn[1] = { 72, 0, (72 * 2), 56 };
 
-			SetAnime32(0,56+ 0,1,16,ANM_DEG);
-			SetAnime32(0,56+32,2,16,ANM_DEG);
-			SetAnime32(0,56+64,3,16,ANM_DEG);
-			SetAnime32(0,56+96,4,16,ANM_DEG);
+			Anime[1].SetSheetDeg<32>({ 0, (56 +  0) });
+			Anime[2].SetSheetDeg<32>({ 0, (56 + 32) });
+			Anime[3].SetSheetDeg<32>({ 0, (56 + 64) });
+			Anime[4].SetSheetDeg<32>({ 0, (56 + 96) });
 
 			// ボス //
 			Anime[5].size = { 72, 64 };
@@ -897,11 +889,11 @@ bool LoadStageData(uint8_t stage)
 		break;
 
 		case(2):		// Ｓｔａｇｅ２のグラフィック矩形
-			SetAnime32(0,  0,0,16,ANM_DEG);
-			SetAnime32(0, 32,1,16,ANM_DEG);
-			SetAnime32(0, 64,2,16,ANM_DEG);
-			SetAnime32(0, 96,3,16,ANM_DEG);
-			SetAnime32(0,128,4,16,ANM_DEG);
+			Anime[0].SetSheetDeg<32>({ 0,   0 });
+			Anime[1].SetSheetDeg<32>({ 0,  32 });
+			Anime[2].SetSheetDeg<32>({ 0,  64 });
+			Anime[3].SetSheetDeg<32>({ 0,  96 });
+			Anime[4].SetSheetDeg<32>({ 0, 128 });
 
 			Anime[5].size = { 112, 48 };
 			Anime[5].n      = 1;
@@ -991,9 +983,9 @@ bool LoadStageData(uint8_t stage)
 			for(i=0;i<8;i++) Anime[0].ptn[i    ] = PIXEL_LTWH{ i*56,  0, 56, 56 };
 			for(i=0;i<8;i++) Anime[0].ptn[i + 8] = PIXEL_LTWH{ i*56, 56, 56, 56 };
 
-			SetAnime32(0,112,1,16,ANM_DEG);
-			SetAnime32(0,144,2,16,ANM_DEG);
-			SetAnime32(0,176,3,16,ANM_DEG);
+			Anime[1].SetSheetDeg<32>({ 0, 112 });
+			Anime[2].SetSheetDeg<32>({ 0, 144 });
+			Anime[3].SetSheetDeg<32>({ 0, 176 });
 
 			Anime[4].size = { 48, 16 };
 			Anime[4].n      = 2;
@@ -1013,8 +1005,8 @@ bool LoadStageData(uint8_t stage)
 			Anime[6].mode   = ANM_NORM;
 			Anime[6].ptn[0] = PIXEL_LTWH{ 464, 392, (11 * 16), ((5 * 16) + 8) };
 
-			SetAnime32(0,208,7,16,ANM_DEG);
-			SetAnime40(0,240,8);
+			Anime[7].SetSheetDeg<32>({ 0, 208 });
+			Anime[8].SetSheetDeg<40>({ 0, 240 });
 
 			// ボスの影 //
 			Anime[10].size = { 196, 100 };
@@ -1035,12 +1027,12 @@ bool LoadStageData(uint8_t stage)
 		break;
 
 		case(4):	// マリーさんのステージ
-			SetAnime32(0,  0,0,16,ANM_DEG);
-			SetAnime32(0, 32,1,16,ANM_DEG);
-			SetAnime32(0, 64,2,16,ANM_DEG);
-			SetAnime32(0, 96,3, 2,ANM_NORM);
-			SetAnime24(64,96,4);
-			SetAnime32(0,128,5,16,ANM_DEG);
+			Anime[0].SetSheetDeg<32>({  0,   0 });
+			Anime[1].SetSheetDeg<32>({  0,  32 });
+			Anime[2].SetSheetDeg<32>({  0,  64 });
+			Anime[3].SetSheet<2, 32>({  0,  96 }, ANM_NORM);
+			Anime[4].SetSheetDeg<24>({ 64,  96 });
+			Anime[5].SetSheetDeg<32>({  0, 128 });
 
 			//(304,296)-(640,480)
 			Anime[6].size = { (640 - 304), (480 - 296) };
@@ -1056,13 +1048,13 @@ bool LoadStageData(uint8_t stage)
 		break;
 
 		case(5):	// ご主人様のステージ
-			SetAnime32(  0,   0, 0, 16, ANM_DEG);		// 赤いヤツ
-			SetAnime32(  0,  32, 1, 16, ANM_DEG);		// 赤いヤツの出現用演出
-			SetAnime32(  0,  64, 2, 16, ANM_DEG);		// 蒼いヤツ
-			SetAnime32(  0,  96, 3, 16, ANM_DEG);		// 緑のヤツ
-			SetAnime32(  0, 128, 4, 16, ANM_DEG);		// オレンジなやつ
-			SetAnime32(512,   0, 5,  4, ANM_NORM);		// 原子炉搭載ビット
-			SetAnime32(512,  64, 6,  4, ANM_NORM);		// オレンジなヤツの出現用演出
+			Anime[0].SetSheetDeg<32>({   0,   0 });	// 赤いヤツ
+			Anime[1].SetSheetDeg<32>({   0,  32 });	// 赤いヤツの出現用演出
+			Anime[2].SetSheetDeg<32>({   0,  64 });	// 蒼いヤツ
+			Anime[3].SetSheetDeg<32>({   0,  96 });	// 緑のヤツ
+			Anime[4].SetSheetDeg<32>({   0, 128 });	// オレンジなやつ
+			Anime[5].SetSheet<4, 32>({ 512,   0 }, ANM_NORM);	// 原子炉搭載ビット
+			Anime[6].SetSheet<4, 32>({ 512,  64 }, ANM_NORM);	// オレンジなヤツの出現用演出
 
 			// 中ボス用のオプション //
 			Anime[7].size = { 24, 24 };
@@ -1073,13 +1065,10 @@ bool LoadStageData(uint8_t stage)
 			Anime[7].ptn[2] = PIXEL_LTWH{ 592, (96 +  0), 24, 24 };
 			Anime[7].ptn[3] = PIXEL_LTWH{ 592, (96 + 48), 24, 24 };
 
-			SetAnimeRect(Anime+8, 512, 96, 80, 9*8);	// 屈強なる中ボス
+			Anime[8].SetSheet<1>({ 512, 96 }, { 80, 72 }, ANM_NORM); // 屈強なる中ボス
 
 			// メタリックご主人 //
-			Anime[9].size = { (640 - 304), (480 - 256) };
-			Anime[9].n      = 1;
-			Anime[9].mode   = ANM_NORM;
-			Anime[9].ptn[0] = { 304, 256, 640, 480 };
+			Anime[9].SetSheet<1>({ 304, 256 }, { 336, 224 }, ANM_NORM);
 		break;
 
 		case(6):
@@ -1179,21 +1168,11 @@ bool LoadStageData(uint8_t stage)
 			Anime[7].ptn[8] = PIXEL_LTWH{ (32 * 1), 416, 32, 32 };
 			Anime[7].ptn[9] = PIXEL_LTWH{ (32 * 0), 416, 32, 32 };
 
-			SetAnimeRect(Anime+8, 0, 368, 48, 48);	// 屈強なる中ボス
+			Anime[8].SetSheet<1>({ 0, 368 }, { 48, 48 }, ANM_NORM);	// 屈強なる中ボス
 		break;
 	}
 
 	return TRUE;
-}
-
-// １パターンのグラフィックをアニメとして定義する //
-static void SetAnimeRect(ANIME_DATA *anm,int x, int y, int w, int h)
-{
-	anm->size = { w, h };
-	anm->n      = 1;
-	anm->mode   = ANM_NORM;
-
-	anm->ptn[0] = PIXEL_LTWH{ x, y, w, h };
 }
 
 // １パターンのグラフィックをアニメとして定義する //
@@ -1204,19 +1183,6 @@ static void SetAnimeRect2(ANIME_DATA *anm,int x1, int y1, int x2, int y2)
 	anm->mode   = ANM_NORM;
 
 	anm->ptn[0] = { x1, y1, x2, y2 };
-}
-
-static void SetAnimeTH(ANIME_DATA *anm, int x, int y, int n)
-{
-	int		i;
-
-	anm->size = { 80, 80 };
-	anm->n      = n;
-	anm->mode   = ANM_NORM;
-
-	for(i=0; i<n; i++){
-		anm->ptn[i] = PIXEL_LTWH{ (x + (i * 80)), y, 80, 80 };
-	}
 }
 
 

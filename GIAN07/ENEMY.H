@@ -106,12 +106,42 @@ struct ENEMY_DATA {
 	void Draw() const;
 };
 
-typedef struct{
+struct ANIME_DATA {
 	uint8_t	mode;	// アニメーションモード
 	uint8_t	n;	// アニメーションパターン数
 	PIXEL_SIZE	size;	// 絵の幅, 絵の高さ
 	PIXEL_LTRB	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
-} ANIME_DATA;
+
+	template <uint8_t Count> void SetSheet(
+		PIXEL_POINT topleft, PIXEL_SIZE size, uint8_t mode
+	)
+	{
+		static_assert(Count <= ANIMEPTN_MAX);
+
+		this->size = size;
+		this->n    = Count;
+		this->mode = mode;
+
+		for(auto i = decltype(Count){ 0 }; i < Count; i++) {
+			ptn[i] = PIXEL_LTWH{ topleft.x, topleft.y, size.w, size.h };
+			topleft.x += size.w;
+		}
+	}
+
+	// Cel sheets of quadratic sprites.
+	template <uint8_t Count, PIXEL_COORD Size> void SetSheet(
+		PIXEL_POINT topleft, uint8_t mode
+	)
+	{
+		SetSheet<Count>(topleft, { Size, Size }, mode);
+	}
+
+	// Rotational cel sheets always consist of 16 quadratic sprites.
+	template <PIXEL_COORD Size> void SetSheetDeg(PIXEL_POINT topleft)
+	{
+		SetSheet<16>(topleft, { Size, Size }, ANM_DEG);
+	}
+};
 
 //// 敵変数 ////
 extern std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
@@ -138,11 +168,6 @@ bool enemy_damage2(int x, int y, int damage);	// ｙ上方向無限Ver.敵にダ
 void enemy_damage3(int x, int y, uint8_t d);	// ナナメレーザーの当たり判定
 extern void enemy_damage4(int damage);				// すべての敵にダメージを与える
 
-extern void SetAnime24(int x,int y,int id);
-void SetAnime32(int x, int y, int id, int n, uint8_t mode);
-extern void SetAnime40(int x,int y,int id);
-extern void SetAnime48(int x,int y,int id);
-extern void SetAnime80(int x,int y,int id);
 extern void EnemyAnimeMove(ENEMY_DATA *e);
 
 

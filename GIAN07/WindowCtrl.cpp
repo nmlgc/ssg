@@ -571,7 +571,7 @@ namespace BGMPack {
 
 	static bool Handle(INPUT_BITS key, size_t selected)
 	{
-		if((key == KEY_TAMA) || (key == KEY_RETURN)) {
+		if(CWinOKKey(key)) {
 			if(selected == SelDownload()) {
 				URLOpen(BGMPack::SOUNDTRACK_URL);
 			} else {
@@ -671,96 +671,76 @@ static bool RFnStgEx(INPUT_BITS key)
 
 static bool MainFnGameStart(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			//EndingInit();
-			WeaponSelectInit(false);
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		//EndingInit();
+		WeaponSelectInit(false);
 	}
+	return true;
 }
 
 static bool MainFnExStart(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			if(ConfigDat.ExtraStgFlags.v) {
-				WeaponSelectInit(true);
-			}
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		if(ConfigDat.ExtraStgFlags.v) {
+			WeaponSelectInit(true);
+		}
 	}
+	return true;
 }
 
 static bool ScoreFn(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			ScoreNameInit();
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		ScoreNameInit();
 	}
+	return true;
 }
 
 static bool MusicFn(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			if(BGM_Enabled()) {
-				MusicRoomInit();
-			}
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		if(BGM_Enabled()) {
+			MusicRoomInit();
+		}
 	}
+	return true;
 }
 
 static bool ExitFnYes(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameExit();
-		return FALSE;
-
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		GameExit();
+		return false;
 	}
+	return true;
 }
 
 static bool ExitFnNo(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameRestart();
-		return FALSE;
-
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		GameRestart();
+		return false;
 	}
+	return true;
 }
 
 static bool ContinueFnYes(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			GameContinue();
-		return FALSE;
-
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		GameContinue();
+		return false;
 	}
+	return true;
 }
 
 static bool ContinueFnNo(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):
-			NameRegistInit(TRUE);
-			//GameExit();
-		return FALSE;
-
-		default:
-		return TRUE;
+	if(CWinOKKey(key)) {
+		NameRegistInit(true);
+		// GameExit();
+		return false;
 	}
+	return true;
 }
 
 static bool InpFnKey(

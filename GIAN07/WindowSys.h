@@ -266,11 +266,17 @@ void CWinMove(WINDOW_SYSTEM *ws);				// コマンドウィンドウを１フレ�
 void CWinDraw(WINDOW_SYSTEM *ws);				// コマンドウィンドウの描画
 bool CWinExitFn(INPUT_BITS key);	// コマンド [Exit] のデフォルト処理関数
 
+// Returns whether this key represents an "OK" action.
+constexpr bool CWinOKKey(INPUT_BITS key)
+{
+	return ((key == KEY_RETURN) || (key == KEY_TAMA));
+}
+
 // Returns the delta that this key would apply to a numeric option value.
 constexpr int_fast8_t CWinOptionKeyDelta(INPUT_BITS key)
 {
 	return (
-		((key == KEY_RETURN) || (key == KEY_TAMA) || (key == KEY_RIGHT)) ? 1 :
+		(CWinOKKey(key) || (key == KEY_RIGHT)) ? 1 :
 		(key == KEY_LEFT) ? -1 :
 		0
 	);

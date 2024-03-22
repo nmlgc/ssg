@@ -306,7 +306,7 @@ namespace DAT {
 			return true;
 		} else if(filename_with_found_prefix.empty()) {
 			static_assert(NOT_FOUND.size() == FOUND.size());
-			const auto& basename = BASENAMES[id];
+			const auto basename = BASENAMES[id];
 			const auto cap = (
 				NOT_FOUND.size() + path_data.size() + basename.size()
 			);

@@ -49,3 +49,12 @@ void SEffectDraw(void)
 		}
 	}
 }
+
+FVOID GrpDrawSpect(int x,int y)
+{
+	// Unused spectrum analyzer colors for the palettized 8-bit mode?
+	BYTE ColTable[10]={
+		RGB256(2,0,0),RGB256(3,0,0),RGB256(4,0,0),RGB256(5,0,0),RGB256(5,1,0),
+		RGB256(5,2,1),RGB256(5,3,1),RGB256(5,4,2),RGB256(5,5,3),RGB256(5,5,4)
+	};
+}

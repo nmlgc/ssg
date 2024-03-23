@@ -17,8 +17,6 @@
 const auto ScoreFileName = _PATH("秋霜SC.DAT");				// スコアデータ格納ファイル名
 NR_SCORE_STRING		ScoreString[NR_RANK_MAX];	// スコアデータ文字列格納先
 
-BYTE ExtraFlags = 0;
-
 // スコアデータ格納先(名前空間で保護)
 static std::unique_ptr<NR_SCORE_DATA> ScoreData = nullptr;
 
@@ -29,8 +27,6 @@ static BOOL SetDefaultScoreData(void);		// スコアデータ初期値をセッ�
 
 static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ &bd);
 static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE &bd);
-static BOOL _LoadExBit(BIT_DEVICE_READ *bd, BYTE *flags);
-static BOOL _SaveExBit(BIT_DEVICE_WRITE &bd, BYTE flags);
 
 static BYTE      _xGet8( BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
 static DWORD     _xGet32(BIT_DEVICE_READ &bd, DWORDLONG *ExMask);

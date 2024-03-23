@@ -50,16 +50,6 @@ typedef struct tagWireFrame3D{
 	int			n;
 } WireFrame3D;
 
-typedef struct tagTriangle3D{
-	Point3D	Current;
-	Point3D	Speed;
-
-	WINDOW_POINT	Grp[3];
-
-	uint8_t	deg_x,deg_y,deg_z;
-	char	roll_x,roll_y,roll_z;
-} Triangle3D;
-
 typedef struct tagCircle3D{
 	int		ox,oy;
 	int		r;
@@ -133,14 +123,6 @@ void MoveWarningR(char count);
 void Init3DCube(void);
 void Draw3DCube(void);
 void Move3DCube(void);
-
-void InitTriangle(void);
-void MoveTriangle(void);
-void DrawTriangle(void);
-
-void InitCircle(void);
-void MoveCircle(void);
-void DrawCircle(void);
 /*
 void InitStg3Cloud(void);	// ３面の雲の初期化を行う
 void MoveStg3Cloud(void);	// ３面の雲を動作させる

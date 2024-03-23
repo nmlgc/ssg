@@ -12,7 +12,6 @@
 
 
 MAID			Viv;					// 麗しきメイドさん構造体
-uint32_t	EvadeRate[256];
 
 
 extern void WideBombDraw(void)
@@ -363,9 +362,6 @@ extern void MaidMove(void)
 // 初期化 //
 extern void MaidSet(void)
 {
-	int i;
-	int sct[4] = {5,10,15,30};
-
 	MaidNextStage();
 
 	Viv.score     = 0;
@@ -394,9 +390,6 @@ extern void MaidSet(void)
 	Viv.ShiftCounter = 0;
 
 	Viv.BuzzSound = FALSE;
-
-	for(i=0;i<256;i++)
-		EvadeRate[i] = i*sct[ConfigDat.GameLevel.v];
 }
 
 // 次のステージの準備 //

@@ -15,7 +15,6 @@
 
 // フラグ //
 constexpr uint8_t GRPF_MASK	= (~0x07);
-constexpr uint8_t GRPF_ALPHA_ENABLE	= 0x01;	// 半透明が有効(無効時はメッシュ???)
 constexpr uint8_t GRPF_WINDOW_UPPER	= 0x02;	// メッセージウィンドウを上の方に表示する
 constexpr uint8_t GRPF_MSG_DISABLE	= 0x04;	// 会話シーンを省略
 

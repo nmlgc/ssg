@@ -714,11 +714,6 @@ void GrpDrawSpect(int x, int y)
 
 	PIXEL_LTRB	src = { (16 * 16), 0, ((16 * 16) + (8 * 21)), 8 };	// ,,,8*4
 
-	BYTE ColTable[10]={
-		RGB256(2,0,0),RGB256(3,0,0),RGB256(4,0,0),RGB256(5,0,0),RGB256(5,1,0),
-		RGB256(5,2,1),RGB256(5,3,1),RGB256(5,4,2),RGB256(5,5,3),RGB256(5,5,4)
-	};
-
 	ftable3flag = (ftable3flag+1)%5;
 
 	for(i=0;i<128;i++){

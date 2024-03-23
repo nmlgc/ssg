@@ -88,7 +88,7 @@ void LaserBombDraw(void)
 						case(2):	GrpSetColor(2,2,5);	break;
 						case(3):	GrpSetColor(0,0,5);	break;
 					}
-					GrpPolygon(p,4);
+					GrpPolygon(p);
 				}
 			}
 			for(i=-3;i<=3;i++){
@@ -114,7 +114,7 @@ void LaserBombDraw(void)
 						case(2):	GrpSetColor(2,2,5);	break;
 						case(3):	GrpSetColor(0,0,5);	break;
 					}
-					GrpPolygon(p,4);
+					GrpPolygon(p);
 				}
 			}
 			if(DxObj.PixelFormat.IsChanneled()) break;
@@ -142,7 +142,7 @@ void LaserBombDraw(void)
 				}
 				else{
 					GrpSetColor(c,c,5);
-					GrpPolygon(p,4);
+					GrpPolygon(p);
 				}
 			}
 			for(i=-3;i<=3;i++){
@@ -164,7 +164,7 @@ void LaserBombDraw(void)
 				}
 				else{
 					GrpSetColor(c,c,5);
-					GrpPolygon(p,4);
+					GrpPolygon(p);
 				}
 			}
 			if(DxObj.PixelFormat.IsChanneled()) break;

@@ -401,7 +401,7 @@ static void __fastcall SLdraw(LASER_DATA *lp)
 	}
 	else{
 		GrpSetColor(1,0,5);
-		GrpPolygon(lp->p,4);
+		GrpPolygon(lp->p);
 
 		GrpSetColor(5,5,5);
 		p[0].x = p[1].x = lp->p[0].x - lp->wx*3/4;//- wx*4/len;
@@ -412,7 +412,7 @@ static void __fastcall SLdraw(LASER_DATA *lp)
 		p[1].y += lp->ly;
 		p[2].x += lp->lx;
 		p[2].y += lp->ly;
-		GrpPolygon(p,4);
+		GrpPolygon(p);
 		//GrpLine(lp->p[0].x,lp->p[0].y,lp->p[1].x,lp->p[1].y);
 		//GrpLine(lp->p[2].x,lp->p[2].y,lp->p[3].x,lp->p[3].y);
 		//GrpPolygon(lp->p,4);

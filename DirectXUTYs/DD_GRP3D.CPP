@@ -195,17 +195,19 @@ void _3DCircleF(int x, int y, int r)
 }
 
 // ポリゴン塗りつぶし //
-void _3DPolygon(WINDOW_POINT *p, int n)
+void _3DPolygon(std::span<const WINDOW_POINT> p)
 {
-	int i;
+	if(!bLocked || (p.size() < 3)) {
+		return;
+	}
 
-	if((!bLocked)||(n<3)) return;
-
-	for(i=0;i<n;i++){
+	for(size_t i = 0; i < p.size(); i++) {
 		Set2DPoint(work+i,p[i].x,p[i].y);
 	}
 
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLEFAN,D3DVT_TLVERTEX,work,n,D3DDP_WAIT);
+	DxObj.D3Dev->DrawPrimitive(
+		D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, work, p.size(), D3DDP_WAIT
+	);
 }
 
 // α長方形 //
@@ -243,19 +245,21 @@ void _3DCircleA(int x, int y, int r)
 }
 
 // αポリゴン塗りつぶし //
-void _3DPolygonA(WINDOW_POINT *p, int n)
+void _3DPolygonA(std::span<const WINDOW_POINT> p)
 {
-	int i;
-
-	if((!bLocked)||(n<3)) return;
+	if(!bLocked || (p.size() < 3)) {
+		return;
+	}
 
 	AlphaEnable(TRUE);
 
-	for(i=0;i<n;i++){
+	for(size_t i = 0; i < p.size(); i++) {
 		Set2DPoint(work+i,p[i].x,p[i].y);
 	}
 
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLEFAN,D3DVT_TLVERTEX,work,n,D3DDP_WAIT);
+	DxObj.D3Dev->DrawPrimitive(
+		D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, work, p.size(), D3DDP_WAIT
+	);
 
 	AlphaEnable(FALSE);
 }
@@ -285,7 +289,7 @@ void _3DFatCircleA(int x, int y, int r, int w)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRect(WINDOW_POINT *p)
+void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 {
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGB_MAKE(255,255,255);
@@ -309,7 +313,7 @@ void GrpGrdRect(WINDOW_POINT *p)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRectA(WINDOW_POINT *p)
+void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p)
 {
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGBA_MAKE(255,255,255,Col3D_A);
@@ -333,21 +337,24 @@ void GrpGrdRectA(WINDOW_POINT *p)
 }
 
 // グラデーション付きポリゴン(レーザー用？) //
-void GrpGrdPolygon(WINDOW_POINT *p, int n)
+void GrpGrdPolygon(std::span<const WINDOW_POINT> p)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //
 	DWORD	c1 = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
 	DWORD	c2 = RGB_MAKE(255,255,255);
-	int		i;
 
 	if(!bLocked) return;
 	AlphaEnable(TRUE);
 
 	Set2DPointC(work+0,p[0].x,p[0].y,c2);
-	for(i=1;i<n;i++) Set2DPointC(work+i,p[i].x,p[i].y,c1);
+	for(size_t i = 1; i < p.size(); i++) {
+		Set2DPointC(&work[i], p[i].x, p[i].y, c1);
+	}
 
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLEFAN,D3DVT_TLVERTEX,work,n,D3DDP_WAIT);
+	DxObj.D3Dev->DrawPrimitive(
+		D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, work, p.size(), D3DDP_WAIT
+	);
 
 	AlphaEnable(FALSE);
 }

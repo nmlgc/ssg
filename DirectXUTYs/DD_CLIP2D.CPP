@@ -16,7 +16,9 @@ enum OUT_EDGE {
 extern int CLIP_X_MIN, CLIP_X_MAX, CLIP_Y_MIN, CLIP_Y_MAX;
 
 
-int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
+std::span<const WINDOW_POINT> Grp_PClip(
+	std::span<WINDOW_POINT> temp, std::span<const WINDOW_POINT> src
+)
 {
 	std::array<WINDOW_POINT, 20> work; // 結果の点の個数(ダミーです)
 	OUT_EDGE lastout;
@@ -26,7 +28,7 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 	auto top = src[0].y; // 最も上の座標の初期化
 	auto bottom = top; // 最も下の座標の初期化
 
-	for(auto i = 1; i < n; i++) {
+	for(size_t i = 1; i < src.size(); i++) {
 		left = (std::min)(left, src[i].x);
 		right = (std::max)(right, src[i].x);
 		top = (std::min)(top, src[i].y);
@@ -38,7 +40,7 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 		(CLIP_X_MIN > right) || (left > CLIP_X_MAX) ||
 		(CLIP_Y_MAX < top) || (CLIP_Y_MIN > bottom)
 	) {
-		return 0;
+		return {};
 	}
 
 	// 完全に内側の場合
@@ -46,7 +48,7 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 		(left >= CLIP_X_MIN) && (right <= CLIP_X_MAX) &&
 		(top >= CLIP_Y_MIN) && (bottom <= CLIP_Y_MAX)
 	) {
-		return -1;
+		return src;
 	}
 
 	// Grp_PClip のクリップ用マクロ
@@ -63,7 +65,7 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 	lastout = getout(cur.y, CLIP_Y_MIN, CLIP_Y_MAX);
 	auto* work_p = work.data();
 
-	for(int src_i = (n - 1); src_i >= 0; src_i--) {
+	for(int src_i = (src.size() - 1); src_i >= 0; src_i--) {
 		auto prev = cur;
 		cur = src[src_i];
 		if(prev != cur) {
@@ -100,12 +102,12 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 		}
 	}
 	if(work_p == work.data()) {
-		return 0;
+		return {};
 	}
 
 	cur = work[0];
 	lastout = getout(cur.x, CLIP_X_MIN, CLIP_X_MAX);
-	auto* dest_p = dest;
+	auto temp_p = temp.begin();
 	while(work_p != work.data()) {
 		auto prev = cur;
 		cur = *(--work_p);
@@ -118,7 +120,7 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 					: CLIP_X_MAX
 				);
 				if(edge != cur.x) {
-					*(dest_p++) = {
+					*(temp_p++) = {
 						edge, ((((edge - cur.x) * prev.y) / prev.x) + cur.y)
 					};
 				}
@@ -129,17 +131,17 @@ int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n)
 					: CLIP_X_MAX
 				);
 				if((prev.x + cur.x) != edge) {
-					*(dest_p++) = {
+					*(temp_p++) = {
 						edge, ((((edge - cur.x) * prev.y) / prev.x) + cur.y)
 					};
 				}
 			}
 		}
 		if(!oc) {
-			*(dest_p++) = cur;
+			*(temp_p++) = cur;
 		}
 		lastout = oc;
 	};
 
-	return std::distance(dest, dest_p);
+	return temp.subspan(0, std::distance(temp.begin(), temp_p));
 }

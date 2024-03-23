@@ -217,7 +217,7 @@ void _CircleA16(int x, int y, int r, uint8_t d)
 
 	src[9] = src[0];
 
-	GrpPolygonA(src, 10);
+	GrpPolygonA(src);
 }
 
 // ホーミングレーザーを描画する //
@@ -227,7 +227,7 @@ void HLaserDraw(void)
 	int			i,w,current;
 	DegPoint	*p;
 	WINDOW_POINT		src[4];
-	void(*AlphaPolygon)(WINDOW_POINT *p, int n);
+	void(*AlphaPolygon)(std::span<const WINDOW_POINT> p);
 	//void(*AlphaCircle)(int x, int y, int r);
 
 	if(DxObj.PixelFormat.IsChanneled()){
@@ -271,7 +271,7 @@ void HLaserDraw(void)
 			src[2].y = (p->y - sinl(p->d-64, w))>>6;
 			src[3].x = (p->x + cosl(p->d-64, w))>>6;
 			src[3].y = (p->y + sinl(p->d-64, w))>>6;
-			AlphaPolygon(src,4);
+			AlphaPolygon(src);
 
 			src[0] = src[3];
 			src[1] = src[2];
@@ -313,7 +313,7 @@ void HLaserDraw(void)
 			src[2].y = (p->y - sinl(p->d-64, w))>>6;
 			src[3].x = (p->x + cosl(p->d-64, w))>>6;
 			src[3].y = (p->y + sinl(p->d-64, w))>>6;
-			AlphaPolygon(src,4);
+			AlphaPolygon(src);
 
 			src[0] = src[3];
 			src[1] = src[2];

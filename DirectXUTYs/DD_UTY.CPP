@@ -44,7 +44,7 @@ static void DM_BBB(uint8_t a, uint8_t b, uint8_t c);
 static void DM_BB(uint8_t a, uint8_t b);
 static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
-static void DM_PI(WINDOW_POINT *p, int n);
+static void DM_PI(std::span<const WINDOW_POINT> p);
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // クリッピング枠 //
@@ -95,10 +95,10 @@ void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
 void(*GrpCircle)(int x, int y, int r)               = DM_III;
 void(*GrpCircleF)(int x, int y, int r)              = DM_III;
-void(*GrpPolygon)(WINDOW_POINT *p, int n)                  = DM_PI;
+void (*GrpPolygon)(std::span<const WINDOW_POINT> p) = DM_PI;
 void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpCircleA)(int x, int y, int r)              = DM_III;
-void(*GrpPolygonA)(WINDOW_POINT *p, int n)                 = DM_PI;
+void (*GrpPolygonA)(std::span<const WINDOW_POINT> p)= DM_PI;
 void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 
@@ -934,7 +934,7 @@ static void DM_BBB(uint8_t a, uint8_t b, uint8_t c) {}
 static void DM_BB(uint8_t a, uint8_t b) {}
 static void DM_III(int a, int b, int c) {}
 static void DM_IIII(int a, int b, int c, int d) {}
-static void DM_PI(WINDOW_POINT *p, int n) {}
+static void DM_PI(std::span<const WINDOW_POINT> p) {}
 
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {

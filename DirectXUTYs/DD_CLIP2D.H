@@ -15,11 +15,19 @@
 // ヘッダファイル //
 #include "game/coords.h"
 #include <stdint.h>
+#include <span>
 
 
 // 関数 //
 // ポリゴン用クリッピング
-int Grp_PClip(WINDOW_POINT *dest, const WINDOW_POINT *src, int n);
+// Returns:
+// • An empty span if all of [src]'s points lie outside the clipping region
+// • [src] if all its points were inside the clipping region and nothing needed
+//   to be clipped
+// • A span pointing into [temp] describing the clipped polygon
+std::span<const WINDOW_POINT> Grp_PClip(
+	std::span<WINDOW_POINT> temp, std::span<const WINDOW_POINT> src
+);
 
 
 #define OUTCODE_X		0x03

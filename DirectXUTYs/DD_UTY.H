@@ -215,11 +215,11 @@ extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
 extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形
 extern void (*GrpCircle)(int x, int y, int r);	// 円
 extern void (*GrpCircleF)(int x, int y, int r);	// 円塗りつぶし
-extern void (*GrpPolygon)(WINDOW_POINT *p, int n);	// ポリゴン塗りつぶし
+extern void (*GrpPolygon)(std::span<const WINDOW_POINT> p);	// ポリゴン塗りつぶし
 
 extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
 extern void (*GrpCircleA)(int x, int y, int r);	// α円塗りつぶし
-extern void (*GrpPolygonA)(WINDOW_POINT *p, int n);	// αポリゴン塗りつぶし
+extern void (*GrpPolygonA)(std::span<const WINDOW_POINT> p);	// αポリゴン塗りつぶし
 
 extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 

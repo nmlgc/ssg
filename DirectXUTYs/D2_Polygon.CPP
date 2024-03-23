@@ -53,27 +53,18 @@ static int DrawTrapezoid(int y, int dy);	// 台形の描画
 
 
 // ポリゴンの描画 //
-void _2DPolygon(WINDOW_POINT *p, int n)
+void _2DPolygon(std::span<const WINDOW_POINT> p)
 {
 	int		i,j,dy;
 	int		nLeft,nRight;
 	int		TopY,BottomY;
 	WINDOW_POINT	temp[100];
 
-	switch(i=Grp_PClip(temp,p,n)){
-		case(0):			// 完全に外側
+	p = Grp_PClip(temp, p);
+	const int n = p.size();
+	if(n <= 2) {
 		return;
-
-		case(-1):			// 完全に内側
-		break;
-
-		default:			// クリッピングがかかった
-			n = i;
-			p = temp;
-		break;
 	}
-
-	if(n<=2) return;
 
 
 	// 頂点サーチ //

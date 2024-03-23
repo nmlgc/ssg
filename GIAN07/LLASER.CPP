@@ -313,7 +313,7 @@ extern void LLaserDraw(void)
 
 
 	int n;
-	WINDOW_POINT p2[256];
+	WINDOW_POINT p2[34];
 
 	GrpLock();
 
@@ -355,12 +355,12 @@ extern void LLaserDraw(void)
 							p2[n].x = p2[0].x + cosl(lp->d+64+128*(n-1)/32,len);
 							p2[n].y = p2[0].y + sinl(lp->d+64+128*(n-1)/32,len);
 						}
-						GrpGrdPolygon(p2,34);
+						GrpGrdPolygon(p2);
 						break;
 					}
 					//GrpSetColor(2,0,2);
 					GrpSetColor(Table8BitA[c][0], Table8BitA[c][1], Table8BitA[c][2]);
-					GrpPolygon(lp->p,4);
+					GrpPolygon(lp->p);
 				}
 				else if(DxObj.PixelFormat.IsChanneled()) {
 					break;
@@ -379,7 +379,7 @@ extern void LLaserDraw(void)
 					p[1].y += lp->infy;
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
-					GrpPolygon(p,4);
+					GrpPolygon(p);
 				}
 				GrpCircleF(x,y,len-len/8);//(lp->w>>6)+2);
 
@@ -394,7 +394,7 @@ extern void LLaserDraw(void)
 					p[1].y += lp->infy;
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
-					GrpPolygon(p,4);
+					GrpPolygon(p);
 				}
 				GrpCircleF(x,y,len-len/4);//lp->w>>6);
 			break;

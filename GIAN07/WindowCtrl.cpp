@@ -301,12 +301,12 @@ void InitMainWindow(void)
 	// エキストラステージが選択できる場合には発生！ //
 	if(ConfigDat.ExtraStgFlags.v) {
 		MainItem[3].NumItems = 6;
-		MainItem[3].ItemPtr[4] = CfgItem + 4;
-		MainItem[3].ItemPtr[5] = CfgItem + 5;
+		MainItem[3].ItemPtr[4] = &CfgItem[4];
+		MainItem[3].ItemPtr[5] = &CfgItem[5];
 	}
 	else{
 		MainItem[3].NumItems = 5;
-		MainItem[3].ItemPtr[4] = CfgItem + 5;
+		MainItem[3].ItemPtr[4] = &CfgItem[5];
 	}
 }
 

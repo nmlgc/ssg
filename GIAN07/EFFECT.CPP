@@ -858,14 +858,14 @@ void GrpDrawNote(void)
 			if(Mid_NoteWTable[Track][NoteNo]){
 				x = 40 + destX[NoteNo%12] + (NoteNo/12)*28;
 				y =  9 + Track*24;
-				GrpBlt((src + (NoteNo % 12)), x, y, GrMusic);
+				GrpBlt(&src[NoteNo % 12], x, y, GrMusic);
 				Mid_NoteWTable[Track][NoteNo]--;
 			}
 
 			if(Mid_NoteTable[Track][NoteNo]){
 				x = 40 + destX[NoteNo%12] + (NoteNo/12)*28;
 				y =  9 + Track*24;
-				GrpBlt((src + (NoteNo % 12)), x, y, GrMusic);
+				GrpBlt(&src[NoteNo % 12], x, y, GrMusic);
 			}
 			if(Mid_PlayTable2[Track][NoteNo]){
 				LevelSum += (Mid_PlayTable2[Track][NoteNo]);

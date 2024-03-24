@@ -467,7 +467,7 @@ void __fastcall _TamaEffectDraw(TAMA_DATA *t)
 {
 #define RCSET(x, y, w) {(x), (y), (x+w), (y+w)}
 
-	static PIXEL_LTRB Data[6][5] = {	// [色][パターン]
+	static constexpr PIXEL_LTRB Data[6][5] = {	// [色][パターン]
 		{	// 赤 //
 			RCSET(168, 344, 32), RCSET(232, 344, 28),
 			RCSET(288, 344, 24), RCSET(336, 344, 20),
@@ -502,8 +502,7 @@ void __fastcall _TamaEffectDraw(TAMA_DATA *t)
 #undef RCSET
 
 	static int  Width[5]     = {32/2, 28/2, 24/2, 20/2, 16/2};
-	static PIXEL_LTRB *Target[16*3] =
-	{
+	static constexpr std::span<const PIXEL_LTRB, 5> Target[16 * 3] = {
 		Data[0], Data[1], Data[2], Data[3], Data[4], Data[5], Data[0], Data[0],
 		Data[0], Data[0], Data[0], Data[0], Data[0], Data[0], Data[0], Data[0],
 

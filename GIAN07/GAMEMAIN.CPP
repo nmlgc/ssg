@@ -1185,7 +1185,7 @@ void WeaponSelectProc(bool&)
 			d = (-i+Viv.weapon)*85 + deg - 64;
 			x = 120 + cosl(d,90) - 56/2;
 			y = 260 + sinl(d,110) - 48/2;
-			GrpBlt(src+i,x,y,GrTama);
+			GrpBlt(&src[i], x, y, GrTama);
 		}
 
 		GrpLock();

@@ -238,8 +238,8 @@ static void enemy_set(void)
 
 			case(SCL_MSG):		// メッセージを出力する
 				//MWinCmd(MWCMD_SMALLFONT);
-				MWinMsg((char *)cmd+1);
-				SCL_Now += (strlen((char *)cmd+1)+2);
+				MWinMsg(reinterpret_cast<char *>(cmd + 1));
+				SCL_Now += (strlen(reinterpret_cast<char *>(cmd + 1)) + 2);
 			break;
 
 			case(SCL_FACE):		// 顔を表示する
@@ -893,10 +893,15 @@ bool ScrollInit(void)
 	}
 
 	// レイヤー情報のロード(長さからループ用変数を調整すること) //
-	LayerInfo = (ScrollSaveHeader *)(ScrollInfo.DataHead.get() + sizeof(DWORD));
+	LayerInfo = reinterpret_cast<ScrollSaveHeader *>(
+		ScrollInfo.DataHead.get() + sizeof(U32LE)
+	);
 	for(i=0;i<ScrollInfo.NumLayer;i++){
-		ScrollInfo.LayerHead[i]  = (PBGMAP *)(ScrollInfo.DataHead.get()+LayerInfo[i].Address);	// 先頭
-		ScrollInfo.LayerPtr[i]   = (PBGMAP *)(ScrollInfo.DataHead.get()+LayerInfo[i].Address);	// 現在
+		auto *p = reinterpret_cast<PBGMAP *>(
+			ScrollInfo.DataHead.get() + LayerInfo[i].Address
+		);
+		ScrollInfo.LayerHead[i]  = p;	// 先頭
+		ScrollInfo.LayerPtr[i]   = p;	// 現在
 		ScrollInfo.LayerWait[i]  = LayerInfo[i].ScrollWait;		// レイヤーの重み
 		ScrollInfo.LayerCount[i] = 0;
 		ScrollInfo.LayerDy[i]    = 0;

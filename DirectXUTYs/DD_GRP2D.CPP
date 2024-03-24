@@ -304,7 +304,7 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 	x2-=x1;
 	temp = x2>>3;
 	for(i=0;i<temp;i++){
-		Dat64.dq  = *(DWORDLONG *)write;
+		Dat64.dq  = *reinterpret_cast<DWORDLONG *>(write);
 		Dat64.db0 = AlphaTable[Dat64.db0];
 		Dat64.db1 = AlphaTable[Dat64.db1];
 		Dat64.db2 = AlphaTable[Dat64.db2];
@@ -313,11 +313,11 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 		Dat64.db5 = AlphaTable[Dat64.db5];
 		Dat64.db6 = AlphaTable[Dat64.db6];
 		Dat64.db7 = AlphaTable[Dat64.db7];
-		*(DWORDLONG *)write = Dat64.dq;
+		*reinterpret_cast<DWORDLONG *>(write) = Dat64.dq;
 		write+=8;
 	}
 
-	Dat64.dq  = *(DWORDLONG *)write;
+	Dat64.dq  = *reinterpret_cast<DWORDLONG *>(write);
 	switch(x2&7){
 		case 7:	Dat64.db6 = AlphaTable[Dat64.db6];	[[fallthrough]];
 		case 6:	Dat64.db5 = AlphaTable[Dat64.db5];	[[fallthrough]];
@@ -326,7 +326,8 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 		case 3:	Dat64.db2 = AlphaTable[Dat64.db2];	[[fallthrough]];
 		case 2:	Dat64.db1 = AlphaTable[Dat64.db1];	[[fallthrough]];
 		case 1:	Dat64.db0 = AlphaTable[Dat64.db0];
-			*(DWORDLONG *)write = Dat64.dq;	[[fallthrough]];
+			*reinterpret_cast<DWORDLONG *>(write) = Dat64.dq;
+			[[fallthrough]];
 		case 0:	return;
 	}
 }

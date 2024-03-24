@@ -191,7 +191,8 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
 		if(dxret!=DD_OK) throw("DirectDrawCreate に失敗");
 
-		dxret = lpDD->QueryInterface(IID_IDirectDraw2, (void **)&DD);
+		auto** dd_ptr = reinterpret_cast<void **>(&DD);
+		dxret = lpDD->QueryInterface(IID_IDirectDraw2, dd_ptr);
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 		RELEASE(lpDD);
 
@@ -227,7 +228,8 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		if(PixelFormat.IsPalettized()) throw(true);
 
 		// Direct3D Object の取得 //
-		dxret = DD->QueryInterface(IID_IDirect3D2, (void **)&D3);
+		auto** d3d_ptr = reinterpret_cast<void **>(&D3);
+		dxret = DD->QueryInterface(IID_IDirect3D2, d3d_ptr);
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 
 		// Direct3D Device の作成 //
@@ -659,7 +661,7 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	}
 
 	// はじっこの色獲得＆カラーキー準備 //
-	const DWORD temp = std::visit([&ddsd](auto pixel) {
+	const auto temp = std::visit([&ddsd](auto pixel) -> DWORD {
 		if(sizeof(decltype(pixel)) == 3) {
 			// これでいいのか？ //
 			const auto *bytes = static_cast<uint8_t *>(ddsd.lpSurface);
@@ -667,7 +669,7 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 				bytes[0] + (DWORD{ bytes[1] } << 8) + (DWORD{ bytes[2] } << 16)
 			);
 		}
-		return DWORD{ *static_cast<decltype(pixel) *>(ddsd.lpSurface) };
+		return *static_cast<decltype(pixel) *>(ddsd.lpSurface);
 	}, PixelFormat);
 
 	// Unlock する //
@@ -814,7 +816,8 @@ static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDNam
 			// このドライバで使用できる３Ｄデバイスを列挙         //
 			// これが実行できないのはＤＸ３以下であると考えられる //
 			// ただし、失敗しても列挙は中断しない                 //
-			dxret = lpDD->QueryInterface(IID_IDirect3D2,(LPVOID *)&lpD3D);
+			auto **ptr = reinterpret_cast<void **>(&lpD3D);
+			dxret = lpDD->QueryInterface(IID_IDirect3D2, ptr);
 			if(dxret==DD_OK)
 				lpD3D->EnumDevices(DeviceEnum,(LPVOID)xenum);
 
@@ -902,7 +905,7 @@ static bool ConfirmDevice3D(const D3DDEVICEDESC *lpDesc)
 [[gsl::suppress(con.3)]]
 static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 {
-	XDDRAWENUM		*xenum = (XDDRAWENUM *)pInfo;
+	auto *xenum = static_cast<XDDRAWENUM *>(pInfo);
 	int				color;
 
 	// ６４０Ｘ４８０についてだけ調べるようにする //

@@ -372,9 +372,9 @@ void EndingSCLDecode()
 			break;
 
 			case(SCL_MSG):		// メッセージを出力する
-				EText.Text[EText.NumText++] = (char *)cmd+1;
+				EText.Text[EText.NumText++] = reinterpret_cast<char *>(cmd + 1);
 				EText.Rerender = true;
-				SCL_Now += (strlen((char *)cmd+1)+2);
+				SCL_Now += (strlen(reinterpret_cast<char *>(cmd + 1)) + 2);
 			break;
 
 			case(SCL_FACE):		// 顔を表示する

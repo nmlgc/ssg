@@ -79,7 +79,7 @@ void _2DLock(void)
 	ddsd.dwSize = sizeof(ddsd);
 	DxObj.Back->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL);
 
-	Grp_Vram  = (BYTE *)ddsd.lpSurface;
+	Grp_Vram  = static_cast<uint8_t *>(ddsd.lpSurface);
 	Grp_Pitch = ddsd.lPitch;
 }
 

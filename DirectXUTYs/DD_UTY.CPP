@@ -662,12 +662,12 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	const DWORD temp = std::visit([&ddsd](auto pixel) {
 		if(sizeof(decltype(pixel)) == 3) {
 			// これでいいのか？ //
-			const auto *bytes = reinterpret_cast<uint8_t *>(ddsd.lpSurface);
+			const auto *bytes = static_cast<uint8_t *>(ddsd.lpSurface);
 			return (
 				bytes[0] + (DWORD{ bytes[1] } << 8) + (DWORD{ bytes[2] } << 16)
 			);
 		}
-		return DWORD{ *reinterpret_cast<decltype(pixel) *>(ddsd.lpSurface) };
+		return DWORD{ *static_cast<decltype(pixel) *>(ddsd.lpSurface) };
 	}, PixelFormat);
 
 	// Unlock する //
@@ -839,7 +839,6 @@ static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR l
 	DWORD		zbuf;
 	DWORD		depth;
 	XD3DENUM	*xd3d;
-	XDDRAWENUM	*xddraw;
 
 	// ハードウェアかどうか //
 	if(lpHWDesc->dcmColorModel) hw_flag = TRUE;
@@ -863,7 +862,7 @@ static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR l
 	}
 
 	// ポインタをセット //
-	xddraw = (XDDRAWENUM *)lpContext;
+	auto *xddraw = static_cast<XDDRAWENUM *>(lpContext);
 	xd3d = (xddraw->D3D) + (xddraw->D3DNow);		// ポインタ＋整数であることに注意
 
 	// どの色深度をサポートしているかな(８ビットは無視する) //

@@ -38,7 +38,7 @@ static BYTE *__LSurfLock(LensInfo *LInfo)
 	// The pitch can be different from (width * BPP) here!
 	LInfo->gPitch = ddsd.lPitch;
 
-	return (BYTE *)ddsd.lpSurface;
+	return static_cast<uint8_t *>(ddsd.lpSurface);
 }
 
 
@@ -60,7 +60,7 @@ static bool __BackSurfLock(void)
 	if(ddret != DD_OK) return FALSE;
 
 	__GrpPitch = ddsd.lPitch;
-	__GrpBack  = (BYTE *)ddsd.lpSurface;
+	__GrpBack  = static_cast<uint8_t *>(ddsd.lpSurface);
 
 	return TRUE;
 }

@@ -20,11 +20,11 @@ template <class T, ENUMARRAY_ID IDType> class ENUMARRAY : public std::array<
 	using BASE = std::array<T, std::to_underlying(IDType::COUNT)>;
 
 public:
-	T& operator[] (IDType id) {
+	T& operator[](IDType id) noexcept {
 		return BASE::operator[](std::to_underlying(id));
 	}
 
-	const T& operator[] (IDType id) const {
+	const T& operator[](IDType id) const noexcept {
 		return BASE::operator[](std::to_underlying(id));
 	}
 };

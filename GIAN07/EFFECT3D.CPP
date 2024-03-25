@@ -91,18 +91,16 @@ LineList3D	LList_A1 = {96,39,PList_A1,8,PWork_A1};
 LineList3D	LList_W = {32,39,PList_W,11,PWork_W};
 */
 
-LineList3D LList_Warning[8] = {
-	{ { 192, 39 }, PList_W, 11, PWork_W },
-	{ { 192, 39 }, PList_A1, 8, PWork_A1 },
-	{ { 192, 39 }, PList_A2, 4, PWork_A2 },
-	{ { 192, 39 }, PList_R, (15 - 1), PWork_R },
-	{ { 192, 39 }, PList_N1, 9, PWork_N1 },
-	{ { 192, 39 }, PList_I, 5, PWork_I },
-	{ { (192 - (296 - 215)), 39 }, PList_N2, 9, PWork_N2 },
-	{ { 192, 39 }, PList_G, 17, PWork_G }
+LineList3D Warning[8] = {
+	{ { 192, 39 }, PList_W, PWork_W },
+	{ { 192, 39 }, PList_A1, PWork_A1 },
+	{ { 192, 39 }, PList_A2, PWork_A2 },
+	{ { 192, 39 }, PList_R, PWork_R },
+	{ { 192, 39 }, PList_N1, PWork_N1 },
+	{ { 192, 39 }, PList_I, PWork_I },
+	{ { (192 - (296 - 215)), 39 }, PList_N2, PWork_N2 },
+	{ { 192, 39 }, PList_G, PWork_G }
 };
-
-WireFrame3D Warning = {LList_Warning,8};
 
 
 static void RollPoint(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
@@ -116,7 +114,7 @@ void InitWarning(void)
 
 	if(bInitialized) return;
 
-	InitLineList3D(&Warning);
+	InitLineList3D(Warning);
 	bInitialized = TRUE;
 }
 
@@ -129,7 +127,7 @@ void DrawWarning(void)
 
 	count+=8;
 
-	if(Warning.LList[0].DegX==0){
+	if(Warning[0].DegX == 0) {
 		GrpLock();
 		GrpSetAlpha((BYTE)(128+sinl(count,48)),ALPHA_NORM);
 		GrpSetColor(5,0,0);
@@ -141,35 +139,36 @@ void DrawWarning(void)
 	else{
 		GrpLock();
 
-		if(Warning.LList[0].DegX<10){
+		if(Warning[0].DegX < 10) {
 			st=0;
 			det=0;
-		}
-		else if(Warning.LList[0].DegX<20){
+			st  = 0;
+			det = 0;
+		} else if(Warning[0].DegX < 20) {
 			st=-4;
 			det=1;
 		}
 		else{
-			//if(Warning.LList[0].DegX<40){
+			//if(Warning[0].DegX < 40){
 			st  = -8;
 			det = 2;
 		}
 
 		GrpSetColor(1,1,5);
 		MoveWarningR(st);
-		DrawLineList3D(&Warning);
+		DrawLineList3D(Warning);
 		GrpSetColor(2,2,5);
 		MoveWarningR(det);
-		DrawLineList3D(&Warning);
+		DrawLineList3D(Warning);
 		GrpSetColor(3,3,5);
 		MoveWarningR(det);
-		DrawLineList3D(&Warning);
+		DrawLineList3D(Warning);
 		GrpSetColor(4,4,5);
 		MoveWarningR(det);
-		DrawLineList3D(&Warning);
+		DrawLineList3D(Warning);
 		GrpSetColor(5,5,5);
 		MoveWarningR(det);
-		DrawLineList3D(&Warning);
+		DrawLineList3D(Warning);
 
 		GrpUnlock();
 	}
@@ -177,68 +176,57 @@ void DrawWarning(void)
 
 void MoveWarningR(char count)
 {
-	int		i;
-
 	if(count==0) return;
 
-	for(i=0; i<Warning.n; i++){
-		Warning.LList[i].DegX += count*2;
-		Warning.LList[i].DegY += count*1;
-		Warning.LList[i].DegZ += count*4;
+	for(auto& llist : Warning) {
+		llist.DegX += (count * 2);
+		llist.DegY += (count * 1);
+		llist.DegZ += (count * 4);
 	}
 
-	MoveLineList3D(&Warning);
+	MoveLineList3D(Warning);
 }
 
 void MoveWarning(uint8_t count)
 {
-	int		i;
-
-	for(i=0; i<Warning.n; i++){
-		Warning.LList[i].DegX = (count<64) ? (64-count)*2 : 0;
-		Warning.LList[i].DegY = (count<64) ? (64-count)*1 : 0;
-		Warning.LList[i].DegZ = (count<64) ? (64-count)*4 : 0;
+	for(auto& llist : Warning) {
+		llist.DegX = ((count < 64) ? ((64 - count) * 2) : 0);
+		llist.DegY = ((count < 64) ? ((64 - count) * 1) : 0);
+		llist.DegZ = ((count < 64) ? ((64 - count) * 4) : 0);
 	}
 
-	MoveLineList3D(&Warning);
+	MoveLineList3D(Warning);
 }
 
-void InitLineList3D(WireFrame3D *w)
+void InitLineList3D(std::span<LineList3D> w)
 {
-	int		i,j;
-
-	for(j=0; j<(w->n); j++){
-		for(i=0; i<(w->LList[j].n); i++){
-			w->LList[j].p[i] -= w->LList[j].center;
+	for(auto& llist : w) {
+		for(auto& point : llist.p) {
+			point -= llist.center;
 		}
 	}
 }
 
-void MoveLineList3D(WireFrame3D *w)
+void MoveLineList3D(std::span<LineList3D> w)
 {
-	Point3D		temp;
-	int			i,j;
+	for(auto& llist : w) {
+		for(size_t i = 0; i < llist.p.size(); i++) {
+			Point3D temp = { llist.p[i].x, llist.p[i].y, 0 };
+			RollPoint(&temp, llist.DegX, llist.DegY, llist.DegZ);
 
-	for(j=0; j<(w->n); j++){
-		for(i=0; i<(w->LList[j].n); i++){
-			temp.x = w->LList[j].p[i].x;
-			temp.y = w->LList[j].p[i].y;
-			temp.z = 0;
-			RollPoint(&temp,w->LList[j].DegX,w->LList[j].DegY,w->LList[j].DegZ);
-
-			w->LList[j].Work[i].x = temp.x;
-			w->LList[j].Work[i].y = temp.y;
+			llist.Work[i].x = temp.x;
+			llist.Work[i].y = temp.y;
 		}
 	}
 }
 
-void DrawLineList3D(WireFrame3D *w)
+void DrawLineList3D(std::span<const LineList3D> w)
 {
 	int		i,j;
 
-	for(j=0; j<(w->n); j++){
-		for(i=0; i<(w->LList[j].n)-1; i++){
-			const auto* p = w->LList[j].Work;
+	for(const auto& llist : w) {
+		for(size_t i = 0; i < (llist.p.size() - 1); i++) {
+			const auto *p = llist.Work;
 			const auto p1 = (PIXEL_POINT{ 320, 100 } + p[i + 0].ToPixel());
 			const auto p2 = (PIXEL_POINT{ 320, 100 } + p[i + 1].ToPixel());
 			GrpLine(p1.x, p1.y, p2.x, p2.y);

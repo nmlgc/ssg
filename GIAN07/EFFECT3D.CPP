@@ -5,6 +5,7 @@
 
 #include "EFFECT3D.H"
 #include "GIAN.H"
+#include <ranges>
 
 #define CIRCLE_MAX			40
 #define CUBE_MAX			8
@@ -79,8 +80,6 @@ WORLD_POINT PList_G[17] = {
 
 #undef _
 
-WORLD_POINT PWork_W[11],PWork_A1[8],PWork_A2[4],PWork_R[15-1],PWork_N1[9],PWork_N2[9],PWork_I[5],PWork_G[17];
-
 /*
 LineList3D	LList_G = {354,39,PList_G,17,PWork_G};
 LineList3D	LList_I = {255,39,PList_I,5,PWork_I};
@@ -92,14 +91,14 @@ LineList3D	LList_W = {32,39,PList_W,11,PWork_W};
 */
 
 LineList3D Warning[8] = {
-	{ { 192, 39 }, PList_W, PWork_W },
-	{ { 192, 39 }, PList_A1, PWork_A1 },
-	{ { 192, 39 }, PList_A2, PWork_A2 },
-	{ { 192, 39 }, PList_R, PWork_R },
-	{ { 192, 39 }, PList_N1, PWork_N1 },
-	{ { 192, 39 }, PList_I, PWork_I },
-	{ { (192 - (296 - 215)), 39 }, PList_N2, PWork_N2 },
-	{ { 192, 39 }, PList_G, PWork_G }
+	{ { 192, 39 }, PList_W },
+	{ { 192, 39 }, PList_A1 },
+	{ { 192, 39 }, PList_A2 },
+	{ { 192, 39 }, PList_R },
+	{ { 192, 39 }, PList_N1 },
+	{ { 192, 39 }, PList_I },
+	{ { (192 - (296 - 215)), 39 }, PList_N2 },
+	{ { 192, 39 }, PList_G }
 };
 
 
@@ -183,8 +182,6 @@ void MoveWarningR(char count)
 		llist.DegY += (count * 1);
 		llist.DegZ += (count * 4);
 	}
-
-	MoveLineList3D(Warning);
 }
 
 void MoveWarning(uint8_t count)
@@ -194,8 +191,6 @@ void MoveWarning(uint8_t count)
 		llist.DegY = ((count < 64) ? ((64 - count) * 1) : 0);
 		llist.DegZ = ((count < 64) ? ((64 - count) * 4) : 0);
 	}
-
-	MoveLineList3D(Warning);
 }
 
 void InitLineList3D(std::span<LineList3D> w)
@@ -207,29 +202,22 @@ void InitLineList3D(std::span<LineList3D> w)
 	}
 }
 
-void MoveLineList3D(std::span<LineList3D> w)
-{
-	for(auto& llist : w) {
-		for(size_t i = 0; i < llist.p.size(); i++) {
-			Point3D temp = { llist.p[i].x, llist.p[i].y, 0 };
-			RollPoint(&temp, llist.DegX, llist.DegY, llist.DegZ);
-
-			llist.Work[i].x = temp.x;
-			llist.Work[i].y = temp.y;
-		}
-	}
-}
-
 void DrawLineList3D(std::span<const LineList3D> w)
 {
-	int		i,j;
+	const auto roll = [](const LineList3D& llist, const WORLD_POINT& point) {
+		Point3D temp = { point.x, point.y, 0 };
+		RollPoint(&temp, llist.DegX, llist.DegY, llist.DegZ);
+		return WORLD_POINT{ &temp.x, &temp.y };
+	};
 
 	for(const auto& llist : w) {
-		for(size_t i = 0; i < (llist.p.size() - 1); i++) {
-			const auto *p = llist.Work;
-			const auto p1 = (PIXEL_POINT{ 320, 100 } + p[i + 0].ToPixel());
-			const auto p2 = (PIXEL_POINT{ 320, 100 } + p[i + 1].ToPixel());
+		WORLD_POINT line_p[2] = { roll(llist, llist.p.front()) };
+		for(const auto& point : (llist.p | std::views::drop(1))) {
+			line_p[1] = roll(llist, point);
+			const auto p1 = (PIXEL_POINT{ 320, 100 } + line_p[0].ToPixel());
+			const auto p2 = (PIXEL_POINT{ 320, 100 } + line_p[1].ToPixel());
 			GrpLine(p1.x, p1.y, p2.x, p2.y);
+			std::swap(line_p[1], line_p[0]);
 		}
 	}
 }

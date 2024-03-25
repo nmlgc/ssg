@@ -33,13 +33,12 @@
 
 ///// [ 構造体 ] /////
 typedef struct tagPoint3D{
-	int		x,y,z;
+	WORLD_COORD x, y, z;
 } Point3D;
 
 typedef struct tagLineList3D{
 	PIXEL_POINT	center;	/* 頂点の座標の補正用 */
 	std::span<WORLD_POINT>	p;	/* 頂点の座標         */
-	WORLD_POINT	*Work;	/* ワークエリア       */
 
 	uint8_t	DegX, DegY, DegZ;	/* 各軸に対する回転角 */
 } LineList3D;
@@ -106,7 +105,6 @@ typedef struct tagRock3D {
 
 ///// [ 関数 ] /////
 void InitLineList3D(std::span<LineList3D> w);
-void MoveLineList3D(std::span<LineList3D> w);
 void DrawLineList3D(std::span<const LineList3D> w);
 
 void InitWarning(void);

@@ -78,8 +78,8 @@ sdl_src += SDL.glob("src/video/yuv2rgb/*.c")
 sdl_src += SDL.join("src/thread/generic/SDL_syscond.c")
 sdl_winmain_src += SDL.glob("src/main/windows/*.c")
 
-sdl_cfg = CONFIG:branch("", SDL_COMPILE, SDL_LINK)
-sdl_mslibc_cfg = sdl_cfg:branch("", {
+sdl_cfg = CONFIG:branch(SDL_COMPILE, SDL_LINK)
+sdl_mslibc_cfg = sdl_cfg:branch({
 	buildtypes = { release = { cflags = flag_remove("/GL") } }
 })
 sdl_obj = (
@@ -102,10 +102,10 @@ LIBVORBIS = sourcepath("libs/libvorbis/")
 XIPH_LINK = { base = { cflags = string.format(
 	"-I%sinclude -I%sinclude", LIBOGG.root, LIBVORBIS.root
 )} }
-libogg_cfg = CONFIG:branch("", XIPH_LINK, { base = { objdir = "libogg/" } })
+libogg_cfg = CONFIG:branch(XIPH_LINK, { base = { objdir = "libogg/" } })
 libogg_src += LIBOGG.glob("src/*.c")
 
-libvorbis_cfg = CONFIG:branch("", XIPH_LINK, { base = {
+libvorbis_cfg = CONFIG:branch(XIPH_LINK, { base = {
 	objdir = "libvorbis/"
 } })
 libvorbis_src += (LIBVORBIS.glob("lib/*.c") - {
@@ -133,7 +133,7 @@ blake3_src += BLAKE3.join("blake3.c")
 blake3_src += BLAKE3.join("blake3_dispatch.c")
 blake3_src += BLAKE3.join("blake3_portable.c")
 
-blake3_modern_cfg = CONFIG:branch("", BLAKE3_COMPILE, { base = {
+blake3_modern_cfg = CONFIG:branch(BLAKE3_COMPILE, { base = {
 	objdir = "modern/",
 } })
 
@@ -145,9 +145,9 @@ blake3_modern_cfg = CONFIG:branch("", BLAKE3_COMPILE, { base = {
 -- also appear in the AVX2 version, breaking it on those CPUs.)
 -- That's why they recommend the ASM versions, but they're 64-bit-exclusive…
 blake3_arch_cfgs = {
-	blake3_modern_cfg:branch("", { base = { cflags = "/arch:SSE2" } }),
-	blake3_modern_cfg:branch("", { base = { cflags = "/arch:AVX2" } }),
-	blake3_modern_cfg:branch("", { base = { cflags = "/arch:AVX512" } }),
+	blake3_modern_cfg:branch({ base = { cflags = "/arch:SSE2" } }),
+	blake3_modern_cfg:branch({ base = { cflags = "/arch:AVX2" } }),
+	blake3_modern_cfg:branch({ base = { cflags = "/arch:AVX512" } }),
 }
 blake3_modern_obj = (
 	cxx(blake3_modern_cfg, blake3_src) +
@@ -183,7 +183,7 @@ ANALYSIS = {
 	},
 }
 
-main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, BLAKE3_LINK, {
+main_cfg = CONFIG:branch(SDL_LINK, BLAKE3_LINK, {
 	base = {
 		cflags = (
 			"/std:c++latest " ..
@@ -201,7 +201,7 @@ main_cfg = CONFIG:branch(tup.getconfig("BUILDTYPE"), SDL_LINK, BLAKE3_LINK, {
 	}
 })
 
-modern_cfg = main_cfg:branch(tup.getconfig("BUILDTYPE"), ANALYSIS)
+modern_cfg = main_cfg:branch(ANALYSIS)
 modern_src += tup.glob("game/*.cpp")
 modern_src += "game/codecs/flac.cpp"
 modern_src += tup.glob("platform/windows/*.cpp")
@@ -212,11 +212,11 @@ main_src += tup.glob("GIAN07/*.CPP")
 
 main_obj = (
 	cxx(modern_cfg, modern_src) +
-	cxx(modern_cfg:branch("", XIPH_LINK), "game/codecs/vorbis.cpp") +
+	cxx(modern_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp") +
 	cxx(main_cfg, main_src)
 )
 
-main_sdl_cfg = main_cfg:branch("", ANALYSIS, {
+main_sdl_cfg = main_cfg:branch(ANALYSIS, {
 	base = { lflags = "/SUBSYSTEM:windows" }
 })
 

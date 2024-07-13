@@ -9,7 +9,7 @@ if "%VCINSTALLDIR%" == "" (
 : a single time in the optimal case.
 for /f "delims=" %%s in ('git submodule status') do call:check_submodule "%%s"
 
-tup
+tup %*
 exit /b
 
 :check_submodule

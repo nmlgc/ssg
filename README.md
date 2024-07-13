@@ -34,13 +34,15 @@ To build:
 The binary will be put into the `bin/` subdirectory, where you can also place the game's original data files.
 
 By default, both Debug and Release configurations are built.
-If you only need one of them and want to speed up the build process, you can pick a single one by creating a file named `tup.config` in the root directory of this repository:
+If you only need one of them and want to speed up the build process, you can pick a single one by passing its binary file name as a parameter to `build.bat`:
 
 ```sh
-CONFIG_BUILDTYPE=debug   # builds only in Debug mode
-CONFIG_BUILDTYPE=release # builds only in Release mode
-CONFIG_BUILDTYPE=        # builds in both modes
+build.bat bin/GIAN07.exe  # builds only in Release mode
+build.bat bin/GIAN07d.exe # builds only in Debug mode
+build.bat                 # builds in both modes
 ```
+
+The Visual Studio Code configuration contains build tasks for all three possibilities.
 
 ## Debugging
 

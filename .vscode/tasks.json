@@ -4,16 +4,39 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Build",
+			"label": "Build (everything)",
 			"type": "shell",
 			"command": "build.bat",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
+			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
 				// CMD most likely starts up much faster than PowerShell.
+				"shell": {
+					"executable": "cmd",
+					"args": ["/d", "/c"]
+				}
+			}
+		},
+		{
+			"label": "Build regular binary (Debug)",
+			"type": "shell",
+			"command": "build.bat bin/GIAN07d.exe",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"shell": {
+					"executable": "cmd",
+					"args": ["/d", "/c"]
+				}
+			}
+		},
+		{
+			"label": "Build regular binary (Release)",
+			"type": "shell",
+			"command": "build.bat bin/GIAN07.exe",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
 				"shell": {
 					"executable": "cmd",
 					"args": ["/d", "/c"]

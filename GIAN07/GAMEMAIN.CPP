@@ -1279,7 +1279,7 @@ void WeaponSelectProc(bool&)
 		DxObj.Back->ReleaseDC(hdc);
 
 		#ifdef PBG_DEBUG
-			OutputDebugMsg();
+			StdStatusOutput();
 		#endif
 */
 		GrpFlip();
@@ -1344,7 +1344,7 @@ void TitleProc(bool& quit)
 		MWinDraw();
 		CWinDraw(window_active);
 		#ifdef PBG_DEBUG
-			OutputDebugMsg();
+			StdStatusOutput();
 		#endif
 
 		GrpFlip();
@@ -1586,11 +1586,7 @@ void GameDraw(void)
 	MWinDraw();
 //	GrpSetClip(rc.left, rc.top, rc.right, rc.bottom);
 
-#ifdef PBG_DEBUG
-	OutputDebugMsg();
-#else
 	StdStatusOutput();
-#endif
 }
 
 bool IsDraw(void)

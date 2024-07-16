@@ -18,9 +18,7 @@ uint8_t	GameStage;
 
 
 ///// [ 関数(非公開) ] /////
-#ifdef PBG_DEBUG
-// デバッグ情報を出力する //
-extern void OutputDebugMsg(void)
+extern void StdStatusOutput(void)
 {
 	static DWORD	fps,count;
 	static DWORD	time,temp;
@@ -28,6 +26,7 @@ extern void OutputDebugMsg(void)
 	const char	*DItem[4] = {"Easy","Norm","Hard","Luna"};
 	char	buf[100];
 
+#ifdef PBG_DEBUG
 	if(!DebugDat.MsgDisplay) return;
 
 	temp = timeGetTime();
@@ -81,54 +80,13 @@ extern void OutputDebugMsg(void)
 	GrpPut16(0,440,"Gian07");
 	GrpPut16(0,460,"DebugMode");
 
-	_strdate(buf);
-	GrpPut16(640-128,0,"Date");
-	GrpPut16(640-128,20,buf);
-
-	_strtime(buf);
-	GrpPut16(640-128,50,"Time");
-	GrpPut16(640-128,70,buf);
-
 	GrpPut16(640-128,100,"SCL Count");
 	sprintf(buf," %5d",GameCount);
 	GrpPut16(640-128,120,buf);
-
-	sprintf(buf,"Left   %d",Viv.left);
-	GrpPut16(640-128,440,buf);
-	sprintf(buf,"Credit %d",Viv.credit);		// -1 に注意だ！！
-	GrpPut16(640-128,460,buf);
-}
-#endif
-
-extern void StdStatusOutput(void)
-{
-	static DWORD	fps,count;
-	static DWORD	time,temp;
-	//extern InputConfig			IConfig;
-	const char	*DItem[4] = {"Easy","Norm","Hard","Luna"};
-	char	buf[100];
-
-//	if(!DebugDat.MsgDisplay) return;
-
-	temp = timeGetTime();
-	if(temp-time<=1000) count++;
-	else{
-		fps   = count;
-		count = 0;
-		time  = temp;
-	}
-/*
-	sprintf(buf,"%03d Fps",fps);
-	GrpPut16(0,0,buf);
-
-	sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v);
-	GrpPut16(0,32,buf);
-
-	sprintf(buf, "%s<Cfg>", DItem[ConfigDat.GameLevel.v]);
-	GrpPut16(0,68,buf);
-*/
+#else
 //	GrpPut16(0,440,"G07");
 //	GrpPut16(0,460,"12/5 Ver");
+#endif
 
 	_strdate(buf);
 	GrpPut16(640-128,0,"Date");
@@ -138,8 +96,10 @@ extern void StdStatusOutput(void)
 	GrpPut16(640-128,50,"Time");
 	GrpPut16(640-128,70,buf);
 
+#ifndef PBG_DEBUG // pbg quirk
 	sprintf(buf,"Bomb   %d",Viv.bomb);
 	GrpPut16(640-128,400,buf);
+#endif
 
 	sprintf(buf,"Left   %d",Viv.left);
 	GrpPut16(640-128,440,buf);

@@ -137,10 +137,6 @@ extern uint32_t	GameCount;
 extern uint8_t	GameStage;
 
 
-#ifdef PBG_DEBUG
-extern void OutputDebugMsg(void);	// デバッグ情報を出力する
-#endif
-
 extern void StdStatusOutput(void);
 
 

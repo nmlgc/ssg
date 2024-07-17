@@ -4,9 +4,9 @@
 /*                                                                           */
 
 #include "platform/file.h"
+#include "platform/time.h"
 #include "DX_ERROR.H"
 #include <array>
-#include <time.h>
 #pragma message(PBGWIN_DX_ERROR_H)
 
 
@@ -17,16 +17,19 @@ static bool ErrorActive = false;
 
 extern void DebugSetup()
 {
-	std::array<char, 9> date; // size defined by ABI
-	std::array<char, 9> time; // size defined by ABI
-	std::array<char, 64> str;
-
-	_strdate(date.data());
-	_strtime(time.data());
+	[[gsl::suppress(type.5)]] std::array<char, 64> str;
+	const auto tm = Time_NowLocal();
 	const auto len = snprintf(
-		str.data(), str.size(), "[%s][%s]\n", date.data(), time.data()
+		str.data(),
+		str.size(),
+		"[%02u/%02u/%02u][%02u:%02u:%02u]\n",
+		tm.month,
+		tm.day,
+		(tm.year % 100),
+		tm.hour,
+		tm.minute,
+		tm.second
 	);
-
 	if(len <= 0) {
 		return;
 	}

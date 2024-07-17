@@ -90,11 +90,13 @@ extern void StdStatusOutput(void)
 //	GrpPut16(0,460,"12/5 Ver");
 #endif
 
-	_strdate(buf);
+	const auto tm = Time_NowLocal();
+
+	sprintf(buf, "%02u/%02u/%02u", tm.month, tm.day, (tm.year % 100u));
 	GrpPut16(640-128,0,"Date");
 	GrpPut16(640-128,20,buf);
 
-	_strtime(buf);
+	sprintf(buf, "%02u:%02u:%02u", tm.hour, tm.minute, tm.second);
 	GrpPut16(640-128,50,"Time");
 	GrpPut16(640-128,70,buf);
 

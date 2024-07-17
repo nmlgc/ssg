@@ -3,10 +3,10 @@
 /*                                                                           */
 /*                                                                           */
 
-#include <windows.h>
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "CONFIG.H"
+#include "platform/time.h"
 
 
 ///// [グローバル変数] /////
@@ -21,8 +21,8 @@ uint8_t	GameLevel;
 ///// [ 関数(非公開) ] /////
 extern void StdStatusOutput(void)
 {
-	static DWORD	fps,count;
-	static DWORD	time,temp;
+	static uint32_t prev;
+	static uint32_t fps, count;
 	//extern InputConfig			IConfig;
 	const char *const DItem[4] = { "Easy", "Norm", "Hard", "Luna" };
 	char	buf[100];
@@ -30,12 +30,13 @@ extern void StdStatusOutput(void)
 #ifdef PBG_DEBUG
 	if(!DebugDat.MsgDisplay) return;
 
-	temp = timeGetTime();
-	if(temp-time<=1000) count++;
-	else{
+	const auto now = Time_SteadyTicksMS();
+	if((now - prev) <= 1000) {
+		count++;
+	} else {
 		fps   = count;
 		count = 0;
-		time  = temp;
+		prev  = now;
 	}
 
 	sprintf(buf, "%03u Fps", fps);

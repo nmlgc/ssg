@@ -15,7 +15,7 @@
 #include "game/input.h"
 #include "game/midi.h"
 #include "game/snd.h"
-#include <mmsystem.h>
+#include "platform/time.h"
 
 
 DWORD		DrawCount = 0;
@@ -575,7 +575,7 @@ extern bool GameReplayInit(int Stage)
 {
 	MaidSet();
 
-//	rnd_seed_set(timeGetTime());
+//	rnd_seed_set(Time_SteadyTicksMS());
 	GameStage = Stage;
 
 	if(!DemoplayLoadReplay(GameStage)) {
@@ -664,7 +664,7 @@ bool DemoInit(void)
 
 	MaidSet();
 
-	rnd_seed_set(timeGetTime());
+	rnd_seed_set(Time_SteadyTicksMS());
 	GameStage = (rnd()%STAGE_MAX)+1;
 
 //	GameStage = (rnd()%3)+1;		// この部分は体験版(コミケ)だけ //

@@ -5,7 +5,6 @@
 
 #include "platform/file.h"
 #include "LZ_UTY.H"
-#include <numeric>
 
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;

@@ -7,10 +7,8 @@
 #define PBGWIN_LENS_H		"LENS_EFC : Version 0.01 : Update 2000/09/18"
 #pragma message(PBGWIN_LENS_H)
 
+import std.compat;
 #include "game/coords.h"
-#include <memory>
-#include <optional>
-#include <stdint.h>
 
 struct SURFACE_DDRAW; // TODO: Remove once we use IDs
 

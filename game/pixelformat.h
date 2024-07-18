@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include <array>
-#include <variant>
-#include <optional>
+import std.compat;
 
 // (We don't really care about the value of whatever variant type this holds,
 // just about the type itself.)

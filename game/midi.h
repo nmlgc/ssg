@@ -18,8 +18,6 @@
 #include "game/narrow.h"
 #include "game/volume.h"
 #include "platform/buffer.h"
-#include <chrono>
-#include <stdint.h>
 
 
 enum class MID_BACKEND_STATE : uint8_t {

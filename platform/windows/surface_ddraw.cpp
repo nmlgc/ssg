@@ -4,7 +4,6 @@
  */
 
 #include "platform/windows/surface_ddraw.h"
-#include <array>
 #include <assert.h>
 #include <ddraw.h>
 

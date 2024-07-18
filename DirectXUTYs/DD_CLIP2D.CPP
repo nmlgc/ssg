@@ -4,8 +4,6 @@
 /*                                                                           */
 
 #include "DD_CLIP2D.H"
-#include <algorithm>
-#include <array>
 #pragma message(PBGWIN_DD_CLIP2D_H)
 
 

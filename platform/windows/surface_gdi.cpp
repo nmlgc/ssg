@@ -6,8 +6,8 @@
 #include "platform/windows/surface_gdi.h"
 #include "platform/file.h"
 #include "game/format_bmp.h"
-#include <array>
 #include <assert.h>
+#include <stddef.h> // for offsetof()
 
 #pragma comment(lib, "gdi32.lib")
 #pragma comment(lib, "user32.lib")

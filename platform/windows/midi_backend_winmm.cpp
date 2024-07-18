@@ -5,7 +5,6 @@
 
 #include "platform/midi_backend.h"
 #include "game/midi.h"
-#include <array>
 #include <windows.h>
 #include <mmeapi.h>
 

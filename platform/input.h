@@ -6,8 +6,6 @@
 #pragma once
 
 #include "game/input.h"
-#include <optional>
-#include <span>
 
 // 関数プロトタイプ宣言 //
 bool Key_Start(void);	// キー入力開始

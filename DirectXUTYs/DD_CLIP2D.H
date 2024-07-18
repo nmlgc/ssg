@@ -13,9 +13,8 @@
 
 
 // ヘッダファイル //
+import std.compat;
 #include "game/coords.h"
-#include <stdint.h>
-#include <span>
 
 
 // 関数 //

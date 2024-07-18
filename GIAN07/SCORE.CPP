@@ -7,7 +7,6 @@
 #include "LEVEL.H"
 #include "SCORE.H"
 #include "game/defer.h"
-#include <ranges>
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
 using NR_CONST_SCORE_LIST = std::span<const NR_NAME_DATA, NR_RANK_MAX>;

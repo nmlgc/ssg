@@ -9,8 +9,6 @@
 #include "game/enum_array.h"
 #include "game/graphics.h"
 #include "game/narrow.h"
-#include <optional>
-#include <string_view>
 
 using TEXTRENDER_RECT_ID = unsigned int;
 

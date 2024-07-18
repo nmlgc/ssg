@@ -10,7 +10,6 @@
  */
 
 #include "game/text_packed.h"
-#include <array>
 #include <assert.h>
 
 struct created_splits {

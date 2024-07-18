@@ -10,7 +10,6 @@
 #include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/snd.h"
-#include <ranges>
 
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 

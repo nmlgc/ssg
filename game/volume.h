@@ -5,9 +5,8 @@
 
 #pragma once
 
+import std.compat;
 #include <assert.h>
-#include <math.h>
-#include <stdint.h>
 
 // Discrete volume values for MIDI and the UI.
 using VOLUME = uint8_t;

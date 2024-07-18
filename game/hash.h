@@ -8,8 +8,6 @@
 #include "game/narrow.h"
 #include "platform/buffer.h"
 #include <blake3.h>
-#include <array>
-#include <algorithm>
 
 using HASH = std::array<std::byte, BLAKE3_OUT_LEN>;
 

@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <array>
-#include <algorithm>
+import std.compat;
 #include <assert.h>
 
 template <class T, size_t N, typename ShouldDelete> void Indsort(

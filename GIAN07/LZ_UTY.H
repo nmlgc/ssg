@@ -8,7 +8,6 @@
 #include "platform/buffer.h"
 #include "platform/unicode.h"
 #include "game/endian.h"
-#include <array>
 
 class FILE_STREAM_READ;
 

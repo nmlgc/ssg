@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <array>
-#include <string>
+import std.compat;
 
 // Number of decimal digits required to store the highest value of the given
 // type.

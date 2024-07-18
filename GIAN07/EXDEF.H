@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_EXDEF_H)
 
 
-#include <stdint.h>
+import std.compat;
 
 
 // 角度付き座標の管理用構造体 //

@@ -5,8 +5,6 @@
 
 #include "DD_CLIP2D.H"
 #include "game/cast.h"
-#include <limits>
-#include <string.h>
 
 
 //// [更新履歴] ////

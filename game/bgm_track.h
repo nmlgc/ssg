@@ -9,12 +9,6 @@
 #include "game/pcm.h"
 #include "game/hash.h"
 #include "platform/file.h"
-#include <stdint.h>
-#include <chrono>
-#include <functional>
-#include <memory>
-#include <optional>
-#include <span>
 
 namespace BGM {
 

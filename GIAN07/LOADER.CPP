@@ -15,8 +15,6 @@
 #include "game/midi.h"
 #include "game/snd.h"
 #include "platform/path.h"
-#include <future>
-#include <ranges>
 #include <assert.h>
 
 // Hardcoded loop points for ZUN's original MIDI files

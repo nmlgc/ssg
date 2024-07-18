@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <array>
+import std.compat;
 #include <assert.h>
 
 // Paletted graphics //

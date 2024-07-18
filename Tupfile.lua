@@ -192,11 +192,14 @@ local ANALYSIS_RELAXED = { cflags = { release = {
 	"/wd26818", -- Switch statement does not cover all cases
 } } }
 
+local modules_cfg = CONFIG:branch(ANALYSIS)
+modules_cfg = modules_cfg:branch(cxx_std_modules(modules_cfg))
+
 --- The game
 -- --------
 
 local SSG = sourcepath("./")
-local ssg_cfg = CONFIG:branch(ANALYSIS, BLAKE3_LINK, {
+local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, {
 	cflags = {
 		"/std:c++latest",
 		"/DWIN32",

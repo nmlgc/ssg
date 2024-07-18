@@ -6,7 +6,6 @@
 #include "game/debug.h"
 #include "platform/file.h"
 #include "platform/time.h"
-#include <array>
 #pragma message(PBGWIN_DX_ERROR_H)
 
 

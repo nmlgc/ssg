@@ -6,7 +6,6 @@
 #include "FONTUTY.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include <ddraw.h>
 
 // Glyph selection inside the 16×16 font //
 std::optional<PIXEL_LTRB> Glyph16x16(char c)

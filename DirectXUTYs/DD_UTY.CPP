@@ -12,7 +12,6 @@
 #include "game/screenshot.h"
 #include <assert.h>
 #include <d3d.h>
-#include <stdio.h>
 #pragma message(PBGWIN_DD_UTY_H)
 
 #pragma comment(lib, "ddraw.lib")

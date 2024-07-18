@@ -28,7 +28,6 @@
 #include "game/pixelformat.h"
 #include "platform/buffer.h"
 #include "platform/windows/surface_ddraw.h"
-#include <algorithm>
 
 
 // 定数＆マクロ //

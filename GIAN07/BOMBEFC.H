@@ -6,7 +6,7 @@
 #ifndef PBG_BOMBEFC_VERSION
 #define PBG_BOMBEFC_VERSION	"爆発系エフェクト : Version 0.01 : Update 2000/11/21"
 
-#include <stdint.h>
+import std.compat;
 
 
 

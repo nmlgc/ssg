@@ -20,7 +20,6 @@
 #include "game/bgm_track.h"
 #include "game/defer.h"
 #include "platform/snd_backend.h"
-#include <ranges>
 
 struct BGM_OBJ {
 	ma_data_source_base data_source{};

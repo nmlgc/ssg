@@ -8,10 +8,7 @@
 
 #pragma once
 
-#include <bit>
-#include <stddef.h>
-#include <stdint.h>
-#include <type_traits>
+import std.compat;
 
 template <typename T, bool Big> class ENDIAN_VALUE {
 	std::byte v[sizeof(T)];

@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
 #include "TAMA.H"
-#include <array>
 
 
 

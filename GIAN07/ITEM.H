@@ -7,7 +7,7 @@
 #define PBGWIN_ITEM_H		"ITEM : Version 0.01 : Update 2000/03/11"
 //#pragma message(PBGWIN_ITEM_H)
 
-#include <array>
+import std.compat;
 
 
 ///// [ 定数 ] /////

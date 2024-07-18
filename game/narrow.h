@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <string>
+import std;
 
 namespace Any {
 	// Strings from outside the game with an unknown and not yet validated

@@ -7,9 +7,6 @@
 #pragma once
 
 #include "game/text.h"
-#include <string>
-#include <optional>
-#include <vector>
 
 class TEXTRENDER_PACKED {
 protected:

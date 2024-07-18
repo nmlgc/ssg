@@ -6,7 +6,6 @@
 #pragma once
 
 #include "game/snd.h"
-#include <chrono>
 
 bool SndBackend_Init(void);
 void SndBackend_Cleanup(void);

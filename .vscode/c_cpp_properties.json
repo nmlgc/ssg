@@ -9,6 +9,10 @@
 			"intelliSenseMode": "windows-msvc-x86",
 			"defines": [
 				"WIN32"
+			],
+			"compilerArgs": [
+				"/reference", "std=${workspaceFolder}\\obj\\stdd.ifc",
+				"/reference", "std.compat=${workspaceFolder}\\obj\\std.compatd.ifc"
 			]
 		}
 	],

@@ -7,6 +7,7 @@
 #define PBGWIN_LASER_H		"LASEER : Ver 0.51 : Update 2000/02/17"
 //#pragma message(PBGWIN_LASER_H)
 
+import std.compat;
 #include "game/coords.h"
 
 ///// [更新履歴] /////

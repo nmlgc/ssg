@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include <array>
+import std;
 #include <assert.h>
-#include <utility>
 
 template <class E> concept ENUMARRAY_ID = (
 	std::is_enum_v<E> &&

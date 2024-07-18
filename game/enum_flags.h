@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <type_traits>
-#include <utility>
+import std;
 
 template <typename T> concept ENUMFLAGS = (std::is_enum_v<T> && requires {
 	{ T::_HAS_BITFLAG_OPERATORS };

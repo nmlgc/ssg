@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <string>
+import std;
 
 using UNICODE_STRING = std::wstring;
 using UNICODE_STRING_VIEW = std::wstring_view;

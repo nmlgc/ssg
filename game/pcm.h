@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <utility>
-#include <stdint.h>
+import std.compat;
 
 enum class PCM_SAMPLE_FORMAT : uint8_t {
 	S16 = 2,

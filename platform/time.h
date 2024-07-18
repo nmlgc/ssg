@@ -3,7 +3,7 @@
  *
  */
 
-#include <stdint.h>
+import std.compat;
 
 struct TIME_OF_DAY {
 	uint32_t year;

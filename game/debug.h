@@ -6,7 +6,7 @@
 #ifndef PBGWIN_DX_ERROR_H
 #define PBGWIN_DX_ERROR_H		"DX_ERROR : Version 0.01 : Update 1999/11/20"
 
-#include <string_view>
+import std;
 
 // 更新履歴 //
 

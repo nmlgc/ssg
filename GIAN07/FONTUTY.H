@@ -18,7 +18,6 @@
 
 #include "DirectXUTYs/DD_UTY.H"
 #include "platform/windows/text_gdi.h"
-#include <string_view>
 
 
 

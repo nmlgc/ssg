@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_TAMA_H)
 
 #include "GIAN07/entity.h"
-#include <array>
 
 
 ///// [更新履歴] /////

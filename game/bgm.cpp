@@ -13,9 +13,6 @@
 #include "platform/midi_backend.h"
 #include "platform/path.h"
 #include "platform/snd_backend.h"
-#include <algorithm>
-#include <filesystem>
-#include <ranges>
 
 using namespace std::chrono_literals;
 

@@ -25,7 +25,6 @@
 #include "LASER.H"
 #include "game/ut_math.h"
 #include "platform/buffer.h"
-#include <array>
 
 
 //// 敵定数 ////

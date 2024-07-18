@@ -10,8 +10,6 @@
 #include "game/narrow.h"
 #include <assert.h>
 #include <malloc.h>
-#include <optional>
-#include <type_traits>
 #include <windows.h>
 
 namespace UTF {

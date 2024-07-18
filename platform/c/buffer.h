@@ -5,10 +5,7 @@
 
 #pragma once
 
-#include <memory>
-#include <optional>
-#include <span>
-#include <vector>
+import std.compat;
 
 struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
 	using span::span;

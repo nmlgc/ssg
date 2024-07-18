@@ -7,7 +7,6 @@
 #include "platform/unicode.h"
 #include "game/bgm.h"
 #include "game/input.h"
-#include <direct.h>
 #include <windows.h>
 #include <mmsystem.h>
 

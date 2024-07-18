@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <compare>
+import std;
 
 // Pixel-space coordinates
 // -----------------------

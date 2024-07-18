@@ -5,9 +5,8 @@
 
 #pragma once
 
+import std.compat;
 #include "game/narrow.h"
-#include <optional>
-#include <span>
 
 // Initializes the backend with a default output device.
 bool MidBackend_Init(void); // ＭＩＤＩ関連初期化

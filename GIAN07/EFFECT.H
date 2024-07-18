@@ -7,8 +7,8 @@
 #define PBGWIN_EFFECT_H		"EFFECT : Version 0.20 : Update 2000/02/23"
 //#pragma message(PBGWIN_EFFECT_H)
 
+import std.compat;
 #include "game/narrow.h"
-#include <stdint.h>
 
 
 

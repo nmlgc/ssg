@@ -6,7 +6,6 @@
 #include "EFFECT3D.H"
 #include "GIAN.H"
 #include "game/cast.h"
-#include <ranges>
 
 #define CIRCLE_MAX			40
 #define CUBE_MAX			8

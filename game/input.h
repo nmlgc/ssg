@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <utility>
+import std.compat;
 
 // Current pressed/released state for all virtual KEY_* keys.
 using INPUT_BITS = uint16_t;

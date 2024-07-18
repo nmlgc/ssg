@@ -4,7 +4,6 @@
  */
 
 #include "platform/path.h"
-#include <memory>
 #include <SDL_filesystem.h>
 
 static std::unique_ptr<char8_t[], decltype(&SDL_free)> PathData = {

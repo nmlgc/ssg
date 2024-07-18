@@ -18,7 +18,6 @@
 #include "game/midi.h"
 #include "game/snd.h"
 #include "game/string_format.h"
-#include <numeric>
 
 
 

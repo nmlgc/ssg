@@ -4,9 +4,6 @@
 /*                                                                           */
 
 #include "ut_math.h"
-#include <array>
-#include <stdlib.h>
-#include <type_traits>
 #pragma message(PBGWIN_UT_MATH_H)
 
 

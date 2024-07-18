@@ -15,7 +15,6 @@
 #include "game/debug.h"
 #include "game/screenshot.h"
 #include "game/snd.h"
-#include <filesystem>
 
 // Mapping world coordinates to a position in the stereo field
 // -----------------------------------------------------------

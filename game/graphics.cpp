@@ -5,8 +5,6 @@
 
 #include "game/graphics.h"
 #include "DirectXUTYs/DD_UTY.H"
-#include <algorithm>
-#include <ranges>
 
 // Paletted graphics //
 // ----------------- //

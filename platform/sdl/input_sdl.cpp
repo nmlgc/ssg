@@ -7,8 +7,6 @@
 #include <SDL_events.h>
 #include <SDL_joystick.h>
 #include <assert.h>
-#include <limits>
-#include <vector>
 
 static constexpr std::pair<SDL_Scancode, INPUT_BITS> KeyBindings[] = {
 	{ SDL_SCANCODE_UP,    	KEY_UP },

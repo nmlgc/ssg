@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <type_traits>
+import std;
 
 namespace Cast {
 

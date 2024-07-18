@@ -17,7 +17,7 @@
 
 
 // ヘッダファイル //
-#include <stdint.h>
+import std.compat;
 
 
 // マクロ //

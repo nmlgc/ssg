@@ -5,11 +5,10 @@
 
 #pragma once
 
+import std.compat;
 #include "game/hash.h"
 #include "game/narrow.h"
 #include "platform/buffer.h"
-#include <chrono>
-#include <stdint.h>
 
 // Loads the BGM with the given 0-based [id] from the game's original BGM data
 // source.

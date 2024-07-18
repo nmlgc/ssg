@@ -7,9 +7,7 @@
 #include "game/endian.h"
 #include "game/volume.h"
 #include "platform/midi_backend.h"
-#include <algorithm>
-#include <thread>
-#include <assert.h>
+#include <malloc.h>
 #pragma message(PBGWIN_PBGMIDI_H)
 
 

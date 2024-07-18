@@ -161,7 +161,6 @@ local ANALYSIS = { cflags = { release = {
 
 	-- Critical warnings
 	"/we26819", -- Unannotated fallthrough between switch labels
-	"/we26427", -- Static initialization order fiasco
 
 	-- Opt-in warnings
 	"/w14101", -- Unreferenced local variable
@@ -178,13 +177,26 @@ local ANALYSIS = { cflags = { release = {
 	"/wd26446", -- …
 	"/wd26472", -- …
 	"/wd26821", -- …
+	"/wd26427", -- Static initialization order fiasco (for now)
+} } }
+
+-- Relaxed analysis flags for pbg code
+local ANALYSIS_RELAXED = { cflags = { release = {
+	"/wd6246", -- Hiding declarations in outer scope
+	"/wd26438", -- Avoid 'goto'
+	"/wd26448", -- …
+	"/wd26450", -- Compile-time overflows (always intended)
+	"/wd26485", -- No array to pointer decay
+	"/wd26494", -- Uninitialized variables
+	"/wd26495", -- Uninitialized member variables
+	"/wd26818", -- Switch statement does not cover all cases
 } } }
 
 --- The game
 -- --------
 
 local SSG = sourcepath("./")
-local ssg_cfg = CONFIG:branch(BLAKE3_LINK, {
+local ssg_cfg = CONFIG:branch(ANALYSIS, BLAKE3_LINK, {
 	cflags = {
 		"/std:c++latest",
 		"/DWIN32",
@@ -196,7 +208,6 @@ local ssg_cfg = CONFIG:branch(BLAKE3_LINK, {
 	},
 	objdir = "ssg/",
 })
-local modern_cfg = ssg_cfg:branch(ANALYSIS)
 
 -- pbg code
 local ssg_src
@@ -211,19 +222,19 @@ layers_src += SSG.glob("game/*.cpp")
 layers_src += SSG.glob("platform/miniaudio/*.cpp")
 layers_src += SSG.glob("platform/windows/*.cpp")
 local layers_obj = (
-	cxx(modern_cfg, layers_src) +
-	cxx(modern_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp")
+	cxx(ssg_cfg, layers_src) +
+	cxx(ssg_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp")
 )
 
 -- SDL code
-local p_sdl_cfg = modern_cfg:branch(SDL_LINK, { lflags = "/SUBSYSTEM:windows" })
+local p_sdl_cfg = ssg_cfg:branch(SDL_LINK, { lflags = "/SUBSYSTEM:windows" })
 local p_sdl_src = SSG.glob("platform/sdl/*.cpp")
 p_sdl_src += "MAIN/main_sdl.cpp"
 local p_sdl_obj = cxx(p_sdl_cfg, p_sdl_src)
 
 -- Main/regular build
 local regular_obj = (
-	cxx(ssg_cfg, ssg_src) +
+	cxx(ssg_cfg:branch(ANALYSIS_RELAXED), ssg_src) +
 	layers_obj +
 	p_sdl_obj +
 	xiph_obj +

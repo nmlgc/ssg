@@ -473,7 +473,7 @@ static bool SndFnSEVol(INPUT_BITS key)
 {
 	if(const auto delta = CWinOptionKeyDelta(key)) {
 		ConfigDat.SEVolume.v = std::clamp(
-			(ConfigDat.SEVolume.v + delta), 0, int(VOLUME_MAX)
+			(ConfigDat.SEVolume.v + delta), 0, int{ VOLUME_MAX }
 		);
 		Snd_UpdateVolumes();
 	}
@@ -485,7 +485,7 @@ static bool SndFnBGMVol(INPUT_BITS key)
 {
 	if(const auto delta = CWinOptionKeyDelta(key)) {
 		ConfigDat.BGMVolume.v = std::clamp(
-			(ConfigDat.BGMVolume.v + delta), 0, int(VOLUME_MAX)
+			(ConfigDat.BGMVolume.v + delta), 0, int{ VOLUME_MAX }
 		);
 		BGM_UpdateVolume();
 	}

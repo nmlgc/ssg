@@ -21,7 +21,7 @@
 
 typedef struct tagNR_NAME_DATA{
 	char		Name[NR_NAME_LEN];		// 名前
-	__int64		Score;					// スコア
+	int64_t	Score;	// スコア
 	uint32_t	Evade;	// かすり回数
 	uint8_t	Stage;	// ステージ
 	uint8_t	Weapon;	// 装備品

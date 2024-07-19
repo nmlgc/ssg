@@ -6,13 +6,13 @@
 #include "LZ_UTY.H"
 #include "LEVEL.H"
 #include "SCORE.H"
-#include <windows.h>
+#include <ranges>
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
 
-//#define PBG_MASK_VALUE		((DWORDLONG)0x342d3a4de92c68ba)
-//#define PBG_MASK_VALUE		((DWORDLONG)0xe92cd3a4d8ba6342)
-#define PBG_MASK_VALUE		((DWORDLONG)0xb97eb2c6542d3a41)
+// constexpr uint64_t PBG_MASK_VALUE = 0x342d3a4de92c68ba;
+// constexpr uint64_t PBG_MASK_VALUE = 0xe92cd3a4d8ba6342;
+constexpr uint64_t PBG_MASK_VALUE = 0xb97eb2c6542d3a41;
 
 
 
@@ -22,39 +22,63 @@ NR_SCORE_STRING		ScoreString[NR_RANK_MAX];	// スコアデータ文字列格納�
 // スコアデータ格納先(名前空間で保護)
 static std::unique_ptr<NR_SCORE_DATA> ScoreData = nullptr;
 
-static BOOL LoadScoreData(void);			// スコアデータを読み込む
+static bool LoadScoreData(void);	// スコアデータを読み込む
 static void ReleaseScoreData(void);	// スコアデータを解放する
 static std::optional<NR_SCORE_LIST> GetNList(uint8_t Dif);	// 難易度でポインタを振り分ける
-static BOOL SetDefaultScoreData(void);		// スコアデータ初期値をセット
+static bool SetDefaultScoreData(void);	// スコアデータ初期値をセット
 
-static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ &bd);
-static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE &bd);
+static bool _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ& bd);
+static void _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE& bd);
 
-static BYTE      _xGet8( BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
-static DWORD     _xGet32(BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
-static DWORDLONG _xGet64(BIT_DEVICE_READ &bd, DWORDLONG *ExMask);
+template <std::unsigned_integral T> T _xGet(
+	BIT_DEVICE_READ& bd, uint64_t& ExMask
+)
+{
+	ExMask = (((ExMask & 0x800000000000000) >> 60) + (ExMask << 1));
 
-static void _xPut8( BIT_DEVICE_WRITE &bd, BYTE  data,    DWORDLONG *ExMask);
-static void _xPut32(BIT_DEVICE_WRITE &bd, DWORD data,    DWORDLONG *ExMask);
-static void _xPut64(BIT_DEVICE_WRITE &bd, DWORDLONG data,DWORDLONG *ExMask);
+	T ret = 0;
+	if constexpr(sizeof(T) == 1) {
+		ret = bd.GetBits(8);
+	} else {
+		for(const auto word : std::views::iota(0u, (sizeof(T) / 2))) {
+			ret |= (static_cast<T>(bd.GetBits(16)) << (word * 16));
+		}
+	}
+	return (ret - static_cast<T>(ExMask));
+}
 
+template <std::unsigned_integral T> void _xPut(
+	BIT_DEVICE_WRITE& bd, T data, uint64_t& ExMask
+)
+{
+	ExMask = (((ExMask & 0x800000000000000) >> 60) + (ExMask << 1));
 
+	const auto temp = (data + static_cast<T>(ExMask));
+
+	if constexpr(sizeof(T) == 1) {
+		bd.PutBits(temp, 8);
+	} else {
+		for(const auto word : std::views::iota(0u, (sizeof(T) / 2))) {
+			bd.PutBits((temp >> (word * 16)), 16);
+		}
+	}
+}
 
 
 // 現在のスコア列を取得する(名前挿入アリ) //
 // NData == NULL の場合、挿入しません     //
-int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
+int SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
 {
 //	static char			*WTable[4] = {"WIDE ","HOMING","LASER","?????"};
 	NR_SCORE_STRING		*Res;
 	int					i,num,rank;
-	__int64				temp;
+	int64_t temp;
 
 	Res = ScoreString;
 
 
 	// スコアデータを読み込む //
-	if(NData != NULL){
+	if(NData != nullptr) {
 		rank = IsHighScore(NData, Dif);
 		if(rank==0) return 0;
 	}
@@ -71,7 +95,7 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 	}
 	auto p = maybe_p.value();
 
-	if(rank!=0 && NData!=NULL){
+	if((rank != 0) && (NData != nullptr)) {
 		// まずは、スコアを下方向に押し出すのだ //
 		for(i=NR_RANK_MAX-1; i>=rank; i--){
 			p[i] = p[i-1];		// 構造体から構造体への代入
@@ -92,7 +116,7 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 		Res[i].Rank = num;
 		Res[i].x    = (640 + (50  + i*24*20)) << 6;
 		Res[i].y    = (100 + i*48) << 6;
-		Res[i].bMoveEnable = TRUE;
+		Res[i].bMoveEnable = true;
 
 		strcpy(Res[i].Name  , p[i].Name);
 
@@ -111,7 +135,7 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 
 
 // ０：ハイスコアでない  それ以外：順位 //
-int IsHighScore(NR_NAME_DATA *NData, BYTE Dif)
+int IsHighScore(NR_NAME_DATA *NData, uint8_t Dif)
 {
 	int				Rank;
 
@@ -143,7 +167,7 @@ int IsHighScore(NR_NAME_DATA *NData, BYTE Dif)
 
 
 // スコアデータを書き出す //
-bool SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
+bool SaveScoreData(NR_NAME_DATA *NData, uint8_t Dif)
 {
 	int				Rank;
 
@@ -151,14 +175,18 @@ bool SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 	Rank = IsHighScore(NData, Dif);
 
 	// これは、ハイスコアじゃないね //
-	if(Rank == 0) return FALSE;
+	if(Rank == 0) {
+		return false;
+	}
 
 	// ポインタをセットする //
-	if(!LoadScoreData()) return FALSE;
+	if(!LoadScoreData()) {
+		return false;
+	}
 	auto maybe_temp = GetNList(Dif);
 	if(!maybe_temp) {
 		ReleaseScoreData();
-		return FALSE;
+		return false;
 	}
 	auto temp = maybe_temp.value();
 
@@ -184,12 +212,14 @@ bool SaveScoreData(NR_NAME_DATA *NData, BYTE Dif)
 
 
 // スコアデータを読み込む //
-static BOOL LoadScoreData(void)
+static bool LoadScoreData(void)
 {
-	BOOL			bInit = FALSE;
+	bool bInit = false;
 
 	// すでにロード済みの場合(これは失敗にしない) //
-	if(ScoreData) return TRUE;
+	if(ScoreData) {
+		return true;
+	}
 
 	ScoreData = std::unique_ptr<NR_SCORE_DATA>(
 		new (std::nothrow) NR_SCORE_DATA
@@ -207,7 +237,7 @@ static BOOL LoadScoreData(void)
 		if(!_LoadSC(ScoreData->Lunatic, bd)) break;
 		if(!_LoadSC(ScoreData->Extra,   bd)) break;
 
-		bInit = TRUE;
+		bInit = true;
 		break;
 	}
 
@@ -217,7 +247,7 @@ static BOOL LoadScoreData(void)
 		return SetDefaultScoreData();
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -247,9 +277,11 @@ static std::optional<NR_SCORE_LIST> GetNList(uint8_t Dif)
 }
 
 // スコアデータ初期値をセット //
-static BOOL SetDefaultScoreData(void)
+static bool SetDefaultScoreData(void)
 {
-	if(NULL == ScoreData) return FALSE;
+	if(nullptr == ScoreData) {
+		return false;
+	}
 
 	for(auto i = 0; i < (GAME_EXTRA + 1); i++) {
 		auto maybe_temp = GetNList(i);
@@ -266,66 +298,68 @@ static BOOL SetDefaultScoreData(void)
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-static BOOL _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ &bd)
+static bool _LoadSC(NR_NAME_DATA *NData, BIT_DEVICE_READ& bd)
 {
 	int			i,j;
-	DWORDLONG	CheckSum = 0;
-	DWORDLONG	Mask     = PBG_MASK_VALUE;
-	BYTE		flag     = 0;
+	uint64_t CheckSum = 0;
+	uint64_t Mask = PBG_MASK_VALUE;
+	uint8_t flag = 0;
 
 	for(i=0; i<NR_RANK_MAX; i++){
 		CheckSum = 0;
-		if(flag != bd.GetBit()) return FALSE;
+		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// 名前を獲得する //
 		for(j=0; j<NR_NAME_LEN; j++){
-			NData[i].Name[j] = _xGet8(bd, &Mask);
+			NData[i].Name[j] = _xGet<uint8_t>(bd, Mask);
 			CheckSum += NData[i].Name[j];
 		}
-		if(flag != bd.GetBit()) return FALSE;
+		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// 得点を獲得する //
-		NData[i].Score = _xGet64(bd, &Mask);
+		NData[i].Score = _xGet<uint64_t>(bd, Mask);
 		CheckSum += NData[i].Score;
-		if(flag != bd.GetBit()) return FALSE;
+		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// かすりを獲得する //
-		NData[i].Evade = _xGet32(bd, &Mask);
+		NData[i].Evade = _xGet<uint32_t>(bd, Mask);
 		CheckSum += NData[i].Evade;
-		if(flag != bd.GetBit()) return FALSE;
+		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// ステージを獲得する //
-		NData[i].Stage = _xGet8(bd, &Mask);
+		NData[i].Stage = _xGet<uint8_t>(bd, Mask);
 		CheckSum += NData[i].Stage;
-		if(flag != bd.GetBit()) return FALSE;
+		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// ウエポンを獲得する //
-		NData[i].Weapon = _xGet8(bd, &Mask);
+		NData[i].Weapon = _xGet<uint8_t>(bd, Mask);
 		CheckSum += NData[i].Weapon;
-		if(flag != bd.GetBit()) return FALSE;
+		if(flag != bd.GetBit()) return false;
 		else                    flag = 1-flag;
 
 		// チェックサム比較 //
-		if(CheckSum != _xGet64(bd, &Mask)) return FALSE;
+		if(CheckSum != _xGet<uint64_t>(bd, Mask)) {
+			return false;
+		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE &bd)
+static void _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE& bd)
 {
 	int			i,j;
-	DWORDLONG	CheckSum = 0;
-	DWORDLONG	Mask     = PBG_MASK_VALUE;
-	BYTE		flag     = 0;
+	uint64_t CheckSum = 0;
+	uint64_t Mask = PBG_MASK_VALUE;
+	uint8_t flag = 0;
 
 	for(i=0; i<NR_RANK_MAX; i++){
 		CheckSum = 0;
@@ -334,120 +368,31 @@ static BOOL _SaveSC(NR_NAME_DATA *NData, BIT_DEVICE_WRITE &bd)
 		// 名前を出力する //
 		for(j=0; j<NR_NAME_LEN; j++){
 			CheckSum += NData[i].Name[j];
-			_xPut8(bd, NData[i].Name[j], &Mask);
+			_xPut(bd, static_cast<unsigned char>(NData[i].Name[j]), Mask);
 		}
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// 得点を出力する //
 		CheckSum += NData[i].Score;
-		_xPut64(bd, NData[i].Score, &Mask);
+		_xPut(bd, static_cast<uint64_t>(NData[i].Score), Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// かすりを出力する //
 		CheckSum += NData[i].Evade;
-		_xPut32(bd, NData[i].Evade, &Mask);
+		_xPut(bd, NData[i].Evade, Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ステージを出力する //
 		CheckSum += NData[i].Stage;
-		_xPut8(bd, NData[i].Stage, &Mask);
+		_xPut(bd, NData[i].Stage, Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// ウエポンを出力する //
 		CheckSum += NData[i].Weapon;
-		_xPut8(bd, NData[i].Weapon, &Mask);
+		_xPut(bd, NData[i].Weapon, Mask);
 		bd.PutBit(flag); flag = 1-flag;	// ビット挿入
 
 		// チェックサムを出力する //
-		_xPut64(bd, CheckSum, &Mask);
+		_xPut(bd, CheckSum, Mask);
 	}
-
-	return TRUE;
-}
-
-
-typedef union tagWORD64{
-	DWORDLONG		data64;
-	struct{
-		WORD	d1;
-		WORD	d2;
-		WORD	d3;
-		WORD	d4;
-	};
-} WORD64;
-
-typedef union tagWORD32{
-	DWORD		data32;
-	struct{
-		WORD	d1;
-		WORD	d2;
-	};
-} WORD32;
-
-static void _xPut8( BIT_DEVICE_WRITE &bd, BYTE data, DWORDLONG *ExMask)
-{
-	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
-
-	data += (BYTE)(*ExMask);
-
-	bd.PutBits((DWORD)data, 8);
-}
-
-static BYTE _xGet8( BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
-{
-	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
-
-	return (BYTE)bd.GetBits(8) - (BYTE)(*ExMask);
-}
-
-static void _xPut32(BIT_DEVICE_WRITE &bd, DWORD data, DWORDLONG *ExMask)
-{
-	WORD32		temp;
-
-	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
-
-	temp.data32 = data + (DWORD)(*ExMask);
-
-	bd.PutBits((DWORD)temp.d1, 16);
-	bd.PutBits((DWORD)temp.d2, 16);
-}
-
-static DWORD _xGet32(BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
-{
-	WORD32		temp;
-
-	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
-
-	temp.d1 = (WORD)bd.GetBits(16);
-	temp.d2 = (WORD)bd.GetBits(16);
-
-	return temp.data32 - (DWORD)(*ExMask);
-}
-
-static void _xPut64(BIT_DEVICE_WRITE &bd, DWORDLONG data, DWORDLONG *ExMask)
-{
-	WORD64		temp;
-
-	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
-
-	temp.data64 = data + (DWORDLONG)(*ExMask);
-
-	bd.PutBits((DWORD)temp.d1, 16);
-	bd.PutBits((DWORD)temp.d2, 16);
-	bd.PutBits((DWORD)temp.d3, 16);
-	bd.PutBits((DWORD)temp.d4, 16);
-}
-
-static DWORDLONG _xGet64(BIT_DEVICE_READ &bd, DWORDLONG *ExMask)
-{
-	WORD64		temp;
-
-	*ExMask = (((*ExMask)&0x800000000000000)>>60)+((*ExMask)<<1);
-
-	temp.d1 = (WORD)bd.GetBits(16);
-	temp.d2 = (WORD)bd.GetBits(16);
-	temp.d3 = (WORD)bd.GetBits(16);
-	temp.d4 = (WORD)bd.GetBits(16);
-
-	return temp.data64 - (DWORDLONG)(*ExMask);
 }

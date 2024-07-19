@@ -416,7 +416,9 @@ static bool GrpFnBpp(INPUT_BITS key)
 
 static bool GrpFnWinLocate(INPUT_BITS key)
 {
-	BYTE	flags[3] = {0, GRPF_WINDOW_UPPER, GRPF_MSG_DISABLE};
+	static constexpr uint8_t flags[3] = {
+		0, GRPF_WINDOW_UPPER, GRPF_MSG_DISABLE
+	};
 	int		i;
 
 	for(i=0; i<3; i++){

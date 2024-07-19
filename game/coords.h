@@ -19,7 +19,7 @@ struct PIXEL_POINT {
 	PIXEL_COORD x;
 	PIXEL_COORD y;
 
-	PIXEL_POINT operator +(const PIXEL_POINT& other) const {
+	constexpr PIXEL_POINT operator+(const PIXEL_POINT& other) const {
 		return { (x + other.x), (y + other.y) };
 	}
 
@@ -40,11 +40,11 @@ struct PIXEL_SIZE {
 		return ((w > 0) && (h > 0));
 	}
 
-	PIXEL_SIZE operator -(const PIXEL_POINT& other) const {
+	constexpr PIXEL_SIZE operator-(const PIXEL_POINT& other) const {
 		return { (w - other.x), (h - other.y) };
 	}
 
-	PIXEL_SIZE operator /(int divisor) const {
+	constexpr PIXEL_SIZE operator/(int divisor) const {
 		return { (w / divisor), (h / divisor) };
 	}
 
@@ -79,7 +79,7 @@ struct PIXEL_LTWH {
 	{
 	}
 
-	PIXEL_LTWH operator +(const PIXEL_POINT& other) const {
+	constexpr PIXEL_LTWH operator+(const PIXEL_POINT& other) const {
 		return { (left + other.x), (top + other.y), w, h };
 	}
 };
@@ -97,7 +97,7 @@ struct PIXEL_LTRB {
 	PIXEL_LTRB(PIXEL_LTRB&&) = default;
 	PIXEL_LTRB& operator=(const PIXEL_LTRB&) = default;
 	PIXEL_LTRB& operator=(PIXEL_LTRB&&) = default;
-	PIXEL_LTRB(
+	constexpr PIXEL_LTRB(
 		decltype(left) left,
 		decltype(top) top,
 		decltype(right) right,
@@ -120,7 +120,7 @@ using WINDOW_COORD = PIXEL_COORD;
 // X/Y coordinate in unscaled game window space. The visible area ranges from
 // (0, 0) to (639, 479) inclusive.
 struct WINDOW_POINT : public PIXEL_POINT {
-	WINDOW_POINT operator +(const PIXEL_POINT& other) const {
+	constexpr WINDOW_POINT operator+(const PIXEL_POINT& other) const {
 		return { (x + other.x), (y + other.y) };
 	}
 };

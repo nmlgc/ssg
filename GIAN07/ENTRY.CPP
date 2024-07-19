@@ -30,9 +30,9 @@
 // with ((16 / 64) × 100) = 25 pixels per shifted decibel.
 
 // Ｘ座標の中心のデフォルト値
-const int SND_X_MID = PixelToWorld(320);
+constexpr int SND_X_MID = PixelToWorld(320);
 
-const int SND_X_PER_DECIBEL = PixelToWorld(25);
+constexpr int SND_X_PER_DECIBEL = PixelToWorld(25);
 // -----------------------------------------------------------
 
 // Volume controls

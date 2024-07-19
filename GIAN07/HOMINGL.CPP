@@ -23,13 +23,13 @@ HLaserData		FreeHL;			// 解放済みホーミングレーザー
 
 
 ///// [マクロ] /////
-int HLASER_GETNEXT(int current)
+constexpr int HLASER_GETNEXT(int current)
 {
 	// 後で mod -> and に変更すること //
 	return (current + HLASER_LEN*HLASER_SECTION - 1)%(HLASER_LEN*HLASER_SECTION);
 }
 
-int HLASER_GETPREV(int current, int n)
+constexpr int HLASER_GETPREV(int current, int n)
 {
 	// 後で mod -> and に変更すること //
 	return (current + n)%(HLASER_LEN*HLASER_SECTION);

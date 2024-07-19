@@ -312,7 +312,9 @@ PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile)
 
 PACKFILE_READ FilStartR(std::unique_ptr<FILE_STREAM_READ> stream)
 {
-	return FilStartR(stream->ReadAll());
+	auto ret = FilStartR(stream->ReadAll());
+	stream.reset();
+	return ret;
 }
 
 PACKFILE_READ FilStartR(const PATH_LITERAL s)

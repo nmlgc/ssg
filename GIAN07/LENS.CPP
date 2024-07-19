@@ -94,6 +94,10 @@ std::optional<LensInfo> GrpCreateLensBall(
 	assert(r > m);	// 出っ張りは半径より小さくせよ！
 
 	const auto Diameter = (int32_t{ r } * 2);
+
+	// Not even restricting [Diameter] to int8_t would convince Visual Studio's
+	// static analyzer that this can't overflow.
+	#pragma warning(suppress: 26831)
 	NewLens.Data = std::unique_ptr<uint32_t[]>(
 		new (std::nothrow) uint32_t[Diameter * Diameter]
 	);
@@ -195,9 +199,11 @@ void LensInfo::Draw(WINDOW_POINT center)
 
 		for(decltype(Height) row = 0; row < Height; row++) {
 			auto Width = *(Table++);
+			[[gsl::suppress(type.1)]]
 			auto* p = reinterpret_cast<decltype(pixel) *>(Dest + *(Table++));
 
 			while(Width--){
+				[[gsl::suppress(type.1)]]
 				*(p++) = *reinterpret_cast<decltype(pixel) *>(&Src[*(Table++)]);
 			}
 			Dest += __GrpPitch;

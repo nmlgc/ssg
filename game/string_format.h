@@ -24,15 +24,6 @@ namespace String {
 	};
 }
 
-template <size_t Width, class T, std::incrementable I> I StringCopyNum(
-	T num, I out
-) {
-	String::Num<Width, T> n = { num };
-	out = std::copy_n(n.str.data(), n.len, out);
-	*out = '\0';
-	return out;
-}
-
 template <size_t Width, class T> std::u8string& StringCatNum(
 	T num, std::u8string& out
 ) {

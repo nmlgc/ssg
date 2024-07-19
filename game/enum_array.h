@@ -20,11 +20,22 @@ template <class T, ENUMARRAY_ID IDType> class ENUMARRAY : public std::array<
 	using BASE = std::array<T, std::to_underlying(IDType::COUNT)>;
 
 public:
+	// We could do something like
+	//
+	//	using T_ref_or_value = std::conditional_t<
+	//		std::derived_from<T, std::string_view>, T, T&
+	//	>;
+	//
+	// to opt into returning by value for certain classes, but this does not
+	// compile on Visual Studio 2022 17.11.0 Preview 4.0.
+
 	constexpr T& operator[](IDType id) noexcept {
+		[[gsl::suppress(gsl.view)]]
 		return BASE::operator[](std::to_underlying(id));
 	}
 
 	constexpr const T& operator[](IDType id) const noexcept {
+		[[gsl::suppress(gsl.view)]]
 		return BASE::operator[](std::to_underlying(id));
 	}
 };

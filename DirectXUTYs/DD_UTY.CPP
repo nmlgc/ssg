@@ -831,6 +831,7 @@ static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDNam
 	return DDENUMRET_OK;
 }
 
+[[gsl::suppress(con.3)]]
 static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR lpdeviceName,
 						LPD3DDEVICEDESC lpHWDesc,LPD3DDEVICEDESC lpHELDesc,LPVOID lpContext)
 {
@@ -899,6 +900,7 @@ static bool ConfirmDevice3D(const D3DDEVICEDESC *lpDesc)
 	return TRUE;
 }
 
+[[gsl::suppress(con.3)]]
 static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 {
 	XDDRAWENUM		*xenum = (XDDRAWENUM *)pInfo;

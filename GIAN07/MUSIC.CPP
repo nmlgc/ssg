@@ -72,7 +72,7 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 		buf.resize_and_overwrite(len, [&](decltype(buf)::value_type* p, auto) {
 			const auto* start = p;
 			*(p++) = '#';
-			p = StringCopyNum<2>((number + 1), p);
+			p += sprintf(p, "%02u", (number + 1));
 			*(p++) = ' ';
 			p = std::ranges::copy(title, p).out;
 			return (p - start);

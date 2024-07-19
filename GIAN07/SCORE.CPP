@@ -100,7 +100,7 @@ int SetScoreString(NR_NAME_DATA *NData, BYTE Dif)
 		Res[i].Weapon = p[i].Weapon % 4;
 
 		sprintf(Res[i].Score,"%11I64d",p[i].Score);
-		sprintf(Res[i].Evade,"%6d" ,p[i].Evade);
+		sprintf(Res[i].Evade, "%6u", p[i].Evade);
 		sprintf(Res[i].Stage,"%1d" ,p[i].Stage);
 	}
 

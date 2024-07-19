@@ -37,7 +37,7 @@ extern void StdStatusOutput(void)
 		time  = temp;
 	}
 
-	sprintf(buf,"%03d Fps",fps);
+	sprintf(buf, "%03u Fps", fps);
 	GrpPut16(0,0,buf);
 
 	sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());

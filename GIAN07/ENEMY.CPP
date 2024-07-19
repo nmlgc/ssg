@@ -1099,7 +1099,7 @@ void parse_ECL(ENEMY_DATA *e)
 		return;
 
 		case(ECL_DEGA):			// ＠角度絶対指定
-			ECL_DEBUG("ECL_DEGA : %d",(BYTE)cmd[1]);
+			ECL_DEBUG("ECL_DEGA : %u", cmd[1]);
 			e->d = ABS_DEGRL((BYTE)cmd[1]);
 			bRetFlag = FALSE;
 		break;

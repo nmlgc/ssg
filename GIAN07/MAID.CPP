@@ -241,7 +241,7 @@ extern void StateDraw(void)
 	GrpPut57(128 + 95,16 + 91-80,buf);
 
 	// 得点表示 //
-	sprintf(buf,"%9d",Viv.score);
+	sprintf(buf, "%9lld", Viv.score);
 	GrpPut16c(128,0,buf);
 
 	// 仮の残機＆残りボム表示 //

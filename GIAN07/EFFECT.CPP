@@ -351,7 +351,7 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_STR2):
-				sprintf(buf,"%d",e->point);
+				sprintf(buf, "%u", e->point);
 				GrpPutScore(e->x>>6,e->y>>6,buf);
 			break;
 

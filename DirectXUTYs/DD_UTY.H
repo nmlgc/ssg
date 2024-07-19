@@ -92,9 +92,6 @@ public:
 	// ロード済みのSurfaceを修復
 	bool Restore(void);
 
-	// TODO: Remove once the loader no longer needs it.
-	std::span<PALETTEENTRY> PaletteForDDraw();
-
 	// オフスクリーン Surface 作成 //
 	// --------------------------- //
 
@@ -199,6 +196,7 @@ void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていた
 
 void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
 bool GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
+void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)

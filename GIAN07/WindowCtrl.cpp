@@ -407,7 +407,7 @@ static bool GrpFnBpp(INPUT_BITS key)
 		if(DxObj.Init(ConfigDat.DeviceID.v, bitdepth_new)) {
 			ConfigDat.BitDepth.v = bitdepth_new;
 			// GrpSetPalette(DxObj.pe);
-			LoadPaletteFrom(GrTitle);
+			GrpSetPaletteFrom(GrTitle);
 
 			// GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
 		}

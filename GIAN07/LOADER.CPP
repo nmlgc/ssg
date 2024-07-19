@@ -18,7 +18,6 @@
 #include <future>
 #include <ranges>
 #include <assert.h>
-#include <ddraw.h>
 
 // Hardcoded loop points for ZUN's original MIDI files
 // ---------------------------------------------------
@@ -653,22 +652,6 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 	GrpGetPalette(FaceData[FaceID].pal);
 
 	return TRUE;
-}
-
-void LoadPaletteFrom(SURFACE_DDRAW& surf)
-{
-	LPDIRECTDRAWPALETTE		lpdp;
-
-	if(DxObj.PixelFormat.IsChanneled()) return;
-	if(surf.surf->GetPalette(&lpdp) != DD_OK) {
-		return;
-	}
-
-	auto p = DxObj.PaletteForDDraw();
-	lpdp->GetEntries(0, 0, p.size(), p.data());
-	GrpSetPalette(DxObj.Palette);
-
-	lpdp->Release();
 }
 
 // 敵のパレットにする

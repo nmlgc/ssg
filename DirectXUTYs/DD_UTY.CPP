@@ -371,16 +371,16 @@ bool GRAPHICS_DDRAW::Restore(void)
 	return true;
 }
 
-std::span<PALETTEENTRY> GRAPHICS_DDRAW::PaletteForDDraw()
+std::span<PALETTEENTRY> CastToPALETTEENTRY(PALETTE& pal)
 {
 	// Verify that PALETTEENTRY and RGBA are identical.
-	using COLOR = decltype(Palette)::value_type;
+	using COLOR = std::decay<decltype(pal)>::type::value_type;
 	static_assert(sizeof(COLOR) == sizeof(PALETTEENTRY));
 	static_assert(offsetof(COLOR, r) == offsetof(PALETTEENTRY, peRed));
 	static_assert(offsetof(COLOR, g) == offsetof(PALETTEENTRY, peGreen));
 	static_assert(offsetof(COLOR, b) == offsetof(PALETTEENTRY, peBlue));
 	static_assert(offsetof(COLOR, a) == offsetof(PALETTEENTRY, peFlags));
-	return { reinterpret_cast<PALETTEENTRY *>(Palette.data()), Palette.size() };
+	return { reinterpret_cast<PALETTEENTRY *>(pal.data()), pal.size() };
 }
 
 // 現在のパレットを取得する(ただの代入なのでこの関数を使うまでも無いかもしれないね) //
@@ -403,7 +403,7 @@ bool GrpSetPalette(const PALETTE& pal)
 	DxObj.Palette[0] = { 0, 0, 0 };	// 強制的に色をセットしてしまう //
 
 	// パレットを変更
-	auto p = DxObj.PaletteForDDraw();
+	auto p = CastToPALETTEENTRY(DxObj.Palette);
 	if(DxObj.Pal) {
 		DxObj.Pal->SetEntries(0, 0, p.size(), p.data());
 	} else {
@@ -419,6 +419,24 @@ bool GrpSetPalette(const PALETTE& pal)
 
 	DisableAlphaTable();
 	return true;
+}
+
+void GrpSetPaletteFrom(SURFACE_DDRAW& surf)
+{
+	if(DxObj.PixelFormat.IsChanneled()) {
+		return;
+	}
+
+	LPDIRECTDRAWPALETTE lpdp;
+	if(surf.surf->GetPalette(&lpdp) != DD_OK) {
+		return;
+	}
+
+	auto p = CastToPALETTEENTRY(DxObj.Palette);
+	lpdp->GetEntries(0, 0, p.size(), p.data());
+	GrpSetPalette(DxObj.Palette);
+
+	lpdp->Release();
 }
 
 bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(

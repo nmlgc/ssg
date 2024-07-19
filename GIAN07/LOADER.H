@@ -96,7 +96,6 @@ bool LoadSound(void);	// 全ての Sound データをロードする
 bool LoadMusicRoomComment(int no);	// MusicRoom のコメントをロードする
 BYTE_BUFFER_OWNED LoadDemo(int stage);
 
-extern void LoadPaletteFrom(SURFACE_DDRAW& surf);
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
 
 

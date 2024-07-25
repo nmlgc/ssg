@@ -73,8 +73,6 @@ void _3DSetup(void)
 	GrpCircleF  = _3DCircleF;
 	GrpPolygon  = _3DPolygon;
 	GrpBoxA     = _3DBoxA;
-	GrpCircleA  = _3DCircleA;
-	GrpPolygonA = _3DPolygonA;
 
 	GrpFatCircleA = _3DFatCircleA;
 }
@@ -229,7 +227,7 @@ void _3DBoxA(int x1, int y1, int x2, int y2)
 }
 
 // α円塗りつぶし //
-void _3DCircleA(int x, int y, int r)
+void GrpCircleA(int x, int y, int r)
 {
 	int		i;
 
@@ -246,7 +244,7 @@ void _3DCircleA(int x, int y, int r)
 }
 
 // αポリゴン塗りつぶし //
-void _3DPolygonA(std::span<const WINDOW_POINT> p)
+void GrpPolygonA(std::span<const WINDOW_POINT> p)
 {
 	if(!bLocked || (p.size() < 3)) {
 		return;
@@ -273,7 +271,9 @@ void _3DFatCircleA(int x, int y, int r, int w)
 	int		wx,wy;
 
 	// 普通の円になってしまう場合 //
-	if(w>=r) _3DCircleA(x,y,r+w);
+	if(w >= r) {
+		GrpCircleA(x, y, (r + w));
+	}
 
 	if(!bLocked) return;
 	AlphaEnable(TRUE);

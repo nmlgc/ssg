@@ -35,12 +35,12 @@ void _3DCircleF(int x, int y, int r);	// 円塗りつぶし
 void _3DPolygon(std::span<const WINDOW_POINT> p);	// ポリゴン塗りつぶし
 
 void _3DBoxA(int x1, int y1, int x2, int y2);	// α長方形
-void _3DCircleA(int x, int y, int r);	// α円塗りつぶし
-void _3DPolygonA(std::span<const WINDOW_POINT> p);	// αポリゴン塗りつぶし
 void _3DFatCircleA(int x, int y, int r, int w);	// 太い半透明円描画
 
 
 // ３Ｄ専用関数 //
+void GrpCircleA(int x, int y, int r);	// α円塗りつぶし
+void GrpPolygonA(std::span<const WINDOW_POINT> p);	// αポリゴン塗りつぶし
 void GrpGrdRect(std::span<const WINDOW_POINT, 4> p);	// グラデーション付き長方形(ナナメ可)
 void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p);	// グラデーション付き長方形(ナナメ可+α)
 void GrpGrdPolygon(std::span<const WINDOW_POINT> p);	// グラデーション付きポリゴン(レーザー用？)

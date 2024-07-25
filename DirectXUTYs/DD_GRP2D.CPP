@@ -58,8 +58,6 @@ void _2DSetup(void)
 	GrpCircleF  = _2DCircleF;
 	GrpPolygon  = _2DPolygon;
 	GrpBoxA     = _2DBoxA;
-	GrpCircleA  = _2DCircleA;
-	GrpPolygonA = _2DPolygonA;
 
 	// 固有の処理(この関数はSurfaceが存在するときに呼ばれるはず) //
 	_2DLock();
@@ -237,20 +235,6 @@ void _2DBoxA(int x1, int y1, int x2, int y2)
 			_2DGrpHlineA(x1,x2,i);
 	}
 
-}
-
-// α円塗りつぶし //
-void _2DCircleA(int x, int y, int r)
-{
-	// 工事中につき、少々お待ち下さい... //
-	if(AlphaFlag) _2DUpdateAlphaTable();
-}
-
-// αポリゴン塗りつぶし //
-void _2DPolygonA(std::span<const WINDOW_POINT> p)
-{
-	// 工事中につき、少々お待ち下さい... //
-	if(AlphaFlag) _2DUpdateAlphaTable();
 }
 
 // 横ラインを引く //

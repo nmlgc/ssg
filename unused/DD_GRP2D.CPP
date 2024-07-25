@@ -5,6 +5,20 @@
 
 #include "DD_GRP2D.H"
 
+// α円塗りつぶし //
+FVOID _2DCircleA(int x,int y,int r)
+{
+	// 工事中につき、少々お待ち下さい... //
+	if(AlphaFlag) _2DUpdateAlphaTable();
+}
+
+// αポリゴン塗りつぶし //
+FVOID _2DPolygonA(POINT *p,int n)
+{
+	// 工事中につき、少々お待ち下さい... //
+	if(AlphaFlag) _2DUpdateAlphaTable();
+}
+
 // ガンマコントロール //
 FVOID _2DGamma(BYTE r,BYTE g,BYTE b,BYTE a)
 {

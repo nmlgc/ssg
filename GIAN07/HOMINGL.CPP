@@ -7,6 +7,7 @@
 #include "GIAN.H"
 #include "MAID.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/DD_GRP3D.H"
 #include "game/snd.h"
 #include "game/ut_math.h"
 

@@ -31,10 +31,7 @@ void _2DBox(int x1, int y1, int x2, int y2);	// 長方形
 void _2DCircle(int x, int y, int r);	// 円
 void _2DCircleF(int x, int y, int r);	// 円塗りつぶし
 void _2DPolygon(std::span<const WINDOW_POINT> p);	// ポリゴン塗りつぶし
-
 void _2DBoxA(int x1, int y1, int x2, int y2);	// α長方形
-void _2DCircleA(int x, int y, int r);	// α円塗りつぶし
-void _2DPolygonA(std::span<const WINDOW_POINT> p);	// αポリゴン塗りつぶし
 
 void DisableAlphaTable(void);
 

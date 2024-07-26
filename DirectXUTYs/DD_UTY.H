@@ -213,8 +213,6 @@ extern void (*GrpPolygon)(std::span<const WINDOW_POINT> p);	// ポリゴン塗�
 
 extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
 
-extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
-
 // ビットマップ転送(WithClip)
 // Returns `true` if any part of the sprite was blitted.
 extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);

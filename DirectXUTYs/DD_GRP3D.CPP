@@ -73,8 +73,6 @@ void _3DSetup(void)
 	GrpCircleF  = _3DCircleF;
 	GrpPolygon  = _3DPolygon;
 	GrpBoxA     = _3DBoxA;
-
-	GrpFatCircleA = _3DFatCircleA;
 }
 
 // 画面描画の準備をする //
@@ -264,7 +262,7 @@ void GrpPolygonA(std::span<const WINDOW_POINT> p)
 }
 
 // 太い半透明円描画 //
-void _3DFatCircleA(int x, int y, int r, int w)
+void GrpFatCircleA(int x, int y, int r, int w)
 {
 	int		i;
 	int		lx,ly;

@@ -97,7 +97,6 @@ void(*GrpCircle)(int x, int y, int r)               = DM_III;
 void(*GrpCircleF)(int x, int y, int r)              = DM_III;
 void (*GrpPolygon)(std::span<const WINDOW_POINT> p) = DM_PI;
 void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
-void(*GrpFatCircleA)(int x, int y, int r, int w)    = DM_IIII;
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 
 // Templating the functor avoids both the need for #including <functional> and
@@ -943,8 +942,6 @@ static void SetDummyFunc(void)
 	GrpCircleF  = DM_III;
 	GrpPolygon  = DM_PI;
 	GrpBoxA     = DM_IIII;
-
-	GrpFatCircleA = DM_IIII;
 }
 
 // ダミー関数の実体(かなり手抜き...) //

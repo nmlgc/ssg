@@ -6,6 +6,7 @@
 #include "FRAGMENT.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "DirectXUTYs/DD_GRP3D.H"
 #include "game/ut_math.h"
 #include "game/coords.h"
 

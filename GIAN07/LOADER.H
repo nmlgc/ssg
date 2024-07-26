@@ -8,8 +8,8 @@
 //#pragma message(PBGWIN_LOADER_H)
 
 #include "game/coords.h"
-#include "game/graphics.h"
 #include "game/hash.h"
+#include "game/graphics.h"
 
 struct SURFACE_DDRAW;
 

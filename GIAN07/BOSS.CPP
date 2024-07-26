@@ -250,14 +250,14 @@ void BossDraw(void)
 
 			// バリア状態 //
 			if(b->ExState == BEXST_SHILD1 && Viv.bomb_time && (e->flag&EF_DRAW)){
-				GrpLock();
+				GrpGeom->Lock();
 				for(uint8_t j = 0; j <= 5; j++) {
-					GrpSetColor({ (5u - j), (5u - j), 5u });
+					GrpGeom->SetColor({ (5u - j), (5u - j), 5u });
 					GeomCircle(
 						{ x, y }, (sinl((e->count * 4), (30 + (j * 4))) + 80)
 					);
 				}
-				GrpUnlock();
+				GrpGeom->Unlock();
 			}
 
 			switch(b->ExState){
@@ -429,8 +429,8 @@ void BossHPG_Draw(void)
 			constexpr uint8_t alpha = (128 + 64);
 			constexpr RGB216 col    = { 0, 1, 5 };
 
-			GrpLock();
-			GrpSetAlpha(alpha, ALPHA_NORM);
+			GrpGeom->Lock();
+			GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
 			if(DxObj.PixelFormat.IsChanneled()){
 				VERTEX_XY Src[4] = {
 					{ 0, top },
@@ -441,37 +441,37 @@ void BossHPG_Draw(void)
 				if(x1<x2){
 					Src[0].x = Src[3].x = x1;
 					GeomGrdRectA(Src, col.ToRGB().WithAlpha(alpha));
-				//	GrpBoxA(left, top, x1, bottom);
-					GrpSetColor({ 5, 0, 0 });
-					GrpBoxA(x1, top, x2, bottom);
+					// GrpGeom->DrawBoxA(left, top, x1, bottom);
+					GrpGeom->SetColor({ 5, 0, 0 });
+					GrpGeom->DrawBoxA(x1, top, x2, bottom);
 				}
 				else{
 					Src[0].x = Src[3].x = x2;
 					GeomGrdRectA(Src, col.ToRGB().WithAlpha(alpha));
-				//	GrpBoxA(left, top, x2, bottom);
+					// GrpGeom->DrawBoxA(left, top, x2, bottom);
 				}
 			}
 			else{
 				constexpr auto line_top = (top + 5);
 				constexpr auto line_bottom = (bottom - 4);
-				GrpSetColor(col);
+				GrpGeom->SetColor(col);
 				if(x1<x2){
-					GrpBoxA(left, top, x2, line_top);
-					GrpBoxA(left, line_bottom, x2, bottom);
-					GrpSetColor({ 5, 5, 5 });
-					GrpBoxA(left, line_top, x1, line_bottom);
-					GrpSetColor({ 5, 0, 0 });
-					GrpBoxA(x1, top, x2, bottom);
+					GrpGeom->DrawBoxA(left, top, x2, line_top);
+					GrpGeom->DrawBoxA(left, line_bottom, x2, bottom);
+					GrpGeom->SetColor({ 5, 5, 5 });
+					GrpGeom->DrawBoxA(left, line_top, x1, line_bottom);
+					GrpGeom->SetColor({ 5, 0, 0 });
+					GrpGeom->DrawBoxA(x1, top, x2, bottom);
 				}
 				else{
-					GrpBoxA(left, top, x2, line_top);
-					GrpBoxA(left, line_bottom, x2, bottom);
-					GrpSetColor({ 5, 5, 5 });
-					GrpBoxA(left, line_top, x2, line_bottom);
+					GrpGeom->DrawBoxA(left, top, x2, line_top);
+					GrpGeom->DrawBoxA(left, line_bottom, x2, bottom);
+					GrpGeom->SetColor({ 5, 5, 5 });
+					GrpGeom->DrawBoxA(left, line_top, x2, line_bottom);
 				}
 			}
 
-			GrpUnlock();
+			GrpGeom->Unlock();
 
 			// 枠の描画 //
 			src = { 0, 104, BOSSHPG_WIDTH, 128 };

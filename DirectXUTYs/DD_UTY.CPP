@@ -42,11 +42,6 @@ void RELEASE(auto*& x)
 
 // 図形描画関数に対するダミー関数 //
 static void DM_V(void);
-static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static void DM_COL(RGB216 col);
-static void DM_BB(uint8_t a, uint8_t b);
-static void DM_IIII(int a, int b, int c, int d);
-static void DM_PI(VERTEX_XY_SPAN<>);
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // クリッピング枠 //
@@ -80,20 +75,15 @@ static void GrpFlipWnd(void);
 
 // グローバル変数 //
 GRAPHICS_DDRAW	DxObj;
+GRAPHICS_GEOMETRY *GrpGeom;
+GRAPHICS_GEOMETRY_DDRAW GrpGeom_DDraw;
+GRAPHICS_GEOMETRY_D3D GrpGeom_D3D;
 SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
 DWORD			DxEnumNow;
 
 // 図形描画用関数ポインタの実体 //
 void(*GrpFlip)(void)                                = DM_V;
-void(*GrpLock)(void)                                = DM_V;
-void(*GrpUnlock)(void)                              = DM_V;
-void(*GrpSetColor)(RGB216 col)                      = DM_COL;
-void(*GrpSetAlpha)(uint8_t a, uint8_t mode)         = DM_BB;
-void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
-void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
-void (*GrpPolygon)(VERTEX_XY_SPAN<>)                = DM_PI;
-void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 
 // Templating the functor avoids both the need for #including <functional> and
@@ -257,9 +247,10 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 	}
 	catch(const bool flag) {
 		if(pixel_format.IsPalettized()) {
-			_2DSetup();
+			GrpGeom = &GrpGeom_DDraw;
+			GrpGeom_DDraw.Setup();
 		} else {
-			_3DSetup();
+			GrpGeom = &GrpGeom_D3D;
 		}
 
 		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
@@ -931,23 +922,10 @@ static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 static void SetDummyFunc(void)
 {
 	GrpFlip     = DM_V;
-	GrpLock     = DM_V;
-	GrpUnlock   = DM_V;
-	GrpSetColor = DM_COL;
-	GrpSetAlpha = DM_BB;
-	GrpLine     = DM_IIII;
-	GrpBox      = DM_IIII;
-	GrpPolygon  = DM_PI;
-	GrpBoxA     = DM_IIII;
 }
 
 // ダミー関数の実体(かなり手抜き...) //
 static void DM_V(void) {}
-static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d){};
-static void DM_COL(RGB216 col) {}
-static void DM_BB(uint8_t a, uint8_t b) {}
-static void DM_IIII(int a, int b, int c, int d) {}
-static void DM_PI(VERTEX_XY_SPAN<>) {}
 
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {

@@ -14,24 +14,25 @@
 
 
 // ヘッダファイル //
-import std.compat;
-#include "game/graphics.h"
 #include "platform/graphics_backend.h"
 
+class GRAPHICS_GEOMETRY_DDRAW : public GRAPHICS_GEOMETRY {
+public:
+	// Generic methods
+	// ---------------
 
-// 関数 //
-void _2DSetup(void);	// 描画系関数ポインタをセットする
+	void Lock(void) final;
+	void Unlock(void) final;
+	void SetColor(RGB216 col) final;
+	void SetAlpha(uint8_t a, GRAPHICS_ALPHA mode) final;
+	void DrawLine(int x1, int y1, int x2, int y2) final;
+	void DrawBox(int x1, int y1, int x2, int y2) final;
+	void DrawBoxA(int x1, int y1, int x2, int y2) final;
+	void DrawTriangleFan(VERTEX_XY_SPAN<>) final;
+	// ----------
 
-void _2DLock(void);	// 画面描画の準備をする
-void _2DUnlock(void);	// 画面描画を完了する
-
-void _2DSetColor(RGB216 col);	// 色セット
-void _2DSetAlpha(uint8_t a, uint8_t mode);	// αセット
-
-void _2DLine(int x1, int y1, int x2, int y2);	// 直線
-void _2DBox(int x1, int y1, int x2, int y2);	// 長方形
-void _2DPolygon(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
-void _2DBoxA(int x1, int y1, int x2, int y2);	// α長方形
+	void Setup(void);	// 描画系関数ポインタをセットする
+};
 
 void GrpPoint(WINDOW_POINT p);
 void GrpHLine(int x1, int x2, int y);

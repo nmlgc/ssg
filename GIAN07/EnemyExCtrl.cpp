@@ -7,7 +7,7 @@
 #include "LLASER.H"
 #include "LOADER.H"
 #include "MAID.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
@@ -511,8 +511,8 @@ void BitLineDraw(void)
 		RefTable[i] = RefTable[i + n] = BitData.Bit[j].pEnemy;
 	}
 
-	GrpLock();
-	GrpSetColor({ 4, 4, 5 });
+	GrpGeom->Lock();
+	GrpGeom->SetColor({ 4, 4, 5 });
 
 	for(i=0; i<n; i++){
 		if(n >= 5) j = i + 2;
@@ -522,10 +522,10 @@ void BitLineDraw(void)
 		y1 = RefTable[i]->y >> 6;
 		x2 = RefTable[j]->x >> 6;
 		y2 = RefTable[j]->y >> 6;
-		GrpLine(x1, y1, x2, y2);
+		GrpGeom->DrawLine(x1, y1, x2, y2);
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 

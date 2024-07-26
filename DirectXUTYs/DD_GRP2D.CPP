@@ -13,6 +13,8 @@
 #pragma message(PBGWIN_DD_GRP2D_H)
 
 #define ATABLE_MAX	8
+#define ALPHA_ONE	0x00	// 一種の加算α
+#define ALPHA_NORM	0x01	// ノーマルなSrc-α
 
 typedef struct tagAlphaInfo {
 	DWORD	CheckValue;
@@ -45,31 +47,21 @@ static void _2DUpdateAlphaTable(void);	// αテーブルを更新する
 
 
 // 描画系関数ポインタをセットする //
-void _2DSetup(void)
+void GRAPHICS_GEOMETRY_DDRAW::Setup(void)
 {
-	// 関数ポインタをセットする //
-	GrpLock     = _2DLock;
-	GrpUnlock   = _2DUnlock;
-	GrpSetColor = _2DSetColor;
-	GrpSetAlpha = _2DSetAlpha;
-	GrpLine     = _2DLine;
-	GrpBox      = _2DBox;
-	GrpPolygon  = _2DPolygon;
-	GrpBoxA     = _2DBoxA;
-
 	// 固有の処理(この関数はSurfaceが存在するときに呼ばれるはず) //
-	_2DLock();
+	Lock();
 	for(const auto i : std::views::iota(0, GRP_RES.h)) {
 		Grp_AddrY[i] = (i * Grp_Pitch);
 	}
-	_2DUnlock();
+	Unlock();
 
 	// テーブル初期化要求を発行 //
 	DisableAlphaTable();
 }
 
 // 画面描画の準備をする //
-void _2DLock(void)
+void GRAPHICS_GEOMETRY_DDRAW::Lock(void)
 {
 	DDSURFACEDESC	ddsd;
 
@@ -82,7 +74,7 @@ void _2DLock(void)
 }
 
 // 画面描画を完了する //
-void _2DUnlock(void)
+void GRAPHICS_GEOMETRY_DDRAW::Unlock(void)
 {
 	DxObj.Back->Unlock(NULL);
 	Grp_Vram  = NULL;
@@ -90,7 +82,7 @@ void _2DUnlock(void)
 }
 
 // 色セット //
-void _2DSetColor(RGB216 col)
+void GRAPHICS_GEOMETRY_DDRAW::SetColor(RGB216 col)
 {
 	Col2D_R = col.r;
 	Col2D_G = col.g;
@@ -100,16 +92,16 @@ void _2DSetColor(RGB216 col)
 }
 
 // αセット //
-void _2DSetAlpha(uint8_t a, uint8_t mode)
+void GRAPHICS_GEOMETRY_DDRAW::SetAlpha(uint8_t a, GRAPHICS_ALPHA mode)
 {
 	Col2D_A    = a;
-	Col2D_Mode = mode;
+	Col2D_Mode = std::to_underlying(mode);
 
 	AlphaFlag = TRUE;
 }
 
 // 直線 //
-void _2DLine(int x1, int y1, int x2, int y2)
+void GRAPHICS_GEOMETRY_DDRAW::DrawLine(int x1, int y1, int x2, int y2)
 {
 	int sx,sy,dx,dy,s,i;
 	const auto c = Col2D;
@@ -152,7 +144,7 @@ void _2DLine(int x1, int y1, int x2, int y2)
 }
 
 // 長方形 //
-void _2DBox(int x1, int y1, int x2, int y2)
+void GRAPHICS_GEOMETRY_DDRAW::DrawBox(int x1, int y1, int x2, int y2)
 {
 	int i;
 
@@ -173,7 +165,7 @@ void GrpPoint(WINDOW_POINT p)
 }
 
 // α長方形 //
-void _2DBoxA(int x1, int y1, int x2, int y2)
+void GRAPHICS_GEOMETRY_DDRAW::DrawBoxA(int x1, int y1, int x2, int y2)
 {
 	int i;
 

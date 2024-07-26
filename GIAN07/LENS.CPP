@@ -134,7 +134,7 @@ void LensInfo::Draw(WINDOW_POINT center)
 
 	// 転送先はロックされているかな //
 	if(!__BackSurfLock()) return;
-//	GrpLock();
+	// GrpGeom->Lock();
 //	if(Grp_Vram == NULL) return;
 
 	std::visit([this, &left, &top](auto pixel) {
@@ -168,5 +168,5 @@ void LensInfo::Draw(WINDOW_POINT center)
 	}, DxObj.PixelFormat);
 
 	__BackSurfUnlock();
-	//GrpUnlock();
+	// GrpGeom->Unlock();
 }

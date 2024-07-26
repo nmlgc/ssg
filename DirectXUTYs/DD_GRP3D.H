@@ -15,25 +15,23 @@
 
 
 // ヘッダファイル //
-import std.compat;
 #include "platform/graphics_backend.h"
-#include "game/graphics.h"
 
+class GRAPHICS_GEOMETRY_D3D : public GRAPHICS_GEOMETRY {
+public:
+	// Generic methods
+	// ---------------
 
-// 関数 //
-void _3DSetup(void);	// 描画系関数ポインタをセットする
-
-void _3DLock(void);	// 画面描画の準備をする
-void _3DUnlock(void);	// 画面描画を完了する
-
-void _3DSetColor(RGB216 col);	// 色セット
-void _3DSetAlpha(uint8_t a, uint8_t mode);	// αセット
-
-void _3DLine(int x1, int y1, int x2, int y2);	// 直線
-void _3DBox(int x1, int y1, int x2, int y2);	// 長方形
-void _3DPolygon(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
-void _3DBoxA(int x1, int y1, int x2, int y2);	// α長方形
-
+	void Lock(void) final;
+	void Unlock(void) final;
+	void SetColor(RGB216 col) final;
+	void SetAlpha(uint8_t a, GRAPHICS_ALPHA mode) final;
+	void DrawLine(int x1, int y1, int x2, int y2) final;
+	void DrawBox(int x1, int y1, int x2, int y2) final;
+	void DrawBoxA(int x1, int y1, int x2, int y2) final;
+	void DrawTriangleFan(VERTEX_XY_SPAN<>) final;
+	// ----------
+};
 
 // ３Ｄ専用関数 //
 void GrpLineStrip(VERTEX_XY_SPAN<> xys);
@@ -43,7 +41,6 @@ void GrpTriangles(
 void GrpTrianglesA(
 	TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
 );
-void GrpPolygonA(VERTEX_XY_SPAN<> p);	// αポリゴン塗りつぶし
 void GrpGrdLineEx(int x, int y1, int y2);	// スペアな用グラデーションライン
 
 

@@ -10,7 +10,7 @@
 #include "PRankCtrl.h"
 #include "GIAN.H"
 #include "GIAN07/entity.h"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/ut_math.h"
 
 
@@ -209,7 +209,7 @@ void laser_draw(void)
 {
 	int				i;
 
-	GrpLock();
+	GrpGeom->Lock();
 
 	for(i=0;i<LaserNow;i++){
 		auto* lp = &Laser[LaserInd[i]];
@@ -236,7 +236,7 @@ void laser_draw(void)
 	}
 	*/
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 void laser_clear(void)
@@ -367,10 +367,10 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 
 
 	if(lp->flag==LF_CLEAR){
-		// GrpSetColor(laser_color[lp->c]);
-		GrpSetColor(col);
-		GrpLine(lp->p[0].x,lp->p[0].y,lp->p[1].x,lp->p[1].y);
-		GrpLine(lp->p[3].x,lp->p[3].y,lp->p[2].x,lp->p[2].y);
+		// GrpGeom->SetColor(laser_color[lp->c]);
+		GrpGeom->SetColor(col);
+		GrpGeom->DrawLine(lp->p[0].x, lp->p[0].y, lp->p[1].x, lp->p[1].y);
+		GrpGeom->DrawLine(lp->p[3].x, lp->p[3].y, lp->p[2].x, lp->p[2].y);
 		return;
 	}
 
@@ -383,18 +383,18 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
  *  んなもんで、ここでは GrpSetAlpha を無効にしている
  */
 
-	//GrpSetAlpha(0,ALPHA_ONE);
-	// GrpSetColor({ 4, 1, 0 });
-//	GrpSetAlpha(128,ALPHA_ONE);		// 2000/09/06 に削除
+	// GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+	// GrpGeom->SetColor({ 4, 1, 0 });
+	// GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);	// 2000/09/06 に削除
 
 	if(DxObj.PixelFormat.IsChanneled()) {
 		GeomGrdRect(lp->p, col.ToRGB());
 	}
 	else{
-		GrpSetColor(col);
-		GrpPolygon(lp->p);
+		GrpGeom->SetColor(col);
+		GrpGeom->DrawTriangleFan(lp->p);
 
-		GrpSetColor({ 5, 5, 5 });
+		GrpGeom->SetColor({ 5, 5, 5 });
 
 		VERTEX_XY p[4];
 		p[0].x = p[1].x = lp->p[0].x - lp->wx*3/4;//- wx*4/len;
@@ -405,12 +405,12 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 		p[1].y += lp->ly;
 		p[2].x += lp->lx;
 		p[2].y += lp->ly;
-		GrpPolygon(p);
-		//GrpLine(lp->p[0].x,lp->p[0].y,lp->p[1].x,lp->p[1].y);
-		//GrpLine(lp->p[2].x,lp->p[2].y,lp->p[3].x,lp->p[3].y);
-		//GrpPolygon(lp->p,4);
-		// GrpSetColor({ 5, 5, 5 });
-		//GrpLine(x,y,x+lp->lx,y+lp->ly);
+		GrpGeom->DrawTriangleFan(p);
+		// GrpGeom->DrawLine(lp->p[0].x, lp->p[0].y, lp->p[1].x, lp->p[1].y);
+		// GrpGeom->DrawLine(lp->p[2].x, lp->p[2].y, lp->p[3].x, lp->p[3].y);
+		// GrpGeom->DrawTriangleFan(lp->p, 4);
+		// GrpGeom->SetColor({ 5, 5, 5 });
+		// GrpGeom->DrawLine(x, y, (x + lp->lx), (y + lp->ly));
 	}
 	//Grp_Polygon(temp,4,RGB256(5,5,5));
 }

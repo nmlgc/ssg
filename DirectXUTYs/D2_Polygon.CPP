@@ -6,6 +6,7 @@
 #include "DD_CLIP2D.H"
 #include "game/cast.h"
 #include "constants.h"
+#include "DirectXUTYs/DD_GRP2D.H"
 
 
 //// [更新履歴] ////
@@ -53,7 +54,7 @@ static int DrawTrapezoid(int y, int dy);	// 台形の描画
 
 
 // ポリゴンの描画 //
-void _2DPolygon(VERTEX_XY_SPAN<> p)
+void GRAPHICS_GEOMETRY_DDRAW::DrawTriangleFan(VERTEX_XY_SPAN<> p)
 {
 	int		i,j,dy;
 	int		nLeft,nRight;

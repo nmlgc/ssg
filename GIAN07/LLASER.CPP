@@ -6,7 +6,7 @@
 #include "LLASER.H"
 #include "GEOMETRY.H"
 #include "MAID.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
 
@@ -292,7 +292,7 @@ extern void LLaserDraw(void)
 	constexpr size_t VERTEX_COUNT = 34;
 	std::array<VERTEX_XY, VERTEX_COUNT> p2;
 
-	GrpLock();
+	GrpGeom->Lock();
 
 	for(const auto& it : LLaser) {
 		const auto *lp = &it;
@@ -319,9 +319,9 @@ extern void LLaserDraw(void)
 					p[2].y += lp->infy;
 					*/
 					if(DxObj.PixelFormat.IsChanneled()) {
-						// GrpSetColor({ 3, 0, 3 });
+						// GrpGeom->SetColor({ 3, 0, 3 });
 						const RGBA col = Table16Bit[c].ToRGB().WithAlpha(0xFF);
-						GrpSetAlpha(0,ALPHA_ONE);
+						GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
 						GeomGrdRectA(lp->p, col);
 
 						std::array<VERTEX_RGBA, VERTEX_COUNT> vcs;
@@ -343,9 +343,9 @@ extern void LLaserDraw(void)
 						GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p2, vcs);
 						break;
 					}
-					// GrpSetColor({ 2, 0, 2 });
-					GrpSetColor(Table8BitA[c]);
-					GrpPolygon(lp->p);
+					// GrpGeom->SetColor({ 2, 0, 2 });
+					GrpGeom->SetColor(Table8BitA[c]);
+					GrpGeom->DrawTriangleFan(lp->p);
 				}
 				else if(DxObj.PixelFormat.IsChanneled()) {
 					break;
@@ -353,8 +353,8 @@ extern void LLaserDraw(void)
 
 				GeomCircleF({ x, y }, len); // (lp->w >> 6) + 4);
 
-				// GrpSetColor({ 3, 0, 3 }); // lp->c;
-				GrpSetColor(Table8BitB[c]);
+				// GrpGeom->SetColor({ 3, 0, 3 }); // lp->c;
+				GrpGeom->SetColor(Table8BitB[c]);
 				if(len){
 					p[0].x = p[1].x = lp->p[0].x - wx/8;//+ wx*2/len;
 					p[0].y = p[1].y = lp->p[0].y - wy/8;//+ wy*2/len;
@@ -364,12 +364,12 @@ extern void LLaserDraw(void)
 					p[1].y += lp->infy;
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
-					GrpPolygon(p);
+					GrpGeom->DrawTriangleFan(p);
 				}
 				GeomCircleF({ x, y }, (len - len / 8)); // (lp->w >> 6) + 2);
 
-				// GrpSetColor({ 5, 4, 5 }); // lp->c;
-				GrpSetColor(Table8BitC[c]);
+				// GrpGeom->SetColor({ 5, 4, 5 }); // lp->c;
+				GrpGeom->SetColor(Table8BitC[c]);
 				if(len){
 					p[0].x = p[1].x = lp->p[0].x - wx/4;//+ wx*2/len;
 					p[0].y = p[1].y = lp->p[0].y - wy/4;//+ wy*2/len;
@@ -379,18 +379,18 @@ extern void LLaserDraw(void)
 					p[1].y += lp->infy;
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
-					GrpPolygon(p);
+					GrpGeom->DrawTriangleFan(p);
 				}
-				GeomCircleF({ x, y }, (len - len / 4)); //lp->w >> 6);
+				GeomCircleF({ x, y }, (len - len / 4)); // (lp->w >> 6));
 			break;
 
 			// ライン状態の場合 //
 			case(LLF_LINE):
 				x = (lp->x)>>6;
 				y = (lp->y)>>6;
-				GrpSetColor({ 4, 4, 4 });
-				GrpLine(x,y,x+(lp->infx),y+(lp->infy));
-			break;
+				GrpGeom->SetColor({ 4, 4, 4 });
+				GrpGeom->DrawLine(x, y, (x + lp->infx), (y + lp->infy));
+				break;
 
 			// 使用中で無い場合 //
 			case(LLF_DISABLE):
@@ -398,7 +398,7 @@ extern void LLaserDraw(void)
 		}
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 extern void LLaserClear(void)

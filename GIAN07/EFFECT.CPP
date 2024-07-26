@@ -71,7 +71,7 @@ void CEffectDraw(void)
 	int					x1, x2, y1, y2;
 	static BYTE dtable[4] = {0, 1, 3, 7};
 
-	GrpLock();
+	GrpGeom->Lock();
 
 	for(const auto& it : CEffect) {
 		const auto *ce = &it;
@@ -80,13 +80,13 @@ void CEffectDraw(void)
 				for(uint8_t k = 0; k < 4; k++) {
 					r = ce->r - k*7;
 					if(r < 0) continue;
-					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
+					GrpGeom->SetColor({ 5u, (k + 2u), (k + 2u) });
 					for(j=0; j<5; j++){
 						x1 = ce->x + cosl(ce->d + dtable[k]*ce->count/10 + j*256/5, r);
 						y1 = ce->y + sinl(ce->d + dtable[k]*ce->count/10 + j*256/5, r);
 						x2 = ce->x + cosl(ce->d + dtable[k]*ce->count/10 + (j+2)*256/5, r);
 						y2 = ce->y + sinl(ce->d + dtable[k]*ce->count/10 + (j+2)*256/5, r);
-						GrpLine(x1, y1, x2, y2);
+						GrpGeom->DrawLine(x1, y1, x2, y2);
 					}
 				}
 			break;
@@ -95,7 +95,7 @@ void CEffectDraw(void)
 				for(uint8_t k = 0; k < 4; k++) {
 					r = ce->r - max(2, (k * ce->r)/8);
 					if(r < 0) continue;
-					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
+					GrpGeom->SetColor({ 5u, (k + 2u), (k + 2u) });
 					GeomCircle({ ce->x, ce->y }, r);
 				}
 			break;
@@ -105,14 +105,14 @@ void CEffectDraw(void)
 					r = ce->r - max(2, (k * ce->r)/12);
 					//r = ce->r - max(2, (k * (600-ce->r))/16);
 					if(r < 0) continue;
-					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
+					GrpGeom->SetColor({ 5u, (k + 2u), (k + 2u) });
 					GeomCircle({ ce->x, ce->y }, r);
 				}
 			break;
 		}
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 // 円エフェクトをセットする //
@@ -363,13 +363,14 @@ void SEffectDraw(void)
 				x = (e->x >> 6) + 8;
 				y = (e->y >> 6) + 8;
 				j = (35 - e->time) / 2;
-				GrpLock();
-				GrpSetColor({ 0, 0, 0 });
-				GrpSetAlpha(
-					Cast::down<uint8_t>((35 - e->time) * 3), ALPHA_NORM
+				GrpGeom->Lock();
+				GrpGeom->SetColor({ 0, 0, 0 });
+				GrpGeom->SetAlpha(
+					Cast::down<uint8_t>((35 - e->time) * 3),
+					GRAPHICS_ALPHA::NORM
 				);
-				GrpBoxA(x-170,y-j,x+170,y+j);
-				GrpUnlock();
+				GrpGeom->DrawBoxA((x - 170), (y - j), (x + 170), (y + j));
+				GrpGeom->Unlock();
 
 				strcpy(buf,"GAME OVER");
 				for(j=0;j<9;j++){
@@ -417,17 +418,22 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_MTITLE2): {
-				GrpLock();
-				GrpSetColor({ 0, 0, 0 });
-				GrpSetAlpha(
+				GrpGeom->Lock();
+				GrpGeom->SetColor({ 0, 0, 0 });
+				GrpGeom->SetAlpha(
 					(sinl(Cast::down<uint8_t>(e->time - 32), 80) + 80),
-					ALPHA_NORM
+					GRAPHICS_ALPHA::NORM
 				);
 				for(j=0;j<16;j++){
 					temp = sinl(128+j*16,16);
-					GrpBoxA((e->x>>6)+temp-16,(e->y>>6)+j,(X_MAX-16)-temp,(e->y>>6)+j+1);
+					GrpGeom->DrawBoxA(
+						((e->x >> 6) + temp - 16),
+						((e->y >> 6) + j),
+						((X_MAX - 16) - temp),
+						((e->y >> 6) + j + 1)
+					);
 				}
-				GrpUnlock();
+				GrpGeom->Unlock();
 				src = { 0, 0, e->vx, e->vy };
 				TextObj.Blit({ (e->x >> 6), (e->y >> 6) }, MTitleRect, src);
 			}
@@ -750,7 +756,7 @@ void GrpDrawSpect(int x, int y)
 
 	//GrpBlt(&src,SPECT_X-7,SPECT_Y,GrTama);
 
-	GrpLock();
+	GrpGeom->Lock();
 
 	if(DxObj.PixelFormat.IsChanneled()){
 		for(i=0;i<128+8+8;i++){
@@ -759,14 +765,16 @@ void GrpDrawSpect(int x, int y)
 		}
 	}
 	else{
-		GrpSetColor({ 4, 2, 1 });
+		GrpGeom->SetColor({ 4, 2, 1 });
 		for(i=0;i<128+8+8;i++){
 			//WORD c2 = 0;	//5
-			if(ftable[i])	GrpLine(i+x,y-ftable[i]*2,i+x,y);
+			if(ftable[i]) {
+				GrpGeom->DrawLine((i + x), (y - (ftable[i] * 2)), (i + x), y);
+			}
 		}
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 // 押されているところを表示 //
@@ -919,15 +927,15 @@ void WarningEffectDraw(void)
 		DrawWarning();
 
 	if(WarnEfcTime>256-40){
-		GrpLock();
+		GrpGeom->Lock();
 
 		r = (WarnEfcTime-(256-40))*3;
-		GrpSetColor({ 1, 1, 5 });	GeomCircle({ 320, 100 }, (r -= 4));
-		GrpSetColor({ 2, 2, 5 });	GeomCircle({ 320, 100 }, (r -= 4));
-		GrpSetColor({ 3, 3, 5 });	GeomCircle({ 320, 100 }, (r -= 6));
-		GrpSetColor({ 4, 4, 5 });	GeomCircle({ 320, 100 }, (r -= 6));
-		GrpSetColor({ 5, 5, 5 });	GeomCircle({ 320, 100 }, (r -= 8));
+		GrpGeom->SetColor({ 1, 1, 5 });	GeomCircle({ 320, 100 }, (r -= 4));
+		GrpGeom->SetColor({ 2, 2, 5 });	GeomCircle({ 320, 100 }, (r -= 4));
+		GrpGeom->SetColor({ 3, 3, 5 });	GeomCircle({ 320, 100 }, (r -= 6));
+		GrpGeom->SetColor({ 4, 4, 5 });	GeomCircle({ 320, 100 }, (r -= 6));
+		GrpGeom->SetColor({ 5, 5, 5 });	GeomCircle({ 320, 100 }, (r -= 8));
 
-		GrpUnlock();
+		GrpGeom->Unlock();
 	}
 }

@@ -66,21 +66,8 @@ inline bool AlphaEnable(bool flag)
 }
 
 
-// 描画系関数ポインタをセットする //
-void _3DSetup(void)
-{
-	GrpLock     = _3DLock;
-	GrpUnlock   = _3DUnlock;
-	GrpSetColor = _3DSetColor;
-	GrpSetAlpha = _3DSetAlpha;
-	GrpLine     = _3DLine;
-	GrpBox      = _3DBox;
-	GrpPolygon  = _3DPolygon;
-	GrpBoxA     = _3DBoxA;
-}
-
 // 画面描画の準備をする //
-void _3DLock(void)
+void GRAPHICS_GEOMETRY_D3D::Lock(void)
 {
 	D3DRECT d3drc = { 0, 0, GRP_RES.w, GRP_RES.h };
 	HRESULT			dxret;
@@ -110,7 +97,7 @@ void _3DLock(void)
 }
 
 // 画面描画を完了する //
-void _3DUnlock(void)
+void GRAPHICS_GEOMETRY_D3D::Unlock(void)
 {
 	// 描き込み終了 //
 	DxObj.D3Dev->EndScene();
@@ -118,7 +105,7 @@ void _3DUnlock(void)
 }
 
 // 色セット //
-void _3DSetColor(RGB216 col)
+void GRAPHICS_GEOMETRY_D3D::SetColor(RGB216 col)
 {
 	const auto rgb = col.ToRGB();
 	Col3D.r = rgb.r;
@@ -127,17 +114,17 @@ void _3DSetColor(RGB216 col)
 }
 
 // αセット //
-void _3DSetAlpha(uint8_t a, uint8_t mode)
+void GRAPHICS_GEOMETRY_D3D::SetAlpha(uint8_t a, GRAPHICS_ALPHA mode)
 {
 	Col3D.a = a;
 
 	switch(mode){
-		case(ALPHA_ONE):
+		case(GRAPHICS_ALPHA::ONE):
 			DxObj.D3Dev->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_ONE);
 			DxObj.D3Dev->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_ONE);
 		break;
 
-		case(ALPHA_NORM):
+		case(GRAPHICS_ALPHA::NORM):
 			DxObj.D3Dev->SetRenderState(D3DRENDERSTATE_SRCBLEND,D3DBLEND_BOTHSRCALPHA);
 			DxObj.D3Dev->SetRenderState(D3DRENDERSTATE_DESTBLEND,D3DBLEND_BOTHSRCALPHA);
 		break;
@@ -145,7 +132,7 @@ void _3DSetAlpha(uint8_t a, uint8_t mode)
 }
 
 // 直線 //
-void _3DLine(int x1, int y1, int x2, int y2)
+void GRAPHICS_GEOMETRY_D3D::DrawLine(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 
@@ -156,7 +143,7 @@ void _3DLine(int x1, int y1, int x2, int y2)
 }
 
 // 長方形 //
-void _3DBox(int x1, int y1, int x2, int y2)
+void GRAPHICS_GEOMETRY_D3D::DrawBox(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 
@@ -200,32 +187,25 @@ void GrpTrianglesA(
 	AlphaEnable(FALSE);
 }
 
-// ポリゴン塗りつぶし //
-void _3DPolygon(VERTEX_XY_SPAN<> p)
+void GRAPHICS_GEOMETRY_D3D::DrawTriangleFan(VERTEX_XY_SPAN<> p)
 {
 	return GrpTriangles(TRIANGLE_PRIMITIVE::FAN, p);
 }
 
 // α長方形 //
-void _3DBoxA(int x1, int y1, int x2, int y2)
+void GRAPHICS_GEOMETRY_D3D::DrawBoxA(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
 	AlphaEnable(TRUE);
-	_3DBox(x1, y1, x2, y2);
+	DrawBox(x1, y1, x2, y2);
 	AlphaEnable(FALSE);
-}
-
-// αポリゴン塗りつぶし //
-void GrpPolygonA(VERTEX_XY_SPAN<> p)
-{
-	return GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
 }
 
 void GrpGrdLineEx(int x, int y1, int y2)
 {
 	if(!bLocked) return;
 
-	//GrpSetAlpha(128,ALPHA_NORM);
+	// SetAlpha(128, GRAPHICS_ALPHA::NORM);
 	constexpr RGB c1 = { 200,   0, 0 };
 	constexpr RGB c2 = { 250, 250, 0 };
 

@@ -155,18 +155,21 @@ void DrawWarning(void)
 	count+=8;
 
 	if(Warning[0].DegX == 0) {
-		GrpLock();
-		GrpSetAlpha(
-			Cast::down_sign<uint8_t>(128 + sinl(count, 48)), ALPHA_NORM
+		GrpGeom->Lock();
+		GrpGeom->SetAlpha(
+			Cast::down_sign<uint8_t>(128 + sinl(count, 48)),
+			GRAPHICS_ALPHA::NORM
 		);
-		GrpSetColor({ 5, 0, 0 });
-		GrpBoxA(129,40+6,128+384,60+6);
-		GrpBoxA(129,60+(232-152)-4,128+384,80+(232-152)-4);
-		GrpUnlock();
+		GrpGeom->SetColor({ 5, 0, 0 });
+		GrpGeom->DrawBoxA(129, (40 + 6), (128 + 384), (60 + 6));
+		GrpGeom->DrawBoxA(
+			129, (60 + (232 - 152) - 4), (128 + 384), (80 + (232 - 152) - 4)
+		);
+		GrpGeom->Unlock();
 		GrpBlt(&src,128+1,60+1,GrTama);
 	}
 	else{
-		GrpLock();
+		GrpGeom->Lock();
 
 		if(Warning[0].DegX < 10) {
 			st=0;
@@ -183,13 +186,14 @@ void DrawWarning(void)
 			det = 2;
 		}
 
-		GrpSetColor({ 1, 1, 5 });	MoveWarningR(st); 	DrawLineList3D(Warning);
-		GrpSetColor({ 2, 2, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
-		GrpSetColor({ 3, 3, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
-		GrpSetColor({ 4, 4, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
-		GrpSetColor({ 5, 5, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
+		const auto draw = DrawLineList3D;
+		GrpGeom->SetColor({ 1, 1, 5 });	MoveWarningR(st); 	draw(Warning);
+		GrpGeom->SetColor({ 2, 2, 5 });	MoveWarningR(det);	draw(Warning);
+		GrpGeom->SetColor({ 3, 3, 5 });	MoveWarningR(det);	draw(Warning);
+		GrpGeom->SetColor({ 4, 4, 5 });	MoveWarningR(det);	draw(Warning);
+		GrpGeom->SetColor({ 5, 5, 5 });	MoveWarningR(det);	draw(Warning);
 
-		GrpUnlock();
+		GrpGeom->Unlock();
 	}
 }
 
@@ -236,7 +240,7 @@ void DrawLineList3D(std::span<const LineList3D> w)
 			line_p[1] = roll(llist, point);
 			const auto p1 = (PIXEL_POINT{ 320, 100 } + line_p[0].ToPixel());
 			const auto p2 = (PIXEL_POINT{ 320, 100 } + line_p[1].ToPixel());
-			GrpLine(p1.x, p1.y, p2.x, p2.y);
+			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
 			std::swap(line_p[1], line_p[0]);
 		}
 	}
@@ -294,11 +298,11 @@ void Draw3DCube(void)
 		GrpBlt(&rc, it.x, it.y, GrTama);
 	}
 
-	GrpLock();
+	GrpGeom->Lock();
 	for(const auto& it : Cube) {
 		__Draw3DCube(&it);
 	}
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 
@@ -360,8 +364,8 @@ static void __Draw3DCube(const Cube3D *c)
 
 	l2  = l;
 
-	// GrpSetColor({ 1, 1, 2 });
-	GrpSetColor({ 1, 1, 3 });
+	// GrpGeom->SetColor({ 1, 1, 2 });
+	GrpGeom->SetColor({ 1, 1, 3 });
 	for(x=-1; x<=1; x++){
 		for(y=-1; y<=1; y++){
 			p1.x = x * l;
@@ -376,11 +380,11 @@ static void __Draw3DCube(const Cube3D *c)
 			Transform3D(&p2, dx, dy, dz);
 			ShiftRight6Bit(&o,&p2);
 
-			GrpLine(p1.x, p1.y, p2.x, p2.y);
+			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
 		}
 	}
 
-	GrpSetColor({ 0, 0, 3 });
+	GrpGeom->SetColor({ 0, 0, 3 });
 	for(y=-1; y<=1; y++){
 		for(z=-1; z<=1; z++){
 			p1.x =    -l2;
@@ -395,12 +399,12 @@ static void __Draw3DCube(const Cube3D *c)
 			Transform3D(&p2, dx, dy, dz);
 			ShiftRight6Bit(&o,&p2);
 
-			GrpLine(p1.x, p1.y, p2.x, p2.y);
+			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
 		}
 	}
 
-	// GrpSetColor({ 1, 1, 3 });
-	GrpSetColor({ 1, 1, 4 });
+	// GrpGeom->SetColor({ 1, 1, 3 });
+	GrpGeom->SetColor({ 1, 1, 4 });
 	for(x=-1; x<=1; x++){
 		for(z=-1; z<=1; z++){
 			p1.x = x * l;
@@ -415,7 +419,7 @@ static void __Draw3DCube(const Cube3D *c)
 			Transform3D(&p2, dx, dy, dz);
 			ShiftRight6Bit(&o,&p2);
 
-			GrpLine(p1.x, p1.y, p2.x, p2.y);
+			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
 		}
 	}
 }
@@ -473,30 +477,30 @@ void DrawEffectFakeECL(void)
 	PIXEL_LTRB	src;
 	int		i,j;
 
-	GrpLock();
+	GrpGeom->Lock();
 
-	// GrpSetColor({ 3, 2, 0 });	// 後半戦用
-	GrpSetColor({ 0, 2, 0 });
-	// GrpSetColor({ 0, 0, 3 });
+	// GrpGeom->SetColor({ 3, 2, 0 });	// 後半戦用
+	GrpGeom->SetColor({ 0, 2, 0 });
+	// GrpGeom->SetColor({ 0, 0, 3 });
 
 	for(i=128-WFLine.ox/2; i<640-128; i+=32)
-		GrpLine(i,0,i,480);
+		GrpGeom->DrawLine(i, 0, i, 480);
 
 	for(j=WFLine.oy/2; j<480; j+=32)
-		GrpLine(128,j,640-128,j);
+		GrpGeom->DrawLine(128, j, (640 - 128), j);
 
 
-	// GrpSetColor({ 5, 3, 0 });	// 後半戦用
-	GrpSetColor({ 0, 3, 0 });
-	// GrpSetColor({ 0, 0, 4 });
+	// GrpGeom->SetColor({ 5, 3, 0 });	// 後半戦用
+	GrpGeom->SetColor({ 0, 3, 0 });
+	// GrpGeom->SetColor({ 0, 0, 4 });
 
 	for(i=128-WFLine.ox; i<640-128; i+=64)
-		GrpLine(i,0,i,480);
+		GrpGeom->DrawLine(i, 0, i, 480);
 
 	for(j=-WFLine.oy; j<480; j+=64)
-		GrpLine(128,j,640-128,j);
+		GrpGeom->DrawLine(128, j, (640 - 128), j);
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 
 	for(const auto& it : FakeECLStr) {
 		src = PIXEL_LTWH{it.SrcX, it.SrcY, 72, 16};

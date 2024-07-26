@@ -65,7 +65,7 @@ void LaserBombDraw(void)
 
 	LaserDeg = GetLaserDeg();
 
-	GrpLock();
+	GrpGeom->Lock();
 	if(LaserDeg<58){
 		for(w=3;w>0;w--){
 			for(i=-3;i<=3;i++){
@@ -81,16 +81,16 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetAlpha(0,ALPHA_ONE);
+					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
 					switch(w){
-					case(1):	GrpSetColor({ 4, 4, 5 });	break;
-					case(2):	GrpSetColor({ 2, 2, 5 });	break;
-					case(3):	GrpSetColor({ 0, 0, 5 });	break;
+					case(1):	GrpGeom->SetColor({ 4, 4, 5 });	break;
+					case(2):	GrpGeom->SetColor({ 2, 2, 5 });	break;
+					case(3):	GrpGeom->SetColor({ 0, 0, 5 });	break;
 					}
-					GrpPolygon(p);
+					GrpGeom->DrawTriangleFan(p);
 				}
 			}
 			for(i=-3;i<=3;i++){
@@ -106,16 +106,16 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetAlpha(0,ALPHA_ONE);
+					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
 					switch(w){
-					case(1):	GrpSetColor({ 4, 4, 5 });	break;
-					case(2):	GrpSetColor({ 2, 2, 5 });	break;
-					case(3):	GrpSetColor({ 0, 0, 5 });	break;
+					case(1):	GrpGeom->SetColor({ 4, 4, 5 });	break;
+					case(2):	GrpGeom->SetColor({ 2, 2, 5 });	break;
+					case(3):	GrpGeom->SetColor({ 0, 0, 5 });	break;
 					}
-					GrpPolygon(p);
+					GrpGeom->DrawTriangleFan(p);
 				}
 			}
 			if(DxObj.PixelFormat.IsChanneled()) break;
@@ -137,12 +137,12 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetAlpha(0,ALPHA_ONE);
+					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
-					GrpSetColor({ c, c, 5u });
-					GrpPolygon(p);
+					GrpGeom->SetColor({ c, c, 5u });
+					GrpGeom->DrawTriangleFan(p);
 				}
 			}
 			for(i=-3;i<=3;i++){
@@ -158,19 +158,19 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetAlpha(0,ALPHA_ONE);
+					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
-					GrpSetColor({ c, c, 5u });
-					GrpPolygon(p);
+					GrpGeom->SetColor({ c, c, 5u });
+					GrpGeom->DrawTriangleFan(p);
 				}
 			}
 			if(DxObj.PixelFormat.IsChanneled()) break;
 		}
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 extern void MaidDraw(void)
@@ -224,16 +224,24 @@ extern void StateDraw(void)
 
 	// 残りかすり時間ゲージの表示 //
 	if(Viv.evade_c){
-		GrpLock();
-		GrpSetColor({ 5, 1, 0 });
-		GrpSetAlpha(128,ALPHA_ONE);
+		GrpGeom->Lock();
+		GrpGeom->SetColor({ 5, 1, 0 });
+		GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);
 		for(i=0;i<=10;i++){
 			temp = 128+9+(Viv.evade_c>>2) + (5-i);
-			if(temp>128+8)
-				GrpBoxA(128+8,16+3+i,temp,16+3+i+1);
-				//GrpBoxA(128+8,16+3,128+9+(Viv.evade_c>>2),16+3+10);
+			if(temp > (128 + 8)) {
+				GrpGeom->DrawBoxA(
+					(128 + 8), (16 + 3 + i), temp, (16 + 3 + i + 1)
+				);
+				// GrpGeom->DrawBoxA(
+				// 	(128 + 8),
+				// 	(16 + 3),
+				// 	(128 + 9 + (Viv.evade_c >> 2)),
+				// 	(16 + 3 + 10)
+				// );
+			}
 		}
-		GrpUnlock();
+		GrpGeom->Unlock();
 	}
 	GrpBlt(&src,128,16,GrTama);
 	sprintf(buf,"%3d",Viv.evade);

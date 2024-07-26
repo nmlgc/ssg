@@ -371,22 +371,22 @@ void NameRegistProc(bool&)
 
 	GrpCls();
 
-	GrpLock();
+	GrpGeom->Lock();
 
-	GrpSetColor({ 2, 0, 0 });
+	GrpGeom->SetColor({ 2, 0, 0 });
 	gx = ScoreString[CurrentRank-1].x >> 6;
 	gy = ScoreString[CurrentRank-1].y >> 6;
-	GrpBox(gx,gy,gx+400,gy+32);
+	GrpGeom->DrawBox(gx, gy, (gx + 400), (gy + 32));
 
 	if(time%64 > 32){
-		GrpSetColor({ 4, 0, 0 });
+		GrpGeom->SetColor({ 4, 0, 0 });
 		len = min(strlen(ScoreString[CurrentRank-1].Name), NR_NAME_LEN-2);
 		gx += (len*16 + 88);
 		gy += (4);
-		GrpBox(gx,gy,gx+14,gy+16);
+		GrpGeom->DrawBox(gx, gy, (gx + 14), (gy + 16));
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 
 	GrpBlt(&src, 120, 0, GrNameReg);
 
@@ -646,11 +646,13 @@ void ReplayProc(bool&)
 		rc = PIXEL_LTWH{ 312, 80, 32, 8 };
 		GrpBlt(&rc,128,470,GrTama);
 		if(ExTimer<64+32){
-			GrpLock();
-			GrpSetAlpha(128, ALPHA_NORM);
-			GrpSetColor({ 0, 0, 0 });
-			GrpBoxA(128+45-3, 470+4-1, 128+45+72, 470+4+5);
-			GrpUnlock();
+			GrpGeom->Lock();
+			GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 0, 0, 0 });
+			GrpGeom->DrawBoxA(
+				(128 + 45 - 3), (470 + 4 - 1), (128 + 45 + 72), (470 + 4 + 5)
+			);
+			GrpGeom->Unlock();
 			rc = PIXEL_LTWH{ 312, 88, 72, 8 };
 			GrpBlt(&rc,128+45,470+4,GrTama);
 		}
@@ -710,11 +712,11 @@ void SProjectProc(bool&)
 
 	const auto fade = [logo](uint8_t black_alpha, uint8_t palette_tone) {
 		if(DxObj.PixelFormat.IsChanneled()){
-			GrpLock();
-			GrpSetAlpha(black_alpha, ALPHA_NORM);
-			GrpSetColor({ 0, 0, 0 });
-			GrpBoxA(logo.left, logo.top, logo.right, logo.bottom);
-			GrpUnlock();
+			GrpGeom->Lock();
+			GrpGeom->SetAlpha(black_alpha, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 0, 0, 0 });
+			GrpGeom->DrawBoxA(logo.left, logo.top, logo.right, logo.bottom);
+			GrpGeom->Unlock();
 		} else {
 			GrpSetPalette(SProjectPalette.Fade(palette_tone));
 		}
@@ -1195,9 +1197,9 @@ void WeaponSelectProc(bool&)
 			GrpBlt(&src[i], x, y, GrTama);
 		}
 
-		GrpLock();
-		GrpSetColor({ 0, 0, 1 });
-		GrpSetAlpha(128, ALPHA_NORM);
+		GrpGeom->Lock();
+		GrpGeom->SetColor({ 0, 0, 1 });
+		GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::NORM);
 		for(i=0;i<3;i++){
 			if(
 				(GameStage != GRAPH_ID_EXSTAGE) ||
@@ -1209,9 +1211,9 @@ void WeaponSelectProc(bool&)
 			d = (-i+Viv.weapon)*85 + deg - 64;
 			x = 120 + cosl(d,90) - 56/2;
 			y = 260 + sinl(d,110) - 48/2;
-			GrpBoxA(x, y, x+56, y+48);
+			GrpGeom->DrawBoxA(x, y, (x + 56), (y + 48));
 		}
-		GrpUnlock();
+		GrpGeom->Unlock();
 
 		Viv.exp = min(count,255);
 		if(Viv.exp < 31) Viv.lay_time = Viv.lay_grp =  0;
@@ -1243,22 +1245,22 @@ void WeaponSelectProc(bool&)
 		sprintf(buf, "%d", ((Cast::up<uint16_t>(Viv.exp) + 1) >> 5));
 		GrpPutScore(500,400,buf);
 
-		GrpLock();
+		GrpGeom->Lock();
 		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
-		GrpSetColor({ 0, 0, 4 });
-		GrpLine(400-110,400-300,400+110,400-300);
-		GrpLine(400-110,400+10,400+110,400+10);
-		GrpLine(400-110,400-300,400-110,400+10);
-		GrpLine(400+110,400-300,400+110,400+10);
+		GrpGeom->SetColor({ 0, 0, 4 });
+		GrpGeom->DrawLine((400 - 110), (400 - 300), (400 + 110), (400 - 300));
+		GrpGeom->DrawLine((400 - 110), (400 +  10), (400 + 110), (400 +  10));
+		GrpGeom->DrawLine((400 - 110), (400 - 300), (400 - 110), (400 +  10));
+		GrpGeom->DrawLine((400 + 110), (400 - 300), (400 + 110), (400 +  10));
 
 		if(abs(deg) <= 25) {
-			GrpSetColor({ 2, 2, 5 });
+			GrpGeom->SetColor({ 2, 2, 5 });
 			GeomCircle({ 120, 150 }, (39 + 10 - (2 * abs(deg))));
-			GrpSetColor({ 4, 4, 5 });
+			GrpGeom->SetColor({ 4, 4, 5 });
 			GeomCircle({ 120, 150 }, (41 + 10 - (2 * abs(deg))));
 		}
-		GrpUnlock();
+		GrpGeom->Unlock();
 
 /*
 		HDC		hdc;

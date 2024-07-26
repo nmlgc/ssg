@@ -23,7 +23,6 @@
 
 // ヘッダファイル //
 #include "game/coords.h"
-#include "game/graphics.h"
 #include "game/pixelformat.h"
 #include "platform/graphics_backend.h"
 #include "platform/windows/surface_ddraw.h"
@@ -37,9 +36,6 @@
 
 #define XDDRAWENUM_MAX	4				// ビデオカード４枚差しをする人はいないと思うので...
 #define XD3DENUM_MAX	8				// DDrawデバイスに対する3Dデバイスの列挙最大数
-
-#define ALPHA_ONE		0x00			// 一種の加算α
-#define ALPHA_NORM		0x01			// ノーマルなSrc-α
 
 // Forward declarations //
 struct BMP_OWNED;
@@ -180,6 +176,7 @@ typedef struct tagDDRAWENUM{
 
 // グローバル変数 //
 extern GRAPHICS_DDRAW	DxObj;
+extern GRAPHICS_GEOMETRY *GrpGeom;
 extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 extern XDDRAWENUM	DxEnum[XDDRAWENUM_MAX];
 extern DWORD		DxEnumNow;
@@ -200,27 +197,6 @@ void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング
 void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col);
 
 extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
-extern void (*GrpLock)(void);	// 図形描画の準備をする
-extern void (*GrpUnlock)(void);	// 図形描画を完了する
-
-extern void (*GrpSetColor)(RGB216 col);	// 色セット
-
-// Sets the alpha value and mode for any *A() calls. All other draw calls
-// must ignore these settings and render fully opaque shapes. Backends with
-// equally stateful handling of alpha blending must implement this as follows:
-//
-// • Leave alpha blending deactivated for all non-*A() calls. If the backend
-//   requires RGBA color values for vertices of those calls as well, set their
-//   alpha component to 0xFF.
-// • Selectively activate alpha blending only during *A() calls and immediately
-//   disable it before returning.
-extern void (*GrpSetAlpha)(uint8_t a, uint8_t mode);
-
-extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
-extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形
-extern void (*GrpPolygon)(VERTEX_XY_SPAN<> p);	// ポリゴン塗りつぶし
-
-extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
 
 // ビットマップ転送(WithClip)
 // Returns `true` if any part of the sprite was blitted.

@@ -523,15 +523,15 @@ static void ExDraw(void)
 	if(count>60)	len = (len+4)%64;
 	else			deg+=4;
 
-	GrpLock();
-	GrpSetColor({ 0, 3, 0 });
+	GrpGeom->Lock();
+	GrpGeom->SetColor({ 0, 3, 0 });
 
 	dx = cosl(deg+64,64);		infx = cosl(deg,800);
 	dy = sinl(deg+64,64);		infy = sinl(deg,800);
 	for(i=-10;i<=10;i++){
 		x = ox + dx*i;
 		y = oy + dy*i;
-		GrpLine(x-infx,y-infy,x+infx,y+infy);
+		GrpGeom->DrawLine((x - infx), (y - infy), (x + infx), (y + infy));
 	}
 
 	dx = cosl(deg,64);		infx = cosl(deg+64,800);
@@ -539,10 +539,10 @@ static void ExDraw(void)
 	for(i=-10;i<=10;i++){
 		x = ox + dx*i;
 		y = oy + dy*i;
-		GrpLine(x-infx,y-infy,x+infx,y+infy);
+		GrpGeom->DrawLine((x - infx), (y - infy), (x + infx), (y + infy));
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 */
 

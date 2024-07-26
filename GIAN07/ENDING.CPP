@@ -336,33 +336,35 @@ void DrawFadeInfo()
 		}
 	}
 	else{
-		GrpLock();
+		GrpGeom->Lock();
 
 		if(EGrpInfo.bWantDisp){
-			GrpSetAlpha(255-EGrpInfo.alpha, ALPHA_NORM);
-			GrpSetColor({ 0, 0, 0 });
-			GrpBoxA(EGrpInfo.x, EGrpInfo.y, EGrpInfo.x+320, EGrpInfo.y+240);
+			GrpGeom->SetAlpha((255 - EGrpInfo.alpha), GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 0, 0, 0 });
+			GrpGeom->DrawBoxA(
+				EGrpInfo.x, EGrpInfo.y, (EGrpInfo.x + 320), (EGrpInfo.y + 240)
+			);
 		}
 		if(EStfTask.bWantDisp){
-			GrpSetAlpha(255-EStfTask.alpha, ALPHA_NORM);
-			GrpSetColor({ 0, 0, 0 });
+			GrpGeom->SetAlpha((255 - EStfTask.alpha), GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 0, 0, 0 });
 			if(EStfTask.ox == 320) {
-				GrpBoxA(0, 0, GRP_RES.w, GRP_RES.h);
+				GrpGeom->DrawBoxA(0, 0, GRP_RES.w, GRP_RES.h);
 			} else if(EStfTask.ox > 320) {
-				GrpBoxA(320, 0, GRP_RES.w, 300);
+				GrpGeom->DrawBoxA(320, 0, GRP_RES.w, 300);
 			} else {
-				GrpBoxA(0, 0, (320 - 50), 300);
+				GrpGeom->DrawBoxA(0, 0, (320 - 50), 300);
 			}
 		}
 		if(FlashState){
 			if(FlashState > 256) a = FlashState - 256;
 			else                 a = FlashState;
-			GrpSetAlpha(255-a, ALPHA_NORM);
-			GrpSetColor({ 5, 5, 5 });
-			GrpBoxA(0, 0, GRP_RES.w, GRP_RES.h);
+			GrpGeom->SetAlpha((255 - a), GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 5, 5, 5 });
+			GrpGeom->DrawBoxA(0, 0, GRP_RES.w, GRP_RES.h);
 		}
 
-		GrpUnlock();
+		GrpGeom->Unlock();
 	}
 }
 

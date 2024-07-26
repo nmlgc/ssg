@@ -204,27 +204,27 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	// 半透明ＢＯＸの描画 //
 	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 128;
 
-	GrpLock();
-	GrpSetAlpha(alpha,ALPHA_NORM);
+	GrpGeom->Lock();
+	GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
 
-	GrpSetColor({ 0, 0, 0 });
-	GrpBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
+	GrpGeom->SetColor({ 0, 0, 0 });
+	GrpGeom->DrawBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 	top += CWIN_ITEM_H;
 
-	GrpSetColor({ 0, 0, 2 });
+	GrpGeom->SetColor({ 0, 0, 2 });
 	for(i=0;i<p->NumItems;i++){
 		if(i==ws->Select[ws->SelectDepth]){
-			GrpSetAlpha(128,ALPHA_NORM);
-			GrpSetColor({ 5, 0, 0 });
+			GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 5, 0, 0 });
 		}
-		GrpBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
+		GrpGeom->DrawBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 		top += CWIN_ITEM_H;
 		if(i==ws->Select[ws->SelectDepth]){
-			GrpSetAlpha(alpha,ALPHA_NORM);
-			GrpSetColor({ 0, 0, 2 });
+			GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetColor({ 0, 0, 2 });
 		}
 	}
-	GrpUnlock();
+	GrpGeom->Unlock();
 
 	// 文字列の描画 //
 	WINDOW_POINT topleft = { ws->x, ws->y };
@@ -416,12 +416,12 @@ void MWinDraw(void)
 	if(MsgWindow.State == MWIN_DEAD) return;
 
 	// 半透明部の描画 //
-	GrpLock();
+	GrpGeom->Lock();
 	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 110;
-	GrpSetAlpha(alpha,ALPHA_NORM);
-	GrpSetColor({ 0, 0, 3 });
-	GrpBoxA(x+4,y+4,x+w-4,y+h-4);
-	GrpUnlock();
+	GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
+	GrpGeom->SetColor({ 0, 0, 3 });
+	GrpGeom->DrawBoxA((x + 4), (y + 4), (x + w - 4), (y + h - 4));
+	GrpGeom->Unlock();
 
 	// 文字列を表示するのはウィンドウが[FREE]である場合だけ        //
 	// -> こうしないと文字列用 Surface を作成することになるので... //
@@ -773,5 +773,5 @@ static void GrpBoxA2(int x1,int y1,int x2,int y2)
 	int i;
 
 	for(i=0;i<=y2-y1;i++)
-		GrpBoxA(x1,y1+i,x2+i*2,y1+i+1);
+		GrpGeom->DrawBoxA(x1, (y1 + i), (x2 + (i * 2)), (y1 + i + 1));
 }

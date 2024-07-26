@@ -211,13 +211,13 @@ static void _FDraw(const FRAGMENT_DATA *f)
 
 		case(FRG_FATCIRCLE):
 			if(DxObj.PixelFormat.IsChanneled()){
-				GrpLock();
-				GrpSetColor({ 4, 0, 0 });
-				GrpSetAlpha(128,ALPHA_ONE);
+				GrpGeom->Lock();
+				GrpGeom->SetColor({ 4, 0, 0 });
+				GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);
 				GeomFatCircleA(
 					{ (f->x >> 6), (f->y >> 6) }, ((60 - f->count) * 6), 5
 				);
-				GrpUnlock();
+				GrpGeom->Unlock();
 			}
 		break;
 

@@ -218,7 +218,7 @@ void _CircleA16(int x, int y, int r, uint8_t d)
 
 	src[9] = src[0];
 
-	GrpPolygonA(src);
+	GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, src);
 }
 
 // ホーミングレーザーを描画する //
@@ -228,22 +228,26 @@ void HLaserDraw(void)
 	int			i,w,current;
 	DegPoint	*p;
 	VERTEX_XY	src[4];
-	void(*AlphaPolygon)(VERTEX_XY_SPAN<>);
+	const auto AlphaPolygon = [](VERTEX_XY_SPAN<> p) {
+		if(DxObj.PixelFormat.IsChanneled()) {
+			GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
+		} else {
+			GrpGeom->DrawTriangleFan(p);
+		}
+	};
 	// void (*AlphaCircle)(WINDOW_POINT center, WINDOW_POINT radius);
 
 	if(DxObj.PixelFormat.IsChanneled()){
-		AlphaPolygon = GrpPolygonA;
 		// AlphaCircle  = GeomCircleFA;
-		GrpSetColor({ 1, 2, 5 });
-		GrpSetAlpha(0,ALPHA_ONE);
+		GrpGeom->SetColor({ 1, 2, 5 });
+		GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
 	}
 	else{
-		AlphaPolygon = GrpPolygon;
 		// AlphaCircle  = GeomCircle;
-		GrpSetColor({ 2, 2, 5 });
+		GrpGeom->SetColor({ 2, 2, 5 });
 	}
 
-	GrpLock();
+	GrpGeom->Lock();
 
 	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
 		w = HOMINGL_WIDTH;
@@ -259,14 +263,16 @@ void HLaserDraw(void)
 		if(DxObj.PixelFormat.IsChanneled()) {
 			_CircleA16(p->x, p->y, w, p->d);
 		} else {
-			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, w >> 6);
+			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, (w >> 6));
 		}
 
 		for(i=0; i< HLASER_LEN-1; i++){
 			//temp    = p;
 			current = HLASER_GETPREV(current, HLASER_SECTION);
 			p       = &(hl->p[current]);
-			//GrpLine(p->x>>6, p->y>>6, temp->x>>6, temp->y>>6);
+			// GrpGeom->DrawLine(
+			// 	(p->x >> 6), (p->y >> 6), (temp->x >> 6), (temp->y >> 6)
+			// );
 
 			src[2].x = (p->x - cosl(p->d-64, w))>>6;
 			src[2].y = (p->y - sinl(p->d-64, w))>>6;
@@ -282,9 +288,9 @@ void HLaserDraw(void)
 	}
 
 	if(DxObj.PixelFormat.IsChanneled()) {
-		GrpSetColor({ 3, 4, 5 });
+		GrpGeom->SetColor({ 3, 4, 5 });
 	} else {
-		GrpSetColor({ 5, 5, 5 });
+		GrpGeom->SetColor({ 5, 5, 5 });
 	}
 
 	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
@@ -301,14 +307,16 @@ void HLaserDraw(void)
 		if(DxObj.PixelFormat.IsChanneled()) {
 			_CircleA16(p->x, p->y, w, p->d);
 		} else {
-			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, w >> 6);
+			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, (w >> 6));
 		}
 
 		for(i=0; i< HLASER_LEN-1; i++){
 			//temp    = p;
 			current = HLASER_GETPREV(current, HLASER_SECTION);
 			p       = &(hl->p[current]);
-			//GrpLine(p->x>>6, p->y>>6, temp->x>>6, temp->y>>6);
+			// GrpGeom->DrawLine(
+			// 	(p->x >> 6), (p->y >> 6), (temp->x >> 6), (temp->y >> 6)
+			// );
 
 			src[2].x = (p->x - cosl(p->d-64, w))>>6;
 			src[2].y = (p->y - sinl(p->d-64, w))>>6;
@@ -324,7 +332,7 @@ void HLaserDraw(void)
 		}
 	}
 
-	GrpUnlock();
+	GrpGeom->Unlock();
 }
 
 

@@ -45,28 +45,35 @@ inline bool _2DChkPoint(int x, int y)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 
-	if(x<CLIP_X_MIN||x>=CLIP_X_MAX||y<CLIP_Y_MIN||y>=CLIP_Y_MAX) return FALSE;
-
-	return TRUE;
+	return !(
+		(x <  CLIP_X_MIN) ||
+		(x >= CLIP_X_MAX) ||
+		(y <  CLIP_Y_MIN) ||
+		(y >= CLIP_Y_MAX)
+	);
 }
 
 inline void _2DPset(int x, int y, uint8_t c)
 {
-	extern BYTE		*Grp_Vram;
+	extern uint8_t *Grp_Vram;
 	extern uint32_t	Grp_AddrY[480];
 
 	if(_2DChkPoint(x,y))
 		*(Grp_Vram+x+Grp_AddrY[y]) = c;
 }
 
-// 正方形クリップ : ReturnValue TRUE:クリッピング成功 FALSE:完全に範囲外
+// 正方形クリップ : ReturnValue true:クリッピング成功 false:完全に範囲外
 inline bool _2DClipRect(int *x1, int *y1, int *x2, int *y2)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 
 	// 完全判定 //
-	if((*x1)>CLIP_X_MAX || (*x2)<CLIP_X_MIN) return FALSE;
-	if((*y1)>CLIP_Y_MAX || (*y2)<CLIP_Y_MIN) return FALSE;
+	if((*x1 > CLIP_X_MAX) || (*x2 < CLIP_X_MIN)) {
+		return false;
+	}
+	if((*y1 > CLIP_Y_MAX) || (*y2 < CLIP_Y_MIN)) {
+		return false;
+	}
 
 	// クリッピング //
 	if((*x1)<CLIP_X_MIN) (*x1)=CLIP_X_MIN;
@@ -74,7 +81,7 @@ inline bool _2DClipRect(int *x1, int *y1, int *x2, int *y2)
 	if((*x2)>CLIP_X_MAX) (*x2)=CLIP_X_MAX;
 	if((*y2)>CLIP_Y_MAX) (*y2)=CLIP_Y_MAX;
 
-	return TRUE;
+	return true;
 }
 
 #endif

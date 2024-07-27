@@ -67,7 +67,7 @@ struct GRAPHICS_DDRAW {
 
 	PIXELFORMAT PixelFormat;
 	HWND					hWnd;			// ウィンドウハンドル
-	BOOL					bNeedChgPal;	// パレットを変更する必要があるか
+	bool	bNeedChgPal;	// パレットを変更する必要があるか
 	std::optional<uint8_t>	DeviceID;
 
 protected:
@@ -108,7 +108,7 @@ public:
 
 	// Consumes the given .BMP file and sets the given surface to its contents,
 	// re-creating it in the correct size if necessary.
-	bool SurfaceLoad(BYTE surf_id, BMP_OWNED bmp);
+	bool SurfaceLoad(uint8_t surf_id, BMP_OWNED bmp);
 
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
 	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col);
@@ -195,7 +195,9 @@ void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
-void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, DWORD col);	// 直接番号指定で矩形内を塗りつぶす
+
+// 直接番号指定で矩形内を塗りつぶす
+void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col);
 
 extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
 extern void (*GrpLock)(void);	// 図形描画の準備をする

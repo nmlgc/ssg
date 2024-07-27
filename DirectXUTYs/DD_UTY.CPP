@@ -533,7 +533,7 @@ void GrpCls(void)
 }
 
 
-void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, DWORD col)
+void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col)
 {
 	DDBLTFX		ddbltfx;
 	RECT	rect_local;

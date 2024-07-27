@@ -404,7 +404,7 @@ static void BossHPG_Close(void)
 void BossHPG_Draw(void)
 {
 	PIXEL_LTRB	src;
-	int		i,x1,x2;
+	int i;
 
 	switch(BossHPG.State){
 		case(BHPG_OPEN1):case(BHPG_CLOSE):
@@ -415,50 +415,53 @@ void BossHPG_Draw(void)
 			}
 		break;
 
-		case(BHPG_OPEN2):case(BHPG_NORM):case(BHPG_OPEN3):
-			WINDOW_POINT Src[4];
-
+		case(BHPG_OPEN2): case(BHPG_NORM): case(BHPG_OPEN3): {
 			// 体力ゲージの描画 //
+			constexpr WINDOW_COORD left   = (BOSSHPG_END_X + 3);
+			constexpr WINDOW_COORD top    = (16 + 3);
+			constexpr WINDOW_COORD bottom = (top + 11);
+			const auto x1 = (left + ((BossHPG.Next * 30 * 8) / BossHPG.Max));
+			const auto x2 = (left + ((BossHPG.Now  * 30 * 8) / BossHPG.Max));
+
 			GrpLock();
 			GrpSetAlpha(128+64,ALPHA_NORM);//ALPHA_NORM);
 			GrpSetColor(0,1,5);
-			x1 = BOSSHPG_END_X+3 + (BossHPG.Next*30*8)/BossHPG.Max;
-			x2 = BOSSHPG_END_X+3 + (BossHPG.Now *30*8)/BossHPG.Max;
-
 			if(DxObj.PixelFormat.IsChanneled()){
+				WINDOW_POINT Src[4] = {
+					{ 0, top },
+					{ left, top },
+					{ left, bottom },
+					{ 0, bottom },
+				};
 				if(x1<x2){
-					Src[1].x = BOSSHPG_END_X+3;		Src[1].y = 16+3;
-					Src[0].x = x1;					Src[0].y = 16+3;
-					Src[3].x = x1;					Src[3].y = 16+3+11;
-					Src[2].x = BOSSHPG_END_X+3;		Src[2].y = 16+3+11;
+					Src[0].x = Src[3].x = x1;
 					GrpGrdRectA(Src);
-					//GrpBoxA(BOSSHPG_END_X+3,16+3,x1,16+3+11);
+				//	GrpBoxA(left, top, x1, bottom);
 					GrpSetColor(5,0,0);
-					GrpBoxA(x1,16+3,x2,16+3+11);
+					GrpBoxA(x1, top, x2, bottom);
 				}
 				else{
-					Src[1].x = BOSSHPG_END_X+3;		Src[1].y = 16+3;
-					Src[0].x = x2;					Src[0].y = 16+3;
-					Src[3].x = x2;					Src[3].y = 16+3+11;
-					Src[2].x = BOSSHPG_END_X+3;		Src[2].y = 16+3+11;
+					Src[0].x = Src[3].x = x2;
 					GrpGrdRectA(Src);
-					//GrpBoxA(BOSSHPG_END_X+3,16+3,x2,16+3+11);
+				//	GrpBoxA(left, top, x2, bottom);
 				}
 			}
 			else{
+				constexpr auto line_top = (top + 5);
+				constexpr auto line_bottom = (bottom - 4);
 				if(x1<x2){
-					GrpBoxA(BOSSHPG_END_X+3,16+3,x2,16+3+5);
-					GrpBoxA(BOSSHPG_END_X+3,16+3+11-4,x2,16+3+11);
+					GrpBoxA(left, top, x2, line_top);
+					GrpBoxA(left, line_bottom, x2, bottom);
 					GrpSetColor(5,5,5);
-					GrpBoxA(BOSSHPG_END_X+3,16+3+5,x1,16+3+11-4);
+					GrpBoxA(left, line_top, x1, line_bottom);
 					GrpSetColor(5,0,0);
-					GrpBoxA(x1,16+3,x2,16+3+11);
+					GrpBoxA(x1, top, x2, bottom);
 				}
 				else{
-					GrpBoxA(BOSSHPG_END_X+3,16+3,x2,16+3+5);
-					GrpBoxA(BOSSHPG_END_X+3,16+3+11-4,x2,16+3+11);
+					GrpBoxA(left, top, x2, line_top);
+					GrpBoxA(left, line_bottom, x2, bottom);
 					GrpSetColor(5,5,5);
-					GrpBoxA(BOSSHPG_END_X+3,16+3+5,x2,16+3+11-4);
+					GrpBoxA(left, line_top, x2, line_bottom);
 				}
 			}
 
@@ -467,6 +470,7 @@ void BossHPG_Draw(void)
 			// 枠の描画 //
 			src = { 0, 104, BOSSHPG_WIDTH, 128 };
 			GrpBlt(&src,BOSSHPG_END_X,16,GrTama);
+		}
 		break;
 
 		case(BHPG_DEAD):

@@ -696,11 +696,6 @@ bool DemoInit(void)
 	return GameInit(DemoProc);
 }
 
-void FadeoutPalette(const PALETTE& Src, uint8_t a)
-{
-	GrpSetPalette(Src.Fade(a));
-}
-
 // 西方Ｐｒｏｊｅｃｔ表示動作部 //
 std::optional<LensInfo> Lens;
 
@@ -708,7 +703,24 @@ void SProjectProc(bool&)
 {
 	static WORD timer = 0;
 
-	PIXEL_LTRB	rc = { 0, 0, 320, 42 };
+	constexpr PIXEL_SIZE logo_size = { 320, 42 };
+	constexpr WINDOW_LTRB logo = WINDOW_LTWH{
+		(320 - (logo_size.w / 2)), (240 + 40), logo_size.w, logo_size.h
+	};
+
+	const auto fade = [logo](uint8_t black_alpha, uint8_t palette_tone) {
+		if(DxObj.PixelFormat.IsChanneled()){
+			GrpLock();
+			GrpSetAlpha(black_alpha, ALPHA_NORM);
+			GrpSetColor(0, 0, 0);
+			GrpBoxA(logo.left, logo.top, logo.right, logo.bottom);
+			GrpUnlock();
+		} else {
+			GrpSetPalette(SProjectPalette.Fade(palette_tone));
+		}
+	};
+
+	PIXEL_LTRB rc = { 0, 0, logo_size.w, logo_size.h };
 	BYTE	d;
 	int		x, y;
 
@@ -725,31 +737,13 @@ void SProjectProc(bool&)
 	if(IsDraw()){
 		GrpCls();//Ex(NULL, 255);
 
-		GrpBlt(&rc, (320 - (320 / 2)), (240 + 40), GrSProject);
+		GrpBlt(&rc, logo.left, logo.top, GrSProject);
 
 		if(timer < 64){
-			if(DxObj.PixelFormat.IsChanneled()){
-				GrpLock();
-				GrpSetAlpha((255-timer)*4, ALPHA_NORM);
-				GrpSetColor(0,0,0);
-				GrpBoxA(320-320/2,240+40,320-320/2+320,240+40+42);
-				GrpUnlock();
-			}
-			else{
-				FadeoutPalette(SProjectPalette, timer * 4);
-			}
+			fade(((255 - timer) * 4), (timer * 4));
 		}
 		else if(timer > 192){
-			if(DxObj.PixelFormat.IsChanneled()){
-				GrpLock();
-				GrpSetAlpha(timer*4, ALPHA_NORM);
-				GrpSetColor(0,0,0);
-				GrpBoxA(320-320/2,240+40,320-320/2+320,240+40+42);
-				GrpUnlock();
-			}
-			else{
-				FadeoutPalette(SProjectPalette, (255-timer) * 4);
-			}
+			fade((timer * 4), ((255 - timer) * 4));
 		}
 		else if(Lens) {
 			d = timer - 64;

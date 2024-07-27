@@ -525,10 +525,10 @@ void ScreenEffectDraw(void)
 
 		case(SCNEFC_WHITEIN):	// ホワイトイン
 			src = PIXEL_LTWH{
-				.left = ((15 - (int(ScreenInfo.count) / 10)) * 16),
-				.top = (128 + 16),
-				.w = 16,
-				.h = 16
+				((15 - (int(ScreenInfo.count) / 10)) * 16),
+				(128 + 16),
+				16,
+				16
 			};
 			for(i=128; i<640-128; i+=16){
 				for(j=0; j<480; j+=16){
@@ -539,10 +539,10 @@ void ScreenEffectDraw(void)
 
 		case(SCNEFC_WHITEOUT):	// ホワイトアウト
 			src = PIXEL_LTWH{
-				.left = ((int(ScreenInfo.count) / 10) * 16),
-				.top = (128 + 16),
-				.w = 16,
-				.h = 16
+				((int(ScreenInfo.count) / 10) * 16),
+				(128 + 16),
+				16,
+				16
 			};
 			for(i=128; i<640-128; i+=16){
 				for(j=0; j<480; j+=16){

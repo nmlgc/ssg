@@ -62,10 +62,22 @@ PIXEL_POINT& operator -=(PIXEL_POINT& self, const PIXEL_SIZE& other);
 // Left-top-width-height rectangle in unscaled pixel space. Relative to any
 // origin.
 struct PIXEL_LTWH {
-	PIXEL_COORD left;
-	PIXEL_COORD top;
-	PIXEL_COORD w;
-	PIXEL_COORD h;
+	PIXEL_COORD left = 0;
+	PIXEL_COORD top = 0;
+	PIXEL_COORD w = 0;
+	PIXEL_COORD h = 0;
+
+	constexpr PIXEL_LTWH() = default;
+	constexpr PIXEL_LTWH(const PIXEL_LTWH&) = default;
+	constexpr PIXEL_LTWH(PIXEL_LTWH&&) = default;
+	constexpr PIXEL_LTWH& operator=(const PIXEL_LTWH&) = default;
+	constexpr PIXEL_LTWH& operator=(PIXEL_LTWH&&) = default;
+	constexpr PIXEL_LTWH(
+		decltype(left) left, decltype(top) top, decltype(w) w, decltype(h) h
+	)
+		: left(left), top(top), w(w), h(h)
+	{
+	}
 
 	PIXEL_LTWH operator +(const PIXEL_POINT& other) const {
 		return { (left + other.x), (top + other.y), w, h };
@@ -94,7 +106,7 @@ struct PIXEL_LTRB {
 		left(left), top(top), right(right), bottom(bottom) {
 	}
 
-	PIXEL_LTRB(const PIXEL_LTWH& o) :
+	constexpr PIXEL_LTRB(const PIXEL_LTWH& o) :
 		left(o.left), top(o.top), right(o.left + o.w), bottom(o.top + o.h) {
 	}
 
@@ -113,10 +125,19 @@ struct WINDOW_POINT : public PIXEL_POINT {
 	}
 };
 
+// Left-top-width-height rectangle in unscaled game window space. The visible
+// area ranges from // (0, 0) to (639, 479) inclusive.
+struct WINDOW_LTWH : public PIXEL_LTWH {
+	using PIXEL_LTWH::PIXEL_LTWH;
+};
+
 // Left-top-right-bottom rectangle in unscaled game window space. The visible
 // area ranges from (0, 0) to (639, 479) inclusive.
 struct WINDOW_LTRB : public PIXEL_LTRB {
 	using PIXEL_LTRB::PIXEL_LTRB;
+
+	constexpr WINDOW_LTRB(const WINDOW_LTWH& o) : PIXEL_LTRB(o) {
+	}
 };
 // -----------------------
 

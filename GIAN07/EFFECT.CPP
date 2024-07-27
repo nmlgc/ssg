@@ -692,7 +692,6 @@ void ObjectLockDraw(void)
 
 
 
-#include "DirectXUTYs/DD_GRP3D.H"
 #include "game/midi.h"
 // スペアナ描画 //
 void GrpDrawSpect(int x, int y)
@@ -754,10 +753,10 @@ void GrpDrawSpect(int x, int y)
 
 	GrpGeom->Lock();
 
-	if(DxObj.PixelFormat.IsChanneled()){
+	if(auto *gp = GrpGeom_Poly()) {
 		for(i=0;i<128+8+8;i++){
 			//WORD c2 = 0;	//5
-			GrpGrdLineEx(i+x,y-ftable[i]*2,y);
+			gp->DrawGrdLineEx((i + x), (y - (ftable[i] * 2)), y);
 		}
 	}
 	else{

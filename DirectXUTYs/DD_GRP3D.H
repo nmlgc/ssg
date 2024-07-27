@@ -32,17 +32,23 @@ public:
 	void DrawBoxA(int x1, int y1, int x2, int y2) final;
 	void DrawTriangleFan(VERTEX_XY_SPAN<>) final;
 	// ----------
+
+	// Poly methods
+	// ------------
+
+	void DrawLineStrip(VERTEX_XY_SPAN<>);
+	void DrawTriangles(
+		TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
+	);
+	void DrawTrianglesA(
+		TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
+	);
+	void DrawGrdLineEx(int x, int y1, int y2);
+	// ------------
 };
 
-// ３Ｄ専用関数 //
-void GrpLineStrip(VERTEX_XY_SPAN<> xys);
-void GrpTriangles(
-	TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
-);
-void GrpTrianglesA(
-	TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
-);
-void GrpGrdLineEx(int x, int y1, int y2);	// スペアな用グラデーションライン
-
+// Returns the instance of the channeled geometry interface if active, or a
+// nullptr otherwise.
+GRAPHICS_GEOMETRY_D3D *GrpGeom_Poly(void);
 
 #endif

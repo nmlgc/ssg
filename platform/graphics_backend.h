@@ -86,6 +86,26 @@ public:
 	virtual ~GRAPHICS_GEOMETRY() {
 	}
 };
+
+// Interface for geometry draw calls that require true-color polygon rendering.
+// The [colors] span either must be either
+// • empty or omitted (which will render all vertices using the last SetColor()
+//   and SetAlpha*() value), or
+// • have as many elements as [points].
+template <class T> concept GRAPHICS_GEOMETRY_POLY = requires(
+	T t,
+	WINDOW_COORD coord,
+	TRIANGLE_PRIMITIVE tp,
+	VERTEX_XY_SPAN<> points,
+	VERTEX_RGBA_SPAN<> colors
+) {
+	t.DrawLineStrip(points);
+	t.DrawTriangles(tp, points, colors);
+	t.DrawTrianglesA(tp, points, colors);
+
+	// スペアな用グラデーションライン
+	t.DrawGrdLineEx(coord, coord, coord);
+};
 /// --------
 
 #ifdef WIN32

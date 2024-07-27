@@ -6,9 +6,8 @@
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
 #include "LOADER.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/ut_math.h"
-#include "game/coords.h"
 
 
 FRAGMENT_DATA	Fragment[FRAGMENT_MAX];		// 破片データ管理用構造体
@@ -210,14 +209,14 @@ static void _FDraw(const FRAGMENT_DATA *f)
 		break;
 
 		case(FRG_FATCIRCLE):
-			if(DxObj.PixelFormat.IsChanneled()){
-				GrpGeom->Lock();
-				GrpGeom->SetColor({ 4, 0, 0 });
-				GrpGeom->SetAlphaOne();
+			if(auto *gp = GrpGeom_Poly()) {
+				gp->Lock();
+				gp->SetColor({ 4, 0, 0 });
+				gp->SetAlphaOne();
 				GeomFatCircleA(
-					{ (f->x >> 6), (f->y >> 6) }, ((60 - f->count) * 6), 5
+					*gp, { (f->x >> 6), (f->y >> 6) }, ((60 - f->count) * 6), 5
 				);
-				GrpGeom->Unlock();
+				gp->Unlock();
 			}
 		break;
 

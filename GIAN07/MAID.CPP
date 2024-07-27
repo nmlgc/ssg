@@ -80,9 +80,9 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlphaOne();
-					GeomGrdRectA(p, col_channeled);
+				if(auto *gp = GrpGeom_Poly()) {
+					gp->SetAlphaOne();
+					GeomGrdRectA(*gp, p, col_channeled);
 				}
 				else{
 					switch(w){
@@ -105,9 +105,9 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlphaOne();
-					GeomGrdRectA(p, col_channeled);
+				if(auto *gp = GrpGeom_Poly()) {
+					gp->SetAlphaOne();
+					GeomGrdRectA(*gp, p, col_channeled);
 				}
 				else{
 					switch(w){
@@ -118,7 +118,9 @@ void LaserBombDraw(void)
 					GrpGeom->DrawTriangleFan(p);
 				}
 			}
-			if(DxObj.PixelFormat.IsChanneled()) break;
+			if(GrpGeom_Poly()) {
+				break;
+			}
 		}
 	}
 	else if(LaserDeg<150){
@@ -136,9 +138,9 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlphaOne();
-					GeomGrdRectA(p, col_channeled);
+				if(auto *gp = GrpGeom_Poly()) {
+					gp->SetAlphaOne();
+					GeomGrdRectA(*gp, p, col_channeled);
 				}
 				else{
 					GrpGeom->SetColor({ c, c, 5u });
@@ -157,16 +159,18 @@ void LaserBombDraw(void)
 				p[2].y = (Viv.opy>>6)            + ly - wy;
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
-				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlphaOne();
-					GeomGrdRectA(p, col_channeled);
+				if(auto *gp = GrpGeom_Poly()) {
+					gp->SetAlphaOne();
+					GeomGrdRectA(*gp, p, col_channeled);
 				}
 				else{
 					GrpGeom->SetColor({ c, c, 5u });
 					GrpGeom->DrawTriangleFan(p);
 				}
 			}
-			if(DxObj.PixelFormat.IsChanneled()) break;
+			if(GrpGeom_Poly()) {
+				break;
+			}
 		}
 	}
 

@@ -49,8 +49,8 @@ void ApproximateFatCircle(
 
 void GeomCircle(WINDOW_POINT center, PIXEL_COORD radius)
 {
-	if(DxObj.PixelFormat.IsChanneled()) {
-		Geometry::Circle_Approximated(center, radius);
+	if(auto *gp = GrpGeom_Poly()) {
+		Geometry::Circle_Approximated(*gp, center, radius);
 	} else {
 		Geometry::Circle_Exact(center, radius);
 	}
@@ -58,8 +58,8 @@ void GeomCircle(WINDOW_POINT center, PIXEL_COORD radius)
 
 void GeomCircleF(WINDOW_POINT center, PIXEL_COORD radius)
 {
-	if(DxObj.PixelFormat.IsChanneled()) {
-		Geometry::CircleF_Approximated(center, radius, false);
+	if(auto *gp = GrpGeom_Poly()) {
+		Geometry::CircleF_Approximated(*gp, center, radius, false);
 	} else {
 		Geometry::CircleF_Exact(center, radius);
 	}

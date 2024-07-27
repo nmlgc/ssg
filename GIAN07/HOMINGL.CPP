@@ -7,7 +7,7 @@
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "MAID.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
 
@@ -205,7 +205,7 @@ void HLaserMove(void)
 	}
 }
 
-void _CircleA16(int x, int y, int r, uint8_t d)
+void _CircleA16(GRAPHICS_GEOMETRY_POLY auto& gp, int x, int y, int r, uint8_t d)
 {
 	VERTEX_XY	src[9 + 1];
 	int			i,j;
@@ -218,7 +218,7 @@ void _CircleA16(int x, int y, int r, uint8_t d)
 
 	src[9] = src[0];
 
-	GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, src);
+	gp.DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, src);
 }
 
 // ホーミングレーザーを描画する //
@@ -228,19 +228,20 @@ void HLaserDraw(void)
 	int			i,w,current;
 	DegPoint	*p;
 	VERTEX_XY	src[4];
-	const auto AlphaPolygon = [](VERTEX_XY_SPAN<> p) {
-		if(DxObj.PixelFormat.IsChanneled()) {
-			GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
+	auto *gp = GrpGeom_Poly();
+	const auto AlphaPolygon = [gp](VERTEX_XY_SPAN<> p) {
+		if(gp) {
+			gp->DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
 		} else {
 			GrpGeom->DrawTriangleFan(p);
 		}
 	};
 	// void (*AlphaCircle)(WINDOW_POINT center, WINDOW_POINT radius);
 
-	if(DxObj.PixelFormat.IsChanneled()){
-		// AlphaCircle  = GeomCircleFA;
-		GrpGeom->SetColor({ 1, 2, 5 });
-		GrpGeom->SetAlphaOne();
+	if(gp) {
+		//AlphaCircle  = GeomCircleFA;
+		gp->SetColor({ 1, 2, 5 });
+		gp->SetAlphaOne();
 	}
 	else{
 		// AlphaCircle  = GeomCircle;
@@ -260,8 +261,8 @@ void HLaserDraw(void)
 		src[1].x = (p->x - cosl(p->d-64, w))>>6;
 		src[1].y = (p->y - sinl(p->d-64, w))>>6;
 
-		if(DxObj.PixelFormat.IsChanneled()) {
-			_CircleA16(p->x, p->y, w, p->d);
+		if(gp) {
+			_CircleA16(*gp, p->x, p->y, w, p->d);
 		} else {
 			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, (w >> 6));
 		}
@@ -287,8 +288,8 @@ void HLaserDraw(void)
 		}
 	}
 
-	if(DxObj.PixelFormat.IsChanneled()) {
-		GrpGeom->SetColor({ 3, 4, 5 });
+	if(gp) {
+		gp->SetColor({ 3, 4, 5 });
 	} else {
 		GrpGeom->SetColor({ 5, 5, 5 });
 	}
@@ -304,8 +305,8 @@ void HLaserDraw(void)
 		src[1].y = (p->y - sinl(p->d-64, w))>>6;
 
 		//AlphaCircle(p->x>>6, p->y>>6, w>>6);
-		if(DxObj.PixelFormat.IsChanneled()) {
-			_CircleA16(p->x, p->y, w, p->d);
+		if(gp) {
+			_CircleA16(*gp, p->x, p->y, w, p->d);
 		} else {
 			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, (w >> 6));
 		}

@@ -318,11 +318,11 @@ extern void LLaserDraw(void)
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
 					*/
-					if(DxObj.PixelFormat.IsChanneled()) {
-						// GrpGeom->SetColor({ 3, 0, 3 });
+					if(auto *gp = GrpGeom_Poly()) {
+						// gp->SetColor({ 3, 0, 3 });
 						const RGBA col = Table16Bit[c].ToRGB().WithAlpha(0xFF);
-						GrpGeom->SetAlphaOne();
-						GeomGrdRectA(lp->p, col);
+						gp->SetAlphaOne();
+						GeomGrdRectA(*gp, lp->p, col);
 
 						std::array<VERTEX_RGBA, VERTEX_COUNT> vcs;
 						vcs[0] = { 255, 255, 255, 0xFF };
@@ -340,14 +340,13 @@ extern void LLaserDraw(void)
 							p2[n].x = p2[0].x + cosl(lp->d+64+128*(n-1)/32,len);
 							p2[n].y = p2[0].y + sinl(lp->d+64+128*(n-1)/32,len);
 						}
-						GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p2, vcs);
+						gp->DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, p2, vcs);
 						break;
 					}
 					// GrpGeom->SetColor({ 2, 0, 2 });
 					GrpGeom->SetColor(Table8BitA[c]);
 					GrpGeom->DrawTriangleFan(lp->p);
-				}
-				else if(DxObj.PixelFormat.IsChanneled()) {
+				} else if(GrpGeom_Poly()) {
 					break;
 				}
 

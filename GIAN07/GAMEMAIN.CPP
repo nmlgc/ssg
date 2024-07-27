@@ -711,12 +711,12 @@ void SProjectProc(bool&)
 	};
 
 	const auto fade = [logo](uint8_t black_alpha, uint8_t palette_tone) {
-		if(DxObj.PixelFormat.IsChanneled()){
-			GrpGeom->Lock();
-			GrpGeom->SetAlphaNorm(black_alpha);
-			GrpGeom->SetColor({ 0, 0, 0 });
-			GrpGeom->DrawBoxA(logo.left, logo.top, logo.right, logo.bottom);
-			GrpGeom->Unlock();
+		if(auto *gp = GrpGeom_Poly()) {
+			gp->Lock();
+			gp->SetAlphaNorm(black_alpha);
+			gp->SetColor({ 0, 0, 0 });
+			gp->DrawBoxA(logo.left, logo.top, logo.right, logo.bottom);
+			gp->Unlock();
 		} else {
 			GrpSetPalette(SProjectPalette.Fade(palette_tone));
 		}
@@ -1552,7 +1552,9 @@ void GameDraw(void)
 	fragment_draw();
 	ItemDraw();
 
-	if(DxObj.PixelFormat.IsChanneled()) LLaserDraw();
+	if(GrpGeom_Poly()) {
+		LLaserDraw();
+	}
 
 	HLaserDraw();
 	laser_draw();

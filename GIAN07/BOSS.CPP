@@ -8,7 +8,7 @@
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "EnemyExCtrl.h"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
@@ -431,7 +431,7 @@ void BossHPG_Draw(void)
 
 			GrpGeom->Lock();
 			GrpGeom->SetAlphaNorm(alpha);
-			if(DxObj.PixelFormat.IsChanneled()){
+			if(auto *gp = GrpGeom_Poly()) {
 				VERTEX_XY Src[4] = {
 					{ 0, top },
 					{ left, top },
@@ -440,15 +440,15 @@ void BossHPG_Draw(void)
 				};
 				if(x1<x2){
 					Src[0].x = Src[3].x = x1;
-					GeomGrdRectA(Src, col.ToRGB().WithAlpha(alpha));
-					// GrpGeom->DrawBoxA(left, top, x1, bottom);
-					GrpGeom->SetColor({ 5, 0, 0 });
-					GrpGeom->DrawBoxA(x1, top, x2, bottom);
+					GeomGrdRectA(*gp, Src, col.ToRGB().WithAlpha(alpha));
+					// gp->DrawBoxA(left, top, x1, bottom);
+					gp->SetColor({ 5, 0, 0 });
+					gp->DrawBoxA(x1, top, x2, bottom);
 				}
 				else{
 					Src[0].x = Src[3].x = x2;
-					GeomGrdRectA(Src, col.ToRGB().WithAlpha(alpha));
-					// GrpGeom->DrawBoxA(left, top, x2, bottom);
+					GeomGrdRectA(*gp, Src, col.ToRGB().WithAlpha(alpha));
+					// gp->DrawBoxA(left, top, x2, bottom);
 				}
 			}
 			else{

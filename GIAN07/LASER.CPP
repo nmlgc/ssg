@@ -387,8 +387,8 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 	// GrpGeom->SetColor({ 4, 1, 0 });
 	// GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);	// 2000/09/06 に削除
 
-	if(DxObj.PixelFormat.IsChanneled()) {
-		GeomGrdRect(lp->p, col.ToRGB());
+	if(auto *gp = GrpGeom_Poly()) {
+		GeomGrdRect(*gp, lp->p, col.ToRGB());
 	}
 	else{
 		GrpGeom->SetColor(col);

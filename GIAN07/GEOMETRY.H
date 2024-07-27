@@ -9,7 +9,6 @@
 
 #include "DirectXUTYs/DD_UTY.H"
 #include "DirectXUTYs/DD_GRP2D.H"
-#include "DirectXUTYs/DD_GRP3D.H"
 
 namespace Geometry {
 
@@ -37,11 +36,13 @@ void ApproximateFatCircle(
 // Implementations
 // ---------------
 
-inline void Circle_Approximated(WINDOW_POINT center, PIXEL_COORD radius)
+void Circle_Approximated(
+	GRAPHICS_GEOMETRY_POLY auto& gc, WINDOW_POINT center, PIXEL_COORD radius
+)
 {
-	std::array<WINDOW_POINT, CIRCLE_POINTS> xys;
+	std::array<VERTEX_XY, CIRCLE_POINTS> xys;
 	ApproximateCircle(xys, center, radius);
-	GrpLineStrip(xys);
+	gc.DrawLineStrip(xys);
 }
 
 inline void Circle_Exact(WINDOW_POINT center, PIXEL_COORD radius)
@@ -71,8 +72,11 @@ inline void Circle_Exact(WINDOW_POINT center, PIXEL_COORD radius)
 	}
 }
 
-inline void CircleF_Approximated(
-	WINDOW_POINT center, PIXEL_COORD radius, bool alpha
+void CircleF_Approximated(
+	GRAPHICS_GEOMETRY_POLY auto& gp,
+	WINDOW_POINT center,
+	PIXEL_COORD radius,
+	bool alpha
 )
 {
 	std::array<VERTEX_XY, (1 + CIRCLE_POINTS)> xys;
@@ -82,9 +86,9 @@ inline void CircleF_Approximated(
 		std::span(xys).subspan<1, CIRCLE_POINTS>(), center, radius
 	);
 	if(alpha) {
-		GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, xys);
+		gp.DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, xys);
 	} else {
-		GrpTriangles(TRIANGLE_PRIMITIVE::FAN, xys);
+		gp.DrawTriangles(TRIANGLE_PRIMITIVE::FAN, xys);
 	}
 }
 
@@ -110,21 +114,27 @@ inline void CircleF_Exact(WINDOW_POINT center, PIXEL_COORD radius)
 	}
 }
 
-inline void FatCircleA_Approximated(
-	WINDOW_POINT center, PIXEL_COORD r, PIXEL_COORD w
+void FatCircleA_Approximated(
+	GRAPHICS_GEOMETRY_POLY auto& gp,
+	WINDOW_POINT center,
+	PIXEL_COORD r,
+	PIXEL_COORD w
 )
 {
 	// 普通の円になってしまう場合 //
 	if(w >= r) {
-		CircleF_Approximated(center, (r + w), true);
+		Geometry::CircleF_Approximated(gp, center, (r + w), true);
 	}
 	std::array<VERTEX_XY, (CIRCLE_POINTS * 2)> xys;
 	ApproximateFatCircle(xys, center, r, w);
-	GrpTrianglesA(TRIANGLE_PRIMITIVE::STRIP, xys);
+	gp.DrawTrianglesA(TRIANGLE_PRIMITIVE::STRIP, xys);
 }
 
-inline void GrdRect(
-	std::span<const WINDOW_POINT, 4> p, RGBA col_edge, bool alpha
+void GrdRect(
+	GRAPHICS_GEOMETRY_POLY auto& gp,
+	std::span<const VERTEX_XY, 4> p,
+	RGBA col_edge,
+	bool alpha
 )
 {
 	const RGBA col_center = { 255, 255, 255, col_edge.a };
@@ -143,9 +153,9 @@ inline void GrdRect(
 		col_edge, col_edge, col_center, col_center, col_edge, col_edge,
 	};
 	if(alpha) {
-		GrpTrianglesA(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
+		gp.DrawTrianglesA(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
 	} else {
-		GrpTriangles(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
+		gp.DrawTriangles(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
 	}
 }
 // ---------------
@@ -162,28 +172,41 @@ void GeomCircle(WINDOW_POINT center, PIXEL_COORD radius);
 void GeomCircleF(WINDOW_POINT center, PIXEL_COORD radius);
 
 // Filled and alpha-blended circle
-inline void GeomCircleFA(WINDOW_POINT center, PIXEL_COORD radius)
+void GeomCircleFA(
+	GRAPHICS_GEOMETRY_POLY auto& gc, WINDOW_POINT center, PIXEL_COORD radius
+)
 {
-	assert(DxObj.PixelFormat.IsChanneled());
-	Geometry::CircleF_Approximated(center, radius, true);
+	Geometry::CircleF_Approximated(*gc, center, radius, true);
 }
 
 // Alpha-blended fat circle
-inline void GeomFatCircleA(WINDOW_POINT center, PIXEL_COORD r, PIXEL_COORD w)
+void GeomFatCircleA(
+	GRAPHICS_GEOMETRY_POLY auto& gp,
+	WINDOW_POINT center,
+	PIXEL_COORD r,
+	PIXEL_COORD w
+)
 {
-	assert(DxObj.PixelFormat.IsChanneled());
-	Geometry::FatCircleA_Approximated(center, r, w);
+	Geometry::FatCircleA_Approximated(gp, center, r, w);
 }
 
 // グラデーション付き長方形(ナナメ可)
-inline void GeomGrdRect(std::span<const WINDOW_POINT, 4> p, RGB col_edge)
+void GeomGrdRect(
+	GRAPHICS_GEOMETRY_POLY auto& gp,
+	std::span<const VERTEX_XY, 4> points,
+	RGB col_edge
+)
 {
-	Geometry::GrdRect(p, col_edge.WithAlpha(0xFF), false);
+	Geometry::GrdRect(gp, points, col_edge.WithAlpha(0xFF), false);
 }
 
 // グラデーション付き長方形(ナナメ可+α)
-inline void GeomGrdRectA(std::span<const WINDOW_POINT, 4> p, RGBA col_edge)
+void GeomGrdRectA(
+	GRAPHICS_GEOMETRY_POLY auto& gp,
+	std::span<const VERTEX_XY, 4> points,
+	RGBA col_edge
+)
 {
-	Geometry::GrdRect(p, col_edge, true);
+	Geometry::GrdRect(gp, points, col_edge, true);
 }
 // ----------

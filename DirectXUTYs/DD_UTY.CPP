@@ -547,6 +547,11 @@ void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col)
 	});
 }
 
+GRAPHICS_GEOMETRY_D3D *GrpGeom_Poly(void)
+{
+	return (DxObj.PixelFormat.IsChanneled() ? &GrpGeom_D3D : nullptr);
+}
+
 
 static void GrpFlipFS(void)
 {

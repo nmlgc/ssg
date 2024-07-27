@@ -153,27 +153,27 @@ void GRAPHICS_GEOMETRY_D3D::DrawBox(int x1, int y1, int x2, int y2)
 	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,4,D3DDP_WAIT);
 }
 
-void GrpLineStrip(VERTEX_XY_SPAN<> xys)
+void GRAPHICS_GEOMETRY_D3D::DrawLineStrip(VERTEX_XY_SPAN<> xys)
 {
 	if(!bLocked) return;
 	DrawVertices(D3DPT_LINESTRIP, xys, {});
 }
 
-constexpr ENUMARRAY<D3DPRIMITIVETYPE, TRIANGLE_PRIMITIVE> D3DPTS = {
+constexpr ENUMARRAY<D3DPRIMITIVETYPE, TRIANGLE_PRIMITIVE> PRIMITIVE_TYPES = {
 	D3DPT_TRIANGLEFAN, D3DPT_TRIANGLESTRIP
 };
 
-void GrpTriangles(
+void GRAPHICS_GEOMETRY_D3D::DrawTriangles(
 	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
 )
 {
 	if(!bLocked || (xys.size() < 3)) {
 		return;
 	}
-	DrawVertices(D3DPTS[tp], xys, colors);
+	DrawVertices(PRIMITIVE_TYPES[tp], xys, colors);
 }
 
-void GrpTrianglesA(
+void GRAPHICS_GEOMETRY_D3D::DrawTrianglesA(
 	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
 )
 {
@@ -181,13 +181,13 @@ void GrpTrianglesA(
 		return;
 	}
 	AlphaEnable(TRUE);
-	DrawVertices(D3DPTS[tp], xys, colors);
+	DrawVertices(PRIMITIVE_TYPES[tp], xys, colors);
 	AlphaEnable(FALSE);
 }
 
-void GRAPHICS_GEOMETRY_D3D::DrawTriangleFan(VERTEX_XY_SPAN<> p)
+void GRAPHICS_GEOMETRY_D3D::DrawTriangleFan(VERTEX_XY_SPAN<> xys)
 {
-	return GrpTriangles(TRIANGLE_PRIMITIVE::FAN, p);
+	return DrawTriangles(TRIANGLE_PRIMITIVE::FAN, xys);
 }
 
 // α長方形 //
@@ -199,7 +199,7 @@ void GRAPHICS_GEOMETRY_D3D::DrawBoxA(int x1, int y1, int x2, int y2)
 	AlphaEnable(FALSE);
 }
 
-void GrpGrdLineEx(int x, int y1, int y2)
+void GRAPHICS_GEOMETRY_D3D::DrawGrdLineEx(int x, int y1, int y2)
 {
 	if(!bLocked) return;
 

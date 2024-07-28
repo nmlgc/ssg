@@ -37,6 +37,49 @@ void RELEASE(auto*& x)
 	}
 }
 
+// 構造体 //
+struct XD3DENUM {
+	GUID *lpGuid;	// GUID
+	char *name;	// お名前
+	bool bIsHW;	// ハードウェアか
+	bool b8Bit;	// この D3D_DEVICE が  8Bit に対応しているか
+	bool b16Bit;	// この D3D_DEVICE が 16Bit に対応しているか
+	bool b24Bit;	// この D3D_DEVICE が 24Bit に対応しているか
+	bool b32Bit;	// この D3D_DEVICE が 32Bit に対応しているか
+	DWORD Zbuf;	// サポートするＺバッファの深度(０は多分無いのでしょう)
+};
+
+struct XDDRAWENUM {
+	GUID *lpDDGuid;	// あるドライバのGUID
+	char *name;	// お名前
+	std::array<XD3DENUM, 8> D3D;	// D3D_DEVICE の GUID & ドライバ名
+	DWORD D3DNow;	// D3D_DEVICE の現在の数
+	bool b8Bit;	// この DD_DEVICE が  8Bit に対応しているか
+	bool b16Bit;	// この DD_DEVICE が 16Bit に対応しているか
+	bool b24Bit;	// この DD_DEVICE が 24Bit に対応しているか
+	bool b32Bit;	// この DD_DEVICE が 32Bit に対応しているか
+
+	// Only looks at the first D3D device?
+	bool BitDepthSupported(uint8_t bpp) const {
+		switch(bpp) {
+		case 8: 	return b8Bit;
+		case 16:	return (b16Bit && D3D[0].b16Bit);
+		case 32:	return (b32Bit && D3D[0].b32Bit);
+		default:	return false;
+		}
+	}
+
+	bool BitDepthSupported(const BITDEPTH& bitdepth) const {
+		return BitDepthSupported(bitdepth.value());
+	}
+
+	auto BitDepthBest() const {
+		return BITDEPTHS::find_if([this](auto bpp) {
+			return BitDepthSupported(bpp);
+		});
+	}
+};
+
 // 図形描画関数に対するダミー関数 //
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
@@ -69,8 +112,10 @@ GRAPHICS_GEOMETRY *GrpGeom;
 GRAPHICS_GEOMETRY_DDRAW GrpGeom_DDraw;
 GRAPHICS_GEOMETRY_D3D GrpGeom_D3D;
 SURFACE_DDRAW	DxSurf[SURFACE_MAX];
-XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
 uint8_t DxEnumNow;
+
+// ビデオカード４枚差しをする人はいないと思うので...
+std::array<XDDRAWENUM, 4> DxEnum;
 
 // 図形描画用関数ポインタの実体 //
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
@@ -100,7 +145,7 @@ bool GrpEnum(void)
 {
 	HRESULT		dxret;
 
-	ZeroMemory(DxEnum, sizeof(DxEnum));
+	DxEnum = {};
 	DxEnumNow = 0;
 
 	// 列挙開始 //
@@ -847,7 +892,7 @@ static HRESULT FAR __stdcall DeviceEnum(LPGUID lpGUID,LPSTR lpDeviceDesc,LPSTR l
 
 	// ポインタをセット //
 	auto *xddraw = static_cast<XDDRAWENUM *>(lpContext);
-	xd3d = (xddraw->D3D) + (xddraw->D3DNow);		// ポインタ＋整数であることに注意
+	xd3d = &xddraw->D3D[xddraw->D3DNow];	// ポインタ＋整数であることに注意
 
 	// どの色深度をサポートしているかな(８ビットは無視する) //
 	if((depth & DDBD_16) && xddraw->b16Bit)		xd3d->b16Bit = TRUE;

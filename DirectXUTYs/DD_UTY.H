@@ -34,9 +34,6 @@
 // header.
 #define SURFACE_MAX		10				// テクスチャ,Prim,BackをのぞくSurfaceの最大数
 
-#define XDDRAWENUM_MAX	4				// ビデオカード４枚差しをする人はいないと思うので...
-#define XD3DENUM_MAX	8				// DDrawデバイスに対する3Dデバイスの列挙最大数
-
 // Forward declarations //
 struct BMP_OWNED;
 struct IDirectDraw2;
@@ -129,48 +126,6 @@ public:
 	);
 	// --------------------------- //
 };
-
-typedef struct tagD3DENUM{
-	LPGUID		lpGuid;					// GUID
-	char		*name;					// お名前
-	BOOL		bIsHW;					// ハードウェアか
-	BOOL		b8Bit;					// この D3D_DEVICE が  8Bit に対応しているか
-	BOOL		b16Bit;					// この D3D_DEVICE が 16Bit に対応しているか
-	BOOL		b24Bit;					// この D3D_DEVICE が 24Bit に対応しているか
-	BOOL		b32Bit;					// この D3D_DEVICE が 32Bit に対応しているか
-	DWORD		Zbuf;					// サポートするＺバッファの深度(０は多分無いのでしょう)
-} XD3DENUM;
-
-typedef struct tagDDRAWENUM{
-	LPGUID		lpDDGuid;				// あるドライバのGUID
-	char		*name;					// お名前
-	XD3DENUM	D3D[XD3DENUM_MAX];		// D3D_DEVICE の GUID & ドライバ名
-	DWORD		D3DNow;					// D3D_DEVICE の現在の数
-	BOOL		b8Bit;					// この DD_DEVICE が  8Bit に対応しているか
-	BOOL		b16Bit;					// この DD_DEVICE が 16Bit に対応しているか
-	BOOL		b24Bit;					// この DD_DEVICE が 24Bit に対応しているか
-	BOOL		b32Bit;					// この DD_DEVICE が 32Bit に対応しているか
-
-	// Only looks at the first D3D device?
-	bool BitDepthSupported(uint8_t bpp) const {
-		switch(bpp) {
-		case  8:	return b8Bit;
-		case 16:	return (b16Bit && D3D[0].b16Bit);
-		case 32:	return (b32Bit && D3D[0].b32Bit);
-		default:	return false;
-		}
-	}
-
-	bool BitDepthSupported(const BITDEPTH& bitdepth) const {
-		return BitDepthSupported(bitdepth.value());
-	}
-
-	auto BitDepthBest() const {
-		return BITDEPTHS::find_if([this](auto bpp) {
-			return BitDepthSupported(bpp);
-		});
-	}
-} XDDRAWENUM;
 
 
 // グローバル変数 //

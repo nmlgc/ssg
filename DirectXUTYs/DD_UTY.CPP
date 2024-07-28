@@ -75,9 +75,6 @@ static void SetDummyFunc(void);
 static void GrpFlipFS(void);
 static void GrpFlipWnd(void);
 
-// ビット深度によりカラーキーをセットする
-extern BOOL GrpSetColorKey(LPDIRECTDRAWSURFACE lpds);
-
 
 // グローバル変数 //
 GRAPHICS_DDRAW	DxObj;
@@ -589,6 +586,7 @@ static void GrpFlipWnd(void)
 	});
 }
 
+// クリッピングをかける
 bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 {
 	int w = src->right - src->left - 1;
@@ -652,6 +650,7 @@ bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 	return GrpBltX(src, x, y, surf);
 }
 
+// ビット深度によりカラーキーをセットする
 bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 {
 	DDSURFACEDESC			ddsd;

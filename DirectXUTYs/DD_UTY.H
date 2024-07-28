@@ -95,9 +95,6 @@ public:
 	// オフスクリーン Surface 作成 //
 	// --------------------------- //
 
-	// Surface の作成(BMPリロード有り)
-	bool SurfaceCreate(BYTE surf_id, PIXEL_SIZE size);
-
 	// (Re-)creates the DirectDraw surface associated with [surf_id], in the
 	// given size and with undefined initial contents, retaining whatever state
 	// the GDI surface might have had. After filling the GDI surface with the
@@ -225,7 +222,6 @@ extern void (*GrpFatCircleA)(int x, int y, int r, int w);	// 太い円を描く
 // Returns `true` if any part of the sprite was blitted.
 extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
-extern bool GrpClip(PIXEL_LTRB *src, int *x, int *y);	// クリッピングをかける
 extern void GrpGetClip(WINDOW_LTRB *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //

@@ -62,7 +62,6 @@ struct GRAPHICS_DDRAW {
 	PALETTE	Palette;
 
 	PIXELFORMAT PixelFormat;
-	HWND					hWnd;			// ウィンドウハンドル
 	bool	bNeedChgPal;	// パレットを変更する必要があるか
 	std::optional<uint8_t>	DeviceID;
 

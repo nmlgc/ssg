@@ -110,9 +110,6 @@ bool GrpEnum(void)
 		return false;
 	}
 
-	extern HWND hWndMain;
-	DxObj.hWnd = hWndMain;
-
 #ifdef _DEBUG
 	DebugOut(u8"正常に列挙できたの");
 #endif
@@ -141,7 +138,8 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 //	D3DMATERIAL			mat;
 //	D3DMATERIALHANDLE	hmat;
 
-	if(hWnd == nullptr) {
+	extern HWND hWndMain;
+	if(hWndMain == nullptr) {
 		return false;
 	}
 
@@ -184,7 +182,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 
 		// 強調レベルのセット //
 		dxret = DD->SetCooperativeLevel(
-			hWnd, (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN)
+			hWndMain, (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN)
 		);
 		if(dxret!=DD_OK) throw("SetCooperativeLevel に失敗");
 

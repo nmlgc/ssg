@@ -78,7 +78,7 @@ GRAPHICS_GEOMETRY_DDRAW GrpGeom_DDraw;
 GRAPHICS_GEOMETRY_D3D GrpGeom_D3D;
 SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
-DWORD			DxEnumNow;
+uint8_t DxEnumNow;
 
 // 図形描画用関数ポインタの実体 //
 void(*GrpFlip)(void)                                = DM_V;
@@ -130,6 +130,19 @@ bool GrpEnum(void)
 #endif
 
 	return TRUE;
+}
+
+uint8_t GrpBackend_DeviceCount(void)
+{
+	return DxEnumNow;
+}
+
+Any::string_view GrpBackend_DeviceName(uint8_t id)
+{
+	if(id >= DxEnumNow) {
+		return {};
+	}
+	return DxEnum[id].name;
 }
 
 bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)

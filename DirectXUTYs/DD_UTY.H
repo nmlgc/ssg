@@ -178,8 +178,6 @@ typedef struct tagDDRAWENUM{
 extern GRAPHICS_DDRAW	DxObj;
 extern GRAPHICS_GEOMETRY *GrpGeom;
 extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
-extern XDDRAWENUM	DxEnum[XDDRAWENUM_MAX];
-extern DWORD		DxEnumNow;
 
 
 // 初期化など //

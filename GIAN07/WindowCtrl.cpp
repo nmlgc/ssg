@@ -373,13 +373,14 @@ static bool GrpFnChgDevice(INPUT_BITS key)
 	return OptionFN(key, SetGrpItem, [&]() {
 		const int flag = ((key == KEY_LEFT) ? -1 : 2);
 		// 一つしかデバイスが存在しないときは変更できない //
-		if(DxEnumNow <= 1) {
+		const auto device_count = GrpBackend_DeviceCount();
+		if(device_count <= 1) {
 			return;
 		}
 
 		// 次のデバイスへ //
 		uint8_t device_id_new = (
-			(ConfigDat.DeviceID.v + DxEnumNow + flag) % DxEnumNow
+			(ConfigDat.DeviceID.v + device_count + flag) % device_count
 		);
 
 		// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
@@ -833,7 +834,9 @@ static void SetGrpItem(void)
 	int		i;
 
 #define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
-	sprintf(GrpTitle[0], "Device   [%.7s]", DxEnum[ConfigDat.DeviceID.v].name);
+
+	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
+	sprintf(GrpTitle[0], "Device   [%.7s]", dev.data());
 	sprintf(GrpTitle[1], "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
 	sprintf(GrpTitle[2], "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
 #undef SetFlagsMacro

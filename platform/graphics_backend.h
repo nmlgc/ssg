@@ -5,10 +5,18 @@
 
 #pragma once
 
-import std.compat;
 #include "game/coords.h"
 #include "game/graphics.h"
+#include "game/narrow.h"
 #include "game/pixelformat.h"
+
+/// Enumeration and pre-initialization queries
+/// ------------------------------------------
+
+// Physical graphics adapters.
+uint8_t GrpBackend_DeviceCount(void);
+Any::string_view GrpBackend_DeviceName(uint8_t id);
+/// ------------------------------------------
 
 /// General
 /// -------

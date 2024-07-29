@@ -234,13 +234,13 @@ void HLaserDraw(void)
 	if(DxObj.PixelFormat.IsChanneled()){
 		AlphaPolygon = GrpPolygonA;
 		//AlphaCircle  = GrpCircleA;
-		GrpSetColor(1,2,5);
+		GrpSetColor({ 1, 2, 5 });
 		GrpSetAlpha(0,ALPHA_ONE);
 	}
 	else{
 		AlphaPolygon = GrpPolygon;
 		//AlphaCircle  = GrpCircle;
-		GrpSetColor(2,2,5);
+		GrpSetColor({ 2, 2, 5 });
 	}
 
 	GrpLock();
@@ -282,9 +282,9 @@ void HLaserDraw(void)
 	}
 
 	if(DxObj.PixelFormat.IsChanneled()) {
-		GrpSetColor(3,4,5);
+		GrpSetColor({ 3, 4, 5 });
 	} else {
-		GrpSetColor(5,5,5);
+		GrpSetColor({ 5, 5, 5 });
 	}
 
 	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){

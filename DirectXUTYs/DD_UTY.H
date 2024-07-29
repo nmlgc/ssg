@@ -202,7 +202,7 @@ extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
 extern void (*GrpLock)(void);	// 図形描画の準備をする
 extern void (*GrpUnlock)(void);	// 図形描画を完了する
 
-extern void (*GrpSetColor)(uint8_t r, uint8_t g, uint8_t b);	// 色セット
+extern void (*GrpSetColor)(RGB216 col);	// 色セット
 extern void (*GrpSetAlpha)(uint8_t a, uint8_t mode);	// αセット
 
 extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線

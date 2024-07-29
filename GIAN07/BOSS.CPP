@@ -208,7 +208,7 @@ void BossMove(void)
 // ボスを描画する
 void BossDraw(void)
 {
-	int j, x, y;
+	int x, y;
 	int			w,h,t;
 	ENEMY_DATA	*e;
 	PIXEL_LTRB	wing;
@@ -251,8 +251,8 @@ void BossDraw(void)
 			// バリア状態 //
 			if(b->ExState == BEXST_SHILD1 && Viv.bomb_time && (e->flag&EF_DRAW)){
 				GrpLock();
-				for(j=0; j<=5; j++){
-					GrpSetColor(5-j,5-j,5);
+				for(uint8_t j = 0; j <= 5; j++) {
+					GrpSetColor({ (5u - j), (5u - j), 5u });
 					GrpCircle(x, y, sinl(e->count*4, 30+j*4)+80);
 				}
 				GrpUnlock();
@@ -427,7 +427,7 @@ void BossHPG_Draw(void)
 
 			GrpLock();
 			GrpSetAlpha(128+64,ALPHA_NORM);//ALPHA_NORM);
-			GrpSetColor(0,1,5);
+			GrpSetColor({ 0, 1, 5 });
 			if(DxObj.PixelFormat.IsChanneled()){
 				WINDOW_POINT Src[4] = {
 					{ 0, top },
@@ -439,7 +439,7 @@ void BossHPG_Draw(void)
 					Src[0].x = Src[3].x = x1;
 					GrpGrdRectA(Src);
 				//	GrpBoxA(left, top, x1, bottom);
-					GrpSetColor(5,0,0);
+					GrpSetColor({ 5, 0, 0 });
 					GrpBoxA(x1, top, x2, bottom);
 				}
 				else{
@@ -454,15 +454,15 @@ void BossHPG_Draw(void)
 				if(x1<x2){
 					GrpBoxA(left, top, x2, line_top);
 					GrpBoxA(left, line_bottom, x2, bottom);
-					GrpSetColor(5,5,5);
+					GrpSetColor({ 5, 5, 5 });
 					GrpBoxA(left, line_top, x1, line_bottom);
-					GrpSetColor(5,0,0);
+					GrpSetColor({ 5, 0, 0 });
 					GrpBoxA(x1, top, x2, bottom);
 				}
 				else{
 					GrpBoxA(left, top, x2, line_top);
 					GrpBoxA(left, line_bottom, x2, bottom);
-					GrpSetColor(5,5,5);
+					GrpSetColor({ 5, 5, 5 });
 					GrpBoxA(left, line_top, x2, line_bottom);
 				}
 			}

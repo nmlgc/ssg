@@ -524,7 +524,7 @@ static void ExDraw(void)
 	else			deg+=4;
 
 	GrpLock();
-	GrpSetColor(0,3,0);
+	GrpSetColor({ 0, 3, 0 });
 
 	dx = cosl(deg+64,64);		infx = cosl(deg,800);
 	dy = sinl(deg+64,64);		infy = sinl(deg,800);

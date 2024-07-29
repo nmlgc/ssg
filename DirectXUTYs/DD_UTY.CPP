@@ -43,7 +43,7 @@ void RELEASE(auto*& x)
 // 図形描画関数に対するダミー関数 //
 static void DM_V(void);
 static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static void DM_BBB(uint8_t a, uint8_t b, uint8_t c);
+static void DM_COL(RGB216 col);
 static void DM_BB(uint8_t a, uint8_t b);
 static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
@@ -89,7 +89,7 @@ DWORD			DxEnumNow;
 void(*GrpFlip)(void)                                = DM_V;
 void(*GrpLock)(void)                                = DM_V;
 void(*GrpUnlock)(void)                              = DM_V;
-void(*GrpSetColor)(uint8_t r, uint8_t g, uint8_t b) = DM_BBB;
+void(*GrpSetColor)(RGB216 col)                      = DM_COL;
 void(*GrpSetAlpha)(uint8_t a, uint8_t mode)         = DM_BB;
 void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
@@ -528,9 +528,11 @@ bool GRAPHICS_DDRAW::SurfaceBlit(
 
 void GrpCls(void)
 {
-	return GrpClsEx(
-		std::nullopt, ((DxObj.PixelFormat.IsPalettized()) ? RGB256(0, 0, 0) : 0)
+	const auto col = ((DxObj.PixelFormat.IsPalettized())
+		? RGB216{ 0, 0, 0 }.PaletteIndex()
+		: 0
 	);
+	return GrpClsEx(std::nullopt, col);
 }
 
 
@@ -934,7 +936,7 @@ static void SetDummyFunc(void)
 	GrpFlip     = DM_V;
 	GrpLock     = DM_V;
 	GrpUnlock   = DM_V;
-	GrpSetColor = DM_BBB;
+	GrpSetColor = DM_COL;
 	GrpSetAlpha = DM_BB;
 	GrpLine     = DM_IIII;
 	GrpBox      = DM_IIII;
@@ -947,7 +949,7 @@ static void SetDummyFunc(void)
 // ダミー関数の実体(かなり手抜き...) //
 static void DM_V(void) {}
 static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d){};
-static void DM_BBB(uint8_t a, uint8_t b, uint8_t c) {}
+static void DM_COL(RGB216 col) {}
 static void DM_BB(uint8_t a, uint8_t b) {}
 static void DM_III(int a, int b, int c) {}
 static void DM_IIII(int a, int b, int c, int d) {}

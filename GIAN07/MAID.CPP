@@ -80,15 +80,15 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor(0,0,5);
+					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
 				}
 				else{
 					switch(w){
-						case(1):	GrpSetColor(4,4,5);	break;
-						case(2):	GrpSetColor(2,2,5);	break;
-						case(3):	GrpSetColor(0,0,5);	break;
+					case(1):	GrpSetColor({ 4, 4, 5 });	break;
+					case(2):	GrpSetColor({ 2, 2, 5 });	break;
+					case(3):	GrpSetColor({ 0, 0, 5 });	break;
 					}
 					GrpPolygon(p);
 				}
@@ -106,15 +106,15 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor(0,0,5);
+					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
 				}
 				else{
 					switch(w){
-						case(1):	GrpSetColor(4,4,5);	break;
-						case(2):	GrpSetColor(2,2,5);	break;
-						case(3):	GrpSetColor(0,0,5);	break;
+					case(1):	GrpSetColor({ 4, 4, 5 });	break;
+					case(2):	GrpSetColor({ 2, 2, 5 });	break;
+					case(3):	GrpSetColor({ 0, 0, 5 });	break;
 					}
 					GrpPolygon(p);
 				}
@@ -138,12 +138,12 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor(0,0,5);
+					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
 				}
 				else{
-					GrpSetColor(c,c,5);
+					GrpSetColor({ c, c, 5u });
 					GrpPolygon(p);
 				}
 			}
@@ -160,12 +160,12 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor(0,0,5);
+					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
 					GrpGrdRectA(p);
 				}
 				else{
-					GrpSetColor(c,c,5);
+					GrpSetColor({ c, c, 5u });
 					GrpPolygon(p);
 				}
 			}
@@ -228,7 +228,7 @@ extern void StateDraw(void)
 	// 残りかすり時間ゲージの表示 //
 	if(Viv.evade_c){
 		GrpLock();
-		GrpSetColor(5,1,0);
+		GrpSetColor({ 5, 1, 0 });
 		GrpSetAlpha(128,ALPHA_ONE);
 		for(i=0;i<=10;i++){
 			temp = 128+9+(Viv.evade_c>>2) + (5-i);

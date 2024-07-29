@@ -367,8 +367,8 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 
 
 	if(lp->flag==LF_CLEAR){
-		//GrpSetColor(laser_color[lp->c]);
-		GrpSetColor(1,0,5);
+		// GrpSetColor(laser_color[lp->c]);
+		GrpSetColor({ 1, 0, 5 });
 		GrpLine(lp->p[0].x,lp->p[0].y,lp->p[1].x,lp->p[1].y);
 		GrpLine(lp->p[3].x,lp->p[3].y,lp->p[2].x,lp->p[2].y);
 		return;
@@ -384,18 +384,18 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
  */
 
 	//GrpSetAlpha(0,ALPHA_ONE);
-	//GrpSetColor(4,1,0);
+	// GrpSetColor({ 4, 1, 0 });
 //	GrpSetAlpha(128,ALPHA_ONE);		// 2000/09/06 に削除
-	GrpSetColor(1,0,5);
+	GrpSetColor({ 1, 0, 5 });
 
 	if(DxObj.PixelFormat.IsChanneled()) {
 		GrpGrdRect(lp->p);
 	}
 	else{
-		GrpSetColor(1,0,5);
+		GrpSetColor({ 1, 0, 5 });
 		GrpPolygon(lp->p);
 
-		GrpSetColor(5,5,5);
+		GrpSetColor({ 5, 5, 5 });
 		p[0].x = p[1].x = lp->p[0].x - lp->wx*3/4;//- wx*4/len;
 		p[0].y = p[1].y = lp->p[0].y - lp->wy*3/4;//- wy*4/len;
 		p[3].x = p[2].x = lp->p[3].x + lp->wx*3/4;//+ wx*4/len;
@@ -408,7 +408,7 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 		//GrpLine(lp->p[0].x,lp->p[0].y,lp->p[1].x,lp->p[1].y);
 		//GrpLine(lp->p[2].x,lp->p[2].y,lp->p[3].x,lp->p[3].y);
 		//GrpPolygon(lp->p,4);
-		//GrpSetColor(5,5,5);
+		// GrpSetColor({ 5, 5, 5 });
 		//GrpLine(x,y,x+lp->lx,y+lp->ly);
 	}
 	//Grp_Polygon(temp,4,RGB256(5,5,5));

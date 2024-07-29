@@ -372,13 +372,13 @@ void NameRegistProc(bool&)
 
 	GrpLock();
 
-	GrpSetColor(2,0,0);
+	GrpSetColor({ 2, 0, 0 });
 	gx = ScoreString[CurrentRank-1].x >> 6;
 	gy = ScoreString[CurrentRank-1].y >> 6;
 	GrpBox(gx,gy,gx+400,gy+32);
 
 	if(time%64 > 32){
-		GrpSetColor(4,0,0);
+		GrpSetColor({ 4, 0, 0 });
 		len = min(strlen(ScoreString[CurrentRank-1].Name), NR_NAME_LEN-2);
 		gx += (len*16 + 88);
 		gy += (4);
@@ -647,7 +647,7 @@ void ReplayProc(bool&)
 		if(ExTimer<64+32){
 			GrpLock();
 			GrpSetAlpha(128, ALPHA_NORM);
-			GrpSetColor(0,0,0);
+			GrpSetColor({ 0, 0, 0 });
 			GrpBoxA(128+45-3, 470+4-1, 128+45+72, 470+4+5);
 			GrpUnlock();
 			rc = PIXEL_LTWH{ 312, 88, 72, 8 };
@@ -711,7 +711,7 @@ void SProjectProc(bool&)
 		if(DxObj.PixelFormat.IsChanneled()){
 			GrpLock();
 			GrpSetAlpha(black_alpha, ALPHA_NORM);
-			GrpSetColor(0, 0, 0);
+			GrpSetColor({ 0, 0, 0 });
 			GrpBoxA(logo.left, logo.top, logo.right, logo.bottom);
 			GrpUnlock();
 		} else {
@@ -1195,7 +1195,7 @@ void WeaponSelectProc(bool&)
 		}
 
 		GrpLock();
-		GrpSetColor(0,0,1);
+		GrpSetColor({ 0, 0, 1 });
 		GrpSetAlpha(128, ALPHA_NORM);
 		for(i=0;i<3;i++){
 			if(
@@ -1245,16 +1245,16 @@ void WeaponSelectProc(bool&)
 		GrpLock();
 		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
-		GrpSetColor(0,0,4);
+		GrpSetColor({ 0, 0, 4 });
 		GrpLine(400-110,400-300,400+110,400-300);
 		GrpLine(400-110,400+10,400+110,400+10);
 		GrpLine(400-110,400-300,400-110,400+10);
 		GrpLine(400+110,400-300,400+110,400+10);
 
 		if(abs(deg) <= 25) {
-			GrpSetColor(2,2,5);
+			GrpSetColor({ 2, 2, 5 });
 			GrpCircle(120, 150, (39 + 10 - (2 * abs(deg))));
-			GrpSetColor(4,4,5);
+			GrpSetColor({ 4, 4, 5 });
 			GrpCircle(120, 150, (41 + 10 - (2 * abs(deg))));
 		}
 		GrpUnlock();

@@ -159,7 +159,7 @@ void DrawWarning(void)
 		GrpSetAlpha(
 			Cast::down_sign<uint8_t>(128 + sinl(count, 48)), ALPHA_NORM
 		);
-		GrpSetColor(5,0,0);
+		GrpSetColor({ 5, 0, 0 });
 		GrpBoxA(129,40+6,128+384,60+6);
 		GrpBoxA(129,60+(232-152)-4,128+384,80+(232-152)-4);
 		GrpUnlock();
@@ -183,21 +183,11 @@ void DrawWarning(void)
 			det = 2;
 		}
 
-		GrpSetColor(1,1,5);
-		MoveWarningR(st);
-		DrawLineList3D(Warning);
-		GrpSetColor(2,2,5);
-		MoveWarningR(det);
-		DrawLineList3D(Warning);
-		GrpSetColor(3,3,5);
-		MoveWarningR(det);
-		DrawLineList3D(Warning);
-		GrpSetColor(4,4,5);
-		MoveWarningR(det);
-		DrawLineList3D(Warning);
-		GrpSetColor(5,5,5);
-		MoveWarningR(det);
-		DrawLineList3D(Warning);
+		GrpSetColor({ 1, 1, 5 });	MoveWarningR(st); 	DrawLineList3D(Warning);
+		GrpSetColor({ 2, 2, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
+		GrpSetColor({ 3, 3, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
+		GrpSetColor({ 4, 4, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
+		GrpSetColor({ 5, 5, 5 });	MoveWarningR(det);	DrawLineList3D(Warning);
 
 		GrpUnlock();
 	}
@@ -370,8 +360,8 @@ static void __Draw3DCube(const Cube3D *c)
 
 	l2  = l;
 
-	//GrpSetColor(1,1,2);
-	GrpSetColor(1,1,3);
+	// GrpSetColor({ 1, 1, 2 });
+	GrpSetColor({ 1, 1, 3 });
 	for(x=-1; x<=1; x++){
 		for(y=-1; y<=1; y++){
 			p1.x = x * l;
@@ -390,7 +380,7 @@ static void __Draw3DCube(const Cube3D *c)
 		}
 	}
 
-	GrpSetColor(0,0,3);
+	GrpSetColor({ 0, 0, 3 });
 	for(y=-1; y<=1; y++){
 		for(z=-1; z<=1; z++){
 			p1.x =    -l2;
@@ -409,8 +399,8 @@ static void __Draw3DCube(const Cube3D *c)
 		}
 	}
 
-	//GrpSetColor(1,1,3);
-	GrpSetColor(1,1,4);
+	// GrpSetColor({ 1, 1, 3 });
+	GrpSetColor({ 1, 1, 4 });
 	for(x=-1; x<=1; x++){
 		for(z=-1; z<=1; z++){
 			p1.x = x * l;
@@ -485,9 +475,9 @@ void DrawEffectFakeECL(void)
 
 	GrpLock();
 
-//	GrpSetColor(3,2,0);		// 後半戦用
-	GrpSetColor(0,2,0);
-//	GrpSetColor(0,0,3);
+	// GrpSetColor({ 3, 2, 0 });	// 後半戦用
+	GrpSetColor({ 0, 2, 0 });
+	// GrpSetColor({ 0, 0, 3 });
 
 	for(i=128-WFLine.ox/2; i<640-128; i+=32)
 		GrpLine(i,0,i,480);
@@ -496,9 +486,9 @@ void DrawEffectFakeECL(void)
 		GrpLine(128,j,640-128,j);
 
 
-//	GrpSetColor(5,3,0);		// 後半戦用
-	GrpSetColor(0,3,0);
-//	GrpSetColor(0,0,4);
+	// GrpSetColor({ 5, 3, 0 });	// 後半戦用
+	GrpSetColor({ 0, 3, 0 });
+	// GrpSetColor({ 0, 0, 4 });
 
 	for(i=128-WFLine.ox; i<640-128; i+=64)
 		GrpLine(i,0,i,480);

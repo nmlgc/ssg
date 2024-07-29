@@ -207,21 +207,21 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	GrpLock();
 	GrpSetAlpha(alpha,ALPHA_NORM);
 
-	GrpSetColor(0,0,0);
+	GrpSetColor({ 0, 0, 0 });
 	GrpBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 	top += CWIN_ITEM_H;
 
-	GrpSetColor(0,0,2);
+	GrpSetColor({ 0, 0, 2 });
 	for(i=0;i<p->NumItems;i++){
 		if(i==ws->Select[ws->SelectDepth]){
 			GrpSetAlpha(128,ALPHA_NORM);
-			GrpSetColor(5,0,0);
+			GrpSetColor({ 5, 0, 0 });
 		}
 		GrpBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 		top += CWIN_ITEM_H;
 		if(i==ws->Select[ws->SelectDepth]){
 			GrpSetAlpha(alpha,ALPHA_NORM);
-			GrpSetColor(0,0,2);
+			GrpSetColor({ 0, 0, 2 });
 		}
 	}
 	GrpUnlock();
@@ -419,7 +419,7 @@ void MWinDraw(void)
 	GrpLock();
 	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 110;
 	GrpSetAlpha(alpha,ALPHA_NORM);
-	GrpSetColor(0,0,3);//0,0,3
+	GrpSetColor({ 0, 0, 3 });
 	GrpBoxA(x+4,y+4,x+w-4,y+h-4);
 	GrpUnlock();
 

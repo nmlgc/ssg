@@ -274,22 +274,18 @@ extern void LLaserDraw(void)
 	WINDOW_POINT	p[4];
 	int				wx,wy,len;
 
-	static const BYTE Table16Bit[16][3] = {
-		{3, 0, 3}, {0, 2, 0}, {0, 0, 4}, {4, 2, 0},
-		{0, 0, 1}
+	static const RGB216 Table16Bit[16] = {
+		{ 3, 0, 3 }, { 0, 2, 0 }, { 0, 0, 4 }, { 4, 2, 0 }, { 0, 0, 1 }
 	};
 
-	static const BYTE Table8BitA[16][3] = {
-		{2, 0, 2}, {0, 2, 0}, {0, 1, 3}, {4, 2, 0},
-		{0, 0, 1}
+	static const RGB216 Table8BitA[16] = {
+		{ 2, 0, 2 }, { 0, 2, 0 }, { 0, 1, 3 }, { 4, 2, 0 }, { 0, 0, 1 }
 	};
-	static const BYTE Table8BitB[16][3] = {
-		{3, 0, 3}, {0, 4, 0}, {0, 1, 5}, {5, 3, 0},
-		{2, 2, 4}
+	static const RGB216 Table8BitB[16] = {
+		{ 3, 0, 3 }, { 0, 4, 0 }, { 0, 1, 5 }, { 5, 3, 0 }, { 2, 2, 4 }
 	};
-	static const BYTE Table8BitC[16][3] = {
-		{5, 4, 5}, {5, 5, 5}, {4, 4, 5}, {5, 5, 4},
-		{4, 4, 5}
+	static const RGB216 Table8BitC[16] = {
+		{ 5, 4, 5 }, { 5, 5, 5 }, { 4, 4, 5 }, { 5, 5, 4 }, { 4, 4, 5 }
 	};
 
 
@@ -323,8 +319,8 @@ extern void LLaserDraw(void)
 					p[2].y += lp->infy;
 					*/
 					if(DxObj.PixelFormat.IsChanneled()) {
-						//GrpSetColor(3,0,3);
-						GrpSetColor(Table16Bit[c][0], Table16Bit[c][1], Table16Bit[c][2]);
+						// GrpSetColor({ 3, 0, 3 });
+						GrpSetColor(Table16Bit[c]);
 						GrpSetAlpha(0,ALPHA_ONE);
 						GrpGrdRectA(lp->p);
 						p2[0].x = x;
@@ -340,8 +336,8 @@ extern void LLaserDraw(void)
 						GrpGrdPolygon(p2);
 						break;
 					}
-					//GrpSetColor(2,0,2);
-					GrpSetColor(Table8BitA[c][0], Table8BitA[c][1], Table8BitA[c][2]);
+					// GrpSetColor({ 2, 0, 2 });
+					GrpSetColor(Table8BitA[c]);
 					GrpPolygon(lp->p);
 				}
 				else if(DxObj.PixelFormat.IsChanneled()) {
@@ -350,8 +346,8 @@ extern void LLaserDraw(void)
 
 				GrpCircleF(x,y,len);//(lp->w>>6)+4);
 
-				//GrpSetColor(3,0,3);//lp->c;
-				GrpSetColor(Table8BitB[c][0], Table8BitB[c][1], Table8BitB[c][2]);
+				// GrpSetColor({ 3, 0, 3 }); // lp->c;
+				GrpSetColor(Table8BitB[c]);
 				if(len){
 					p[0].x = p[1].x = lp->p[0].x - wx/8;//+ wx*2/len;
 					p[0].y = p[1].y = lp->p[0].y - wy/8;//+ wy*2/len;
@@ -365,8 +361,8 @@ extern void LLaserDraw(void)
 				}
 				GrpCircleF(x,y,len-len/8);//(lp->w>>6)+2);
 
-				//GrpSetColor(5,4,5);//lp->c;
-				GrpSetColor(Table8BitC[c][0], Table8BitC[c][1], Table8BitC[c][2]);
+				// GrpSetColor({ 5, 4, 5 }); // lp->c;
+				GrpSetColor(Table8BitC[c]);
 				if(len){
 					p[0].x = p[1].x = lp->p[0].x - wx/4;//+ wx*2/len;
 					p[0].y = p[1].y = lp->p[0].y - wy/4;//+ wy*2/len;
@@ -385,7 +381,7 @@ extern void LLaserDraw(void)
 			case(LLF_LINE):
 				x = (lp->x)>>6;
 				y = (lp->y)>>6;
-				GrpSetColor(4,4,4);
+				GrpSetColor({ 4, 4, 4 });
 				GrpLine(x,y,x+(lp->infx),y+(lp->infy));
 			break;
 

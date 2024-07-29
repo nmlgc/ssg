@@ -23,7 +23,7 @@ void _2DSetup(void);	// 描画系関数ポインタをセットする
 void _2DLock(void);	// 画面描画の準備をする
 void _2DUnlock(void);	// 画面描画を完了する
 
-void _2DSetColor(uint8_t r, uint8_t g, uint8_t b);	// 色セット
+void _2DSetColor(RGB216 col);	// 色セット
 void _2DSetAlpha(uint8_t a, uint8_t mode);	// αセット
 
 void _2DLine(int x1, int y1, int x2, int y2);	// 直線

@@ -34,13 +34,60 @@ struct PALETTE : public std::array<RGBA, 256> {
 	PALETTE Fade(uint8_t alpha, uint8_t first = 0, uint8_t last = 255) const;
 };
 
-// Maps (6 * 6 * 6) = 216 RGB colors to standard palette indices.
-constexpr uint8_t RGB256(uint8_t r, uint8_t g, uint8_t b) {
-	assert(r < 6);
-	assert(g < 6);
-	assert(b < 6);
-	return (20 + r + (g * 6) + (b * 36));
-}
+// (6 * 6 * 6) = 216 standard colors, available in both channeled and
+// palettized modes.
+struct RGB216 {
+	static constexpr uint8_t MAX = 5;
+
+	const uint8_t r = 0;
+	const uint8_t g = 0;
+	const uint8_t b = 0;
+
+	consteval RGB216() = default;
+	consteval RGB216(uint8_t&& r, uint8_t&& g, uint8_t&& b) : r(r), g(g), b(b) {
+		if((r > MAX) || (g > MAX) || (b > MAX)) {
+			throw "216-color component out of range";
+		}
+	}
+
+	RGB216(
+		std::unsigned_integral auto r,
+		std::unsigned_integral auto g,
+		std::unsigned_integral auto b
+	) :
+		r(r), g(g), b(b)
+	{
+		assert(r <= MAX);
+		assert(g <= MAX);
+		assert(b <= MAX);
+	}
+
+	static RGB216 Clamped(uint8_t r, uint8_t g, uint8_t b) {
+		return RGB216{
+			(std::min)(r, MAX), (std::min)(g, MAX), (std::min)(b, MAX)
+		};
+	}
+
+	constexpr uint8_t PaletteIndex(void) const {
+		return (20 + r + (g * (MAX + 1)) + (b * ((MAX + 1) * (MAX + 1))));
+	}
+
+	constexpr RGB ToRGB(void) const {
+		return RGB{ .r = (r * 50u), .g = (g * 50u), .b = (b * 50u) };
+	}
+
+	static void ForEach(std::invocable<const RGB216&> auto&& func) {
+		constexpr uint8_t start = 0;
+		constexpr uint8_t end = (MAX + 1);
+		for(const auto r : std::views::iota(start, end)) {
+			for(const auto g : std::views::iota(start, end)) {
+				for(const auto b : std::views::iota(start, end)) {
+					func(RGB216{ r, g, b });
+				}
+			}
+		}
+	}
+};
 
 // Sets a default palette covering 216 equally distributed RGB colors. Useful
 // for showing some text before loading any of the game's images that would

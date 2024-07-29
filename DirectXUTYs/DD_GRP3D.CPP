@@ -114,11 +114,12 @@ void _3DUnlock(void)
 }
 
 // 色セット //
-void _3DSetColor(uint8_t r, uint8_t g, uint8_t b)
+void _3DSetColor(RGB216 col)
 {
-	Col3D_R = (r>5) ? 250 : r*50;
-	Col3D_G = (g>5) ? 250 : g*50;
-	Col3D_B = (b>5) ? 250 : b*50;
+	const auto rgb = col.ToRGB();
+	Col3D_R = rgb.r;
+	Col3D_G = rgb.g;
+	Col3D_B = rgb.b;
 }
 
 // αセット //

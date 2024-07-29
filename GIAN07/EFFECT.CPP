@@ -66,7 +66,7 @@ void CEffectMove(void)
 // 円エフェクトを描画する //
 void CEffectDraw(void)
 {
-	int j, k, r;
+	int j, r;
 	int					x1, x2, y1, y2;
 	static BYTE dtable[4] = {0, 1, 3, 7};
 
@@ -76,10 +76,10 @@ void CEffectDraw(void)
 		const auto *ce = &it;
 		switch(ce->type){
 			case(CEFC_STAR):
-				for(k=0; k<4; k++){
+				for(uint8_t k = 0; k < 4; k++) {
 					r = ce->r - k*7;
 					if(r < 0) continue;
-					GrpSetColor(5,k+2,k+2);
+					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
 					for(j=0; j<5; j++){
 						x1 = ce->x + cosl(ce->d + dtable[k]*ce->count/10 + j*256/5, r);
 						y1 = ce->y + sinl(ce->d + dtable[k]*ce->count/10 + j*256/5, r);
@@ -91,20 +91,20 @@ void CEffectDraw(void)
 			break;
 
 			case(CEFC_CIRCLE1):		// 集
-				for(k=0; k<4; k++){
+				for(uint8_t k = 0; k < 4; k++) {
 					r = ce->r - max(2, (k * ce->r)/8);
 					if(r < 0) continue;
-					GrpSetColor(5,k+2,k+2);
+					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
 					GrpCircle(ce->x, ce->y, r);
 				}
 			break;
 
 			case(CEFC_CIRCLE2):		// 離
-				for(k=0; k<4; k++){
+				for(uint8_t k = 0; k < 4; k++) {
 					r = ce->r - max(2, (k * ce->r)/12);
 					//r = ce->r - max(2, (k * (600-ce->r))/16);
 					if(r < 0) continue;
-					GrpSetColor(5,k+2,k+2);
+					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
 					GrpCircle(ce->x, ce->y, r);
 				}
 			break;
@@ -363,7 +363,7 @@ void SEffectDraw(void)
 				y = (e->y >> 6) + 8;
 				j = (35 - e->time) / 2;
 				GrpLock();
-				GrpSetColor(0,0,0);
+				GrpSetColor({ 0, 0, 0 });
 				GrpSetAlpha(
 					Cast::down<uint8_t>((35 - e->time) * 3), ALPHA_NORM
 				);
@@ -417,7 +417,7 @@ void SEffectDraw(void)
 
 			case(SEFC_MTITLE2): {
 				GrpLock();
-				GrpSetColor(0,0,0);
+				GrpSetColor({ 0, 0, 0 });
 				GrpSetAlpha(
 					(sinl(Cast::down<uint8_t>(e->time - 32), 80) + 80),
 					ALPHA_NORM
@@ -758,7 +758,7 @@ void GrpDrawSpect(int x, int y)
 		}
 	}
 	else{
-		GrpSetColor(4,2,1);
+		GrpSetColor({ 4, 2, 1 });
 		for(i=0;i<128+8+8;i++){
 			//WORD c2 = 0;	//5
 			if(ftable[i])	GrpLine(i+x,y-ftable[i]*2,i+x,y);
@@ -921,16 +921,11 @@ void WarningEffectDraw(void)
 		GrpLock();
 
 		r = (WarnEfcTime-(256-40))*3;
-		GrpSetColor(1,1,5);
-		GrpCircle(320,100,r-=4);
-		GrpSetColor(2,2,5);
-		GrpCircle(320,100,r-=4);
-		GrpSetColor(3,3,5);
-		GrpCircle(320,100,r-=6);
-		GrpSetColor(4,4,5);
-		GrpCircle(320,100,r-=6);
-		GrpSetColor(5,5,5);
-		GrpCircle(320,100,r-=8);
+		GrpSetColor({ 1, 1, 5 });	GrpCircle(320, 100, (r -= 4));
+		GrpSetColor({ 2, 2, 5 });	GrpCircle(320, 100, (r -= 4));
+		GrpSetColor({ 3, 3, 5 });	GrpCircle(320, 100, (r -= 6));
+		GrpSetColor({ 4, 4, 5 });	GrpCircle(320, 100, (r -= 6));
+		GrpSetColor({ 5, 5, 5 });	GrpCircle(320, 100, (r -= 8));
 
 		GrpUnlock();
 	}

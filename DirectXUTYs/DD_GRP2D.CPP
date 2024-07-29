@@ -92,12 +92,12 @@ void _2DUnlock(void)
 }
 
 // 色セット //
-void _2DSetColor(uint8_t r, uint8_t g, uint8_t b)
+void _2DSetColor(RGB216 col)
 {
-	Col2D_R = (r>5) ? 5 : r;
-	Col2D_G = (g>5) ? 5 : g;
-	Col2D_B = (b>5) ? 5 : b;
-	Col2D = RGB256(Col2D_R, Col2D_G, Col2D_B);
+	Col2D_R = col.r;
+	Col2D_G = col.g;
+	Col2D_B = col.b;
+	Col2D = col.PaletteIndex();
 	AlphaFlag = TRUE;
 }
 
@@ -328,9 +328,50 @@ static void _2DGrpHlineA(int x1, int x2_exclusive, int y)
 }
 
 // αテーブルを更新する //
+static RGB216 RGB216FromPalette(uint8_t index)
+{
+	return RGB216{
+		((Cast::up<uint16_t>(DxObj.Palette[index].r) * RGB216::MAX) / 255u),
+		((Cast::up<uint16_t>(DxObj.Palette[index].g) * RGB216::MAX) / 255u),
+		((Cast::up<uint16_t>(DxObj.Palette[index].b) * RGB216::MAX) / 255u),
+	};
+}
+
+static uint8_t _2DBlendOne(const RGB216& col)
+{
+	return RGB216{
+		(((Col2D_R + col.r) > RGB216::MAX) ? RGB216::MAX : Col2D_R),
+		(((Col2D_G + col.g) > RGB216::MAX) ? RGB216::MAX : Col2D_G),
+		(((Col2D_B + col.b) > RGB216::MAX) ? RGB216::MAX : Col2D_B),
+	}.PaletteIndex();
+}
+
+// Result := Src*Alpha + Dest*(1-Alpha) //
+static uint8_t _2DBlendNorm(const RGB216& col)
+{
+	return RGB216::Clamped(
+		(((Col2D_R * Col2D_A) + (col.r * (255 - Col2D_A))) >> 8),
+		(((Col2D_G * Col2D_A) + (col.g * (255 - Col2D_A))) >> 8),
+		(((Col2D_B * Col2D_A) + (col.b * (255 - Col2D_A))) >> 8)
+	).PaletteIndex();
+}
+
+template <uint8_t (*Func)(const RGB216&)> static void _2DBlend(uint8_t *table)
+{
+	// 固定パレットに対する処理 //
+	RGB216::ForEach([&](const RGB216& col) {
+		table[col.PaletteIndex()] = Func(col);
+	});
+	// 可変パレットに対する処理 //
+	for(int pal = 0; pal < 20; pal++) {
+		table[  0 + pal] = Func(RGB216FromPalette(  0 + pal));
+		table[236 + pal] = Func(RGB216FromPalette(236 + pal));
+	}
+}
+
 static void _2DUpdateAlphaTable(void)
 {
-	int		r,g,b,i,j,k,pal;
+	int		i;
 	BYTE	ref;
 
 	AlphaFlag = FALSE;
@@ -360,74 +401,9 @@ static void _2DUpdateAlphaTable(void)
 	AInfo[ref].CheckValue = chk;
 	AInfo[ref].RefCount   = 0;
 
-	switch(Col2D_Mode){
-		case(ALPHA_ONE):
-			// 固定パレットに対する処理 //
-			for(r=0;r<6;r++){
-				for(g=0;g<6;g++){
-					for(b=0;b<6;b++){
-						i = (Col2D_R + r)>5 ? 5 : Col2D_R;
-						j = (Col2D_G + g)>5 ? 5 : Col2D_G;
-						k = (Col2D_B + b)>5 ? 5 : Col2D_B;
-						AlphaTable[RGB256(r,g,b)] = RGB256(i,j,k);
-					}
-				}
-			}
-			// 可変パレットに対する処理 //
-			for(pal=0;pal<20;pal++){
-				r = ((Cast::up<uint16_t>(DxObj.Palette[pal].r) * 5) / 255);
-				g = ((Cast::up<uint16_t>(DxObj.Palette[pal].g) * 5) / 255);
-				b = ((Cast::up<uint16_t>(DxObj.Palette[pal].b) * 5) / 255);
-				i = (Col2D_R + r)>5 ? 5 : Col2D_R;
-				j = (Col2D_G + g)>5 ? 5 : Col2D_G;
-				k = (Col2D_B + b)>5 ? 5 : Col2D_B;
-				AlphaTable[pal] = RGB256(i,j,k);
-			}
-			for(pal=236;pal<256;pal++){
-				r = ((Cast::up<uint16_t>(DxObj.Palette[pal].r) * 5) / 255);
-				g = ((Cast::up<uint16_t>(DxObj.Palette[pal].g) * 5) / 255);
-				b = ((Cast::up<uint16_t>(DxObj.Palette[pal].b) * 5) / 255);
-				i = (Col2D_R + r)>5 ? 5 : Col2D_R;
-				j = (Col2D_G + g)>5 ? 5 : Col2D_G;
-				k = (Col2D_B + b)>5 ? 5 : Col2D_B;
-				AlphaTable[pal] = RGB256(i,j,k);
-			}
-		break;
-
-		case(ALPHA_NORM):
-			// 固定パレットに対する処理 //
-			for(r=0;r<6;r++){
-				for(g=0;g<6;g++){
-					for(b=0;b<6;b++){
-						// Result := Src*Alpha + Dest*(1-Alpha) //
-						i = (Col2D_R*Col2D_A + r*(255-Col2D_A))>>8;		if(i>6) i=5;
-						j = (Col2D_G*Col2D_A + g*(255-Col2D_A))>>8;		if(j>6) j=5;
-						k = (Col2D_B*Col2D_A + b*(255-Col2D_A))>>8;		if(k>6) k=5;
-						AlphaTable[RGB256(r,g,b)] = RGB256(i,j,k);
-					}
-				}
-			}
-			// 可変パレットに対する処理 //
-			for(pal=0;pal<20;pal++){
-				r = ((Cast::up<uint16_t>(DxObj.Palette[pal].r) * 5) / 255);
-				g = ((Cast::up<uint16_t>(DxObj.Palette[pal].g) * 5) / 255);
-				b = ((Cast::up<uint16_t>(DxObj.Palette[pal].b) * 5) / 255);
-				i = (Col2D_R*Col2D_A + r*(255-Col2D_A))>>8;		if(i>6) i=5;
-				j = (Col2D_G*Col2D_A + g*(255-Col2D_A))>>8;		if(j>6) j=5;
-				k = (Col2D_B*Col2D_A + b*(255-Col2D_A))>>8;		if(k>6) k=5;
-				AlphaTable[pal] = RGB256(i,j,k);
-			}
-			for(pal=236;pal<256;pal++){
-				r = ((Cast::up<uint16_t>(DxObj.Palette[pal].r) * 5) / 255);
-				g = ((Cast::up<uint16_t>(DxObj.Palette[pal].g) * 5) / 255);
-				b = ((Cast::up<uint16_t>(DxObj.Palette[pal].b) * 5) / 255);
-				i = (Col2D_R*Col2D_A + r*(255-Col2D_A))>>8;		if(i>6) i=5;
-				j = (Col2D_G*Col2D_A + g*(255-Col2D_A))>>8;		if(j>6) j=5;
-				k = (Col2D_B*Col2D_A + b*(255-Col2D_A))>>8;		if(k>6) k=5;
-				AlphaTable[pal] = RGB256(i,j,k);
-			}
-
-		break;
+	switch(Col2D_Mode) {
+	case(ALPHA_ONE): 	_2DBlend<_2DBlendOne>(AlphaTable); 	break;
+	case(ALPHA_NORM):	_2DBlend<_2DBlendNorm>(AlphaTable);	break;
 	}
 }
 

@@ -512,7 +512,7 @@ void BitLineDraw(void)
 	}
 
 	GrpLock();
-	GrpSetColor(4, 4, 5);
+	GrpSetColor({ 4, 4, 5 });
 
 	for(i=0; i<n; i++){
 		if(n >= 5) j = i + 2;

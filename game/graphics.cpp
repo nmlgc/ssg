@@ -30,16 +30,12 @@ void Grp_PaletteSetDefault(void)
 		return;
 	}
 	PALETTE palette = {0};
-	for(const auto r : std::views::iota(0, 6)) {
-		for(const auto g : std::views::iota(0, 6)) {
-			for(const auto b : std::views::iota(0, 6)) {
-				const auto col = RGB256(r, g, b);
-				palette[col].r = (r * (255 / 5));
-				palette[col].g = (g * (255 / 5));
-				palette[col].b = (b * (255 / 5));
-			}
-		}
-	}
+	RGB216::ForEach([&](const RGB216& col) {
+		const auto index = col.PaletteIndex();
+		palette[index].r = (col.r * (255 / RGB216::MAX));
+		palette[index].g = (col.g * (255 / RGB216::MAX));
+		palette[index].b = (col.b * (255 / RGB216::MAX));
+	});
 	GrpSetPalette(palette);
 }
 // ----------------- //

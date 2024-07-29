@@ -102,15 +102,15 @@ typedef struct{
 LASER_CMD		LaserCmd;							// 標準レーザーコマンド構造体
 std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
 std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
-WORD			LaserNow;							// レーザーの本数
+uint16_t LaserNow;                          // レーザーの本数
 //REFLECTOR		Reflector[RT_MAX];					// 反射物_構造体
-//WORD			ReflectorNow;						// 反射物の個数
+// uint16_t	ReflectorNow;		// 反射物の個数
 
 static void easy_cmdL(void);						// 難易度：Ｅａｓｙ
 static void hard_cmdL(void);						// 難易度：Ｈａｒｄ
 static void luna_cmdL(void);						// 難易度：Ｌｕｎａｔｉｃ
 
-static BYTE __fastcall laser_dir(WORD i);				// レーザーの進行方向をセットする
+static uint8_t __fastcall laser_dir(uint16_t i); // レーザーの進行方向をセットする
 static void __fastcall slaser_pset(LASER_DATA *lp);		// ４点の座標をセットする(ショート用)
 static void __fastcall SLdraw(const LASER_DATA *lp);	// ショートレーザー描画
 
@@ -144,9 +144,7 @@ void laser_set(void)
 
 void laser_setEX(void)
 {
-	WORD i;
-
-	for(i=0;i<LaserCmd.n;i++){
+	for(decltype(LaserCmd.n) i = 0; i < LaserCmd.n; i++) {
 		if(LaserNow+1 == LASER_MAX) return;		// 最大数を越えた場合
 
 		auto* lp = &Laser[LaserInd[LaserNow++]];
@@ -192,9 +190,8 @@ void laser_setEX(void)
 
 void laser_move(void)
 {
-	WORD i;
-
-	for(i=0;i<LaserNow;i++){
+	// [LaserNow] will get mutated for reflecting lasers!
+	for(decltype(LaserNow) i = 0; i < LaserNow; i++) {
 		auto* lp = &Laser[LaserInd[i]];
 		Lmove(lp);
 		lp->count++;
@@ -244,9 +241,7 @@ void laser_draw(void)
 
 void laser_clear(void)
 {
-	WORD i;
-
-	for(i=0;i<LaserNow;i++){
+	for(decltype(LaserNow) i = 0; i < LaserNow; i++) {
 		auto& l = Laser[LaserInd[i]];
 		if(l.flag != LF_CLEAR){
 			l.flag = LF_CLEAR;
@@ -257,9 +252,7 @@ void laser_clear(void)
 
 void laserind_set(void)
 {
-	WORD i;
-
-	for(i=0;i<LASER_MAX;i++){
+	for(auto i = 0; i < LASER_MAX; i++) {
 		LaserInd[i]=i;
 		//memset(Laser+i,0,sizeof(LASER_DATA));
 	}
@@ -323,9 +316,9 @@ static void luna_cmdL(void)
 	LaserCmd.l += (LaserCmd.l>>1);
 }
 
-static BYTE __fastcall laser_dir(WORD i)
+static uint8_t __fastcall laser_dir(uint16_t i)
 {
-	BYTE deg = 0;
+	uint8_t deg = 0;
 
 	if(LaserCmd.cmd & LS_ZSET)
 		deg = atan8(Viv.x-LaserCmd.x,Viv.y-LaserCmd.y);

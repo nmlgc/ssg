@@ -36,7 +36,6 @@ void SnakyInit(void)
 // 蛇型の敵をセットする //
 void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 {
-	DWORD			n;
 	ENEMY_DATA		*e;
 
 	auto s = std::ranges::find_if(SnakeData, [](const auto& s) {
@@ -46,7 +45,7 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 		return;
 	}
 
-	s->bIsUse = TRUE;
+	s->bIsUse = true;
 	s->Parent = b;
 	s->Head   = 0;
 
@@ -62,7 +61,7 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 		point.d = b->Edat.d;
 	}
 
-	n = 4 + (TailID<<2);
+	const auto n = (4 + (TailID << 2));
 	for(auto& enemy_ptr : s->EnemyPtr) {
 		if(EnemyNow+1<ENEMY_MAX){
 			e = &Enemy[EnemyInd[EnemyNow++]];
@@ -83,7 +82,9 @@ void SnakyMove(void)
 
 	for(auto& it : SnakeData) {
 		auto *s = &it;
-		if(s->bIsUse==FALSE) continue;
+		if(s->bIsUse == false) {
+			continue;
+		}
 
 		// バッファ更新処理 //
 		constexpr auto points = (s->Length() * SNAKEYMOVE_POINTS_PER_ENEMY);
@@ -132,7 +133,7 @@ void SnakyDelete(const BOSS_DATA *b)
 		//ItemSet(e->x,e->y,0);
 	}
 
-	s->bIsUse = FALSE;
+	s->bIsUse = false;
 	s->Parent = NULL;
 }
 
@@ -154,7 +155,7 @@ void BitInit(void)
 	BitData.NumBits     = 0;
 //	BitData.DeltaAngle  = 0;
 	BitData.LaserState  = BLASERCMD_DISABLE;
-	BitData.bIsLaserEnable = FALSE;
+	BitData.bIsLaserEnable = false;
 //	BitData.ForceCount  = 0;
 
 	// ここから下の初期化がメインとなる //
@@ -174,11 +175,9 @@ void BitInit(void)
 // ビットをセットする //
 void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 {
-	static const BYTE BitHPTable[BIT_MAX] =
-	{1, 4, 2, 5, 3, 6};
+	static const uint8_t BitHPTable[BIT_MAX] = { 1, 4, 2, 5, 3, 6 };
 
 	int			i;
-	DWORD		n;
 
 	// 他の関数と違い、不等号なので注意すべし
 	// このビット構造体が有効な場合、この関数の実行はできないので
@@ -201,10 +200,10 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 //	BitData.DeltaAngle  = (256*256)/NumBits;
 	BitData.BaseAngle   = 0;//(256*256)/NumBits;//0;
 	BitData.LaserState  = BLASERCMD_DISABLE;
-	BitData.bIsLaserEnable = FALSE;
+	BitData.bIsLaserEnable = false;
 //	BitData.ForceCount  = 0;
 
-	n = 4 + (BitID<<2);
+	const auto n = (4 + (BitID << 2));
 
 	for(i=0; i<NumBits; i++){
 		if(EnemyNow+1 < ENEMY_MAX){
@@ -238,9 +237,8 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 void BitMove(void)
 {
 	int				i, j;
-	DWORD			damage;
 	ENEMY_DATA		*e;
-	BOOL			bIsDestroyed = FALSE;
+	bool bIsDestroyed = false;
 
 	if(BitData.NumBits == 0) return;
 
@@ -283,9 +281,9 @@ void BitMove(void)
 		e = BitData.Bit[i].pEnemy;
 		if(e == NULL) continue;
 
-		damage = BIT_VIRTUAL_HP - e->hp;
+		const uint32_t damage = (BIT_VIRTUAL_HP - e->hp);
 		if(BitData.Bit[i].BitHP <= damage){
-			bIsDestroyed = TRUE;
+			bIsDestroyed = true;
 
 			// ビット配列に関連づけられた敵に削除要求を送出 //
 			if(e->LLaserRef) LLaserForceClose(e);
@@ -368,10 +366,8 @@ static void BitSTDRoll(void)
 	int			i, ox, oy;
 	int			n, l;
 
-	BYTE		d, delta;
 	int			dir;
-	BYTE		ExSpeed;
-	BYTE		LaserDeg;
+	uint8_t LaserDeg;
 
 	ENEMY_DATA	*e;
 	BIT_PARAM	*bit;
@@ -388,8 +384,8 @@ static void BitSTDRoll(void)
 	ox = BitData.x;
 	oy = BitData.y;
 
-	delta   = 256 / BitData.NumBits;
-	ExSpeed = abs(BitData.BitSpeed/2);
+	const uint8_t delta   = (256 / BitData.NumBits);
+	const uint8_t ExSpeed = abs(BitData.BitSpeed / 2);
 
 /*	if((BitData.DeltaAngle / 256) < delta){
 		BitData.DeltaAngle += 64;
@@ -405,7 +401,7 @@ static void BitSTDRoll(void)
 		if(e == NULL) continue;
 
 		// 目標とする角度を求める //
-		d = (BitData.BaseAngle>>1) + (delta * bit->BitID);
+		const uint8_t d = ((BitData.BaseAngle >> 1) + (delta * bit->BitID));
 
 		// 通常の角度収束処理 //
 		dir = (Cast::sign<int8_t>(d) - Cast::sign<int8_t>(bit->Angle));
@@ -535,10 +531,9 @@ void BitLineDraw(void)
 // 攻撃パターンをセットor変更 //
 void BitSelectAttack(uint32_t BitID)
 {
-	DWORD		n;
 	int			i;
 
-	n = 4 + (BitID<<2);
+	const auto n = (4 + (BitID << 2));
 
 	for(i=0; i<BitData.NumBits; i++){
 		EnemyECL_LongJump(BitData.Bit[i].pEnemy, n);
@@ -550,14 +545,14 @@ void BitLaserCommand(uint8_t Command)
 {
 	int				i;
 	ENEMY_DATA		*e;
-	BYTE			delta;
+	uint8_t delta;
 
 	LLaserCmd.dx = 0;
 	LLaserCmd.dy = 0;
 	LLaserCmd.v  = 64;
 	LLaserCmd.w  = 64*8;
 
-	BitData.bIsLaserEnable = TRUE;
+	BitData.bIsLaserEnable = true;
 
 	for(i=0; i<BitData.NumBits; i++){
 		e = BitData.Bit[i].pEnemy;
@@ -602,7 +597,7 @@ void BitLaserCommand(uint8_t Command)
 			case(BLASERCMD_CLOSE):
 				LLaserClose(e, ECLCST_LLASERALL);
 				e->LLaserRef = 0;
-				BitData.bIsLaserEnable = FALSE;
+				BitData.bIsLaserEnable = false;
 			continue;
 
 			case(BLASERCMD_CLOSEL):

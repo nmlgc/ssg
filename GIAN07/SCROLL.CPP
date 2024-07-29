@@ -142,14 +142,12 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 // p:SCL_ENEMY以降の敵配置データ //
 static void enemy_set(void)
 {
-	BYTE		id;
-	BOOL		bFlag = TRUE;
-	BYTE		*cmd;
+	bool	bFlag = true;
 //	BIT_DEVICE	*in;				// やばやば...
-	BOOL		CtrlFlag = FALSE;
+	bool CtrlFlag = false;
 
 	while(bFlag){
-		cmd = SCL_Now;
+		const auto* cmd = SCL_Now;
 		switch(cmd[0]){
 			case(SCL_KEY):		// キー入力待ち
 			break;
@@ -173,22 +171,28 @@ static void enemy_set(void)
 					){
 						if(!SclInfo.ReturnFlag){
 							GameCount = temp;
-							SclInfo.ReturnFlag = TRUE;
+							SclInfo.ReturnFlag = true;
 						}
+					} else {
+						SclInfo.ReturnFlag = false;
 					}
-					else SclInfo.ReturnFlag = FALSE;
 				}
 /*
 				if((Key_Data & KEY_SKIP) && SclInfo.MsgFlag)
 					GameCount+=(temp-GameCount)/3;
-				else if((Key_Data&KEY_RETURN) && SclInfo.ReturnFlag==FALSE){
+				else if((Key_Data & KEY_RETURN) && !SclInfo.ReturnFlag){
 					GameCount  = temp;
-					SclInfo.ReturnFlag = TRUE;
+					SclInfo.ReturnFlag = true;
 				}
-				if(!(Key_Data&KEY_RETURN) && SclInfo.ReturnFlag) SclInfo.ReturnFlag = FALSE;
+				if(!(Key_Data & KEY_RETURN) && SclInfo.ReturnFlag) {
+					SclInfo.ReturnFlag = false;
+				}
 */
-				if(temp>GameCount) bFlag    = FALSE;
-				else               SCL_Now += 5;		// cmd(1)+time(4)
+				if(temp > GameCount) {
+					bFlag = false;
+				} else {
+					SCL_Now += 5;		// cmd(1)+time(4)
+				}
 				SCL_DEBUG("--- SCL_TIME ---");
 			}
 			break;
@@ -202,7 +206,7 @@ static void enemy_set(void)
 			case(SCL_BOSS): { // ボスをセットする(X(16),Y(16),ID(8))
 				const auto x  = I16LEAt(&cmd[1 + 0]);	// ボス初期Ｘ
 				const auto y  = I16LEAt(&cmd[1 + 2]);	// ボス初期Ｙ
-				id = cmd[1+2+2];				// ボスＩＤ
+				const auto id = cmd[1 + 2 + 2];	// ボスＩＤ
 				BossSet(x,y,id);
 				SCL_Now += (1+2+2+1);	// cmd+x+y+id
 			}
@@ -221,7 +225,7 @@ static void enemy_set(void)
 				)) {
 					MWinOpen();
 				}
-				SclInfo.MsgFlag = TRUE;
+				SclInfo.MsgFlag = true;
 				SCL_Now++;
 			break;
 
@@ -233,14 +237,14 @@ static void enemy_set(void)
 				)) {
 					MWinClose();
 				}
-				SclInfo.MsgFlag = FALSE;
+				SclInfo.MsgFlag = false;
 				SCL_Now++;
 			break;
 
 			case(SCL_MSG):		// メッセージを出力する
 				//MWinCmd(MWCMD_SMALLFONT);
-				MWinMsg(reinterpret_cast<char *>(cmd + 1));
-				SCL_Now += (strlen(reinterpret_cast<char *>(cmd + 1)) + 2);
+				MWinMsg(reinterpret_cast<const char *>(cmd + 1));
+				SCL_Now += (strlen(reinterpret_cast<const char *>(cmd + 1)) + 2);
 			break;
 
 			case(SCL_FACE):		// 顔を表示する
@@ -343,7 +347,7 @@ static void enemy_set(void)
 			case(SCL_STAGECLEAR):	// ステージクリア
 				if(ConfigDat.StageSelect.v) {
 					DemoplaySaveReplay();
-					GameExit(TRUE);
+					GameExit(true);
 					return;
 				}
 				if(DemoplayLoadEnable) return;
@@ -354,7 +358,7 @@ static void enemy_set(void)
 			case(SCL_GAMECLEAR):
 				if(ConfigDat.StageSelect.v) {
 					DemoplaySaveReplay();
-					GameExit(TRUE);
+					GameExit(true);
 					return;
 				}
 				if(DemoplayLoadEnable) return;
@@ -377,7 +381,7 @@ static void enemy_set(void)
 				}
 				if(DemoplayLoadEnable) return;
 
-				NameRegistInit(TRUE);
+				NameRegistInit(true);
 			return;
 
 			case(SCL_MAPPALETTE):	// マップパーツ用Surface からパレットを
@@ -416,7 +420,6 @@ static void _PutEnemy(const uint8_t *p)
  *  p[0-1]:EnemyX  p[2-3]:EnemyY  p[4]:EnemyID
  *  ECL_Head[0-3]:Num  ECL_Head[n*4-(n*4+3)] (n>1):StartAddr(ABS)
  */
-	DWORD			n;
 	ENEMY_DATA		*e;
 	short			x,y;
 
@@ -424,7 +427,7 @@ static void _PutEnemy(const uint8_t *p)
 
 	e = &Enemy[EnemyInd[EnemyNow++]];
 
-	n = (4 + (p[4] << 2));
+	const uint32_t n = (4 + (p[4] << 2));
 
 	x = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
 	y = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
@@ -853,20 +856,22 @@ bool ScrollInit(void)
 {
 	ScrollSaveHeader	*LayerInfo;
 	int					i;
-	static BOOL			bInitialized = FALSE;
+	static bool bInitialized = false;
 
-	SclInfo.MsgFlag    = FALSE;
-	SclInfo.ReturnFlag = FALSE;
+	SclInfo.MsgFlag    = false;
+	SclInfo.ReturnFlag = false;
 
 	if(!bInitialized){
 		InitMapChipRect();
-		bInitialized = TRUE;
+		bInitialized = true;
 	}
 
 /*
 	// 読み込みの準備 //
 	auto in = FilStartR("GIAN_MAP.DAT");
-	if(in==NULL) return FALSE;
+	if(!in) {
+		return false;
+	}
 
 	// もしすでにロードが行われていた場合、メモリを解放する //
 	if(ScrollInfo.DataHead!=NULL){
@@ -874,15 +879,20 @@ bool ScrollInit(void)
 		ScrollInfo.DataHead = NULL;
 	}
 	// そうでなければ、スクロールに関する初期化を行う //
-	else if(!InitScrollInfo()) return FALSE;
+	else if(!InitScrollInfo()) {
+		return false;
+	}
 
 	// 解凍を行う(後で、ステージを考慮したものに変更すること) //
 	ScrollInfo.DataHead = in->MemExpand(0);
-	if(ScrollInfo.DataHead==NULL) return FALSE;
+	if(!ScrollInfo.DataHead) {
+		return false;
+	}
 */
 	// 標準のスクロールスピード(マップエディタと同じ) //
+	auto* head = ScrollInfo.DataHead.get();
 	ScrollInfo.ScrollSpeed = TIME_PER_FRAME;					// 標準のスクロール速度
-	ScrollInfo.NumLayer    = U32LEAt(ScrollInfo.DataHead.get());	// レイヤーの数
+	ScrollInfo.NumLayer    = U32LEAt(head);	// レイヤーの数
 	ScrollInfo.Count       = 0;					// スクロール用カウンタ
 	ScrollInfo.InfStart    = 0;					// 無限ループ開始時刻
 	ScrollInfo.State       = SST_NORMAL;		// 状態(デフォルトの標準で..)
@@ -898,13 +908,9 @@ bool ScrollInit(void)
 	}
 
 	// レイヤー情報のロード(長さからループ用変数を調整すること) //
-	LayerInfo = reinterpret_cast<ScrollSaveHeader *>(
-		ScrollInfo.DataHead.get() + sizeof(U32LE)
-	);
+	LayerInfo = reinterpret_cast<ScrollSaveHeader *>(head + sizeof(U32LE));
 	for(i=0;i<ScrollInfo.NumLayer;i++){
-		auto *p = reinterpret_cast<PBGMAP *>(
-			ScrollInfo.DataHead.get() + LayerInfo[i].Address
-		);
+		auto *p = reinterpret_cast<PBGMAP *>(head + LayerInfo[i].Address);
 		ScrollInfo.LayerHead[i]  = p;	// 先頭
 		ScrollInfo.LayerPtr[i]   = p;	// 現在
 		ScrollInfo.LayerWait[i]  = LayerInfo[i].ScrollWait;		// レイヤーの重み
@@ -915,7 +921,7 @@ bool ScrollInit(void)
 	// 無限ループ終了時刻 //
 	ScrollInfo.InfEnd  = 16*(LayerInfo[i-1].Length-1280/16)*LayerInfo[i-1].ScrollWait;
 
-	return TRUE;
+	return true;
 }
 
 // スクロールに関する情報の初期化を行う //

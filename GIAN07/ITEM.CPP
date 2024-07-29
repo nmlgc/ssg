@@ -12,19 +12,17 @@
 
 std::array<ITEM_DATA, ITEM_MAX>	Item;
 std::array<uint16_t, ITEM_MAX>	ItemInd;
-WORD		ItemNow;
+uint16_t ItemNow;
 
 
 // アイテムを発生させる //
 void ItemSet(int x, int y, uint8_t type)
 {
-	BYTE		deg;
-
 	if(ItemNow+1>=ITEM_MAX) return;
 
 	auto* ip = &Item[ItemInd[ItemNow++]];
 
-	deg = -64;//rnd()%(128-110)+128+55;
+	constexpr uint8_t deg = -64; //rnd()%(128-110)+128+55;
 
 	ip->x     = x;
 	ip->y     = y;
@@ -52,11 +50,10 @@ void ItemSet(int x, int y, uint8_t type)
 // アイテムを動かす //
 void ItemMove(void)
 {
-	int				i,tx,ty,l;
-	DWORD			point;
+	int i, tx, ty, l;
 
 	//point = 100+(Viv.evade)*100;
-	point = (((SY_MAX-Viv.y)>>6)+Viv.evade*4)*160;
+	const uint32_t point = ((((SY_MAX - Viv.y) >> 6) + (Viv.evade * 4)) * 160);
 
 	for(i=0;i<ItemNow;i++){
 		auto* ip = &Item[ItemInd[i]];

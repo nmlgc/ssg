@@ -109,12 +109,12 @@ static void __Draw3DCube(const Cube3D *c); // 汎用３Ｄキューブ描画
 
 void InitWarning(void)
 {
-	static BOOL		bInitialized = FALSE;
+	static bool bInitialized = false;
 
 	if(bInitialized) return;
 
 	InitLineList3D(Warning);
-	bInitialized = TRUE;
+	bInitialized = true;
 }
 
 void DrawWarning(void)
@@ -288,8 +288,8 @@ void Move3DCube(void)
 {
 	int				i;
 	int				l,d2;
-	static WORD		d;
-	static WORD		dx,dy,dz;
+	static uint16_t d;
+	static uint16_t dx, dy, dz;
 
 	d+=64*4;
 
@@ -329,7 +329,6 @@ static void __Draw3DCube(const Cube3D *c)
 	// ３Ｄで透過色付きorアルファ比較ポリゴンを使えばもっともっと早いのだが... //
 	// ８ビット対応のため、まぁ仕方が無いか... //
 
-	BYTE		dx,dy,dz;
 	int			x,y,z;
 	int			l,l2;
 	Point3D		p1,p2;
@@ -337,9 +336,9 @@ static void __Draw3DCube(const Cube3D *c)
 
 	o  = c->p;
 	l  = c->l;
-	dx = c->d.dx;
-	dy = c->d.dy;
-	dz = c->d.dz;
+	const uint8_t dx = c->d.dx;
+	const uint8_t dy = c->d.dy;
+	const uint8_t dz = c->d.dz;
 
 	l2  = l;
 
@@ -407,7 +406,6 @@ static void __Draw3DCube(const Cube3D *c)
 void InitEffectFakeECL(void)
 {
 	int v;
-	BYTE	d;
 
 	WFLine.d  = 0;
 	WFLine.ox = 640*64/2;
@@ -415,7 +413,7 @@ void InitEffectFakeECL(void)
 	WFLine.w  = 30;
 
 	for(auto& it : FakeECLStr) {
-		d = rnd()%128;
+		const uint8_t d = (rnd() % 128);
 		v = rnd()%(64*5) + 64*5;
 
 		it.SrcX = (((rnd() % 7) *  9) * 8);
@@ -430,7 +428,6 @@ void InitEffectFakeECL(void)
 void MoveEffectFakeECL(void)
 {
 	int v;
-	BYTE	d;
 
 	WFLine.ox = (WFLine.ox+1)%64;
 	WFLine.oy = (WFLine.oy+62)%64;
@@ -440,7 +437,7 @@ void MoveEffectFakeECL(void)
 		it.y += it.vy;
 
 		if(it.y >= (480 * 64)) {
-			d = rnd()%128;
+			const uint8_t d = (rnd() % 128);
 			v = rnd()%(64*5) + 64*5;
 
 			it.SrcX = (((rnd() % 7) *  9) * 8);
@@ -801,9 +798,9 @@ void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 typedef struct tagStg6Raster {
 	int		x, y;		// 表示座標
 	char	vy;			//
-	BYTE	type;		// 種類(0-2)
-	BYTE	deg;		// 基準角度
-	BYTE	amp;		// 振幅
+	uint8_t	type;	// 種類(0-2)
+	uint8_t	deg;	// 基準角度
+	uint8_t	amp;	// 振幅
 } Stg6Raster;
 
 typedef struct tagStg6Star {

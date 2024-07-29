@@ -15,10 +15,10 @@ TAMA_CMD		TamaCmd;				// 標準・弾コマンド構造体
 std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
 std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
 std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
-WORD			Tama1Now;				// 小型弾の弾数
-WORD			Tama2Now;				// 特殊弾の弾数
-WORD			Tama1Max;				// 小型弾の最大数
-WORD			Tama2Max;				// 特殊弾の最大数
+uint16_t	Tama1Now;	// 小型弾の弾数
+uint16_t	Tama2Now;	// 特殊弾の弾数
+uint16_t	Tama1Max;	// 小型弾の最大数
+uint16_t	Tama2Max;	// 特殊弾の最大数
 int				TamaSpeed;
 
 
@@ -28,14 +28,14 @@ static void easy_cmd(void);				// 難易度：Ｅａｓｙ
 static void hard_cmd(void);				// 難易度：Ｈａｒｄ
 static void luna_cmd(void);				// 難易度：Ｌｕｎａｔｉｃ
 
-int __fastcall NewTamaSpeed(WORD i);
-int __fastcall LineCmdNewTamaSpeed(WORD i);
-int __fastcall TamaSpeedEx(BYTE d);
+int __fastcall NewTamaSpeed(uint16_t i);
+int __fastcall LineCmdNewTamaSpeed(uint16_t i);
+int __fastcall TamaSpeedEx(uint8_t d);
 void __fastcall _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
 
 
 /*
-_inline Debug(DWORD old,int id)
+_inline Debug(uint32_t old, int id)
 {
 	RndBuf[id] += (random_ref-old);
 }
@@ -81,12 +81,8 @@ void tama_setEX(void)
 // 弾をセットする(ライン状に発射)
 void tama_setLine(void)
 {
-//	DWORD temp;
-
-	WORD i;							// 雑用
-	WORD setmax;					// セットする弾数(連射を考慮に入れる)
-
-	WORD *indnow,*indmax,*indp;		// 上に同じ
+	// uint32_t temp;
+	uint16_t *indnow, *indmax, *indp; // 上に同じ
 
 
 	TamaSpeed = SPEEDM(TamaCmd.v);
@@ -98,12 +94,15 @@ void tama_setLine(void)
 	else
 		indnow=&Tama2Now,indmax=&Tama2Max,indp=&Tama2Ind[Tama2Now];
 
-	setmax = (TamaCmd.n)*( (TamaCmd.cmd & TAMA_REN) ? TamaCmd.ns : 1);
+	// セットする弾数(連射を考慮に入れる)
+	const uint16_t setmax = (
+		TamaCmd.n * ((TamaCmd.cmd & TAMA_REN) ? TamaCmd.ns : 1)
+	);
 
 	// その他パラメータのセット //
 	TamaCmd.cmd = (TamaCmd.cmd & 0xf0) | TC_WAY;
 
-	for(i=0;i<setmax;i++){
+	for(const auto i : std::views::iota(0u, setmax)) {
 		if( (*indnow)+1 >= (*indmax) ) return;	// セットできない場合
 
 		*indnow = *indnow + 1;					// 弾数をインクリメント
@@ -141,12 +140,8 @@ void tama_setLine(void)
 // エキストラボス専用弾幕(角度が広くなると、遅くなる) //
 void tama_setExtra01(void)
 {
-//	DWORD temp;
-
-	WORD i;							// 雑用
-	WORD setmax;					// セットする弾数(連射を考慮に入れる)
-
-	WORD *indnow,*indmax,*indp;		// 上に同じ
+	// uint32_t temp;
+	uint16_t *indnow, *indmax, *indp; // 上に同じ
 
 
 	TamaSpeed = SPEEDM(TamaCmd.v);
@@ -158,13 +153,15 @@ void tama_setExtra01(void)
 	else
 		indnow=&Tama2Now,indmax=&Tama2Max,indp=&Tama2Ind[Tama2Now];
 
-	// "セットする弾数" をセットする //
-	setmax = (TamaCmd.n)*( (TamaCmd.cmd & TAMA_REN) ? TamaCmd.ns : 1);
+	// セットする弾数(連射を考慮に入れる)
+	const uint16_t setmax = (
+		TamaCmd.n * ((TamaCmd.cmd & TAMA_REN) ? TamaCmd.ns : 1)
+	);
 
 	// その他パラメータのセット //
 	//TamaCmd.cmd = (TamaCmd.cmd & 0xf0);
 
-	for(i=0;i<setmax;i++){
+	for(const auto i : std::views::iota(0u, setmax)) {
 		if( (*indnow)+1 >= (*indmax) ) return;	// セットできない場合
 
 		*indnow = *indnow + 1;					// 弾数をインクリメント
@@ -194,7 +191,7 @@ void tama_setExtra01(void)
 	}
 }
 
-int __fastcall TamaSpeedEx(BYTE d)
+int __fastcall TamaSpeedEx(uint8_t d)
 {
 	int		temp = 0;
 	int		delta;
@@ -215,13 +212,8 @@ int __fastcall TamaSpeedEx(BYTE d)
 
 static void __TamaSet(void)
 {
-//	DWORD temp;
-
-
-	WORD i;							// 雑用
-	WORD setmax;					// セットする弾数(連射を考慮に入れる)
-
-	WORD *indnow,*indmax,*indp;		// 上に同じ
+	// uint32_t temp;
+	uint16_t *indnow, *indmax, *indp; // 上に同じ
 
 
 	// "アクセスする領域" をセットする(小型弾 or 特殊弾)        //
@@ -230,10 +222,12 @@ static void __TamaSet(void)
 	else
 		indnow=&Tama2Now,indmax=&Tama2Max,indp=&Tama2Ind[Tama2Now];
 
-	// "セットする弾数" をセットする //
-	setmax = (TamaCmd.n)*( (TamaCmd.cmd & TAMA_REN) ? TamaCmd.ns : 1);
+	// セットする弾数(連射を考慮に入れる)
+	const uint16_t setmax = (
+		TamaCmd.n * ((TamaCmd.cmd & TAMA_REN) ? TamaCmd.ns : 1)
+	);
 
-	for(i=0;i<setmax;i++){
+	for(const auto i : std::views::iota(0u, setmax)) {
 		if( (*indnow)+1 >= (*indmax) ) return;	// セットできない場合
 
 		*indnow = *indnow + 1;					// 弾数をインクリメント
@@ -274,10 +268,8 @@ void tama_move(void)
 	// ヒットチェック後にサボテンの生死判定をしているのは、死んでいる時間 //
 	// よりも生きている時間のほうが長いからなのですが...                  //
 
-	WORD i;
-
 	// 小型弾の処理 //
-	for(i=0;i<Tama1Now;i++){
+	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect==TE_NONE){
 			tamaTmove(t);
@@ -303,7 +295,7 @@ void tama_move(void)
 	Indsort(Tama1Ind, Tama1Now, Tama);
 
 	// 大型弾＆特殊弾の処理 //
-	for(i=0;i<Tama2Now;i++){
+	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect==TE_NONE){
 			tamaTmove(t);
@@ -331,12 +323,10 @@ void tama_move(void)
 
 void tama_draw(void)
 {
-	WORD		i;
 //	HRESULT		ddrval;
 	PIXEL_LTRB	src;
 	int			x,y;
 	int			dx,dy;
-	BYTE		d;
 
 	static const PIXEL_LTRB	rcExtraTama[4] = {
 		{128   , 384, 128+32, 384+32},
@@ -345,12 +335,10 @@ void tama_draw(void)
 		{128+72, 384, 128+80, 384+ 8}
 	};
 
-	static const BYTE sizeExtraTama[4] = {
-		16, 12, 8, 4
-	};
+	static constexpr uint8_t sizeExtraTama[4] = { 16, 12, 8, 4 };
 
 	// 大型弾＆特殊弾(16*16) の描画 //
-	for(i=0;i<Tama2Now;i++){
+	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です
@@ -377,15 +365,16 @@ void tama_draw(void)
 				src.right  = src.left + 16;
 			break;
 
-			case(TAMA_EXTRA):
-				d   = t->c & 3;
+			case(TAMA_EXTRA): {
+				const uint8_t d = (t->c & 3);
 				src = rcExtraTama[d];
 				x   = (t->x>>6) - sizeExtraTama[d];
 				y   = (t->y>>6) - sizeExtraTama[d];
 				GrpBlt(&src,x,y,GrEnemy);
+			}
 			continue;
 
-			case(TAMA_EXTRA2):
+			case(TAMA_EXTRA2): {
 				// The original code spelled this as
 				//
 				// 	d = (BYTE)(t->d+4)/8;
@@ -408,7 +397,7 @@ void tama_draw(void)
 				// (`int` > `uint8_t`) and signed.
 				//
 				// 256(-1) -> 32(-1) に変換
-				d = (Cast::down_sign<uint8_t>(t->d + 4) / 8);
+				const auto d = (Cast::down_sign<uint8_t>(t->d + 4) / 8);
 
 				src.top    = 320 + ((t->c & 3)<<4);	// (c mod 4) * 16
 				src.left   = d * 16;
@@ -417,6 +406,7 @@ void tama_draw(void)
 				//x   = (t->x>>6) - 8;	// サイズは１６で固定
 				//y   = (t->y>>6) - 8;	// すなわち、そのままでＯＫ！
 				GrpBlt(&src,x,y,GrEnemy);
+			}
 			continue;
 
 			case(TAMA_ANGLE):
@@ -432,7 +422,7 @@ void tama_draw(void)
 					//
 					// 修正 8 ごとで 32 分割だからズラシは 4
 					// d = (Cast::down_sign<uint8_t>(t->d + 8) / 8);
-					d  = (Cast::down_sign<uint8_t>(t->d + 4) / 8);
+					const auto d = (Cast::down_sign<uint8_t>(t->d + 4) / 8);
 
 					dx = (d%8) * 32;
 					dy = (d/8) * 32;
@@ -452,7 +442,7 @@ void tama_draw(void)
 	}
 
 	// 小型弾(8*8) の描画 //
-	for(i=0;i<Tama1Now;i++){
+	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 
 		x = (t->x >> 6)-4;	// -4 は座標の補正用です
@@ -557,9 +547,7 @@ void __fastcall _TamaEffectDraw(const TAMA_DATA *t)
 
 void tama_clear(void)
 {
-	WORD i;
-
-	for(i=0;i<Tama1Now;i++){
+	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto& t = Tama[Tama1Ind[i]];
 		if(t.effect != TE_DELETE){
 			t.effect = TE_DELETE;
@@ -569,7 +557,7 @@ void tama_clear(void)
 		}
 	}
 
-	for(i=0;i<Tama2Now;i++){
+	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto& t = Tama[Tama2Ind[i]];
 		if(t.effect != TE_DELETE){
 			t.effect = TE_DELETE;
@@ -583,12 +571,11 @@ void tama_clear(void)
 // 弾を得点化する(Ret : 得点)
 uint32_t tama2score(void)
 {
-	WORD		i;
-	DWORD		sum = 0;
-	DWORD		Score;
+	uint32_t sum = 0;
+	uint32_t Score;
 
 	Score = TAMA1_POINT + Viv.evade * 100;
-	for(i=0;i<Tama1Now;i++){
+	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect!=TE_DELETE){
 			StringEffect2(t->x-64*4,t->y-64*4,Score);
@@ -602,7 +589,7 @@ uint32_t tama2score(void)
 	Indsort(Tama1Ind, Tama1Now, Tama);
 
 	Score = TAMA2_POINT + Viv.evade * 100;
-	for(i=0;i<Tama2Now;i++){
+	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect!=TE_DELETE){
 			StringEffect2(t->x-64*8,t->y-64*8,Score);
@@ -619,11 +606,10 @@ uint32_t tama2score(void)
 }
 
 // 弾をアイテム化する //
-void tama2item(BYTE n)
+void tama2item(uint8_t n)
 {
-	WORD		i;
-//	DWORD		sum = 0;
-//	DWORD		Score;
+	// uint32_t sum = 0;
+	// uint32_t Score;
 
 //	Score = TAMA1_POINT + Viv.evade * 100;
 
@@ -632,7 +618,7 @@ void tama2item(BYTE n)
 		return;
 	}
 
-	for(i=0;i<Tama1Now;i++){
+	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect!=TE_DELETE){
 			t->count  = 0;
@@ -653,7 +639,7 @@ void tama2item(BYTE n)
 	Indsort(Tama1Ind, Tama1Now, Tama);
 
 //	Score = TAMA2_POINT + Viv.evade * 100;
-	for(i=0;i<Tama2Now;i++){
+	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect!=TE_DELETE){
 			t->count  = 0;
@@ -676,7 +662,7 @@ void tama2item(BYTE n)
 //	return sum;
 }
 
-void tamaind_set(WORD tama1)
+void tamaind_set(uint16_t tama1)
 {
 	int i;
 
@@ -751,14 +737,12 @@ static void luna_cmd(void)
 	TamaCmd.ns+=2;		// 連射数_増加
 }
 
-BYTE __fastcall tama_dir(WORD i)
+uint8_t __fastcall tama_dir(uint16_t i)
 {
-	BYTE deg;
-
-	if(TamaCmd.cmd & TAMA_ZSET)
-		deg = atan8(Viv.x-TamaCmd.x,Viv.y-TamaCmd.y);
-	else
-		deg = 0;
+	uint8_t deg = ((TamaCmd.cmd & TAMA_ZSET)
+		? atan8((Viv.x - TamaCmd.x), (Viv.y - TamaCmd.y))
+		: 0
+	);
 
 	deg += TamaCmd.d;	// 基本角のセット完了
 	i = i%TamaCmd.n;	// 連射弾対策
@@ -783,7 +767,7 @@ BYTE __fastcall tama_dir(WORD i)
 	}
 }
 
-int __fastcall NewTamaSpeed(WORD i)
+int __fastcall NewTamaSpeed(uint16_t i)
 {
 	int temp = 0;						// ランダム要素の設定用
 	const int vret = TamaSpeed; // SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
@@ -801,17 +785,18 @@ int __fastcall NewTamaSpeed(WORD i)
 		return vret + temp;
 }
 
-int __fastcall LineCmdNewTamaSpeed(WORD i)
+int __fastcall LineCmdNewTamaSpeed(uint16_t i)
 {
 	int		vret = TamaSpeed;		// 速度の基本値をセットする(GIAN.H)
-	BYTE	deg;					// 中心からの角度
 
 	i = (i%TamaCmd.n)+1;	// 連射弾対策
 
-	if(TamaCmd.n&1)
-		deg = (i>>1)*TamaCmd.dw*(1-((i&1)<<1));
-	else
-		deg = -(TamaCmd.dw>>1)+(i>>1)*TamaCmd.dw*(1-((i&1)<<1));
+	// 中心からの角度
+	const auto deg_factor = ((i >> 1) * TamaCmd.dw * (1 - ((i & 1) << 1)));
+	const uint8_t deg = ((TamaCmd.n & 1)
+		? deg_factor
+		: -(TamaCmd.dw >> 1) + deg_factor
+	);
 
 	vret = cosDiv(deg, vret);
 
@@ -821,7 +806,7 @@ int __fastcall LineCmdNewTamaSpeed(WORD i)
 		return vret;
 }
 
-int __fastcall tama_speed(WORD i)
+int __fastcall tama_speed(uint16_t i)
 {
 	int temp = 0;						// ランダム要素の設定用
 	const int vret = SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
@@ -839,7 +824,7 @@ int __fastcall tama_speed(WORD i)
 		return vret + temp;
 }
 
-BYTE __fastcall tama_flag(void)
+uint8_t __fastcall tama_flag(void)
 {
 	switch(TamaCmd.type){
 		case(T_HOMING):case(T_HOMING_M):

@@ -72,7 +72,7 @@ static void BossHPG_Move(uint32_t now);	// ボスの体力ゲージを増減す�
 static void BossHPG_Close(void);	// ボスの体力ゲージをクローズする
 static void BossHPG_Update(uint32_t next);	// ボスの体力ゲージを上昇させる
 
-static int PutBoss(int x,int y,DWORD id);	// ボスをセットする
+static int PutBoss(int x, int y, uint32_t id);	// ボスをセットする
 static void BossSTDMove(BOSS_DATA *b);	// ノーマルECL互換の移動
 
 
@@ -107,7 +107,7 @@ void BossDataInit(void)
 void BossSet(int x, int y, uint32_t BossID)
 {
 	int n;
-	DWORD	HP_Sum = 0;
+	uint32_t HP_Sum = 0;
 
 	// ｘ６４座標に変換してボスをセットする //
 	n = PutBoss(x<<6,y<<6,BossID);
@@ -137,7 +137,7 @@ void BossSet(int x, int y, uint32_t BossID)
 void BossSetEx(int x, int y, uint32_t BossID)
 {
 	int n;
-	DWORD	HP_Sum = 0;
+	uint32_t HP_Sum = 0;
 
 	// ｘ６４座標に変換してボスをセットする //
 	n = PutBoss(x<<6,y<<6,BossID);
@@ -166,7 +166,7 @@ void BossSetEx(int x, int y, uint32_t BossID)
 // ボスを動かす //
 void BossMove(void)
 {
-	DWORD			HP_Sum = 0;
+	uint32_t HP_Sum = 0;
 	ENEMY_DATA		*e;
 
 	HomingFlag = HOMING_DUMMY;
@@ -329,7 +329,6 @@ static void BossHPG_Move(uint32_t now)
 {
 	int		i;
 	int		ChkCount = 0;
-	DWORD	temp;
 
 	BossHPG.Next = now;
 
@@ -367,7 +366,9 @@ static void BossHPG_Move(uint32_t now)
 			if(BossHPG.Now > BossHPG.Next){
 				//temp = max(BossHPG.Max>>10,1);
 				//temp = max((30*8*3)/max(BossHPG.Max,1),3);
-				temp = max(max(BossHPG.Max,1)/(30*8*4),3);
+				const auto temp = (std::max)(
+					((std::max)(BossHPG.Max, 1u) / (30 * 8 * 4)), 3u
+				);
 				if(BossHPG.Now-BossHPG.Next>temp) BossHPG.Now -= temp;
 				else                              BossHPG.Now = BossHPG.Next;
 			}
@@ -557,7 +558,9 @@ bool BossDamage(int x, int y, int damage)
 
 	i = (BitGetNum()>>1);
 	damage -= i;
-	if(damage <= 0) return FALSE;
+	if(damage <= 0) {
+		return false;
+	}
 
 	for(auto& it : Boss) {
 		auto *b = &it;
@@ -575,7 +578,7 @@ bool BossDamage(int x, int y, int damage)
 			}
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 // ボスにダメージを与える(ｙ上方向無限Ver) //
@@ -583,11 +586,13 @@ bool BossDamage2(int x, int y, int damage)
 {
 	int				i;
 	ENEMY_DATA		*e;
-	BOOL			ret_val = FALSE;
+	bool	ret_val = false;
 
 	i = (BitGetNum()>>1);
 	damage -= i;
-	if(damage <= 0) return FALSE;
+	if(damage <= 0) {
+		return false;
+	}
 
 	for(auto& it : Boss) {
 		auto *b = &it;
@@ -671,10 +676,8 @@ void BossDamage4(int damage)
 }
 
 
-static int PutBoss(int x,int y,DWORD id)
+static int PutBoss(int x, int y, uint32_t id)
 {
-	DWORD			addr;
-
 	//if(EnemyNow+1>=ENEMY_MAX) return;
 	//e = Enemy+ (*(EnemyInd+EnemyNow));
 	//EnemyNow++;
@@ -693,7 +696,7 @@ static int PutBoss(int x,int y,DWORD id)
 
 	auto *e = &it->Edat;
 
-	addr   = 4 + (id<<2);			// ちと、やばいね...
+	const uint32_t addr = (4 + (id << 2)); // ちと、やばいね...
 	InitEnemyDataX64(e,x,y,addr);
 	e->item = 0;
 
@@ -790,7 +793,7 @@ static void BossSTDMove(BOSS_DATA *b)
 // ボスの体力の総和を求める //
 uint32_t GetBossHPSum(void)
 {
-	DWORD			HP_Sum = 0;
+	uint32_t	HP_Sum = 0;
 	ENEMY_DATA		*e;
 
 	for(auto& it : Boss) {

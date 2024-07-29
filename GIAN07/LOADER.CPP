@@ -176,7 +176,7 @@ bool LoadMIDIWithPotentialLoop(BYTE_BUFFER_OWNED buf, const HASH& hash)
 // ---------------------------------------------------
 
 // Packfile loading //
-bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
+bool GrpBMPLoadP(const PACKFILE_READ& in, fil_no_t filno, uint8_t surf_id)
 {
 	auto maybe_bmp = BMPLoad(in.MemExpand(filno));
 
@@ -194,7 +194,7 @@ bool GrpBMPLoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE surf_id)
 	return DxObj.SurfaceLoad(surf_id, std::move(bmp));
 }
 
-bool Snd_SELoadP(const PACKFILE_READ &in, fil_no_t filno, BYTE id, int max)
+bool Snd_SELoadP(const PACKFILE_READ& in, fil_no_t filno, uint8_t id, int max)
 {
 	return Snd_SELoad(in.MemExpand(filno), id, max);
 }
@@ -554,7 +554,7 @@ bool LoadGraph(int stage)
 		// if(!GrpBMPLoadP(graph, (21 + 4), SURFACE_ID_NAMEREG)) {
 		// 	return false;
 		// }
-		return TRUE;
+		return true;
 	}
 	// エンディング全画像ロード(パレット含む) //
 	if(stage==GRAPH_ID_ENDING){
@@ -569,7 +569,7 @@ bool LoadGraph(int stage)
 			}
 			GrpGetPalette(EndingGrp[i].pal);
 		}
-		return TRUE;
+		return true;
 	}
 
 
@@ -592,7 +592,7 @@ bool LoadGraph(int stage)
 			return false;
 		}
 
-		return TRUE;
+		return true;
 	}
 
 	// エキストラステージボス用(1) //
@@ -601,7 +601,7 @@ bool LoadGraph(int stage)
 			return false;
 		}
 		GrpGetPalette(EnemyPalette);
-		return TRUE;
+		return true;
 	}
 
 	// エキストラステージボス用(2) //
@@ -610,10 +610,12 @@ bool LoadGraph(int stage)
 			return false;
 		}
 		GrpGetPalette(EnemyPalette);
-		return TRUE;
+		return true;
 	}
 
-	if(stage<0 || stage>STAGE_MAX) return FALSE;
+	if((stage < 0) || (stage > STAGE_MAX)) {
+		return false;
+	}
 
 	// マップチップのロードは後で変換すること //
 	if(!GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM)) {
@@ -648,7 +650,7 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 	// パレットを保存する //
 	GrpGetPalette(FaceData[FaceID].pal);
 
-	return TRUE;
+	return true;
 }
 
 // 敵のパレットにする
@@ -696,11 +698,13 @@ bool LoadStageData(uint8_t stage)
 		}
 		SCL_Now   = SCL_Head.get();
 		GameCount = 0;
-		return TRUE;
+		return true;
 	}
 	else{
 		// 各データをロードする //
-		if(stage<1 || stage>STAGE_MAX)								return FALSE;
+		if((stage < 1) || (stage > STAGE_MAX)) {
+			return false;
+		}
 
 		// ECL Load
 		if((ECL_Head = enemy.MemExpand(stage + 0 - 1)) == nullptr) {
@@ -719,7 +723,9 @@ bool LoadStageData(uint8_t stage)
 	}
 
 	// スクロール用変数の初期化 //
-	if(!ScrollInit()) return FALSE;
+	if(!ScrollInit()) {
+		return false;
+	}
 
 	// 各変数の初期化 //
 	SCL_Now   = SCL_Head.get();
@@ -1171,7 +1177,7 @@ bool LoadStageData(uint8_t stage)
 		break;
 	}
 
-	return TRUE;
+	return true;
 }
 
 // １パターンのグラフィックをアニメとして定義する //
@@ -1236,12 +1242,12 @@ bool LoadSound(const PACKFILE_READ& in)
 
 		// DirectSound can only apply volume onto loaded buffers.
 		Snd_UpdateVolumes();
-		return TRUE;
+		return true;
 	}
 
 	ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
 	Snd_SECleanup();
-	return FALSE;
+	return false;
 }
 
 bool LoadSound(void)
@@ -1253,7 +1259,9 @@ bool LoadSound(void)
 // MusicRoom のコメントをロードする //
 bool LoadMusicRoomComment(int no)
 {
-	if(no < 0 || no > 19) return FALSE;
+	if((no < 0) || (no > 19)) {
+		return false;
+	}
 	if(!MusicRoomText) {
 		return false;
 	}

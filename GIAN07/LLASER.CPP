@@ -74,7 +74,7 @@ bool LLaserSet(uint8_t id)
 
 	// Snd_SEPlay(1, LaserCmd.x);
 
-	return TRUE;
+	return true;
 }
 
 extern void LLaserOpen(const ENEMY_DATA *e, uint8_t id)
@@ -270,7 +270,6 @@ extern void LLaserMove(void)
 extern void LLaserDraw(void)
 {
 	int x, y;
-	BYTE			c;
 	WINDOW_POINT	p[4];
 	int				wx,wy,len;
 
@@ -300,7 +299,7 @@ extern void LLaserDraw(void)
 
 	for(const auto& it : LLaser) {
 		const auto *lp = &it;
-		c = lp->c;
+		const auto c = lp->c;
 		switch(lp->flag){
 			// 太さを持った状態 //
 			case(LLF_OPEN):case(LLF_NORM):

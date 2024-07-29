@@ -13,7 +13,7 @@
 
 
 
-WORD			HLaserNow;				// ホーミングレーザーの本数
+uint16_t	HLaserNow;	// ホーミングレーザーの本数
 HLaserInfo		HLaserCmd;				// ホーミングレーザーセット用データ
 HLaserData		HLaserBuf[HLASER_MAX];	// ホーミングレーザー格納バッファ
 
@@ -59,7 +59,7 @@ void HLaserInit(void)
 void HLaserSet(const HLaserInfo *hinfo)
 {
 	int			i,j;
-	BYTE		deg;
+	uint8_t	deg;
 	HLaserData	*p;
 
 	// 1-n としているのは、角度設定のためね... //
@@ -104,7 +104,6 @@ void HLaserMove(void)
 	int			x,y;
 	int			i, j;
 	int			deg,deg2;
-	BOOL		ev_flag;
 
 	// 次のフレームに移行する //
 	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
@@ -168,14 +167,14 @@ void HLaserMove(void)
 
 		if(Viv.muteki) continue;
 
-		ev_flag = FALSE;
+		auto ev_flag = false;
 		for(j=0; j<HLASER_LEN*HLASER_SECTION; j++){
 			x = hl->p[j].x;
 			y = hl->p[j].y;
 
 			// かすり判定 //
 			if(HITCHK(x,Viv.x,HOMINGL_WIDTH+15*64) && HITCHK(y,Viv.y,HOMINGL_WIDTH+15*64)){
-				ev_flag = TRUE;
+				ev_flag = true;
 			}
 
 			// 当たり判定 //

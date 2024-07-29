@@ -53,7 +53,7 @@ void ExBombEfcSet(int x, int y, uint8_t type)
 	}
 
 	// ここまできたら、無事にエフェクトがセットされた事になる //
-	p->bIsUsed = TRUE;
+	p->bIsUsed = true;
 }
 
 
@@ -138,24 +138,22 @@ void _ExBombSTDMove(BombEfcCtrl *p)
 {
 	int j = 0;
 	int x, y, v, rv;
-	DWORD		t;
-	BYTE		d, rd;
 
 	x = p->x;
 	y = p->y;
-	t = p->count;
+	const auto t = p->count;
 	v = sinl(t/2-64, 200*64)+(200*64);
 
 	for(auto& it : p->Obj) {
 		auto *target = &it;
 		if(target->d > 7*2){
 			if(t > 64*3) continue;
-			rd = rnd();
+			const uint8_t rd = rnd();
 			rv = rnd()%256+128;
 			target->vx = cosl(rd, rv);
 			target->vy = sinl(rd, rv);
 
-			d = t*2 + ((j%8)<<5);// + rnd()%8 - 4;
+			const uint8_t d = ((t * 2) + ((j % 8) << 5)); // + (rnd() % 8) - 4;
 			//v = sinl(degx,64*90)+64*90;
 
 			rv = v - rnd()%(v>>2);

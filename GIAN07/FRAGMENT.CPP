@@ -17,11 +17,11 @@ int				FragmentPtr = 0;			// 次に破片データを挿入する位置
 static void _FDraw(const FRAGMENT_DATA *f);
 
 
-void fragment_set(int x,int y,BYTE cmd)
+void fragment_set(int x, int y, uint8_t cmd)
 {
 	int				i;
 	int				l;
-	BYTE			d;
+	uint8_t d;
 	FRAGMENT_DATA	*f = Fragment+FragmentPtr;
 
 	if(cmd==FRG_ESCAPE){

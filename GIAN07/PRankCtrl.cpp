@@ -21,9 +21,10 @@ void PlayRankAdd(int n)
 
 	// 難易度を変化させる //
 	if(GameStage == GRAPH_ID_EXSTAGE){
-		if(n){
-			if(n > 0) PlayRank.Rank += max(1, n/4);
-			else      PlayRank.Rank += min(-1, n/10);
+		if(n > 0) {
+			PlayRank.Rank += (std::max)(+1, (n /  4));
+		} else if(n < 0) {
+			PlayRank.Rank += (std::min)(-1, (n / 10));
 		}
 	}
 	else{

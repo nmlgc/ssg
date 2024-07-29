@@ -15,7 +15,7 @@ bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作して�
 bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作しているか
 DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
 INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
-DWORD			DemoBufPtr;						// デモプレイ用バッファPtr(Ｃのそれではない)
+size_t	DemoBufPtr;	// デモプレイ用バッファPtr(Ｃのそれではない)
 CONFIG_DATA		ConfigTemp;						// コンフィグのデータ一時保存用
 
 //DWORD RndBuf[RNDBUF_MAX];
@@ -54,7 +54,7 @@ void DemoplayInit(void)
 	DemoInfo.CfgDat = ConfigDat;
 
 	DemoBufPtr         = 0;
-	DemoplaySaveEnable = TRUE;
+	DemoplaySaveEnable = true;
 }
 
 
@@ -119,7 +119,7 @@ void DemoplaySaveDemo(void)
 	};
 	FileWrite(fn, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
 
-	DemoplaySaveEnable = FALSE;
+	DemoplaySaveEnable = false;
 }
 
 
@@ -149,14 +149,11 @@ bool DemoplayLoadDemo(int stage)
 
 INPUT_BITS DemoplayMove(void)
 {
-	DWORD ptr;
-
 	if(!DemoplayLoadEnable) return KEY_ESC;
 
-	ptr = DemoBufPtr;
+	const auto ptr = DemoBufPtr;
 	if(ptr>=DemoInfo.DataSize){
-		ptr = DemoBufPtr;
-		DemoplayLoadEnable = FALSE;
+		DemoplayLoadEnable = false;
 	}
 	else DemoBufPtr++;
 
@@ -167,7 +164,7 @@ INPUT_BITS DemoplayMove(void)
 void DemoplayCleanup(void)
 {
 	ConfigDat          = ConfigTemp;
-	DemoplayLoadEnable = FALSE;
+	DemoplayLoadEnable = false;
 }
 
 
@@ -176,7 +173,7 @@ void DemoplaySaveReplay(void)
 	if(!DemoplaySaveEnable) return;
 
 	// すぐさま、無効化する //
-	DemoplaySaveEnable = FALSE;
+	DemoplaySaveEnable = false;
 
 	DemoBuffer[DemoBufPtr] = KEY_ESC;
 	DemoInfo.DataSize = DemoBufPtr+1;
@@ -200,14 +197,16 @@ bool DemoplayLoadReplay(int stage)
 
 	// ヘッダの格納先は０番である //
 	temp = in.MemExpand( 0);
-	if(NULL == temp) return FALSE;
+	if(NULL == temp) {
+		return false;
+	}
 	memcpy(&DemoInfo, temp.get(), sizeof(DEMOPLAY_INFO));
 
 	// データの格納先は１番ですね //
 	temp = in.MemExpand( 1);
 	if(NULL == temp){
-		return FALSE;
+		return false;
 	}
-	memcpy(DemoBuffer, temp.get(), sizeof(WORD)*DemoInfo.DataSize);
+	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * DemoInfo.DataSize));
 	return DemoplayLoadSetup();
 }

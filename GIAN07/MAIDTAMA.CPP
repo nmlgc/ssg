@@ -62,10 +62,9 @@ static void SetCactusBomb(void);
 
 std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
 std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
-WORD		MaidTamaNow;					// 現在の数
+uint16_t	MaidTamaNow;	// 現在の数
 
-BYTE TogeDamage[4*2+2] =
-{
+constexpr uint8_t TogeDamage[(4 * 2) + 2] = {
 	// MainWeapon		// SubWeapon
 	TDM_WIDE_MAIN,		TDM_WIDE_SUB,		// TYPE_A(WIDE)
 	TDM_HOMING_MAIN,	TDM_HOMING_SUB,		// TYPE_B(HOMING)
@@ -89,8 +88,9 @@ static void (*MaidBombFunc[4])(void) =
 #define LASER_BOMB_TIME			(60*2)
 #define CACTUS_BOMB_TIME		(0)
 
-static BYTE MaidBombTime[4] =
-{WIDE_BOMB_TIME, HOMING_BOMB_TIME, LASER_BOMB_TIME, CACTUS_BOMB_TIME};
+static constexpr uint8_t MaidBombTime[4] = {
+	WIDE_BOMB_TIME, HOMING_BOMB_TIME, LASER_BOMB_TIME, CACTUS_BOMB_TIME
+};
 
 
 #define MAID_TAMA_START		18	//12
@@ -111,9 +111,13 @@ void MaidTamaSet(void)
 	}
 
 	// ボムの発動条件を満たしていれば、発動! //
-	if((Key_Data&KEY_BOMB) && Viv.bomb_time==0 /*&& Viv.muteki==0*/
-		&& Viv.bomb && SclInfo.MsgFlag==FALSE)
-	{
+	if(
+		(Key_Data & KEY_BOMB) &&
+		(Viv.bomb_time == 0) &&
+		// (Viv.muteki == 0) &&
+		Viv.bomb &&
+		(SclInfo.MsgFlag == false)
+	) {
 		//if(Viv.weapon == 0) EnterBombPalette();
 
 		Viv.bomb_time = MaidBombTime[Viv.weapon&3];		// 装備ごとに変更せよ
@@ -288,9 +292,7 @@ void MaidTamaIndSet(void)
 
 static void MTamaSet(void)
 {
-	WORD i;
-
-	for(i=0;i<TamaCmd.n;i++){
+	for(decltype(TamaCmd.n) i = 0; i < TamaCmd.n; i++) {
 		if(MaidTamaNow+1 >= MAIDTAMA_MAX) return;			// セットできない場合
 
 		auto* t = &MaidTama[MaidTamaInd[MaidTamaNow++]];	// 弾ポインタをセット
@@ -908,11 +910,10 @@ static void SetT_D8(void)
 static void SetWideBomb(void)
 {
 	int		dx,dy,l;
-	BYTE	d;
 
 	if(Viv.bomb_time > WIDE_BOMB_TIME-30) return;
 
-	d  = Cast::down<uint8_t>(Viv.bomb_time * 3u);
+	const uint8_t d  = Cast::down<uint8_t>(Viv.bomb_time * 3u);
 	l  = (WIDE_BOMB_TIME - Viv.bomb_time)*26;		// 16-32
 	dx = GX_MID + 64*70/2 + cosl(d, l<<1);
 	dy = GY_MID - 64*90/2 + sinl(d<<1, l);
@@ -945,24 +946,22 @@ static void SetHomingBomb(void)
 // こいつは、Set というよりも、 HitCheck 的な役割を果たす //
 static void SetLaserBomb(void)
 {
-	BYTE		LaserDeg;
-	BYTE		d;
 	int			ox,oy;
 	int			i;
 
-	LaserDeg = GetLaserDeg();
+	const auto LaserDeg = GetLaserDeg();
 
 	ox = Viv.opx + (SBOPT_DX*64);
 	oy = Viv.opy;
 	for(i=-3;i<=3;i++){
-		d = GetRightLaserDeg(LaserDeg, i);
+		const auto d = GetRightLaserDeg(LaserDeg, i);
 		enemy_damage3(ox, oy, d);
 	}
 
 	ox = Viv.opx - (SBOPT_DX*64);
 	oy = Viv.opy;
 	for(i=-3;i<=3;i++){
-		d = GetLeftLaserDeg(LaserDeg, i);
+		const auto d = GetLeftLaserDeg(LaserDeg, i);
 		enemy_damage3(ox, oy, d);
 	}
 }

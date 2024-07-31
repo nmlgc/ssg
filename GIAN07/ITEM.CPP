@@ -118,7 +118,6 @@ void ItemDraw(void)
 	int				i,j,x,y;
 	BYTE			ptn;
 	PIXEL_LTRB	src;
-	static BYTE		time;
 
 	for(i=0;i<ItemNow;i++){
 		auto* ip = &Item[ItemInd[i]];

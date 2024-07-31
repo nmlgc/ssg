@@ -207,7 +207,6 @@ void BossDraw(void)
 	int j, x, y;
 	int			w,h,t;
 	ENEMY_DATA	*e;
-	PIXEL_LTRB	*src;
 	PIXEL_LTRB	wing;
 /*
 	PIXEL_LTRB	Right[6] = {

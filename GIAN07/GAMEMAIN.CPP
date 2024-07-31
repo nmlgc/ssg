@@ -1357,7 +1357,6 @@ void PauseProc(bool&)
 void MusicRoomProc(bool&)
 {
 	char	buf[100];
-	int		i;
 	static WORD Old_Key;
 	static BYTE DevChgWait;
 
@@ -1550,7 +1549,7 @@ void GameDraw(void)
 	laser_draw();
 	tama_draw();
 
-	static BYTE test = 0;
+	// static uint8_t test = 0;
 
 	//if((Key_Data&KEY_UP  ) && test<64) test++;
 	//if((Key_Data&KEY_DOWN) && test!=0 ) test--;

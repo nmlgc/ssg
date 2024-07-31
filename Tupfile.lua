@@ -163,6 +163,9 @@ local ANALYSIS = { cflags = { release = {
 	"/we26819", -- Unannotated fallthrough between switch labels
 	"/we26427", -- Static initialization order fiasco
 
+	-- Opt-in warnings
+	"/w14101", -- Unreferenced local variable
+
 	-- Disabled warnings
 	"/wd4834", -- Discarding `[[nodiscard]]` (C6031 covers this and more)
 	"/wd26408", -- Avoid _malloca()

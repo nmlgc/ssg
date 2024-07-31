@@ -141,7 +141,6 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 // p:SCL_ENEMY以降の敵配置データ //
 static void enemy_set(void)
 {
-	WINDOW_LTRB	MWinRect;
 	BYTE		id;
 	BOOL		bFlag = TRUE;
 	BYTE		*cmd;

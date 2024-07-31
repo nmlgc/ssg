@@ -612,7 +612,6 @@ void InitStg4Rock(void)
 
 void MoveStg4Rock(void)
 {
-	int		y;
 	constexpr int dy = (500 * (64 / 4));
 	constexpr int dy2 = (dy / 2);
 

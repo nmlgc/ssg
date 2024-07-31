@@ -175,7 +175,6 @@ void enemy_draw(void)
 {
 	int			i,x,y;
 	//HRESULT		ddrval;
-	PIXEL_LTRB	*src;
 
 	for(i=0;i<EnemyNow;i++){
 		auto* e = &Enemy[EnemyInd[i]];

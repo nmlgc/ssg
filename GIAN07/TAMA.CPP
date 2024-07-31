@@ -331,7 +331,6 @@ void tama_move(void)
 void tama_draw(void)
 {
 	WORD		i;
-	TAMA_DATA	*t;
 //	HRESULT		ddrval;
 	PIXEL_LTRB	src;
 	int			x,y;

@@ -196,7 +196,6 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	}};
 	WINDOW_INFO		*p;
 	int				i;
-	HDC				hdc;
 	BYTE			alpha;
 	WINDOW_COORD	top = ws->y;
 
@@ -560,7 +559,7 @@ void MWinFace(uint8_t faceID)
 // コマンドを送る //
 void MWinCmd(uint8_t cmd)
 {
-	int		temp,i;
+	int temp;
 	int		Ysize = 0;
 
 	switch(cmd){

@@ -389,7 +389,8 @@ static void enemy_set(void)
 
 			case(SCL_MAPPALETTE):	// マップパーツ用Surface からパレットを
 				// 前後にある４０色をマップパーツのパレットにする
-				GrpSetPaletteFrom(GrMap);	// BitDeapth 判定は、関数側に任せる
+				// BitDeapth 判定は、関数側に任せる
+				GrpSurface_PaletteApplyToBackend(SURFACE_ID::MAPCHIP);
 				SCL_Now++;
 			break;
 
@@ -597,7 +598,8 @@ void ScrollDraw(void)
 				if(*p != MAPDATA_NONE){
 					x   = (j<<4) + X_MIN + dx + RasterDx;
 					y   = (i<<4) + ScrollInfo.LayerDy[k];
-					GrpBlt(rcMapChip[*p], x, y, GrMap);
+					const auto& src = rcMapChip[*p];
+					GrpSurface_Blit({ x, y }, SURFACE_ID::MAPCHIP, src);
 					p++,j++;
 				}
 				// 何もない場合 //
@@ -809,7 +811,7 @@ static void Stg3BossMapDraw(void)
 
 	for(; y<Y_MAX; y+=208){
 		constexpr PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
-		GrpBlt(src, x, y, GrMap);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::MAPCHIP, src);
 	}
 
 //	DrawStg3Cloud();

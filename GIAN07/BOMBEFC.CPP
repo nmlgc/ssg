@@ -5,8 +5,8 @@
 
 #include "BOMBEFC.H"
 #include "LOADER.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/ut_math.h"
+#include "platform/graphics_backend.h"
 
 
 BombEfcCtrl		BombEfc[EXBOMB_MAX];
@@ -128,7 +128,7 @@ void _ExBombSTDDraw(BombEfcCtrl *p)
 			y = (target->y >> 6) - 24;
 			dx = (target->d>>1) * 48;
 			const PIXEL_LTRB src = PIXEL_LTWH{ dx, 296, 48, 48 };
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		}
 	}
 }

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "game/coords.h"
+#include "constants.h"
 #include "game/graphics.h"
 #include "game/narrow.h"
 #include "game/pixelformat.h"
@@ -46,6 +46,25 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
 
 /// Surfaces
 /// --------
+struct BMP_OWNED;
+
+// Consumes the given .BMP file and sets the given surface to its contents,
+// re-creating it in the correct size if necessary.
+bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp);
+
+bool GrpSurface_PaletteApplyToBackend(SURFACE_ID sid);
+
+// Blits the given [src] rectangle inside [sid] to the given top-left point
+// on the backbuffer while clipping the destination rectangle to the clipping
+// area. Returns `true` if any part of the sprite was blitted.
+bool GrpSurface_Blit(
+	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
+);
+
+// Like GrpSurface_Blit(), but ignores [sid]'s color key.
+void GrpSurface_BlitOpaque(
+	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
+);
 
 #ifdef WIN32
 	// Win32 GDI text rendering bridge

@@ -110,6 +110,8 @@ _inline Debug(DWORD old,int id)
 
 void ENEMY_DATA::Draw() const
 {
+	constexpr auto sid = SURFACE_ID::ENEMY;
+
 	// TODO: Remove once the structure itself uses WORLD_POINT.
 	const WORLD_POINT center = { &x, &y };
 
@@ -121,11 +123,11 @@ void ENEMY_DATA::Draw() const
 		? a.ptn[uint8_t(d - 64 + 8) >> 4]
 		: a.ptn[anm_c]
 	);
-	if(GrpBlt(src, topleft.x, topleft.y, GrEnemy)) {
+	if(GrpSurface_Blit({ topleft.x, topleft.y }, sid, src)) {
 		if((anm_ptn != anm_ptnEx) && IsDamaged) {
 			const auto& a = Anime[anm_ptnEx];
 			const auto topleft = center.ToPixel(a.size); // 座標セット //
-			GrpBlt(a.ptn[0], topleft.x, topleft.y, GrEnemy);
+			GrpSurface_Blit({ topleft.x, topleft.y }, sid, a.ptn[0]);
 		}
 	}
 }
@@ -518,7 +520,7 @@ static void _EnemyDrawBomb(int x, int y, uint32_t count)
 	x-=24;
 	y-=24;
 
-	GrpBlt(src, x, y, GrTama);
+	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 }
 
 void parse_ECL(ENEMY_DATA *e)

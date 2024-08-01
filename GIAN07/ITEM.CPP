@@ -6,9 +6,9 @@
 #include "ITEM.H"
 #include "GIAN.H"
 #include "GIAN07/entity.h"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/snd.h"
 #include "game/ut_math.h"
+#include "platform/graphics_backend.h"
 
 
 
@@ -127,7 +127,7 @@ void ItemDraw(void)
 				};
 				x = (ip->x>>6) - 8;
 				y = (ip->y>>6) - 8;
-				GrpBlt(src, x, y, GrTama);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 			break;
 
 			case(ITEM_EXTEND):
@@ -137,7 +137,7 @@ void ItemDraw(void)
 					};
 					x = (ip->x>>6) - 8 + cosl(ip->count+j*256/8, 12);
 					y = (ip->y>>6) - 8 + sinl(ip->count+j*256/8, 12);
-					GrpBlt(src, x, y, GrTama);
+					GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 				}
 
 			//	src = PIXEL_LTWH{
@@ -145,7 +145,7 @@ void ItemDraw(void)
 			//	};
 			//	x = (ip->x>>6) - 8;
 			//	y = (ip->y>>6) - 8;
-			//	GrpBlt(src, x, y, GrTama);
+			//	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 			break;
 
 			case(ITEM_BOMB):
@@ -155,7 +155,7 @@ void ItemDraw(void)
 					};
 					x = (ip->x>>6) - 8 + cosl(-2*ip->count+j*256/8, 12);
 					y = (ip->y>>6) - 8 + sinl(-2*ip->count+j*256/8, 12);
-					GrpBlt(src, x, y, GrTama);
+					GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 				}
 
 			//	src = PIXEL_LTWH{
@@ -163,7 +163,7 @@ void ItemDraw(void)
 			//	};
 			//	x = (ip->x>>6) - 8;
 			//	y = (ip->y>>6) - 8;
-			//	GrpBlt(src, x, y, GrTama);
+			//	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 			break;
 
 			default:

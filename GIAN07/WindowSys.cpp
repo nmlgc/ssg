@@ -455,14 +455,14 @@ void MWinDraw(void)
 	DrawWindowFrame(x,y,w,h);
 
 	// お顔をかきましょう(表示を要請されている場合にだけ) //
-	auto& GrFace = GrFaces[MsgWindow.FaceID / FACE_NUMX];
+	const auto sid = (SURFACE_ID::FACE + (MsgWindow.FaceID / FACE_NUMX));
 	switch(MsgWindow.FaceState){
 		case(MFACE_WAIT):
 			oy = MsgWindow.MaxSize.bottom - 100;
 			src = PIXEL_LTWH{
 				((MsgWindow.FaceID % FACE_NUMX) * FACE_W), 0, FACE_W, FACE_H
 			};
-			GrpBlt(src, (x + 2), oy, GrFace);
+			GrpSurface_Blit({ (x + 2), oy }, sid, src);
 		break;
 
 		case(MFACE_OPEN):
@@ -474,9 +474,9 @@ void MWinDraw(void)
 				src = PIXEL_LTWH{
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
-				GrpBlt(src, (x + len + 2), (oy + i), GrFace);
-				//if(i & 1)	GrpBlt(src, (x + len + 2), (oy + i), GrFace);
-				//else     	GrpBlt(src, (x - len + 2), (oy + i), GrFace);
+				GrpSurface_Blit({ (x + len + 2), (oy + i) }, sid, src);
+				//if(i & 1)	GrpSurface_Blit({ (x + len + 2), (oy + i) }, sid, src);
+				//else     	GrpSurface_Blit({ (x - len + 2), (oy + i) }, sid, src);
 			}
 		break;
 
@@ -489,9 +489,9 @@ void MWinDraw(void)
 				src = PIXEL_LTWH{
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
-				GrpBlt(src, (x + len + 2), (oy + i), GrFace);
-				//if(i & 1)	GrpBlt(src, (x + len + 2), (oy + i), GrFace);
-				//else     	GrpBlt(src, (x - len + 2), (oy + i), GrFace);
+				GrpSurface_Blit({ (x + len + 2), (oy + i) }, sid, src);
+				//if(i & 1)	GrpSurface_Blit({ (x + len + 2), (oy + i) }, sid, src);
+				//else     	GrpSurface_Blit({ (x - len + 2), (oy + i) }, sid, src);
 			}
 		break;
 
@@ -504,9 +504,9 @@ void MWinDraw(void)
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
 				if(i & 1) {
-					GrpBlt(src, (x - len + 2), (oy + i), GrFace);
+					GrpSurface_Blit({ (x - len + 2), (oy + i) }, sid, src);
 				} else {
-					GrpBlt(src, (x + len + 2), (oy + i), GrFace);
+					GrpSurface_Blit({ (x + len + 2), (oy + i) }, sid, src);
 				}
 			}
 		break;
@@ -596,19 +596,19 @@ static void DrawWindowFrame(int x,int y,int w,int h)
 
 	// 左上 //
 	src = { 0, 0, w, h };
-	GrpBlt(src, x, y, GrTama);
+	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 
 	// 右上 //
 	src = { (384 - w), 0, 384, h };
-	GrpBlt(src, (x + w), y, GrTama);
+	GrpSurface_Blit({ (x + w), y }, SURFACE_ID::SYSTEM, src);
 
 	// 左下 //
 	src = { 0, (80 - h), w, 80 };
-	GrpBlt(src, x, (y + h), GrTama);
+	GrpSurface_Blit({ x, (y + h) }, SURFACE_ID::SYSTEM, src);
 
 	// 右下 //
 	src = { (384 - w), (80 - h), 384, 80 };
-	GrpBlt(src, (x + w), (y + h), GrTama);
+	GrpSurface_Blit({ (x + w), (y + h) }, SURFACE_ID::SYSTEM, src);
 }
 
 // ヘルプ文字列を送る //

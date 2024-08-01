@@ -236,10 +236,8 @@ void DrawGrpInfo()
 	if(!EGrpInfo.bWantDisp) return;
 
 	// 驚異の画像表示 //
-	constexpr PIXEL_LTRB src = { 0, 0, 320, 240 };
-	GrpBltXC(
-		src, EGrpInfo.x, EGrpInfo.y, GrEndingPic[EGrpInfo.target - EndingGrp]
-	);
+	const auto sid = (SURFACE_ID::ENDING_PIC + (EGrpInfo.target - EndingGrp));
+	GrpSurface_BlitOpaque({ EGrpInfo.x, EGrpInfo.y }, sid, { 0, 0, 320, 240 });
 }
 
 
@@ -250,7 +248,7 @@ void DrawStfInfo()
 
 	auto Blit = [](WINDOW_POINT dst, const PIXEL_LTRB& src) {
 		dst -= (src.Size() / 2);
-		GrpBlt(src, dst.x, dst.y, GrEndingCredits);
+		GrpSurface_Blit({ dst.x, dst.y }, SURFACE_ID::ENDING_CREDITS, src);
 	};
 
 	Blit({ EStfTask.ox, EStfTask.oy }, StaffLabel[EStfTask.TitleID]);

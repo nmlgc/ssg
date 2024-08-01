@@ -161,6 +161,7 @@ local ANALYSIS = { cflags = { release = {
 
 	-- Critical warnings
 	"/we26819", -- Unannotated fallthrough between switch labels
+	"/we26427", -- Static initialization order fiasco
 
 	-- Opt-in warnings
 	"/w14101", -- Unreferenced local variable
@@ -177,7 +178,6 @@ local ANALYSIS = { cflags = { release = {
 	"/wd26446", -- …
 	"/wd26472", -- …
 	"/wd26821", -- …
-	"/wd26427", -- Static initialization order fiasco (for now)
 } } }
 
 -- Relaxed analysis flags for pbg code

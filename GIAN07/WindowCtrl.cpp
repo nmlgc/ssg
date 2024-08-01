@@ -406,7 +406,7 @@ static bool GrpFnBpp(INPUT_BITS key)
 		if(DxObj.Init(ConfigDat.DeviceID.v, bitdepth_new)) {
 			ConfigDat.BitDepth.v = bitdepth_new;
 			// GrpBackend_PaletteSet(DxObj.pe);
-			GrpSetPaletteFrom(GrTitle);
+			GrpSurface_PaletteApplyToBackend(SURFACE_ID::TITLE);
 		}
 	});
 }

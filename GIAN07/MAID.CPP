@@ -48,7 +48,7 @@ extern void WideBombDraw(void)
 		t = (Viv.bomb_time/4); if(t > 5) t = 5;
 	}
 
-	GrpBlt(data[t], x, y, GrBomber);
+	GrpSurface_Blit({ x, y }, SURFACE_ID::BOMBER, data[t]);
 }
 
 void LaserBombDraw(void)
@@ -196,15 +196,15 @@ extern void MaidDraw(void)
 
 	if(Viv.muteki==0 || draw_flag){
 		src = PIXEL_LTWH{ (384 + (Viv.GrpID * 32)), 128, (16 * 2), (16 * 3) };
-		GrpBlt(src, x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 	}
 
 	if( ((Viv.exp+1)>>5) ){
 		if(Viv.muteki < VIVDEAD_VAL){
 			src = VivBit[Viv.weapon&3][(draw_flag2>>2)&1];
-			GrpBlt(src, (ox + SBOPT_DX), oy, GrTama);
+			GrpSurface_Blit({ (ox + SBOPT_DX), oy }, SURFACE_ID::SYSTEM, src);
 			src = VivBit[Viv.weapon&3][(draw_flag2>>2)&1];
-			GrpBlt(src, (ox - SBOPT_DX), oy, GrTama);
+			GrpSurface_Blit({ (ox - SBOPT_DX), oy }, SURFACE_ID::SYSTEM, src);
 		}
 	}
 
@@ -241,7 +241,7 @@ extern void StateDraw(void)
 		}
 		GrpGeom->Unlock();
 	}
-	GrpBlt(src, 128, 16, GrTama);
+	GrpSurface_Blit({ 128, 16 }, SURFACE_ID::SYSTEM, src);
 	sprintf(buf,"%3d",Viv.evade);
 	GrpPut57(128 + 95,16 + 91-80,buf);
 
@@ -256,7 +256,7 @@ extern void StateDraw(void)
 	// 残りメイド数表示 //
 	for(i=0; i<Viv.left; i++){
 		constexpr PIXEL_LTWH src = { 608, 432, 16, 16 };
-		GrpBlt(src, (280 + (i * 14)), 0, GrTama);
+		GrpSurface_Blit({ (280 + (i * 14)), 0 }, SURFACE_ID::SYSTEM, src);
 	}
 }
 

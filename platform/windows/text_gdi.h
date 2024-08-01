@@ -48,11 +48,7 @@ public:
 
 static_assert(TEXTRENDER_SESSION<TEXTRENDER_GDI_SESSION>);
 
-template <
-	class Graphics, class Surface
-> class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
-	Graphics& graphics;
-	Surface& surf;
+class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
 	ENUMARRAY<HFONT, FONT_ID>& fonts;
 
 	bool Wipe() {
@@ -76,8 +72,7 @@ template <
 
 public:
 	// Can share the font array with other GDI renderers.
-	TEXTRENDER_GDI(Graphics& graphics, decltype(fonts)& fonts) :
-		graphics(graphics), fonts(fonts), surf(DxSurf[SURFACE_ID::TEXT]) {
+	TEXTRENDER_GDI(decltype(fonts)& fonts) : fonts(fonts) {
 	}
 
 	void WipeBeforeNextRender() {
@@ -111,7 +106,7 @@ public:
 		std::optional<PIXEL_LTWH> subrect = std::nullopt
 	) {
 		const PIXEL_LTRB rect = Subrect(rect_id, subrect);
-		return graphics.SurfaceBlit(dst, surf, rect);
+		return GrpSurface_Blit(dst, SURFACE_ID::TEXT, rect);
 	}
 
 	bool Render(
@@ -132,3 +127,5 @@ public:
 		return Blit(dst, rect_id, subrect);
 	}
 };
+
+static_assert(TEXTRENDER<TEXTRENDER_GDI>);

@@ -159,7 +159,7 @@ static void _FDraw(const FRAGMENT_DATA *f)
 			src = PIXEL_LTWH{
 				(592 + (((24 - f->count) >> 2) << 3)), 8, 8, 8
 			};
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_HIT):
@@ -168,7 +168,7 @@ static void _FDraw(const FRAGMENT_DATA *f)
 			src = PIXEL_LTWH{
 				(592 + (((24 - f->count) >> 2) << 3)), (8 + 8), 8, 8
 			};
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_SMOKE):
@@ -177,35 +177,35 @@ static void _FDraw(const FRAGMENT_DATA *f)
 			src = PIXEL_LTWH{
 				(592 + (((24 - f->count) >> 2) << 3)), 0, 8, 8
 			};
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_STAR1):
 			x = (f->x>>6) - 8;
 			y = (f->y>>6) - 8;
 			src = PIXEL_LTWH{ 624, 432, 16, 16 };
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_STAR2):
 			x = (f->x>>6) - 16;
 			y = (f->y>>6) - 16;
 			src = PIXEL_LTWH{ 608, 448, 32, 32 };
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_STAR3):
 			x = (f->x>>6) - 16;
 			y = (f->y>>6) - 16;
 			src = PIXEL_LTWH{ 608, 448, 32, 32 };
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_HEART):
 			x = (f->x>>6) - 16;
 			y = (f->y>>6) - 16;
 			src = PIXEL_LTWH{ 576, 448, 32, 32 };
-			GrpBlt(src, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 		break;
 
 		case(FRG_FATCIRCLE):

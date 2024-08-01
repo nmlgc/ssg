@@ -208,6 +208,7 @@ void BossMove(void)
 // ボスを描画する
 void BossDraw(void)
 {
+	constexpr auto sid = SURFACE_ID::ENEMY;
 	int x, y;
 	int			w,h,t;
 	ENEMY_DATA	*e;
@@ -248,7 +249,10 @@ void BossDraw(void)
 				// pbg quirk: Blitted without clipping?! I'd consider this a
 				// bug if it wasn't explicitly commented as such. Fine then...
 				GrpBackend_SetClip(GRP_RES_RECT);
-				GrpBlt(wing, (x - 20), (y - 20), GrEnemy); // クリッピングなし
+
+				// クリッピングなし
+				GrpSurface_Blit({ (x - 20), (y - 20) }, sid, wing);
+
 				GrpBackend_SetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 				continue;
 			}
@@ -272,18 +276,18 @@ void BossDraw(void)
 					w = 64;
 					h = 92;
 					wing = {   0, 176, 128, 360 };
-					GrpBlt(wing, (x - w - t), (y - h), GrEnemy);
+					GrpSurface_Blit({ (x - w - t), (y - h) }, sid, wing);
 					wing = { 128, 176, 256, 360 };
-					GrpBlt(wing, (x - w + t), (y - h), GrEnemy);
+					GrpSurface_Blit({ (x - w + t), (y - h) }, sid, wing);
 				break;
 
 				case(BEXST_WING02):
 					w = 44;
 					h = 52;
 					wing = { 552,   0, 640, 104 };
-					GrpBlt(wing, (x - w - 50), (y - h), GrEnemy);
+					GrpSurface_Blit({ (x - w - 50), (y - h) }, sid, wing);
 					wing = { 552, 104, 640, 208 };
-					GrpBlt(wing, (x - w + 50), (y - h), GrEnemy);
+					GrpSurface_Blit({ (x - w + 50), (y - h) }, sid, wing);
 				break;
 			}
 
@@ -420,7 +424,9 @@ void BossHPG_Draw(void)
 			// エフェクト付き枠の描画 //
 			for(i=0;i<BOSSHPG_HEIGHT;i++){
 				src = { 0, (104 + i), BOSSHPG_WIDTH, (104 + i + 1) };
-				GrpBlt(src, BossHPG.XTemp[i], (16 + i), GrTama);
+				GrpSurface_Blit(
+					{ BossHPG.XTemp[i], (16 + i) }, SURFACE_ID::SYSTEM, src
+				);
 			}
 		break;
 
@@ -479,7 +485,7 @@ void BossHPG_Draw(void)
 
 			// 枠の描画 //
 			src = { 0, 104, BOSSHPG_WIDTH, 128 };
-			GrpBlt(src, BOSSHPG_END_X, 16, GrTama);
+			GrpSurface_Blit({ BOSSHPG_END_X, 16 }, SURFACE_ID::SYSTEM, src);
 		}
 		break;
 

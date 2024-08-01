@@ -16,13 +16,11 @@
 
 
 
-#include "DirectXUTYs/DD_UTY.H"
 #include "platform/windows/text_gdi.h"
 
 
 
-extern TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW> TextObj;
-static_assert(TEXTRENDER<decltype(TextObj)>);
+extern TEXTRENDER_GDI TextObj;
 
 
 

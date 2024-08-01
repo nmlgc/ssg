@@ -5,7 +5,7 @@
 
 #include "FONTUTY.H"
 #include "LOADER.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 
 // Glyph selection inside the 16×16 font //
 std::optional<PIXEL_LTRB> Glyph16x16(char c)
@@ -14,7 +14,7 @@ std::optional<PIXEL_LTRB> Glyph16x16(char c)
 	src.w = 16;
 	src.h = 16;
 
-	// GrTama における文字の並びは次のようになっている。 //
+	// SURFACE_ID::SYSTEM における文字の並びは次のようになっている。 //
 	// (変更する可能性もあるので十分に注意すること)      //
 	// ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789              //
 	// abcdefghijklmnopqrstuvwxyz!?#\<>=,+-              //
@@ -56,7 +56,9 @@ extern void GrpPut16(int x, int y, const char *s)
 		if(maybe_src) {
 			tx = x;ty = y;
 			if(tx>=0 && tx<630)	// 安全対策???
-				GrpBlt(maybe_src.value(), tx, ty, GrTama);
+				GrpSurface_Blit(
+					{ tx, ty }, SURFACE_ID::SYSTEM, maybe_src.value()
+				);
 		}
 	}
 }
@@ -73,7 +75,7 @@ extern void GrpPut16c2(int x, int y, const char *s)
 		if(maybe_src) {
 			tx = x;ty = y;
 			//if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(maybe_src.value(), tx, ty, GrTama);
+			GrpSurface_Blit({ tx, ty }, SURFACE_ID::SYSTEM, maybe_src.value());
 		}
 	}
 }
@@ -83,7 +85,7 @@ extern void GrpPutc(int x, int y, char c)
 {
 	auto maybe_src = Glyph16x16(c);
 	if(maybe_src) {
-		GrpBlt(maybe_src.value(), x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, maybe_src.value());
 	}
 }
 
@@ -105,7 +107,7 @@ extern void GrpPut57(int x, int y, const char *s)
 
 		tx = x;ty = y;
 		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(src, tx, ty, GrTama);
+			GrpSurface_Blit({ tx, ty }, SURFACE_ID::SYSTEM, src);
 	}
 }
 
@@ -128,7 +130,7 @@ extern void GrpPut7B(int x, int y, const char *s)
 		}
 
 		if((x >= 0) && (x < 630)) { // 安全対策???
-			GrpBlt(src, x, y, GrMusic);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::MUSIC, src);
 		}
 	}
 }
@@ -151,7 +153,7 @@ extern void GrpPutScore(int x, int y, const char *s)
 
 		tx = x;ty = y;
 		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(src, tx, ty, GrTama);
+			GrpSurface_Blit({ tx, ty }, SURFACE_ID::SYSTEM, src);
 	}
 }
 
@@ -168,11 +170,11 @@ extern void GrpPutMidNum(int x, int y, int n)
 	for(i=0;i<3;i++,x+=5){
 		if(buf[i]>='0' && buf[i]<='9'){
 			src = PIXEL_LTWH{ (80 + ((buf[i] - '0') * 4)), 432, 4, 5 };
-			GrpBlt(src, x, y, GrMusic);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::MUSIC, src);
 		}
 		if(buf[i]=='-'){
 			src = PIXEL_LTWH{ (80 + (10 * 4)), 432, 4, 5 };
-			GrpBlt(src, x, y, GrMusic);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::MUSIC, src);
 		}
 	}
 }
@@ -225,9 +227,7 @@ struct GDI_FONTS {
 };
 GDI_FONTS GDIFonts;
 
-TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW> TextObj = {
-	DxObj, GDIFonts.fonts,
-};
+TEXTRENDER_GDI TextObj = { GDIFonts.fonts };
 
 PIXEL_SIZE DrawGrdFont(
 	TEXTRENDER_RECT_ID rect_id, std::span<const Narrow::string_view> strs

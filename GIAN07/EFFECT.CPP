@@ -533,7 +533,7 @@ void ScreenEffectDraw(void)
 			};
 			for(i=128; i<640-128; i+=16){
 				for(j=0; j<480; j+=16){
-					GrpBlt(src, i, j, GrTama);
+					GrpSurface_Blit({ i, j }, SURFACE_ID::SYSTEM, src);
 				}
 			}
 		break;
@@ -547,7 +547,7 @@ void ScreenEffectDraw(void)
 			};
 			for(i=128; i<640-128; i+=16){
 				for(j=0; j<480; j+=16){
-					GrpBlt(src, i, j, GrTama);
+					GrpSurface_Blit({ i, j }, SURFACE_ID::SYSTEM, src);
 				}
 			}
 		break;
@@ -574,12 +574,12 @@ extern void CircleFadeOut(int x, int y, int r)
 				//temp = (r-temp)>>4;
 				//src = PIXEL_LTWH{ ((temp << 4) + 256), 104, 16, 16 };
 				src = PIXEL_LTWH{ (temp << 4), 128, 16, 16 };
-				GrpBlt(src, i, j, GrTama);
+				GrpSurface_Blit({ i, j }, SURFACE_ID::SYSTEM, src);
 			}
 			else if(temp>=r) {
 				//src = PIXEL_LTWH{ 256, 104, 16, 16 };
 				src = PIXEL_LTWH{ 0, 128, 16, 16 };
-				GrpBlt(src, i, j, GrTama);
+				GrpSurface_Blit({ i, j }, SURFACE_ID::SYSTEM, src);
 			}
 		}
 	}
@@ -668,42 +668,47 @@ void ObjectLockMove(void)
 // ロックオン枠描画 //
 void ObjectLockDraw(void)
 {
-	PIXEL_LTRB	temp;
-
 	for(const auto& it : LockInfo) {
 		const auto *l = &it;
 		if(l->state!=LOCKON_NONE){
-			temp = { 208, 80, 272, 96 };
-			GrpBlt(temp, ((*l->x >> 6) - 8), ((*l->y >> 6) - 8), GrTama);
-
-			temp = { 280, 88, 288, 96 };
-			GrpBlt(
-				temp,
-				(((*l->x - l->width) >> 6) - 4),
-				(((*l->y - l->height) >> 6) - 4),
-				GrTama
-			);
-			temp = { 272, 80, 280, 88 };
-			GrpBlt(
-				temp,
-				(((*l->x + l->width) >> 6) - 4),
-				(((*l->y + l->height) >> 6) - 4),
-				GrTama
+			GrpSurface_Blit(
+				{ ((*l->x >> 6) - 8), ((*l->y >> 6) - 8) },
+				SURFACE_ID::SYSTEM,
+				{ 208, 80, 272, 96 }
 			);
 
-			temp = { 280, 80, 288, 88 };
-			GrpBlt(
-				temp,
-				(((*l->x - l->width) >> 6) - 4),
-				(((*l->y + l->height) >> 6) - 4),
-				GrTama
+			GrpSurface_Blit(
+				{
+					(((*l->x - l->width) >> 6) - 4),
+					(((*l->y - l->height) >> 6) - 4),
+				},
+				SURFACE_ID::SYSTEM,
+				{ 280, 88, 288, 96 }
 			);
-			temp = { 272, 88, 280, 96 };
-			GrpBlt(
-				temp,
-				(((*l->x + l->width) >> 6) - 4),
-				(((*l->y - l->height) >> 6) - 4),
-				GrTama
+			GrpSurface_Blit(
+				{
+					(((*l->x + l->width) >> 6) - 4),
+					(((*l->y + l->height) >> 6) - 4),
+				},
+				SURFACE_ID::SYSTEM,
+				{ 272, 80, 280, 88 }
+			);
+
+			GrpSurface_Blit(
+				{
+					(((*l->x - l->width) >> 6) - 4),
+					(((*l->y + l->height) >> 6) - 4),
+				},
+				SURFACE_ID::SYSTEM,
+				{ 280, 80, 288, 88 }
+			);
+			GrpSurface_Blit(
+				{
+					(((*l->x + l->width) >> 6) - 4),
+					(((*l->y - l->height) >> 6) - 4),
+				},
+				SURFACE_ID::SYSTEM,
+				{ 272, 88, 280, 96 }
 			);
 		}
 	}
@@ -768,7 +773,7 @@ void GrpDrawSpect(int x, int y)
 			ftable3[i]--;
 	}
 
-	// GrpBlt(src, (SPECT_X - 7), SPECT_Y, GrTama);
+	// GrpSurface_Blit({ (SPECT_X - 7), SPECT_Y }, SURFACE_ID::SYSTEM, src);
 
 	GrpGeom->Lock();
 
@@ -874,14 +879,14 @@ void GrpDrawNote(void)
 			if(Mid_NoteWTable[Track][NoteNo]){
 				x = 40 + destX[NoteNo%12] + (NoteNo/12)*28;
 				y =  9 + Track*24;
-				GrpBlt(src[NoteNo % 12], x, y, GrMusic);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::MUSIC, src[NoteNo % 12]);
 				Mid_NoteWTable[Track][NoteNo]--;
 			}
 
 			if(Mid_NoteTable[Track][NoteNo]){
 				x = 40 + destX[NoteNo%12] + (NoteNo/12)*28;
 				y =  9 + Track*24;
-				GrpBlt(src[NoteNo % 12], x, y, GrMusic);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::MUSIC, src[NoteNo % 12]);
 			}
 			if(Mid_PlayTable2[Track][NoteNo]){
 				LevelSum += (Mid_PlayTable2[Track][NoteNo]);
@@ -893,7 +898,9 @@ void GrpDrawNote(void)
 
 		if(num){
 			rc = PIXEL_LTWH{ 80, 456, (std::min)((LevelSum / num), 96), 5 };
-			GrpBlt(rc, 240, (22 + (Track * 24)), GrMusic);
+			GrpSurface_Blit(
+				{ 240, (22 + (Track * 24)) }, SURFACE_ID::MUSIC, rc
+			);
 		}
 	}
 }

@@ -157,10 +157,14 @@ void ScoreDraw(void)
 			ScoreString[i].bMoveEnable = FALSE;
 
 		src = PIXEL_LTWH{ 0, (64 + (32 * i)), 400, 32 };
-		GrpBlt(
-			src, (ScoreString[i].x >> 6), (ScoreString[i].y >> 6), GrNameReg
-		);
-		// GrpBlt(src, (50 + (i * 24)), (100 + (i * 48), GrNameReg);
+		const WINDOW_POINT topleft = {
+			(ScoreString[i].x >> 6),
+			(ScoreString[i].y >> 6),
+		};
+		GrpSurface_Blit(topleft, SURFACE_ID::NAMEREG, src);
+		// GrpSurface_Blit(
+		// 	{ (50 + (i * 24)), (100 + (i * 48) }, SURFACE_ID::NAMEREG, src
+		// );
 
 		gx = (ScoreString[i].x>>6) + 88;
 		gy = (ScoreString[i].y>>6) + 4;
@@ -179,7 +183,7 @@ void ScoreDraw(void)
 		gy = (ScoreString[i].y>>6) + 25;
 		if(ScoreString[i].Stage[0] == '7'){
 			src = { 288, 88, (288 + 16), (88 + 8) };
-			GrpBlt(src, gx, (gy - 1), GrTama);
+			GrpSurface_Blit({ gx, (gy - 1) }, SURFACE_ID::SYSTEM, src);
 		}
 		else
 			GrpPutScore(gx, gy, ScoreString[i].Stage);
@@ -187,7 +191,7 @@ void ScoreDraw(void)
 		gx = (ScoreString[i].x>>6) + 224 + 80;
 		gy = (ScoreString[i].y>>6) + 25;
 		src = PIXEL_LTWH{ 0, (400 + (ScoreString[i].Weapon * 8)), 48, 8 };
-		GrpBlt(src, gx, (gy - 1), GrNameReg);
+		GrpSurface_Blit({ gx, (gy - 1) }, SURFACE_ID::NAMEREG, src);
 	}
 }
 
@@ -388,13 +392,14 @@ void NameRegistProc(bool&)
 
 	GrpGeom->Unlock();
 
-	GrpBlt(src, 120, 0, GrNameReg);
+	constexpr auto sid = SURFACE_ID::NAMEREG;
+	GrpSurface_Blit({ 120, 0 }, sid, src);
 
 	ScoreDraw();
 
 	// 名前入力用文字列群 //
 	src = { 0, 432, 416, 480 };
-	GrpBlt(src, 112, 420, GrNameReg);
+	GrpSurface_Blit({ 112, 420 }, sid, src);
 
 	// カーソル //
 	if((x >= 20) && (y == 2)) {
@@ -402,7 +407,7 @@ void NameRegistProc(bool&)
 	} else {
 		src = PIXEL_LTWH{ 416, (432 + ((count >> 3) << 4)), 16, 16 };
 	}
-	GrpBlt(src, (112 + (x << 4)), (420 + (y << 4)), GrNameReg);
+	GrpSurface_Blit({ (112 + (x << 4)), (420 + (y << 4)) }, sid, src);
 
 	//sprintf(buf,"(%2d,%2d)", x, y);
 	//GrpPut16(0,0,buf);
@@ -643,7 +648,7 @@ void ReplayProc(bool&)
 		GameDraw();
 
 		constexpr PIXEL_LTWH rc = { 312, 80, 32, 8 };
-		GrpBlt(rc, 128, 470, GrTama);
+		GrpSurface_Blit({ 128, 470 }, SURFACE_ID::SYSTEM, rc);
 		if(ExTimer<64+32){
 			GrpGeom->Lock();
 			GrpGeom->SetAlphaNorm(128);
@@ -653,7 +658,7 @@ void ReplayProc(bool&)
 			);
 			GrpGeom->Unlock();
 			constexpr PIXEL_LTWH rc = { 312, 88, 72, 8 };
-			GrpBlt(rc, (128 + 45), (470 + 4), GrTama);
+			GrpSurface_Blit({ (128 + 45), (470 + 4) }, SURFACE_ID::SYSTEM, rc);
 		}
 		Grp_Flip();
 	}
@@ -738,7 +743,7 @@ void SProjectProc(bool&)
 	if(IsDraw()){
 		GrpBackend_Clear(/* 255 */);
 
-		GrpBlt(rc, logo.left, logo.top, GrSProject);
+		GrpSurface_Blit({ logo.left, logo.top }, SURFACE_ID::SPROJECT, rc);
 
 		if(timer < 64){
 			fade(((255 - timer) * 4), (timer * 4));
@@ -946,7 +951,7 @@ void GameProc(bool&)
 		GameDraw();
 		if(DemoplaySaveEnable){
 			constexpr PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
-			GrpBlt(rc, 128, 470, GrTama);
+			GrpSurface_Blit({ 128, 470 }, SURFACE_ID::SYSTEM, rc);
 		}
 		Grp_Flip();
 	}
@@ -1015,7 +1020,7 @@ void GameOverProc(bool&)
 		/*
 		if(DemoplaySaveEnable){
 			constexpr PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
-			GrpBlt(rc, 128, 470, GrTama);
+			GrpSurface_Blit({ 128, 470 }, SURFACE_ID::SYSTEM, rc);
 		}*/
 		Grp_Flip();
 	}
@@ -1181,14 +1186,14 @@ void WeaponSelectProc(bool&)
 		GrpBackend_Clear();
 
 		rc = { 0, (264 - 8), 224, (296 - 24) };
-		GrpBlt(rc, (320 - 112), 20, GrTama);
+		GrpSurface_Blit({ (320 - 112), 20 }, SURFACE_ID::SYSTEM, rc);
 
 		rc = PIXEL_LTWH{ 0, 272, 64, 24 };
-		GrpBlt(rc, (120 - 32), (260 - 12), GrTama);
+		GrpSurface_Blit({ (120 - 32), (260 - 12) }, SURFACE_ID::SYSTEM, rc);
 
 		d = ((count/8)%2)<<3;
 		rc = PIXEL_LTWH{ 72, (272 + d), 56, 8 };
-		GrpBlt(rc, (400 - 28 + 4), 420, GrTama);
+		GrpSurface_Blit({ (400 - 28 + 4), 420 }, SURFACE_ID::SYSTEM, rc);
 
 		for(i=0;i<3;i++){
 		//for(i=0;i<4;i++){
@@ -1196,7 +1201,7 @@ void WeaponSelectProc(bool&)
 			d = (-i+Viv.weapon)*85 + deg - 64;
 			x = 120 + cosl(d,90) - 56/2;
 			y = 260 + sinl(d,110) - 48/2;
-			GrpBlt(src[i], x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src[i]);
 		}
 
 		GrpGeom->Lock();
@@ -1238,14 +1243,14 @@ void WeaponSelectProc(bool&)
 				d = Viv.weapon<<4;
 				rc = PIXEL_LTWH{ 224, 256, 32, 32 };
 				//rc = PIXEL_LTWH{ d, (296 - 24), 16, 16 };
-				GrpBlt(rc, x, y, GrTama);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, rc);
 			}
 		}
 		MaidDraw();
 		MaidTamaDraw();
 
 		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
-		GrpBlt(rc, 468, 400, GrTama);
+		GrpSurface_Blit({ 468, 400 }, SURFACE_ID::SYSTEM, rc);
 		sprintf(buf, "%d", ((Cast::up<uint16_t>(Viv.exp) + 1) >> 5));
 		GrpPutScore(500,400,buf);
 
@@ -1335,8 +1340,8 @@ void TitleProc(bool& quit)
 
 	if(IsDraw()){
 		GrpBackend_Clear();
-		GrpBlt(src, 0, 42, GrTitle);
-		// GrpBlt(src, (320 - 175), 77, GrTitle);
+		GrpSurface_Blit({ 0, 42 }, SURFACE_ID::TITLE, src);
+		// GrpSurface_Blit({ (320 - 175), 77 }, SURFACE_ID::TITLE, src);
 		MWinDraw();
 		CWinDraw(window_active);
 		#ifdef PBG_DEBUG
@@ -1429,12 +1434,14 @@ void MusicRoomProc(bool&)
 		GrpBackend_Clear();
 
 		auto BlitBG = [](const PIXEL_LTWH& rect) {
-			GrpBlt(rect, rect.left, rect.top, GrMusic);
+			GrpSurface_Blit({ rect.left, rect.top }, SURFACE_ID::MUSIC, rect);
 		};
 
 		auto BlitLegend = [](const PIXEL_LTWH& rect) {
 			const PIXEL_LTRB src = (rect + PIXEL_POINT{ 0, 392 });
-			GrpBlt(src, (8 + rect.left), (410 + rect.top), GrMusic);
+			GrpSurface_Blit(
+				{ (8 + rect.left), (410 + rect.top) }, SURFACE_ID::MUSIC, src
+			);
 		};
 
 		BlitBG({   0,   0, 504, 392 });	// From keyboard to spectrum analyzer

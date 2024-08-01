@@ -5,11 +5,11 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/input.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
+#include "platform/graphics_backend.h"
 
 
 ///// [ひみつの関数] /////
@@ -246,7 +246,7 @@ void MaidTamaDraw(void)
 		}
 
 		// 完全判定付きクリッピング //
-		GrpBlt(src, x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 	}
 
 	// レーザーの描画 //
@@ -255,22 +255,22 @@ void MaidTamaDraw(void)
 
 		x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 		y = (Viv.opy>>6)-20;
-		GrpBlt(ltemp, x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
 
 		x = (Viv.opx>>6)+4 -8 - SBOPT_DX;
 		y = (Viv.opy>>6)-20;
-		GrpBlt(ltemp, x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
 
 		ltemp = PIXEL_LTWH{ (384 + 8 + ((Viv.lay_grp - 1) << 4)), 240, 8, 16 };
 		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
 			x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 			y = i;
-			GrpBlt(ltemp, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
 		}
 		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
 			x = (Viv.opx>>6)+4 -8 - SBOPT_DX;
 			y = i;
-			GrpBlt(ltemp, x, y, GrTama);
+			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
 		}
 	}
 }

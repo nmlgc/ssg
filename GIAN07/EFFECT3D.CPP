@@ -5,9 +5,9 @@
 
 #include "EFFECT3D.H"
 #include "GIAN.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/ut_math.h"
+#include "platform/graphics_backend.h"
 
 #define CIRCLE_MAX			40
 #define CUBE_MAX			8
@@ -148,7 +148,6 @@ void InitWarning(void)
 void DrawWarning(void)
 {
 	constexpr PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
-	extern SURFACE_DDRAW& GrTama;
 	int	st,det;
 	static int count;
 
@@ -163,7 +162,7 @@ void DrawWarning(void)
 			129, (60 + (232 - 152) - 4), (128 + 384), (80 + (232 - 152) - 4)
 		);
 		GrpGeom->Unlock();
-		GrpBlt(src, (128 + 1), (60 + 1), GrTama);
+		GrpSurface_Blit({ (128 + 1), (60 + 1) }, SURFACE_ID::SYSTEM, src);
 	}
 	else{
 		GrpGeom->Lock();
@@ -290,7 +289,7 @@ void Draw3DCube(void)
 {
 	for(const auto& it : Star) {
 		constexpr PIXEL_LTWH rc = { 136, 272, 16, 24 };
-		GrpBlt(rc, it.x, it.y, GrTama);
+		GrpSurface_Blit({ it.x, it.y }, SURFACE_ID::SYSTEM, rc);
 	}
 
 	GrpGeom->Lock();
@@ -499,11 +498,11 @@ void DrawEffectFakeECL(void)
 
 	for(const auto& it : FakeECLStr) {
 		src = PIXEL_LTWH{it.SrcX, it.SrcY, 72, 16};
-		GrpBlt(src, (it.x >> 6), (it.y >> 6), GrMap);
+		GrpSurface_Blit({ (it.x >> 6), (it.y >> 6) }, SURFACE_ID::MAPCHIP, src);
 	}
 
 	src = { 0, 272, 416, 352 };
-	GrpBlt(src, 128, 400, GrMap);
+	GrpSurface_Blit({ 128, 400 }, SURFACE_ID::MAPCHIP, src);
 }
 
 /*
@@ -588,7 +587,7 @@ void DrawStg3Cloud(void)
 		y   = (p->y >> 6) - Size[j].y;
 		src = Data[j];
 
-		GrpBlt(src, x, y, GrEnemy);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::ENEMY, src);
 	}
 }
 */
@@ -744,6 +743,7 @@ void MoveStg4Rock(void)
 
 void DrawStg4Rock(void)
 {
+	constexpr auto sid       = SURFACE_ID::MAPCHIP;
 	static PIXEL_LTRB src[3] ={{0, 224, 80, 288},{0, 288, 48, 336},{48, 288, 80, 320}};
 	static int dx[3] = {80/2, 48/2, 32/2};
 	static int dy[3] = {64/2, 48/2, 32/2};
@@ -754,7 +754,9 @@ void DrawStg4Rock(void)
 		const auto *p = &it;
 		x = (p->x + GX_MID)>>6;
 		y = (p->y + GY_MID)>>6;
-		GrpBlt(src[p->GrpID], (x - dx[p->GrpID]), (y - dy[p->GrpID]), GrMap);
+		GrpSurface_Blit(
+			{ (x - dx[p->GrpID]), (y - dy[p->GrpID]) }, sid, src[p->GrpID]
+		);
 	}
 }
 
@@ -883,6 +885,7 @@ void MoveStg6Raster()
 // ６面ラスター描画 //
 void DrawStg6Raster()
 {
+	constexpr auto sid = SURFACE_ID::MAPCHIP;
 	static PIXEL_LTRB Target[3] = {
 		{608, 272, 640, 352}, {592, 160, 640, 272}, {576, 0, 640, 160},
 	};
@@ -893,7 +896,7 @@ void DrawStg6Raster()
 
 	for(i=0; i<S6STAR_MAX; i++){
 		src = { 624, 352, (624 + 16), (352 + 16) };
-		GrpBlt(src, S6Star[i].x, S6Star[i].y, GrMap);
+		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, sid, src);
 	}
 
 	for(const auto& it : S6Ras) {
@@ -905,7 +908,7 @@ void DrawStg6Raster()
 		for(j=0; j<h; j+=2){
 			dx = sinl((it.deg + j), it.amp);
 			src = { x1, (j + oy), x2, (j + 2) };
-			GrpBlt(src, (it.x + dx - w), (it.y + j), GrMap);
+			GrpSurface_Blit({ (it.x + dx - w), (it.y + j) }, sid, src);
 		}
 	}
 }
@@ -948,6 +951,6 @@ void DrawStg3Star()
 
 	for(i=0; i<S3STAR_MAX; i++){
 		constexpr PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
-		GrpBlt(src, S6Star[i].x, S6Star[i].y, GrMap);
+		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, SURFACE_ID::MAPCHIP, src);
 	}
 }

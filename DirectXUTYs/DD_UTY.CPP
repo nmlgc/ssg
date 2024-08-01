@@ -6,8 +6,10 @@
 #include "DD_UTY.H"
 #include "game/cast.h"
 #include "game/debug.h"
+#include "game/enum_array.h"
 #include "game/format_bmp.h"
 #include "game/input.h"
+#include "platform/windows/surface_ddraw.h"
 #include <assert.h>
 #include <d3d.h>
 #pragma message(PBGWIN_DD_UTY_H)
@@ -423,22 +425,23 @@ bool GrpBackend_PaletteSet(const PALETTE& pal)
 	return true;
 }
 
-void GrpSetPaletteFrom(SURFACE_DDRAW& surf)
+bool GrpSurface_PaletteApplyToBackend(SURFACE_ID sid)
 {
 	if(DxObj.PixelFormat.IsChanneled()) {
-		return;
+		return false;
 	}
 
 	LPDIRECTDRAWPALETTE lpdp;
-	if(surf.surf->GetPalette(&lpdp) != DD_OK) {
-		return;
+	if(DxSurf[sid].surf->GetPalette(&lpdp) != DD_OK) {
+		return false;
 	}
 
 	const auto p = CastToPALETTEENTRY(DxObj.Palette);
 	lpdp->GetEntries(0, 0, p.size(), p.data());
-	GrpBackend_PaletteSet(DxObj.Palette);
+	const auto ret = GrpBackend_PaletteSet(DxObj.Palette);
 
 	lpdp->Release();
+	return ret;
 }
 
 bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
@@ -511,18 +514,18 @@ bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)
 	return SurfaceUpdateFromGDI(DxSurf[SURFACE_ID::TEXT], r);
 }
 
-bool GRAPHICS_DDRAW::SurfaceLoad(SURFACE_ID sid, BMP_OWNED&& bmp)
+bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
 {
 	auto& surf = DxSurf[sid];
 	const PIXEL_SIZE bmp_size = {
 		std::abs(bmp.info.biWidth), std::abs(bmp.info.biHeight),
 	};
 	if(surf.size != bmp_size) {
-		if(!SurfaceCreateUninitialized(surf, bmp_size)) {
+		if(!DxObj.SurfaceCreateUninitialized(surf, bmp_size)) {
 			return false;
 		}
 	}
-	return (surf.Load(std::move(bmp)) && SurfaceRestore(surf));
+	return (surf.Load(std::move(bmp)) && DxObj.SurfaceRestore(surf));
 }
 
 bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col)
@@ -537,11 +540,11 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col)
 	);
 }
 
-bool GRAPHICS_DDRAW::SurfaceBlit(
-	WINDOW_POINT topleft, SURFACE_DDRAW& surf, const PIXEL_LTRB& src
+bool GrpSurface_Blit(
+	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
 )
 {
-	return GrpBlt(src, topleft.x, topleft.y, surf);
+	return GrpBlt(src, topleft.x, topleft.y, DxSurf[sid]);
 }
 
 void GrpBackend_Clear(uint8_t col_palettized, RGB col_channeled)
@@ -628,37 +631,34 @@ bool GrpClip(PIXEL_LTRB *src, int *x, int *y)
 	return TRUE;
 }
 
-bool GrpBltX(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
-{
-	RECT rect = { src.left, src.top, src.right, src.bottom };
-	DDrawRetryUntilSuccessful(DxObj, [&] {
-		return DxObj.Back->BltFast(
-			x, y, surf.surf, &rect, DDBLTFAST_SRCCOLORKEY
-		);
-	});
-	return true;
-}
-
-void GrpBltXC(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
-{
-	RECT rect = { src.left, src.top, src.right, src.bottom };
-	DDrawRetryUntilSuccessful(DxObj, [&] {
-		return DxObj.Back->BltFast(
-			x, y, surf.surf, &rect, DDBLTFAST_NOCOLORKEY
-		);
-	});
-}
-
-// カラーキー＆クリッピング付きＢＭＰ転送 //
-// 注意 : src の内容が変更される可能性があります //
-bool STD_GrpBlt(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
+bool GrpBltX(
+	const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf, DWORD trans
+)
 {
 	// 完全に範囲外なら何もしない //
 	PIXEL_LTRB clipped = src;
 	if(!GrpClip(&clipped, &x, &y)) {
 		return false;
 	}
-	return GrpBltX(clipped, x, y, surf);
+	RECT rect = { clipped.left, clipped.top, clipped.right, clipped.bottom };
+	DDrawRetryUntilSuccessful(DxObj, [&] {
+		return DxObj.Back->BltFast(x, y, surf.surf, &rect, trans);
+	});
+	return true;
+}
+
+void GrpSurface_BlitOpaque(
+	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
+)
+{
+	GrpBltX(src, topleft.x, topleft.y, DxSurf[sid], DDBLTFAST_NOCOLORKEY);
+}
+
+// カラーキー＆クリッピング付きＢＭＰ転送 //
+// 注意 : src の内容が変更される可能性があります //
+bool STD_GrpBlt(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
+{
+	return GrpBltX(src, x, y, surf, DDBLTFAST_SRCCOLORKEY);
 }
 
 // ビット深度によりカラーキーをセットする

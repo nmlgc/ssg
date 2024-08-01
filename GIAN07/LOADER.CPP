@@ -7,16 +7,15 @@
 #include "CONFIG.H"
 #include "GIAN.H"
 #include "MUSIC.H"
-#include "LOADER.H"
 #include "LZ_UTY.H"
 #include "WindowSys.h"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/enum_array.h"
 #include "game/format_bmp.h"
 #include "game/graphics.h"
 #include "game/hash.h"
 #include "game/midi.h"
 #include "game/snd.h"
+#include "platform/graphics_backend.h"
 #include "platform/path.h"
 #include <assert.h>
 
@@ -194,7 +193,7 @@ bool GrpBMPLoadP(const PACKFILE_READ& in, fil_no_t filno, SURFACE_ID sid)
 	}
 
 	auto& bmp = maybe_bmp.value();
-	return DxObj.SurfaceLoad(sid, std::move(bmp));
+	return GrpSurface_Load(sid, std::move(bmp));
 }
 
 bool Snd_SELoadP(const PACKFILE_READ& in, fil_no_t filno, uint8_t id, int max)
@@ -467,34 +466,6 @@ void LoaderInit(void)
 
 
 // グローバル変数 //
-SURFACE_DDRAW& GrTama	= DxSurf[SURFACE_ID::SYSTEM];	// 弾など
-SURFACE_DDRAW& GrEnemy	= DxSurf[SURFACE_ID::ENEMY];	// 雑魚など
-SURFACE_DDRAW& GrMap	= DxSurf[SURFACE_ID::MAPCHIP];	// 背景
-SURFACE_DDRAW& GrBomber	= DxSurf[SURFACE_ID::BOMBER];	// ボム用グラフィック用
-SURFACE_DDRAW& GrSProject	= DxSurf[SURFACE_ID::SPROJECT];
-SURFACE_DDRAW& GrTitle	= DxSurf[SURFACE_ID::TITLE];
-SURFACE_DDRAW& GrMusic	= DxSurf[SURFACE_ID::MUSIC];
-SURFACE_DDRAW& GrNameReg	= DxSurf[SURFACE_ID::NAMEREG];
-SURFACE_DDRAW& GrEndingCredits	= DxSurf[SURFACE_ID::ENDING_CREDITS];
-
-extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX] = {
-	{ DxSurf[SURFACE_ID::FACE + 0] },
-	{ DxSurf[SURFACE_ID::FACE + 1] },
-	{ DxSurf[SURFACE_ID::FACE + 2] },
-};
-
-extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
-	ENDING_PIC_MAX
-] = {
-	{ DxSurf[SURFACE_ID::ENDING_PIC + 0] },
-	{ DxSurf[SURFACE_ID::ENDING_PIC + 1] },
-	{ DxSurf[SURFACE_ID::ENDING_PIC + 2] },
-	{ DxSurf[SURFACE_ID::ENDING_PIC + 3] },
-	{ DxSurf[SURFACE_ID::ENDING_PIC + 4] },
-	{ DxSurf[SURFACE_ID::ENDING_PIC + 5] },
-};
-
-
 uint32_t	MusicNum = 0;	// 曲数
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
 ENDING_GRP	EndingGrp[ENDING_PIC_MAX];	// エンディング用
@@ -536,7 +507,7 @@ bool LoadGraph(int stage)
 			GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM) &&
 			GrpBMPLoadP(graph, (20 + 4), SURFACE_ID::TITLE)
 		);
-		//LoadPaletteFrom(GrEnemy);
+		// LoadPaletteFrom(SURFACE_ID::ENEMY);
 	}
 	// お名前登録画面用 //
 	if(stage==GRAPH_ID_NAMEREGIST){

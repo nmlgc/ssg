@@ -6,7 +6,7 @@
 #include "TAMA.H"
 #include "GIAN.H"
 #include "LEVEL.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
@@ -349,7 +349,7 @@ void tama_draw(void)
 		switch(t->effect){
 			case(TE_DELETE):
 				src = PIXEL_LTWH{ (384 + ((t->count / 6) << 4)), 104, 16, 16 };
-				GrpBlt(src, x, y, GrTama);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 			continue;
 
 			case(TE_CIRCLE1):
@@ -372,7 +372,7 @@ void tama_draw(void)
 				src = rcExtraTama[d];
 				x   = (t->x>>6) - sizeExtraTama[d];
 				y   = (t->y>>6) - sizeExtraTama[d];
-				GrpBlt(src, x, y, GrEnemy);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::ENEMY, src);
 			}
 			continue;
 
@@ -407,7 +407,7 @@ void tama_draw(void)
 				src.right  = src.left + 16;
 				//x   = (t->x>>6) - 8;	// サイズは１６で固定
 				//y   = (t->y>>6) - 8;	// すなわち、そのままでＯＫ！
-				GrpBlt(src, x, y, GrEnemy);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::ENEMY, src);
 			}
 			continue;
 
@@ -440,7 +440,7 @@ void tama_draw(void)
 			break;
 		}
 
-		GrpBlt(src, x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 	}
 
 	// 小型弾(8*8) の描画 //
@@ -453,7 +453,7 @@ void tama_draw(void)
 		switch(t->effect){
 			case(TE_DELETE):
 				src = PIXEL_LTWH{ (384 + ((t->count / 6) << 3)), 120, 8, 8 };
-				GrpBlt(src, x, y, GrTama);
+				GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 			continue;
 
 			case(TE_CIRCLE1):
@@ -476,7 +476,7 @@ void tama_draw(void)
 			src.right  = src.left + 16;
 		}
 
-		GrpBlt(src, x, y, GrTama);
+		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 	}
 }
 
@@ -543,7 +543,7 @@ void __fastcall _TamaEffectDraw(const TAMA_DATA *t)
 	//temp = Data[(t->c&0x0f)%6][ptn];
 	if(t->c >= 16*3) temp = Target[3][ptn];
 	else             temp = Target[t->c][ptn];
-	GrpBlt(temp, x, y, GrTama);
+	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, temp);
 }
 
 

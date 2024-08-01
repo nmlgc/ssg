@@ -22,12 +22,10 @@
 
 
 // ヘッダファイル //
-#include "constants.h"
-#include "game/coords.h"
-#include "game/enum_array.h"
 #include "DirectXUTYs/DD_GRP2D.H"	// ２Ｄ用描画関数(公開しないこと)
 #include "DirectXUTYs/DD_GRP3D.H"	// ３Ｄ用描画関数(公開しないこと)
-#include "platform/windows/surface_ddraw.h"
+#include "game/graphics.h"
+#include "game/pixelformat.h"
 
 
 // Forward declarations //
@@ -38,6 +36,7 @@ struct IDirectDrawSurface;
 struct IDirect3D2;
 struct IDirect3DDevice2;
 struct IDirect3DViewport2;
+struct SURFACE_DDRAW;
 
 // 構造体 //
 struct GRAPHICS_DDRAW {
@@ -58,14 +57,13 @@ struct GRAPHICS_DDRAW {
 	bool	bNeedChgPal;	// パレットを変更する必要があるか
 	std::optional<uint8_t>	DeviceID;
 
-protected:
+public:
 	// Ensures that a DirectDraw surface matches its underlying image.
 	bool SurfaceRestore(SURFACE_DDRAW& surf);
 
 	// Also ensures the correct color key for palettized pixel formats.
 	bool SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf);
 
-public:
 	// Can mutate the two parameters and replace them with a supported
 	// configuration if necessary.
 	bool Init(uint8_t& device_id, BITDEPTH& bitdepth);
@@ -76,9 +74,6 @@ public:
 	// ロード済みのSurfaceを修復
 	bool Restore(void);
 
-	// オフスクリーン Surface 作成 //
-	// --------------------------- //
-
 	// (Re-)creates the DirectDraw surface associated with [surf_id], in the
 	// given size and with undefined initial contents, retaining whatever state
 	// the GDI surface might have had. After filling the GDI surface with the
@@ -86,40 +81,17 @@ public:
 	// surface.
 	bool SurfaceCreateUninitialized(SURFACE_DDRAW& surf, PIXEL_SIZE size);
 
-	// Consumes the given .BMP file and sets the given surface to its contents,
-	// re-creating it in the correct size if necessary.
-	bool SurfaceLoad(SURFACE_ID sid, BMP_OWNED&& bmp);
-
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
 	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col);
-
-	// Blits the given [src] rectangle inside [surf] to the given top-left
-	// point on the back buffer, while clipping the destination rectangle to
-	// the clipping area. Returns `true` if any part of the sprite was blitted.
-	bool SurfaceBlit(
-		WINDOW_POINT topleft, SURFACE_DDRAW& surf, const PIXEL_LTRB& src
-	);
-	// --------------------------- //
 };
 
 
 // グローバル変数 //
 extern GRAPHICS_DDRAW	DxObj;
 extern GRAPHICS_GEOMETRY *GrpGeom;
-extern ENUMARRAY<SURFACE_DDRAW, SURFACE_ID> DxSurf;
 
 
 // 初期化など //
 bool GrpEnum(void);	// 使用できるデバイスを列挙する
-
-void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
-
-// ビットマップ転送(WithClip)
-// Returns `true` if any part of the sprite was blitted.
-extern bool (*GrpBlt)(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
-
-// カラーキー無し転送(クリッピングはないので注意！！) //
-// src の値は変更されません //
-void GrpBltXC(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
 
 #endif

@@ -225,6 +225,7 @@ struct GDI_FONTS {
 };
 GDI_FONTS GDIFonts;
 
+SURFACE_DDRAW& GrText = DxSurf[SURFACE_ID::TEXT];	// 曲のタイトル加工用
 TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW> TextObj = {
 	DxObj, GrText, GDIFonts.fonts
 };

@@ -7,6 +7,7 @@
 #define PBGWIN_LOADER_H		"LOADER : Version 0.10 : Update 2000/02/18"
 //#pragma message(PBGWIN_LOADER_H)
 
+#include "constants.h"
 #include "game/coords.h"
 #include "game/hash.h"
 #include "game/graphics.h"
@@ -15,9 +16,7 @@ struct SURFACE_DDRAW;
 
 
 ///// [ 定数 ] /////
-#define FACE_MAX				3			// 同時にロード可能な人数...
 #define FACE_NUMX				6			// 顔グラの横の個数
-constexpr auto ENDING_PIC_MAX = 6;
 
 // 特殊グラフィックID (For LoadGraph() ) //
 #define GRAPH_ID_MUSICROOM		(128)		// 音楽室用ＢＭＰのＩＤ(数値は1-6 で無ければ良い)
@@ -109,39 +108,6 @@ extern void LeaveBombPalette(void);		// ボム用パレット属性を外す
 */
 
 //// [ 変数 ] ////
-enum GIAN_SURFACE_ID {
-	SURFACE_ID_SYSTEM,	// システム用
-
-	// Title Screen
-	SURFACE_ID_TITLE = 2,	// たいとる用
-
-	// Music Room
-	SURFACE_ID_MUSIC = 2,	// 音楽室用
-
-	// Name Registration
-	SURFACE_ID_NAMEREG = 2,	// お名前登録用
-
-	// In-game
-	SURFACE_ID_MAPCHIP = 1,	// 背景用
-	SURFACE_ID_ENEMY = 2,	// 敵(雑魚＆ボス)用
-	SURFACE_ID_FACE,	// 顔グラ用
-	SURFACE_ID_FACE_last = (SURFACE_ID_FACE + FACE_MAX - 1),
-	SURFACE_ID_BOMBER,	// ボム用グラフィック用
-
-	// Splash screen
-	SURFACE_ID_SPROJECT = 1,	// 西方Project表示用
-
-	// Endings
-	SURFACE_ID_ENDING_CREDITS = 1,
-	SURFACE_ID_ENDING_PIC,
-	SURFACE_ID_ENDING_PIC_last = (SURFACE_ID_ENDING_PIC + ENDING_PIC_MAX - 1),
-
-	// Rendered text. Since this one is procedurally generated and therefore
-	// doesn't have a palette, it must come last to ensure that DirectDraw
-	// initializes it with the implicit palette loaded for an earlier surface.
-	SURFACE_ID_TEXT,
-};
-
 extern SURFACE_DDRAW&	GrTama;	// システム用
 extern SURFACE_DDRAW&	GrEnemy;	// 敵(雑魚＆ボス)用
 extern SURFACE_DDRAW&	GrMap;	// 背景用

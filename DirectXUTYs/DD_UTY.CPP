@@ -4,7 +4,6 @@
 /*                                                                           */
 
 #include "DD_UTY.H"
-#include "constants.h"
 #include "game/cast.h"
 #include "game/debug.h"
 #include "game/format_bmp.h"
@@ -111,11 +110,12 @@ GRAPHICS_DDRAW	DxObj;
 GRAPHICS_GEOMETRY *GrpGeom;
 GRAPHICS_GEOMETRY_DDRAW GrpGeom_DDraw;
 GRAPHICS_GEOMETRY_D3D GrpGeom_D3D;
-SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 uint8_t DxEnumNow;
 
 // ビデオカード４枚差しをする人はいないと思うので...
 std::array<XDDRAWENUM, 4> DxEnum;
+
+ENUMARRAY<SURFACE_DDRAW, SURFACE_ID> DxSurf;
 
 // 図形描画用関数ポインタの実体 //
 bool (*GrpBlt)(const PIXEL_LTRB&, int, int, SURFACE_DDRAW&) = STD_GrpBlt;
@@ -496,11 +496,9 @@ bool GRAPHICS_DDRAW::SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size)
 	return SurfaceCreateUninitialized(surf, size);
 }
 
-bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED&& bmp)
+bool GRAPHICS_DDRAW::SurfaceLoad(SURFACE_ID sid, BMP_OWNED&& bmp)
 {
-	if(surf_id>=SURFACE_MAX) return FALSE;
-
-	auto& surf = DxSurf[surf_id];
+	auto& surf = DxSurf[sid];
 	const PIXEL_SIZE bmp_size = {
 		std::abs(bmp.info.biWidth), std::abs(bmp.info.biHeight),
 	};

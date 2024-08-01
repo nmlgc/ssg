@@ -179,7 +179,7 @@ bool LoadMIDIWithPotentialLoop(BYTE_BUFFER_OWNED buf, const HASH& hash)
 // ---------------------------------------------------
 
 // Packfile loading //
-bool GrpBMPLoadP(const PACKFILE_READ& in, fil_no_t filno, uint8_t surf_id)
+bool GrpBMPLoadP(const PACKFILE_READ& in, fil_no_t filno, SURFACE_ID sid)
 {
 	auto maybe_bmp = BMPLoad(in.MemExpand(filno));
 
@@ -194,7 +194,7 @@ bool GrpBMPLoadP(const PACKFILE_READ& in, fil_no_t filno, uint8_t surf_id)
 	}
 
 	auto& bmp = maybe_bmp.value();
-	return DxObj.SurfaceLoad(surf_id, std::move(bmp));
+	return DxObj.SurfaceLoad(sid, std::move(bmp));
 }
 
 bool Snd_SELoadP(const PACKFILE_READ& in, fil_no_t filno, uint8_t id, int max)
@@ -467,32 +467,31 @@ void LoaderInit(void)
 
 
 // グローバル変数 //
-SURFACE_DDRAW& GrText	= DxSurf[SURFACE_ID_TEXT];	// 曲のタイトル加工用
-SURFACE_DDRAW& GrTama	= DxSurf[SURFACE_ID_SYSTEM];	// 弾など
-SURFACE_DDRAW& GrEnemy	= DxSurf[SURFACE_ID_ENEMY];	// 雑魚など
-SURFACE_DDRAW& GrMap	= DxSurf[SURFACE_ID_MAPCHIP];	// 背景
-SURFACE_DDRAW& GrBomber	= DxSurf[SURFACE_ID_BOMBER];	// ボム用グラフィック用
-SURFACE_DDRAW& GrSProject	= DxSurf[SURFACE_ID_SPROJECT];
-SURFACE_DDRAW& GrTitle	= DxSurf[SURFACE_ID_TITLE];
-SURFACE_DDRAW& GrMusic	= DxSurf[SURFACE_ID_MUSIC];
-SURFACE_DDRAW& GrNameReg	= DxSurf[SURFACE_ID_NAMEREG];
-SURFACE_DDRAW& GrEndingCredits	= DxSurf[SURFACE_ID_ENDING_CREDITS];
+SURFACE_DDRAW& GrTama	= DxSurf[SURFACE_ID::SYSTEM];	// 弾など
+SURFACE_DDRAW& GrEnemy	= DxSurf[SURFACE_ID::ENEMY];	// 雑魚など
+SURFACE_DDRAW& GrMap	= DxSurf[SURFACE_ID::MAPCHIP];	// 背景
+SURFACE_DDRAW& GrBomber	= DxSurf[SURFACE_ID::BOMBER];	// ボム用グラフィック用
+SURFACE_DDRAW& GrSProject	= DxSurf[SURFACE_ID::SPROJECT];
+SURFACE_DDRAW& GrTitle	= DxSurf[SURFACE_ID::TITLE];
+SURFACE_DDRAW& GrMusic	= DxSurf[SURFACE_ID::MUSIC];
+SURFACE_DDRAW& GrNameReg	= DxSurf[SURFACE_ID::NAMEREG];
+SURFACE_DDRAW& GrEndingCredits	= DxSurf[SURFACE_ID::ENDING_CREDITS];
 
 extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX] = {
-	{ DxSurf[SURFACE_ID_FACE + 0] },
-	{ DxSurf[SURFACE_ID_FACE + 1] },
-	{ DxSurf[SURFACE_ID_FACE + 2] },
+	{ DxSurf[SURFACE_ID::FACE + 0] },
+	{ DxSurf[SURFACE_ID::FACE + 1] },
+	{ DxSurf[SURFACE_ID::FACE + 2] },
 };
 
 extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[
 	ENDING_PIC_MAX
 ] = {
-	{ DxSurf[SURFACE_ID_ENDING_PIC + 0] },
-	{ DxSurf[SURFACE_ID_ENDING_PIC + 1] },
-	{ DxSurf[SURFACE_ID_ENDING_PIC + 2] },
-	{ DxSurf[SURFACE_ID_ENDING_PIC + 3] },
-	{ DxSurf[SURFACE_ID_ENDING_PIC + 4] },
-	{ DxSurf[SURFACE_ID_ENDING_PIC + 5] },
+	{ DxSurf[SURFACE_ID::ENDING_PIC + 0] },
+	{ DxSurf[SURFACE_ID::ENDING_PIC + 1] },
+	{ DxSurf[SURFACE_ID::ENDING_PIC + 2] },
+	{ DxSurf[SURFACE_ID::ENDING_PIC + 3] },
+	{ DxSurf[SURFACE_ID::ENDING_PIC + 4] },
+	{ DxSurf[SURFACE_ID::ENDING_PIC + 5] },
 };
 
 
@@ -527,33 +526,33 @@ bool LoadGraph(int stage)
 	// 音楽室用 //
 	if(stage==GRAPH_ID_MUSICROOM){
 		return (
-			GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM) &&
-			GrpBMPLoadP(graph, (19 + 4), SURFACE_ID_MUSIC)
+			GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM) &&
+			GrpBMPLoadP(graph, (19 + 4), SURFACE_ID::MUSIC)
 		);
 	}
 	// タイトル画面用 //
 	if(stage==GRAPH_ID_TITLE){
 		return (
-			GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM) &&
-			GrpBMPLoadP(graph, (20 + 4), SURFACE_ID_MUSIC)
+			GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM) &&
+			GrpBMPLoadP(graph, (20 + 4), SURFACE_ID::TITLE)
 		);
 		//LoadPaletteFrom(GrEnemy);
 	}
 	// お名前登録画面用 //
 	if(stage==GRAPH_ID_NAMEREGIST){
 		return (
-			GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM) &&
-			GrpBMPLoadP(graph, (21 + 4), SURFACE_ID_NAMEREG)
+			GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM) &&
+			GrpBMPLoadP(graph, (21 + 4), SURFACE_ID::NAMEREG)
 		);
 	}
 	// 西方Ｐｒｏｊｅｃｔ表示用 //
 	if(stage==GRAPH_ID_SPROJECT){
-		if(!GrpBMPLoadP(graph, 31, SURFACE_ID_SPROJECT)) {
+		if(!GrpBMPLoadP(graph, 31, SURFACE_ID::SPROJECT)) {
 			return false;
 		}
 		GrpBackend_PaletteGet(SProjectPalette);
 
-		// if(!GrpBMPLoadP(graph, (21 + 4), SURFACE_ID_NAMEREG)) {
+		// if(!GrpBMPLoadP(graph, (21 + 4), SURFACE_ID::NAMEREG)) {
 		// 	return false;
 		// }
 		return true;
@@ -562,11 +561,11 @@ bool LoadGraph(int stage)
 	if(stage==GRAPH_ID_ENDING){
 		const auto& in = DAT::Packfile(DAT::PACK_ID::GRAPH2);
 
-		if(!GrpBMPLoadP(in, 0, SURFACE_ID_ENDING_CREDITS)) {
+		if(!GrpBMPLoadP(in, 0, SURFACE_ID::ENDING_CREDITS)) {
 			return false;
 		}
 		for(auto i = 0; i < ENDING_PIC_MAX; i++) {
-			if(!GrpBMPLoadP(in, (1 + i), (SURFACE_ID_ENDING_PIC + i))) {
+			if(!GrpBMPLoadP(in, (1 + i), (SURFACE_ID::ENDING_PIC + i))) {
 				return false;
 			}
 			GrpBackend_PaletteGet(EndingGrp[i].pal);
@@ -577,20 +576,20 @@ bool LoadGraph(int stage)
 
 	// エキストラステージシステム用 //
 	if(stage == GRAPH_ID_EXSTAGE){
-		if(!GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM)) {
+		if(!GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM)) {
 			return false;
 		}
-		if(!GrpBMPLoadP(graph, (27 + 1), SURFACE_ID_ENEMY)) {
+		if(!GrpBMPLoadP(graph, (27 + 1), SURFACE_ID::ENEMY)) {
 			return false;
 		}
 		GrpBackend_PaletteGet(EnemyPalette);
 
-		if(!GrpBMPLoadP(graph, 27, SURFACE_ID_MAPCHIP)) {
+		if(!GrpBMPLoadP(graph, 27, SURFACE_ID::MAPCHIP)) {
 			return false;
 		}
 
 		// 諸事情により、ここにいるのです //
-		if(!GrpBMPLoadP(graph, 26, SURFACE_ID_BOMBER)) {
+		if(!GrpBMPLoadP(graph, 26, SURFACE_ID::BOMBER)) {
 			return false;
 		}
 
@@ -599,7 +598,7 @@ bool LoadGraph(int stage)
 
 	// エキストラステージボス用(1) //
 	if(stage == GRAPH_ID_EXBOSS1){
-		if(!GrpBMPLoadP(graph, 29, SURFACE_ID_ENEMY)) {
+		if(!GrpBMPLoadP(graph, 29, SURFACE_ID::ENEMY)) {
 			return false;
 		}
 		GrpBackend_PaletteGet(EnemyPalette);
@@ -608,7 +607,7 @@ bool LoadGraph(int stage)
 
 	// エキストラステージボス用(2) //
 	if(stage == GRAPH_ID_EXBOSS2){
-		if(!GrpBMPLoadP(graph, 30, SURFACE_ID_ENEMY)) {
+		if(!GrpBMPLoadP(graph, 30, SURFACE_ID::ENEMY)) {
 			return false;
 		}
 		GrpBackend_PaletteGet(EnemyPalette);
@@ -620,10 +619,10 @@ bool LoadGraph(int stage)
 	}
 
 	// マップチップのロードは後で変換すること //
-	if(!GrpBMPLoadP(graph, 0, SURFACE_ID_SYSTEM)) {
+	if(!GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM)) {
 		return false;
 	}
-	if(!GrpBMPLoadP(graph, (stage + 0), SURFACE_ID_ENEMY)) {
+	if(!GrpBMPLoadP(graph, (stage + 0), SURFACE_ID::ENEMY)) {
 		return false;
 	}
 	GrpBackend_PaletteGet(EnemyPalette);
@@ -631,12 +630,12 @@ bool LoadGraph(int stage)
 	// 本当は STAGE_MAX とすべき
 	// const fil_no_t MapChipID[STAGE_MAX] = { 7, 7, 8, 9, 10, 11 };
 	const fil_no_t MapChipID[STAGE_MAX] = { 7, 8, 9, 10, 11, 12 };
-	if(!GrpBMPLoadP(graph, MapChipID[stage - 1], SURFACE_ID_MAPCHIP)) {
+	if(!GrpBMPLoadP(graph, MapChipID[stage - 1], SURFACE_ID::MAPCHIP)) {
 		return false;
 	}
 
 	// 諸事情により、ここにいるのです //
-	return GrpBMPLoadP(graph, 26, SURFACE_ID_BOMBER);
+	return GrpBMPLoadP(graph, 26, SURFACE_ID::BOMBER);
 }
 
 bool LoadFace(uint8_t FaceID, uint8_t FileNo)
@@ -645,7 +644,7 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 		return false;
 	}
 	const auto& graph = DAT::Packfile(DAT::PACK_ID::GRAPH);
-	if(!GrpBMPLoadP(graph, (13 + FileNo), (SURFACE_ID_FACE + FaceID))) {
+	if(!GrpBMPLoadP(graph, (13 + FileNo), (SURFACE_ID::FACE + FaceID))) {
 		return false;
 	}
 

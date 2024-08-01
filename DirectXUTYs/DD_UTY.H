@@ -22,17 +22,13 @@
 
 
 // ヘッダファイル //
+#include "constants.h"
 #include "game/coords.h"
-#include "DirectXUTYs/DD_GRP2D.H"
-#include "DirectXUTYs/DD_GRP3D.H"
+#include "game/enum_array.h"
+#include "DirectXUTYs/DD_GRP2D.H"	// ２Ｄ用描画関数(公開しないこと)
+#include "DirectXUTYs/DD_GRP3D.H"	// ３Ｄ用描画関数(公開しないこと)
 #include "platform/windows/surface_ddraw.h"
 
-
-// 定数＆マクロ //
-
-// TODO: Move to GIAN_SURFACE_ID once LOADER.H does no longer depend on this
-// header.
-#define SURFACE_MAX		10				// テクスチャ,Prim,BackをのぞくSurfaceの最大数
 
 // Forward declarations //
 struct BMP_OWNED;
@@ -100,7 +96,7 @@ public:
 
 	// Consumes the given .BMP file and sets the given surface to its contents,
 	// re-creating it in the correct size if necessary.
-	bool SurfaceLoad(uint8_t surf_id, BMP_OWNED&& bmp);
+	bool SurfaceLoad(SURFACE_ID sid, BMP_OWNED&& bmp);
 
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
 	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col);
@@ -131,7 +127,7 @@ public:
 // グローバル変数 //
 extern GRAPHICS_DDRAW	DxObj;
 extern GRAPHICS_GEOMETRY *GrpGeom;
-extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
+extern ENUMARRAY<SURFACE_DDRAW, SURFACE_ID> DxSurf;
 
 
 // 初期化など //

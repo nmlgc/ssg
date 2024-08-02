@@ -130,7 +130,6 @@ enum GIAN_SURFACE_ID {
 
 	// Splash screen
 	SURFACE_ID_SPROJECT = 1,	// 西方Project表示用
-	SURFACE_ID_LENS = 7,	// レンズエフェクト用
 
 	// Endings
 	SURFACE_ID_ENDING_CREDITS = 1,
@@ -147,7 +146,6 @@ extern SURFACE_DDRAW&	GrTama;	// システム用
 extern SURFACE_DDRAW&	GrEnemy;	// 敵(雑魚＆ボス)用
 extern SURFACE_DDRAW&	GrMap;	// 背景用
 extern SURFACE_DDRAW&	GrBomber;	// ボム用グラフィック用
-extern SURFACE_DDRAW&	GrLens;	// レンズエフェクト用
 extern SURFACE_DDRAW&	GrSProject;
 extern SURFACE_DDRAW&	GrTitle;
 extern SURFACE_DDRAW&	GrMusic;

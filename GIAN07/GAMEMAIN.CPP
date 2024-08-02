@@ -765,7 +765,7 @@ bool SProjectInit(void)
 	}
 
 	// レンズをすでに作成しているのなら、破棄する //
-	Lens = GrpCreateLensBall(70, 36, GrLens);
+	Lens = GrpCreateLensBall(70, 36);
 	if(!Lens) {
 		return false;
 	}

@@ -10,8 +10,6 @@
 import std.compat;
 #include "game/coords.h"
 
-struct SURFACE_DDRAW; // TODO: Remove once we use IDs
-
 
 ///// [構造体] /////
 
@@ -21,9 +19,8 @@ struct LensInfo {
 	uint16_t	Height;	// レンズの直径
 	std::unique_ptr<uint32_t[]>	Data;	// レンズ置換テーブル
 
-	SURFACE_DDRAW*	gTemp;	// データ一時待避用Surface(できればSysMemory)
-	size_t	gPitch;		// Surface の横幅
-	// uint8_t	gID;	// SurfaceID (DD_UTY の関数に対する)
+	// Per-frame capture of the original back-buffer pixels under the lens.
+	std::unique_ptr<std::byte[]> FOV;
 
 	// GrpLock() 系関数 : レンズボールを描画する //
 	void Draw(WINDOW_POINT center);
@@ -34,9 +31,7 @@ struct LensInfo {
 ///// [ 関数 ] /////
 
 // 半径:r  出っ張り:m  のレンズを作成 //
-std::optional<LensInfo> GrpCreateLensBall(
-	uint16_t r, uint16_t m, SURFACE_DDRAW& surf
-);
+std::optional<LensInfo> GrpCreateLensBall(uint16_t r, uint16_t m);
 
 
 

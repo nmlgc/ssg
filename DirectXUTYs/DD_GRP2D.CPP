@@ -22,7 +22,7 @@ typedef struct tagAlphaInfo {
 BYTE				*Grp_Vram;				// これは公開しない
 long				Grp_Pitch = 0;			// これも公開しない
 uint32_t	Grp_AddrY[480];	// Ｙ座標テーブル
-uint32_t	Col2D;	// 現在の色 x ４バイト分
+uint8_t	Col2D;	// 現在の色
 BYTE				Col2D_R;				// 赤(α用)
 BYTE				Col2D_G;				// 緑(α用)
 BYTE				Col2D_B;				// 青(α用)
@@ -94,15 +94,10 @@ void _2DUnlock(void)
 // 色セット //
 void _2DSetColor(uint8_t r, uint8_t g, uint8_t b)
 {
-	DWORD temp;
-
 	Col2D_R = (r>5) ? 5 : r;
 	Col2D_G = (g>5) ? 5 : g;
 	Col2D_B = (b>5) ? 5 : b;
-
-	temp  = RGB256(Col2D_R,Col2D_G,Col2D_B);
-	Col2D = temp + (temp<<8) + (temp<<16) + (temp<<24);
-
+	Col2D = RGB256(Col2D_R, Col2D_G, Col2D_B);
 	AlphaFlag = TRUE;
 }
 
@@ -119,7 +114,7 @@ void _2DSetAlpha(uint8_t a, uint8_t mode)
 void _2DLine(int x1, int y1, int x2, int y2)
 {
 	int sx,sy,dx,dy,s,i;
-	BYTE c = (BYTE)Col2D&0xff;	// ここでは１ビットずつの書き込みとなるので
+	const auto c = Col2D;
 
 	if(Grp_Vram==NULL) return;
 
@@ -174,7 +169,7 @@ void _2DCircle(int x, int y, int r)
 {
 	int dx,dy;
 	int s;
-	BYTE c = (BYTE)Col2D&0xff;
+	const auto c = Col2D;
 
 	if(Grp_Vram==NULL) return;
 
@@ -212,7 +207,7 @@ void _2DCircleF(int x, int y, int r)
 	if(Grp_Vram==NULL) return;
 
 	if(r==0){
-		_2DPset(x,y,(BYTE)Col2D&0xff);
+		_2DPset(x, y, Col2D);
 		return;
 	}
 
@@ -340,13 +335,16 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 static void _2DUpdateAlphaTable(void)
 {
 	int		r,g,b,i,j,k,pal;
-	DWORD	chk;
 	BYTE	ref;
 
 	AlphaFlag = FALSE;
 
 	// 参照テーブルから検索を行う //
-	chk = (Col2D&0xff) + ((DWORD)Col2D_A<<8) + ((DWORD)Col2D_Mode<<16);
+	const auto chk = (
+		Col2D +
+		(static_cast<uint32_t>(Col2D_A) << 8) +
+		(static_cast<uint32_t>(Col2D_Mode) << 16)
+	);
 	for(i=0; i<ATABLE_MAX; i++){
 		// すでにキャッシュが効いている場合 //
 		if(chk == AInfo[i].CheckValue){

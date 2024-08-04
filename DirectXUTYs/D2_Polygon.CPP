@@ -132,7 +132,7 @@ void _2DPolygon(std::span<const WINDOW_POINT> p)
 extern uint8_t*	Grp_Vram;	// これは公開しない
 extern long				Grp_Pitch;				// これも公開しない
 extern uint32_t	Grp_AddrY[480];	// Ｙ座標テーブル
-extern uint32_t	Col2D;
+extern uint8_t	Col2D;
 
 
 // 横ラインを引く //

@@ -4,6 +4,8 @@
  */
 
 #include "game/graphics.h"
+#include "game/input.h"
+#include "game/screenshot.h"
 #include "DirectXUTYs/DD_UTY.H"
 
 // Paletted graphics //
@@ -39,3 +41,10 @@ void Grp_PaletteSetDefault(void)
 	GrpSetPalette(palette);
 }
 // ----------------- //
+
+void Grp_Flip(void)
+{
+	GrpBackend_Flip(
+		(SystemKey_Data & SYSKEY_SNAPSHOT) ? ScreenshotNextStream() : nullptr
+	);
+}

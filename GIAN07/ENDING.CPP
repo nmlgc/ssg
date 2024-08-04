@@ -105,7 +105,7 @@ bool EndingInit(void)
 
 	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 	GrpBackend_Clear();
 
 	if(!LoadGraph(GRAPH_ID_ENDING)) return FALSE;
@@ -174,7 +174,7 @@ void EndingDraw(void)
 	// フェード情報の反映ぢゃ //
 	DrawFadeInfo();
 
-	GrpFlip();
+	Grp_Flip();
 }
 
 

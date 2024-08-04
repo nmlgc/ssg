@@ -9,7 +9,6 @@
 #include "game/debug.h"
 #include "game/format_bmp.h"
 #include "game/input.h"
-#include "game/screenshot.h"
 #include <assert.h>
 #include <d3d.h>
 #pragma message(PBGWIN_DD_UTY_H)
@@ -39,7 +38,6 @@ void RELEASE(auto*& x)
 }
 
 // 図形描画関数に対するダミー関数 //
-static void DM_V(void);
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
 // クリッピング枠 //
@@ -47,6 +45,8 @@ int CLIP_X_MIN = 0;
 int CLIP_Y_MIN = 0;
 int CLIP_X_MAX = (GRP_RES.w - 1);
 int CLIP_Y_MAX = (GRP_RES.h - 1);
+
+static constexpr bool Fullscreen = true;
 
 bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
@@ -62,14 +62,6 @@ static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo);
 // デバイスが求める性能を持っているか //
 static bool ConfirmDevice3D(const D3DDEVICEDESC *lpDesc);
 
-// ダミー関数をセットする //
-static void SetDummyFunc(void);
-
-
-// フリップ用関数 //
-static void GrpFlipFS(void);
-static void GrpFlipWnd(void);
-
 
 // グローバル変数 //
 GRAPHICS_DDRAW	DxObj;
@@ -81,7 +73,6 @@ XDDRAWENUM		DxEnum[XDDRAWENUM_MAX];
 uint8_t DxEnumNow;
 
 // 図形描画用関数ポインタの実体 //
-void(*GrpFlip)(void)                                = DM_V;
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
 
 // Templating the functor avoids both the need for #including <functional> and
@@ -118,9 +109,6 @@ bool GrpEnum(void)
 		DebugOut(u8"DirectDrawEnumerate に失敗");
 		return false;
 	}
-
-	// 一応ダミー関数をセットしておく //
-	SetDummyFunc();
 
 	extern HWND hWndMain;
 	DxObj.hWnd = hWndMain;
@@ -219,9 +207,6 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		dxret = Prim->GetAttachedSurface(&ddscaps, &Back);
 		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
 
-		// フルスクリーン用フリップ //
-		GrpFlip = GrpFlipFS;
-
 		// 2Dの初期化はここでおしまい //
 		DeviceID = device_id;
 		PixelFormat = pixel_format;
@@ -296,9 +281,6 @@ void GRAPHICS_DDRAW::Cleanup(void)
 	RELEASE(Back);
 	RELEASE(Prim);
 	RELEASE(DD);
-
-	// グラフィック系関数を実行できないようにする //
-	SetDummyFunc();
 }
 
 PIXELFORMAT GrpBackend_PixelFormat(void)
@@ -559,31 +541,27 @@ GRAPHICS_GEOMETRY_DDRAW *GrpGeom_FB(void)
 }
 
 
-static void GrpFlipFS(void)
+void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 {
-	if(SystemKey_Data & SYSKEY_SNAPSHOT) {
-		DDrawSaveSurface(ScreenshotNextStream().get(), DxObj.Back);
+	if(auto *stream = screenshot_stream.get()) {
+		DDrawSaveSurface(stream, DxObj.Back);
 	}
 
-	// パレットを変更する必要があれば、変更だ //
-	if(DxObj.bNeedChgPal && DxObj.PixelFormat.IsPalettized()){
-		DxObj.Back->SetPalette(DxObj.Pal);		// 裏画面にパレットをセットする
-		DxObj.bNeedChgPal = FALSE;
+	if(Fullscreen) {
+		// パレットを変更する必要があれば、変更だ //
+		if(DxObj.bNeedChgPal && DxObj.PixelFormat.IsPalettized()) {
+			DxObj.Back->SetPalette(DxObj.Pal); // 裏画面にパレットをセットする
+			DxObj.bNeedChgPal = FALSE;
+		}
+		DDrawRetryUntilSuccessful(DxObj, [&] {
+			return DxObj.Prim->Flip(nullptr, 0);
+		});
+	} else {
+		DDrawRetryUntilSuccessful(DxObj, [&] {
+			return DxObj.Prim->Blt(nullptr, DxObj.Back, nullptr, 0, nullptr);
+		});
 	}
-	DDrawRetryUntilSuccessful(DxObj, [&] {
-		return DxObj.Prim->Flip(nullptr, 0);
-	});
-}
-
-static void GrpFlipWnd(void)
-{
-	if(SystemKey_Data & SYSKEY_SNAPSHOT) {
-		DDrawSaveSurface(ScreenshotNextStream().get(), DxObj.Back);
-	}
-
-	DDrawRetryUntilSuccessful(DxObj, [&] {
-		return DxObj.Prim->Blt(nullptr, DxObj.Back, nullptr, 0, nullptr);
-	});
+	screenshot_stream.reset();
 }
 
 // クリッピングをかける
@@ -929,14 +907,6 @@ static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 
 	return DDENUMRET_OK;
 }
-
-static void SetDummyFunc(void)
-{
-	GrpFlip     = DM_V;
-}
-
-// ダミー関数の実体(かなり手抜き...) //
-static void DM_V(void) {}
 
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {

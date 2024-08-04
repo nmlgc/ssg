@@ -188,8 +188,6 @@ void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
 bool GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
-extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
-
 // ビットマップ転送(WithClip)
 // Returns `true` if any part of the sprite was blitted.
 extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);

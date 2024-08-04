@@ -98,3 +98,6 @@ struct RGB216 {
 // otherwise define a palette.
 void Grp_PaletteSetDefault(void);
 // ----------------- //
+
+// Wraps screenshot handling around GrpBackend_Flip().
+void Grp_Flip(void);

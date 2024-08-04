@@ -87,7 +87,7 @@ extern bool ScoreNameInit(void)
 
 	MWinForceClose();
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -138,7 +138,7 @@ void ScoreNameProc(bool&)
 	GrpBackend_Clear();
 	ScoreDraw();
 	GrpPut16(320,450,ExString[CurrentDif]);
-	GrpFlip();
+	Grp_Flip();
 }
 
 // スコアの描画 //
@@ -414,7 +414,7 @@ void NameRegistProc(bool&)
 		if(CurrentRank == i+1) GrpPut16(85, 100+i*32, "!!");
 	}
 */
-	GrpFlip();
+	Grp_Flip();
 }
 
 // お名前入力の初期化 //
@@ -439,7 +439,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 
 	MWinForceClose();
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -463,7 +463,7 @@ void GameSTD_Init(void)
 {
 	MWinForceClose();
 	// GrpBackend_Clear();
-	//GrpFlip();
+	// Grp_Flip();
 
 	BossDataInit();
 
@@ -497,7 +497,7 @@ void GameSTD_Init(void)
 bool WeaponSelectInit(bool ExStg)
 {
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 
 	GameLevel = (ExStg ? GAME_HARD : ConfigDat.GameLevel.v);
 
@@ -593,7 +593,7 @@ extern bool GameReplayInit(int Stage)
 	PlayRankReset();
 
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 	GameSTD_Init();
 
 	if(!LoadGraph(GameStage)){
@@ -656,7 +656,7 @@ void ReplayProc(bool&)
 			rc = PIXEL_LTWH{ 312, 88, 72, 8 };
 			GrpBlt(&rc,128+45,470+4,GrTama);
 		}
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -667,7 +667,7 @@ bool DemoInit(void)
 //	return NameRegistInit();
 
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 
 	GameSTD_Init();
 
@@ -754,7 +754,7 @@ void SProjectProc(bool&)
 			Lens.value().Draw({ x, y });
 		}
 
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -787,7 +787,7 @@ extern bool MusicRoomInit(void)
 
 	MWinForceClose();
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 
 	if(!LoadGraph(GRAPH_ID_MUSICROOM)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -836,7 +836,7 @@ extern bool GameExit(bool bNeedChgMusic)
 {
 	TextObj.Clear();
 	GrpBackend_Clear();
-	GrpFlip();
+	Grp_Flip();
 
 	if(!LoadGraph(GRAPH_ID_TITLE)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -946,7 +946,7 @@ void GameProc(bool&)
 			PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
 			GrpBlt(&rc,128,470,GrTama);
 		}
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -994,7 +994,7 @@ void GameOverProc0(bool&)
 
 	if(IsDraw()){
 		GameDraw();
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -1015,7 +1015,7 @@ void GameOverProc(bool&)
 			PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
 			GrpBlt(&rc,128,470,GrTama);
 		}*/
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -1051,7 +1051,7 @@ void DemoProc(bool&)
 	if(IsDraw()){
 		GameDraw();
 		if(ExTimer<64) GrpPut16(200,200,"D E M O   P L A Y");
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -1274,7 +1274,7 @@ void WeaponSelectProc(bool&)
 			StdStatusOutput();
 		#endif
 */
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -1339,7 +1339,7 @@ void TitleProc(bool& quit)
 			StdStatusOutput();
 		#endif
 
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -1358,7 +1358,7 @@ void PauseProc(bool&)
 		CWinDraw(&ExitWindow);
 		GrpSetClip(rc.left, rc.top, rc.right, rc.bottom);
 
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 
@@ -1483,7 +1483,7 @@ void MusicRoomProc(bool&)
 			TextObj.Blit({ (200 - 50),  460       }, text.version);
 		}
 
-		GrpFlip();
+		Grp_Flip();
 	}
 }
 

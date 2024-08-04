@@ -30,6 +30,9 @@ void GrpBackend_Clear(
 
 // Returns the current pixel format of the backbuffer.
 PIXELFORMAT GrpBackend_PixelFormat(void);
+
+struct FILE_STREAM_WRITE;
+void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
 /// -------
 
 /// Geometry

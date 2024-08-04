@@ -106,6 +106,14 @@ template <class T> concept GRAPHICS_GEOMETRY_POLY = requires(
 	// スペアな用グラデーションライン
 	t.DrawGrdLineEx(coord, coord, coord);
 };
+
+// Interface for framebuffer-exclusive geometry draw calls.
+template <class T> concept GRAPHICS_GEOMETRY_FB = requires(
+	T t, int coord, WINDOW_POINT p
+) {
+	t.DrawPoint(p);
+	t.DrawHLine(coord, coord, coord);
+};
 /// --------
 
 #ifdef WIN32

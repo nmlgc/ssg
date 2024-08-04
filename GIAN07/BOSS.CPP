@@ -450,24 +450,23 @@ void BossHPG_Draw(void)
 					GeomGrdRectA(*gp, Src, col.ToRGB().WithAlpha(alpha));
 					// gp->DrawBoxA(left, top, x2, bottom);
 				}
-			}
-			else{
+			} else if(auto *gf = GrpGeom_FB()) {
 				constexpr auto line_top = (top + 5);
 				constexpr auto line_bottom = (bottom - 4);
-				GrpGeom->SetColor(col);
+				gf->SetColor(col);
 				if(x1<x2){
-					GrpGeom->DrawBoxA(left, top, x2, line_top);
-					GrpGeom->DrawBoxA(left, line_bottom, x2, bottom);
-					GrpGeom->SetColor({ 5, 5, 5 });
-					GrpGeom->DrawBoxA(left, line_top, x1, line_bottom);
-					GrpGeom->SetColor({ 5, 0, 0 });
-					GrpGeom->DrawBoxA(x1, top, x2, bottom);
+					gf->DrawBoxA(left, top, x2, line_top);
+					gf->DrawBoxA(left, line_bottom, x2, bottom);
+					gf->SetColor({ 5, 5, 5 });
+					gf->DrawBoxA(left, line_top, x1, line_bottom);
+					gf->SetColor({ 5, 0, 0 });
+					gf->DrawBoxA(x1, top, x2, bottom);
 				}
 				else{
-					GrpGeom->DrawBoxA(left, top, x2, line_top);
-					GrpGeom->DrawBoxA(left, line_bottom, x2, bottom);
-					GrpGeom->SetColor({ 5, 5, 5 });
-					GrpGeom->DrawBoxA(left, line_top, x2, line_bottom);
+					gf->DrawBoxA(left, top, x2, line_top);
+					gf->DrawBoxA(left, line_bottom, x2, bottom);
+					gf->SetColor({ 5, 5, 5 });
+					gf->DrawBoxA(left, line_top, x2, line_bottom);
 				}
 			}
 

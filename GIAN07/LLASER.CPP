@@ -342,10 +342,11 @@ extern void LLaserDraw(void)
 						}
 						gp->DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, p2, vcs);
 						break;
+					} else if(auto *gf = GrpGeom_FB()) {
+						// gf->SetColor({ 2, 0, 2 });
+						gf->SetColor(Table8BitA[c]);
+						gf->DrawTriangleFan(lp->p);
 					}
-					// GrpGeom->SetColor({ 2, 0, 2 });
-					GrpGeom->SetColor(Table8BitA[c]);
-					GrpGeom->DrawTriangleFan(lp->p);
 				} else if(GrpGeom_Poly()) {
 					break;
 				}

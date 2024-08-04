@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/DD_GRP2D.H"
+#include "platform/graphics_backend.h"
 
 namespace Geometry {
 
@@ -45,11 +44,13 @@ void Circle_Approximated(
 	gc.DrawLineStrip(xys);
 }
 
-inline void Circle_Exact(WINDOW_POINT center, PIXEL_COORD radius)
+// Draw exact points along the outline
+void Circle_Exact(
+	GRAPHICS_GEOMETRY_FB auto& gf, WINDOW_POINT c, PIXEL_COORD radius
+)
 {
-	// Draw exact points along the outline
 	if(radius == 0) {
-		GrpPoint(center);
+		gf.DrawPoint(c);
 		return;
 	}
 
@@ -59,10 +60,10 @@ inline void Circle_Exact(WINDOW_POINT center, PIXEL_COORD radius)
 
 	while(dx >= dy) {
 		using _ = WINDOW_POINT;
-		GrpPoint(center + _{ +dx, +dy }); GrpPoint(center + _{ +dx, -dy });
-		GrpPoint(center + _{ -dx, +dy }); GrpPoint(center + _{ -dx, -dy });
-		GrpPoint(center + _{ +dy, +dx }); GrpPoint(center + _{ +dy, -dx });
-		GrpPoint(center + _{ -dy, +dx }); GrpPoint(center + _{ -dy, -dx });
+		gf.DrawPoint(c + _{ +dx, +dy }); gf.DrawPoint(c + _{ +dx, -dy });
+		gf.DrawPoint(c + _{ -dx, +dy }); gf.DrawPoint(c + _{ -dx, -dy });
+		gf.DrawPoint(c + _{ +dy, +dx }); gf.DrawPoint(c + _{ +dy, -dx });
+		gf.DrawPoint(c + _{ -dy, +dx }); gf.DrawPoint(c + _{ -dy, -dx });
 		s -= ((dy << 1) + 1);
 		if(s < 0) {
 			s += ((dx - 1) << 1);
@@ -92,24 +93,26 @@ void CircleF_Approximated(
 	}
 }
 
-inline void CircleF_Exact(WINDOW_POINT center, PIXEL_COORD radius)
+void CircleF_Exact(
+	GRAPHICS_GEOMETRY_FB auto& gf, WINDOW_POINT center, PIXEL_COORD radius
+)
 {
 	if(radius == 0) {
-		GrpPoint(center);
+		gf.DrawPoint(center);
 		return;
 	}
 	auto si = radius;
 	auto di = decltype(si){ 0 };
 	auto s = radius;
 	for(; si >= di; di++) {
-		GrpHLine((center.x - si), (center.x + si), (center.y - di));
-		GrpHLine((center.x - si), (center.x + si), (center.y + di));
+		gf.DrawHLine((center.x - si), (center.x + si), (center.y - di));
+		gf.DrawHLine((center.x - si), (center.x + si), (center.y + di));
 		s -= ((di << 1) + 1);
 		if(s >= 0) {
 			continue;
 		}
-		GrpHLine((center.x - di), (center.x + di), (center.y - si));
-		GrpHLine((center.x - di), (center.x + di), (center.y + si));
+		gf.DrawHLine((center.x - di), (center.x + di), (center.y - si));
+		gf.DrawHLine((center.x - di), (center.x + di), (center.y + si));
 		s += ((--si) << 1);
 	}
 }

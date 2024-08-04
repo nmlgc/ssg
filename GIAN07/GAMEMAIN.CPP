@@ -1545,7 +1545,9 @@ void GameDraw(void)
 
 	MaidDraw();
 
-	if(DxObj.PixelFormat.IsPalettized()) LLaserDraw();
+	if(GrpGeom_FB()) {
+		LLaserDraw();
+	}
 
 	ObjectLockDraw();
 

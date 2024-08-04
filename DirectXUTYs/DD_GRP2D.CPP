@@ -160,7 +160,7 @@ void GRAPHICS_GEOMETRY_DDRAW::DrawBox(int x1, int y1, int x2, int y2)
 	}
 }
 
-void GrpPoint(WINDOW_POINT p)
+void GRAPHICS_GEOMETRY_DDRAW::DrawPoint(WINDOW_POINT p)
 {
 	if(!Grp_Vram) {
 		return;
@@ -192,7 +192,7 @@ static void _2DGrpHline(int x1, int x2_inclusive, int y)
 }
 
 // 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り) //
-void GrpHLine(int x1, int x2, int y)
+void GRAPHICS_GEOMETRY_DDRAW::DrawHLine(int x1, int x2, int y)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 	int		temp;

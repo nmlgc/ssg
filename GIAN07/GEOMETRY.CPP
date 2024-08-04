@@ -51,8 +51,8 @@ void GeomCircle(WINDOW_POINT center, PIXEL_COORD radius)
 {
 	if(auto *gp = GrpGeom_Poly()) {
 		Geometry::Circle_Approximated(*gp, center, radius);
-	} else {
-		Geometry::Circle_Exact(center, radius);
+	} else if(auto* gf = GrpGeom_FB()) {
+		Geometry::Circle_Exact(*gf, center, radius);
 	}
 }
 
@@ -60,7 +60,7 @@ void GeomCircleF(WINDOW_POINT center, PIXEL_COORD radius)
 {
 	if(auto *gp = GrpGeom_Poly()) {
 		Geometry::CircleF_Approximated(*gp, center, radius, false);
-	} else {
-		Geometry::CircleF_Exact(center, radius);
+	} else if(auto* gf = GrpGeom_FB()) {
+		Geometry::CircleF_Exact(*gf, center, radius);
 	}
 }

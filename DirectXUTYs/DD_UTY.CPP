@@ -5,8 +5,6 @@
 
 #include "DD_UTY.H"
 #include "constants.h"
-#include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
-#include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
 #include "game/cast.h"
 #include "game/debug.h"
 #include "game/format_bmp.h"
@@ -550,6 +548,11 @@ void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col)
 GRAPHICS_GEOMETRY_D3D *GrpGeom_Poly(void)
 {
 	return (DxObj.PixelFormat.IsChanneled() ? &GrpGeom_D3D : nullptr);
+}
+
+GRAPHICS_GEOMETRY_DDRAW *GrpGeom_FB(void)
+{
+	return (DxObj.PixelFormat.IsPalettized() ? &GrpGeom_DDraw : nullptr);
 }
 
 

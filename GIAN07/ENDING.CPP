@@ -313,7 +313,7 @@ void DrawFadeInfo()
 	WORD			a;
 
 	// フェードアウト関連
-	if(DxObj.PixelFormat.IsPalettized()){
+	if(GrpGeom_FB()) {
 		if(FlashState){
 			FlashPaletteGrp(temp_pal, EGrpInfo.target->pal, FlashState);
 			GrpSetPalette(temp_pal);

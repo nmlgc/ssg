@@ -229,11 +229,12 @@ void HLaserDraw(void)
 	DegPoint	*p;
 	VERTEX_XY	src[4];
 	auto *gp = GrpGeom_Poly();
-	const auto AlphaPolygon = [gp](VERTEX_XY_SPAN<> p) {
+	auto *gf = GrpGeom_FB();
+	const auto AlphaPolygon = [gp, gf](VERTEX_XY_SPAN<> p) {
 		if(gp) {
 			gp->DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
-		} else {
-			GrpGeom->DrawTriangleFan(p);
+		} else if(gf) {
+			gf->DrawTriangleFan(p);
 		}
 	};
 	// void (*AlphaCircle)(WINDOW_POINT center, WINDOW_POINT radius);
@@ -242,10 +243,9 @@ void HLaserDraw(void)
 		//AlphaCircle  = GeomCircleFA;
 		gp->SetColor({ 1, 2, 5 });
 		gp->SetAlphaOne();
-	}
-	else{
+	} else if(gf) {
 		// AlphaCircle  = GeomCircle;
-		GrpGeom->SetColor({ 2, 2, 5 });
+		gf->SetColor({ 2, 2, 5 });
 	}
 
 	GrpGeom->Lock();
@@ -290,8 +290,8 @@ void HLaserDraw(void)
 
 	if(gp) {
 		gp->SetColor({ 3, 4, 5 });
-	} else {
-		GrpGeom->SetColor({ 5, 5, 5 });
+	} else if(gf) {
+		gf->SetColor({ 5, 5, 5 });
 	}
 
 	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){

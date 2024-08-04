@@ -15,6 +15,7 @@
 
 // ヘッダファイル //
 #include "platform/graphics_backend.h"
+#include "constants.h"
 
 class GRAPHICS_GEOMETRY_DDRAW : public GRAPHICS_GEOMETRY {
 public:
@@ -32,11 +33,22 @@ public:
 	void DrawTriangleFan(VERTEX_XY_SPAN<>) final;
 	// ----------
 
+	// Framebuffer methods
+	// -------------------
+
+	void DrawPoint(WINDOW_POINT p);
+	void DrawHLine(int x1, int x2, int y);
+	// -------------------
+
 	void Setup(void);	// 描画系関数ポインタをセットする
 };
 
-void GrpPoint(WINDOW_POINT p);
-void GrpHLine(int x1, int x2, int y);
+static_assert(GRAPHICS_GEOMETRY_FB<GRAPHICS_GEOMETRY_DDRAW>);
+
+// Returns the instance of the framebuffer geometry interface if active, or a
+// nullptr otherwise.
+GRAPHICS_GEOMETRY_DDRAW *GrpGeom_FB(void);
+
 void DisableAlphaTable(void);
 
 

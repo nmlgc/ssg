@@ -389,12 +389,11 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 
 	if(auto *gp = GrpGeom_Poly()) {
 		GeomGrdRect(*gp, lp->p, col.ToRGB());
-	}
-	else{
-		GrpGeom->SetColor(col);
-		GrpGeom->DrawTriangleFan(lp->p);
+	} else if(auto *gf = GrpGeom_FB()) {
+		gf->SetColor({ 1, 0, 5 });
+		gf->DrawTriangleFan(lp->p);
 
-		GrpGeom->SetColor({ 5, 5, 5 });
+		gf->SetColor({ 5, 5, 5 });
 
 		VERTEX_XY p[4];
 		p[0].x = p[1].x = lp->p[0].x - lp->wx*3/4;//- wx*4/len;
@@ -405,12 +404,12 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 		p[1].y += lp->ly;
 		p[2].x += lp->lx;
 		p[2].y += lp->ly;
-		GrpGeom->DrawTriangleFan(p);
-		// GrpGeom->DrawLine(lp->p[0].x, lp->p[0].y, lp->p[1].x, lp->p[1].y);
-		// GrpGeom->DrawLine(lp->p[2].x, lp->p[2].y, lp->p[3].x, lp->p[3].y);
-		// GrpGeom->DrawTriangleFan(lp->p, 4);
-		// GrpGeom->SetColor({ 5, 5, 5 });
-		// GrpGeom->DrawLine(x, y, (x + lp->lx), (y + lp->ly));
+		gf->DrawTriangleFan(p);
+		// gf->DrawLine(lp->p[0].x, lp->p[0].y, lp->p[1].x, lp->p[1].y);
+		// gf->DrawLine(lp->p[2].x, lp->p[2].y, lp->p[3].x, lp->p[3].y);
+		// gf->DrawTriangleFan(lp->p, 4);
+		// gf->SetColor({ 5, 5, 5 });
+		// gf->DrawLine(x, y, (x + lp->lx), (y + lp->ly));
 	}
 	//Grp_Polygon(temp,4,RGB256(5,5,5));
 }

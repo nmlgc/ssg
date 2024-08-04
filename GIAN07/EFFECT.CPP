@@ -758,13 +758,12 @@ void GrpDrawSpect(int x, int y)
 			//WORD c2 = 0;	//5
 			gp->DrawGrdLineEx((i + x), (y - (ftable[i] * 2)), y);
 		}
-	}
-	else{
-		GrpGeom->SetColor({ 4, 2, 1 });
+	} else if(auto *gf = GrpGeom_FB()) {
+		gf->SetColor({ 4, 2, 1 });
 		for(i=0;i<128+8+8;i++){
 			//WORD c2 = 0;	//5
 			if(ftable[i]) {
-				GrpGeom->DrawLine((i + x), (y - (ftable[i] * 2)), (i + x), y);
+				gf->DrawLine((i + x), (y - (ftable[i] * 2)), (i + x), y);
 			}
 		}
 	}

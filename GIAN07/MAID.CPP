@@ -83,14 +83,13 @@ void LaserBombDraw(void)
 				if(auto *gp = GrpGeom_Poly()) {
 					gp->SetAlphaOne();
 					GeomGrdRectA(*gp, p, col_channeled);
-				}
-				else{
+				} else if(auto *gf = GrpGeom_FB()) {
 					switch(w){
-					case(1):	GrpGeom->SetColor({ 4, 4, 5 });	break;
-					case(2):	GrpGeom->SetColor({ 2, 2, 5 });	break;
-					case(3):	GrpGeom->SetColor({ 0, 0, 5 });	break;
+					case(1):	gf->SetColor({ 4, 4, 5 });	break;
+					case(2):	gf->SetColor({ 2, 2, 5 });	break;
+					case(3):	gf->SetColor({ 0, 0, 5 });	break;
 					}
-					GrpGeom->DrawTriangleFan(p);
+					gf->DrawTriangleFan(p);
 				}
 			}
 			for(i=-3;i<=3;i++){
@@ -108,14 +107,13 @@ void LaserBombDraw(void)
 				if(auto *gp = GrpGeom_Poly()) {
 					gp->SetAlphaOne();
 					GeomGrdRectA(*gp, p, col_channeled);
-				}
-				else{
+				} else if(auto *gf = GrpGeom_FB()) {
 					switch(w){
-					case(1):	GrpGeom->SetColor({ 4, 4, 5 });	break;
-					case(2):	GrpGeom->SetColor({ 2, 2, 5 });	break;
-					case(3):	GrpGeom->SetColor({ 0, 0, 5 });	break;
+					case(1):	gf->SetColor({ 4, 4, 5 });	break;
+					case(2):	gf->SetColor({ 2, 2, 5 });	break;
+					case(3):	gf->SetColor({ 0, 0, 5 });	break;
 					}
-					GrpGeom->DrawTriangleFan(p);
+					gf->DrawTriangleFan(p);
 				}
 			}
 			if(GrpGeom_Poly()) {
@@ -141,10 +139,9 @@ void LaserBombDraw(void)
 				if(auto *gp = GrpGeom_Poly()) {
 					gp->SetAlphaOne();
 					GeomGrdRectA(*gp, p, col_channeled);
-				}
-				else{
-					GrpGeom->SetColor({ c, c, 5u });
-					GrpGeom->DrawTriangleFan(p);
+				} else if(auto *gf = GrpGeom_FB()) {
+					gf->SetColor({ c, c, 5u });
+					gf->DrawTriangleFan(p);
 				}
 			}
 			for(i=-3;i<=3;i++){
@@ -162,10 +159,9 @@ void LaserBombDraw(void)
 				if(auto *gp = GrpGeom_Poly()) {
 					gp->SetAlphaOne();
 					GeomGrdRectA(*gp, p, col_channeled);
-				}
-				else{
-					GrpGeom->SetColor({ c, c, 5u });
-					GrpGeom->DrawTriangleFan(p);
+				} else if(auto *gf = GrpGeom_FB()) {
+					gf->SetColor({ c, c, 5u });
+					gf->DrawTriangleFan(p);
 				}
 			}
 			if(GrpGeom_Poly()) {

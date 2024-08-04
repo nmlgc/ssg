@@ -195,14 +195,13 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	}};
 	WINDOW_INFO		*p;
 	int				i;
-	BYTE			alpha;
 	WINDOW_COORD	top = ws->y;
 
 	// アクティブな項目を検索する //
 	p = CWinSearchActive(ws);
 
 	// 半透明ＢＯＸの描画 //
-	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 128;
+	const uint8_t alpha = (GrpGeom_FB() ? (64 + 32) : 128);
 
 	GrpGeom->Lock();
 	GrpGeom->SetAlphaNorm(alpha);
@@ -416,7 +415,7 @@ void MWinDraw(void)
 
 	// 半透明部の描画 //
 	GrpGeom->Lock();
-	GrpGeom->SetAlphaNorm((DxObj.PixelFormat.IsPalettized()) ? (64 + 32) : 110);
+	GrpGeom->SetAlphaNorm(GrpGeom_FB() ? (64 + 32) : 110);
 	GrpGeom->SetColor({ 0, 0, 3 });
 	GrpGeom->DrawBoxA((x + 4), (y + 4), (x + w - 4), (y + h - 4));
 	GrpGeom->Unlock();

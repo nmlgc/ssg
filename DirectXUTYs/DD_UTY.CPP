@@ -536,29 +536,21 @@ void GrpCls(void)
 		? RGB216{ 0, 0, 0 }.PaletteIndex()
 		: 0
 	);
-	return GrpClsEx(std::nullopt, col);
+	return GrpClsEx(col);
 }
 
 
-void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col)
+void GrpClsEx(uint32_t col)
 {
 	DDBLTFX		ddbltfx;
-	RECT	rect_local;
-	RECT*	rect = nullptr;
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
 	ddbltfx.dwFillColor = col;
 
-	if(Target) {
-		const auto& target = Target.value();
-		rect_local = { target.left, target.top, target.right, target.bottom };
-		rect = &rect_local;
-	}
-
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->Blt(
-			rect, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx
+			nullptr, nullptr, nullptr, DDBLT_COLORFILL, &ddbltfx
 		);
 	});
 }

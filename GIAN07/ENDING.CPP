@@ -164,7 +164,7 @@ void EndingDraw(void)
 		? 255
 		: RGB(0, 0, 0)
 	);
-	GrpClsEx(std::nullopt, cls_col);
+	GrpClsEx(cls_col);
 
 	// それぞれのグラフィックを描画するで //
 	DrawGrpInfo();

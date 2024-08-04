@@ -737,7 +737,7 @@ void SProjectProc(bool&)
 	}
 
 	if(IsDraw()){
-		GrpCls();//Ex(NULL, 255);
+		GrpCls();//Ex(255);
 
 		GrpBlt(&rc, logo.left, logo.top, GrSProject);
 

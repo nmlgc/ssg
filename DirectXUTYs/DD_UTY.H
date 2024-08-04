@@ -190,9 +190,7 @@ void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
 // 図形描画関連関数Ptr(GrpInitにより初期化される) //
 void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
-
-// 直接番号指定で矩形内を塗りつぶす
-void GrpClsEx(const std::optional<WINDOW_LTRB>& Target, uint32_t col);
+void GrpClsEx(uint32_t col);
 
 extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
 

@@ -507,7 +507,7 @@ bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED&& bmp)
 	return (surf.Load(std::move(bmp)) && SurfaceRestore(surf));
 }
 
-bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col)
+bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col)
 {
 	HDC ddraw_dc;
 	return (

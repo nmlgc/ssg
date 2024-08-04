@@ -110,7 +110,7 @@ public:
 	bool SurfaceLoad(uint8_t surf_id, BMP_OWNED&& bmp);
 
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
-	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col);
+	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col);
 
 	// Ensures that the given rectangle of the DirectDraw surface matches the
 	// underlying GDI image after an edit.

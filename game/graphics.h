@@ -20,6 +20,13 @@ struct RGBA {
 };
 static_assert(sizeof(RGBA) == 4);
 
+struct RGB {
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+};
+static_assert(sizeof(RGB) == 3);
+
 struct PALETTE : public std::array<RGBA, 256> {
 	// Builds a new palette with the given fade [alpha] value applied onto the
 	// given inclusive (!) range of colors. Returns the rest of the palette

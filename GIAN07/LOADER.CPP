@@ -424,7 +424,7 @@ namespace DAT_MISSING {
 			}
 		}
 		if(IsDraw()) {
-			GrpCls();
+			GrpBackend_Clear();
 			CWinDraw(&Window);
 			GrpFlip();
 		}

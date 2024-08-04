@@ -188,10 +188,6 @@ void GrpGetPalette(PALETTE& pal);	// 現在のパレットを取得する
 bool GrpSetPalette(const PALETTE& pal);	// 現在のパレットを変更する
 void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
-// 図形描画関連関数Ptr(GrpInitにより初期化される) //
-void GrpCls(void);	// 指定色で塗りつぶしをかける(クリッピング無効)
-void GrpClsEx(uint32_t col);
-
 extern void (*GrpFlip)(void);	// ウィンドウモード時の動作に注意
 
 // ビットマップ転送(WithClip)

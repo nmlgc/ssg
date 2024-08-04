@@ -21,6 +21,13 @@ Any::string_view GrpBackend_DeviceName(uint8_t id);
 /// General
 /// -------
 
+// Clears the backbuffer with the given palettized or channeled color,
+// depending on the mode.
+void GrpBackend_Clear(
+	uint8_t col_palettized = RGB216{ 0, 0, 0 }.PaletteIndex(),
+	RGB col_channeled = RGB{ 0, 0, 0 }
+);
+
 // Returns the current pixel format of the backbuffer.
 PIXELFORMAT GrpBackend_PixelFormat(void);
 /// -------

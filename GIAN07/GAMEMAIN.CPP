@@ -86,7 +86,7 @@ extern bool ScoreNameInit(void)
 	if(CurrentRank == 0) return GameExit();
 
 	MWinForceClose();
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
@@ -135,7 +135,7 @@ void ScoreNameProc(bool&)
 			break;
 	}
 
-	GrpCls();
+	GrpBackend_Clear();
 	ScoreDraw();
 	GrpPut16(320,450,ExString[CurrentDif]);
 	GrpFlip();
@@ -369,7 +369,7 @@ void NameRegistProc(bool&)
 		time++;
 	}
 
-	GrpCls();
+	GrpBackend_Clear();
 
 	GrpGeom->Lock();
 
@@ -438,7 +438,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 	if(CurrentRank == 0) return GameExit();
 
 	MWinForceClose();
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
@@ -462,7 +462,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 void GameSTD_Init(void)
 {
 	MWinForceClose();
-	//GrpCls();
+	// GrpBackend_Clear();
 	//GrpFlip();
 
 	BossDataInit();
@@ -496,7 +496,7 @@ void GameSTD_Init(void)
 
 bool WeaponSelectInit(bool ExStg)
 {
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 
 	GameLevel = (ExStg ? GAME_HARD : ConfigDat.GameLevel.v);
@@ -592,7 +592,7 @@ extern bool GameReplayInit(int Stage)
 
 	PlayRankReset();
 
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 	GameSTD_Init();
 
@@ -666,7 +666,7 @@ bool DemoInit(void)
 {
 //	return NameRegistInit();
 
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 
 	GameSTD_Init();
@@ -737,7 +737,7 @@ void SProjectProc(bool&)
 	}
 
 	if(IsDraw()){
-		GrpCls();//Ex(255);
+		GrpBackend_Clear(/* 255 */);
 
 		GrpBlt(&rc, logo.left, logo.top, GrSProject);
 
@@ -786,7 +786,7 @@ extern bool MusicRoomInit(void)
 	MusicRoomText = MUSICROOM_TEXT::Register();
 
 	MWinForceClose();
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_MUSICROOM)){
@@ -835,7 +835,7 @@ extern void GameRestart(void)
 extern bool GameExit(bool bNeedChgMusic)
 {
 	TextObj.Clear();
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
 
 	if(!LoadGraph(GRAPH_ID_TITLE)){
@@ -1176,7 +1176,7 @@ void WeaponSelectProc(bool&)
 	count = (count+1)%(256+128);
 
 	if(IsDraw()){
-		GrpCls();
+		GrpBackend_Clear();
 
 		rc = { 0, (264 - 8), 224, (296 - 24) };
 		GrpBlt(&rc,320-112,20,GrTama);
@@ -1330,7 +1330,7 @@ void TitleProc(bool& quit)
 	}
 
 	if(IsDraw()){
-		GrpCls();
+		GrpBackend_Clear();
 		GrpBlt(&src, 0, 42, GrTitle);
 		// GrpBlt(&src, (320 - 175), 77, GrTitle);
 		MWinDraw();
@@ -1425,7 +1425,7 @@ void MusicRoomProc(bool&)
 	}
 
 	if(IsDraw()){
-		GrpCls();
+		GrpBackend_Clear();
 
 		auto BlitBG = [](const PIXEL_LTWH& rect) {
 			PIXEL_LTRB src = rect;
@@ -1528,7 +1528,7 @@ void GameDraw(void)
 //	WINDOW_LTRB	rc;
 
 
-	GrpCls();
+	GrpBackend_Clear();
 
 	ScrollDraw();
 	CEffectDraw();

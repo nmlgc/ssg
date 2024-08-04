@@ -104,9 +104,9 @@ bool EndingInit(void)
 	PALETTE	pal;
 
 	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
-	GrpCls();
+	GrpBackend_Clear();
 	GrpFlip();
-	GrpCls();
+	GrpBackend_Clear();
 
 	if(!LoadGraph(GRAPH_ID_ENDING)) return FALSE;
 	if(!LoadStageData(GRAPH_ID_ENDING)) return FALSE;
@@ -160,11 +160,7 @@ void EndingProc(bool&)
 void EndingDraw(void)
 {
 	// 画面消去 //
-	const DWORD cls_col = (DxObj.PixelFormat.IsPalettized()
-		? 255
-		: RGB(0, 0, 0)
-	);
-	GrpClsEx(cls_col);
+	GrpBackend_Clear(255, RGB{ 0, 0, 0 });
 
 	// それぞれのグラフィックを描画するで //
 	DrawGrpInfo();

@@ -530,23 +530,16 @@ bool GRAPHICS_DDRAW::SurfaceBlit(
 	return GrpBlt(&src, topleft.x, topleft.y, surf);
 }
 
-void GrpCls(void)
-{
-	const auto col = ((DxObj.PixelFormat.IsPalettized())
-		? RGB216{ 0, 0, 0 }.PaletteIndex()
-		: 0
-	);
-	return GrpClsEx(col);
-}
-
-
-void GrpClsEx(uint32_t col)
+void GrpBackend_Clear(uint8_t col_palettized, RGB col_channeled)
 {
 	DDBLTFX		ddbltfx;
 
 	ZeroMemory(&ddbltfx,sizeof(ddbltfx));
 	ddbltfx.dwSize      = sizeof(ddbltfx);
-	ddbltfx.dwFillColor = col;
+	ddbltfx.dwFillColor = (DxObj.PixelFormat.IsPalettized()
+		? col_palettized
+		: RGB(col_channeled.r, col_channeled.g, col_channeled.b)
+	);
 
 	DDrawRetryUntilSuccessful(DxObj, [&] {
 		return DxObj.Back->Blt(

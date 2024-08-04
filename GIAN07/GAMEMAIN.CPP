@@ -762,6 +762,8 @@ void SProjectProc(bool&)
 // 西方Ｐｒｏｊｅｃｔ表示の初期化 //
 bool SProjectInit(void)
 {
+	GrpBackend_PixelAccessStart();
+
 	if(!LoadGraph(GRAPH_ID_SPROJECT)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
@@ -834,6 +836,7 @@ extern void GameRestart(void)
 // ゲームから抜ける //
 extern bool GameExit(bool bNeedChgMusic)
 {
+	GrpBackend_PixelAccessEnd();
 	TextObj.Clear();
 	GrpBackend_Clear();
 	Grp_Flip();

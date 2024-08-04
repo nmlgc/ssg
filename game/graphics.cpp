@@ -8,6 +8,7 @@
 #include "game/string_format.h"
 #include "platform/file.h"
 #include "DirectXUTYs/DD_UTY.H"
+#include "platform/file.h"
 
 // Paletted graphics //
 // ----------------- //

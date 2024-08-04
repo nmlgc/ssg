@@ -143,6 +143,44 @@ template <class T> concept GRAPHICS_GEOMETRY_FB = requires(
 };
 /// --------
 
+/// Software rendering with pixel access
+/// ------------------------------------
+/// Separate rendering mode that provides read and write access to backbuffer
+/// pixels before it's presented.
+
+// Enters the software-rendered pixel access mode if necessary, and returns
+// `true` if successful. Does nothing if the renderer is already in this mode.
+bool GrpBackend_PixelAccessStart(void);
+
+// Leaves the software-rendered pixel access mode and returns to regular
+// hardware-accelerated rendering if necessary, and returns `true` if
+// successful. Does nothing if the renderer is already in hardware mode.
+bool GrpBackend_PixelAccessEnd(void);
+
+// Locks the backbuffer, returning a pointer to its pixels and the row pitch.
+// Should return a pitch of 0 on failure.
+// On success, the returned buffer has a size of [GRP_RES.h] times the returned
+// pitch, and uses the pixel format returned by GrpBackend_PixelFormat().
+std::tuple<std::byte *, size_t> GrpBackend_PixelAccessLock(void);
+
+// Unlocks the backbuffer.
+void GrpBackend_PixelAccessUnlock(void);
+
+// Calls [func] with a locked backbuffer.
+void GrpBackend_PixelAccessEdit(auto func)
+{
+	const auto [pixels, pitch] = GrpBackend_PixelAccessLock();
+	if(pitch == 0) {
+		return;
+	}
+	std::visit(
+		[&](auto P) { func.template operator()<decltype(P)>(pixels, pitch); },
+		GrpBackend_PixelFormat()
+	);
+	GrpBackend_PixelAccessUnlock();
+}
+/// ------------------------------------
+
 #ifdef WIN32
 	#include "DirectXUTYs/DD_UTY.H"
 #endif

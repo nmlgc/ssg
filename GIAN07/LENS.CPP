@@ -5,44 +5,11 @@
 
 #include "LENS.H"
 #include "constants.h"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/ut_math.h"
 #include <assert.h>
-#include <ddraw.h>
 
-
-
-// 秘密の関数 //
-static bool __BackSurfLock(void);
-static void __BackSurfUnlock(void);
-
-static BYTE		*__GrpBack = NULL;
-static DWORD	__GrpPitch = 0;
-
-
-
-static bool __BackSurfLock(void)
-{
-	DDSURFACEDESC	ddsd;
-	HRESULT			ddret;
-
-	memset(&ddsd,0,sizeof(DDSURFACEDESC));
-	ddsd.dwSize = sizeof(ddsd);
-	ddret = DxObj.Back->Lock(NULL,&ddsd,DDLOCK_WAIT,NULL);
-	if(ddret != DD_OK) return FALSE;
-
-	__GrpPitch = ddsd.lPitch;
-	__GrpBack  = static_cast<uint8_t *>(ddsd.lpSurface);
-
-	return TRUE;
-}
-
-
-static void __BackSurfUnlock(void)
-{
-	DxObj.Back->Unlock(NULL);
-}
 
 
 // 半径:r  出っ張り:m  のレンズを作成 //
@@ -132,41 +99,31 @@ void LensInfo::Draw(WINDOW_POINT center)
 		return;
 	}
 
-	// 転送先はロックされているかな //
-	if(!__BackSurfLock()) return;
-	// GrpGeom->Lock();
-//	if(Grp_Vram == NULL) return;
-
-	std::visit([this, &left, &top](auto pixel) {
-		const auto fov_buffer = reinterpret_cast<decltype(pixel) *>(FOV.get());
+	GrpBackend_PixelAccessEdit([&]<class P>(std::byte *pixels, size_t pitch) {
+		const auto fov_buffer = reinterpret_cast<P *>(FOV.get());
 		const auto fov_size = (static_cast<size_t>(Height) * Height);
 		const std::span fov = { fov_buffer, fov_size };
 
 		auto* Table = Data.get(); // テーブル参照用
-		auto* Dest = &__GrpBack[(top * __GrpPitch) + (left * sizeof(pixel))];
+		auto* Dest = &pixels[(top * pitch) + (left * sizeof(P))];
 
 		// Capture the pixels under the lens
 		const auto* back_p = Dest;
 		for(auto fov_p = fov.begin(); fov_p != fov.end(); fov_p += Height) {
 			[[gsl::suppress(type.1)]]
-			std::copy_n(
-				reinterpret_cast<const decltype(pixel) *>(back_p), Height, fov_p
-			);
-			back_p += __GrpPitch;
+			std::copy_n(reinterpret_cast<const P *>(back_p), Height, fov_p);
+			back_p += pitch;
 		}
 
 		for(decltype(Height) row = 0; row < Height; row++) {
 			auto Width = *(Table++);
 			[[gsl::suppress(type.1)]]
-			auto* p = reinterpret_cast<decltype(pixel) *>(Dest + *(Table++));
+			auto* p = reinterpret_cast<P *>(Dest + *(Table++));
 
 			while(Width--){
 				*(p++) = fov[*(Table++)];
 			}
-			Dest += __GrpPitch;
+			Dest += pitch;
 		}
-	}, GrpBackend_PixelFormat());
-
-	__BackSurfUnlock();
-	// GrpGeom->Unlock();
+	});
 }

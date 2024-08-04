@@ -912,3 +912,22 @@ static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
 {
 	return false;
 }
+// DirectDraw always provides read and write access to the backbuffer, which
+// removes any distinction between regular and pixel access rendering modes.
+bool GrpBackend_PixelAccessStart(void) { return true; }
+bool GrpBackend_PixelAccessEnd(void) { return true; }
+
+std::tuple<std::byte *, size_t> GrpBackend_PixelAccessLock(void)
+{
+	DDSURFACEDESC ddsd = { .dwSize = sizeof(ddsd) };
+	const auto ddret = DxObj.Back->Lock(nullptr, &ddsd, DDLOCK_WAIT, nullptr);
+	if(ddret != DD_OK) {
+		return { nullptr, 0 };
+	}
+	return { static_cast<std::byte *>(ddsd.lpSurface), ddsd.lPitch };
+}
+
+void GrpBackend_PixelAccessUnlock(void)
+{
+	DxObj.Back->Unlock(nullptr);
+}

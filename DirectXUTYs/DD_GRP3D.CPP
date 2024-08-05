@@ -212,16 +212,8 @@ void _3DPolygon(std::span<const WINDOW_POINT> p)
 void _3DBoxA(int x1, int y1, int x2, int y2)
 {
 	if(!bLocked) return;
-
 	AlphaEnable(TRUE);
-
-	Set2DPoint(work+0,x1,y1);
-	Set2DPoint(work+1,x2,y1);
-	Set2DPoint(work+2,x1,y2);
-	Set2DPoint(work+3,x2,y2);
-
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,4,D3DDP_WAIT);
-
+	_3DBox(x1, y1, x2, y2);
 	AlphaEnable(FALSE);
 }
 
@@ -292,11 +284,10 @@ void GrpFatCircleA(int x, int y, int r, int w)
 void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 {
 	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
-	constexpr DWORD c2 = RGB_MAKE(255, 255, 255);
+	const DWORD c2 = RGBA_MAKE(255, 255, 255, Col3D_A);
 	const DWORD c3 = c1; //RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
 
 	if(!bLocked) return;
-	//AlphaEnable(TRUE);
 
 	Set2DPointC(work+0,p[3].x,p[3].y,c3);
 	Set2DPointC(work+1,p[2].x,p[2].y,c1);
@@ -308,31 +299,14 @@ void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 	Set2DPointC(work+5,p[1].x,p[1].y,c1);
 
 	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,6,D3DDP_WAIT);
-
-	//AlphaEnable(FALSE);
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
 void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p)
 {
-	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
-	const DWORD c2 = RGBA_MAKE(255, 255, 255, Col3D_A);
-	const DWORD c3 = c1; // RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
-
 	if(!bLocked) return;
 	AlphaEnable(TRUE);
-
-	Set2DPointC(work+0,p[3].x,p[3].y,c3);
-	Set2DPointC(work+1,p[2].x,p[2].y,c1);
-
-	Set2DPointC(work+2,(p[0].x+p[3].x)>>1,(p[0].y+p[3].y)>>1,c2);
-	Set2DPointC(work+3,(p[1].x+p[2].x)>>1,(p[1].y+p[2].y)>>1,c2);
-
-	Set2DPointC(work+4,p[0].x,p[0].y,c3);
-	Set2DPointC(work+5,p[1].x,p[1].y,c1);
-
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,6,D3DDP_WAIT);
-
+	GrpGrdRect(p);
 	AlphaEnable(FALSE);
 }
 

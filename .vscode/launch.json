@@ -23,6 +23,12 @@
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/bin/",
 			"console": "internalConsole"
+		},
+		{
+			"name": "Attach",
+			"type": "cppvsdbg",
+			"request": "attach",
+			"processId": "${command:pickProcess}"
 		}
 	]
 }

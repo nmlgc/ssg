@@ -54,7 +54,7 @@ std::optional<LensInfo> GrpCreateLensBall(uint16_t r, uint16_t m)
 	// still contain byte offsets, regardless of our main pixel format.
 	const auto BitWeight = std::visit([](auto pixel) {
 		return sizeof(pixel);
-	}, DxObj.PixelFormat);
+	}, GrpBackend_PixelFormat());
 
 	assert(r > 0);	// 半径がおかしい
 	assert(r > m);	// 出っ張りは半径より小さくせよ！
@@ -165,7 +165,7 @@ void LensInfo::Draw(WINDOW_POINT center)
 			}
 			Dest += __GrpPitch;
 		}
-	}, DxObj.PixelFormat);
+	}, GrpBackend_PixelFormat());
 
 	__BackSurfUnlock();
 	// GrpGeom->Unlock();

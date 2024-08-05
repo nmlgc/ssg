@@ -23,7 +23,6 @@
 
 // ヘッダファイル //
 #include "game/coords.h"
-#include "game/pixelformat.h"
 #include "DirectXUTYs/DD_GRP2D.H"
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "platform/windows/surface_ddraw.h"

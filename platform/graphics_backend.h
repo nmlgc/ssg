@@ -8,6 +8,14 @@
 import std.compat;
 #include "game/coords.h"
 #include "game/graphics.h"
+#include "game/pixelformat.h"
+
+/// General
+/// -------
+
+// Returns the current pixel format of the backbuffer.
+PIXELFORMAT GrpBackend_PixelFormat(void);
+/// -------
 
 /// Geometry
 /// --------

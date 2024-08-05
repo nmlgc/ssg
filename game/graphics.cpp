@@ -26,7 +26,7 @@ PALETTE PALETTE::Fade(uint8_t alpha, uint8_t first, uint8_t last) const
 
 void Grp_PaletteSetDefault(void)
 {
-	if(DxObj.PixelFormat.IsChanneled()) {
+	if(GrpBackend_PixelFormat().IsChanneled()) {
 		return;
 	}
 	PALETTE palette = {0};

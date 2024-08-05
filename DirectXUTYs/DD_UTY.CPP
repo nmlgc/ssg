@@ -288,6 +288,11 @@ void GRAPHICS_DDRAW::Cleanup(void)
 	SetDummyFunc();
 }
 
+PIXELFORMAT GrpBackend_PixelFormat(void)
+{
+	return DxObj.PixelFormat;
+}
+
 // クリッピング枠を取得する //
 void GrpGetClip(WINDOW_LTRB *dest)
 {

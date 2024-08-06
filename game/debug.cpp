@@ -3,9 +3,9 @@
 /*                                                                           */
 /*                                                                           */
 
+#include "game/debug.h"
 #include "platform/file.h"
 #include "platform/time.h"
-#include "DX_ERROR.H"
 #include <array>
 #pragma message(PBGWIN_DX_ERROR_H)
 

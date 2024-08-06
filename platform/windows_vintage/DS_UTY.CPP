@@ -8,7 +8,7 @@
 #include <dsound.h>
 #include "platform/file.h"
 #include "platform/snd_backend.h"
-#include "DirectXUTYs/DX_ERROR.H"	// エラー処理用関数
+#include "game/debug.h" // エラー処理用関数
 #pragma message("DS_UTY : Version 0.03 : Update 2000/02/04")
 
 #pragma comment(lib,"dsound.lib")

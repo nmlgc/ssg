@@ -12,6 +12,7 @@
 #include "MUSIC.H"
 #include "SCORE.H"
 #include "game/bgm.h"
+#include "game/debug.h"
 #include "game/input.h"
 #include "game/midi.h"
 #include "game/snd.h"

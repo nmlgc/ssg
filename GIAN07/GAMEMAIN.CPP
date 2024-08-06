@@ -1575,11 +1575,12 @@ void GameDraw(void)
 	BossHPG_Draw();
 	ScreenEffectDraw();
 
-	// GrpBackend_SetClip(GRP_RES_RECT);
 	MWinDraw();
 	// GrpBackend_SetClip(PLAYFIELD_CLIP);
 
+	GrpBackend_SetClip(GRP_RES_RECT);
 	StdStatusOutput();
+	GrpBackend_SetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 }
 
 bool IsDraw(void)

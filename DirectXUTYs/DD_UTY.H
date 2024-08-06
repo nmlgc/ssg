@@ -143,11 +143,6 @@ void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 // Returns `true` if any part of the sprite was blitted.
 extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
-// カラーキー付き転送(クリッピングはないので注意！！) //
-// src の値は変更されません //
-// Always returns `true`. //
-bool GrpBltX(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
-
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //
 void GrpBltXC(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);

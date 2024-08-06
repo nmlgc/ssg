@@ -249,11 +249,11 @@ extern void StateDraw(void)
 
 	// 得点表示 //
 	sprintf(buf, "%9lld", Viv.score);
-	GrpPut16c(128,0,buf);
+	GrpPut16(128, 0, buf);
 
 	// 仮の残機＆残りボム表示 //
 	sprintf(buf,"       Bomb %1d", Viv.bomb);
-	GrpPut16c(280,0,buf);
+	GrpPut16(280, 0, buf);
 
 	// 残りメイド数表示 //
 	for(i=0; i<Viv.left; i++){

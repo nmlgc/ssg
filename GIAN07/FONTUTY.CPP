@@ -58,26 +58,7 @@ extern void GrpPut16(int x, int y, const char *s)
 
 			tx = x;ty = y;
 			if(tx>=0 && tx<630)	// 安全対策???
-				GrpBltX(src, tx, ty, GrTama);
-		}
-	}
-}
-
-// 16x16 透過フォントで文字列出力(高速) //
-extern void GrpPut16c(int x, int y, const char *s)
-{
-	int		sx,tx,ty;
-
-	sx = x;
-
-	for(;(*s)!='\0';s++,x+=14){
-		auto maybe_src = Glyph16x16(*s);
-		if(maybe_src) {
-			auto& src = maybe_src.value();
-
-			tx = x;ty = y;
-			if(tx>=0 && tx<630)	// 安全対策???
-				GrpBlt(&src,tx,ty,GrTama);
+				GrpBlt(&src, tx, ty, GrTama);
 		}
 	}
 }
@@ -153,7 +134,7 @@ extern void GrpPut7B(int x, int y, const char *s)
 		}
 
 		if((x >= 0) && (x < 630)) { // 安全対策???
-			GrpBltX(src, x, y, GrMusic);
+			GrpBlt(&src, x, y, GrMusic);
 		}
 	}
 }

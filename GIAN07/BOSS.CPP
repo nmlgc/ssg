@@ -244,7 +244,12 @@ void BossDraw(void)
 				wing = PIXEL_LTWH{
 					(160 + ((e->count / 2) % 4) * 40), 80, 40, 40
 				};
-				GrpBltX(wing, (x - 20), (y - 20), GrEnemy); // クリッピングなし
+
+				// pbg quirk: Blitted without clipping?! I'd consider this a
+				// bug if it wasn't explicitly commented as such. Fine then...
+				GrpBackend_SetClip(GRP_RES_RECT);
+				GrpBlt(&wing, (x - 20), (y - 20), GrEnemy); // クリッピングなし
+				GrpBackend_SetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 				continue;
 			}
 

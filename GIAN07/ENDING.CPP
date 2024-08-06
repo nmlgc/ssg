@@ -113,9 +113,9 @@ bool EndingInit(void)
 	BGM_Stop();
 
 
-	GrpGetPalette(pal);
+	GrpBackend_PaletteGet(pal);
 	EndingSetFixedColors(pal);
-	GrpSetPalette(pal);
+	GrpBackend_PaletteSet(pal);
 
 
 	GameMain = EndingProc;
@@ -312,7 +312,7 @@ void DrawFadeInfo()
 	if(GrpGeom_FB()) {
 		if(FlashState){
 			FlashPaletteGrp(temp_pal, EGrpInfo.target->pal, FlashState);
-			GrpSetPalette(temp_pal);
+			GrpBackend_PaletteSet(temp_pal);
 		}
 		else if(EGrpInfo.target){
 			FadeoutPaletteGrp(
@@ -323,12 +323,12 @@ void DrawFadeInfo()
 			FadeoutPaletteStf(
 				temp_pal, temp_pal, Cast::down_sign<uint8_t>(EStfTask.alpha)
 			);
-			GrpSetPalette(temp_pal);
+			GrpBackend_PaletteSet(temp_pal);
 		}
 		else{
 			temp_pal = { 0 };
 			EndingSetFixedColors(temp_pal);
-			GrpSetPalette(temp_pal);
+			GrpBackend_PaletteSet(temp_pal);
 		}
 	}
 	else{

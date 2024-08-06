@@ -7,8 +7,7 @@
 #include "game/input.h"
 #include "game/string_format.h"
 #include "platform/file.h"
-#include "DirectXUTYs/DD_UTY.H"
-#include "platform/file.h"
+#include "platform/graphics_backend.h"
 
 // Paletted graphics //
 // ----------------- //
@@ -40,7 +39,7 @@ void Grp_PaletteSetDefault(void)
 		palette[index].g = (col.g * (255 / RGB216::MAX));
 		palette[index].b = (col.b * (255 / RGB216::MAX));
 	});
-	GrpSetPalette(palette);
+	GrpBackend_PaletteSet(palette);
 }
 // ----------------- //
 

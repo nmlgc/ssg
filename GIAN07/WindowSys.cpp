@@ -357,7 +357,9 @@ void MWinMove(void)
 			if(MsgWindow.FaceTime==0){
 				MsgWindow.FaceState = MFACE_OPEN;
 				MsgWindow.FaceID    = MsgWindow.NextFace;
-				GrpSetPalette(FaceData[MsgWindow.FaceID/FACE_NUMX].pal);
+				GrpBackend_PaletteSet(
+					FaceData[MsgWindow.FaceID / FACE_NUMX].pal
+				);
 			}
 		break;
 
@@ -542,7 +544,7 @@ void MWinFace(uint8_t faceID)
 	if(MsgWindow.FaceState==MFACE_NONE){
 		MsgWindow.FaceState = MFACE_OPEN;
 		MsgWindow.FaceID = faceID;
-		GrpSetPalette(FaceData[faceID/FACE_NUMX].pal);
+		GrpBackend_PaletteSet(FaceData[faceID / FACE_NUMX].pal);
 	}
 	else{
 		MsgWindow.FaceState = MFACE_NEXT;

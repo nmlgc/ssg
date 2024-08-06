@@ -31,6 +31,12 @@ void GrpBackend_Clear(
 // Returns the current pixel format of the backbuffer.
 PIXELFORMAT GrpBackend_PixelFormat(void);
 
+// Retrieves the current backbuffer palette. Does nothing in channeled mode.
+void GrpBackend_PaletteGet(PALETTE& pal);
+
+// Sets the current backbuffer palette. Does nothing in channeled mode.
+bool GrpBackend_PaletteSet(const PALETTE& pal);
+
 struct FILE_STREAM_WRITE;
 void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
 /// -------

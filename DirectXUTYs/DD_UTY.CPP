@@ -409,7 +409,7 @@ std::span<PALETTEENTRY> CastToPALETTEENTRY(PALETTE& pal)
 }
 
 // 現在のパレットを取得する(ただの代入なのでこの関数を使うまでも無いかもしれないね) //
-void GrpGetPalette(PALETTE& pal)
+void GrpBackend_PaletteGet(PALETTE& pal)
 {
 	// ８Ｂｉｔモード以外では、何もしないでリターンする //
 	if(DxObj.PixelFormat.IsChanneled()) return;
@@ -417,7 +417,7 @@ void GrpGetPalette(PALETTE& pal)
 	pal = DxObj.Palette;
 }
 
-bool GrpSetPalette(const PALETTE& pal)
+bool GrpBackend_PaletteSet(const PALETTE& pal)
 {
 	// ８Ｂｉｔモード以外では、何もしないでリターンする //
 	if(DxObj.PixelFormat.IsChanneled()) {
@@ -459,7 +459,7 @@ void GrpSetPaletteFrom(SURFACE_DDRAW& surf)
 
 	const auto p = CastToPALETTEENTRY(DxObj.Palette);
 	lpdp->GetEntries(0, 0, p.size(), p.data());
-	GrpSetPalette(DxObj.Palette);
+	GrpBackend_PaletteSet(DxObj.Palette);
 
 	lpdp->Release();
 }
@@ -759,7 +759,7 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 			}
 
 			RELEASE(Pal);
-			if(!GrpSetPalette(Palette)) {
+			if(!GrpBackend_PaletteSet(Palette)) {
 				return false;
 			}
 			surf.surf->SetPalette(Pal);

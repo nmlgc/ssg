@@ -551,7 +551,7 @@ bool LoadGraph(int stage)
 		if(!GrpBMPLoadP(graph, 31, SURFACE_ID_SPROJECT)) {
 			return false;
 		}
-		GrpGetPalette(SProjectPalette);
+		GrpBackend_PaletteGet(SProjectPalette);
 
 		// if(!GrpBMPLoadP(graph, (21 + 4), SURFACE_ID_NAMEREG)) {
 		// 	return false;
@@ -569,7 +569,7 @@ bool LoadGraph(int stage)
 			if(!GrpBMPLoadP(in, (1 + i), (SURFACE_ID_ENDING_PIC + i))) {
 				return false;
 			}
-			GrpGetPalette(EndingGrp[i].pal);
+			GrpBackend_PaletteGet(EndingGrp[i].pal);
 		}
 		return true;
 	}
@@ -583,7 +583,7 @@ bool LoadGraph(int stage)
 		if(!GrpBMPLoadP(graph, (27 + 1), SURFACE_ID_ENEMY)) {
 			return false;
 		}
-		GrpGetPalette(EnemyPalette);
+		GrpBackend_PaletteGet(EnemyPalette);
 
 		if(!GrpBMPLoadP(graph, 27, SURFACE_ID_MAPCHIP)) {
 			return false;
@@ -602,7 +602,7 @@ bool LoadGraph(int stage)
 		if(!GrpBMPLoadP(graph, 29, SURFACE_ID_ENEMY)) {
 			return false;
 		}
-		GrpGetPalette(EnemyPalette);
+		GrpBackend_PaletteGet(EnemyPalette);
 		return true;
 	}
 
@@ -611,7 +611,7 @@ bool LoadGraph(int stage)
 		if(!GrpBMPLoadP(graph, 30, SURFACE_ID_ENEMY)) {
 			return false;
 		}
-		GrpGetPalette(EnemyPalette);
+		GrpBackend_PaletteGet(EnemyPalette);
 		return true;
 	}
 
@@ -626,7 +626,7 @@ bool LoadGraph(int stage)
 	if(!GrpBMPLoadP(graph, (stage + 0), SURFACE_ID_ENEMY)) {
 		return false;
 	}
-	GrpGetPalette(EnemyPalette);
+	GrpBackend_PaletteGet(EnemyPalette);
 
 	// 本当は STAGE_MAX とすべき
 	// const fil_no_t MapChipID[STAGE_MAX] = { 7, 7, 8, 9, 10, 11 };
@@ -650,7 +650,7 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 	}
 
 	// パレットを保存する //
-	GrpGetPalette(FaceData[FaceID].pal);
+	GrpBackend_PaletteGet(FaceData[FaceID].pal);
 
 	return true;
 }
@@ -659,7 +659,7 @@ bool LoadFace(uint8_t FaceID, uint8_t FileNo)
 extern void LoadPaletteFromEnemy(void)
 {
 	if(GrpBackend_PixelFormat().IsPalettized()) {
-		GrpSetPalette(EnemyPalette);
+		GrpBackend_PaletteSet(EnemyPalette);
 	}
 }
 

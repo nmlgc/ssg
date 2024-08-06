@@ -718,7 +718,7 @@ void SProjectProc(bool&)
 			gp->DrawBoxA(logo.left, logo.top, logo.right, logo.bottom);
 			gp->Unlock();
 		} else {
-			GrpSetPalette(SProjectPalette.Fade(palette_tone));
+			GrpBackend_PaletteSet(SProjectPalette.Fade(palette_tone));
 		}
 	};
 

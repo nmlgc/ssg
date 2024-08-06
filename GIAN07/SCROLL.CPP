@@ -6,13 +6,14 @@
 #include "SCROLL.H"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
-#include "FONTUTY.H"
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
+#include "platform/graphics_backend.h"
 #include "game/bgm.h"
 #include "game/cast.h"
+#include "game/debug.h"
 #include "game/input.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
@@ -56,14 +57,12 @@ static void ScrollCmdStg4Rock(void);	// ４面岩
 
 
 // デバッグ用マクロ //
-#ifdef _DEBUG
-	#define SCL_DEBUG(s)					\
-	{										\
-		GrpPut16(10,10+16*11,s);			\
-	}
-#else
-	#define SCL_DEBUG(s)
+static void SCL_DEBUG(std::u8string_view s)
+{
+#ifdef SCRIPT_TRACE
+	DebugLog(s);
 #endif
+}
 
 
 
@@ -197,14 +196,14 @@ static void enemy_set(void)
 				} else {
 					SCL_Now += 5;		// cmd(1)+time(4)
 				}
-				SCL_DEBUG("--- SCL_TIME ---");
+				SCL_DEBUG(u8"--- SCL_TIME ---");
 			}
 			break;
 
 			case(SCL_ENEMY):
 				if(BossNow==0) _PutEnemy(cmd+1);		// ボス出現中は出て来ちゃダメ
 				SCL_Now += 6;	// cmd(1)+x(2)+y(2)+id(1)
-				SCL_DEBUG("--- SCL_ENEMY ---");
+				SCL_DEBUG(u8"--- SCL_ENEMY ---");
 			break;
 
 			case(SCL_BOSS): { // ボスをセットする(X(16),Y(16),ID(8))
@@ -272,7 +271,7 @@ static void enemy_set(void)
 				MWinCmd(MWCMD_NEWPAGE);
 				MWinCmd(MWCMD_LARGEFONT);
 				MWinMsg("ＳＣＬ完了ですの");
-				SCL_DEBUG("--- SCL_END ---");
+				SCL_DEBUG(u8"--- SCL_END ---");
 				*/
 			return;
 
@@ -404,7 +403,7 @@ static void enemy_set(void)
 				MWinCmd(MWCMD_NEWPAGE);
 				MWinCmd(MWCMD_LARGEFONT);
 				MWinMsg("バグ発生だにょ");
-				SCL_DEBUG("---- SCL !BUG! ---");
+				SCL_DEBUG(u8"---- SCL !BUG! ---");
 			return;
 		}
 	}

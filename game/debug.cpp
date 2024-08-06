@@ -41,7 +41,7 @@ extern void DebugCleanup(void)
 	ErrorActive = false;
 }
 
-extern void DebugOut(std::u8string_view s)
+void DebugLog(std::u8string_view prefix, std::u8string_view s)
 {
 	using namespace std::string_view_literals;
 
@@ -49,7 +49,17 @@ extern void DebugOut(std::u8string_view s)
 		return;
 	}
 	const std::array<BYTE_BUFFER_BORROWED, 3> bufs = {
-		std::span("Error : "sv), std::span(s), std::span("\n"sv),
+		std::span(prefix), std::span(s), std::span("\n"sv),
 	};
 	FileAppend(ErrorOut, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
+}
+
+void DebugLog(std::u8string_view s)
+{
+	return DebugLog(u8"", s);
+}
+
+extern void DebugOut(std::u8string_view s)
+{
+	return DebugLog(u8"Error : ", s);
 }

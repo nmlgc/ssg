@@ -5,9 +5,9 @@
 
 #include "ENEMY.H"
 #include "ECL_LEN.H"
-#include "FONTUTY.H"
 #include "GIAN.H"
 #include "LEVEL.H"
+#include "platform/graphics_backend.h"
 #include "GIAN07/entity.h"
 #include "game/cast.h"
 #include "game/debug.h"
@@ -27,16 +27,17 @@
 
 
 // ＥＣＬデバッグ用マクロ //
-#ifdef _DEBUG
-	#define ECL_DEBUG(s,param)				\
-	{										\
-		char _ECL_Debug[1000];				\
-		sprintf(_ECL_Debug,s,param);		\
-		GrpPut16(10,10+16*10,_ECL_Debug);	\
+static void ECL_DEBUG(const char *s, auto param)
+{
+#ifdef SCRIPT_TRACE
+	char8_t _ECL_Debug[1000];
+	const auto size = sprintf(reinterpret_cast<char *>(_ECL_Debug), s, param);
+	if(size <= 0) {
+		return;
 	}
-#else
-	#define ECL_DEBUG(s,param)
+	DebugLog({ _ECL_Debug, static_cast<size_t>(size) });
 #endif
+}
 
 
 // 変数の実体 //

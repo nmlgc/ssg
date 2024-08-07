@@ -329,10 +329,10 @@ void GrpSetClip(int sx, int sy, int ex, int ey)
 
 	if(DxObj.View){
 		view.dwSize = sizeof(view);
-		view.dwX          = sx;
-		view.dwY          = sy;
-		view.dwWidth      = ex-sx;
-		view.dwHeight     = ey-sy;
+		view.dwX          = CLIP_X_MIN;
+		view.dwY          = CLIP_Y_MIN;
+		view.dwWidth      = (CLIP_X_MAX - CLIP_X_MIN + 1);
+		view.dwHeight     = (CLIP_Y_MAX - CLIP_Y_MIN + 1);
 		view.dvClipX      = D3DVAL(1);
 		view.dvClipY      = D3DVAL(1);
 		view.dvClipWidth  = D3DVAL(2);

@@ -265,11 +265,20 @@ static void _2DGrpCHline(int x1, int x2, int y)
 	int		temp;
 
 	// 完全判定 //
-	if(x1>=CLIP_X_MAX || x2<CLIP_X_MIN || y>=CLIP_Y_MAX || y<=CLIP_Y_MIN-1) return;
+	if(
+		(x1 > CLIP_X_MAX) ||
+		(x2 < CLIP_X_MIN) ||
+		(y > CLIP_Y_MAX) ||
+		(y < CLIP_Y_MIN)
+	 ) {
+		return;
+	}
 
 	// Ｘクリッピング //
 	if(x1<CLIP_X_MIN) x1  = CLIP_X_MIN;
-	if(x2>=CLIP_X_MAX) x2 = CLIP_X_MAX-1;
+	if(x2 > CLIP_X_MAX) {
+		x2 = CLIP_X_MAX;
+	}
 
 	if(x1>x2){
 		temp = x1;

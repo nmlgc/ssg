@@ -292,7 +292,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 			GrpGeom = &GrpGeom_D3D;
 		}
 
-		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+		GrpSetClip(GRP_RES_RECT);
 
 		for(auto& surf : DxSurf) {
 			if(surf.size) {
@@ -337,31 +337,31 @@ void GrpGetClip(WINDOW_LTRB *dest)
 	dest->left   = CLIP_X_MIN;
 	dest->top    = CLIP_Y_MIN;
 
-	dest->right  = CLIP_X_MAX;
-	dest->bottom = CLIP_Y_MAX;
+	dest->right  = (CLIP_X_MAX + 1);
+	dest->bottom = (CLIP_Y_MAX + 1);
 }
 
-void GrpSetClip(int sx, int sy, int ex, int ey)
+void GrpSetClip(const WINDOW_LTRB& rect)
 {
 	D3DVIEWPORT2		view;
 
-	CLIP_X_MIN = (sx<0) ? 0 : sx;
-	CLIP_Y_MIN = (sy<0) ? 0 : sy;
-	CLIP_X_MAX = (std::min)(ex, (GRP_RES.w - 1));
-	CLIP_Y_MAX = (std::min)(ey, (GRP_RES.h - 1));
-
-	if ((CLIP_X_MIN == CLIP_X_MAX) || (CLIP_Y_MIN == CLIP_Y_MAX)) {
+	if((rect.left == rect.right) || (rect.top == rect.bottom)) {
 		GrpBlt = DM_GRPBLT;
 	} else {
 		GrpBlt = STD_GrpBlt;
 	}
 
+	CLIP_X_MIN = (std::max)(0, rect.left);
+	CLIP_Y_MIN = (std::max)(0, rect.top);
+	CLIP_X_MAX = ((std::min)(GRP_RES.w, rect.right) - 1);
+	CLIP_Y_MAX = ((std::min)(GRP_RES.h, rect.bottom) - 1);
+
 	if(DxObj.View){
 		view.dwSize = sizeof(view);
-		view.dwX          = CLIP_X_MIN;
-		view.dwY          = CLIP_Y_MIN;
-		view.dwWidth      = (CLIP_X_MAX - CLIP_X_MIN + 1);
-		view.dwHeight     = (CLIP_Y_MAX - CLIP_Y_MIN + 1);
+		view.dwX          = rect.left;
+		view.dwY          = rect.top;
+		view.dwWidth      = (rect.right - rect.left);
+		view.dwHeight     = (rect.bottom - rect.top);
 		view.dvClipX      = D3DVAL(1);
 		view.dvClipY      = D3DVAL(1);
 		view.dvClipWidth  = D3DVAL(2);

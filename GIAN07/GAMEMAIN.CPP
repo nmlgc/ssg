@@ -94,7 +94,7 @@ extern bool ScoreNameInit(void)
 		return FALSE;
 	}
 
-	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+	GrpSetClip(GRP_RES_RECT);
 
 	InputLocked = Key_Data;
 	GameMain = ScoreNameProc;
@@ -446,7 +446,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 		return FALSE;
 	}
 
-	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+	GrpSetClip(GRP_RES_RECT);
 
 	InputLocked = Key_Data;
 	GameMain = NameRegistProc;
@@ -506,7 +506,7 @@ bool WeaponSelectInit(bool ExStg)
 
 	MaidSet();
 
-	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+	GrpSetClip(GRP_RES_RECT);
 
 	WeaponKeyWait = 1;
 	Viv.weapon    = 0;
@@ -542,7 +542,7 @@ bool GameInit(void(*NextProc)(bool& quit))
 		InitExitWindow();
 		InitContinueWindow();
 	}
-	GrpSetClip(X_MIN, Y_MIN, X_MAX, Y_MAX);
+	GrpSetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 	GameMain = NextProc;
 	return TRUE;
 }
@@ -796,7 +796,7 @@ extern bool MusicRoomInit(void)
 		return FALSE;
 	}
 
-	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+	GrpSetClip(GRP_RES_RECT);
 
 	MidiPlayID = 0;
 
@@ -845,7 +845,7 @@ extern bool GameExit(bool bNeedChgMusic)
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
-	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+	GrpSetClip(GRP_RES_RECT);
 
 	LLaserSetup();		// 音を止める
 	Snd_SEStop(8);	// ワーニング音を止めるのだ
@@ -1231,7 +1231,7 @@ void WeaponSelectProc(bool&)
 		MaidMove();
 		MaidTamaMove();
 
-		GrpSetClip(400-110,400-300+2,400+110,400+10);
+		GrpSetClip({ (400 - 110), (400 - 300 + 2), (400 + 110), (400 + 10) });
 		for(x=400-110-2; x<400+110; x+=32){
 			for(y=400-300+2+(count*2)%32-32; y<400+10; y+=32){
 				d = Viv.weapon<<4;
@@ -1249,7 +1249,7 @@ void WeaponSelectProc(bool&)
 		GrpPutScore(500,400,buf);
 
 		GrpGeom->Lock();
-		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+		GrpSetClip(GRP_RES_RECT);
 
 		GrpGeom->SetColor({ 0, 0, 4 });
 		GrpGeom->DrawLine((400 - 110), (400 - 300), (400 + 110), (400 - 300));
@@ -1357,9 +1357,9 @@ void PauseProc(bool&)
 		GameDraw();
 
 		GrpGetClip(&rc);
-		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+		GrpSetClip(GRP_RES_RECT);
 		CWinDraw(&ExitWindow);
-		GrpSetClip(rc.left, rc.top, rc.right, rc.bottom);
+		GrpSetClip(rc);
 
 		Grp_Flip();
 	}
@@ -1579,10 +1579,10 @@ void GameDraw(void)
 	BossHPG_Draw();
 	ScreenEffectDraw();
 
-//	GrpGetClip(&rc);
-	// GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
+	// GrpGetClip(&rc);
+	// GrpSetClip(GRP_RES_RECT);
 	MWinDraw();
-//	GrpSetClip(rc.left, rc.top, rc.right, rc.bottom);
+	// GrpSetClip(rc);
 
 	StdStatusOutput();
 }

@@ -125,6 +125,15 @@ template <class Coord> struct PIXEL_LTRB_BASE {
 	) :
 		left(left), top(top), right(right), bottom(bottom) {
 	}
+	constexpr PIXEL_LTRB_BASE(
+		const PIXEL_POINT_BASE<Coord>& topleft,
+		const PIXEL_SIZE_BASE<Coord>& size
+	) :
+		left(topleft.x),
+		top(topleft.y),
+		right(topleft.x + size.w),
+		bottom(topleft.y + size.h) {
+	}
 
 	constexpr PIXEL_LTRB_BASE(const PIXEL_LTWH_BASE<Coord>& o) :
 		left(o.left), top(o.top), right(o.left + o.w), bottom(o.top + o.h) {

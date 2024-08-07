@@ -10,7 +10,8 @@ import std.compat;
 #include "game/coords.h"
 
 // The game's native resolution.
-constexpr WINDOW_SIZE GRP_RES = { 640, 480 };
+constexpr WINDOW_SIZE GRP_RES      = { 640, 480 };
+constexpr WINDOW_LTRB GRP_RES_RECT = { { 0, 0 }, GRP_RES };
 
 // Yup, the game is supposed to be running at 62.5 FPS.
 constexpr auto FRAME_TIME_TARGET = 16;

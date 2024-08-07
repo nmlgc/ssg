@@ -447,7 +447,7 @@ void ScreenEffectInit(void)
 	ScreenInfo.cmd   = SCNEFC_NONE;
 	ScreenInfo.count = 0;
 
-	GrpSetClip(X_MIN,Y_MIN,X_MAX,Y_MAX);
+	GrpSetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 }
 
 // 画面全体に対するエフェクトをセットする //
@@ -585,17 +585,16 @@ extern void CircleFadeOut(int x, int y, int r)
 	}
 
 	if(r != 0){
-		src = { (x - r), (y - r), (x + r), (y + r) };
-		if(src.left  < X_MIN) src.left  = X_MIN;
-		if(src.right < X_MIN) src.right = X_MIN;
-		if(src.left  > X_MAX) src.left  = X_MAX;
-		if(src.right > X_MAX) src.right = X_MAX;
-		if(src.top    < Y_MIN) src.top    = Y_MIN;
-		if(src.bottom > Y_MAX) src.bottom = Y_MAX;
-		GrpSetClip(src.left,src.top,src.right,src.bottom);
+		const WINDOW_LTRB clip = {
+			std::clamp((x - r), X_MIN, (X_MAX + 1)),
+			(std::max)((y - r), Y_MIN),
+			std::clamp((x + r + 1), X_MIN, (X_MAX + 1)),
+			(std::min)((y + r + 1), (Y_MAX + 1))
+		};
+		GrpSetClip(clip);
 	}
 	else{
-		GrpSetClip(X_MID,Y_MID,X_MID,Y_MID);
+		GrpSetClip({ X_MID, Y_MID, X_MID, Y_MID });
 	}
 }
 

@@ -136,7 +136,7 @@ extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 
 // 初期化など //
 bool GrpEnum(void);	// 使用できるデバイスを列挙する
-void GrpSetClip(int sx, int sy, int ex, int ey);	// 3DViewportが生きていたらそちらもセット
+void GrpSetClip(const WINDOW_LTRB& rect);	// 3DViewportが生きていたらそちらもセット
 
 void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 

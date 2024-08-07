@@ -37,9 +37,9 @@ BYTE				ATableRef = 0;					// αテーブル格納先
 
 
 // ２Ｄ用関数(補助) //
-static void _2DGrpHline(int x1, int x2, int y);	// 横ラインを引く
+static void _2DGrpHline(int x1, int x2_inclusive, int y);	// 横ラインを引く
 static void _2DGrpCHline(int x1, int x2, int y);	// 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り)
-static void _2DGrpHlineA(int x1, int x2, int y);	// α横ラインを引く
+static void _2DGrpHlineA(int x1, int x2_exclusive, int y);	// α横ラインを引く
 static void _2DUpdateAlphaTable(void);	// αテーブルを更新する
 
 
@@ -161,7 +161,7 @@ void _2DBox(int x1, int y1, int x2, int y2)
 
 	if(_2DClipRect(&x1,&y1,&x2,&y2)){
 		for(i=y1;i<y2;i++)
-			_2DGrpHline(x1,x2,i);
+			_2DGrpHline(x1, (x2 - 1), i);
 	}
 }
 
@@ -253,9 +253,9 @@ void _2DPolygonA(std::span<const WINDOW_POINT> p)
 }
 
 // 横ラインを引く //
-static void _2DGrpHline(int x1, int x2, int y)
+static void _2DGrpHline(int x1, int x2_inclusive, int y)
 {
-	memset((Grp_Vram + Grp_AddrY[y] + x1), Col2D, ((x2 - x1) + 1));
+	memset((Grp_Vram + Grp_AddrY[y] + x1), Col2D, ((x2_inclusive - x1) + 1));
 }
 
 // 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り) //
@@ -281,7 +281,7 @@ static void _2DGrpCHline(int x1, int x2, int y)
 }
 
 // α横ラインを引く //
-static void _2DGrpHlineA(int x1, int x2, int y)
+static void _2DGrpHlineA(int x1, int x2_exclusive, int y)
 {
 	union{
 		DWORDLONG	dq;
@@ -302,8 +302,8 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 
 	if(Grp_Vram==NULL) return;
 	write = Grp_Vram + x1 + Grp_AddrY[y];
-	x2-=x1;
-	temp = x2>>3;
+	x2_exclusive -= x1;
+	temp = (x2_exclusive >> 3);
 	for(i=0;i<temp;i++){
 		Dat64.dq  = *reinterpret_cast<DWORDLONG *>(write);
 		Dat64.db0 = AlphaTable[Dat64.db0];
@@ -319,7 +319,7 @@ static void _2DGrpHlineA(int x1, int x2, int y)
 	}
 
 	Dat64.dq  = *reinterpret_cast<DWORDLONG *>(write);
-	switch(x2&7){
+	switch(x2_exclusive & 7) {
 		case 7:	Dat64.db6 = AlphaTable[Dat64.db6];	[[fallthrough]];
 		case 6:	Dat64.db5 = AlphaTable[Dat64.db5];	[[fallthrough]];
 		case 5:	Dat64.db4 = AlphaTable[Dat64.db4];	[[fallthrough]];

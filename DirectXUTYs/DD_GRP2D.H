@@ -46,10 +46,10 @@ inline bool _2DChkPoint(int x, int y)
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 
 	return !(
-		(x <  CLIP_X_MIN) ||
-		(x >= CLIP_X_MAX) ||
-		(y <  CLIP_Y_MIN) ||
-		(y >= CLIP_Y_MAX)
+		(x < CLIP_X_MIN) ||
+		(x > CLIP_X_MAX) ||
+		(y < CLIP_Y_MIN) ||
+		(y > CLIP_Y_MAX)
 	);
 }
 

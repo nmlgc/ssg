@@ -292,8 +292,6 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 			GrpGeom = &GrpGeom_D3D;
 		}
 
-		GrpBackend_SetClip(GRP_RES_RECT);
-
 		for(auto& surf : DxSurf) {
 			if(surf.size) {
 				SurfaceCreateUninitialized(surf, surf.size);
@@ -333,7 +331,10 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 
 void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 {
-	D3DVIEWPORT2		view;
+	extern bool bLocked;
+	assert(
+		!bLocked && "Clipping region should not be changed during a 3D scene"
+	);
 
 	if((rect.left == rect.right) || (rect.top == rect.bottom)) {
 		GrpBlt = DM_GRPBLT;
@@ -345,21 +346,6 @@ void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 	CLIP_Y_MIN = (std::max)(0, rect.top);
 	CLIP_X_MAX = ((std::min)(GRP_RES.w, rect.right) - 1);
 	CLIP_Y_MAX = ((std::min)(GRP_RES.h, rect.bottom) - 1);
-
-	if(DxObj.View){
-		view.dwSize = sizeof(view);
-		view.dwX          = rect.left;
-		view.dwY          = rect.top;
-		view.dwWidth      = (rect.right - rect.left);
-		view.dwHeight     = (rect.bottom - rect.top);
-		view.dvClipX      = D3DVAL(1);
-		view.dvClipY      = D3DVAL(1);
-		view.dvClipWidth  = D3DVAL(2);
-		view.dvClipHeight = D3DVAL(2);
-		view.dvMinZ       = D3DVAL(0);
-		view.dvMaxZ       = D3DVAL(1);
-		DxObj.View->SetViewport2(&view);
-	}
 }
 
 bool GRAPHICS_DDRAW::Restore(void)

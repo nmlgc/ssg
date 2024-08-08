@@ -6,17 +6,24 @@
 #include "DD_UTY.H"
 #include "constants.h"
 #include "DD_GRP3D.H"
+#include "game/cast.h"
 #include "game/enum_array.h"
 #include "game/ut_math.h"
 #include <assert.h>
 #include <d3d.h>
 #pragma message(PBGWIN_DD_GRP3D_H)
 
+extern int CLIP_X_MIN, CLIP_X_MAX, CLIP_Y_MIN, CLIP_Y_MAX;
+
 
 // ３Ｄ用変数 //
 bool	bLocked = false;	// ロック中か
 RGBA	Col3D;	// 現在の色+α
 D3DTLVERTEX	work[100];	// 頂点用ワークエリア
+
+// Adding the viewport instance allows us to nicely invalidate this cache after
+// a backend reinitialization.
+std::pair<D3DRECT, IDirect3DViewport2 *> d3drc;
 
 
 // インライン関数 //
@@ -69,8 +76,35 @@ inline bool AlphaEnable(bool flag)
 // 画面描画の準備をする //
 void GRAPHICS_GEOMETRY_D3D::Lock(void)
 {
-	D3DRECT d3drc = { 0, 0, GRP_RES.w, GRP_RES.h };
+	const D3DRECT clip = {
+		.x1 = (std::max)(0, CLIP_X_MIN),
+		.y1 = (std::max)(0, CLIP_Y_MIN),
+		.x2 = (std::max)(0, (CLIP_X_MAX + 1)),
+		.y2 = (std::max)(0, (CLIP_Y_MAX + 1)),
+	};
 	HRESULT			dxret;
+
+	if(
+		(d3drc.first.x1 != clip.x1) || (d3drc.first.y1 != clip.y1) ||
+		(d3drc.first.x2 != clip.x2) || (d3drc.first.y2 != clip.y2) ||
+		(d3drc.second != DxObj.View)
+	) {
+		d3drc = { clip, DxObj.View };
+		D3DVIEWPORT2 view = {
+			.dwSize       = sizeof(view),
+			.dwX          = Cast::sign<DWORD>(clip.x1),
+			.dwY          = Cast::sign<DWORD>(clip.y1),
+			.dwWidth      = Cast::sign<DWORD>(clip.x2 - clip.x1),
+			.dwHeight     = Cast::sign<DWORD>(clip.y2 - clip.y1),
+			.dvClipX      = D3DVAL(1),
+			.dvClipY      = D3DVAL(1),
+			.dvClipWidth  = D3DVAL(2),
+			.dvClipHeight = D3DVAL(2),
+			.dvMinZ       = D3DVAL(0),
+			.dvMaxZ       = D3DVAL(1),
+		};
+		DxObj.View->SetViewport2(&view);
+	}
 
 	// 目標セット //
 	dxret = DxObj.D3Dev->SetRenderTarget(DxObj.Back,0);
@@ -81,7 +115,7 @@ void GRAPHICS_GEOMETRY_D3D::Lock(void)
 	}
 
 	// Ｚバッファだけをクリアする //
-	dxret = DxObj.View->Clear(1,&d3drc,/*D3DCLEAR_TARGET|*/D3DCLEAR_ZBUFFER);
+	dxret = DxObj.View->Clear(1, &d3drc.first, D3DCLEAR_ZBUFFER);
 	if(dxret!=D3D_OK){
 		if(!DxObj.Restore()) {
 			return;

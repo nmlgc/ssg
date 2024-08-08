@@ -51,6 +51,7 @@ bool XInit(void)
 	if(!DxObj.Init(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
 		return false;
 	}
+	GrpBackend_SetClip(GRP_RES_RECT);
 
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {

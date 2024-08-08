@@ -1250,9 +1250,9 @@ void WeaponSelectProc(bool&)
 		sprintf(buf, "%d", ((Cast::up<uint16_t>(Viv.exp) + 1) >> 5));
 		GrpPutScore(500,400,buf);
 
-		GrpGeom->Lock();
 		GrpBackend_SetClip(GRP_RES_RECT);
 
+		GrpGeom->Lock();
 		GrpGeom->SetColor({ 0, 0, 4 });
 		GrpGeom->DrawLine((400 - 110), (400 - 300), (400 + 110), (400 - 300));
 		GrpGeom->DrawLine((400 - 110), (400 +  10), (400 + 110), (400 +  10));

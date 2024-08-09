@@ -24,6 +24,10 @@ struct RGB {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
+
+	constexpr RGBA WithAlpha(uint8_t a) const {
+		return RGBA{ .r = r, .g = g, .b = b, .a = a };
+	}
 };
 static_assert(sizeof(RGB) == 3);
 

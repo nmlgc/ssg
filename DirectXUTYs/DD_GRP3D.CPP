@@ -11,22 +11,14 @@
 #pragma message(PBGWIN_DD_GRP3D_H)
 
 
+// ３Ｄ用変数 //
+bool	bLocked = false;	// ロック中か
+RGBA	Col3D;	// 現在の色+α
+D3DTLVERTEX	work[100];	// 頂点用ワークエリア
+
+
 // インライン関数 //
-inline void Set2DPoint(D3DTLVERTEX *tlv, int x, int y)
-{
-	extern BYTE	 Col3D_R,Col3D_G,Col3D_B,Col3D_A;
-
-	memset(tlv,0,sizeof(D3DTLVERTEX));
-
-	tlv->sx       = D3DVAL(x);
-	tlv->sy       = D3DVAL(y);
-	tlv->sz       = D3DVAL(0);
-	tlv->rhw      = D3DVAL(1);
-	tlv->color    = RGBA_MAKE(Col3D_R,Col3D_G,Col3D_B,Col3D_A);
-	tlv->specular = RGB_MAKE(0,0,0);
-}
-
-inline void Set2DPointC(D3DTLVERTEX *tlv, int x, int y, D3DCOLOR c)
+inline void Set2DPoint(D3DTLVERTEX *tlv, int x, int y, RGBA c = Col3D)
 {
 	memset(tlv,0,sizeof(D3DTLVERTEX));
 
@@ -34,7 +26,7 @@ inline void Set2DPointC(D3DTLVERTEX *tlv, int x, int y, D3DCOLOR c)
 	tlv->sy       = D3DVAL(y);
 	tlv->sz       = D3DVAL(0);
 	tlv->rhw      = D3DVAL(1);
-	tlv->color    = c;
+	tlv->color    = RGBA_MAKE(c.r, c.g, c.b, c.a);
 	tlv->specular = RGB_MAKE(0,0,0);
 }
 
@@ -51,13 +43,6 @@ inline bool AlphaEnable(bool flag)
 
 	return TRUE;
 }
-
-
-// ３Ｄ用変数 //
-BOOL			bLocked = FALSE;					// ロック中か
-BYTE			Col3D_R,Col3D_G,Col3D_B;			// 現在の色
-BYTE			Col3D_A;							// α
-D3DTLVERTEX		work[100];							// 頂点用ワークエリア
 
 
 // 描画系関数ポインタをセットする //
@@ -117,15 +102,15 @@ void _3DUnlock(void)
 void _3DSetColor(RGB216 col)
 {
 	const auto rgb = col.ToRGB();
-	Col3D_R = rgb.r;
-	Col3D_G = rgb.g;
-	Col3D_B = rgb.b;
+	Col3D.r = rgb.r;
+	Col3D.g = rgb.g;
+	Col3D.b = rgb.b;
 }
 
 // αセット //
 void _3DSetAlpha(uint8_t a, uint8_t mode)
 {
-	Col3D_A = a;
+	Col3D.a = a;
 
 	switch(mode){
 		case(ALPHA_ONE):
@@ -283,20 +268,23 @@ void GrpFatCircleA(int x, int y, int r, int w)
 // グラデーション付き長方形(中心部が明るくなる) //
 void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 {
-	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
-	const DWORD c2 = RGBA_MAKE(255, 255, 255, Col3D_A);
-	const DWORD c3 = c1; //RGBA_MAKE(Col3D_R>>1,Col3D_G>>1,Col3D_B>>1,Col3D_A);
+	const RGBA c1 = Col3D;
+	const RGBA c2 = { 255, 255, 255, Col3D.a };
+	const RGBA c3 = Col3D;
+	// const RGBA c3 = {
+	// 	(Col3D.r >> 1), (Col3D.g >> 1), (Col3D.b >> 1), Col3D.a,
+	// };
 
 	if(!bLocked) return;
 
-	Set2DPointC(work+0,p[3].x,p[3].y,c3);
-	Set2DPointC(work+1,p[2].x,p[2].y,c1);
+	Set2DPoint(&work[0], p[3].x, p[3].y, c3);
+	Set2DPoint(&work[1], p[2].x, p[2].y, c1);
 
-	Set2DPointC(work+2,(p[0].x+p[3].x)>>1,(p[0].y+p[3].y)>>1,c2);
-	Set2DPointC(work+3,(p[1].x+p[2].x)>>1,(p[1].y+p[2].y)>>1,c2);
+	Set2DPoint(&work[2], ((p[0].x + p[3].x) / 2), ((p[0].y + p[3].y) / 2), c2);
+	Set2DPoint(&work[3], ((p[1].x + p[2].x) / 2), ((p[1].y + p[2].y) / 2), c2);
 
-	Set2DPointC(work+4,p[0].x,p[0].y,c3);
-	Set2DPointC(work+5,p[1].x,p[1].y,c1);
+	Set2DPoint(&work[4], p[0].x, p[0].y, c3);
+	Set2DPoint(&work[5], p[1].x, p[1].y, c1);
 
 	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,6,D3DDP_WAIT);
 }
@@ -315,15 +303,15 @@ void GrpGrdPolygonA(std::span<const WINDOW_POINT> p)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //
-	const DWORD c1 = RGBA_MAKE(Col3D_R, Col3D_G, Col3D_B, Col3D_A);
-	constexpr DWORD c2 = RGB_MAKE(255, 255, 255);
+	const RGBA c1 = Col3D;
+	const RGB c2 = { 255, 255, 255 };
 
 	if(!bLocked) return;
 	AlphaEnable(TRUE);
 
-	Set2DPointC(work+0,p[0].x,p[0].y,c2);
+	Set2DPoint(&work[0], p[0].x, p[0].y, c2.WithAlpha(Col3D.a));
 	for(size_t i = 1; i < p.size(); i++) {
-		Set2DPointC(&work[i], p[i].x, p[i].y, c1);
+		Set2DPoint(&work[i], p[i].x, p[i].y, c1);
 	}
 
 	DxObj.D3Dev->DrawPrimitive(
@@ -335,17 +323,15 @@ void GrpGrdPolygonA(std::span<const WINDOW_POINT> p)
 
 void GrpGrdLineEx(int x, int y1, int y2)
 {
-	DWORD	c1,c2;
-
 	if(!bLocked) return;
 
 	//GrpSetAlpha(128,ALPHA_NORM);
-	c1 = RGBA_MAKE(200,0,0,Col3D_A);
-	c2 = RGBA_MAKE(250,250,0,Col3D_A);
+	constexpr RGB c1 = { 200,   0, 0 };
+	constexpr RGB c2 = { 250, 250, 0 };
 
 	//AlphaEnable(TRUE);
-	Set2DPointC(work+0,x,y1,c1);
-	Set2DPointC(work+1,x,y2,c2);
+	Set2DPoint(&work[0], x, y1, c1.WithAlpha(Col3D.a));
+	Set2DPoint(&work[1], x, y2, c2.WithAlpha(Col3D.a));
 
 	DxObj.D3Dev->DrawPrimitive(D3DPT_LINELIST,D3DVT_TLVERTEX,work,2,D3DDP_WAIT);
 

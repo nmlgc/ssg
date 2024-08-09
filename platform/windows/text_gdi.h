@@ -114,7 +114,7 @@ public:
 		TEXTRENDER_RECT_ID rect_id,
 		std::optional<PIXEL_LTWH> subrect = std::nullopt
 	) {
-		PIXEL_LTRB rect = Subrect(rect_id, subrect);
+		const PIXEL_LTRB rect = Subrect(rect_id, subrect);
 		return graphics.SurfaceBlit(dst, surf, rect);
 	}
 

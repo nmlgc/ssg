@@ -81,7 +81,7 @@ struct XDDRAWENUM {
 };
 
 // 図形描画関数に対するダミー関数 //
-static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+static bool DM_GRPBLT(const PIXEL_LTRB&, int, int, SURFACE_DDRAW&);
 
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
@@ -91,7 +91,7 @@ int CLIP_Y_MAX = (GRP_RES.h - 1);
 
 static constexpr bool Fullscreen = true;
 
-bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+bool STD_GrpBlt(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
 
 
 // Ｚバッファを必要なら生成し、接続する //
@@ -118,7 +118,7 @@ uint8_t DxEnumNow;
 std::array<XDDRAWENUM, 4> DxEnum;
 
 // 図形描画用関数ポインタの実体 //
-bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
+bool (*GrpBlt)(const PIXEL_LTRB&, int, int, SURFACE_DDRAW&) = STD_GrpBlt;
 
 // Templating the functor avoids both the need for #including <functional> and
 // any potential runtime exceptions related to the call.
@@ -525,10 +525,10 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKey(SURFACE_DDRAW& surf, RGB col)
 }
 
 bool GRAPHICS_DDRAW::SurfaceBlit(
-	WINDOW_POINT topleft, SURFACE_DDRAW& surf, PIXEL_LTRB& src
+	WINDOW_POINT topleft, SURFACE_DDRAW& surf, const PIXEL_LTRB& src
 )
 {
-	return GrpBlt(&src, topleft.x, topleft.y, surf);
+	return GrpBlt(src, topleft.x, topleft.y, surf);
 }
 
 void GrpBackend_Clear(uint8_t col_palettized, RGB col_channeled)
@@ -638,13 +638,14 @@ void GrpBltXC(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
 
 // カラーキー＆クリッピング付きＢＭＰ転送 //
 // 注意 : src の内容が変更される可能性があります //
-bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+bool STD_GrpBlt(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf)
 {
 	// 完全に範囲外なら何もしない //
-	if(!GrpClip(src, &x, &y)) {
+	PIXEL_LTRB clipped = src;
+	if(!GrpClip(&clipped, &x, &y)) {
 		return false;
 	}
-	return GrpBltX(*src, x, y, surf);
+	return GrpBltX(clipped, x, y, surf);
 }
 
 // ビット深度によりカラーキーをセットする
@@ -927,7 +928,7 @@ static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 	return DDENUMRET_OK;
 }
 
-static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf)
+static bool DM_GRPBLT(const PIXEL_LTRB&, int, int, SURFACE_DDRAW&)
 {
 	return false;
 }

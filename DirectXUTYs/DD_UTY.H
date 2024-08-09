@@ -122,7 +122,7 @@ public:
 	// point on the back buffer, while clipping the destination rectangle to
 	// the clipping area. Returns `true` if any part of the sprite was blitted.
 	bool SurfaceBlit(
-		WINDOW_POINT topleft, SURFACE_DDRAW& surf, PIXEL_LTRB& src
+		WINDOW_POINT topleft, SURFACE_DDRAW& surf, const PIXEL_LTRB& src
 	);
 	// --------------------------- //
 };
@@ -141,7 +141,7 @@ void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
 // ビットマップ転送(WithClip)
 // Returns `true` if any part of the sprite was blitted.
-extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
+extern bool (*GrpBlt)(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
 
 // カラーキー無し転送(クリッピングはないので注意！！) //
 // src の値は変更されません //

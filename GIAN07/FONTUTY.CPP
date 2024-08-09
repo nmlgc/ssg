@@ -54,11 +54,9 @@ extern void GrpPut16(int x, int y, const char *s)
 	for(;(*s)!='\0';s++,x+=14){
 		auto maybe_src = Glyph16x16(*s);
 		if(maybe_src) {
-			auto& src = maybe_src.value();
-
 			tx = x;ty = y;
 			if(tx>=0 && tx<630)	// 安全対策???
-				GrpBlt(&src, tx, ty, GrTama);
+				GrpBlt(maybe_src.value(), tx, ty, GrTama);
 		}
 	}
 }
@@ -73,11 +71,9 @@ extern void GrpPut16c2(int x, int y, const char *s)
 	for(;(*s)!='\0';s++,x+=16){
 		auto maybe_src = Glyph16x16(*s);
 		if(maybe_src) {
-			auto& src = maybe_src.value();
-
 			tx = x;ty = y;
 			//if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(&src,tx,ty,GrTama);
+			GrpBlt(maybe_src.value(), tx, ty, GrTama);
 		}
 	}
 }
@@ -87,9 +83,7 @@ extern void GrpPutc(int x, int y, char c)
 {
 	auto maybe_src = Glyph16x16(c);
 	if(maybe_src) {
-		auto& src = maybe_src.value();
-
-		GrpBlt(&src, x, y, GrTama);
+		GrpBlt(maybe_src.value(), x, y, GrTama);
 	}
 }
 
@@ -111,7 +105,7 @@ extern void GrpPut57(int x, int y, const char *s)
 
 		tx = x;ty = y;
 		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(&src,tx,ty,GrTama);
+			GrpBlt(src, tx, ty, GrTama);
 	}
 }
 
@@ -134,7 +128,7 @@ extern void GrpPut7B(int x, int y, const char *s)
 		}
 
 		if((x >= 0) && (x < 630)) { // 安全対策???
-			GrpBlt(&src, x, y, GrMusic);
+			GrpBlt(src, x, y, GrMusic);
 		}
 	}
 }
@@ -157,7 +151,7 @@ extern void GrpPutScore(int x, int y, const char *s)
 
 		tx = x;ty = y;
 		if(tx>=0 && tx<630)	// 安全対策???
-			GrpBlt(&src,tx,ty,GrTama);
+			GrpBlt(src, tx, ty, GrTama);
 	}
 }
 
@@ -174,11 +168,11 @@ extern void GrpPutMidNum(int x, int y, int n)
 	for(i=0;i<3;i++,x+=5){
 		if(buf[i]>='0' && buf[i]<='9'){
 			src = PIXEL_LTWH{ (80 + ((buf[i] - '0') * 4)), 432, 4, 5 };
-			GrpBlt(&src, x, y, GrMusic);
+			GrpBlt(src, x, y, GrMusic);
 		}
 		if(buf[i]=='-'){
 			src = PIXEL_LTWH{ (80 + (10 * 4)), 432, 4, 5 };
-			GrpBlt(&src, x, y, GrMusic);
+			GrpBlt(src, x, y, GrMusic);
 		}
 	}
 }

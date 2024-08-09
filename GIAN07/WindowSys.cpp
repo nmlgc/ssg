@@ -462,7 +462,7 @@ void MWinDraw(void)
 			src = PIXEL_LTWH{
 				((MsgWindow.FaceID % FACE_NUMX) * FACE_W), 0, FACE_W, FACE_H
 			};
-			GrpBlt(&src,x+2,oy,GrFace);
+			GrpBlt(src, (x + 2), oy, GrFace);
 		break;
 
 		case(MFACE_OPEN):
@@ -474,9 +474,9 @@ void MWinDraw(void)
 				src = PIXEL_LTWH{
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
-				GrpBlt(&src,x+len+2,oy+i,GrFace);
-				//if(i&1)	GrpBlt(&src,x+len+2,oy+i,GrFace);
-				//else	GrpBlt(&src,x-len+2,oy+i,GrFace);
+				GrpBlt(src, (x + len + 2), (oy + i), GrFace);
+				//if(i & 1)	GrpBlt(src, (x + len + 2), (oy + i), GrFace);
+				//else     	GrpBlt(src, (x - len + 2), (oy + i), GrFace);
 			}
 		break;
 
@@ -489,9 +489,9 @@ void MWinDraw(void)
 				src = PIXEL_LTWH{
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
-				GrpBlt(&src,x+len+2,oy+i,GrFace);
-				//if(i&1)	GrpBlt(&src,x+len+2,oy+i,GrFace);
-				//else	GrpBlt(&src,x-len+2,oy+i,GrFace);
+				GrpBlt(src, (x + len + 2), (oy + i), GrFace);
+				//if(i & 1)	GrpBlt(src, (x + len + 2), (oy + i), GrFace);
+				//else     	GrpBlt(src, (x - len + 2), (oy + i), GrFace);
 			}
 		break;
 
@@ -503,8 +503,11 @@ void MWinDraw(void)
 				src = PIXEL_LTWH{
 					((MsgWindow.FaceID % FACE_NUMX) * FACE_W), i, FACE_W, 1
 				};
-				if(i&1)	GrpBlt(&src,x-len+2,oy+i,GrFace);
-				else	GrpBlt(&src,x+len+2,oy+i,GrFace);
+				if(i & 1) {
+					GrpBlt(src, (x - len + 2), (oy + i), GrFace);
+				} else {
+					GrpBlt(src, (x + len + 2), (oy + i), GrFace);
+				}
 			}
 		break;
 	}
@@ -593,19 +596,19 @@ static void DrawWindowFrame(int x,int y,int w,int h)
 
 	// 左上 //
 	src = { 0, 0, w, h };
-	GrpBlt(&src,x,y,GrTama);
+	GrpBlt(src, x, y, GrTama);
 
 	// 右上 //
 	src = { (384 - w), 0, 384, h };
-	GrpBlt(&src,x+w,y,GrTama);
+	GrpBlt(src, (x + w), y, GrTama);
 
 	// 左下 //
 	src = { 0, (80 - h), w, 80 };
-	GrpBlt(&src,x,y+h,GrTama);
+	GrpBlt(src, x, (y + h), GrTama);
 
 	// 右下 //
 	src = { (384 - w), (80 - h), 384, 80 };
-	GrpBlt(&src,x+w,y+h,GrTama);
+	GrpBlt(src, (x + w), (y + h), GrTama);
 }
 
 // ヘルプ文字列を送る //

@@ -24,7 +24,6 @@ extern void WideBombDraw(void)
 		{0, 240, 210, 480}, {210, 240, 210*2, 480}, {210*2, 240, 210*3, 480}
 	};
 
-	PIXEL_LTRB	src;
 	int		x,y;
 	int		t;
 
@@ -49,8 +48,7 @@ extern void WideBombDraw(void)
 		t = (Viv.bomb_time/4); if(t > 5) t = 5;
 	}
 
-	src = data[t];
-	GrpBlt(&src, x, y, GrBomber);
+	GrpBlt(data[t], x, y, GrBomber);
 }
 
 void LaserBombDraw(void)
@@ -198,15 +196,15 @@ extern void MaidDraw(void)
 
 	if(Viv.muteki==0 || draw_flag){
 		src = PIXEL_LTWH{ (384 + (Viv.GrpID * 32)), 128, (16 * 2), (16 * 3) };
-		GrpBlt(&src,x,y,GrTama);
+		GrpBlt(src, x, y, GrTama);
 	}
 
 	if( ((Viv.exp+1)>>5) ){
 		if(Viv.muteki < VIVDEAD_VAL){
 			src = VivBit[Viv.weapon&3][(draw_flag2>>2)&1];
-			GrpBlt(&src,ox+SBOPT_DX,oy,GrTama);
+			GrpBlt(src, (ox + SBOPT_DX), oy, GrTama);
 			src = VivBit[Viv.weapon&3][(draw_flag2>>2)&1];
-			GrpBlt(&src,ox-SBOPT_DX,oy,GrTama);
+			GrpBlt(src, (ox - SBOPT_DX), oy, GrTama);
 		}
 	}
 
@@ -219,7 +217,7 @@ extern void StateDraw(void)
 {
 	int		i,temp;
 	//PIXEL_LTRB	src = { 0, 80, 128, (80 + 16) };
-	PIXEL_LTRB	src = { 0, 80, 128, (80 + 24) };
+	constexpr PIXEL_LTRB src = { 0, 80, 128, (80 + 24) };
 	char	buf[100];
 
 	// 残りかすり時間ゲージの表示 //
@@ -243,7 +241,7 @@ extern void StateDraw(void)
 		}
 		GrpGeom->Unlock();
 	}
-	GrpBlt(&src,128,16,GrTama);
+	GrpBlt(src, 128, 16, GrTama);
 	sprintf(buf,"%3d",Viv.evade);
 	GrpPut57(128 + 95,16 + 91-80,buf);
 
@@ -257,8 +255,8 @@ extern void StateDraw(void)
 
 	// 残りメイド数表示 //
 	for(i=0; i<Viv.left; i++){
-		src = PIXEL_LTWH{ 608, 432, 16, 16 };
-		GrpBlt(&src, 280+i*14, 0, GrTama);
+		constexpr PIXEL_LTWH src = { 608, 432, 16, 16 };
+		GrpBlt(src, (280 + (i * 14)), 0, GrTama);
 	}
 }
 

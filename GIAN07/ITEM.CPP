@@ -127,7 +127,7 @@ void ItemDraw(void)
 				};
 				x = (ip->x>>6) - 8;
 				y = (ip->y>>6) - 8;
-				GrpBlt(&src,x,y,GrTama);
+				GrpBlt(src, x, y, GrTama);
 			break;
 
 			case(ITEM_EXTEND):
@@ -137,7 +137,7 @@ void ItemDraw(void)
 					};
 					x = (ip->x>>6) - 8 + cosl(ip->count+j*256/8, 12);
 					y = (ip->y>>6) - 8 + sinl(ip->count+j*256/8, 12);
-					GrpBlt(&src,x,y,GrTama);
+					GrpBlt(src, x, y, GrTama);
 				}
 
 			//	src = PIXEL_LTWH{
@@ -145,7 +145,7 @@ void ItemDraw(void)
 			//	};
 			//	x = (ip->x>>6) - 8;
 			//	y = (ip->y>>6) - 8;
-			//	GrpBlt(&src,x,y,GrTama);
+			//	GrpBlt(src, x, y, GrTama);
 			break;
 
 			case(ITEM_BOMB):
@@ -155,7 +155,7 @@ void ItemDraw(void)
 					};
 					x = (ip->x>>6) - 8 + cosl(-2*ip->count+j*256/8, 12);
 					y = (ip->y>>6) - 8 + sinl(-2*ip->count+j*256/8, 12);
-					GrpBlt(&src,x,y,GrTama);
+					GrpBlt(src, x, y, GrTama);
 				}
 
 			//	src = PIXEL_LTWH{
@@ -163,7 +163,7 @@ void ItemDraw(void)
 			//	};
 			//	x = (ip->x>>6) - 8;
 			//	y = (ip->y>>6) - 8;
-			//	GrpBlt(&src,x,y,GrTama);
+			//	GrpBlt(src, x, y, GrTama);
 			break;
 
 			default:

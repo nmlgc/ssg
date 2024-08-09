@@ -597,8 +597,7 @@ void ScrollDraw(void)
 				if(*p != MAPDATA_NONE){
 					x   = (j<<4) + X_MIN + dx + RasterDx;
 					y   = (i<<4) + ScrollInfo.LayerDy[k];
-					auto src = rcMapChip[*p];
-					GrpBlt(&src,x,y,GrMap);
+					GrpBlt(rcMapChip[*p], x, y, GrMap);
 					p++,j++;
 				}
 				// 何もない場合 //
@@ -809,8 +808,8 @@ static void Stg3BossMapDraw(void)
 	y = Y_MIN - ScrollInfo.ExCount;
 
 	for(; y<Y_MAX; y+=208){
-		PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
-		GrpBlt(&src,x,y,GrMap);
+		constexpr PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
+		GrpBlt(src, x, y, GrMap);
 	}
 
 //	DrawStg3Cloud();

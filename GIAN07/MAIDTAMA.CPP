@@ -246,7 +246,7 @@ void MaidTamaDraw(void)
 		}
 
 		// 完全判定付きクリッピング //
-		GrpBlt(&src,x,y,GrTama);
+		GrpBlt(src, x, y, GrTama);
 	}
 
 	// レーザーの描画 //
@@ -255,24 +255,22 @@ void MaidTamaDraw(void)
 
 		x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 		y = (Viv.opy>>6)-20;
-		src = ltemp;GrpBlt(&src,x,y,GrTama);
+		GrpBlt(ltemp, x, y, GrTama);
 
 		x = (Viv.opx>>6)+4 -8 - SBOPT_DX;
 		y = (Viv.opy>>6)-20;
-		src = ltemp;GrpBlt(&src,x,y,GrTama);
+		GrpBlt(ltemp, x, y, GrTama);
 
 		ltemp = PIXEL_LTWH{ (384 + 8 + ((Viv.lay_grp - 1) << 4)), 240, 8, 16 };
 		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
 			x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 			y = i;
-			src = ltemp;
-			GrpBlt(&src,x,y,GrTama);
+			GrpBlt(ltemp, x, y, GrTama);
 		}
 		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
 			x = (Viv.opx>>6)+4 -8 - SBOPT_DX;
 			y = i;
-			src = ltemp;
-			GrpBlt(&src,x,y,GrTama);
+			GrpBlt(ltemp, x, y, GrTama);
 		}
 	}
 }

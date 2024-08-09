@@ -248,10 +248,9 @@ void DrawStfInfo()
 {
 	if(!EStfTask.bWantDisp) return;
 
-	// [src] is copied! For now.
-	auto Blit = [](WINDOW_POINT dst, PIXEL_LTRB src) {
+	auto Blit = [](WINDOW_POINT dst, const PIXEL_LTRB& src) {
 		dst -= (src.Size() / 2);
-		GrpBlt(&src, dst.x, dst.y, GrEndingCredits);
+		GrpBlt(src, dst.x, dst.y, GrEndingCredits);
 	};
 
 	Blit({ EStfTask.ox, EStfTask.oy }, StaffLabel[EStfTask.TitleID]);

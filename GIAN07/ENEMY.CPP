@@ -117,17 +117,15 @@ void ENEMY_DATA::Draw() const
 	const auto topleft = center.ToPixel(a.size); // 座標セット //
 
 	// 描画モード選択 //
-	// Copy! (For now.)
-	auto src = ((a.mode == ANM_DEG)
+	const auto& src = ((a.mode == ANM_DEG)
 		? a.ptn[uint8_t(d - 64 + 8) >> 4]
 		: a.ptn[anm_c]
 	);
-	if(GrpBlt(&src, topleft.x, topleft.y, GrEnemy)) {
+	if(GrpBlt(src, topleft.x, topleft.y, GrEnemy)) {
 		if((anm_ptn != anm_ptnEx) && IsDamaged) {
 			const auto& a = Anime[anm_ptnEx];
 			const auto topleft = center.ToPixel(a.size); // 座標セット //
-			auto src = a.ptn[0]; // Copy! (For now.)
-			GrpBlt(&src, topleft.x, topleft.y, GrEnemy);
+			GrpBlt(a.ptn[0], topleft.x, topleft.y, GrEnemy);
 		}
 	}
 }
@@ -520,7 +518,7 @@ static void _EnemyDrawBomb(int x, int y, uint32_t count)
 	x-=24;
 	y-=24;
 
-	GrpBlt(&src,x,y,GrTama);
+	GrpBlt(src, x, y, GrTama);
 }
 
 void parse_ECL(ENEMY_DATA *e)

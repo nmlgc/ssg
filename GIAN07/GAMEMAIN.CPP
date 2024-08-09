@@ -158,9 +158,9 @@ void ScoreDraw(void)
 
 		src = PIXEL_LTWH{ 0, (64 + (32 * i)), 400, 32 };
 		GrpBlt(
-			&src, (ScoreString[i].x >> 6), (ScoreString[i].y >> 6), GrNameReg
+			src, (ScoreString[i].x >> 6), (ScoreString[i].y >> 6), GrNameReg
 		);
-		// GrpBlt(&src, (50 + (i * 24)), (100 + (i * 48), GrNameReg);
+		// GrpBlt(src, (50 + (i * 24)), (100 + (i * 48), GrNameReg);
 
 		gx = (ScoreString[i].x>>6) + 88;
 		gy = (ScoreString[i].y>>6) + 4;
@@ -179,7 +179,7 @@ void ScoreDraw(void)
 		gy = (ScoreString[i].y>>6) + 25;
 		if(ScoreString[i].Stage[0] == '7'){
 			src = { 288, 88, (288 + 16), (88 + 8) };
-			GrpBlt(&src, gx, gy-1, GrTama);
+			GrpBlt(src, gx, (gy - 1), GrTama);
 		}
 		else
 			GrpPutScore(gx, gy, ScoreString[i].Stage);
@@ -187,7 +187,7 @@ void ScoreDraw(void)
 		gx = (ScoreString[i].x>>6) + 224 + 80;
 		gy = (ScoreString[i].y>>6) + 25;
 		src = PIXEL_LTWH{ 0, (400 + (ScoreString[i].Weapon * 8)), 48, 8 };
-		GrpBlt(&src, gx, gy-1, GrNameReg);
+		GrpBlt(src, gx, (gy - 1), GrNameReg);
 	}
 }
 
@@ -388,13 +388,13 @@ void NameRegistProc(bool&)
 
 	GrpGeom->Unlock();
 
-	GrpBlt(&src, 120, 0, GrNameReg);
+	GrpBlt(src, 120, 0, GrNameReg);
 
 	ScoreDraw();
 
 	// 名前入力用文字列群 //
 	src = { 0, 432, 416, 480 };
-	GrpBlt(&src, 112, 420, GrNameReg);
+	GrpBlt(src, 112, 420, GrNameReg);
 
 	// カーソル //
 	if((x >= 20) && (y == 2)) {
@@ -402,7 +402,7 @@ void NameRegistProc(bool&)
 	} else {
 		src = PIXEL_LTWH{ 416, (432 + ((count >> 3) << 4)), 16, 16 };
 	}
-	GrpBlt(&src, (112 + (x << 4)), (420 + (y << 4)), GrNameReg);
+	GrpBlt(src, (112 + (x << 4)), (420 + (y << 4)), GrNameReg);
 
 	//sprintf(buf,"(%2d,%2d)", x, y);
 	//GrpPut16(0,0,buf);
@@ -617,7 +617,6 @@ extern bool GameReplayInit(int Stage)
 void ReplayProc(bool&)
 {
 	static BYTE ExTimer;
-	PIXEL_LTRB	rc;
 
 	ExTimer = (ExTimer+1)%128;
 
@@ -643,8 +642,8 @@ void ReplayProc(bool&)
 	if(IsDraw()){
 		GameDraw();
 
-		rc = PIXEL_LTWH{ 312, 80, 32, 8 };
-		GrpBlt(&rc,128,470,GrTama);
+		constexpr PIXEL_LTWH rc = { 312, 80, 32, 8 };
+		GrpBlt(rc, 128, 470, GrTama);
 		if(ExTimer<64+32){
 			GrpGeom->Lock();
 			GrpGeom->SetAlphaNorm(128);
@@ -653,8 +652,8 @@ void ReplayProc(bool&)
 				(128 + 45 - 3), (470 + 4 - 1), (128 + 45 + 72), (470 + 4 + 5)
 			);
 			GrpGeom->Unlock();
-			rc = PIXEL_LTWH{ 312, 88, 72, 8 };
-			GrpBlt(&rc,128+45,470+4,GrTama);
+			constexpr PIXEL_LTWH rc = { 312, 88, 72, 8 };
+			GrpBlt(rc, (128 + 45), (470 + 4), GrTama);
 		}
 		Grp_Flip();
 	}
@@ -722,7 +721,7 @@ void SProjectProc(bool&)
 		}
 	};
 
-	PIXEL_LTRB rc = { 0, 0, logo_size.w, logo_size.h };
+	constexpr PIXEL_LTRB rc = { 0, 0, logo_size.w, logo_size.h };
 	BYTE	d;
 	int		x, y;
 
@@ -739,7 +738,7 @@ void SProjectProc(bool&)
 	if(IsDraw()){
 		GrpBackend_Clear(/* 255 */);
 
-		GrpBlt(&rc, logo.left, logo.top, GrSProject);
+		GrpBlt(rc, logo.left, logo.top, GrSProject);
 
 		if(timer < 64){
 			fade(((255 - timer) * 4), (timer * 4));
@@ -946,8 +945,8 @@ void GameProc(bool&)
 	if(IsDraw()){
 		GameDraw();
 		if(DemoplaySaveEnable){
-			PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
-			GrpBlt(&rc,128,470,GrTama);
+			constexpr PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
+			GrpBlt(rc, 128, 470, GrTama);
 		}
 		Grp_Flip();
 	}
@@ -1015,8 +1014,8 @@ void GameOverProc(bool&)
 		CWinDraw(&ContinueWindow);
 		/*
 		if(DemoplaySaveEnable){
-			PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
-			GrpBlt(&rc,128,470,GrTama);
+			constexpr PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
+			GrpBlt(rc, 128, 470, GrTama);
 		}*/
 		Grp_Flip();
 	}
@@ -1070,7 +1069,7 @@ void WeaponSelectProc(bool&)
 	static char spd  = 0;
 	static WORD	count = 0;
 
-	PIXEL_LTRB src[4] = {
+	constexpr PIXEL_LTRB src[4] = {
 		PIXEL_LTWH{  0, 344, 56, 48 },
 		PIXEL_LTWH{  0, 392, 56, 48 },
 		PIXEL_LTWH{ 56, 344, 56, 48 },
@@ -1182,14 +1181,14 @@ void WeaponSelectProc(bool&)
 		GrpBackend_Clear();
 
 		rc = { 0, (264 - 8), 224, (296 - 24) };
-		GrpBlt(&rc,320-112,20,GrTama);
+		GrpBlt(rc, (320 - 112), 20, GrTama);
 
 		rc = PIXEL_LTWH{ 0, 272, 64, 24 };
-		GrpBlt(&rc,120-32,260-12,GrTama);
+		GrpBlt(rc, (120 - 32), (260 - 12), GrTama);
 
 		d = ((count/8)%2)<<3;
 		rc = PIXEL_LTWH{ 72, (272 + d), 56, 8 };
-		GrpBlt(&rc,400-28+4,420,GrTama);
+		GrpBlt(rc, (400 - 28 + 4), 420, GrTama);
 
 		for(i=0;i<3;i++){
 		//for(i=0;i<4;i++){
@@ -1197,7 +1196,7 @@ void WeaponSelectProc(bool&)
 			d = (-i+Viv.weapon)*85 + deg - 64;
 			x = 120 + cosl(d,90) - 56/2;
 			y = 260 + sinl(d,110) - 48/2;
-			GrpBlt(&src[i], x, y, GrTama);
+			GrpBlt(src[i], x, y, GrTama);
 		}
 
 		GrpGeom->Lock();
@@ -1239,14 +1238,14 @@ void WeaponSelectProc(bool&)
 				d = Viv.weapon<<4;
 				rc = PIXEL_LTWH{ 224, 256, 32, 32 };
 				//rc = PIXEL_LTWH{ d, (296 - 24), 16, 16 };
-				GrpBlt(&rc,x,y,GrTama);
+				GrpBlt(rc, x, y, GrTama);
 			}
 		}
 		MaidDraw();
 		MaidTamaDraw();
 
 		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
-		GrpBlt(&rc,468,400,GrTama);
+		GrpBlt(rc, 468, 400, GrTama);
 		sprintf(buf, "%d", ((Cast::up<uint16_t>(Viv.exp) + 1) >> 5));
 		GrpPutScore(500,400,buf);
 
@@ -1286,7 +1285,7 @@ void WeaponSelectProc(bool&)
 
 void TitleProc(bool& quit)
 {
-	PIXEL_LTRB	src = { 0, 0, 640, 396 };
+	constexpr PIXEL_LTRB src = { 0, 0, 640, 396 };
 	//PIXEL_LTRB	src = { 0, 0, 350, 403 };
 	//PIXEL_LTRB	src = { 0, 0, 195, 256 };
 	//PIXEL_LTRB	src = { 0, 0, 275, 256 };
@@ -1336,8 +1335,8 @@ void TitleProc(bool& quit)
 
 	if(IsDraw()){
 		GrpBackend_Clear();
-		GrpBlt(&src, 0, 42, GrTitle);
-		// GrpBlt(&src, (320 - 175), 77, GrTitle);
+		GrpBlt(src, 0, 42, GrTitle);
+		// GrpBlt(src, (320 - 175), 77, GrTitle);
 		MWinDraw();
 		CWinDraw(window_active);
 		#ifdef PBG_DEBUG
@@ -1430,13 +1429,12 @@ void MusicRoomProc(bool&)
 		GrpBackend_Clear();
 
 		auto BlitBG = [](const PIXEL_LTWH& rect) {
-			PIXEL_LTRB src = rect;
-			GrpBlt(&src, src.left, src.top, GrMusic);
+			GrpBlt(rect, rect.left, rect.top, GrMusic);
 		};
 
 		auto BlitLegend = [](const PIXEL_LTWH& rect) {
-			PIXEL_LTRB src = (rect + PIXEL_POINT{ 0, 392 });
-			GrpBlt(&src, (8 + rect.left), (410 + rect.top), GrMusic);
+			const PIXEL_LTRB src = (rect + PIXEL_POINT{ 0, 392 });
+			GrpBlt(src, (8 + rect.left), (410 + rect.top), GrMusic);
 		};
 
 		BlitBG({   0,   0, 504, 392 });	// From keyboard to spectrum analyzer

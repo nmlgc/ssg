@@ -147,7 +147,7 @@ void InitWarning(void)
 
 void DrawWarning(void)
 {
-	PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
+	constexpr PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
 	extern SURFACE_DDRAW& GrTama;
 	int	st,det;
 	static int count;
@@ -163,7 +163,7 @@ void DrawWarning(void)
 			129, (60 + (232 - 152) - 4), (128 + 384), (80 + (232 - 152) - 4)
 		);
 		GrpGeom->Unlock();
-		GrpBlt(&src,128+1,60+1,GrTama);
+		GrpBlt(src, (128 + 1), (60 + 1), GrTama);
 	}
 	else{
 		GrpGeom->Lock();
@@ -288,11 +288,9 @@ void Init3DCube(void)
 
 void Draw3DCube(void)
 {
-	PIXEL_LTRB	rc;
-
 	for(const auto& it : Star) {
-		rc = PIXEL_LTWH{ 136, 272, 16, 24 };
-		GrpBlt(&rc, it.x, it.y, GrTama);
+		constexpr PIXEL_LTWH rc = { 136, 272, 16, 24 };
+		GrpBlt(rc, it.x, it.y, GrTama);
 	}
 
 	GrpGeom->Lock();
@@ -501,11 +499,11 @@ void DrawEffectFakeECL(void)
 
 	for(const auto& it : FakeECLStr) {
 		src = PIXEL_LTWH{it.SrcX, it.SrcY, 72, 16};
-		GrpBlt(&src, (it.x >> 6), (it.y >> 6), GrMap);
+		GrpBlt(src, (it.x >> 6), (it.y >> 6), GrMap);
 	}
 
 	src = { 0, 272, 416, 352 };
-	GrpBlt(&src, 128, 400, GrMap);
+	GrpBlt(src, 128, 400, GrMap);
 }
 
 /*
@@ -590,7 +588,7 @@ void DrawStg3Cloud(void)
 		y   = (p->y >> 6) - Size[j].y;
 		src = Data[j];
 
-		GrpBlt(&src, x, y, GrEnemy);
+		GrpBlt(src, x, y, GrEnemy);
 	}
 }
 */
@@ -750,15 +748,13 @@ void DrawStg4Rock(void)
 	static int dx[3] = {80/2, 48/2, 32/2};
 	static int dy[3] = {64/2, 48/2, 32/2};
 
-	PIXEL_LTRB	temp;
 	int x, y;
 
 	for(const auto& it : Rock) {
 		const auto *p = &it;
-		temp = src[p->GrpID];
 		x = (p->x + GX_MID)>>6;
 		y = (p->y + GY_MID)>>6;
-		GrpBlt(&temp, x-dx[p->GrpID], y-dy[p->GrpID], GrMap);
+		GrpBlt(src[p->GrpID], (x - dx[p->GrpID]), (y - dy[p->GrpID]), GrMap);
 	}
 }
 
@@ -897,7 +893,7 @@ void DrawStg6Raster()
 
 	for(i=0; i<S6STAR_MAX; i++){
 		src = { 624, 352, (624 + 16), (352 + 16) };
-		GrpBlt(&src, S6Star[i].x, S6Star[i].y, GrMap);
+		GrpBlt(src, S6Star[i].x, S6Star[i].y, GrMap);
 	}
 
 	for(const auto& it : S6Ras) {
@@ -909,7 +905,7 @@ void DrawStg6Raster()
 		for(j=0; j<h; j+=2){
 			dx = sinl((it.deg + j), it.amp);
 			src = { x1, (j + oy), x2, (j + 2) };
-			GrpBlt(&src, (it.x + dx - w), (it.y + j), GrMap);
+			GrpBlt(src, (it.x + dx - w), (it.y + j), GrMap);
 		}
 	}
 }
@@ -951,7 +947,7 @@ void DrawStg3Star()
 	int		i;
 
 	for(i=0; i<S3STAR_MAX; i++){
-		PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
-		GrpBlt(&src, S6Star[i].x, S6Star[i].y, GrMap);
+		constexpr PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
+		GrpBlt(src, S6Star[i].x, S6Star[i].y, GrMap);
 	}
 }

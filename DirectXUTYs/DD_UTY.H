@@ -203,7 +203,17 @@ extern void (*GrpLock)(void);	// 図形描画の準備をする
 extern void (*GrpUnlock)(void);	// 図形描画を完了する
 
 extern void (*GrpSetColor)(RGB216 col);	// 色セット
-extern void (*GrpSetAlpha)(uint8_t a, uint8_t mode);	// αセット
+
+// Sets the alpha value and mode for any *A() calls. All other draw calls
+// must ignore these settings and render fully opaque shapes. Backends with
+// equally stateful handling of alpha blending must implement this as follows:
+//
+// • Leave alpha blending deactivated for all non-*A() calls. If the backend
+//   requires RGBA color values for vertices of those calls as well, set their
+//   alpha component to 0xFF.
+// • Selectively activate alpha blending only during *A() calls and immediately
+//   disable it before returning.
+extern void (*GrpSetAlpha)(uint8_t a, uint8_t mode);
 
 extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
 extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形

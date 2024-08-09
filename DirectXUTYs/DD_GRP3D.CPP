@@ -169,15 +169,15 @@ void _3DBox(int x1, int y1, int x2, int y2)
 // 円 //
 void _3DCircle(int x, int y, int r)
 {
-	int		i;
-
 	if(!bLocked) return;
 
-	for(i=0;i<=64;i++){			// 円周上の点
+	for(auto i = 0; i <= 32; i++) { // 円周上の点
 		Set2DPoint(work+i,x+cosl(i*8,r),y+sinl(i*8,r));
 	}
 
-	DxObj.D3Dev->DrawPrimitive(D3DPT_LINESTRIP,D3DVT_TLVERTEX,work,65,D3DDP_WAIT);
+	DxObj.D3Dev->DrawPrimitive(
+		D3DPT_LINESTRIP, D3DVT_TLVERTEX, work, 33, D3DDP_WAIT
+	);
 }
 
 // 円塗りつぶし //

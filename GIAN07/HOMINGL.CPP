@@ -233,7 +233,7 @@ void HLaserDraw(void)
 
 	if(DxObj.PixelFormat.IsChanneled()){
 		AlphaPolygon = GrpPolygonA;
-		//AlphaCircle  = GrpCircleA;
+		//AlphaCircle  = GrpCircleFA;
 		GrpSetColor({ 1, 2, 5 });
 		GrpSetAlpha(0,ALPHA_ONE);
 	}

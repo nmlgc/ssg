@@ -226,7 +226,7 @@ void _3DBoxA(int x1, int y1, int x2, int y2)
 }
 
 // α円塗りつぶし //
-void GrpCircleA(int x, int y, int r)
+void GrpCircleFA(int x, int y, int r)
 {
 	int		i;
 
@@ -271,7 +271,7 @@ void GrpFatCircleA(int x, int y, int r, int w)
 
 	// 普通の円になってしまう場合 //
 	if(w >= r) {
-		GrpCircleA(x, y, (r + w));
+		GrpCircleFA(x, y, (r + w));
 	}
 
 	if(!bLocked) return;
@@ -337,7 +337,7 @@ void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p)
 }
 
 // グラデーション付きポリゴン(レーザー用？) //
-void GrpGrdPolygon(std::span<const WINDOW_POINT> p)
+void GrpGrdPolygonA(std::span<const WINDOW_POINT> p)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //

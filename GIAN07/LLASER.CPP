@@ -333,7 +333,7 @@ extern void LLaserDraw(void)
 							p2[n].x = p2[0].x + cosl(lp->d+64+128*(n-1)/32,len);
 							p2[n].y = p2[0].y + sinl(lp->d+64+128*(n-1)/32,len);
 						}
-						GrpGrdPolygon(p2);
+						GrpGrdPolygonA(p2);
 						break;
 					}
 					// GrpSetColor({ 2, 0, 2 });

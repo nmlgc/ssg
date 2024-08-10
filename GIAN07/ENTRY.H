@@ -10,7 +10,7 @@
 bool XInit(void);
 void XCleanup(void);
 
-void XGrpTry(GRAPHICS_PARAMS& params);
+void XGrpTry(const GRAPHICS_PARAMS& params);
 
 // Tries the graphics configuration that results from applying the given
 // [patch_func] onto the current configuration, and updates all subsystems

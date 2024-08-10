@@ -63,13 +63,6 @@ public:
 	// Also ensures the correct color key for palettized pixel formats.
 	bool SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf);
 
-	// Can mutate the two parameters and replace them with a supported
-	// configuration if necessary.
-	bool Init(uint8_t& device_id, BITDEPTH& bitdepth);
-
-	// いつも通りに(ただし失敗したら異常終了)
-	void Cleanup();
-
 	// ロード済みのSurfaceを修復
 	bool Restore(void);
 
@@ -88,9 +81,5 @@ public:
 // グローバル変数 //
 extern GRAPHICS_DDRAW	DxObj;
 extern GRAPHICS_GEOMETRY *GrpGeom;
-
-
-// 初期化など //
-bool GrpEnum(void);	// 使用できるデバイスを列挙する
 
 #endif

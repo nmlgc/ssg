@@ -12,6 +12,9 @@
 /// Enumeration and pre-initialization queries
 /// ------------------------------------------
 
+// Should initialize everything needed for device and API queries.
+bool GrpBackend_Enum(void);
+
 // Physical graphics adapters.
 uint8_t GrpBackend_DeviceCount(void);
 Any::string_view GrpBackend_DeviceName(uint8_t id);
@@ -20,6 +23,19 @@ Any::string_view GrpBackend_DeviceName(uint8_t id);
 int8_t GrpBackend_APICount(void);
 std::u8string_view GrpBackend_APIName(int8_t id);
 /// ------------------------------------------
+
+/// Initialization and cleanup
+/// --------------------------
+
+// Tries initializing the backend with the closest available configuration for
+// the given params. Called after GrpBackend_Enum(). Returns the actual
+// configuration the backend was initialized with, or `std::nullopt` on
+// failure.
+std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params);
+
+// いつも通りに(ただし失敗したら異常終了)
+void GrpBackend_Cleanup(void);
+/// --------------------------
 
 /// General
 /// -------

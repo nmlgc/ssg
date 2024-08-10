@@ -203,7 +203,7 @@ bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
 }
 
 
-bool GrpEnum(void)
+bool GrpBackend_Enum(void)
 {
 	HRESULT		dxret;
 
@@ -250,7 +250,7 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	);
 }
 
-bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
+std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params)
 {
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
@@ -260,55 +260,57 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 
 	extern HWND hWndMain;
 	if(hWndMain == nullptr) {
-		return false;
+		return std::nullopt;
 	}
 
-	if(device_id >= DxEnumNow) {
-		device_id = 0;
+	if(params.device_id >= DxEnumNow) {
+		return std::nullopt;
 	}
-	auto& pXDD = DxEnum[device_id];
+	auto& pXDD = DxEnum[params.device_id];
 
 	// Change bit depth to a supported one, if necessary //
-	if(!pXDD.BitDepthSupported(bitdepth)) {
-		bitdepth = pXDD.BitDepthBest();
-		if(!bitdepth) {
-			// TODO: Check other devices.
-			return false;
+	if(!pXDD.BitDepthSupported(params.bitdepth)) {
+		params.bitdepth = pXDD.BitDepthBest();
+		if(!params.bitdepth) {
+			return std::nullopt;
 		}
 	}
 
-	const auto maybe_pixel_format = bitdepth.pixel_format();
+	const auto maybe_pixel_format = params.bitdepth.pixel_format();
 	if(!maybe_pixel_format) {
-		return false;
+		return std::nullopt;
 	}
 	const auto pixel_format = maybe_pixel_format.value();
 
 	// Already running with this configuration? //
-	if((device_id == DeviceID) && (pixel_format == PixelFormat)) {
-		return false;
+	if(
+		(params.device_id == DxObj.DeviceID) &&
+		(pixel_format == DxObj.PixelFormat)
+	) {
+		return std::nullopt;
 	}
 
-	Cleanup();
+	GrpBackend_Cleanup();
 	ZeroMemory(&ddsd, sizeof(ddsd));
 
 	try{
 		dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
 		if(dxret!=DD_OK) throw("DirectDrawCreate に失敗");
 
-		auto** dd_ptr = reinterpret_cast<void **>(&DD);
+		auto** dd_ptr = reinterpret_cast<void **>(&DxObj.DD);
 		dxret = lpDD->QueryInterface(IID_IDirectDraw2, dd_ptr);
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 		RELEASE(lpDD);
 
 		// 強調レベルのセット //
-		dxret = DD->SetCooperativeLevel(
+		dxret = DxObj.DD->SetCooperativeLevel(
 			hWndMain, (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN)
 		);
 		if(dxret!=DD_OK) throw("SetCooperativeLevel に失敗");
 
 		// ディスプレイモードのセット //
-		dxret = DD->SetDisplayMode(
-			GRP_RES.w, GRP_RES.h, bitdepth.value(), 0, 0
+		dxret = DxObj.DD->SetDisplayMode(
+			GRP_RES.w, GRP_RES.h, params.bitdepth.value(), 0, 0
 		);
 		if(dxret!=DD_OK) throw("SetDisplayMode に失敗");
 
@@ -317,27 +319,31 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		ddsd.dwFlags = DDSD_CAPS|DDSD_BACKBUFFERCOUNT;
 		ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE|DDSCAPS_3DDEVICE|DDSCAPS_FLIP|DDSCAPS_COMPLEX;
 		ddsd.dwBackBufferCount = 1;
-		dxret = DD->CreateSurface(&ddsd, &Prim, nullptr);
+		dxret = DxObj.DD->CreateSurface(&ddsd, &DxObj.Prim, nullptr);
 		if(dxret!=DD_OK) throw("CreateSurface(Prim) に失敗");
 
 		// BackBuffer へのポインタを Get //
 		DDSCAPS ddscaps = { .dwCaps = DDSCAPS_BACKBUFFER };
-		dxret = Prim->GetAttachedSurface(&ddscaps, &Back);
+		dxret = DxObj.Prim->GetAttachedSurface(&ddscaps, &DxObj.Back);
 		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
 
 		// 2Dの初期化はここでおしまい //
-		DeviceID = device_id;
-		PixelFormat = pixel_format;
-		if(PixelFormat.IsPalettized()) throw(true);
+		DxObj.DeviceID = params.device_id;
+		DxObj.PixelFormat = pixel_format;
+		if(pixel_format.IsPalettized()) throw(true);
 
 		// Direct3D Object の取得 //
-		auto** d3d_ptr = reinterpret_cast<void **>(&D3);
-		dxret = DD->QueryInterface(IID_IDirect3D2, d3d_ptr);
+		auto** d3d_ptr = reinterpret_cast<void **>(&DxObj.D3);
+		dxret = DxObj.DD->QueryInterface(IID_IDirect3D2, d3d_ptr);
 		if(dxret!=DD_OK) throw("QueryInterface に失敗");
 
 		// Direct3D Device の作成 //
-		dxret = D3->CreateDevice(*pXDD.D3D[0].lpGuid, Back, &D3Dev);
-		//dxret = D3->CreateDevice(IID_IDirect3DHALDevice, Back, &D3Dev);
+		dxret = DxObj.D3->CreateDevice(
+			*pXDD.D3D[0].lpGuid, DxObj.Back, &DxObj.D3Dev
+		);
+		// dxret = D3->CreateDevice(
+		// 	IID_IDirect3DHALDevice, DxObj.Back, &DxObj.D3Dev
+		// );
 		if(dxret!=D3D_OK) throw("CreateDevice(D3D_Device) に失敗");
 
 		// Ｚバッファ作成＆接続 //
@@ -345,21 +351,21 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 			throw("CreateSurface(Z-Buffer) に失敗");
 
 		// Direct3D Viewport の作成＆接続 //
-		dxret = D3->CreateViewport(&View, nullptr);
+		dxret = DxObj.D3->CreateViewport(&DxObj.View, nullptr);
 		if(dxret!=D3D_OK) throw("CreateViewport に失敗");
-		dxret = D3Dev->AddViewport(View);
+		dxret = DxObj.D3Dev->AddViewport(DxObj.View);
 		if(dxret!=D3D_OK) throw("AddViewport に失敗");
-		dxret = D3Dev->SetCurrentViewport(View);
+		dxret = DxObj.D3Dev->SetCurrentViewport(DxObj.View);
 		if(dxret!=D3D_OK) throw("SetCurrentViewport に失敗");
 
 		throw(true);
 	}
 	catch(const std::u8string_view error) {
 		DebugOut(error);
-		Cleanup();
-		return FALSE;
+		GrpBackend_Cleanup();
+		return std::nullopt;
 	}
-	catch(const bool flag) {
+	catch(const bool) {
 		if(pixel_format.IsPalettized()) {
 			GrpGeom = &GrpGeom_DDraw;
 			GrpGeom_DDraw.Setup();
@@ -369,34 +375,34 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 
 		for(auto& surf : DxSurf) {
 			if(surf.size) {
-				SurfaceCreateUninitialized(surf, surf.size);
-				SurfaceRestore(surf);
+				DxObj.SurfaceCreateUninitialized(surf, surf.size);
+				DxObj.SurfaceRestore(surf);
 			}
 		}
 
-		return flag;
+		return params;
 	}
 
-	return FALSE;
+	return std::nullopt;
 }
 
-void GRAPHICS_DDRAW::Cleanup(void)
+void GrpBackend_Cleanup(void)
 {
-	RELEASE(View);
-	RELEASE(D3Dev);
-	RELEASE(D3);
-	RELEASE(Zbuf);
+	RELEASE(DxObj.View);
+	RELEASE(DxObj.D3Dev);
+	RELEASE(DxObj.D3);
+	RELEASE(DxObj.Zbuf);
 
-	RELEASE(Pal);
+	RELEASE(DxObj.Pal);
 
 	// ここではSurfaceのBMPを解放しないことに注意 //
 	for(auto& surf : DxSurf) {
 		RELEASE(surf.surf);
 	}
 
-	RELEASE(Back);
-	RELEASE(Prim);
-	RELEASE(DD);
+	RELEASE(DxObj.Back);
+	RELEASE(DxObj.Prim);
+	RELEASE(DxObj.DD);
 }
 
 PIXELFORMAT GrpBackend_PixelFormat(void)

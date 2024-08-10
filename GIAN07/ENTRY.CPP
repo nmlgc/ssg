@@ -8,7 +8,7 @@
 #include "GIAN07/FONTUTY.H"
 #include "GIAN07/GAMEMAIN.H"
 #include "GIAN07/LOADER.H"
-#include "DirectXUTYs/DD_UTY.H"
+#include "platform/graphics_backend.h"
 #include "platform/input.h"
 #include "platform/path.h"
 #include "game/bgm.h"
@@ -44,14 +44,16 @@ bool XInit(void)
 	Key_Start();
 
 	// コンフィグ依存の初期化処理
-	if(!GrpEnum()) {
+	if(!GrpBackend_Enum()) {
 		return false;
 	}
 
 	// グラフィックの初期化 //
-	if(!DxObj.Init(ConfigDat.DeviceID.v, ConfigDat.BitDepth.v)) {
+	const auto maybe_params = GrpBackend_Init(ConfigDat.GraphicsParams());
+	if(!maybe_params) {
 		return false;
 	}
+	ConfigDat.GraphicsParamsApply(maybe_params.value());
 	GrpBackend_SetClip(GRP_RES_RECT);
 
 	// ＢＧＭの初期化 //
@@ -70,17 +72,17 @@ bool XInit(void)
 void XCleanup(void)
 {
 	ConfigSave();
-	DxObj.Cleanup();
+	GrpBackend_Cleanup();
 	BGM_Cleanup();
 	Snd_Cleanup();
 	Key_End();
 }
 
-void XGrpTry(GRAPHICS_PARAMS& params)
+void XGrpTry(const GRAPHICS_PARAMS& params)
 {
-	if(DxObj.Init(params.device_id, params.bitdepth)) {
+	if(const auto live = GrpBackend_Init(params)) {
 		TextObj.WipeBeforeNextRender();
-		ConfigDat.GraphicsParamsApply(params);
+		ConfigDat.GraphicsParamsApply(live.value());
 
 		// TODO: Assumes that 8-bit mode only ever calls this function within
 		// the main menu.

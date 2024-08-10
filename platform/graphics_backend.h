@@ -97,19 +97,20 @@ template <class T> concept GRAPHICS_GEOMETRY_POLY = requires(
 	WINDOW_COORD coord,
 	TRIANGLE_PRIMITIVE tp,
 	VERTEX_XY_SPAN<> points,
-	VERTEX_RGBA_SPAN<> colors
+	VERTEX_RGBA_SPAN<> colors,
+	RGB rgb
 ) {
 	t.DrawLineStrip(points);
 	t.DrawTriangles(tp, points, colors);
 	t.DrawTrianglesA(tp, points, colors);
 
 	// スペアな用グラデーションライン
-	t.DrawGrdLineEx(coord, coord, coord);
+	t.DrawGrdLineEx(coord, coord, rgb, coord, rgb);
 };
 
 // Interface for framebuffer-exclusive geometry draw calls.
 template <class T> concept GRAPHICS_GEOMETRY_FB = requires(
-	T t, int coord, WINDOW_POINT p
+	T t, WINDOW_COORD coord, WINDOW_POINT p
 ) {
 	t.DrawPoint(p);
 	t.DrawHLine(coord, coord, coord);

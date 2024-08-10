@@ -199,17 +199,14 @@ void GRAPHICS_GEOMETRY_D3D::DrawBoxA(int x1, int y1, int x2, int y2)
 	AlphaEnable(FALSE);
 }
 
-void GRAPHICS_GEOMETRY_D3D::DrawGrdLineEx(int x, int y1, int y2)
+void GRAPHICS_GEOMETRY_D3D::DrawGrdLineEx(int x, int y1, RGB c1, int y2, RGB c2)
 {
 	if(!bLocked) return;
 
 	// SetAlpha(128, GRAPHICS_ALPHA::NORM);
-	constexpr RGB c1 = { 200,   0, 0 };
-	constexpr RGB c2 = { 250, 250, 0 };
-
 	//AlphaEnable(TRUE);
-	Set2DPoint(&work[0], x, y1, c1.WithAlpha(Col3D.a));
-	Set2DPoint(&work[1], x, y2, c2.WithAlpha(Col3D.a));
+	Set2DPoint(&work[0], x, y1, c1.WithAlpha(0xFF));
+	Set2DPoint(&work[1], x, y2, c2.WithAlpha(0xFF));
 
 	DxObj.D3Dev->DrawPrimitive(D3DPT_LINELIST,D3DVT_TLVERTEX,work,2,D3DDP_WAIT);
 

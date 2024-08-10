@@ -756,7 +756,9 @@ void GrpDrawSpect(int x, int y)
 	if(auto *gp = GrpGeom_Poly()) {
 		for(i=0;i<128+8+8;i++){
 			//WORD c2 = 0;	//5
-			gp->DrawGrdLineEx((i + x), (y - (ftable[i] * 2)), y);
+			constexpr RGB c1 = { 200,   0, 0 };
+			constexpr RGB c2 = { 250, 250, 0 };
+			gp->DrawGrdLineEx((i + x), (y - (ftable[i] * 2)), c1, y, c2);
 		}
 	} else if(auto *gf = GrpGeom_FB()) {
 		gf->SetColor({ 4, 2, 1 });

@@ -43,7 +43,7 @@ public:
 	void DrawTrianglesA(
 		TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
 	);
-	void DrawGrdLineEx(int x, int y1, int y2);
+	void DrawGrdLineEx(int x, int y1, RGB c1, int y2, RGB c2);
 	// ------------
 };
 

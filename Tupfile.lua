@@ -215,8 +215,6 @@ local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, {
 
 -- pbg code
 local ssg_src
-ssg_src += SSG.glob("DirectXUTYs/*.CPP")
-ssg_src += SSG.glob("DirectXUTYs/*.cpp")
 ssg_src += SSG.glob("GIAN07/*.cpp")
 ssg_src += SSG.glob("GIAN07/*.CPP")
 
@@ -230,9 +228,9 @@ local layers_obj = (
 	cxx(ssg_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp")
 )
 
--- SDL code
+-- SDL code. The graphics backend is compiled separately to keep it switchable.
 local p_sdl_cfg = ssg_cfg:branch(SDL_LINK, { lflags = "/SUBSYSTEM:windows" })
-local p_sdl_src = SSG.glob("platform/sdl/*.cpp")
+local p_sdl_src = (SSG.glob("platform/sdl/*.cpp") - { "graphics_sdl.cpp$" })
 p_sdl_src += "MAIN/main_sdl.cpp"
 local p_sdl_obj = cxx(p_sdl_cfg, p_sdl_src)
 
@@ -241,6 +239,7 @@ local regular_obj = (
 	cxx(ssg_cfg:branch(ANALYSIS_RELAXED), ssg_src) +
 	layers_obj +
 	p_sdl_obj +
+	cxx(p_sdl_cfg, "platform/sdl/graphics_sdl.cpp") +
 	xiph_obj +
 	blake3_modern_obj +
 	sdl_dll

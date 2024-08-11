@@ -117,7 +117,11 @@ void GrpSurface_BlitOpaque(
 // Vertex types
 // ------------
 
-using VERTEX_COORD = WINDOW_COORD;
+#ifdef WIN32_VINTAGE
+	using VERTEX_COORD = WINDOW_COORD;
+#else
+	using VERTEX_COORD = float;
+#endif
 using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
 using VERTEX_RGBA = RGBA;
 
@@ -226,11 +230,13 @@ template <class T> concept GRAPHICS_GEOMETRY_FB = requires(
 
 // Enters the software-rendered pixel access mode if necessary, and returns
 // `true` if successful. Does nothing if the renderer is already in this mode.
+// If a mode change occurred, all surfaces are invalidated.
 bool GrpBackend_PixelAccessStart(void);
 
 // Leaves the software-rendered pixel access mode and returns to regular
 // hardware-accelerated rendering if necessary, and returns `true` if
 // successful. Does nothing if the renderer is already in hardware mode.
+// If a mode change occurred, all surfaces are invalidated.
 bool GrpBackend_PixelAccessEnd(void);
 
 // Locks the backbuffer, returning a pointer to its pixels and the row pitch.
@@ -257,6 +263,8 @@ void GrpBackend_PixelAccessEdit(auto func)
 }
 /// ------------------------------------
 
-#ifdef WIN32
-	#include "DirectXUTYs/DD_UTY.H"
+#ifdef WIN32_VINTAGE
+	#include "platform/windows_vintage/DD_UTY.H"
+#else
+	#include "platform/sdl/graphics_sdl.h"
 #endif

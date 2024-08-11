@@ -5,6 +5,7 @@
 
 #include "platform/window_backend.h"
 #include "platform/sdl/log_sdl.h"
+#include "platform/graphics_backend.h"
 #include "platform/snd_backend.h"
 #include "platform/input.h"
 #include "constants.h"
@@ -12,9 +13,14 @@
 #include "game/frame.h"
 #include "game/graphics.h"
 #include <SDL_events.h>
+#include <SDL_hints.h>
 #include <SDL_mouse.h>
+#include <SDL_render.h>
 #include <SDL_timer.h>
 #include <SDL_video.h>
+
+// We only need the Win32 functions for the vintage build, but why compile this
+// translation unit twice just to add two small functions?
 #ifdef WIN32
 	#include <SDL_syswm.h>
 #endif
@@ -23,18 +29,30 @@ constexpr auto LOG_CAT = SDL_LOG_CATEGORY_VIDEO;
 
 static SDL_Window *Window;
 
+std::u8string_view WndBackend_SDLRendererName(int8_t id)
+{
+	if(id < 0) {
+		const auto ret = SDL_GetHint(SDL_HINT_RENDER_DRIVER);
+		if(!ret) {
+			return {};
+		};
+		return reinterpret_cast<const char8_t *>(ret);
+	}
+	SDL_RendererInfo info;
+	if(SDL_GetRenderDriverInfo(id, &info) != 0) {
+		return {};
+	}
+	return reinterpret_cast<const char8_t *>(info.name);
+}
+
 SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS&)
 {
 	assert(Window == nullptr);
 
-	// For now, we need to keep resizability for external DirectDraw windowing
-	// tools, since we would disallow resizing otherwise. As a side effect,
-	// this also allows these tools to freely change the window's aspect ratio
-	// as well. Which we can't prevent, since we don't receive window resize
-	// messages from SDL in this "resizable fullscreen mode". (Or window move
-	// messages, for that matter.)
-	constexpr uint32_t flags = (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_RESIZABLE);
-	Window = SDL_CreateWindow(GAME_TITLE, 0, 0, GRP_RES.w, GRP_RES.h, flags);
+	constexpr auto res = GRP_RES;
+	constexpr auto left = SDL_WINDOWPOS_CENTERED;
+	constexpr auto top = SDL_WINDOWPOS_CENTERED;
+	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, 0);
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
 		return nullptr;

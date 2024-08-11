@@ -1,0 +1,745 @@
+/*
+ *   Graphics via SDL_Renderer
+ *
+ */
+
+#include "platform/sdl/graphics_sdl.h"
+#include "platform/sdl/log_sdl.h"
+#include "platform/window_backend.h"
+#include "game/defer.h"
+#include "game/enum_array.h"
+#include "game/format_bmp.h"
+#include "constants.h"
+#include <SDL_render.h>
+
+static constexpr auto LOG_CAT = SDL_LOG_CATEGORY_RENDER;
+
+/// State
+/// -----
+
+PIXELFORMAT PreferredPixelFormat;
+
+// Primary renderer
+// ----------------
+// Probably hardware-accelerated, but not necessarily.
+
+SDL_Renderer *PrimaryRenderer = nullptr;
+SDL_RendererInfo PrimaryInfo;
+// ----------------
+
+// Software renderer
+// -----------------
+
+SDL_Renderer *SoftwareRenderer = nullptr;
+
+// Used as the destination for software rendering.
+SDL_Surface *SoftwareSurface = nullptr;
+
+SDL_Texture *SoftwareTexture = nullptr;
+// -----------------
+
+SDL_Renderer *Renderer = nullptr;
+
+// Storing their associated renderer (primary or software) in the user data.
+ENUMARRAY<SDL_Texture *, SURFACE_ID> Textures;
+
+GRAPHICS_GEOMETRY_SDL GrpGeomSDL;
+
+static RGBA Col = { 0, 0, 0, 0xFF };
+static SDL_BlendMode AlphaMode = SDL_BLENDMODE_NONE;
+/// -----
+
+// Compile-time index buffers
+// --------------------------
+
+using INDEX_TYPE = uint8_t;
+
+constexpr int TriangleIndexCount(size_t vertex_count)
+{
+	return ((vertex_count - 3 + 1) * 3);
+}
+
+constinit const auto TRIANGLE_FAN = ([] {
+	constexpr INDEX_TYPE max = GRP_TRIANGLES_MAX;
+	std::array<INDEX_TYPE, TriangleIndexCount(max)> ret;
+	auto ret_p = ret.begin();
+	for(const auto& i : std::views::iota(1u, max) | std::views::adjacent<2>) {
+		*(ret_p++) = 0;
+		*(ret_p++) = std::get<0>(i);
+		*(ret_p++) = std::get<1>(i);
+	}
+	return ret;
+})();
+
+constinit const auto TRIANGLE_STRIP = ([] {
+	constexpr INDEX_TYPE max = GRP_TRIANGLES_MAX;
+	std::array<INDEX_TYPE, TriangleIndexCount(max)> ret;
+	auto ret_p = ret.begin();
+	for(const auto& i : std::views::iota(0u, max) | std::views::adjacent<3>) {
+		*(ret_p++) = std::get<0>(i);
+		*(ret_p++) = std::get<1>(i);
+		*(ret_p++) = std::get<2>(i);
+	}
+	return ret;
+})();
+
+constinit const ENUMARRAY<
+	std::span<const INDEX_TYPE>, TRIANGLE_PRIMITIVE
+> INDICES = { TRIANGLE_FAN, TRIANGLE_STRIP };
+// --------------------------
+
+// Helpers
+// -------
+
+SDL_FPoint HelpFPointFrom(const WINDOW_POINT& p)
+{
+	return SDL_FPoint{ static_cast<float>(p.x), static_cast<float>(p.y) };
+}
+
+SDL_Color HelpColorFrom(const RGBA& o)
+{
+	return SDL_Color{ .r = o.r, .g = o.g, .b = o.b, .a = o.a };
+}
+
+SDL_Rect HelpRectFrom(const PIXEL_LTWH& o)
+{
+	return SDL_Rect{ .x = o.left, .y = o.top, .w = o.w, .h = o.h };
+}
+
+SDL_Rect HelpRectFrom(const PIXEL_LTRB& o)
+{
+	return SDL_Rect{
+		.x = o.left,
+		.y = o.top,
+		.w = (o.right - o.left),
+		.h = (o.bottom - o.top),
+	};
+}
+
+std::span<const SDL_FPoint> HelpFPointsFrom(VERTEX_XY_SPAN<> sp)
+{
+	using GT = decltype(sp)::value_type;
+	static_assert(sizeof(SDL_FPoint) == sizeof(GT));
+	static_assert(std::is_same_v<decltype(SDL_FPoint::x), decltype(GT::x)>);
+	static_assert(std::is_same_v<decltype(SDL_FPoint::y), decltype(GT::y)>);
+	return { reinterpret_cast<const SDL_FPoint *>(sp.data()), sp.size() };
+}
+
+std::span<const SDL_Color> HelpColorsFrom(VERTEX_RGBA_SPAN<> sp)
+{
+	using GT = decltype(sp)::value_type;
+	static_assert(sizeof(SDL_Color) == sizeof(GT));
+	static_assert(std::is_same_v<decltype(SDL_Color::r), decltype(GT::r)>);
+	static_assert(std::is_same_v<decltype(SDL_Color::g), decltype(GT::g)>);
+	static_assert(std::is_same_v<decltype(SDL_Color::b), decltype(GT::b)>);
+	static_assert(std::is_same_v<decltype(SDL_Color::a), decltype(GT::a)>);
+	return { reinterpret_cast<const SDL_Color *>(sp.data()), sp.size() };
+}
+
+SDL_Texture *TexturePostInit(SDL_Texture& tex)
+{
+	SDL_SetTextureUserData(&tex, Renderer);
+	return &tex;
+}
+
+SDL_Texture *HelpCreateTexture(uint32_t format, int access, int w, int h)
+{
+	auto *ret = SDL_CreateTexture(Renderer, format, access, w, h);
+	if(!ret) {
+		return ret;
+	}
+	return TexturePostInit(*ret);
+}
+
+template <typename T> [[nodiscard]] T *SafeDestroy(void Destroy(T *), T *v)
+{
+	if(v) {
+		Destroy(v);
+		v = nullptr;
+	}
+	return v;
+}
+
+void SwitchActiveRenderer(SDL_Renderer *new_renderer)
+{
+	for(auto& tex : Textures) {
+		if(tex && (SDL_GetTextureUserData(tex) == Renderer)) {
+			tex = SafeDestroy(SDL_DestroyTexture, tex);
+		}
+	}
+	Renderer = new_renderer;
+}
+
+bool PixelFormatSupported(uint32_t fmt)
+{
+	return (
+		(SDL_ISPIXELFORMAT_PACKED(fmt) || SDL_ISPIXELFORMAT_INDEXED(fmt)) &&
+		BITDEPTHS::find(SDL_BITSPERPIXEL(fmt))
+	);
+}
+// -------
+
+/// Enumeration and pre-initialization queries
+/// ------------------------------------------
+
+bool GrpBackend_Enum(void)
+{
+	// Any SDL-specific initialization was already done as part of
+	// SDL_Init(SDL_INIT_VIDEO).
+	return true;
+}
+
+uint8_t GrpBackend_DeviceCount(void) { return 0; }
+Any::string_view GrpBackend_DeviceName(uint8_t) { return {}; }
+
+int8_t GrpBackend_APICount(void)
+{
+	return SDL_GetNumRenderDrivers();
+}
+
+std::u8string_view GrpBackend_APIName(int8_t id)
+{
+	return WndBackend_SDLRendererName(id);
+}
+/// ------------------------------------------
+
+/// Initialization and cleanup
+/// --------------------------
+
+bool DestroySoftwareRenderer(void)
+{
+	SoftwareRenderer = SafeDestroy(SDL_DestroyRenderer, SoftwareRenderer);
+	SoftwareTexture = SafeDestroy(SDL_DestroyTexture, SoftwareTexture);
+	return false;
+}
+
+void PrimaryCleanup(void)
+{
+	for(auto& tex : Textures) {
+		tex = SafeDestroy(SDL_DestroyTexture, tex);
+	}
+	PrimaryRenderer = SafeDestroy(SDL_DestroyRenderer, PrimaryRenderer);
+	Renderer = nullptr;
+	WndBackend_Cleanup();
+}
+
+std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
+{
+	auto *window = WndBackend_SDLCreate(params);
+	auto *renderer = SDL_CreateRenderer(
+		window, params.api, SDL_RENDERER_ACCELERATED
+	);
+	if(!renderer) {
+		const auto api_name = GrpBackend_APIName(params.api);
+		SDL_LogCritical(
+			LOG_CAT,
+			"Error creating %s renderer: %s",
+			(api_name.empty() ? u8"?" : api_name.data()),
+			SDL_GetError()
+		);
+		return std::nullopt;
+	}
+	SDL_GetRendererInfo(renderer, &PrimaryInfo);
+	SDL_RenderSetLogicalSize(renderer, GRP_RES.w, GRP_RES.h);
+
+	// Determine preferred texture formats.
+	// SDL_GetWindowPixelFormat() is *not* a shortcut we could use for software
+	// rendering mode. On my system, it always returns the 24-bit RGB888, which
+	// we don't support.
+	const auto formats = std::span(
+		&PrimaryInfo.texture_formats[0], PrimaryInfo.num_texture_formats
+	);
+	const auto sdl_format = std::ranges::find_if(formats, PixelFormatSupported);
+	if(sdl_format == formats.end()) {
+		SDL_LogCritical(
+			LOG_CAT,
+			"The \"%s\" renderer does not support any of the game's supported software rendering pixel formats.",
+			PrimaryInfo.name
+		);
+		return std::nullopt;
+	}
+
+	PrimaryRenderer = renderer;
+	SwitchActiveRenderer(PrimaryRenderer);
+
+	const auto bpp = SDL_BITSPERPIXEL(*sdl_format);
+	const auto pixel_format = BITDEPTHS::find(bpp).pixel_format();
+	if(!pixel_format) {
+		assert(!"The pixel format should always be valid here");
+		std::unreachable();
+	}
+	// We don't overwrite [params.bitdepth] here to allow frictionless
+	// switching between the old DirectDraw/Direct3D backend and this one.
+	PreferredPixelFormat = pixel_format.value();
+
+	// Ensure that the software surface uses the preferred format
+	if(!SoftwareSurface || (SoftwareSurface->format->format != *sdl_format)) {
+		SoftwareSurface = SafeDestroy(SDL_FreeSurface, SoftwareSurface);
+		SoftwareSurface = SDL_CreateRGBSurfaceWithFormat(
+			0, GRP_RES.w, GRP_RES.h, 0, *sdl_format
+		);
+		if(!SoftwareSurface) {
+			Log_Fail(LOG_CAT, "Error creating surface for software rendering");
+			return std::nullopt;
+		}
+	}
+
+	return GRAPHICS_INIT_RESULT{ .live = params, .reload_surfaces = true };
+}
+
+std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
+	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
+)
+{
+	const auto reinit_full = [](const GRAPHICS_PARAMS& params) {
+		PrimaryCleanup();
+		return PrimaryInitFull(params);
+	};
+
+	if(!maybe_prev) {
+		return PrimaryInitFull(params);
+	}
+	const auto& prev = maybe_prev.value();
+
+	// API changes need a complete reinit.
+	if(prev.api != params.api) {
+		return reinit_full(params);
+	}
+
+	return GRAPHICS_INIT_RESULT::From(maybe_prev);
+}
+
+void GrpBackend_Cleanup(void)
+{
+	PrimaryCleanup();
+	DestroySoftwareRenderer();
+	SoftwareSurface = SafeDestroy(SDL_FreeSurface, SoftwareSurface);
+}
+/// --------------------------
+
+/// General
+/// -------
+
+void GrpBackend_Clear(uint8_t, RGB col)
+{
+	SDL_SetRenderDrawColor(Renderer, col.r, col.g, col.b, 0xFF);
+	SDL_RenderClear(Renderer);
+}
+
+void GrpBackend_SetClip(const WINDOW_LTRB& rect)
+{
+	if(!Renderer) {
+		return;
+	}
+	const auto sdl_rect = HelpRectFrom(rect);
+	SDL_RenderSetClipRect(Renderer, &sdl_rect);
+}
+
+PIXELFORMAT GrpBackend_PixelFormat(void)
+{
+	return PreferredPixelFormat;
+}
+
+void GrpBackend_PaletteGet(PALETTE& pal) {}
+bool GrpBackend_PaletteSet(const PALETTE& pal) { return false; }
+
+void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
+{
+	if(SoftwareRenderer) {
+		if(SDL_MUSTLOCK(SoftwareSurface)) {
+			SDL_LockSurface(SoftwareSurface);
+		}
+		SDL_UpdateTexture(
+			SoftwareTexture,
+			nullptr,
+			SoftwareSurface->pixels,
+			SoftwareSurface->pitch
+		);
+		if(SDL_MUSTLOCK(SoftwareSurface)) {
+			SDL_UnlockSurface(SoftwareSurface);
+		}
+		SDL_RenderCopy(PrimaryRenderer, SoftwareTexture, nullptr, nullptr);
+	}
+	SDL_RenderPresent(PrimaryRenderer);
+	screenshot_stream.reset();
+}
+/// -------
+
+/// Surfaces
+/// --------
+
+[[gsl::suppress(con.3)]] bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
+{
+	auto& tex = Textures[sid];
+	tex = SafeDestroy(SDL_DestroyTexture, tex);
+
+	auto *rwops = SDL_RWFromMem(bmp.buffer.get(), bmp.buffer.size());
+	auto *surf = SDL_LoadBMP_RW(rwops, 1);
+	defer(SDL_FreeSurface(surf));
+
+	if(surf->format->format == SDL_PIXELFORMAT_INDEX8) {
+		// The transparent pixel is in the top-left corner.
+		if(SDL_MUSTLOCK(surf)) {
+			SDL_LockSurface(surf);
+		}
+		const auto key = static_cast<uint8_t *>(surf->pixels)[0];
+		if(SDL_MUSTLOCK(surf)) {
+			SDL_UnlockSurface(surf);
+		}
+		SDL_SetColorKey(surf, SDL_TRUE, key);
+	}
+
+	tex = SDL_CreateTextureFromSurface(Renderer, surf);
+	if(!tex) {
+		Log_Fail(LOG_CAT, "Error loading .BMP as texture");
+		return false;
+	}
+	TexturePostInit(*tex);
+	return true;
+}
+
+bool GrpSurface_PaletteApplyToBackend(SURFACE_ID) { return true; }
+
+bool GrpSurface_Blit(
+	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
+)
+{
+	const auto rect_src = HelpRectFrom(src);
+	const SDL_Rect rect_dst = {
+		.x = topleft.x, .y = topleft.y, .w = rect_src.w, .h = rect_src.h
+	};
+	return (SDL_RenderCopy(Renderer, Textures[sid], &rect_src, &rect_dst) == 0);
+}
+
+void GrpSurface_BlitOpaque(
+	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
+)
+{
+	auto *tex = Textures[sid];
+	SDL_BlendMode prev{};
+	SDL_GetTextureBlendMode(tex, &prev);
+	SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_NONE);
+	GrpSurface_Blit(topleft, sid, src);
+	SDL_SetTextureBlendMode(tex, prev);
+}
+
+// Win32 GDI text rendering bridge
+// -------------------------------
+#ifdef WIN32
+
+#include "platform/windows/surface_gdi.h"
+
+// SDL textures only support transparency via alpha blending, and the only
+// alpha-blended formats available on any SDL_Renderer backend in a Windows
+// build of SDL 2.30.6 are 32-bit ones. GDI also exclusively uses the BGRX
+// memory order for 32-bit bitmaps. Might as well limit the GDI code to that
+// one specific format then.
+static constexpr auto GDITEXT_BPP = 32;
+static constexpr uint32_t GDITEXT_SDL_FORMAT = SDL_PIXELFORMAT_ARGB8888;
+
+static SURFACE_GDI GrText;
+
+static uint32_t GDIText_ColorKey;
+static uint32_t GDIText_AlphaMask;
+
+SURFACE_GDI& GrpSurface_GDIText_Surface(void)
+{
+	return GrText;
+}
+
+bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
+{
+	auto& tex = Textures[SURFACE_ID::TEXT];
+
+	tex = SafeDestroy(SDL_DestroyTexture, tex);
+	GrText.Delete();
+
+	const auto formats = std::span(
+		&PrimaryInfo.texture_formats[0], PrimaryInfo.num_texture_formats
+	);
+	if(std::ranges::find(formats, GDITEXT_SDL_FORMAT) == formats.end()) {
+		SDL_LogCritical(
+			LOG_CAT,
+			"Renderer \"%s\" does not support the BGRA8888 pixel format required for rendering text via GDI.",
+			PrimaryInfo.name
+		);
+		return false;
+	};
+
+	auto *format_struct = SDL_AllocFormat(GDITEXT_SDL_FORMAT);
+	if(!format_struct) {
+		Log_Fail(
+			LOG_CAT, "Error retrieving format structure for GDI text surface"
+		);
+		return false;
+	}
+	defer(SDL_FreeFormat(format_struct));
+
+	// GDI always sets the "alpha channel" to 0. Removing it from the color key
+	// as well saves an OR operation in the alpha fixing loop.
+	GDIText_AlphaMask = format_struct->Amask;
+	GDIText_ColorKey = (
+		SDL_MapRGB(format_struct, colorkey.r, colorkey.g, colorkey.b) &
+		 ~GDIText_AlphaMask
+	);
+
+	const BITMAPINFOHEADER bmi = {
+		.biSize = sizeof(bmi),
+		.biWidth = w,
+		.biHeight = -h,
+		.biPlanes = 1,
+		.biBitCount = GDITEXT_BPP,
+		.biCompression = BI_RGB,
+	};
+	const auto *bi = reinterpret_cast<const BITMAPINFO *>(&bmi);
+	void *dib_bits = nullptr;
+	GrText.img = CreateDIBSection(GrText.dc, bi, 0, &dib_bits, nullptr, 0);
+	if(!GrText.img) {
+		SDL_LogCritical(LOG_CAT, "%s", "Error creating GDI text surface");
+		return false;
+	}
+	GrText.size = { w, h };
+	GrText.stock_img = SelectObject(GrText.dc, GrText.img);
+
+	tex = HelpCreateTexture(
+		GDITEXT_SDL_FORMAT, SDL_TEXTUREACCESS_STREAMING, w, h
+	);
+	if(!tex) {
+		Log_Fail(LOG_CAT, "Error creating blank texture");
+		return false;
+	}
+	if(SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND) != 0) {
+		Log_Fail(LOG_CAT, "Error enabling alpha blending for GDI text texture");
+		return false;
+	}
+	return true;
+}
+
+bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)
+{
+	DIBSECTION dib;
+	if(!GetObject(GrText.img, sizeof(DIBSECTION), &dib)) {
+		return false;
+	}
+
+	auto *pixels = (
+		static_cast<std::byte *>(dib.dsBm.bmBits) +
+		(r.top * dib.dsBm.bmWidthBytes) +
+		(r.left * (dib.dsBmih.biBitCount / 8))
+	);
+
+	static_assert((GDITEXT_BPP == 32), "Only tested for 32-bit.");
+	const auto w = static_cast<size_t>(r.w);
+	const auto h = static_cast<size_t>(r.h);
+	auto *row_p = pixels;
+	for(const auto y : std::views::iota(0u, h)) {
+		auto pixels_in_row = std::span(reinterpret_cast<uint32_t *>(row_p), w);
+		for(auto& pixel : pixels_in_row) {
+			if(pixel != GDIText_ColorKey) {
+				pixel |= GDIText_AlphaMask;
+			}
+		}
+		row_p += dib.dsBm.bmWidthBytes;
+	};
+
+	auto *tex = Textures[SURFACE_ID::TEXT];
+	const auto rect = HelpRectFrom(r);
+	return (SDL_UpdateTexture(tex, &rect, pixels, dib.dsBm.bmWidthBytes) == 0);
+}
+#endif
+// -------------------------------
+/// --------
+
+/// Geometry
+/// --------
+
+void DrawGeometry(
+	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
+)
+{
+	const auto vertices = HelpFPointsFrom(xys);
+	const auto vertex_count = vertices.size();
+	const auto sdl_colors = HelpColorsFrom(colors);
+	const auto indices = INDICES[tp];
+	const auto index_count = TriangleIndexCount(vertex_count);
+	assert(index_count <= indices.size());
+	assert((colors.size() == 1) || (colors.size() == vertex_count));
+
+	SDL_RenderGeometryRaw(
+		Renderer,
+		nullptr,
+		&vertices.data()->x,
+		sizeof(SDL_FPoint),
+		sdl_colors.data(),
+		((sdl_colors.size() == 1) ? 0 : sizeof(SDL_Color)),
+		nullptr,
+		0,
+		vertex_count,
+		indices.data(),
+		index_count,
+		sizeof(INDEX_TYPE)
+	);
+}
+
+static void DrawWithAlpha(auto func)
+{
+	SDL_SetRenderDrawBlendMode(Renderer, AlphaMode);
+	SDL_SetRenderDrawColor(Renderer, Col.r, Col.g, Col.b, Col.a);
+	func();
+	SDL_SetRenderDrawColor(Renderer, Col.r, Col.g, Col.b, 0xFF);
+	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_NONE);
+}
+
+GRAPHICS_GEOMETRY_SDL *GrpGeom_Poly(void)
+{
+	return &GrpGeomSDL;
+}
+
+GRAPHICS_GEOMETRY_SDL *GrpGeom_FB(void) { return nullptr; }
+
+void GRAPHICS_GEOMETRY_SDL::Lock(void) {}
+void GRAPHICS_GEOMETRY_SDL::Unlock(void) {}
+
+void GRAPHICS_GEOMETRY_SDL::SetColor(RGB216 col)
+{
+	const auto rgb = col.ToRGB();
+	Col.r = rgb.r;
+	Col.g = rgb.g;
+	Col.b = rgb.b;
+	SDL_SetRenderDrawColor(Renderer, Col.r, Col.g, Col.b, 0xFF);
+}
+
+void GRAPHICS_GEOMETRY_SDL::SetAlphaNorm(uint8_t a)
+{
+	Col.a = a;
+	AlphaMode = SDL_BLENDMODE_BLEND;
+}
+
+void GRAPHICS_GEOMETRY_SDL::SetAlphaOne(void)
+{
+	Col.a = 0xFF;
+	AlphaMode = SDL_BLENDMODE_ADD;
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawLine(int x1, int y1, int x2, int y2)
+{
+	SDL_RenderDrawLine(Renderer, x1, y1, x2, y2);
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawBox(int x1, int y1, int x2, int y2)
+{
+	const SDL_Rect rect = { .x = x1, .y = y1, .w = (x2 - x1), .h = (y2 - y1) };
+	SDL_RenderFillRect(Renderer, &rect);
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawBoxA(int x1, int y1, int x2, int y2)
+{
+	DrawWithAlpha([&] { DrawBox(x1, y1, x2, y2); });
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawTriangleFan(VERTEX_XY_SPAN<> xys)
+{
+	DrawTriangles(TRIANGLE_PRIMITIVE::FAN, xys);
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawLineStrip(VERTEX_XY_SPAN<> xys)
+{
+	const auto points = HelpFPointsFrom(xys);
+	SDL_RenderDrawLinesF(Renderer, points.data(), points.size());
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawTriangles(
+	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
+)
+{
+	if(colors.empty()) {
+		const RGBA single = { .r = Col.r, .g = Col.g, .b = Col.b, .a = 0xFF };
+		DrawGeometry(tp, xys, std::span(&single, 1));
+	} else {
+		DrawGeometry(tp, xys, colors);
+	}
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawTrianglesA(
+	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
+)
+{
+	DrawWithAlpha([&] {
+		DrawGeometry(tp, xys, (colors.empty() ? std::span(&Col, 1) : colors));
+	});
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawGrdLineEx(int x, int y1, RGB c1, int y2, RGB c2)
+{
+	const auto c1a = c1.WithAlpha(0xFF);
+	const auto c2a = c2.WithAlpha(0xFF);
+	const VERTEX_XY xys[4] = {
+		{ static_cast<VERTEX_COORD>(x + 0), static_cast<VERTEX_COORD>(y1) },
+		{ static_cast<VERTEX_COORD>(x + 0), static_cast<VERTEX_COORD>(y2) },
+		{ static_cast<VERTEX_COORD>(x + 1), static_cast<VERTEX_COORD>(y1) },
+		{ static_cast<VERTEX_COORD>(x + 1), static_cast<VERTEX_COORD>(y2) },
+	};
+	const RGBA colors[4] = { c1a, c2a, c1a, c2a };
+	DrawGeometry(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
+}
+
+void GRAPHICS_GEOMETRY_SDL::DrawPoint(WINDOW_POINT) {}
+void GRAPHICS_GEOMETRY_SDL::DrawHLine(int, int, int) {}
+/// --------
+
+/// Software rendering with pixel access
+/// ------------------------------------
+
+bool GrpBackend_PixelAccessStart(void)
+{
+	if(SoftwareRenderer) {
+		return true;
+	}
+	SoftwareTexture = HelpCreateTexture(
+		SoftwareSurface->format->format,
+		SDL_TEXTUREACCESS_STREAMING,
+		SoftwareSurface->w,
+		SoftwareSurface->h
+	);
+	if(!SoftwareTexture) {
+		Log_Fail(LOG_CAT, "Error creating software rendering texture");
+		return DestroySoftwareRenderer();
+	}
+	SoftwareRenderer = SDL_CreateSoftwareRenderer(SoftwareSurface);
+	if(!SoftwareRenderer) {
+		Log_Fail(LOG_CAT, "Error creating software renderer");
+		return DestroySoftwareRenderer();
+	}
+	SwitchActiveRenderer(SoftwareRenderer);
+	return true;
+}
+
+bool GrpBackend_PixelAccessEnd(void)
+{
+	if(!SoftwareRenderer) {
+		return true;
+	}
+	SwitchActiveRenderer(PrimaryRenderer);
+	DestroySoftwareRenderer();
+	return true;
+}
+
+std::tuple<std::byte *, size_t> GrpBackend_PixelAccessLock(void)
+{
+	if(SDL_MUSTLOCK(SoftwareSurface)) {
+		if(SDL_LockSurface(SoftwareSurface) != 0) {
+			Log_Fail(LOG_CAT, "Error locking CPU backbuffer");
+			return { nullptr, 0 };
+		}
+	}
+	auto *pixels = static_cast<std::byte *>(SoftwareSurface->pixels);
+	return { pixels, SoftwareSurface->pitch };
+}
+
+void GrpBackend_PixelAccessUnlock(void)
+{
+	if(SDL_MUSTLOCK(SoftwareSurface)) {
+		SDL_UnlockSurface(SoftwareSurface);
+	}
+}
+/// ------------------------------------

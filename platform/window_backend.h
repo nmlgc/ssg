@@ -5,6 +5,7 @@
 
 #pragma once
 
+import std.compat;
 struct GRAPHICS_PARAMS;
 
 // Initialization
@@ -14,11 +15,15 @@ struct GRAPHICS_PARAMS;
 
 typedef struct SDL_Window SDL_Window;
 
+// Looks like it belongs into `graphics_sdl`, but is also needed for window
+// creation.
+std::u8string_view WndBackend_SDLRendererName(int8_t id);
+
 // Creates the game window and returns its SDL handle. Fails if the window
 // already exists.
 SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS&);
 
-#ifdef WIN32
+#ifdef WIN32_VINTAGE
 	#include <windows.h>
 
 	// Returns the Win32 handle of the current window.

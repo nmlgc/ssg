@@ -6,7 +6,7 @@
 #include "DD_CLIP2D.H"
 #include "game/cast.h"
 #include "constants.h"
-#include "DirectXUTYs/DD_GRP2D.H"
+#include "DD_GRP2D.H"
 
 
 //// [更新履歴] ////

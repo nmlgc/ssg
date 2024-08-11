@@ -137,34 +137,4 @@ void InitStg3Star();	// ３面高速星初期化
 void MoveStg3Star();	// ３面高速星動作
 void DrawStg3Star();	// ３面高速星描画
 
-
-
-
-__inline void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
-{
-	static Point3D	temp;
-
-	temp.y = p->y;
-	temp.z = p->z;
-	p->y = cosl(dx,temp.y) - sinl(dx,temp.z);
-	p->z = sinl(dx,temp.y) + cosl(dx,temp.z);
-
-	temp.x = p->x;
-	temp.z = p->z;
-	p->x =   cosl(dy,temp.x) + sinl(dy,temp.z);
-	p->z = - sinl(dy,temp.x) + cosl(dy,temp.z);
-
-	temp.x = p->x;
-	temp.y = p->y;
-	p->x = cosl(dz,temp.x) - sinl(dz,temp.y);
-	p->y = sinl(dz,temp.x) + cosl(dz,temp.y);
-}
-
-__inline void ShiftRight6Bit(const Point3D *o, Point3D *p)
-{
-	p->x = ((p->x+o->x)>>6) + 320;
-	p->y = ((p->y+o->y)>>6) + 240;
-}
-
-
 #endif

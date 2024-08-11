@@ -23,7 +23,6 @@
 #include "ECL.H"
 #include "TAMA.H"
 #include "LASER.H"
-#include "game/ut_math.h"
 #include "platform/buffer.h"
 
 
@@ -186,21 +185,6 @@ extern void InitECLInterrupt(ENEMY_DATA *e);	// 割り込みベクタの初期�
 
 
 // Vivit ナナメレーザーの当たり判定 //
-inline bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
-{
-	int		tx,ty,l,w;
-	int		chkw;
-
-	chkw = min(e->g_height, e->g_width) + 3*64;
-
-	tx = e->x - ox;
-	ty = e->y - oy;
-
-	l =  cosl(d,tx) + sinl(d,ty);
-	w = abs(-sinl(d,tx) + cosl(d,ty));
-
-	return ((l > 0) && (w < chkw));
-}
-
+bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d);
 
 #endif

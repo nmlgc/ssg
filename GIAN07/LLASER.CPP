@@ -8,6 +8,7 @@
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 //// レーザー変数２ ////

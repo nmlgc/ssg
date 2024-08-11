@@ -11,6 +11,7 @@
 #include "game/cast.h"
 #include "game/debug.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 /*
  * ECLコマンドのアドレス更新には ECL_CmdLen[ECLコマンド定数] を使用する
@@ -82,6 +83,19 @@ void UpdateHoming(const ENEMY_DATA *e)
 		HomingX    = e->x;
 		HomingY    = e->y;
 	}
+}
+
+bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
+{
+	const int chkw = (min(e->g_height, e->g_width) + (3 * 64));
+
+	const int tx = (e->x - ox);
+	const int ty = (e->y - oy);
+
+	const int l = (cosl(d, tx) + sinl(d, ty));
+	const int w = abs(-sinl(d, tx) + cosl(d, ty));
+
+	return ((l > 0) && (w < chkw));
 }
 
 /*

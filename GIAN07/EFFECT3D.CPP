@@ -5,7 +5,9 @@
 
 #include "EFFECT3D.H"
 #include "GIAN.H"
+#include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
+#include "game/ut_math.h"
 
 #define CIRCLE_MAX			40
 #define CUBE_MAX			8

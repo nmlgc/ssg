@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "game/enum_array.h"
 #include "game/text_packed.h"
 #include <assert.h>
 

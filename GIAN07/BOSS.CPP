@@ -4,11 +4,14 @@
 /*                                                                           */
 
 #include "BOSS.H"
+#include "BOMBEFC.H" // 爆発エフェクト処理
 #include "GIAN.H"
 #include "EnemyExCtrl.h"
+#include "DirectXUTYs/DD_UTY.H"
 #include "../DirectXUTYs/DD_GRP3D.H"
 #include "game/cast.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 ///// [ 定数 ] /////

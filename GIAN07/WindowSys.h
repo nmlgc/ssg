@@ -6,9 +6,8 @@
 #ifndef PBGWIN_WINDOWSYS_H
 #define PBGWIN_WINDOWSYS_H		"WINDOWSYS : Version 0.24 : Update 2000/02/28"
 
-#include "FONTUTY.H"
-#include "game/coords.h"
 #include "game/input.h"
+#include "game/text.h"
 
 
 

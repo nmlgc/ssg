@@ -3,14 +3,16 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "game/graphics.h"
 #include "ENEMY.H"
 #include "CONFIG.H"
 #include "GIAN.H"
 #include "MUSIC.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
+#include "WindowSys.h"
+#include "DirectXUTYs/DD_UTY.H"
 #include "game/enum_array.h"
+#include "game/graphics.h"
 #include "game/hash.h"
 #include "game/midi.h"
 #include "game/snd.h"

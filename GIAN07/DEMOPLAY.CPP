@@ -9,6 +9,7 @@
 #include "GIAN.H"
 #include "DEMOPLAY.H"
 #include "game/input.h"
+#include "game/ut_math.h"
 
 
 bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作しているか

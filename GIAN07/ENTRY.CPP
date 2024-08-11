@@ -11,7 +11,6 @@
 #include "platform/input.h"
 #include "platform/path.h"
 #include "game/bgm.h"
-#include "game/coords.h"
 #include "game/debug.h"
 #include "game/screenshot.h"
 #include "game/snd.h"

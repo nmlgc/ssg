@@ -21,24 +21,12 @@
 
 
 ///// [Include Files] /////
-#include "EXDEF.H"				// 色々な定義
-#include "WindowSys.h"			// ウィンドウシステム本体
-#include "WindowCtrl.h"			// ウィンドウ定義
-#include "FONTUTY.H"			// フォント管理(GrpPut系,CrateFont系)
-
-#include "ECL.H"				// ＥＣＬ定義ファイル
-#include "SCL.H"				// ＳＣＬ定義ファイル
-#include "ENEMY.H"				// 敵の移動処理など
 #include "BOSS.H"				// ボスの定義＆ボス用エフェクトなど
-//#include "EnemyExCtrl.h"		// 特殊動作処理
-
 #include "PRankCtrl.h"			// プレイランク管理
 #include "GAMEMAIN.H"			// メインのルーチン切り替え処理
 #include "EFFECT.H"				// 主にテキストベースのエフェクト処理
 #include "EFFECT3D.H"			// ３Ｄエフェクト
 #include "FRAGMENT.H"			// 破片系エフェクト処理
-#include "BOMBEFC.H"			// 爆発エフェクト処理
-#include "TAMA.H"				// 敵弾処理
 #include "LASER.H"				// 短いレーザー＆リフレクトレーザー処理
 #include "LLASER.H"				// なが～いレーザーの処理
 #include "HOMINGL.H"			// ホーミングレーザーの処理
@@ -48,8 +36,6 @@
 #include "LOADER.H"				// 各種ローダー
 
 #include "ITEM.H"				// アイテム処理
-
-#include "SCORE.H"
 
 
 ///// [ 定数 ] /////

@@ -6,7 +6,6 @@
 #include "WindowSys.h"
 #include "LOADER.H"
 #include "FONTUTY.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/enum_flags.h"
 #include "game/snd.h"
 #include "game/ut_math.h"

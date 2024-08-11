@@ -6,6 +6,7 @@
 #include "WindowCtrl.h"
 #include "WindowSys.h"
 #include "CONFIG.H"
+#include "FONTUTY.H"
 #include "GAMEMAIN.H"
 #include "LEVEL.H"
 #include "LOADER.H"

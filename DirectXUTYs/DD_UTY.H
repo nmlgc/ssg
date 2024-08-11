@@ -26,7 +26,6 @@
 #include "game/format_bmp.h"
 #include "game/graphics.h"
 #include "game/pixelformat.h"
-#include "platform/buffer.h"
 #include "platform/windows/surface_ddraw.h"
 
 

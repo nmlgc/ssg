@@ -5,9 +5,11 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
+#include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/input.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 ///// [ひみつの関数] /////

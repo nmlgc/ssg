@@ -6,7 +6,9 @@
 #include "ITEM.H"
 #include "GIAN.H"
 #include "GIAN07/entity.h"
+#include "DirectXUTYs/DD_UTY.H"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 

@@ -6,6 +6,7 @@
 #include "ENDING.H"
 #include "FONTUTY.H"
 #include "GIAN.H"
+#include "SCL.H" // ＳＣＬ定義ファイル
 #include "game/bgm.h"
 #include "game/cast.h"
 

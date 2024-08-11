@@ -6,8 +6,10 @@
 #include "TAMA.H"
 #include "GIAN.H"
 #include "LEVEL.H"
+#include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 ////グローバル変数////

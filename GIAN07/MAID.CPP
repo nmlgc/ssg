@@ -5,10 +5,12 @@
 
 #include "MAID.H"
 #include "CONFIG.H"
+#include "FONTUTY.H"
 #include "GIAN.H"
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "game/snd.h"
 #include "game/input.h"
+#include "game/ut_math.h"
 
 
 MAID			Viv;					// 麗しきメイドさん構造体

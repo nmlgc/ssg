@@ -6,12 +6,16 @@
 #include "SCROLL.H"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "FONTUTY.H"
 #include "GIAN.H"
 #include "LEVEL.H"
+#include "SCL.H" // ＳＣＬ定義ファイル
+#include "WindowSys.h"
 #include "game/bgm.h"
 #include "game/cast.h"
 #include "game/input.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 

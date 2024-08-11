@@ -9,7 +9,7 @@
 #include "platform/unicode.h"
 #include "game/endian.h"
 
-class FILE_STREAM_READ;
+struct FILE_STREAM_READ;
 
 // Format
 // ------

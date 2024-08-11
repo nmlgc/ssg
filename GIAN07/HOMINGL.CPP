@@ -6,6 +6,7 @@
 #include "HOMINGL.H"
 #include "GIAN.H"
 #include "MAID.H"
+#include "DirectXUTYs/DD_UTY.H"
 #include "game/snd.h"
 #include "game/ut_math.h"
 

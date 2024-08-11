@@ -4,18 +4,23 @@
 /*                                                                           */
 
 #include "GAMEMAIN.H"
+#include "BOMBEFC.H" // 爆発エフェクト処理
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "FONTUTY.H"
 #include "GIAN.H"
 #include "LENS.H"
 #include "LEVEL.H"
 #include "MUSIC.H"
 #include "SCORE.H"
+#include "WindowCtrl.h" // ウィンドウ定義
+#include "WindowSys.h"
 #include "game/bgm.h"
 #include "game/debug.h"
 #include "game/input.h"
 #include "game/midi.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 #include "platform/time.h"
 
 

@@ -7,8 +7,11 @@
 #define PBGWIN_LOADER_H		"LOADER : Version 0.10 : Update 2000/02/18"
 //#pragma message(PBGWIN_LOADER_H)
 
+#include "game/coords.h"
+#include "game/graphics.h"
 #include "game/hash.h"
-#include "DirectXUTYs/DD_UTY.H"
+
+struct SURFACE_DDRAW;
 
 
 ///// [ 定数 ] /////

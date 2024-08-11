@@ -15,9 +15,8 @@
 
 
 ///// [ヘッダファイル] /////
+import std.compat;
 #include "game/coords.h"
-#include "DirectXUTYs/DD_UTY.H"
-#include "game/ut_math.h"
 
 
 

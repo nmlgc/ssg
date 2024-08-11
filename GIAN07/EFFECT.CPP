@@ -4,9 +4,11 @@
 /*                                                                           */
 
 #include "EFFECT.H"
+#include "FONTUTY.H"
 #include "GIAN.H"
 #include "game/cast.h"
 #include "game/snd.h"
+#include "game/ut_math.h"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];

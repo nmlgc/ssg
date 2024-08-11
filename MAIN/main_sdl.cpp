@@ -23,6 +23,7 @@
 #include "GIAN07/GAMEMAIN.H"
 #include "platform/input.h"
 #include "platform/snd_backend.h"
+#include "platform/sdl/log_sdl.h"
 #include "game/bgm.h"
 #include "game/defer.h"
 #include "game/frame.h"
@@ -32,25 +33,6 @@
 // Still required for:
 // • DirectDraw
 HWND hWndMain;
-
-SDL_LogOutputFunction log_default_func;
-void* log_default_data;
-
-void SDLCALL LogCriticalAsMessageBox(
-	void* userdata,
-	int category,
-	SDL_LogPriority priority,
-	const char *message
-)
-{
-	if(priority == SDL_LOG_PRIORITY_CRITICAL) {
-		SDL_ShowSimpleMessageBox(
-			SDL_MESSAGEBOX_ERROR, GAME_TITLE, message, nullptr
-		);
-	} else {
-		log_default_func(log_default_data, category, priority, message);
-	}
-}
 
 int Run()
 {
@@ -120,21 +102,16 @@ int Run()
 	return 0;
 }
 
+#define UTF8_(S) u8 ## S
+#define UTF8(S) UTF8_(S)
+
 int main(int argc, char** args)
 {
-	// The easiest workaround for SDL_ShowSimpleMessageBox()'s lack of built-in
-	// string interpolation: Route errors through the log system instead.
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
-	SDL_LogGetOutputFunction(&log_default_func, &log_default_data);
-	SDL_LogSetOutputFunction(LogCriticalAsMessageBox, nullptr);
-
-	const auto fail = [](SDL_LogCategory category, const char* msg) {
-		SDL_LogCritical(category, "%s: %s", msg, SDL_GetError());
-		return 1;
-	};
+	Log_Init(UTF8(GAME_TITLE));
 
 	if(SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0) {
-		return fail(SDL_LOG_CATEGORY_VIDEO, "Error initializing SDL");
+		Log_Fail(SDL_LOG_CATEGORY_VIDEO, "Error initializing SDL");
+		return 1;
 	}
 	defer(SDL_Quit());
 
@@ -149,7 +126,8 @@ int main(int argc, char** args)
 		GAME_TITLE, 0, 0, GRP_RES.w, GRP_RES.h, flags
 	);
 	if(!window) {
-		return fail(SDL_LOG_CATEGORY_VIDEO, "Error creating SDL window");
+		Log_Fail(SDL_LOG_CATEGORY_VIDEO, "Error creating SDL window");
+		return 1;
 	}
 	defer(SDL_DestroyWindow(window));
 
@@ -158,7 +136,8 @@ int main(int argc, char** args)
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
 	if(!SDL_GetWindowWMInfo(window, &wminfo)) {
-		return fail(SDL_LOG_CATEGORY_VIDEO, "Error retrieving window handles");
+		Log_Fail(SDL_LOG_CATEGORY_VIDEO, "Error retrieving window handles");
+		return 1;
 	}
 
 	hWndMain = wminfo.info.win.window;

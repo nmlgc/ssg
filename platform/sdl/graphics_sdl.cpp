@@ -552,6 +552,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 			(api_name.empty() ? u8"?" : api_name.data()),
 			SDL_GetError()
 		);
+		WndBackend_Cleanup();
 		return std::nullopt;
 	}
 	SDL_GetRendererInfo(renderer, &PrimaryInfo);

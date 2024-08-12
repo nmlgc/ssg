@@ -32,6 +32,7 @@ extern void StdStatusOutput(void)
 
 #ifdef PBG_DEBUG
 	if(!DebugDat.MsgDisplay) return;
+#endif
 
 	const auto now = Time_SteadyTicksMS();
 	if((now - prev) <= 1000) {
@@ -42,9 +43,10 @@ extern void StdStatusOutput(void)
 		prev  = now;
 	}
 
-	sprintf(buf, "%03u Fps", fps);
+	sprintf(buf, "%03u FPS", fps);
 	GrpPut16(0,0,buf);
 
+#ifdef PBG_DEBUG
 	#ifdef GRP_SUPPORT_BITDEPTH
 		sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());
 		GrpPut16(0, 32, buf);

@@ -276,7 +276,7 @@ extern void ConfigSave(void)
 {
 	// Backwards compatibility with 秋霜CFG.DAT
 	VERSION_ORIGINAL.BitDepth8Or16.v = ((ConfigDat.BitDepth.v.value() > 16)
-		? BITDEPTHS::find_if([](auto bpp) { return (bpp == 16); })
+		? BITDEPTHS::find(16)
 		: ConfigDat.BitDepth.v
 	);
 	VERSION_ORIGINAL.SoundFlags.v  = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);

@@ -102,6 +102,10 @@ public:
 	constexpr static BITDEPTH find_if(auto pred) {
 		return std::ranges::find_if(SUPPORTED, pred);
 	}
+
+	constexpr static BITDEPTH find(uint8_t bpp) {
+		return std::ranges::find(SUPPORTED, bpp);
+	}
 };
 
 using BITDEPTH = BITDEPTHS::BITDEPTH;

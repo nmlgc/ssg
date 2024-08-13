@@ -6,8 +6,9 @@
 #include "platform/path.h"
 #include <SDL_filesystem.h>
 
-static std::unique_ptr<char8_t[], decltype(&SDL_free)> PathData = {
-	nullptr, SDL_free
+constexpr auto SDL_free_deleter = [](auto* p) { SDL_free(p); };
+static std::unique_ptr<char8_t[], decltype(SDL_free_deleter)> PathData = {
+	nullptr
 };
 static std::u8string_view PathDataView;
 
@@ -20,7 +21,7 @@ std::u8string_view PathForData(void)
 	if(!path_base) {
 		return {};
 	}
-	PathData = decltype(PathData){ path_base, SDL_free };
+	PathData.reset(path_base);
 	PathDataView = PathData.get();
 	return PathDataView;
 }

@@ -99,5 +99,8 @@ struct RGB216 {
 void Grp_PaletteSetDefault(void);
 // ----------------- //
 
+// Required to enable the screenshot feature as a whole.
+void Grp_SetScreenshotPrefix(std::u8string_view prefix);
+
 // Wraps screenshot handling around GrpBackend_Flip().
 void Grp_Flip(void);

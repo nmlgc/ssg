@@ -12,7 +12,6 @@
 #include "platform/path.h"
 #include "game/bgm.h"
 #include "game/debug.h"
-#include "game/screenshot.h"
 #include "game/snd.h"
 
 // Volume controls
@@ -61,7 +60,7 @@ bool XInit(void)
 		ConfigDat.BGMPack.v.clear();
 	}
 	BGM_SetGainApply(!(ConfigDat.SoundFlags.v & SNDF_BGM_NOT_VOL_NORM));
-	ScreenshotSetPrefix(u8"秋霜");
+	Grp_SetScreenshotPrefix(u8"秋霜");
 	LoaderInit();
 	return true;
 }

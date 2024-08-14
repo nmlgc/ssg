@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "DD_UTY.H"
+#include "constants.h"
 #include "DD_GRP2D.H"
 #include "DD_CLIP2D.H"		// 図形クリッピング用関数群
 #include "game/cast.h"
@@ -22,7 +23,7 @@ typedef struct tagAlphaInfo {
 // ２Ｄ用変数 //
 BYTE				*Grp_Vram;				// これは公開しない
 long				Grp_Pitch = 0;			// これも公開しない
-uint32_t	Grp_AddrY[480];	// Ｙ座標テーブル
+uint32_t	Grp_AddrY[GRP_RES.h];	// Ｙ座標テーブル
 uint8_t	Col2D;	// 現在の色
 BYTE				Col2D_R;				// 赤(α用)
 BYTE				Col2D_G;				// 緑(α用)
@@ -46,8 +47,6 @@ static void _2DUpdateAlphaTable(void);	// αテーブルを更新する
 // 描画系関数ポインタをセットする //
 void _2DSetup(void)
 {
-	int i;
-
 	// 関数ポインタをセットする //
 	GrpLock     = _2DLock;
 	GrpUnlock   = _2DUnlock;
@@ -64,7 +63,9 @@ void _2DSetup(void)
 
 	// 固有の処理(この関数はSurfaceが存在するときに呼ばれるはず) //
 	_2DLock();
-	for(i=0;i<480;i++) Grp_AddrY[i]=i*Grp_Pitch;
+	for(const auto i : std::views::iota(0, GRP_RES.h)) {
+		Grp_AddrY[i] = (i * Grp_Pitch);
+	}
 	_2DUnlock();
 
 	// テーブル初期化要求を発行 //
@@ -202,7 +203,7 @@ void _2DCircleF(int x, int y, int r)
 
 	int si,di;
 	int s;
-	//static int	pmin[480],pmax[480];
+	// static int pmin[GRP_RES.h], pmax[GRP_RES.h];
 	//int			ymin,ymax;
 
 	if(Grp_Vram==NULL) return;

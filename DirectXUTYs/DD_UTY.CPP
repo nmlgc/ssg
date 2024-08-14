@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "DD_UTY.H"
+#include "constants.h"
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
 #include "game/cast.h"
@@ -52,8 +53,8 @@ static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 // クリッピング枠 //
 int CLIP_X_MIN = 0;
 int CLIP_Y_MIN = 0;
-int CLIP_X_MAX = 639;
-int CLIP_Y_MAX = 479;
+int CLIP_X_MAX = (GRP_RES.w - 1);
+int CLIP_Y_MAX = (GRP_RES.h - 1);
 
 bool STD_GrpBlt(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
 
@@ -205,7 +206,9 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 		if(dxret!=DD_OK) throw("SetCooperativeLevel に失敗");
 
 		// ディスプレイモードのセット //
-		dxret = DD->SetDisplayMode(640, 480, bitdepth.value(), 0, 0);
+		dxret = DD->SetDisplayMode(
+			GRP_RES.w, GRP_RES.h, bitdepth.value(), 0, 0
+		);
 		if(dxret!=DD_OK) throw("SetDisplayMode に失敗");
 
 		// プライマリ＆バックサーフェスの作成 //
@@ -265,7 +268,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 			_3DSetup();
 		}
 
-		GrpSetClip(0,0,640,480);
+		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 		for(auto& surf : DxSurf) {
 			if(surf.size) {
@@ -318,8 +321,8 @@ void GrpSetClip(int sx, int sy, int ex, int ey)
 
 	CLIP_X_MIN = (sx<0) ? 0 : sx;
 	CLIP_Y_MIN = (sy<0) ? 0 : sy;
-	CLIP_X_MAX = (ex>639) ? 639 : ex;
-	CLIP_Y_MAX = (ey>479) ? 479 : ey;
+	CLIP_X_MAX = (std::min)(ex, (GRP_RES.w - 1));
+	CLIP_Y_MAX = (std::min)(ey, (GRP_RES.h - 1));
 
 	if ((CLIP_X_MIN == CLIP_X_MAX) || (CLIP_Y_MIN == CLIP_Y_MAX)) {
 		GrpBlt = DM_GRPBLT;
@@ -783,8 +786,8 @@ static bool CreateZbuffer(const XD3DENUM& D3De)
 	mem_flag = (D3De.bIsHW ? DDSCAPS_VIDEOMEMORY : DDSCAPS_SYSTEMMEMORY);
 	ddsd.dwSize = sizeof(ddsd);
 	ddsd.dwFlags = DDSD_WIDTH|DDSD_HEIGHT|DDSD_CAPS|DDSD_ZBUFFERBITDEPTH;
-	ddsd.dwWidth = 640;
-	ddsd.dwHeight = 480;
+	ddsd.dwWidth = GRP_RES.w;
+	ddsd.dwHeight = GRP_RES.h;
 	ddsd.dwZBufferBitDepth = D3De.Zbuf;
 	ddsd.ddsCaps.dwCaps = DDSCAPS_ZBUFFER|mem_flag;
 	dxret = DxObj.DD->CreateSurface(&ddsd,&DxObj.Zbuf,NULL);
@@ -913,8 +916,9 @@ static HRESULT FAR __stdcall ModeEnum(DDSURFACEDESC *pddsd,VOID *pInfo)
 	int				color;
 
 	// ６４０Ｘ４８０についてだけ調べるようにする //
-	if(pddsd->dwWidth!=640)		return DDENUMRET_OK;
-	if(pddsd->dwHeight!=480)	return DDENUMRET_OK;
+	if((pddsd->dwWidth != GRP_RES.w) || (pddsd->dwHeight != GRP_RES.h)) {
+		return DDENUMRET_OK;
+	}
 
 	// どの色か //
 	color  = pddsd->ddpfPixelFormat.dwRGBBitCount;

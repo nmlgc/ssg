@@ -9,7 +9,7 @@ import std;
 
 // Pixel-space coordinates
 // -----------------------
-// The unscaled output space in the game's original 640×480 resolution.
+// The unscaled output space in the game's native resolution.
 
 // X or Y value in unscaled pixel space. Relative to any origin.
 using PIXEL_COORD = int;
@@ -130,7 +130,7 @@ template <class Coord> struct PIXEL_LTRB_BASE {
 using WINDOW_COORD = PIXEL_COORD;
 
 // X/Y coordinate in unscaled game window space. The visible area ranges from
-// (0, 0) to (639, 479) inclusive.
+// (0, 0) inclusive to [GRP_RES] exclusive.
 template <
 	class Coord
 > struct WINDOW_POINT_BASE : public PIXEL_POINT_BASE<Coord> {
@@ -145,13 +145,13 @@ template <
 template <class Coord> using WINDOW_SIZE_BASE = PIXEL_SIZE_BASE<Coord>;
 
 // Left-top-width-height rectangle in unscaled game window space. The visible
-// area ranges from // (0, 0) to (639, 479) inclusive.
+// area ranges from (0, 0) inclusive to [GRP_RES] exclusive.
 template <class Coord> struct WINDOW_LTWH_BASE : public PIXEL_LTWH_BASE<Coord> {
 	using PIXEL_LTWH_BASE<Coord>::PIXEL_LTWH_BASE;
 };
 
 // Left-top-right-bottom rectangle in unscaled game window space. The visible
-// area ranges from (0, 0) to (639, 479) inclusive.
+// area ranges from (0, 0) inclusive to [GRP_RES] exclusive.
 template <class Coord> struct WINDOW_LTRB_BASE : public PIXEL_LTRB_BASE<Coord> {
 	using PIXEL_LTRB_BASE<Coord>::PIXEL_LTRB_BASE;
 

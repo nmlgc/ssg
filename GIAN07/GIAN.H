@@ -21,6 +21,8 @@
 
 
 ///// [Include Files] /////
+#include "constants.h"
+
 #include "BOSS.H"				// ボスの定義＆ボス用エフェクトなど
 #include "PRankCtrl.h"			// プレイランク管理
 #include "GAMEMAIN.H"			// メインのルーチン切り替え処理
@@ -45,7 +47,7 @@
 #define X_MAX		(511)						// 表示Ｘ座標最大値
 #define X_MID		((X_MAX+X_MIN)/2)
 #define Y_MIN		(0)							// 表示Ｙ座標最小値
-#define Y_MAX		(479)						// 表示Ｙ座標最大値
+constexpr WINDOW_COORD Y_MAX = (GRP_RES.h - 1);
 #define Y_MID		((Y_MAX+Y_MIN)/2)
 
 #define X_RNDV		(-30000)				// Ｘ座標のランダム指定用

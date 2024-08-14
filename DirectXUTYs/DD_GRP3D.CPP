@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "DD_UTY.H"
+#include "constants.h"
 #include "DD_GRP3D.H"
 #include "game/ut_math.h"
 #include <d3d.h>
@@ -81,7 +82,7 @@ void _3DSetup(void)
 // 画面描画の準備をする //
 void _3DLock(void)
 {
-	D3DRECT			d3drc = {0,0,640,480};
+	D3DRECT d3drc = { 0, 0, GRP_RES.w, GRP_RES.h };
 	HRESULT			dxret;
 
 	// 目標セット //

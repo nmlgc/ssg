@@ -18,6 +18,7 @@
 
 #include <SDL.h>
 #include <SDL_syswm.h>
+#include "constants.h"
 #include "GIAN07/CONFIG.H"
 #include "GIAN07/ENTRY.H"
 #include "GIAN07/GAMEMAIN.H"
@@ -143,7 +144,9 @@ int main(int argc, char** args)
 	// messages from SDL in this "resizable fullscreen mode". (Or window move
 	// messages, for that matter.)
 	constexpr uint32_t flags = (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_RESIZABLE);
-	auto* window = SDL_CreateWindow(GAME_TITLE, 0, 0, 640, 480, flags);
+	auto *window = SDL_CreateWindow(
+		GAME_TITLE, 0, 0, GRP_RES.w, GRP_RES.h, flags
+	);
 	if(!window) {
 		return fail(SDL_LOG_CATEGORY_VIDEO, "Error creating SDL window");
 	}

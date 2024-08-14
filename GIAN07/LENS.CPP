@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "LENS.H"
+#include "constants.h"
 #include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/ut_math.h"
@@ -125,8 +126,8 @@ void LensInfo::Draw(WINDOW_POINT center)
 	if(
 		(left < 0) ||
 		(top < 0) ||
-		((left + Height) > 639) ||
-		((top + Height) > 479)
+		((left + Height) > (GRP_RES.w - 1)) ||
+		((top + Height) > (GRP_RES.h - 1))
 	) {
 		return;
 	}

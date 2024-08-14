@@ -5,6 +5,7 @@
 
 #include "DD_CLIP2D.H"
 #include "game/cast.h"
+#include "constants.h"
 
 
 //// [更新履歴] ////
@@ -130,7 +131,7 @@ void _2DPolygon(std::span<const WINDOW_POINT> p)
 
 extern uint8_t*	Grp_Vram;	// これは公開しない
 extern long				Grp_Pitch;				// これも公開しない
-extern uint32_t	Grp_AddrY[480];	// Ｙ座標テーブル
+extern uint32_t	Grp_AddrY[GRP_RES.h];	// Ｙ座標テーブル
 extern uint8_t	Col2D;
 
 
@@ -140,7 +141,9 @@ static void GrpHLineX(int x1, int x2, int y)
 	int temp;
 	if(x1>x2) temp = x1,x1 = x2,x2 = temp;
 	if(x1<0) x1 = 0;
-	if(x2>639) x2 = 639;
+	if(x2 > (GRP_RES.w - 1)) {
+		x2 = (GRP_RES.w - 1);
+	}
 	//if(y<0 || y>479) return;
 	//if(y<0) y = 0;
 	//if(y>479) y = 479;

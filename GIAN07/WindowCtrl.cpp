@@ -538,7 +538,7 @@ namespace BGMPack {
 			w = (std::max)(w, CWinItemExtent(pack).w);
 			i++;
 		}
-		w = (std::min)(w, 640);
+		w = (std::min)(w, GRP_RES.w);
 
 		BGMPackScroll.Init(Title, SelAtOpen, w, &MainWindow);
 		BGMPackWindow.OpenCentered(w, BGMPackWindow.Select[0]);

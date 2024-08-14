@@ -558,13 +558,13 @@ void ScreenEffectDraw(void)
 extern void CircleFadeOut(int x, int y, int r)
 {
 	PIXEL_LTRB	src;
-	int		i,j,temp;
+	int temp;
 
 	if(r<0) r=0;
 
 
-	for(i=0;i<640;i+=16){
-		for(j=0;j<480;j+=16){
+	for(auto i = 0; i < GRP_RES.w; i += 16) {
+		for(auto j = 0; j < GRP_RES.h; j += 16) {
 			temp = isqrt((i-x)*(i-x)+(j-y)*(j-y));
 			if(temp<r && r-temp<8*16 && temp>=0){
 				temp = (r-temp)>>3;

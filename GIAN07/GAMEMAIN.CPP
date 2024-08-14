@@ -93,7 +93,7 @@ extern bool ScoreNameInit(void)
 		return FALSE;
 	}
 
-	GrpSetClip(0,0,640,480);
+	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 	InputLocked = Key_Data;
 	GameMain = ScoreNameProc;
@@ -445,7 +445,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 		return FALSE;
 	}
 
-	GrpSetClip(0,0,640,480);
+	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 	InputLocked = Key_Data;
 	GameMain = NameRegistProc;
@@ -505,7 +505,7 @@ bool WeaponSelectInit(bool ExStg)
 
 	MaidSet();
 
-	GrpSetClip(0,0,640,480);
+	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 	WeaponKeyWait = 1;
 	Viv.weapon    = 0;
@@ -791,7 +791,7 @@ extern bool MusicRoomInit(void)
 		return FALSE;
 	}
 
-	GrpSetClip(0,0,640,480);
+	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 	MidiPlayID = 0;
 
@@ -839,7 +839,7 @@ extern bool GameExit(bool bNeedChgMusic)
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return FALSE;
 	}
-	GrpSetClip(0,0,640,480);
+	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 	LLaserSetup();		// 音を止める
 	Snd_SEStop(8);	// ワーニング音を止めるのだ
@@ -1243,7 +1243,7 @@ void WeaponSelectProc(bool&)
 		GrpPutScore(500,400,buf);
 
 		GrpLock();
-		GrpSetClip(0,0,640,480);
+		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 
 		GrpSetColor(0,0,4);
 		GrpLine(400-110,400-300,400+110,400-300);
@@ -1351,7 +1351,7 @@ void PauseProc(bool&)
 		GameDraw();
 
 		GrpGetClip(&rc);
-		GrpSetClip(0,0,640,480);
+		GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 		CWinDraw(&ExitWindow);
 		GrpSetClip(rc.left, rc.top, rc.right, rc.bottom);
 
@@ -1570,7 +1570,7 @@ void GameDraw(void)
 	ScreenEffectDraw();
 
 //	GrpGetClip(&rc);
-//	GrpSetClip(0,0,640,480);
+	// GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 	MWinDraw();
 //	GrpSetClip(rc.left, rc.top, rc.right, rc.bottom);
 

@@ -103,7 +103,7 @@ bool EndingInit(void)
 {
 	PALETTE	pal;
 
-	GrpSetClip(0, 0, 640, 480);
+	GrpSetClip(0, 0, GRP_RES.w, GRP_RES.h);
 	GrpCls();
 	GrpFlip();
 	GrpCls();
@@ -127,7 +127,7 @@ bool EndingInit(void)
 
 	TextObj.Clear();
 	EText.NumText = 0;
-	EText.Rect = TextObj.Register({ 640, 131 });
+	EText.Rect = TextObj.Register({ GRP_RES.w, 131 });
 	EText.Rerender = true;
 
 	return TRUE;
@@ -346,16 +346,20 @@ void DrawFadeInfo()
 		if(EStfTask.bWantDisp){
 			GrpSetAlpha(255-EStfTask.alpha, ALPHA_NORM);
 			GrpSetColor(0, 0, 0);
-			if(EStfTask.ox == 320)     GrpBoxA(0, 0, 640,480);
-			else if(EStfTask.ox > 320) GrpBoxA(320,0,640,300);
-			else                       GrpBoxA(0,0, 320-50,300);
+			if(EStfTask.ox == 320) {
+				GrpBoxA(0, 0, GRP_RES.w, GRP_RES.h);
+			} else if(EStfTask.ox > 320) {
+				GrpBoxA(320, 0, GRP_RES.w, 300);
+			} else {
+				GrpBoxA(0, 0, (320 - 50), 300);
+			}
 		}
 		if(FlashState){
 			if(FlashState > 256) a = FlashState - 256;
 			else                 a = FlashState;
 			GrpSetAlpha(255-a, ALPHA_NORM);
 			GrpSetColor(5, 5, 5);
-			GrpBoxA(0,0,640,480);
+			GrpBoxA(0, 0, GRP_RES.w, GRP_RES.h);
 		}
 
 		GrpUnlock();

@@ -22,6 +22,8 @@ uint8_t	GameLevel;
 ///// [ 関数(非公開) ] /////
 extern void StdStatusOutput(void)
 {
+	const WINDOW_COORD column2_left = (GRP_RES.w - 128);
+
 	static uint32_t prev;
 	static uint32_t fps, count;
 	//extern InputConfig			IConfig;
@@ -83,9 +85,9 @@ extern void StdStatusOutput(void)
 	GrpPut16(0,440,"Gian07");
 	GrpPut16(0,460,"DebugMode");
 
-	GrpPut16(640-128,100,"SCL Count");
+	GrpPut16(column2_left, 100, "SCL Count");
 	sprintf(buf," %5d",GameCount);
-	GrpPut16(640-128,120,buf);
+	GrpPut16(column2_left, 120, buf);
 #else
 //	GrpPut16(0,440,"G07");
 //	GrpPut16(0,460,"12/5 Ver");
@@ -94,20 +96,20 @@ extern void StdStatusOutput(void)
 	const auto tm = Time_NowLocal();
 
 	sprintf(buf, "%02u/%02u/%02u", tm.month, tm.day, (tm.year % 100u));
-	GrpPut16(640-128,0,"Date");
-	GrpPut16(640-128,20,buf);
+	GrpPut16(column2_left, 0, "Date");
+	GrpPut16(column2_left, 20, buf);
 
 	sprintf(buf, "%02u:%02u:%02u", tm.hour, tm.minute, tm.second);
-	GrpPut16(640-128,50,"Time");
-	GrpPut16(640-128,70,buf);
+	GrpPut16(column2_left, 50, "Time");
+	GrpPut16(column2_left, 70, buf);
 
 #ifndef PBG_DEBUG // pbg quirk
 	sprintf(buf,"Bomb   %d",Viv.bomb);
-	GrpPut16(640-128,400,buf);
+	GrpPut16(column2_left, 400, buf);
 #endif
 
 	sprintf(buf,"Left   %d",Viv.left);
-	GrpPut16(640-128,440,buf);
+	GrpPut16(column2_left, 440, buf);
 	sprintf(buf,"Credit %d",Viv.credit);		// -1 に注意だ！！
-	GrpPut16(640-128,460,buf);
+	GrpPut16(column2_left, 460, buf);
 }

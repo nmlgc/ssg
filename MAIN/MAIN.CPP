@@ -58,7 +58,10 @@ int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nShowCmd)
 		else if(bIsActive){
 			// １フレーム進める //
 			tempdw = timeGetTime();
-			if(((tempdw - WaitTime) >= 16) || (ConfigDat.FPSDivisor.v == 0)) {
+			if(
+				((tempdw - WaitTime) >= FRAME_TIME_TARGET) ||
+				(ConfigDat.FPSDivisor.v == 0)
+			) {
 				Key_Read(PadBindings);
 
 				bool quit = false;

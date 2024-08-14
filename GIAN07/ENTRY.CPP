@@ -15,25 +15,6 @@
 #include "game/screenshot.h"
 #include "game/snd.h"
 
-// Mapping world coordinates to a position in the stereo field
-// -----------------------------------------------------------
-// The algorithm from the original game:
-//
-// • The [x] values are world coordinates (Q26.6, 64 units per pixel)
-// • Subtract the center of the screen (in world coordinates) from [x]
-// • Divide the result by (a scalar) 16
-// • Directly pass that result to DirectSound, which interprets it as a panning
-//   value with a unit of 1/100 dB
-//
-// By transforming the calculation to pixel space and full decibels, we end up
-// with ((16 / 64) × 100) = 25 pixels per shifted decibel.
-
-// Ｘ座標の中心のデフォルト値
-constexpr int SND_X_MID = PixelToWorld(320);
-
-constexpr int SND_X_PER_DECIBEL = PixelToWorld(25);
-// -----------------------------------------------------------
-
 // Volume controls
 // ---------------
 

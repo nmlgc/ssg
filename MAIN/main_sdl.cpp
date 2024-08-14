@@ -56,9 +56,6 @@ int Run()
 	bool active = true;
 	uint64_t ticks_last = 0;
 
-	// Yup, the game is supposed to be running at 62.5 FPS.
-	constexpr auto FRAME_TIME_TARGET = 16;
-
 	while(!quit) {
 		// Read input events first to remove them from the queue
 		SDL_PumpEvents();

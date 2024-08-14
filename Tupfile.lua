@@ -204,6 +204,7 @@ local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, {
 		"/std:c++latest",
 		"/DWIN32",
 		"/I.",
+		"/IGIAN07/",
 		"/EHsc",
 		"/source-charset:utf-8",
 		"/execution-charset:utf-8",

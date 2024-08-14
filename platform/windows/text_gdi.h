@@ -57,8 +57,7 @@ template <
 
 	bool Wipe() {
 		return (
-			GrpSurface_GDIText_Create(bounds) &&
-			graphics.SurfaceSetColorKey(surf, { 0x00, 0x00, 0x00 }) &&
+			GrpSurface_GDIText_Create(bounds, { 0x00, 0x00, 0x00 }) &&
 			TEXTRENDER_PACKED::Wipe()
 		);
 	}

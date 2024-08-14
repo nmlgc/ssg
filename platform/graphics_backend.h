@@ -58,7 +58,7 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
 	// (Re-)creates the backend's designated GDI text surface with the given
 	// size and undefined initial contents. After filling it with the intended
 	// pixels, call GrpSurface_GDIText_Update() to upload them to the backend.
-	bool GrpSurface_GDIText_Create(PIXEL_SIZE size);
+	bool GrpSurface_GDIText_Create(PIXEL_SIZE size, RGB colorkey);
 
 	bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r);
 	// -------------------------------

@@ -472,7 +472,7 @@ SURFACE_GDI& GrpSurface_GDIText_Surface(void)
 	return DxSurf[SURFACE_ID::TEXT];
 }
 
-bool GrpSurface_GDIText_Create(PIXEL_SIZE size)
+bool GrpSurface_GDIText_Create(PIXEL_SIZE size, RGB colorkey)
 {
 	auto& surf = DxSurf[SURFACE_ID::TEXT];
 	surf.Delete();
@@ -500,7 +500,10 @@ bool GrpSurface_GDIText_Create(PIXEL_SIZE size)
 		return false;
 	}
 	surf.stock_img = SelectObject(surf.dc, surf.img);
-	return DxObj.SurfaceCreateUninitialized(surf, size);
+	return (
+		DxObj.SurfaceCreateUninitialized(surf, size) &&
+		DxObj.SurfaceSetColorKey(surf, colorkey)
+	);
 }
 
 bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)

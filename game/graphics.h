@@ -117,5 +117,10 @@ std::optional<GRAPHICS_PARAMS> Grp_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 );
 
+// Calls Grp_Init() with the given parameters and tries the remaining devices
+// and APIs failure. Returns the actual configuration the backend was
+// initialized with, or `std::nullopt` on failure.
+std::optional<GRAPHICS_PARAMS> Grp_InitOrFallback(GRAPHICS_PARAMS params);
+
 // Wraps screenshot handling around GrpBackend_Flip().
 void Grp_Flip(void);

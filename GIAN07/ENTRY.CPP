@@ -49,9 +49,7 @@ bool XInit(void)
 	}
 
 	// グラフィックの初期化 //
-	const auto maybe_params = Grp_Init(
-		std::nullopt, ConfigDat.GraphicsParams()
-	);
+	const auto maybe_params = Grp_InitOrFallback(ConfigDat.GraphicsParams());
 	if(!maybe_params) {
 		return false;
 	}

@@ -96,6 +96,34 @@ std::optional<GRAPHICS_PARAMS> Grp_Init(
 	return GrpBackend_Init(maybe_prev, params);
 }
 
+std::optional<GRAPHICS_PARAMS> Grp_InitOrFallback(GRAPHICS_PARAMS params)
+{
+	if(const auto ret = Grp_Init(std::nullopt, params)) {
+		return ret;
+	}
+
+	// Start with the defaults and try looking for a different working
+	// configuration
+	const auto api_count = GrpBackend_APICount();
+	const auto device_count = std::max(GrpBackend_DeviceCount(), uint8_t{ 1 });
+
+	const auto api_it = ((api_count > 0)
+		? std::views::iota(int8_t{ -1 }, api_count)
+		: std::views::iota(params.api, int8_t{ params.api + 1 })
+	);
+
+	for(const auto api : api_it) {
+		for(const auto device_id : std::views::iota(0u, device_count)) {
+			params.api = api;
+			params.device_id = device_id;
+			if(const auto ret = Grp_Init(std::nullopt, params)) {
+				return ret;
+			}
+		}
+	}
+	return std::nullopt;
+}
+
 void Grp_Flip(void)
 {
 	GrpBackend_Flip((SystemKey_Data & SYSKEY_SNAPSHOT)

@@ -137,6 +137,7 @@ namespace BGMPack {
 	constexpr auto HELP_NONE = "デフォルトのMIDIサントラに戻ります";
 
 	char Title[TITLE_FMT.size() + (STRING_NUM_CAP<size_t> * 2)];
+	WINDOW_LABEL TitleItem = { Title };
 
 	std::vector<std::u8string> Packs;
 	size_t SelAtOpen = 0;
@@ -147,13 +148,13 @@ namespace BGMPack {
 	static size_t ListSize(void) {
 		return (1 + Packs.size() + 1);
 	}
-	static void Generate(WINDOW_INFO& ret, size_t generated, size_t selected);
+	static void Generate(WINDOW_CHOICE& ret, size_t generated, size_t selected);
 	static bool Handle(INPUT_BITS key, size_t selected);
 	// ----------------
 }
 
 char	DifTitle[9][20];
-WINDOW_INFO DifItem[] = {
+WINDOW_CHOICE DifItem[] = {
 	{ DifTitle[0],	"残り人数?を設定します",	DifFnPlayerStock },
 	{ DifTitle[1],	"ボムの数を設定します",	DifFnBombStock },
 	{ DifTitle[2],	"難易度を設定します",	DifFnDifficulty },
@@ -166,15 +167,17 @@ WINDOW_INFO DifItem[] = {
 #endif
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU DifMenu = { std::span(DifItem) };
 
 char	GrpTitle[5][50];
-WINDOW_INFO GrpItem[] = {
+WINDOW_CHOICE GrpItem[] = {
 	// { GrpTitle[0],	"ビデオカードの選択",	GrpFnChgDevice },
 	{ GrpTitle[1],	"描画スキップの設定です",	GrpFnSkip },
 	{ GrpTitle[2],	"使用する色数を指定します",	GrpFnBpp },
 	{ GrpTitle[3],	"ウィンドウの表示位置を決めます",	GrpFnWinLocate },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU GrpMenu = { std::span(GrpItem) };
 
 constexpr auto VOLUME_FLAGS = WINDOW_FLAGS::FAST_REPEAT;
 
@@ -185,7 +188,7 @@ static char SndTitleBGMVol[26];
 static char SndTitleBGMGain[26];
 static char SndTitleBGMPack[26];
 static char SndTitleMIDIPort[26];
-WINDOW_INFO SndItem[] = {
+WINDOW_CHOICE SndItem[] = {
 	{ SndTitleSE,	"SEを鳴らすかどうかの設定",	SndFnSE },
 	{ SndTitleBGM,	"BGMを鳴らすかどうかの設定",	SndFnBGM },
 	{ SndTitleSEVol, "効果音の音量", SndFnSEVol, VOLUME_FLAGS },
@@ -195,6 +198,7 @@ WINDOW_INFO SndItem[] = {
 	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU SndMenu = { std::span(SndItem) };
 static auto& SndItemSE = SndItem[0];
 static auto& SndItemBGM = SndItem[1];
 static auto& SndItemSEVol = SndItem[2];
@@ -205,42 +209,45 @@ static auto& SndItemMIDIPort = SndItem[6];
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
-WINDOW_INFO InpKey[] = {
+WINDOW_CHOICE InpKey[] = {
 	{ IKeyTitle[0],	InpHelp,	InpFnKeyTama },
 	{ IKeyTitle[1],	InpHelp,	InpFnKeyBomb },
 	{ IKeyTitle[2],	InpHelp,	InpFnKeyShift },
 	{ IKeyTitle[3],	InpHelp,	InpFnKeyCancel },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU InpKeyMenu = { std::span(InpKey) };
 
 char	InpTitle[23];
 char	InpTitle2[23];
-WINDOW_INFO InpItem[] = {
+WINDOW_CHOICE InpItem[] = {
 	{ InpTitle,	"弾キーのメッセージスキップ設定",	InpFnMsgSkip },
 	{ InpTitle2,	"弾キーの押しっぱなしで低速移動",	InpFnZSpeedDown },
-	{ "Joy Pad",	"パッドの設定をします",	InpKey },
+	{ "Joy Pad",	"パッドの設定をします",	InpKeyMenu },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-
+WINDOW_MENU InpMenu = { std::span(InpItem) };
 
 char CfgRepTitle[2][23];
 
-WINDOW_INFO CfgRep[] = {
+WINDOW_CHOICE CfgRep[] = {
 	{ CfgRepTitle[0],	"リプレイ用データの保存",	CfgRepSave },
 	{ CfgRepTitle[1],	"ステージセレクト",	CfgRepStgSelect },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU CfgRepMenu = { std::span(CfgRep) };
 
-WINDOW_INFO CfgItem[] = {
-	{ " Difficulty",	"難易度に関する設定",	DifItem },
-	{ " Graphic",	"グラフィックに関する設定",	GrpItem },
-	{ " Sound / Music",	"ＳＥ／ＢＧＭに関する設定",	SndItem },
-	{ " Input",	"入力デバイスに関する設定",	InpItem },
-	{ " Replay",	"リプレイに関する設定",	CfgRep },
+WINDOW_CHOICE CfgItem[] = {
+	{ " Difficulty",	"難易度に関する設定",	DifMenu },
+	{ " Graphic",	"グラフィックに関する設定",	GrpMenu },
+	{ " Sound / Music",	"ＳＥ／ＢＧＭに関する設定",	SndMenu },
+	{ " Input",	"入力デバイスに関する設定",	InpMenu },
+	{ " Replay",	"リプレイに関する設定",	CfgRepMenu },
 	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU CfgMenu = { std::span(CfgItem) };
 
-WINDOW_INFO RepItem[] = {
+WINDOW_CHOICE RepItem[] = {
 	{ " Stage 1 デモ再生",	"ステージ１のリプレイ",	RFnStg1 },
 	{ " Stage 2 デモ再生",	"ステージ２のリプレイ",	RFnStg2 },
 	{ " Stage 3 デモ再生",	"ステージ３のリプレイ",	RFnStg3 },
@@ -250,37 +257,45 @@ WINDOW_INFO RepItem[] = {
 	{ " ExStage デモ再生",	"エキストラステージのリプレイ",	RFnStgEx },
 	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
+WINDOW_MENU RepMenu = { std::span(RepItem) };
 
-WINDOW_INFO MainItem[] = {
+WINDOW_LABEL MainTitle = { "     Main Menu" };
+WINDOW_CHOICE MainItem[] = {
 	// { "   Game  Start",	"ゲームを開始します(使用不可)" },
 	{ "   Game  Start",	"ゲームを開始します",	MainFnGameStart },
 	{ "   Extra Start",	"ゲームを開始します(Extra)",	MainFnExStart },
-	{ "   Replay",	"リプレイを開始します",	RepItem },
-	{ "   Config",	"各種設定を変更します",	CfgItem },
+	{ "   Replay",	"リプレイを開始します",	RepMenu },
+	{ "   Config",	"各種設定を変更します",	CfgMenu },
 	{ "   Score",	"スコアの表示をします",	ScoreFn },
 	{ "   Music",	"音楽室に入ります",	MusicFn },
 	{ "   Exit",	"ゲームを終了します",	CWinExitFn }
 };
+WINDOW_MENU MainMenu = { std::span(MainItem), &MainTitle };
 
-WINDOW_INFO ExitYesNoItem[] = {
+WINDOW_LABEL ExitTitle = { "    終了するの？" };
+WINDOW_CHOICE ExitYesNoItem[] = {
 	{ "   お っ け ～ ",	"",	ExitFnYes },
 	{ "   だ め だ め",	"",	ExitFnNo }
 };
+WINDOW_MENU ExitMenu = { std::span(ExitYesNoItem), &ExitTitle };
 
-WINDOW_INFO ContinueYesNoItem[] = {
+WINDOW_LABEL ContinueTitle = { " Ｃｏｎｔｉｎｕｅ？" };
+WINDOW_CHOICE ContinueYesNoItem[] = {
 	{ "   お っ け ～",	"",	ContinueFnYes },
 	{ "   や だ や だ",	"",	ContinueFnNo }
 };
+WINDOW_MENU ContinueMenu = { std::span(ContinueYesNoItem), &ContinueTitle };
+
+WINDOW_MENU_SCROLL<
+	BGMPack::TitleItem, BGMPack::ListSize, BGMPack::Generate, BGMPack::Handle
+> BGMPackMenu;
 
 
 ///// [グローバル変数(公開)] /////
-WINDOW_SYSTEM MainWindow;
-WINDOW_SYSTEM ExitWindow;
-WINDOW_SYSTEM ContinueWindow;
-WINDOW_SYSTEM BGMPackWindow;
-WINDOW_SCROLL<
-	BGMPack::ListSize, BGMPack::Generate, BGMPack::Handle
-> BGMPackScroll;
+WINDOW_SYSTEM MainWindow = { MainMenu };
+WINDOW_SYSTEM ExitWindow = { ExitMenu };
+WINDOW_SYSTEM ContinueWindow = { ContinueMenu };
+WINDOW_SYSTEM BGMPackWindow = { BGMPackMenu.Menu };
 
 
 
@@ -294,31 +309,31 @@ void InitMainWindow(void)
 	SetIKeyItem();
 	SetCfgRepItem();
 
-	MainWindow.Init("     Main Menu", MainItem, 140);
+	MainWindow.Init(140);
 
 	//	{ "   Config",	"各種設定を変更します",	CfgItem },
 
 	// エキストラステージが選択できる場合には発生！ //
 	if(ConfigDat.ExtraStgFlags.v) {
-		MainItem[3].NumItems = 6;
-		MainItem[3].ItemPtr[4] = &CfgItem[4];
-		MainItem[3].ItemPtr[5] = &CfgItem[5];
+		CfgMenu.NumItems = 6;
+		CfgMenu.ItemPtr[4] = &CfgItem[4];
+		CfgMenu.ItemPtr[5] = &CfgItem[5];
 	}
 	else{
-		MainItem[3].NumItems = 5;
-		MainItem[3].ItemPtr[4] = &CfgItem[5];
+		CfgMenu.NumItems = 5;
+		CfgMenu.ItemPtr[4] = &CfgItem[5];
 	}
 }
 
 
 void InitExitWindow(void)
 {
-	ExitWindow.Init("    終了するの？", ExitYesNoItem, 140);
+	ExitWindow.Init(140);
 }
 
 void InitContinueWindow(void)
 {
-	ContinueWindow.Init(" Ｃｏｎｔｉｎｕｅ？", ContinueYesNoItem, 140);
+	ContinueWindow.Init(140);
 }
 
 static bool DifFnPlayerStock(INPUT_BITS key)
@@ -529,14 +544,12 @@ namespace BGMPack {
 		}
 		w = (std::min)(w, GRP_RES.w);
 
-		BGMPackScroll.Init(BGMPackWindow, SelAtOpen, &MainWindow);
-		BGMPackWindow.Parent.Title = Title;
-		BGMPackWindow.Parent.Help = "";
+		BGMPackMenu.Init(BGMPackWindow, SelAtOpen, &MainWindow);
 		BGMPackWindow.Init(w);
 		BGMPackWindow.OpenCentered(w, BGMPackWindow.Select[0]);
 	}
 
-	static void Generate(WINDOW_INFO& ret, size_t generated, size_t selected)
+	static void Generate(WINDOW_CHOICE& ret, size_t generated, size_t selected)
 	{
 		const auto sel_none = SelNone();
 		const auto sel_download = SelDownload();

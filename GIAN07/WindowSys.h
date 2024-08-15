@@ -84,13 +84,11 @@ enum class WINDOW_FLAGS : uint8_t {
 	CENTER = 0x02,
 };
 
-// 子ウィンドウの情報 //
-struct WINDOW_INFO {
-	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
-	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
+struct WINDOW_MENU;
 
-	// 特殊処理用コールバック関数(未使用ならNULL)
-	bool	(*CallBackFn)(INPUT_BITS);
+// Shared data for menu titles and choices.
+struct WINDOW_LABEL {
+	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
 
 	WINDOW_FLAGS	Flags = WINDOW_FLAGS::NONE;
 	WINDOW_STATE	State = WINDOW_STATE::REGULAR;
@@ -98,33 +96,60 @@ struct WINDOW_INFO {
 	// Required for forcing the item to be re-rendered after a state change.
 	WINDOW_STATE	StatePrev = WINDOW_STATE::COUNT;
 
-	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
-	WINDOW_INFO*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
+	constexpr WINDOW_LABEL(
+		const Narrow::literal title = "",
+		WINDOW_FLAGS flags = WINDOW_FLAGS::NONE
+	) noexcept :
+		Title(title), Flags(flags) {
+	}
+};
 
-	constexpr WINDOW_INFO(
+// 子ウィンドウの情報 //
+struct WINDOW_CHOICE : public WINDOW_LABEL {
+	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
+
+	// 特殊処理用コールバック関数(未使用ならNULL)
+	bool	(*CallBackFn)(INPUT_BITS);
+
+	WINDOW_MENU	*Submenu = nullptr;
+
+	constexpr WINDOW_CHOICE(
 		const Narrow::literal title = "",
 		const Narrow::literal help = "",
 		decltype(CallBackFn) callback_fn = nullptr,
 		WINDOW_FLAGS flags = WINDOW_FLAGS::NONE
 	) noexcept :
-		Title(title),
-		Help(help),
-		CallBackFn(callback_fn),
-		NumItems(0),
-		Flags(flags)
+		WINDOW_LABEL(title, flags), Help(help), CallBackFn(callback_fn)
 	{
 		if(!callback_fn) {
 			State = WINDOW_STATE::DISABLED;
 		}
 	}
 
-	constexpr WINDOW_INFO(
+	constexpr WINDOW_CHOICE(
 		const Narrow::literal title,
 		const Narrow::literal help,
-		std::span<WINDOW_INFO> children
-	) :
-		Title(title), Help(help), CallBackFn(nullptr), NumItems(children.size())
+		WINDOW_MENU& submenu
+	) noexcept :
+		WINDOW_LABEL(title), Help(help), Submenu(&submenu)
 	{
+	}
+
+	void SetActive(bool active);
+};
+
+// Dynamic collection of menu items at a single hierarchy level.
+struct WINDOW_MENU {
+	WINDOW_LABEL*	Title;
+	WINDOW_CHOICE*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
+	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
+
+	template <size_t N> constexpr WINDOW_MENU(
+		std::span<WINDOW_CHOICE, N> children, WINDOW_LABEL* title = nullptr
+	) noexcept :
+		Title(title), NumItems(N)
+	{
+		static_assert(N <= WINITEM_MAX);
 		for(size_t i = 0; auto& item : children) {
 			ItemPtr[i++] = &item;
 		}
@@ -132,13 +157,11 @@ struct WINDOW_INFO {
 
 	// Returns the maximum number of items among all submenus.
 	uint8_t MaxItems() const;
-
-	void SetActive(bool active);
 };
 
 // ウィンドウ群 //
 typedef struct tagWINDOW_SYSTEM{
-	WINDOW_INFO		Parent;					// 親ウィンドウ
+	WINDOW_MENU&	Parent;	// 親ウィンドウ
 	int				x,y;					// ウィンドウ左上の座標
 	PIXEL_COORD	W;
 	uint32_t	Count;	// フレームカウンタ
@@ -156,14 +179,6 @@ typedef struct tagWINDOW_SYSTEM{
 	// Prepares text rendering for a window with the given width.
 	void Init(PIXEL_COORD w);
 
-	// Initializes [Parent] using the given title and info span, and prepares
-	// text rendering for a window with the given width.
-	void Init(
-		const Narrow::literal title,
-		std::span<WINDOW_INFO> info,
-		PIXEL_COORD w
-	);
-
 	// コマンドウィンドウの初期化 //
 	void Open(WINDOW_POINT topleft, int select);
 
@@ -176,15 +191,14 @@ typedef struct tagWINDOW_SYSTEM{
 // Unfortunately has to be a template because [WINDOW_SYSTEM::CallBackFn]
 // doesn't take a reference to a window system object.
 template <
+	WINDOW_LABEL& Title,
 	size_t (*ListSize)(),
-	void (*Generate)(WINDOW_INFO& ret, size_t generated, size_t selected),
+	void (*Generate)(WINDOW_CHOICE& ret, size_t generated, size_t selected),
 	bool (*Handle)(INPUT_BITS key, size_t selected),
 	size_t MaxVisible = WINITEM_MAX
-> class WINDOW_SCROLL {
-	static_assert(MaxVisible <= WINITEM_MAX);
-
+> class WINDOW_MENU_SCROLL {
 	// Rewritten when scrolling.
-	static inline WINDOW_INFO Item[MaxVisible] = {};
+	static inline std::array<WINDOW_CHOICE, MaxVisible> Item = {};
 
 	static inline size_t Sel = 0;
 	static inline WINDOW_SYSTEM *Sys = nullptr;
@@ -193,8 +207,8 @@ template <
 	static void Scroll(void)
 	{
 		const auto total = ListSize();
-		const auto visible = Sys->Parent.NumItems;
-		const auto visible_half = (Sys->Parent.NumItems / 2);
+		const auto visible = Menu.NumItems;
+		const auto visible_half = (Menu.NumItems / 2);
 		size_t generated_i = (
 			(Sel < visible_half) ? 0 :
 			(Sel >= (total - visible_half)) ? (total - visible) :
@@ -239,16 +253,14 @@ template <
 	}
 
 public:
+	static inline WINDOW_MENU Menu = { std::span(Item), &Title };
+
 	static void Init(WINDOW_SYSTEM& sys, size_t sel, WINDOW_SYSTEM* return_to)
 	{
 		assert(sel < ListSize());
 		Sys = &sys;
 		ReturnTo = return_to;
-		Sys->Parent.NumItems = (std::min)(ListSize(), MaxVisible);
-		Sys->Parent.CallBackFn = Fn;
-		for(size_t i = 0; i < Sys->Parent.NumItems; i++) {
-			Sys->Parent.ItemPtr[i] = &Item[i];
-		}
+		Menu.NumItems = (std::min)(ListSize(), Item.size());
 		Scroll();
 	}
 };

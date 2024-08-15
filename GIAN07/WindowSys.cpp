@@ -65,7 +65,7 @@ typedef struct tagMSG_WINDOW{
 
 ///// [非公開関数] /////
 
-static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws);	// アクティブなウィンドウを探す
+static WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws);	// アクティブなウィンドウを探す
 static void CWinKeyEvent(WINDOW_SYSTEM *ws);				// キーボード入力を処理する
 
 static void DrawWindowFrame(int x,int y,int w,int h);		// ウィンドウ枠を描画する
@@ -79,16 +79,18 @@ MSG_WINDOW		MsgWindow;		// メッセージウィンドウ
 
 
 
-uint8_t WINDOW_INFO::MaxItems() const
+uint8_t WINDOW_MENU::MaxItems() const
 {
 	uint8_t ret = NumItems;
 	for(auto i = 0; i < NumItems; i++) {
-		ret = (std::max)(ret, ItemPtr[i]->MaxItems());
+		if(ItemPtr[i]->Submenu) {
+			ret = (std::max)(ret, ItemPtr[i]->Submenu->MaxItems());
+		}
 	}
 	return ret;
 }
 
-void WINDOW_INFO::SetActive(bool active)
+void WINDOW_CHOICE::SetActive(bool active)
 {
 	State = (active ? WINDOW_STATE::REGULAR : WINDOW_STATE::DISABLED);
 }
@@ -103,22 +105,6 @@ void WINDOW_SYSTEM::Init(PIXEL_COORD w)
 	for(auto i = 0; i < max_items; i++) {
 		TRRs[i] = TextObj.Register({ W, CWIN_ITEM_H });
 	}
-}
-
-void WINDOW_SYSTEM::Init(
-	const Narrow::literal title, std::span<WINDOW_INFO> info, PIXEL_COORD w
-)
-{
-	Parent.Title      = title;
-	Parent.Help       = "";	// ここは指定しても意味がない
-	Parent.NumItems   = info.size();
-	Parent.CallBackFn = nullptr;
-
-	assert(info.size() <= WINITEM_MAX);
-	for(size_t i = 0; i < info.size(); i++) {
-		Parent.ItemPtr[i] = &info[i];
-	}
-	Init(w);
 }
 
 void WINDOW_SYSTEM::Open(WINDOW_POINT topleft, int select)
@@ -193,12 +179,11 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255,  70 } }, // Highlight
 		COLOR_PAIR{ {  96,  96,  96 }, { 192, 192, 192 } }, // Disabled
 	}};
-	WINDOW_INFO		*p;
 	int				i;
 	WINDOW_COORD	top = ws->y;
 
 	// アクティブな項目を検索する //
-	p = CWinSearchActive(ws);
+	auto* p = CWinSearchActive(ws);
 
 	// 半透明ＢＯＸの描画 //
 	const uint8_t alpha = (GrpGeom_FB() ? (64 + 32) : 128);
@@ -228,12 +213,12 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	// 文字列の描画 //
 	WINDOW_POINT topleft = { ws->x, ws->y };
 	const auto trr = ws->TRRs[0];
-	const Narrow::string_view str = p->Title;
+	const Narrow::string_view str = p->Title->Title;
 	TextObj.Render(topleft, trr, str, [=](TEXTRENDER_SESSION auto& s) {
 		const auto& col = COL[WINDOW_STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
 
-		const auto left = (!!(p->Flags & WINDOW_FLAGS::CENTER)
+		const auto left = (!!(p->Title->Flags & WINDOW_FLAGS::CENTER)
 			? TextLayoutXCenter(s, str)
 			: 0
 		);
@@ -612,10 +597,8 @@ static void DrawWindowFrame(int x,int y,int w,int h)
 // ヘルプ文字列を送る //
 void MWinHelp(WINDOW_SYSTEM *ws)
 {
-	WINDOW_INFO		*p;
-
 	// アクティブなウィンドウを検索し、メッセージ領域をクリアする //
-	p = CWinSearchActive(ws);
+	const auto *p = CWinSearchActive(ws);
 	MsgWindow.MsgBlank();
 
 	// 一列だけ文字列を割り当てる //
@@ -623,15 +606,14 @@ void MWinHelp(WINDOW_SYSTEM *ws)
 }
 
 // アクティブなウィンドウを探す //
-static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws)
+static WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws)
 {
-	WINDOW_INFO		*p;
 	int				i;
 
 	// 現在アクティブな項目を探す //
-	p = &(ws->Parent);
+	auto *p = &(ws->Parent);
 	for(i=0;i<ws->SelectDepth;i++){
-		p = p->ItemPtr[ws->Select[i]];
+		p = p->ItemPtr[ws->Select[i]]->Submenu;
 	}
 
 	return p;
@@ -660,7 +642,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	auto Depth = ws->SelectDepth;
 
 	// アクティブな項目をセットする //
-	const auto *p2 = p->ItemPtr[ws->Select[Depth]];
+	auto *p2 = p->ItemPtr[ws->Select[Depth]];
 
 	assert(p2->State != STATE::DISABLED);
 
@@ -737,7 +719,8 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		// デフォルトのキーボード動作 //
 		if(CWinOKKey(Key_Data)) {
 			// 決定・選択
-			if(p2->NumItems != 0) {
+			if(p2->Submenu && (p2->Submenu->NumItems != 0)) {
+				p2->Submenu->Title = p2;
 				ws->Select[Depth + 1] = 0;
 				ws->SelectDepth++;
 			}

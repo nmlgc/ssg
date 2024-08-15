@@ -384,7 +384,6 @@ extern bool IsDraw();
 namespace DAT_MISSING {
 	constexpr Narrow::string_view TITLE = "Missing game data files";
 
-	WINDOW_SYSTEM Window;
 	bool FoundAll = false;
 
 	bool FnRecheck(INPUT_BITS key) {
@@ -398,7 +397,8 @@ namespace DAT_MISSING {
 	}
 
 	constexpr auto CENTER = WINDOW_FLAGS::CENTER;
-	std::array<WINDOW_INFO, (DAT::BASENAMES.size() + 6)> Info = {{
+	WINDOW_LABEL Title = { TITLE.data(), CENTER };
+	std::array<WINDOW_CHOICE, (DAT::BASENAMES.size() + 6)> Info = {{
 		{ },
 		{ },
 		{ },
@@ -411,6 +411,8 @@ namespace DAT_MISSING {
 		{ "Recheck", "", FnRecheck, CENTER },
 		{ "Quit", "", CWinExitFn, CENTER },
 	}};
+	WINDOW_MENU Menu = { std::span(Info), &Title };
+	WINDOW_SYSTEM Window = { Menu };
 
 	void Proc(bool& quit)
 	{
@@ -444,8 +446,7 @@ namespace DAT_MISSING {
 
 		Grp_PaletteSetDefault();
 
-		Window.Parent.Flags = CENTER;
-		Window.Init(TITLE.data(), Info, w);
+		Window.Init(w);
 		Window.OpenCentered(w, (Info.size() - 2));
 		GameMain = Proc;
 	}

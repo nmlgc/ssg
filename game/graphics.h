@@ -6,6 +6,7 @@
 #pragma once
 
 import std.compat;
+#include "game/pixelformat.h"
 #include <assert.h>
 
 // Paletted graphics //
@@ -101,6 +102,11 @@ void Grp_PaletteSetDefault(void);
 
 // Required to enable the screenshot feature as a whole.
 void Grp_SetScreenshotPrefix(std::u8string_view prefix);
+
+struct GRAPHICS_PARAMS {
+	uint8_t device_id;
+	BITDEPTH bitdepth;
+};
 
 // Wraps screenshot handling around GrpBackend_Flip().
 void Grp_Flip(void);

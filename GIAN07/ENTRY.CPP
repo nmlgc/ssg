@@ -5,6 +5,7 @@
 
 #include "GIAN07/ENTRY.H"
 #include "GIAN07/CONFIG.H"
+#include "GIAN07/FONTUTY.H"
 #include "GIAN07/GAMEMAIN.H"
 #include "GIAN07/LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
@@ -75,3 +76,14 @@ void XCleanup(void)
 	Key_End();
 }
 
+void XGrpTry(GRAPHICS_PARAMS& params)
+{
+	if(DxObj.Init(params.device_id, params.bitdepth)) {
+		TextObj.WipeBeforeNextRender();
+		ConfigDat.GraphicsParamsApply(params);
+
+		// TODO: Assumes that 8-bit mode only ever calls this function within
+		// the main menu.
+		GrpSurface_PaletteApplyToBackend(SURFACE_ID::TITLE);
+	}
+}

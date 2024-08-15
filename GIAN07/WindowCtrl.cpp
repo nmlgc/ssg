@@ -6,6 +6,7 @@
 #include "WindowCtrl.h"
 #include "WindowSys.h"
 #include "CONFIG.H"
+#include "ENTRY.H"
 #include "FONTUTY.H"
 #include "GAMEMAIN.H"
 #include "LEVEL.H"
@@ -370,8 +371,8 @@ static bool DifFnDemo(INPUT_BITS key)
 
 static bool GrpFnChgDevice(INPUT_BITS key)
 {
-	return OptionFN(key, SetGrpItem, [&]() {
-		const int flag = ((key == KEY_LEFT) ? -1 : 2);
+	const int delta = ((key == KEY_LEFT) ? -1 : 2);
+	return OptionFN(key, SetGrpItem, [&]() { XGrpTry([&](auto& params) {
 		// 一つしかデバイスが存在しないときは変更できない //
 		const auto device_count = GrpBackend_DeviceCount();
 		if(device_count <= 1) {
@@ -379,16 +380,10 @@ static bool GrpFnChgDevice(INPUT_BITS key)
 		}
 
 		// 次のデバイスへ //
-		uint8_t device_id_new = (
-			(ConfigDat.DeviceID.v + device_count + flag) % device_count
+		params.device_id = (
+			(ConfigDat.DeviceID.v + device_count + delta) % device_count
 		);
-
-		// この部分に本当ならエラーチェックが必要(後で関数化しろよ) //
-		TextObj.WipeBeforeNextRender();
-		if(DxObj.Init(device_id_new, ConfigDat.BitDepth.v)) {
-			ConfigDat.DeviceID.v = device_id_new;
-		}
-	});
+	}); });
 }
 
 static bool GrpFnSkip(INPUT_BITS key)
@@ -398,17 +393,10 @@ static bool GrpFnSkip(INPUT_BITS key)
 
 static bool GrpFnBpp(INPUT_BITS key)
 {
-	return OptionFN(key, SetGrpItem, [&]() {
-		auto bitdepth_new = ConfigDat.BitDepth.v.cycle(key == KEY_LEFT);
-
-		// この部分に本当ならエラーチェックが必要 //
-		TextObj.WipeBeforeNextRender();
-		if(DxObj.Init(ConfigDat.DeviceID.v, bitdepth_new)) {
-			ConfigDat.BitDepth.v = bitdepth_new;
-			// GrpBackend_PaletteSet(DxObj.pe);
-			GrpSurface_PaletteApplyToBackend(SURFACE_ID::TITLE);
-		}
-	});
+	const auto delta = CWinOptionKeyDelta(key);
+	return OptionFN(key, SetGrpItem, [&]() { XGrpTry([delta](auto& params) {
+		params.bitdepth = ConfigDat.BitDepth.v.cycle(delta < 0);
+	}); });
 }
 
 static bool GrpFnWinLocate(INPUT_BITS key)

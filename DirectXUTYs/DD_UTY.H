@@ -25,7 +25,6 @@
 #include "DirectXUTYs/DD_GRP2D.H"	// ２Ｄ用描画関数(公開しないこと)
 #include "DirectXUTYs/DD_GRP3D.H"	// ３Ｄ用描画関数(公開しないこと)
 #include "game/graphics.h"
-#include "game/pixelformat.h"
 
 
 // Forward declarations //

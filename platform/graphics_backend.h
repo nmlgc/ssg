@@ -8,7 +8,6 @@
 #include "constants.h"
 #include "game/graphics.h"
 #include "game/narrow.h"
-#include "game/pixelformat.h"
 
 /// Enumeration and pre-initialization queries
 /// ------------------------------------------

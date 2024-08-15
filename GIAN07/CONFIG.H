@@ -11,6 +11,7 @@
 #include "game/pixelformat.h"
 #include "game/volume.h"
 #include "platform/buffer.h"
+#include "platform/graphics_backend.h"
 #include "platform/unicode.h"
 
 // フラグ //
@@ -187,6 +188,9 @@ struct CONFIG_DATA {
 
 	// ワケ有りでここにいるのです(チェックサムの範囲外)
 	OPTION_U8_BELOW<STAGE_MAX> StageSelect = { 0 };
+
+	GRAPHICS_PARAMS GraphicsParams(void) const;
+	void GraphicsParamsApply(const GRAPHICS_PARAMS& params);
 };
 
 // Active configuration

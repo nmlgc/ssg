@@ -217,6 +217,20 @@ bool VersionSave(const VERSION auto& version)
 }
 // ----------------------------
 
+GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
+{
+	return {
+		.device_id = DeviceID.v,
+		.bitdepth = BitDepth.v,
+	};
+}
+
+void CONFIG_DATA::GraphicsParamsApply(const GRAPHICS_PARAMS& params)
+{
+	DeviceID.v = params.device_id;
+	BitDepth.v = params.bitdepth;
+}
+
 ///// [グローバル変数] /////
 CONFIG_DATA ConfigDat;
 #ifdef PBG_DEBUG

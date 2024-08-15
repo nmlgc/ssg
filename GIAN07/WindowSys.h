@@ -172,27 +172,29 @@ typedef struct tagWINDOW_SYSTEM{
 
 
 
-// Turns [Sys] into a vertically scrolling window, with elements generated on
-// the fly.
+// Vertically scrolling menu with elements generated on the fly.
 // Unfortunately has to be a template because [WINDOW_SYSTEM::CallBackFn]
 // doesn't take a reference to a window system object.
 template <
-	WINDOW_SYSTEM& Sys,
 	size_t (*ListSize)(),
 	void (*Generate)(WINDOW_INFO& ret, size_t generated, size_t selected),
-	bool (*Handle)(INPUT_BITS key, size_t selected)
+	bool (*Handle)(INPUT_BITS key, size_t selected),
+	size_t MaxVisible = WINITEM_MAX
 > class WINDOW_SCROLL {
+	static_assert(MaxVisible <= WINITEM_MAX);
+
 	// Rewritten when scrolling.
-	static inline WINDOW_INFO Item[WINITEM_MAX] = {};
+	static inline WINDOW_INFO Item[MaxVisible] = {};
 
 	static inline size_t Sel = 0;
+	static inline WINDOW_SYSTEM *Sys = nullptr;
 	static inline WINDOW_SYSTEM* ReturnTo = nullptr;
 
 	static void Scroll(void)
 	{
 		const auto total = ListSize();
-		const auto visible = Sys.Parent.NumItems;
-		const auto visible_half = (Sys.Parent.NumItems / 2);
+		const auto visible = Sys->Parent.NumItems;
+		const auto visible_half = (Sys->Parent.NumItems / 2);
 		size_t generated_i = (
 			(Sel < visible_half) ? 0 :
 			(Sel >= (total - visible_half)) ? (total - visible) :
@@ -202,7 +204,7 @@ template <
 			Item[item_i].CallBackFn = Fn;
 			Generate(Item[item_i], generated_i, Sel);
 			if(generated_i == Sel) {
-				Sys.Select[0] = item_i;
+				Sys->Select[Sys->SelectDepth] = item_i;
 			}
 			generated_i++;
 		}
@@ -223,7 +225,11 @@ template <
 			}
 			Scroll();
 		} else if((key == KEY_BOMB) || (key == KEY_ESC)) {
-			Sys.State = CWIN_DEAD;
+			if(Sys->SelectDepth > 0) {
+				Sys->SelectDepth--;
+			} else {
+				Sys->State = CWIN_DEAD;
+			}
 			if(ReturnTo) {
 				ReturnTo->OldKey = key;
 			}
@@ -233,25 +239,17 @@ template <
 	}
 
 public:
-	static void Init(
-		const Narrow::literal title,
-		size_t sel,
-		PIXEL_COORD w,
-		WINDOW_SYSTEM* return_to
-	)
+	static void Init(WINDOW_SYSTEM& sys, size_t sel, WINDOW_SYSTEM* return_to)
 	{
 		assert(sel < ListSize());
-
+		Sys = &sys;
 		ReturnTo = return_to;
-		Sys.Parent.Title = title;
-		Sys.Parent.Help = "";
-		Sys.Parent.NumItems = (std::min)(ListSize(), size_t{ WINITEM_MAX });
-		Sys.Parent.CallBackFn = Fn;
-		for(size_t i = 0; i < Sys.Parent.NumItems; i++) {
-			Sys.Parent.ItemPtr[i] = &Item[i];
+		Sys->Parent.NumItems = (std::min)(ListSize(), MaxVisible);
+		Sys->Parent.CallBackFn = Fn;
+		for(size_t i = 0; i < Sys->Parent.NumItems; i++) {
+			Sys->Parent.ItemPtr[i] = &Item[i];
 		}
 		Scroll();
-		Sys.Init(w);
 	}
 };
 

@@ -279,7 +279,7 @@ WINDOW_SYSTEM ExitWindow;
 WINDOW_SYSTEM ContinueWindow;
 WINDOW_SYSTEM BGMPackWindow;
 WINDOW_SCROLL<
-	BGMPackWindow, BGMPack::ListSize, BGMPack::Generate, BGMPack::Handle
+	BGMPack::ListSize, BGMPack::Generate, BGMPack::Handle
 > BGMPackScroll;
 
 
@@ -529,7 +529,10 @@ namespace BGMPack {
 		}
 		w = (std::min)(w, GRP_RES.w);
 
-		BGMPackScroll.Init(Title, SelAtOpen, w, &MainWindow);
+		BGMPackScroll.Init(BGMPackWindow, SelAtOpen, &MainWindow);
+		BGMPackWindow.Parent.Title = Title;
+		BGMPackWindow.Parent.Help = "";
+		BGMPackWindow.Init(w);
 		BGMPackWindow.OpenCentered(w, BGMPackWindow.Select[0]);
 	}
 

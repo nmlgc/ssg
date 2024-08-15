@@ -397,7 +397,7 @@ namespace DAT_MISSING {
 		return true;
 	}
 
-	constexpr auto CENTER = WINDOW_INFO::FLAGS::CENTER;
+	constexpr auto CENTER = WINDOW_FLAGS::CENTER;
 	std::array<WINDOW_INFO, (DAT::BASENAMES.size() + 6)> Info = {{
 		{ },
 		{ },

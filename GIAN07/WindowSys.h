@@ -66,38 +66,37 @@
 
 ///// [構造体] /////
 
+enum class WINDOW_STATE : uint8_t {
+	REGULAR = 0,
+	HIGHLIGHT = 1,
+	DISABLED = 2,
+	COUNT,
+};
+
+enum class WINDOW_FLAGS : uint8_t {
+	_HAS_BITFLAG_OPERATORS,
+	NONE = 0x00,
+
+	// Shortens the key repeat times for option items.
+	FAST_REPEAT = 0x01,
+
+	// Horizontally centered text.
+	CENTER = 0x02,
+};
+
 // 子ウィンドウの情報 //
 struct WINDOW_INFO {
-	enum class STATE : uint8_t {
-		REGULAR = 0,
-		HIGHLIGHT = 1,
-		DISABLED = 2,
-		COUNT,
-	};
-
-	enum class FLAGS : uint8_t {
-		_HAS_BITFLAG_OPERATORS,
-		NONE = 0x00,
-
-		// Shortens the key repeat times for option items.
-		FAST_REPEAT = 0x01,
-
-		// Horizontally centered text.
-		CENTER = 0x02,
-	};
-
 	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
 	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
 
 	// 特殊処理用コールバック関数(未使用ならNULL)
 	bool	(*CallBackFn)(INPUT_BITS);
 
-	STATE	State = STATE::REGULAR;
+	WINDOW_FLAGS	Flags = WINDOW_FLAGS::NONE;
+	WINDOW_STATE	State = WINDOW_STATE::REGULAR;
 
 	// Required for forcing the item to be re-rendered after a state change.
-	STATE	StatePrev = STATE::COUNT;
-
-	FLAGS	Flags = FLAGS::NONE;
+	WINDOW_STATE	StatePrev = WINDOW_STATE::COUNT;
 
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
 	WINDOW_INFO*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
@@ -106,7 +105,7 @@ struct WINDOW_INFO {
 		const Narrow::literal title = "",
 		const Narrow::literal help = "",
 		decltype(CallBackFn) callback_fn = nullptr,
-		FLAGS flags = FLAGS::NONE
+		WINDOW_FLAGS flags = WINDOW_FLAGS::NONE
 	) noexcept :
 		Title(title),
 		Help(help),
@@ -115,7 +114,7 @@ struct WINDOW_INFO {
 		Flags(flags)
 	{
 		if(!callback_fn) {
-			State = STATE::DISABLED;
+			State = WINDOW_STATE::DISABLED;
 		}
 	}
 

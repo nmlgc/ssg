@@ -90,7 +90,7 @@ uint8_t WINDOW_INFO::MaxItems() const
 
 void WINDOW_INFO::SetActive(bool active)
 {
-	State = (active ? STATE::REGULAR : STATE::DISABLED);
+	State = (active ? WINDOW_STATE::REGULAR : WINDOW_STATE::DISABLED);
 }
 
 void WINDOW_SYSTEM::Init(PIXEL_COORD w)
@@ -188,7 +188,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 		RGBA text;
 	};
 
-	static constexpr ENUMARRAY<COLOR_PAIR, WINDOW_INFO::STATE> COL = {{
+	static constexpr ENUMARRAY<COLOR_PAIR, WINDOW_STATE> COL = {{
 		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255, 255 } }, // Regular
 		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255,  70 } }, // Highlight
 		COLOR_PAIR{ {  96,  96,  96 }, { 192, 192, 192 } }, // Disabled
@@ -230,10 +230,10 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	const auto trr = ws->TRRs[0];
 	const Narrow::string_view str = p->Title;
 	TextObj.Render(topleft, trr, str, [=](TEXTRENDER_SESSION auto& s) {
-		const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
+		const auto& col = COL[WINDOW_STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
 
-		const auto left = (!!(p->Flags & WINDOW_INFO::FLAGS::CENTER)
+		const auto left = (!!(p->Flags & WINDOW_FLAGS::CENTER)
 			? TextLayoutXCenter(s, str)
 			: 0
 		);
@@ -256,7 +256,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 
 			// Adding CWIN_ITEM_LEFT to centered text would throw it off-center,
 			// obviously.
-			const auto left = (!!(item->Flags & WINDOW_INFO::FLAGS::CENTER)
+			const auto left = (!!(item->Flags & WINDOW_FLAGS::CENTER)
 				? TextLayoutXCenter(s, str)
 				: CWIN_ITEM_LEFT
 			);
@@ -643,8 +643,8 @@ static WINDOW_INFO *CWinSearchActive(WINDOW_SYSTEM *ws)
 // キーボード入力を処理する //
 static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 {
-	using STATE = WINDOW_INFO::STATE;
-	using FLAGS = WINDOW_INFO::FLAGS;
+	using STATE = WINDOW_STATE;
+	using FLAGS = WINDOW_FLAGS;
 
 	if(ws->FirstWait){
 		if(Key_Data) return;

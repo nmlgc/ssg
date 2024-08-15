@@ -176,7 +176,7 @@ WINDOW_INFO GrpItem[] = {
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
-constexpr auto VOLUME_FLAGS = WINDOW_INFO::FLAGS::FAST_REPEAT;
+constexpr auto VOLUME_FLAGS = WINDOW_FLAGS::FAST_REPEAT;
 
 static char SndTitleSE[26];
 static char SndTitleBGM[26];
@@ -548,8 +548,8 @@ namespace BGMPack {
 			ret.Help = "";
 		}
 		ret.State = ((generated == SelAtOpen)
-			? WINDOW_INFO::STATE::HIGHLIGHT
-			: WINDOW_INFO::STATE::REGULAR
+			? WINDOW_STATE::HIGHLIGHT
+			: WINDOW_STATE::REGULAR
 		);
 		if(generated == selected) {
 			if((generated == sel_none) || (generated == sel_download)) {
@@ -894,10 +894,10 @@ static void SetSndItem(void)
 			strcpy(buf, dev.data());
 		}
 		sprintf(SndTitleMIDIPort, ">%.18s", (buf + now));
-		SndItemMIDIPort.State = WINDOW_INFO::STATE::REGULAR;
+		SndItemMIDIPort.State = WINDOW_STATE::REGULAR;
 	} else {
 		strcpy(SndTitleMIDIPort, ">");
-		SndItemMIDIPort.State = WINDOW_INFO::STATE::DISABLED;
+		SndItemMIDIPort.State = WINDOW_STATE::DISABLED;
 	}
 }
 

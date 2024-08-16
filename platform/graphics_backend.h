@@ -75,9 +75,11 @@ void GrpSurface_BlitOpaque(
 	SURFACE_GDI& GrpSurface_GDIText_Surface(void);
 
 	// (Re-)creates the backend's designated GDI text surface with the given
-	// size and undefined initial contents. After filling it with the intended
-	// pixels, call GrpSurface_GDIText_Update() to upload them to the backend.
-	bool GrpSurface_GDIText_Create(PIXEL_SIZE size, RGB colorkey);
+	// size and undefined initial contents. [w] and [h] have already been
+	// validated to fit into the positive range of a signed 32-bit integer.
+	// After filling it with the intended pixels, call
+	// GrpSurface_GDIText_Update() to upload them to the backend.
+	bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey);
 
 	bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r);
 	// -------------------------------

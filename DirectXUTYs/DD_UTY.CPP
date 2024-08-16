@@ -534,19 +534,10 @@ SURFACE_GDI& GrpSurface_GDIText_Surface(void)
 	return DxSurf[SURFACE_ID::TEXT];
 }
 
-bool GrpSurface_GDIText_Create(PIXEL_SIZE size, RGB colorkey)
+bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
 {
 	auto& surf = DxSurf[SURFACE_ID::TEXT];
 	surf.Delete();
-
-	if(
-		!size ||
-		(size.w > (std::numeric_limits<int32_t>::max)()) ||
-		(size.h > (std::numeric_limits<int32_t>::max)())
-	) {
-		assert(!"Invalid size for blank surface");
-		return false;
-	}
 
 	HDC reference_dc;
 	if(DxObj.Back->GetDC(&reference_dc) != DD_OK) {
@@ -556,14 +547,14 @@ bool GrpSurface_GDIText_Create(PIXEL_SIZE size, RGB colorkey)
 	// This *MUST* be a compatible bitmap. You do *NOT* want to blit a 24-bit
 	// GDI image onto an 8-bit DirectDraw surface, and work around all of GDI's
 	// undocumented palette color matching quirks.
-	surf.img = CreateCompatibleBitmap(reference_dc, size.w, size.h);
+	surf.img = CreateCompatibleBitmap(reference_dc, w, h);
 
 	if((DxObj.Back->ReleaseDC(reference_dc) != DD_OK) || !surf.img) {
 		return false;
 	}
 	surf.stock_img = SelectObject(surf.dc, surf.img);
 	return (
-		DxObj.SurfaceCreateUninitialized(surf, size) &&
+		DxObj.SurfaceCreateUninitialized(surf, { w, h }) &&
 		DxObj.SurfaceSetColorKey(surf, colorkey)
 	);
 }

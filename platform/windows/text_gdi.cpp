@@ -101,8 +101,18 @@ void TEXTRENDER_GDI_SESSION::Put(
 
 bool TEXTRENDER_GDI::Wipe()
 {
+	if(
+		!bounds ||
+		(bounds.w > (std::numeric_limits<int32_t>::max)()) ||
+		(bounds.h > (std::numeric_limits<int32_t>::max)())
+	) {
+		assert(!"Invalid size for blank surface");
+		return false;
+	}
+	const auto w = static_cast<int32_t>(bounds.w);
+	const auto h = static_cast<int32_t>(bounds.h);
 	return (
-		GrpSurface_GDIText_Create(bounds, { 0x00, 0x00, 0x00 }) &&
+		GrpSurface_GDIText_Create(w, h, { 0x00, 0x00, 0x00 }) &&
 		TEXTRENDER_PACKED::Wipe()
 	);
 }

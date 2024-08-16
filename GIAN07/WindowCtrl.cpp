@@ -33,7 +33,9 @@ static void DifFnHit(int_fast8_t delta);
 static void DifFnDemo(int_fast8_t delta);
 #endif
 
+static void GrpAPIFnDef(int_fast8_t delta);
 static void GrpFnChgDevice(int_fast8_t delta);
+static void GrpFnSetAPI(int_fast8_t delta);
 static void GrpFnSkip(int_fast8_t delta);
 static void GrpFnBpp(int_fast8_t delta);
 static void GrpFnWinLocate(int_fast8_t delta);
@@ -72,6 +74,7 @@ static bool ScoreFn(INPUT_BITS key);
 
 static void SetDifItem(bool tick = true);
 static void SetGrpItem(bool tick = true);
+static void SetGrpAPIItem(bool tick = true);
 static void SetSndItem(bool tick = true);
 static void SetInpItem(bool tick = true);
 static void SetIKeyItem(bool tick = true);
@@ -151,6 +154,8 @@ namespace BGMPack {
 }
 
 constexpr auto HELP_SUBMENU_EXIT = "一つ前のメニューにもどります";
+constexpr auto HELP_API_DEFAULT  = "Let the backend choose a graphics API";
+constexpr auto HELP_API_SPECIFIC = "Select to override default API selection";
 
 constexpr WINDOW_CHOICE HRuleItemForArray = { "-------------------" };
 constexpr WINDOW_CHOICE SubmenuExitItemForArray = {
@@ -175,10 +180,19 @@ WINDOW_CHOICE DifItem[] = {
 };
 WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
+#ifdef GRP_SUPPORT_API
+	char GrpAPIDefTitle[26];
+	WINDOW_CHOICE GrpAPIItemDef = {
+		GrpAPIDefTitle, HELP_API_DEFAULT, GrpAPIFnDef
+	};
+	std::array<WINDOW_CHOICE, 6> GrpAPIItem;
+	WINDOW_MENU GrpAPIMenu = { std::span<WINDOW_CHOICE, 0>(), SetGrpAPIItem };
+#endif
+
 static char GrpTitleDevice[50];
 static char GrpTitleSkip[50];
 #ifdef GRP_SUPPORT_BITDEPTH
-static char GrpTitleBpp[50];
+	static char GrpTitleBpp[50];
 #endif
 static char GrpTitleMsg[50];
 // WINDOW_CHOICE GrpItemDevice = {
@@ -187,18 +201,27 @@ static char GrpTitleMsg[50];
 WINDOW_CHOICE GrpItemSkip = {
 	GrpTitleSkip, "描画スキップの設定です", GrpFnSkip
 };
-WINDOW_CHOICE GrpItemBpp = {
-	GrpTitleBpp, "使用する色数を指定します", GrpFnBpp
-};
+#ifdef GRP_SUPPORT_BITDEPTH
+	WINDOW_CHOICE GrpItemBpp = {
+		GrpTitleBpp, "使用する色数を指定します", GrpFnBpp
+	};
+#endif
 WINDOW_CHOICE GrpItemMsg = {
 	GrpTitleMsg, "ウィンドウの表示位置を決めます", GrpFnWinLocate
 };
+#ifdef GRP_SUPPORT_API
+	WINDOW_CHOICE GrpItemAPI = { "API",	"Select rendering API",	GrpAPIMenu };
+#endif
 WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
 	&GrpItemSkip,
 #ifdef GRP_SUPPORT_BITDEPTH
 	&GrpItemBpp,
 #endif
+#ifdef GRP_SUPPORT_API
+	&GrpItemAPI,
+#endif
+	&HRuleItem,
 	&GrpItemMsg,
 	&GrpItemExit,
 } };
@@ -328,6 +351,26 @@ WINDOW_SYSTEM BGMPackWindow = { BGMPackMenu.Menu };
 // メインメニューの初期化 //
 void InitMainWindow(void)
 {
+	#ifdef GRP_SUPPORT_API
+		const auto grp_api_count = GrpBackend_APICount();
+		if(grp_api_count >= 2) {
+			assert(grp_api_count <= GrpAPIItem.size());
+			auto* menu_p = GrpAPIMenu.ItemPtr;
+
+			*(menu_p++) = &GrpAPIItemDef;
+			for(const auto i : std::views::iota(0, grp_api_count)) {
+				const Narrow::string_view name = GrpBackend_APIName(i);
+				assert(!name.empty());
+				GrpAPIItem[i] = { name.data(), HELP_API_SPECIFIC, GrpFnSetAPI };
+				*(menu_p++) = &GrpAPIItem[i];
+			}
+			*(menu_p++) = &SubmenuExitItem;
+			GrpAPIMenu.NumItems = std::distance(GrpAPIMenu.ItemPtr, menu_p);
+		} else {
+			GrpItemAPI.State = WINDOW_STATE::DISABLED;
+		}
+	#endif
+
 	MainWindow.Init(140);
 
 	//	{ "   Config",	"各種設定を変更します",	CfgItem },
@@ -393,6 +436,13 @@ static void DifFnDemo(int_fast8_t)
 
 #endif // PBG_DEBUG
 
+static void GrpAPIFnDef(int_fast8_t)
+{
+	XGrpTry([](auto& params) {
+		params.api = -1;
+	});
+}
+
 static void GrpFnChgDevice(int_fast8_t delta)
 {
 	XGrpTry([&](auto& params) {
@@ -406,6 +456,13 @@ static void GrpFnChgDevice(int_fast8_t delta)
 		params.device_id = (
 			(ConfigDat.DeviceID.v + device_count + delta) % device_count
 		);
+	});
+}
+
+static void GrpFnSetAPI(int_fast8_t)
+{
+	XGrpTry([](auto& params) {
+		params.api = (MainWindow.Select[MainWindow.SelectDepth] - 1);
 	});
 }
 
@@ -829,6 +886,29 @@ static void SetGrpItem(bool)
 	sprintf(GrpTitleMsg,    "MsgWindow[%s]", UorD[u_or_d]);
 	// clang-format on
 }
+
+#ifdef GRP_SUPPORT_API
+static void SetGrpAPIItem(bool)
+{
+	const bool is_def_api = (ConfigDat.GraphicsAPI.v < 0);
+
+	// Since [ConfigDat.GraphicsAPI.v] can be negative, we must find the
+	// active entry via string comparison.
+	const Narrow::string_view api_active = GrpBackend_APIName(
+		ConfigDat.GraphicsAPI.v
+	);
+
+	GrpAPIItemDef.SetActive(!is_def_api);
+	for(auto& api : GrpAPIItem | std::views::take(GrpBackend_APICount())) {
+		api.State = (!strcmp(api_active.data(), api.Title.ptr)
+			? WINDOW_STATE::HIGHLIGHT
+			: WINDOW_STATE::REGULAR
+		);
+	}
+
+	sprintf(GrpAPIDefTitle, "UseDefault  %s", CHOICE_OFF_ON[is_def_api]);
+}
+#endif
 
 static void SetSndItem(bool tick)
 {

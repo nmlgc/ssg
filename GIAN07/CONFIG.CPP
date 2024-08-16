@@ -193,12 +193,22 @@ const struct VERSION_01 {
 		ConfigDat.SEVolume,
 		ConfigDat.BGMVolume,
 		ConfigDat.BGMPack,
-		ConfigDat.GraphicsAPI,
 	};
 } VERSION_01;
 
+const struct VERSION_02 {
+	static constexpr auto FN = _PATH("SSG_V02.CFG");
+
+	static constexpr CONFIG_OPTION_ARRAY Options = {
+		VERSION_01.Options,
+		ConfigDat.GraphicsAPI,
+	};
+} VERSION_02;
+
+
 // Must be sorted from the newest to the oldest version.
 const auto VERSIONS = std::make_tuple(
+	VERSION_02,
 	VERSION_01,
 	VERSION_00,
 	VERSION_ORIGINAL

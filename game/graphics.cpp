@@ -83,7 +83,7 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 }
 // -----------
 
-std::optional<GRAPHICS_PARAMS> Grp_Init(
+std::optional<GRAPHICS_INIT_RESULT> Grp_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 )
 {
@@ -96,7 +96,7 @@ std::optional<GRAPHICS_PARAMS> Grp_Init(
 	return GrpBackend_Init(maybe_prev, params);
 }
 
-std::optional<GRAPHICS_PARAMS> Grp_InitOrFallback(GRAPHICS_PARAMS params)
+std::optional<GRAPHICS_INIT_RESULT> Grp_InitOrFallback(GRAPHICS_PARAMS params)
 {
 	if(const auto ret = Grp_Init(std::nullopt, params)) {
 		return ret;

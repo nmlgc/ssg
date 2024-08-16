@@ -250,7 +250,7 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	);
 }
 
-std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
+std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 )
 {
@@ -262,7 +262,7 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
 
 	extern HWND hWndMain;
 	if(hWndMain == nullptr) {
-		return maybe_prev;
+		return GRAPHICS_INIT_RESULT::From(maybe_prev);
 	}
 
 	auto& pXDD = DxEnum[params.device_id];
@@ -271,13 +271,13 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
 	if(!pXDD.BitDepthSupported(params.bitdepth)) {
 		params.bitdepth = pXDD.BitDepthBest();
 		if(!params.bitdepth) {
-			return maybe_prev;
+			return GRAPHICS_INIT_RESULT::From(maybe_prev);
 		}
 	}
 
 	const auto maybe_pixel_format = params.bitdepth.pixel_format();
 	if(!maybe_pixel_format) {
-		return maybe_prev;
+		return GRAPHICS_INIT_RESULT::From(maybe_prev);
 	}
 	const auto pixel_format = maybe_pixel_format.value();
 
@@ -288,7 +288,7 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
 			(prev.device_id == params.device_id) &&
 			(prev.bitdepth == params.bitdepth)
 		) {
-			return maybe_prev;
+			return GRAPHICS_INIT_RESULT::From(maybe_prev);
 		}
 	}
 
@@ -385,7 +385,7 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
 			}
 		}
 
-		return params;
+		return GRAPHICS_INIT_RESULT{ params, false };
 	}
 
 	return std::nullopt;

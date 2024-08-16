@@ -29,12 +29,13 @@ std::u8string_view GrpBackend_APIName(int8_t id);
 
 // Tries initializing the backend with the closest available configuration for
 // the given [params], which can be assumed to be valid. Called after
-// GrpBackend_Enum(). Returns the actual configuration the backend is running,
-// or `std::nullopt` if no valid format could be found.
+// GrpBackend_Enum(). Returns the actual configuration the backend is running
+// and whether the call site must reinitialize any surfaces, or `std::nullopt`
+// if no valid format could be found.
 //
 // If [maybe_prev] is valid, this call is supposed to reinitialize an already
 // running backend with new parameters.
-std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
+std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 );
 

@@ -100,6 +100,8 @@ BYTE_BUFFER_OWNED LoadDemo(int stage);
 
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
 
+// Reloads the last stage loaded with LoadGraph().
+void ReloadGraph(void);
 
 /*
 // 廃止：2000/12/01 //

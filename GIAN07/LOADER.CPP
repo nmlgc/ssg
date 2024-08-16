@@ -486,12 +486,13 @@ PALETTE SProjectPalette;
 // 秘密の関数 //
 static void SetAnimeRect2(ANIME_DATA *anm, int x1, int y1, int x2, int y2);
 
+static int LoadedStage = 0;
 
 // あるステージのグラフィックをロードする //
 bool LoadGraph(int stage)
 {
 //	bIsBombPalette = FALSE;
-
+	LoadedStage = stage;
 	const auto& graph = DAT::Packfile(DAT::PACK_ID::GRAPH);
 
 	// 音楽室用 //
@@ -607,6 +608,12 @@ bool LoadGraph(int stage)
 
 	// 諸事情により、ここにいるのです //
 	return GrpBMPLoadP(graph, 26, SURFACE_ID::BOMBER);
+}
+
+void ReloadGraph(void)
+{
+	assert(LoadedStage != 0);
+	LoadGraph(LoadedStage);
 }
 
 bool LoadFace(uint8_t FaceID, uint8_t FileNo)

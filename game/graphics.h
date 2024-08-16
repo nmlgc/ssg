@@ -111,16 +111,29 @@ struct GRAPHICS_PARAMS {
 	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;
 };
 
+struct GRAPHICS_INIT_RESULT {
+	GRAPHICS_PARAMS live;
+	bool reload_surfaces;
+
+	static std::optional<GRAPHICS_INIT_RESULT> From(
+		std::optional<GRAPHICS_PARAMS>&& o
+	) {
+		return o.transform([](auto&& o) {
+			return GRAPHICS_INIT_RESULT{ .live = o, .reload_surfaces = false };
+		});
+	}
+};
+
 // Validates and clamps [params] to the supported ranges before passing them on
 // to GrpBackend_Init().
-std::optional<GRAPHICS_PARAMS> Grp_Init(
+std::optional<GRAPHICS_INIT_RESULT> Grp_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 );
 
 // Calls Grp_Init() with the given parameters and tries the remaining devices
 // and APIs failure. Returns the actual configuration the backend was
 // initialized with, or `std::nullopt` on failure.
-std::optional<GRAPHICS_PARAMS> Grp_InitOrFallback(GRAPHICS_PARAMS params);
+std::optional<GRAPHICS_INIT_RESULT> Grp_InitOrFallback(GRAPHICS_PARAMS params);
 
 // Wraps screenshot handling around GrpBackend_Flip().
 void Grp_Flip(void);

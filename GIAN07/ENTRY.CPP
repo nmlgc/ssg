@@ -53,7 +53,7 @@ bool XInit(void)
 	if(!maybe_params) {
 		return false;
 	}
-	ConfigDat.GraphicsParamsApply(maybe_params.value());
+	ConfigDat.GraphicsParamsApply(maybe_params.value().live);
 	GrpBackend_SetClip(GRP_RES_RECT);
 
 	// ＢＧＭの初期化 //
@@ -83,15 +83,19 @@ void XGrpTry(const GRAPHICS_PARAMS& prev, const GRAPHICS_PARAMS& params)
 	if(prev == params) {
 		return;
 	}
-	auto maybe_live = Grp_Init(prev, params);
-	if(!maybe_live) {
-		// Reset to the configuration that ran previously.
-		maybe_live = Grp_Init(std::nullopt, prev);
+	auto maybe_result = Grp_Init(prev, params);
+	if(!maybe_result) {
+		// Try resetting to the previous configuration, or, if necessary,
+		// attempt anything to get graphics back working again.
+		maybe_result = Grp_InitOrFallback(prev);
 	}
-	if(maybe_live) {
-		const auto& live = maybe_live.value();
+	if(maybe_result) {
+		const auto& result = maybe_result.value();
 		TextObj.WipeBeforeNextRender();
-		ConfigDat.GraphicsParamsApply(live);
+		ConfigDat.GraphicsParamsApply(result.live);
+		if(result.reload_surfaces) {
+			ReloadGraph();
+		}
 
 		// TODO: Assumes that 8-bit mode only ever calls this function within
 		// the main menu.

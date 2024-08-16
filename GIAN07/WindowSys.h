@@ -182,6 +182,15 @@ struct WINDOW_MENU {
 		}
 	}
 
+	constexpr WINDOW_MENU(
+		void (*set_items)(bool), std::initializer_list<WINDOW_CHOICE*> children
+	) : Title(nullptr), SetItems(set_items), NumItems(children.size())
+	{
+		for(size_t i = 0; auto& item : children) {
+			ItemPtr[i++] = item;
+		}
+	}
+
 	// Returns the maximum number of items among all submenus.
 	uint8_t MaxItems() const;
 };

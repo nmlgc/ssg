@@ -175,15 +175,29 @@ WINDOW_CHOICE DifItem[] = {
 };
 WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
-char	GrpTitle[5][50];
-WINDOW_CHOICE GrpItem[] = {
-	// { GrpTitle[0],	"ビデオカードの選択",	GrpFnChgDevice },
-	{ GrpTitle[1],	"描画スキップの設定です",	GrpFnSkip },
-	{ GrpTitle[2],	"使用する色数を指定します",	GrpFnBpp },
-	{ GrpTitle[3],	"ウィンドウの表示位置を決めます",	GrpFnWinLocate },
-	SubmenuExitItem,
+static char GrpTitleDevice[50];
+static char GrpTitleSkip[50];
+static char GrpTitleBpp[50];
+static char GrpTitleMsg[50];
+// WINDOW_CHOICE GrpItemDevice = {
+// 	GrpTitleDevice, "ビデオカードの選択", GrpFnChgDevice
+// };
+WINDOW_CHOICE GrpItemSkip = {
+	GrpTitleSkip, "描画スキップの設定です", GrpFnSkip
 };
-WINDOW_MENU GrpMenu = { std::span(GrpItem), SetGrpItem };
+WINDOW_CHOICE GrpItemBpp = {
+	GrpTitleBpp, "使用する色数を指定します", GrpFnBpp
+};
+WINDOW_CHOICE GrpItemMsg = {
+	GrpTitleMsg, "ウィンドウの表示位置を決めます", GrpFnWinLocate
+};
+WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
+WINDOW_MENU GrpMenu = { SetGrpItem, {
+	&GrpItemSkip,
+	&GrpItemBpp,
+	&GrpItemMsg,
+	&GrpItemExit,
+} };
 
 constexpr auto VOLUME_FLAGS = WINDOW_FLAGS::FAST_REPEAT;
 
@@ -802,10 +816,12 @@ static void SetGrpItem(bool)
 	);
 	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
 
-	sprintf(GrpTitle[0], "Device   [%.7s]", dev.data());
-	sprintf(GrpTitle[1], "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
-	sprintf(GrpTitle[2], "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
-	sprintf(GrpTitle[3], "MsgWindow[%s]", UorD[u_or_d]);
+	// clang-format off
+	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
+	sprintf(GrpTitleSkip,   "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
+	sprintf(GrpTitleBpp,    "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
+	sprintf(GrpTitleMsg,    "MsgWindow[%s]", UorD[u_or_d]);
+	// clang-format on
 }
 
 static void SetSndItem(bool tick)

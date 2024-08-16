@@ -641,10 +641,13 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	const auto* p = CWinSearchActive(ws);
 	auto Depth = ws->SelectDepth;
 
+	// In case the item just disabled itself...
+	while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED) {
+		ws->Select[Depth] = ((ws->Select[Depth] + 1) % p->NumItems);
+	}
+
 	// アクティブな項目をセットする //
 	auto *p2 = p->ItemPtr[ws->Select[Depth]];
-
-	assert(p2->State != STATE::DISABLED);
 
 	// キーボードの過剰なリピート防止 //
 	if(ws->KeyCount) {
@@ -679,15 +682,20 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 
 	ws->OldKey = Key_Data;
 
+	const auto next_active = [](
+		const WINDOW_MENU& menu, auto cur, int_fast8_t direction
+	) {
+		do {
+			cur = ((cur + menu.NumItems + direction) % menu.NumItems);
+		} while(menu.ItemPtr[cur]->State == STATE::DISABLED);
+		return cur;
+	};
+
 	// 一部のキーボード入力を処理する(KEY_UP/KEY_DOWN) //
 	if((Key_Data == KEY_UP) || (Key_Data == KEY_DOWN)) {
 		// 一つ上の項目へ / 一つ下の項目へ
-		const auto delta = ((Key_Data == KEY_UP) ? (p->NumItems - 1) : 1);
-
-		do {
-			ws->Select[Depth] = ((ws->Select[Depth] + delta) % p->NumItems);
-		} while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED);
-
+		const auto delta = ((Key_Data == KEY_UP) ? -1 : +1);
+		ws->Select[Depth] = next_active(*p, ws->Select[Depth], delta);
 		Snd_SEPlay(SOUND_ID_SELECT);
 	} else if(CWinCancelKey(Key_Data)) {
 		Snd_SEPlay(SOUND_ID_CANCEL);
@@ -721,7 +729,11 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 			// 決定・選択
 			if(p2->Submenu && (p2->Submenu->NumItems != 0)) {
 				p2->Submenu->Title = p2;
-				ws->Select[Depth + 1] = 0;
+
+				// Jump to the first active item to avoid potentially drawing
+				// the selection cursor on top of a disabled item on the next
+				// frame.
+				ws->Select[Depth + 1] = next_active(*p2->Submenu, -1, +1);
 				ws->SelectDepth++;
 			}
 		} else if(CWinCancelKey(Key_Data)) {

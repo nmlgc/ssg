@@ -157,6 +157,7 @@ struct CONFIG_DATA {
 
 	// グラフィック関連 //
 	OPTION<uint8_t> DeviceID = { 0 };	// 何番目のデバイスか
+	OPTION<int8_t> GraphicsAPI = { -1 };
 	OPTION<BITDEPTH> BitDepth;	// ビット深度
 
 	// Target frame rate = 60 / [FPSDivisor]. 0 disables any frame rate

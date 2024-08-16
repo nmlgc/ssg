@@ -237,6 +237,19 @@ Any::string_view GrpBackend_DeviceName(uint8_t id)
 	return DxEnum[id].name;
 }
 
+int8_t GrpBackend_APICount(void)
+{
+	return 0;
+}
+
+std::u8string_view GrpBackend_APIName(int8_t id)
+{
+	return (DxObj.PixelFormat.IsChanneled()
+		? u8"DirectDraw blitting + Direct3D 2 geometry"
+		: u8"DirectDraw blitting + software geometry"
+	);
+}
+
 bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 {
 	HRESULT				dxret;

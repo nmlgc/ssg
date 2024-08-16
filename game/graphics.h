@@ -105,6 +105,7 @@ void Grp_SetScreenshotPrefix(std::u8string_view prefix);
 
 struct GRAPHICS_PARAMS {
 	uint8_t device_id;
+	int8_t api; // Negative = "use default API"
 	BITDEPTH bitdepth;
 };
 

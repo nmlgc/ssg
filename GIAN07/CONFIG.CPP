@@ -193,6 +193,7 @@ const struct VERSION_01 {
 		ConfigDat.SEVolume,
 		ConfigDat.BGMVolume,
 		ConfigDat.BGMPack,
+		ConfigDat.GraphicsAPI,
 	};
 } VERSION_01;
 
@@ -221,6 +222,7 @@ GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
 {
 	return {
 		.device_id = DeviceID.v,
+		.api = GraphicsAPI.v,
 		.bitdepth = BitDepth.v,
 	};
 }
@@ -228,6 +230,7 @@ GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
 void CONFIG_DATA::GraphicsParamsApply(const GRAPHICS_PARAMS& params)
 {
 	DeviceID.v = params.device_id;
+	GraphicsAPI.v = params.api;
 	BitDepth.v = params.bitdepth;
 }
 

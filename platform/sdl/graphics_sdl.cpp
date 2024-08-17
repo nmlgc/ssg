@@ -197,9 +197,24 @@ int8_t GrpBackend_APICount(void)
 	return SDL_GetNumRenderDrivers();
 }
 
+constexpr std::pair<std::u8string_view, std::u8string_view> API_NICE[] = {
+	{ u8"direct3d", u8"Direct3D 9" },
+	{ u8"direct3d11", u8"Direct3D 11" },
+	{ u8"direct3d12", u8"Direct3D 12" },
+	{ u8"opengl", u8"OpenGL" },
+	{ u8"opengles2", u8"OpenGL ES 2" },
+	{ u8"software", u8"Software" },
+};
+
 std::u8string_view GrpBackend_APIName(int8_t id)
 {
-	return WndBackend_SDLRendererName(id);
+	const auto ret = WndBackend_SDLRendererName(id);
+	for(const auto& nice : API_NICE) {
+		if(nice.first == ret) {
+			return nice.second;
+		}
+	}
+	return ret;
 }
 /// ------------------------------------------
 

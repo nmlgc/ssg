@@ -21,20 +21,8 @@
 
 
 
-enum class GIAN_FONT_ID : uint8_t {
-	SMALL = 0,	// フォント(小さい文字用)
-	NORMAL = 1,	// フォント(通常の文字用)
-	LARGE = 2,	// フォント(大きい文字用)
-	COUNT,
-};
-
-struct GRAPHICS_DDRAW;
-struct SURFACE_DDRAW;
-extern TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj;
-template <class T> concept GIAN_TEXTRENDER_SESSION = (
-	TEXTRENDER_SESSION<T, GIAN_FONT_ID>
-);
-static_assert(TEXTRENDER<decltype(TextObj), GIAN_FONT_ID>);
+extern TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW> TextObj;
+static_assert(TEXTRENDER<decltype(TextObj)>);
 
 
 

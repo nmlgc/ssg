@@ -203,7 +203,7 @@ extern void GrpPutMidNum(int x, int y, int n)
 }
 
 struct GDI_FONTS {
-	ENUMARRAY<HFONT, GIAN_FONT_ID> fonts;
+	ENUMARRAY<HFONT, FONT_ID> fonts;
 
 	GDI_FONTS() noexcept
 	{
@@ -225,19 +225,19 @@ struct GDI_FONTS {
 		logfont.lfHeight = 24;
 		logfont.lfWidth = 12;
 		logfont.lfWeight = FW_MEDIUM;
-		fonts[GIAN_FONT_ID::LARGE] = CreateFontIndirectW(&logfont);
+		fonts[FONT_ID::LARGE] = CreateFontIndirectW(&logfont);
 
 		// 並なフォント //
 		logfont.lfHeight = 16;
 		logfont.lfWidth = 8;
 		logfont.lfWeight = FW_NORMAL;
-		fonts[GIAN_FONT_ID::NORMAL] = CreateFontIndirectW(&logfont);
+		fonts[FONT_ID::NORMAL] = CreateFontIndirectW(&logfont);
 
 		// ちっこいフォント //
 		logfont.lfHeight = 14;
 		logfont.lfWidth = 7;
 		logfont.lfWeight = FW_NORMAL;
-		fonts[GIAN_FONT_ID::SMALL] = CreateFontIndirectW(&logfont);
+		fonts[FONT_ID::SMALL] = CreateFontIndirectW(&logfont);
 	}
 
 	~GDI_FONTS() {
@@ -250,7 +250,7 @@ struct GDI_FONTS {
 };
 GDI_FONTS GDIFonts;
 
-TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW, GIAN_FONT_ID> TextObj = {
+TEXTRENDER_GDI<GRAPHICS_DDRAW, SURFACE_DDRAW> TextObj = {
 	DxObj, GrText, GDIFonts.fonts
 };
 
@@ -259,14 +259,14 @@ PIXEL_SIZE DrawGrdFont(
 )
 {
 	PIXEL_SIZE extent = { 0, 0 };
-	TextObj.Prerender(rect_id, [&](GIAN_TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(rect_id, [&](TEXTRENDER_SESSION auto& s) {
 		// ここら辺は、一種の常套手段か？ //
 		const auto old = GetPixel(s.hdc, 0, 0);
 		SetPixelV(s.hdc, 0, 0, RGB(255, 255, 255));
 		const auto temp = GetPixel(s.hdc, 0, 0);
 		SetPixelV(s.hdc, 0, 0, old);
 
-		s.SetFont(GIAN_FONT_ID::NORMAL);
+		s.SetFont(FONT_ID::NORMAL);
 		for(const auto& str : strs) {
 			s.Put({ (extent.w + 2), 2 }, str, RGBA{   0,   0, 128 });
 			s.Put({ (extent.w + 1), 2 }, str, RGBA{   0,   0, 128 });

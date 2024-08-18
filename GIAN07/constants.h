@@ -1,14 +1,23 @@
 /*
- *   Game-specific compile-time constants to be shared with the platform layers
+ *   Game-specific compile-time constants and types to be shared with the
+ *   platform layers
  *
  */
 
 #pragma once
 
+import std.compat;
 #include "game/coords.h"
 
 // Yup, the game is supposed to be running at 62.5 FPS.
 constexpr auto FRAME_TIME_TARGET = 16;
+
+enum class FONT_ID : uint8_t {
+	SMALL = 0,	// フォント(小さい文字用)
+	NORMAL = 1,	// フォント(通常の文字用)
+	LARGE = 2,	// フォント(大きい文字用)
+	COUNT,
+};
 
 // Mapping world coordinates to a position in the stereo field
 // -----------------------------------------------------------

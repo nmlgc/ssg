@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "constants.h"
 #include "game/coords.h"
 #include "game/enum_array.h"
 #include "game/graphics.h"
@@ -14,13 +15,13 @@ using TEXTRENDER_RECT_ID = unsigned int;
 
 // Concept for a text render session on a single rectangle, abstracting away
 // the rasterizer.
-template <class T, class FontID> concept TEXTRENDER_SESSION = (
-	ENUMARRAY_ID<FontID> && requires (
+template <class T> concept TEXTRENDER_SESSION = (
+	ENUMARRAY_ID<FONT_ID> && requires (
 		T t,
 		PIXEL_POINT topleft_rel,
 		Narrow::string_view str,
 		RGBA color,
-		FontID font
+		FONT_ID font
 	) {
 		{ t.rect } -> std::same_as<const PIXEL_LTWH&>;
 
@@ -49,9 +50,8 @@ PIXEL_COORD TextLayoutXCenter(auto& s, Narrow::string_view str) {
 }
 
 // Concept that describes valid text rendering session functors in game code.
-template <typename F, class Session, class FontID>
-concept TEXTRENDER_SESSION_FUNC = (
-	TEXTRENDER_SESSION<Session, FontID> &&
+template <typename F, class Session> concept TEXTRENDER_SESSION_FUNC = (
+	TEXTRENDER_SESSION<Session> &&
 	requires(F f, Session& s) {
 		{ f(s) };
 	}
@@ -59,21 +59,21 @@ concept TEXTRENDER_SESSION_FUNC = (
 
 // Just here to keep the TEXTRENDER concept from requiring an impossible
 // template parameter for the session functor.
-template <class FontID> struct TEXTRENDER_SESSION_FUNC_ARCHETYPE {
+struct TEXTRENDER_SESSION_FUNC_ARCHETYPE {
 	TEXTRENDER_SESSION_FUNC_ARCHETYPE() = delete;
-	void operator()(TEXTRENDER_SESSION<FontID> auto& s) {
+	void operator()(TEXTRENDER_SESSION auto& s) {
 	}
 };
 
 // Concept for a text rendering backend.
-template <class T, class FontID> concept TEXTRENDER = requires(
+template <class T> concept TEXTRENDER = requires(
 	T t,
-	FontID font,
+	FONT_ID font,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
 	Narrow::string_view contents,
 	TEXTRENDER_RECT_ID rect_id,
-	TEXTRENDER_SESSION_FUNC_ARCHETYPE<FontID>& func,
+	TEXTRENDER_SESSION_FUNC_ARCHETYPE& func,
 	std::optional<PIXEL_LTWH> subrect
 ) {
 	// Rectangle management

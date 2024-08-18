@@ -14,7 +14,7 @@
 // Constants
 // ---------
 
-constexpr auto CWIN_FONT = GIAN_FONT_ID::SMALL;
+constexpr auto CWIN_FONT = FONT_ID::SMALL;
 
 constexpr PIXEL_COORD CWIN_ITEM_LEFT = 8;
 constexpr PIXEL_COORD CWIN_ITEM_H = 16;
@@ -33,7 +33,7 @@ typedef struct tagMSG_WINDOW{
 	PIXEL_POINT	TextTopleft;
 
 	MSG_WINDOW_FLAGS	Flags;
-	GIAN_FONT_ID	FontID;	// 使用するフォント
+	FONT_ID	FontID;	// 使用するフォント
 	uint8_t	FontDy;	// フォントのＹ増量値
 	uint8_t	State;	// 状態
 	uint8_t	MaxLine;	// 最大表示可能行数
@@ -230,7 +230,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	WINDOW_POINT topleft = { ws->x, ws->y };
 	const auto trr = ws->TRRs[0];
 	const Narrow::string_view str = p->Title;
-	TextObj.Render(topleft, trr, str, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+	TextObj.Render(topleft, trr, str, [=](TEXTRENDER_SESSION auto& s) {
 		const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
 
@@ -251,7 +251,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 			? str
 			: ""
 		);
-		TextObj.Render(topleft, trr, c, [=](GIAN_TEXTRENDER_SESSION auto& s) {
+		TextObj.Render(topleft, trr, c, [=](TEXTRENDER_SESSION auto& s) {
 			const auto& col = COL[item->State];
 			s.SetFont(CWIN_FONT);
 
@@ -283,7 +283,7 @@ bool CWinExitFn(INPUT_BITS key)
 
 PIXEL_SIZE CWinTextExtent(Narrow::string_view str)
 {
-	return TextObj.TextExtent(GIAN_FONT_ID::SMALL, str);
+	return TextObj.TextExtent(FONT_ID::SMALL, str);
 }
 
 PIXEL_SIZE CWinItemExtent(Narrow::string_view str)
@@ -429,7 +429,7 @@ void MWinDraw(void)
 		const auto topleft = (WINDOW_POINT{ x, y } + MsgWindow.TextTopleft);
 		const auto trr = MsgWindow.TRR.value();
 		const auto& text = MsgWindow.Text;
-		TextObj.Render(topleft, trr, text, [](GIAN_TEXTRENDER_SESSION auto& s) {
+		TextObj.Render(topleft, trr, text, [](TEXTRENDER_SESSION auto& s) {
 			// セットされたフォントで描画
 			s.SetFont(MsgWindow.FontID);
 			for(auto i = 0; i < MsgWindow.Line; i++) {
@@ -571,7 +571,7 @@ void MWinCmd(uint8_t cmd)
 			temp = MsgWindow.MaxSize.bottom - MsgWindow.MaxSize.top - 16;
 			MsgWindow.MaxLine = temp / Ysize;							// 表示可能最大行数
 			MsgWindow.FontDy  =(temp % Ysize)/(temp/Ysize)+Ysize + 1;	// Ｙ増量
-			MsgWindow.FontID  = Cast::down_enum<GIAN_FONT_ID>(cmd);	// 使用フォント
+			MsgWindow.FontID  = Cast::down_enum<FONT_ID>(cmd);	// 使用フォント
 			[[fallthrough]];
 
 		case(MWCMD_NEWPAGE):		// 改ページする

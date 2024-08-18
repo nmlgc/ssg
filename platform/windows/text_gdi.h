@@ -16,10 +16,9 @@ PIXEL_SIZE TextGDIExtent(
 	HDC hdc, std::optional<HFONT> font, Narrow::string_view str
 );
 
-// Un-templated session code
-class TEXTRENDER_GDI_SESSION_BASE {
+class TEXTRENDER_GDI_SESSION {
 protected:
-	const std::span<HFONT> fonts;
+	const ENUMARRAY<HFONT, FONT_ID>& fonts;
 
 	// HFONT would require a cast of the value returned from SelectObject().
 	std::optional<HGDIOBJ> font_initial = std::nullopt;
@@ -28,12 +27,13 @@ protected:
 	// bits.
 	uint32_t color_cur = -1;
 
-	void SetFont(size_t id);
+	FONT_ID font_cur = FONT_ID::COUNT;
 
 public:
 	const PIXEL_LTWH rect;
 	HDC hdc;
 
+	void SetFont(FONT_ID font);
 	void SetColor(const RGBA& color);
 	PIXEL_SIZE Extent(Narrow::string_view str);
 	void Put(
@@ -42,34 +42,20 @@ public:
 		std::optional<RGBA> color = std::nullopt
 	);
 
-	TEXTRENDER_GDI_SESSION_BASE(
-		const PIXEL_LTWH& rect, HDC hdc, const std::span<HFONT> fonts
+	TEXTRENDER_GDI_SESSION(
+		const PIXEL_LTWH& rect, HDC hdc, const ENUMARRAY<HFONT, FONT_ID>& fonts
 	);
-	~TEXTRENDER_GDI_SESSION_BASE();
+	~TEXTRENDER_GDI_SESSION();
 };
 
+static_assert(TEXTRENDER_SESSION<TEXTRENDER_GDI_SESSION>);
+
 template <
-	class Graphics, class Surface, ENUMARRAY_ID FontID
+	class Graphics, class Surface
 > class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
 	Graphics& graphics;
 	Surface& surf;
-	ENUMARRAY<HFONT, FontID>& fonts;
-
-	class SESSION : public TEXTRENDER_GDI_SESSION_BASE {
-		FontID font_cur = FontID::COUNT;
-
-	public:
-		using TEXTRENDER_GDI_SESSION_BASE::TEXTRENDER_GDI_SESSION_BASE;
-
-		void SetFont(FontID font) {
-			if(font_cur != font) {
-				TEXTRENDER_GDI_SESSION_BASE::SetFont(std::to_underlying(font));
-				font_cur = font;
-			}
-		}
-	};
-
-	static_assert(TEXTRENDER_SESSION<SESSION, FontID>);
+	ENUMARRAY<HFONT, FONT_ID>& fonts;
 
 	bool Wipe() {
 		return (
@@ -80,16 +66,14 @@ template <
 	}
 
 	// Common rendering preparation code.
-	std::optional<SESSION> PreparePrerender(TEXTRENDER_RECT_ID rect_id) {
+	std::optional<TEXTRENDER_GDI_SESSION> PreparePrerender(
+		TEXTRENDER_RECT_ID rect_id
+	) {
 		if((surf.size != bounds) && !Wipe()) {
 			return std::nullopt;
 		}
 		assert(rect_id < rects.size());
-		return SESSION{
-			rects[rect_id].rect,
-			surf.dc,
-			std::span<HFONT>{ fonts.data(), fonts.size() }
-		};
+		return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect, surf.dc, fonts };
 	}
 
 public:
@@ -106,13 +90,13 @@ public:
 		surf.size = { 0, 0 };
 	}
 
-	PIXEL_SIZE TextExtent(FontID font, Narrow::string_view str) {
+	PIXEL_SIZE TextExtent(FONT_ID font, Narrow::string_view str) {
 		return TextGDIExtent(surf.dc, fonts[font], str);
 	}
 
 	bool Prerender(
 		TEXTRENDER_RECT_ID rect_id,
-		TEXTRENDER_SESSION_FUNC<SESSION, FontID> auto func
+		TEXTRENDER_SESSION_FUNC<TEXTRENDER_GDI_SESSION> auto func
 	) {
 		auto maybe_session = PreparePrerender(rect_id);
 		if(!maybe_session) {
@@ -138,7 +122,7 @@ public:
 		WINDOW_POINT dst,
 		TEXTRENDER_RECT_ID rect_id,
 		Narrow::string_view contents,
-		TEXTRENDER_SESSION_FUNC<SESSION, FontID> auto func,
+		TEXTRENDER_SESSION_FUNC<TEXTRENDER_GDI_SESSION> auto func,
 		std::optional<PIXEL_LTWH> subrect = std::nullopt
 	) {
 		assert(rect_id < rects.size());

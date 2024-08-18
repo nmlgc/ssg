@@ -27,8 +27,8 @@ PIXEL_SIZE TextGDIExtent(
 	return ret;
 }
 
-TEXTRENDER_GDI_SESSION_BASE::TEXTRENDER_GDI_SESSION_BASE(
-	const PIXEL_LTWH& rect, HDC hdc, const std::span<HFONT> fonts
+TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(
+	const PIXEL_LTWH& rect, HDC hdc, const ENUMARRAY<HFONT, FONT_ID>& fonts
 ) :
 	rect(rect), hdc(hdc), fonts(fonts)
 {
@@ -46,22 +46,24 @@ TEXTRENDER_GDI_SESSION_BASE::TEXTRENDER_GDI_SESSION_BASE(
 	assert(background_mode_set_to_transparent);
 }
 
-TEXTRENDER_GDI_SESSION_BASE::~TEXTRENDER_GDI_SESSION_BASE()
+TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
 {
 	if(font_initial) {
 		SelectObject(hdc, font_initial.value());
 	}
 }
 
-void TEXTRENDER_GDI_SESSION_BASE::SetFont(size_t id)
+void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 {
-	auto font_prev = SelectObject(hdc, fonts[id]);
-	if(!font_initial) {
-		font_initial = font_prev;
+	if(font_cur != font) {
+		auto font_prev = SelectObject(hdc, fonts[font]);
+		if(!font_initial) {
+			font_initial = font_prev;
+		}
 	}
 }
 
-void TEXTRENDER_GDI_SESSION_BASE::SetColor(const RGBA& color)
+void TEXTRENDER_GDI_SESSION::SetColor(const RGBA& color)
 {
 	const COLORREF color_gdi = RGB(color.r, color.g, color.b);
 	if(color_cur != color_gdi) {
@@ -70,12 +72,12 @@ void TEXTRENDER_GDI_SESSION_BASE::SetColor(const RGBA& color)
 	}
 }
 
-PIXEL_SIZE TEXTRENDER_GDI_SESSION_BASE::Extent(Narrow::string_view str)
+PIXEL_SIZE TEXTRENDER_GDI_SESSION::Extent(Narrow::string_view str)
 {
 	return TextGDIExtent(hdc, std::nullopt, str);
 }
 
-void TEXTRENDER_GDI_SESSION_BASE::Put(
+void TEXTRENDER_GDI_SESSION::Put(
 	const PIXEL_POINT& topleft_rel,
 	Narrow::string_view str,
 	std::optional<RGBA> color

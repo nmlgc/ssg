@@ -23,8 +23,8 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 		.version = TextObj.Register({ 490, 13 }),
 	};
 
-	TextObj.Prerender(ret.version, [](GIAN_TEXTRENDER_SESSION auto& s) {
-		s.SetFont(GIAN_FONT_ID::SMALL);
+	TextObj.Prerender(ret.version, [](TEXTRENDER_SESSION auto& s) {
+		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
 		s.Put({ 0, 0 }, "秋霜玉    Version 1.005     ★デモ対応版＃★");
 	});
@@ -35,13 +35,13 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 
 void MUSICROOM_TEXT::PrerenderMidDev() const
 {
-	TextObj.Prerender(mid_dev, [](GIAN_TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(mid_dev, [](TEXTRENDER_SESSION auto& s) {
 		const auto maybe_dev = MidBackend_DeviceName();
 		if(!maybe_dev) {
 			return;
 		}
 		const auto dev = maybe_dev.value();
-		s.SetFont(GIAN_FONT_ID::SMALL);
+		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
 		s.Put({ 0, 0 }, { dev.data(), (std::min)(dev.size(), 13u) });
 	});
@@ -60,7 +60,7 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 	};
 
 	auto cursor = buffer.cursor();
-	TextObj.Prerender(title, [&](GIAN_TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(title, [&](TEXTRENDER_SESSION auto& s) {
 		// Skip the title in the comment and take it from the BGM instead.
 		cursor.next<LINE>();
 
@@ -77,17 +77,17 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 			p = std::ranges::copy(title, p).out;
 			return (p - start);
 		});
-		s.SetFont(GIAN_FONT_ID::NORMAL);
+		s.SetFont(FONT_ID::NORMAL);
 		s.Put({ 1, 0 }, buf, ColorHighlight);
 		s.Put({ 0, 0 }, buf, ColorDefault);
 	});
 
-	TextObj.Prerender(comment, [&cursor](GIAN_TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(comment, [&cursor](TEXTRENDER_SESSION auto& s) {
 		if(!BGM_LoadedOriginalMIDI()) {
 			return;
 		}
 		int y = 0;
-		s.SetFont(GIAN_FONT_ID::SMALL);
+		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
 		while(const auto line = cursor.next<LINE>()) {
 			s.Put({ 0, y }, line.value()[0] );

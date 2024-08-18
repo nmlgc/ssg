@@ -269,7 +269,7 @@ void DrawStfInfo()
 // テキストの描画 //
 void EndingText::Prerender()
 {
-	TextObj.Prerender(Rect, [this](GIAN_TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(Rect, [this](TEXTRENDER_SESSION auto& s) {
 		int max = 0;
 
 		for(decltype(NumText) i = 0; i < NumText; i++) {
@@ -278,7 +278,7 @@ void EndingText::Prerender()
 
 		const auto dx = (8 * (39 - (max / 2)));
 
-		s.SetFont(GIAN_FONT_ID::NORMAL);
+		s.SetFont(FONT_ID::NORMAL);
 		s.SetColor({ 128, 128, 128 });
 		for(decltype(NumText) i = 0; i < NumText; i++) {
 			s.Put({ (dx + 21), (1 + (i * 25)) }, Text[i]);

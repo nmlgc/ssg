@@ -44,6 +44,27 @@ struct FILE_STREAM_WRITE;
 void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
 /// -------
 
+/// Surfaces
+/// --------
+
+#ifdef WIN32
+	// Win32 GDI text rendering bridge
+	// -------------------------------
+	class SURFACE_GDI;
+
+	// Returns a reference to the backend's designated GDI text surface.
+	SURFACE_GDI& GrpSurface_GDIText_Surface(void);
+
+	// (Re-)creates the backend's designated GDI text surface with the given
+	// size and undefined initial contents. After filling it with the intended
+	// pixels, call GrpSurface_GDIText_Update() to upload them to the backend.
+	bool GrpSurface_GDIText_Create(PIXEL_SIZE size);
+
+	bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r);
+	// -------------------------------
+#endif
+/// --------
+
 /// Geometry
 /// --------
 

@@ -91,6 +91,7 @@ int CLIP_Y_MAX = (GRP_RES.h - 1);
 static constexpr bool Fullscreen = true;
 
 bool STD_GrpBlt(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
+bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r);
 
 
 // Ｚバッファを必要なら生成し、接続する //
@@ -466,8 +467,14 @@ bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
 	return true;
 }
 
-bool GRAPHICS_DDRAW::SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size)
+SURFACE_GDI& GrpSurface_GDIText_Surface(void)
 {
+	return DxSurf[SURFACE_ID::TEXT];
+}
+
+bool GrpSurface_GDIText_Create(PIXEL_SIZE size)
+{
+	auto& surf = DxSurf[SURFACE_ID::TEXT];
 	surf.Delete();
 
 	if(
@@ -480,7 +487,7 @@ bool GRAPHICS_DDRAW::SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size)
 	}
 
 	HDC reference_dc;
-	if(Back->GetDC(&reference_dc) != DD_OK) {
+	if(DxObj.Back->GetDC(&reference_dc) != DD_OK) {
 		return false;
 	}
 
@@ -489,11 +496,16 @@ bool GRAPHICS_DDRAW::SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size)
 	// undocumented palette color matching quirks.
 	surf.img = CreateCompatibleBitmap(reference_dc, size.w, size.h);
 
-	if((Back->ReleaseDC(reference_dc) != DD_OK) || !surf.img) {
+	if((DxObj.Back->ReleaseDC(reference_dc) != DD_OK) || !surf.img) {
 		return false;
 	}
 	surf.stock_img = SelectObject(surf.dc, surf.img);
-	return SurfaceCreateUninitialized(surf, size);
+	return DxObj.SurfaceCreateUninitialized(surf, size);
+}
+
+bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)
+{
+	return SurfaceUpdateFromGDI(DxSurf[SURFACE_ID::TEXT], r);
 }
 
 bool GRAPHICS_DDRAW::SurfaceLoad(SURFACE_ID sid, BMP_OWNED&& bmp)
@@ -742,15 +754,13 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	}
 
 	// DIB から DC を作成 //
-	SurfaceEdit(surf, [](auto, auto) { return true; });
+	SurfaceUpdateFromGDI(surf, { 0, 0, surf.size.w, surf.size.h });
 
 	// カラーキーをセットする //
 	return SurfaceSetColorKeyFromFirstPixel(surf);
 }
 
-bool GRAPHICS_DDRAW::SurfaceUpdateFromGDI(
-	SURFACE_DDRAW& surf, const PIXEL_LTWH& r
-)
+bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r)
 {
 	HDC ddraw_dc;
 	if(surf.surf->GetDC(&ddraw_dc) != DD_OK) {

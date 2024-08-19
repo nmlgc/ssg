@@ -117,7 +117,6 @@ extern SURFACE_DDRAW&	GrTitle;
 extern SURFACE_DDRAW&	GrMusic;
 extern SURFACE_DDRAW&	GrNameReg;
 extern SURFACE_DDRAW&	GrEndingCredits;
-extern SURFACE_DDRAW&	GrText;
 
 // 顔グラ用
 extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX];

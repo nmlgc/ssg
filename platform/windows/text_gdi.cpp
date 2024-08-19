@@ -4,6 +4,7 @@
  */
 
 #include "platform/windows/text_gdi.h"
+#include "platform/windows/surface_gdi.h"
 #include "platform/windows/utf.h"
 
 PIXEL_SIZE TextGDIExtent(
@@ -96,4 +97,48 @@ void TEXTRENDER_GDI_SESSION::Put(
 		constexpr UINT flags = (DT_LEFT | DT_TOP | DT_SINGLELINE);
 		return DrawTextW(hdc, str_w.data(), str_w.size(), &r, flags);
 	});
+}
+
+bool TEXTRENDER_GDI::Wipe()
+{
+	return (
+		GrpSurface_GDIText_Create(bounds, { 0x00, 0x00, 0x00 }) &&
+		TEXTRENDER_PACKED::Wipe()
+	);
+}
+
+std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::PreparePrerender(
+	TEXTRENDER_RECT_ID rect_id
+)
+{
+	auto& surf = GrpSurface_GDIText_Surface();
+	if((surf.size != bounds) && !Wipe()) {
+		return std::nullopt;
+	}
+	assert(rect_id < rects.size());
+	return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect, surf.dc, fonts };
+}
+
+void TEXTRENDER_GDI::WipeBeforeNextRender()
+{
+	TEXTRENDER_PACKED::Wipe();
+
+	// This also skips the needless creation of an uninitialized surface
+	// during DirectDraw's init function.
+	GrpSurface_GDIText_Surface().size = { 0, 0 };
+}
+
+PIXEL_SIZE TEXTRENDER_GDI::TextExtent(FONT_ID font, Narrow::string_view str)
+{
+	return TextGDIExtent(GrpSurface_GDIText_Surface().dc, fonts[font], str);
+}
+
+bool TEXTRENDER_GDI::Blit(
+	WINDOW_POINT dst,
+	TEXTRENDER_RECT_ID rect_id,
+	std::optional<PIXEL_LTWH> subrect
+)
+{
+	const PIXEL_LTRB rect = Subrect(rect_id, subrect);
+	return GrpSurface_Blit(dst, SURFACE_ID::TEXT, rect);
 }

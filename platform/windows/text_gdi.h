@@ -6,13 +6,9 @@
 #pragma once
 
 #include "game/text_packed.h"
-#include "platform/windows/surface_gdi.h"
 #include "platform/graphics_backend.h"
 #include <assert.h>
-
-PIXEL_SIZE TextGDIExtent(
-	HDC hdc, std::optional<HFONT> font, Narrow::string_view str
-);
+#include <windows.h>
 
 class TEXTRENDER_GDI_SESSION {
 protected:
@@ -51,41 +47,21 @@ static_assert(TEXTRENDER_SESSION<TEXTRENDER_GDI_SESSION>);
 class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
 	ENUMARRAY<HFONT, FONT_ID>& fonts;
 
-	bool Wipe() {
-		return (
-			GrpSurface_GDIText_Create(bounds, { 0x00, 0x00, 0x00 }) &&
-			TEXTRENDER_PACKED::Wipe()
-		);
-	}
+	bool Wipe();
 
 	// Common rendering preparation code.
 	std::optional<TEXTRENDER_GDI_SESSION> PreparePrerender(
 		TEXTRENDER_RECT_ID rect_id
-	) {
-		auto& surf = GrpSurface_GDIText_Surface();
-		if((surf.size != bounds) && !Wipe()) {
-			return std::nullopt;
-		}
-		assert(rect_id < rects.size());
-		return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect, surf.dc, fonts };
-	}
+	);
 
 public:
 	// Can share the font array with other GDI renderers.
 	TEXTRENDER_GDI(decltype(fonts)& fonts) : fonts(fonts) {
 	}
 
-	void WipeBeforeNextRender() {
-		TEXTRENDER_PACKED::Wipe();
+	void WipeBeforeNextRender();
 
-		// This also skips the needless creation of an uninitialized surface
-		// during DirectDraw's init function.
-		GrpSurface_GDIText_Surface().size = { 0, 0 };
-	}
-
-	PIXEL_SIZE TextExtent(FONT_ID font, Narrow::string_view str) {
-		return TextGDIExtent(GrpSurface_GDIText_Surface().dc, fonts[font], str);
-	}
+	PIXEL_SIZE TextExtent(FONT_ID font, Narrow::string_view str);
 
 	bool Prerender(
 		TEXTRENDER_RECT_ID rect_id,
@@ -104,10 +80,7 @@ public:
 		WINDOW_POINT dst,
 		TEXTRENDER_RECT_ID rect_id,
 		std::optional<PIXEL_LTWH> subrect = std::nullopt
-	) {
-		const PIXEL_LTRB rect = Subrect(rect_id, subrect);
-		return GrpSurface_Blit(dst, SURFACE_ID::TEXT, rect);
-	}
+	);
 
 	bool Render(
 		WINDOW_POINT dst,

@@ -236,6 +236,30 @@ void enemyind_set(void)
 	EnemyNow = 0;
 }
 
+bool EnemyDamageApply(ENEMY_DATA& e, int damage)
+{
+	e.IsDamaged = ((e.count) & 1);
+	if(e.hp <= damage) {
+		Snd_SEPlay(SOUND_ID_BOMB, e.x);
+		if(e.LLaserRef) {
+			LLaserForceClose(&e); // レーザーの強制クローズ
+		}
+		PowerUp(static_cast<uint8_t>(e.hp)); // パワーアップ
+		e.hp    = 0;
+		e.count = 0;
+		e.flag  = EF_BOMB;
+		score_add(e.score);
+		if(e.item) {
+			ItemSet(e.x, e.y, e.item);
+		}
+	} else {
+		Snd_SEPlay(SOUND_ID_HIT, e.x);
+		PowerUp(damage); // ここでもパワーアップ
+		e.hp -= damage;
+	}
+	return true;
+}
+
 bool enemy_damage(int x,int y,int damage)
 {
 	int				i;
@@ -247,24 +271,7 @@ bool enemy_damage(int x,int y,int damage)
 		if(HITCHK(x,e->x,e->g_width) && HITCHK(y,e->y,e->g_height) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				e->IsDamaged = ((e->count) & 1);
-				if(e->hp<=damage){
-					Snd_SEPlay(SOUND_ID_BOMB, e->x);
-					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-					PowerUp((BYTE)e->hp);			// パワーアップ
-					e->hp    = 0;
-					e->count = 0;
-					e->flag  = EF_BOMB;
-					score_add(e->score);
-					if(e->item) ItemSet(e->x,e->y,e->item);
-				}
-				else{
-					Snd_SEPlay(SOUND_ID_HIT, e->x);
-					PowerUp(damage);	// ここでもパワーアップ
-					e->hp -= damage;
-				}
-
-				return TRUE;
+				return EnemyDamageApply(*e, damage);
 			}
 		}
 	}
@@ -284,24 +291,7 @@ bool enemy_damage2(int x,int y,int damage)
 		if(HITCHK(x,e->x,e->g_width) && (y > e->y) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				e->IsDamaged = ((e->count) & 1);
-				if(e->hp<=damage){
-					Snd_SEPlay(SOUND_ID_BOMB, e->x);
-					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-					PowerUp((BYTE)e->hp);			// パワーアップ
-					e->hp    = 0;
-					e->count = 0;
-					e->flag  = EF_BOMB;
-					score_add(e->score);
-					if(e->item) ItemSet(e->x,e->y,e->item);
-				}
-				else{
-					Snd_SEPlay(SOUND_ID_HIT, e->x);
-					PowerUp(damage);	// ここでもパワーアップ
-					e->hp -= damage;
-				}
-
-				ret_val = TRUE;
+				ret_val = EnemyDamageApply(*e, damage);
 			}
 		}
 	}
@@ -323,22 +313,7 @@ extern VOID enemy_damage3(int x,int y,BYTE d)
 		if(LaserHITCHK(e, x, y, d) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				e->IsDamaged = ((e->count) & 1);
-				if(e->hp<=damage){
-					Snd_SEPlay(SOUND_ID_BOMB, e->x);
-					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-					PowerUp((BYTE)e->hp);			// パワーアップ
-					e->hp    = 0;
-					e->count = 0;
-					e->flag  = EF_BOMB;
-					score_add(e->score);
-					if(e->item) ItemSet(e->x,e->y,e->item);
-				}
-				else{
-					Snd_SEPlay(SOUND_ID_HIT, e->x);
-					PowerUp(damage);	// ここでもパワーアップ
-					e->hp -= damage;
-				}
+				EnemyDamageApply(*e, damage);
 			}
 		}
 	}
@@ -357,23 +332,7 @@ extern void enemy_damage4(int damage)
 		if(e->flag&EF_DAMAGE){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				e->IsDamaged = ((e->count) & 1);
-				if(e->hp<=damage){
-					Snd_SEPlay(SOUND_ID_BOMB, e->x);
-					if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-					PowerUp((BYTE)e->hp);			// パワーアップ
-					e->hp    = 0;
-					e->count = 0;
-					e->flag  = EF_BOMB;
-					score_add(e->score);
-					if(e->item) ItemSet(e->x,e->y,e->item);
-				}
-				else{
-					Snd_SEPlay(SOUND_ID_HIT, e->x);
-					PowerUp(damage);	// ここでもパワーアップ
-					e->hp -= damage;
-				}
-
+				EnemyDamageApply(*e, damage);
 				//return TRUE;
 			}
 		}

@@ -505,14 +505,56 @@ void BossKillAll(void)
 	BossNow = 0;
 }
 
+bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
+{
+	e.IsDamaged = ((e.count) & 1);
+	if(e.hp <= damage) { // ボスの死亡処理(後で変更すること!!)
+		SnakyDelete(&b);
+		BitDelete();
+		enemy_clear();
+		fragment_set(e.x, e.y, FRG_FATCIRCLE);
+		ExBombEfcSet(e.x, e.y, EXBOMB_STD);
+		ScrollCommand(SCMD_QUAKE);
+		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);
+		if(e.LLaserRef) {
+			LLaserForceClose(&e); // レーザーの強制クローズ
+		}
+		PowerUp((BYTE)e.hp);
+		e.hp    = 0;
+		e.count = 0;
+		e.flag  = EF_BOMB;
+
+		// 最後の一匹だった場合 //
+		if(BossNow == 1) {
+			char buf[100];
+			const auto temp = tama2score(); // 弾→スコアエフェクト
+			// sprintf(buf, "%3d Evade  %5dPts", Viv.evade, Viv.evadesc);
+			sprintf(buf, "  Bonus    %7dPts", temp);
+			StringEffect(180, 60, buf);
+			score_add(temp);
+		}
+
+		if(e.item) {
+			ItemSet(e.x, e.y, e.item);
+		}
+		score_add(e.score);
+		laser_clear();
+		b.IsUsed = 0;
+		BossNow--; // ボスの参照カウント？を使用する
+	} else {
+		Snd_SEPlay(SOUND_ID_HIT, e.x);
+		PowerUp(damage);
+		e.hp -= damage;
+	}
+	return true;
+}
+
 // ボスにダメージを与える //
 bool BossDamage(int x, int y, int damage)
 {
 	int				i;
 	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
-	DWORD			temp;
-	static char		buf[100];
 
 	i = (BitGetNum()>>1);
 	damage -= i;
@@ -529,45 +571,7 @@ bool BossDamage(int x, int y, int damage)
 			if(HITCHK(x,e->x,e->g_width) && HITCHK(y,e->y,e->g_height) && (e->flag&EF_DAMAGE)){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					e->IsDamaged = ((e->count) & 1);
-					if(e->hp<=damage){		// ボスの死亡処理(後で変更すること!!)
-						SnakyDelete(b);
-						BitDelete();
-						enemy_clear();
-
-						fragment_set(e->x,e->y,FRG_FATCIRCLE);
-						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
-
-						ScrollCommand(SCMD_QUAKE);
-						Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
-						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-						PowerUp((BYTE)e->hp);
-						e->hp    = 0;
-						e->count = 0;
-						e->flag  = EF_BOMB;
-
-						// 最後の一匹だった場合 //
-						if(BossNow==1){
-							temp = tama2score();	// 弾→スコアエフェクト
-							//sprintf(buf,"%3d Evade  %5dPts",Viv.evade,Viv.evadesc);
-							sprintf(buf,"  Bonus    %7dPts",temp);
-							StringEffect(180,60,buf);
-							score_add(temp);
-						}
-
-						if(e->item) ItemSet(e->x,e->y,e->item);
-						score_add(e->score);
-						laser_clear();
-						b->IsUsed = 0;
-						BossNow--;		// ボスの参照カウント？を使用する
-					}
-					else{
-						Snd_SEPlay(SOUND_ID_HIT, e->x);
-						PowerUp(damage);
-						e->hp -= damage;
-					}
-
-					return TRUE;
+					return BossDamageApply(*b, *e, damage);
 				}
 			}
 		}
@@ -581,8 +585,6 @@ bool BossDamage2(int x, int y, int damage)
 	int				i;
 	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
-	DWORD			temp;
-	static char		buf[100];
 	BOOL			ret_val = FALSE;
 
 	i = (BitGetNum()>>1);
@@ -600,43 +602,7 @@ bool BossDamage2(int x, int y, int damage)
 			if(HITCHK(x,e->x,e->g_width) && (y > e->y) && (e->flag&EF_DAMAGE)){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					e->IsDamaged = ((e->count) & 1);
-					if(e->hp<=damage){		// ボスの死亡処理(後で変更すること!!)
-						SnakyDelete(b);
-						BitDelete();
-						enemy_clear();
-						fragment_set(e->x,e->y,FRG_FATCIRCLE);
-						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
-						ScrollCommand(SCMD_QUAKE);
-						Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
-						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-						PowerUp((BYTE)e->hp);
-						e->hp    = 0;
-						e->count = 0;
-						e->flag  = EF_BOMB;
-
-						// 最後の一匹だった場合 //
-						if(BossNow==1){
-							temp = tama2score();	// 弾→スコアエフェクト
-							//sprintf(buf,"%3d Evade  %5dPts",Viv.evade,Viv.evadesc);
-							sprintf(buf,"  Bonus    %7dPts",temp);
-							StringEffect(180,60,buf);
-							score_add(temp);
-						}
-
-						if(e->item) ItemSet(e->x,e->y,e->item);
-						score_add(e->score);
-						laser_clear();
-						b->IsUsed = 0;
-						BossNow--;		// ボスの参照カウント？を使用する
-					}
-					else{
-						Snd_SEPlay(SOUND_ID_HIT, e->x);
-						PowerUp(damage);
-						e->hp -= damage;
-					}
-
-					ret_val = TRUE;
+					ret_val = BossDamageApply(*b, *e, damage);
 				}
 			}
 		}
@@ -650,8 +616,6 @@ void BossDamage3(int x, int y, uint8_t d)
 	int				i;
 	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
-	DWORD			temp;
-	static char		buf[100];
 	//BOOL			ret_val = FALSE;
 	int				damage  = 2;
 
@@ -670,41 +634,7 @@ void BossDamage3(int x, int y, uint8_t d)
 			if(LaserHITCHK(e, x, y, d) && (e->flag&EF_DAMAGE)){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					e->IsDamaged = ((e->count) & 1);
-					if(e->hp<=damage){		// ボスの死亡処理(後で変更すること!!)
-						SnakyDelete(b);
-						BitDelete();
-						enemy_clear();
-						fragment_set(e->x,e->y,FRG_FATCIRCLE);
-						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
-						ScrollCommand(SCMD_QUAKE);
-						Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
-						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-						PowerUp((BYTE)e->hp);
-						e->hp    = 0;
-						e->count = 0;
-						e->flag  = EF_BOMB;
-
-						// 最後の一匹だった場合 //
-						if(BossNow==1){
-							temp = tama2score();	// 弾→スコアエフェクト
-							//sprintf(buf,"%3d Evade  %5dPts",Viv.evade,Viv.evadesc);
-							sprintf(buf,"  Bonus    %7dPts",temp);
-							StringEffect(180,60,buf);
-							score_add(temp);
-						}
-
-						if(e->item) ItemSet(e->x,e->y,e->item);
-						score_add(e->score);
-						laser_clear();
-						b->IsUsed = 0;
-						BossNow--;		// ボスの参照カウント？を使用する
-					}
-					else{
-						Snd_SEPlay(SOUND_ID_HIT, e->x);
-						PowerUp(damage);
-						e->hp -= damage;
-					}
+					BossDamageApply(*b, *e, damage);
 				}
 			}
 		}
@@ -718,8 +648,6 @@ void BossDamage4(int damage)
 	int				i;
 	BOSS_DATA		*b;
 	ENEMY_DATA		*e;
-	DWORD			temp;
-	static char		buf[100];
 
 	i = (BitGetNum()>>1);
 	damage -= i;
@@ -736,41 +664,7 @@ void BossDamage4(int damage)
 			if(e->flag&EF_DAMAGE){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					e->IsDamaged = ((e->count) & 1);
-					if(e->hp<=damage){		// ボスの死亡処理(後で変更すること!!)
-						SnakyDelete(b);
-						BitDelete();
-						enemy_clear();
-						fragment_set(e->x,e->y,FRG_FATCIRCLE);
-						ExBombEfcSet(e->x, e->y, EXBOMB_STD);
-						ScrollCommand(SCMD_QUAKE);
-						Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
-						if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-						PowerUp((BYTE)e->hp);
-						e->hp    = 0;
-						e->count = 0;
-						e->flag  = EF_BOMB;
-
-						// 最後の一匹だった場合 //
-						if(BossNow==1){
-							temp = tama2score();	// 弾→スコアエフェクト
-							//sprintf(buf,"%3d Evade  %5dPts",Viv.evade,Viv.evadesc);
-							sprintf(buf,"  Bonus    %7dPts",temp);
-							StringEffect(180,60,buf);
-							score_add(temp);
-						}
-
-						if(e->item) ItemSet(e->x,e->y,e->item);
-						score_add(e->score);
-						laser_clear();
-						b->IsUsed = 0;
-						BossNow--;		// ボスの参照カウント？を使用する
-					}
-					else{
-						Snd_SEPlay(SOUND_ID_HIT, e->x);
-						PowerUp(damage);
-						e->hp -= damage;
-					}
+					BossDamageApply(*b, *e, damage);
 
 					//return TRUE;
 				}

@@ -674,22 +674,26 @@ void parse_ECL(ENEMY_DATA *e)
 			e->cmd = e->call_addr;
 		goto ECL_HEAD;
 
-		case(ECL_JHPL):			// ◎ＨＰが指定値より大きければジャンプ
-			ECL_DEBUG("ECL_JHPL : %d",(DWORD)cmd[1]);
+		case(ECL_JHPL): { // ◎ＨＰが指定値より大きければジャンプ
+			const auto target = U32LEAt(&cmd[1]);
+			ECL_DEBUG("ECL_JHPL : %u", target);
 			if(e->hp > U32LEAt(&cmd[1 + 4])) {
-				e->cmd = U32LEAt(&cmd[1]);
+				e->cmd = target;
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
+		}
 		break;
 
-		case(ECL_JHPS):			// ◎ＨＰが指定値より小さければジャンプ
-			ECL_DEBUG("ECL_JHPS : %d",(DWORD)cmd[1]);
+		case(ECL_JHPS): { // ◎ＨＰが指定値より小さければジャンプ
+			const auto target = U32LEAt(&cmd[1]);
+			ECL_DEBUG("ECL_JHPS : %u", target);
 			if(e->hp < U32LEAt(&cmd[1 + 4])) {
-				e->cmd = U32LEAt(&cmd[1]);
+				e->cmd = target;
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
+		}
 		break;
 
 		case(ECL_JDIF):			// 難易度によるジャンプ

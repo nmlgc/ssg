@@ -14,6 +14,13 @@
 
 
 
+// マップデータ保存用ヘッダ //
+typedef struct tagScrollSaveHeader{
+	U32LE	Address;	// このデータの開始アドレス
+	U32LE	ScrollWait;	// このレイヤーのディレイ
+	U32LE	Length;	// このレイヤーの長さ
+} ScrollSaveHeader;
+
 SCROLL_INFO		ScrollInfo;			// スクロールに関する情報
 SCL_INFO		SclInfo;			// ＳＣＬに関する情報
 PIXEL_LTRB	rcMapChip[1200];	// マップパーツＩＤに対する矩形
@@ -135,11 +142,9 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 static void enemy_set(void)
 {
 	WINDOW_LTRB	MWinRect;
-	int			x,y;
 	BYTE		id;
 	BOOL		bFlag = TRUE;
 	BYTE		*cmd;
-	DWORD		temp;
 //	BIT_DEVICE	*in;				// やばやば...
 	BOOL		CtrlFlag = FALSE;
 
@@ -149,8 +154,8 @@ static void enemy_set(void)
 			case(SCL_KEY):		// キー入力待ち
 			break;
 
-			case(SCL_TIME):
-				temp = (*(DWORD *)(&cmd[1]));
+			case(SCL_TIME): {
+				const auto temp = U32LEAt(&cmd[1]);
 				// メッセージウィンドウがオープンしている場合 //
 				if(SclInfo.MsgFlag){
 					if(
@@ -185,6 +190,7 @@ static void enemy_set(void)
 				if(temp>GameCount) bFlag    = FALSE;
 				else               SCL_Now += 5;		// cmd(1)+time(4)
 				SCL_DEBUG("--- SCL_TIME ---");
+			}
 			break;
 
 			case(SCL_ENEMY):
@@ -193,12 +199,13 @@ static void enemy_set(void)
 				SCL_DEBUG("--- SCL_ENEMY ---");
 			break;
 
-			case(SCL_BOSS):		// ボスをセットする(X(16),Y(16),ID(8))
-				x  = (*(short *)(&cmd[1]));		// ボス初期Ｘ
-				y  = (*(short *)(&cmd[1+2]));	// ボス初期Ｙ
+			case(SCL_BOSS): { // ボスをセットする(X(16),Y(16),ID(8))
+				const auto x  = I16LEAt(&cmd[1 + 0]);	// ボス初期Ｘ
+				const auto y  = I16LEAt(&cmd[1 + 2]);	// ボス初期Ｙ
 				id = cmd[1+2+2];				// ボスＩＤ
 				BossSet(x,y,id);
 				SCL_Now += (1+2+2+1);	// cmd+x+y+id
+			}
 			break;
 
 			case(SCL_BOSSDEAD):		// ボスを強制的に破壊する(Level2 命令Only)
@@ -262,7 +269,7 @@ static void enemy_set(void)
 			return;
 
 			case(SCL_SSP):		// スクロールスピード変更
-				ScrollSpeed(*(short *)&cmd[1]);
+				ScrollSpeed(I16LEAt(&cmd[1]));
 				SCL_Now += 3;
 			break;
 
@@ -320,10 +327,14 @@ static void enemy_set(void)
 			case(SCL_WAITEX):	// 特殊待ち <cmd1>,<opt4>
 				switch(cmd[1]){
 					case(SWAIT_BOSSHP):		// 残りＨＰ
-						if(GetBossHPSum()<=(*(DWORD *)(&cmd[2]))) break;
+						if(GetBossHPSum() <= U32LEAt(&cmd[2])) {
+							break;
+						}
 					return;
 					case(SWAIT_BOSSLEFT):	// 残りボス数
-						if(BossNow<=(*(DWORD *)(&cmd[2]))) break;
+						if(BossNow <= U32LEAt(&cmd[2])) {
+							break;
+						}
 					return;
 				}
 				SCL_Now += (1+1+4);
@@ -415,17 +426,17 @@ static void _PutEnemy(BYTE *p)
 
 	n      = 4 + (((BYTE)p[4])<<2);
 
-	x   = (*(short *)(&p[0]));	//((int)(*(short *)(&p[0])))*64;
-	y   = (*(short *)(&p[2]));	//((int)(*(short *)(&p[2])))*64;
+	x = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
+	y = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
 	InitEnemyDataSTD(e,x,y,n);
 
 /*
-	e->x   = (*(short *)(&p[0]));	//((int)(*(short *)(&p[0])))*64;
-	e->y   = (*(short *)(&p[2]));	//((int)(*(short *)(&p[2])))*64;
+	e->x   = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
+	e->y   = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
 
 	e->x = (e->x==X_RNDV) ? GX_RND : (e->x<<6);
 	e->y = (e->y==Y_RNDV) ? GY_RND : (e->y<<6);
-	e->cmd = (*(DWORD *)(&ECL_Head[n]));
+	e->cmd = U32LEAt(&ECL_Head[n]);
 
 	e->call_addr = e->cmd;
 
@@ -867,7 +878,7 @@ bool ScrollInit(void)
 */
 	// 標準のスクロールスピード(マップエディタと同じ) //
 	ScrollInfo.ScrollSpeed = TIME_PER_FRAME;					// 標準のスクロール速度
-	ScrollInfo.NumLayer    = *(DWORD *)ScrollInfo.DataHead.get();		// レイヤーの数
+	ScrollInfo.NumLayer    = U32LEAt(ScrollInfo.DataHead.get());	// レイヤーの数
 	ScrollInfo.Count       = 0;					// スクロール用カウンタ
 	ScrollInfo.InfStart    = 0;					// 無限ループ開始時刻
 	ScrollInfo.State       = SST_NORMAL;		// 状態(デフォルトの標準で..)

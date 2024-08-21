@@ -67,3 +67,12 @@ using I16BE = ENDIAN_SELECT_BIG<int16_t>;
 using U16BE = ENDIAN_SELECT_BIG<uint16_t>;
 using I32BE = ENDIAN_SELECT_BIG<int32_t>;
 using U32BE = ENDIAN_SELECT_BIG<uint32_t>;
+
+static I16LE I16LEAt(const void *p) { return *static_cast<const I16LE *>(p); }
+static U16LE U16LEAt(const void *p) { return *static_cast<const U16LE *>(p); }
+static I32LE I32LEAt(const void *p) { return *static_cast<const I32LE *>(p); }
+static U32LE U32LEAt(const void *p) { return *static_cast<const U32LE *>(p); }
+static I16BE I16BEAt(const void *p) { return *static_cast<const I16BE *>(p); }
+static U16BE U16BEAt(const void *p) { return *static_cast<const U16BE *>(p); }
+static I32BE I32BEAt(const void *p) { return *static_cast<const I32BE *>(p); }
+static U32BE U32BEAt(const void *p) { return *static_cast<const U32BE *>(p); }

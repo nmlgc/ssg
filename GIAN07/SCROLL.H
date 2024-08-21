@@ -88,13 +88,6 @@ typedef struct tagScrollInfo{
 	uint32_t	ExCount;	// 特殊コマンド用カウンタ
 } SCROLL_INFO;
 
-// マップデータ保存用ヘッダ //
-typedef struct tagScrollSaveHeader{
-	uint32_t	Address;	// このデータの開始アドレス
-	uint32_t	ScrollWait;	// このレイヤーのディレイ
-	uint32_t	Length;	// このレイヤーの長さ
-} ScrollSaveHeader;
-
 // ＳＣＬ管理用構造体 //
 typedef struct tagSCL_INFO{
 	bool	MsgFlag;	// メッセージスキップ用フラグ

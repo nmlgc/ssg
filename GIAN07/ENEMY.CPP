@@ -348,7 +348,7 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID)
 	e->x = x;
 	e->y = y;
 
-	e->cmd = (*(DWORD *)(&ECL_Head[EclID]));
+	e->cmd = U32LEAt(&ECL_Head[EclID]);
 
 	e->call_addr = e->cmd;
 
@@ -413,7 +413,7 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID)
 // 強制的に ECL ブロック間を移動する //
 void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID)
 {
-	e->cmd = (*(DWORD *)(&ECL_Head[EclID]));
+	e->cmd = U32LEAt(&ECL_Head[EclID]);
 
 	e->call_addr = e->cmd;
 
@@ -429,8 +429,8 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID)
 	int		EnemyX = x;
 	int		EnemyY = y;
 /*
-	e->x   = (*(short *)(&p[0]));	//((int)(*(short *)(&p[0])))*64;
-	e->y   = (*(short *)(&p[2]));	//((int)(*(short *)(&p[2])))*64;
+	e->x   = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
+	e->y   = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
 */
 
 	// ランダム配置に対応するぞ //
@@ -531,10 +531,8 @@ void parse_ECL(ENEMY_DATA *e)
 	switch(*cmd){
 		case(ECL_CEFC):
 		{
-			int		x, y;
-
-			x = e->x + ((*(short *)(&cmd[1+0]))<<6);
-			y = e->y + ((*(short *)(&cmd[1+2]))<<6);
+			const auto x = (e->x + PixelToWorld(I16LEAt(&cmd[1 + 0])));
+			const auto y = (e->y + PixelToWorld(I16LEAt(&cmd[1 + 2])));
 			CEffectSet(x, y, cmd[1+2+2]);
 			bRetFlag = FALSE;
 		}
@@ -553,8 +551,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_XYL):	// 1+2 Bytes Param
-			e->x += cosl(e->d, (*(short *)(&cmd[1]))<<6);
-			e->y += sinl(e->d, (*(short *)(&cmd[1]))<<6);
+			e->x += cosl(e->d, PixelToWorld(I16LEAt(&cmd[1])));
+			e->y += sinl(e->d, PixelToWorld(I16LEAt(&cmd[1])));
 			bRetFlag = FALSE;
 		break;
 
@@ -580,8 +578,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_HITXY):		// 当たり判定を変更する
-			e->g_width  = (*(WORD *)(&cmd[1]))<<6;
-			e->g_height = (*(WORD *)(&cmd[3]))<<6;
+			e->g_width  = PixelToWorld(U16LEAt(&cmd[1]));
+			e->g_height = PixelToWorld(U16LEAt(&cmd[3]));
 			bRetFlag = FALSE;
 		break;
 
@@ -636,8 +634,8 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_SETUP):		// 敵の初期化
 			ECL_DEBUG("ECL_SETUP",0);
-			e->hp    = *(DWORD *)(&cmd[1]);
-			e->score = *(DWORD *)(&cmd[1+4]);
+			e->hp    = U32LEAt(&cmd[1 + 0]);
+			e->score = U32LEAt(&cmd[1 + 4]);
 			if(e->hp==0) BossKillAll();
 			bRetFlag = FALSE;
 		break;
@@ -650,14 +648,16 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JMP):			// ◎ＥＣＬ無条件ジャンプ(少々特殊な動作をします)
 			ECL_DEBUG("ECL_JMP",0);
-			e->cmd = *(DWORD *)(&cmd[1]);
+			e->cmd = U32LEAt(&cmd[1]);
 		goto ECL_HEAD;
 
 		case(ECL_LOOP):			// ◎一定区間を繰り返す
 			ECL_DEBUG("ECL_LOOP : %d",e->rep_c);
-			if(e->rep_c==0) e->rep_c = (*(WORD *)(&cmd[1+4]))+1;
+			if(e->rep_c == 0) {
+				e->rep_c = (U16LEAt(&cmd[1 + 4]) + 1);
+			}
 			if((--e->rep_c)!=0){
-				e->cmd = *(DWORD *)(&cmd[1]);
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
@@ -666,7 +666,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_CALL):			// ＠サブルーチンを呼ぶ
 			ECL_DEBUG("ECL_CALL",0);
 			e->call_addr = e->cmd + ECL_CmdLen[ECL_CALL];
-			e->cmd       = *(DWORD *)(&cmd[1]);
+			e->cmd       = U32LEAt(&cmd[1]);
 		goto ECL_HEAD;
 
 		case(ECL_RET):			// ＠サブルーチンから復帰する
@@ -676,8 +676,8 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JHPL):			// ◎ＨＰが指定値より大きければジャンプ
 			ECL_DEBUG("ECL_JHPL : %d",(DWORD)cmd[1]);
-			if(e->hp>(*(DWORD *)(&cmd[1+4]))){
-				e->cmd = *(DWORD *)(&cmd[1]);
+			if(e->hp > U32LEAt(&cmd[1 + 4])) {
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
@@ -685,8 +685,8 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JHPS):			// ◎ＨＰが指定値より小さければジャンプ
 			ECL_DEBUG("ECL_JHPS : %d",(DWORD)cmd[1]);
-			if(e->hp<(*(DWORD *)(&cmd[1+4]))){
-				e->cmd = *(DWORD *)(&cmd[1]);
+			if(e->hp < U32LEAt(&cmd[1 + 4])) {
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
@@ -695,11 +695,11 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_JDIF):			// 難易度によるジャンプ
 			ECL_DEBUG("ECL_JDIF",0);
 			switch(PlayRank.GameLevel){
-				case(GAME_EASY):	e->cmd = *(DWORD *)(&cmd[1]);		break;
+				case(GAME_EASY):	e->cmd = U32LEAt(&cmd[1 +  0]);	break;
 				default:
-				case(GAME_NORMAL):	e->cmd = *(DWORD *)(&cmd[1+4]);		break;
-				case(GAME_HARD):	e->cmd = *(DWORD *)(&cmd[1+8]);		break;
-				case(GAME_LUNATIC):	e->cmd = *(DWORD *)(&cmd[1+12]);	break;
+				case(GAME_NORMAL):	e->cmd = U32LEAt(&cmd[1 +  4]);	break;
+				case(GAME_HARD):	e->cmd = U32LEAt(&cmd[1 +  8]);	break;
+				case(GAME_LUNATIC):	e->cmd = U32LEAt(&cmd[1 + 12]);	break;
 			}
 		goto ECL_HEAD;
 
@@ -707,7 +707,7 @@ void parse_ECL(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_JDSB",0);
 			temp = abs(atan8(Viv.x-e->x,Viv.y-e->y) - (e->d));
 			if(temp<4){
-				e->cmd = *(DWORD *)(&cmd[1]);
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
@@ -715,8 +715,8 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JFCL):			// フレームカウンタが大きければジャンプ
 			ECL_DEBUG("ECL_JFCL",0);
-			if(e->count>(*(DWORD *)(&cmd[1+4]))){
-				e->cmd = *(DWORD *)(&cmd[1]);
+			if(e->count > U32LEAt(&cmd[1 + 4])) {
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
@@ -724,8 +724,8 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JFCS):			// フレームカウンタが小さければジャンプ
 			ECL_DEBUG("ECL_JFCS",0);
-			if(e->count<(*(DWORD *)(&cmd[1+4]))){
-				e->cmd = *(DWORD *)(&cmd[1]);
+			if(e->count < U32LEAt(&cmd[1 + 4])) {
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			bRetFlag = FALSE;
@@ -734,23 +734,23 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_STI):			// 割り込みベクタをセットする Addr(4),条件(1),比較値(4)
 			switch(cmd[1+4]){
 				case(ECLVECT_BITLEFT):
-					e->Vect[ECLVECT_BITLEFT].vect  = (*(DWORD *)(&cmd[1]));
-					e->Vect[ECLVECT_BITLEFT].value = (*(DWORD *)(&cmd[1+4+1]));
+					e->Vect[ECLVECT_BITLEFT].vect  = U32LEAt(&cmd[1]);
+					e->Vect[ECLVECT_BITLEFT].value = U32LEAt(&cmd[1 + 4 + 1]);
 				break;
 
 				case(ECLVECT_BOSSLEFT):
-					e->Vect[ECLVECT_BOSSLEFT].vect  = (*(DWORD *)(&cmd[1]));
-					e->Vect[ECLVECT_BOSSLEFT].value = (*(DWORD *)(&cmd[1+4+1]));
+					e->Vect[ECLVECT_BOSSLEFT].vect  = U32LEAt(&cmd[1]);
+					e->Vect[ECLVECT_BOSSLEFT].value = U32LEAt(&cmd[1 + 4 + 1]);
 				break;
 
 				case(ECLVECT_HP):
-					e->Vect[ECLVECT_HP].vect  = (*(DWORD *)(&cmd[1]));
-					e->Vect[ECLVECT_HP].value = (*(DWORD *)(&cmd[1+4+1]));
+					e->Vect[ECLVECT_HP].vect  = U32LEAt(&cmd[1]);
+					e->Vect[ECLVECT_HP].value = U32LEAt(&cmd[1 + 4 + 1]);
 				break;
 
 				case(ECLVECT_TIMER):
-					e->Vect[ECLVECT_TIMER].vect  = (*(DWORD *)(&cmd[1]));
-					e->Vect[ECLVECT_TIMER].value = (*(DWORD *)(&cmd[1+4+1]));
+					e->Vect[ECLVECT_TIMER].vect  = U32LEAt(&cmd[1]);
+					e->Vect[ECLVECT_TIMER].value = U32LEAt(&cmd[1 + 4 + 1]);
 					e->IntTimer = 0;
 				break;
 
@@ -784,14 +784,18 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_NOP):			// ＠何もしない
 			ECL_DEBUG("ECL_NOP : %d",e->cmd_c);
-			if(e->cmd_c==0) e->cmd_c = (*(WORD *)(&cmd[1]))+1;
+			if(e->cmd_c == 0) {
+				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
+			}
 			if((--e->cmd_c)!=0) return;
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_NOPSC):		// スクロールに流される
 			ECL_DEBUG("ECL_NOPSC : %d",e->cmd_c);
-			if(e->cmd_c==0) e->cmd_c = (*(WORD *)(&cmd[1]))+1;
+			if(e->cmd_c == 0) {
+				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
+			}
 			if((--e->cmd_c)!=0){
 				// スクロールに流される処理を記述 //
 				return;
@@ -808,7 +812,7 @@ void parse_ECL(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_ACC : %d",e->cmd_c);
 			if(e->cmd_c == 0){
 				// 初期化 //
-				e->cmd_c = (*(WORD *)(&cmd[2]))+1;
+				e->cmd_c = (U16LEAt(&cmd[2]) + 1);
 				//e->vx    = cosl(e->d,e->v);
 				//e->vy    = sinl(e->d,e->v);
 			}
@@ -890,7 +894,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MOV):			// ＠直線移動
 			ECL_DEBUG("ECL_MOV : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1]))+1;
+				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = cosl(e->d,e->v);
 				e->vy    = sinl(e->d,e->v);
 			}
@@ -905,7 +909,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_ROL):			// ＠回転移動
 			ECL_DEBUG("ECL_ROL : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+1]))+1;
+				e->cmd_c = (U16LEAt(&cmd[1 + 1]) + 1);
 				e->vd    = REL_DEGRL((char)cmd[1]);
 			}
 			if((--e->cmd_c)!=0){
@@ -920,9 +924,9 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_LROL):			// ＠回転＆直線移動
 			ECL_DEBUG("ECL_LROL : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+9]))+1;
-				e->vx    = ABS_VXRL((*(int  *)(&cmd[1]   )));
-				e->vy    = (*(int  *)(&cmd[1+4] ));
+				e->cmd_c = (U16LEAt(&cmd[1 + 9]) + 1);
+				e->vx    = ABS_VXRL(I32LEAt(&cmd[1]));
+				e->vy    = I32LEAt(&cmd[1+4] );
 				e->vd    = REL_DEGRL((char)cmd[1+8]);
 			}
 			if((--e->cmd_c)!=0){
@@ -937,8 +941,8 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_WAVX):			// ＠波Ｘ移動
 			ECL_DEBUG("ECL_WAVX : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+6]))+1;
-				e->vx    = ABS_VXRL(*(int  *)(&cmd[1]  ));
+				e->cmd_c = (U16LEAt(&cmd[1 + 6]) + 1);
+				e->vx    = ABS_VXRL(I32LEAt(&cmd[1]));
 				e->vy    = e->y;
 				e->amp   = (BYTE)cmd[1+4];
 				e->vd    = (char)cmd[1+5];
@@ -956,8 +960,8 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_WAVY):			// ＠波Ｙ移動
 			ECL_DEBUG("ECL_WAVY : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+6]))+1;
-				e->vy    = (*(int  *)(&cmd[1]  ));
+				e->cmd_c = (U16LEAt(&cmd[1 + 6]) + 1);
+				e->vy    = I32LEAt(&cmd[1]);
 				e->vx    = e->x;
 				e->amp   = (BYTE)cmd[1+4];
 				e->vd    = (char)cmd[1+5];
@@ -975,8 +979,8 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MXA):		// Ｘ絶対移動
 			ECL_DEBUG("ECL_MXA : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+2]))+1;
-				e->vx    = (((*(WORD *)(&cmd[1]))<<6)-(e->x))/e->cmd_c;
+				e->cmd_c = (U16LEAt(&cmd[1 + 2]) + 1);
+				e->vx    = ((PixelToWorld(U16LEAt(&cmd[1])) - e->x) / e->cmd_c);
 				e->vy    = 0;
 			}
 			if((--e->cmd_c)!=0){
@@ -989,8 +993,8 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MYA):		// Ｙ絶対移動
 			ECL_DEBUG("ECL_MYA : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+2]))+1;
-				e->vy    = (((*(WORD *)(&cmd[1]))<<6)-(e->y))/e->cmd_c;
+				e->cmd_c = (U16LEAt(&cmd[1 + 2])) + 1;
+				e->vy    = ((PixelToWorld(U16LEAt(&cmd[1])) - e->y) / e->cmd_c);
 				e->vx    = 0;
 			}
 			if((--e->cmd_c)!=0){
@@ -1003,9 +1007,9 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MXYA):		// ＸＹ絶対移動
 			ECL_DEBUG("ECL_MXYA : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1+4]))+1;
-				e->vx    = (((*(WORD *)(&cmd[1+0]))<<6)-(e->x))/e->cmd_c;
-				e->vy    = (((*(WORD *)(&cmd[1+2]))<<6)-(e->y))/e->cmd_c;
+				e->cmd_c = (U16LEAt(&cmd[1 + 4]) + 1);
+				e->vx    = ((PixelToWorld(U16LEAt(&cmd[1 + 0])) - e->x) / e->cmd_c);
+				e->vy    = ((PixelToWorld(U16LEAt(&cmd[1 + 2])) - e->y) / e->cmd_c);
 			}
 			if((--e->cmd_c)!=0){
 				e->x += e->vx;
@@ -1018,7 +1022,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MXS):		// Ｘサボテンセット移動
 			ECL_DEBUG("ECL_MXS : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1]))+1;
+				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = ((Viv.x)-(e->x))/e->cmd_c;
 				e->vy    = 0;
 			}
@@ -1032,7 +1036,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MYS):		// Ｙサボテンセット移動
 			ECL_DEBUG("ECL_MYS : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1]))+1;
+				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = 0;
 				e->vy    = ((Viv.y)-(e->y))/e->cmd_c;
 			}
@@ -1046,7 +1050,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_MXYS):		// ＸＹサボテンセット移動
 			ECL_DEBUG("ECL_MXYS : %d",e->cmd_c);
 			if(e->cmd_c==0){
-				e->cmd_c = (*(WORD *)(&cmd[1]))+1;
+				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = ((Viv.x)-(e->x))/e->cmd_c;
 				e->vy    = ((Viv.y)-(e->y))/e->cmd_c;
 			}
@@ -1132,27 +1136,27 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_SPDA):			// ＠速度絶対指定
 			ECL_DEBUG("ECL_SPDA",0);
-			e->v = (*(int *)(&cmd[1]));
+			e->v = I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_SPDR):			// ＠速度相対指定
 			ECL_DEBUG("ECL_SPDR",0);
-			e->v += (*(int *)(&cmd[1]));
+			e->v += I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_XYA):			// ＠座標絶対指定
 			ECL_DEBUG("ECL_XYA",0);
-			e->x = ((int)(*(short *)(&cmd[1]  )))<<6;
-			e->y = ((int)(*(short *)(&cmd[1+2])))<<6;
+			e->x     = PixelToWorld(I16LEAt(&cmd[1 + 0]));
+			e->y     = PixelToWorld(I16LEAt(&cmd[1 + 2]));
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_XYR):			// ＠座標相対指定
 			ECL_DEBUG("ECL_XYR",0);
-			e->x += (((int)(*(short *)(&cmd[1]  )))<<6);
-			e->y += (((int)(*(short *)(&cmd[1+2])))<<6);
+			e->x += PixelToWorld(I16LEAt(&cmd[1 + 0]));
+			e->y += PixelToWorld(I16LEAt(&cmd[1 + 2]));
 			bRetFlag = FALSE;
 		break;
 
@@ -1200,8 +1204,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TXYR):			// ＠弾発射位置相対指定
-			e->t_cmd.x = (*(short *)(&cmd[1]  ))<<6;
-			e->t_cmd.y = (*(short *)(&cmd[1+2]))<<6;
+			e->t_cmd.x = PixelToWorld(I16LEAt(&cmd[1 + 0]));
+			e->t_cmd.y = PixelToWorld(I16LEAt(&cmd[1 + 2]));
 			bRetFlag = FALSE;
 		break;
 
@@ -1315,17 +1319,17 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LLA):			// レーザー長・絶対指定
-			e->l_cmd.l = (*(int *)(&cmd[1]));
+			e->l_cmd.l = I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_LLR):			// レーザー長・相対指定
-			e->l_cmd.l += (*(int *)(&cmd[1]));
+			e->l_cmd.l += I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_LL2):			// レーザー発射位置
-			e->l_cmd.l2 = (*(int *)(&cmd[1]));
+			e->l_cmd.l2 = I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1363,12 +1367,12 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LSPDA):		// レーザーの速度絶対指定
-			e->l_cmd.v = (*(int *)(&cmd[1]));
+			e->l_cmd.v = I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_LSPDR):		// レーザーの速度相対指定
-			e->l_cmd.v = (*(int *)(&cmd[1]));
+			e->l_cmd.v = I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1383,13 +1387,13 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LWA):			// レーザーの太さ絶対指定
-			e->l_cmd.w = (*(int *)(&cmd[1]));
+			e->l_cmd.w = I32LEAt(&cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_LXY):			// レーザーの発射位置指定
-			e->l_cmd.x = (*(short *)(&cmd[1]  ))<<6;
-			e->l_cmd.y = (*(short *)(&cmd[1+2]))<<6;
+			e->l_cmd.x = PixelToWorld(I16LEAt(&cmd[1 + 0]));
+			e->l_cmd.y = PixelToWorld(I16LEAt(&cmd[1 + 2]));
 			bRetFlag = FALSE;
 		break;
 
@@ -1485,7 +1489,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;					// cmd を動かさない
 
 		case(ECL_BITATTACK):	// (ボス特権命令)ビットに攻撃パターンをセットする
-			BossBitAttack(e,(*(DWORD *)(&cmd[1])));
+			BossBitAttack(e, U32LEAt(&cmd[1]));
 			bRetFlag = FALSE;
 		break;
 
@@ -1495,7 +1499,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_BITCMD):
-			BossBitCommand(e, cmd[1], (*(int *)(&cmd[2])));
+			BossBitCommand(e, cmd[1], I32LEAt(&cmd[2]));
 			bRetFlag = FALSE;
 		break;
 
@@ -1515,8 +1519,8 @@ void parse_ECL(ENEMY_DATA *e)
 			if(EnemyNow+1>=ENEMY_MAX) break;
 			auto* new_enemy = &Enemy[EnemyInd[EnemyNow++]];
 
-			x   = (e->x >>6) + (*(short *)(&cmd[1]));	//((int)(*(short *)(&p[0])))*64;
-			y   = (e->y >>6) + (*(short *)(&cmd[3]));	//((int)(*(short *)(&p[2])))*64;
+			x = ((e->x >> 6) + I16LEAt(&cmd[1])); // PixelToWorld(I16LEAt(&p[0]));
+			y = ((e->y >> 6) + I16LEAt(&cmd[3])); // PixelToWorld(I16LEAt(&p[2]));
 
 			// バグに注意注意！！ //
 			if(cmd[0] == ECL_ENEMYSETD){
@@ -1584,7 +1588,7 @@ void parse_ECL(ENEMY_DATA *e)
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-					e->GR[cmd[1]] = (*(DWORD *)(&cmd[2]));
+					e->GR[cmd[1]] = U32LEAt(&cmd[2]);
 				break;
 
 				default:	// レジスタ指定がおかしい
@@ -1670,8 +1674,9 @@ void parse_ECL(ENEMY_DATA *e)
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-					if((*(DWORD *)(&cmd[2]))!=0)
-						e->GR[cmd[1]] %= (*(DWORD *)(&cmd[2]));
+					if(U32LEAt(&cmd[2]) != 0) {
+						e->GR[cmd[1]] %= U32LEAt(&cmd[2]);
+					}
 					//else
 						// ゼロ除算エラー
 					break;
@@ -1705,13 +1710,13 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_CMPC):		// レジスタ～定数の比較(Reg,Const)
 			if(cmd[1]>=ECLREG_MAX) return;		// エラー
-			RegCmp = (ID2Value(e, cmd[1]) - (*(int *)&cmd[1+1]) );
+			RegCmp = (ID2Value(e, cmd[1]) - I32LEAt(&cmd[1 + 1]));
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_JL):		// 比較結果 > 0 ならばジャンプ
 			if(RegCmp>0){
-				e->cmd = *(DWORD *)(&cmd[1]);
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			else bRetFlag = FALSE;
@@ -1719,7 +1724,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JS):		// 比較結果 < 0 ならばジャンプ
 			if(RegCmp<0){
-				e->cmd = *(DWORD *)(&cmd[1]);
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			else bRetFlag = FALSE;
@@ -1727,7 +1732,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JEQ):		// 比較結果 == 0 ならばジャンプ
 			if(RegCmp == 0){
-				e->cmd = *(DWORD *)(&cmd[1]);
+				e->cmd = U32LEAt(&cmd[1]);
 				goto ECL_HEAD;
 			}
 			else bRetFlag = FALSE;

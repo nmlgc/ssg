@@ -363,7 +363,7 @@ void EndingSCLDecode()
 		cmd = SCL_Now;
 		switch(cmd[0]){
 			case(SCL_TIME):
-				temp = (*(DWORD *)(&cmd[1]));
+				temp = I32LEAt(&cmd[1]);
 				if(temp>GameCount) bFlag    = FALSE;
 				else               SCL_Now += 5;		// cmd(1)+time(4)
 			break;

@@ -239,7 +239,7 @@ void HLaserDraw(void)
 	}
 	else{
 		AlphaPolygon = GrpPolygon;
-		//AlphaCircle  = GrpCircle;
+		// AlphaCircle  = GeomCircle;
 		GrpSetColor({ 2, 2, 5 });
 	}
 

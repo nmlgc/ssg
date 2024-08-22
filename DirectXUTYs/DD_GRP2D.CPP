@@ -54,7 +54,6 @@ void _2DSetup(void)
 	GrpSetAlpha = _2DSetAlpha;
 	GrpLine     = _2DLine;
 	GrpBox      = _2DBox;
-	GrpCircle   = _2DCircle;
 	GrpCircleF  = _2DCircleF;
 	GrpPolygon  = _2DPolygon;
 	GrpBoxA     = _2DBoxA;
@@ -164,34 +163,13 @@ void _2DBox(int x1, int y1, int x2, int y2)
 	}
 }
 
-// 円 //
-void _2DCircle(int x, int y, int r)
+void GrpPoint(WINDOW_POINT p)
 {
-	int dx,dy;
-	int s;
-	const auto c = Col2D;
-
-	if(Grp_Vram==NULL) return;
-
-	if(r==0){
-		_2DPset(x,y,c);
+	if(!Grp_Vram) {
 		return;
 	}
-
-	dx = s = r;
-	dy = 0;
-
-	while(dx>=dy){
-		_2DPset(x+dx,y+dy,c); _2DPset(x+dx,y-dy,c);
-		_2DPset(x-dx,y+dy,c); _2DPset(x-dx,y-dy,c);
-		_2DPset(x+dy,y+dx,c); _2DPset(x+dy,y-dx,c);
-		_2DPset(x-dy,y+dx,c); _2DPset(x-dy,y-dx,c);
-		s -= (dy<<1)+1;
-		if(s<0){
-			s+=((dx-1)<<1);
-			dx--;
-		}
-		dy++;
+	if(_2DChkPoint(p.x, p.y)) {
+		Grp_Vram[Grp_AddrY[p.y] + p.x] = Col2D;
 	}
 }
 
@@ -207,7 +185,7 @@ void _2DCircleF(int x, int y, int r)
 	if(Grp_Vram==NULL) return;
 
 	if(r==0){
-		_2DPset(x, y, Col2D);
+		GrpPoint({ x, y });
 		return;
 	}
 

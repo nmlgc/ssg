@@ -16,7 +16,7 @@
 
 // ヘッダファイル //
 import std.compat;
-#include "game/coords.h"
+#include "platform/graphics_backend.h"
 #include "game/graphics.h"
 
 
@@ -31,13 +31,13 @@ void _3DSetAlpha(uint8_t a, uint8_t mode);	// αセット
 
 void _3DLine(int x1, int y1, int x2, int y2);	// 直線
 void _3DBox(int x1, int y1, int x2, int y2);	// 長方形
-void _3DCircle(int x, int y, int r);	// 円
 void _3DCircleF(int x, int y, int r);	// 円塗りつぶし
 void _3DPolygon(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
 void _3DBoxA(int x1, int y1, int x2, int y2);	// α長方形
 
 
 // ３Ｄ専用関数 //
+void GrpLineStrip(VERTEX_XY_SPAN<> points);
 void GrpCircleFA(int x, int y, int r);	// α円塗りつぶし
 void GrpFatCircleA(int x, int y, int r, int w);	// 太い円を描く
 void GrpPolygonA(VERTEX_XY_SPAN<>);	// αポリゴン塗りつぶし

@@ -7,6 +7,7 @@
 #include "constants.h"
 #include "DD_GRP3D.H"
 #include "game/ut_math.h"
+#include <assert.h>
 #include <d3d.h>
 #pragma message(PBGWIN_DD_GRP3D_H)
 
@@ -28,6 +29,17 @@ inline void Set2DPoint(D3DTLVERTEX *tlv, int x, int y, RGBA c = Col3D)
 	tlv->rhw      = D3DVAL(1);
 	tlv->color    = RGBA_MAKE(c.r, c.g, c.b, c.a);
 	tlv->specular = RGB_MAKE(0,0,0);
+}
+
+void DrawVertices(D3DPRIMITIVETYPE type, VERTEX_XY_SPAN<> xys)
+{
+	const auto count = xys.size();
+	assert(count <= (sizeof(work) / sizeof(work[0])));
+	auto out_p = work;
+	for(const auto point : xys) {
+		Set2DPoint(out_p++, point.x, point.y);
+	}
+	DxObj.D3Dev->DrawPrimitive(type, D3DVT_TLVERTEX, work, count, D3DDP_WAIT);
 }
 
 inline bool AlphaEnable(bool flag)
@@ -54,7 +66,6 @@ void _3DSetup(void)
 	GrpSetAlpha = _3DSetAlpha;
 	GrpLine     = _3DLine;
 	GrpBox      = _3DBox;
-	GrpCircle   = _3DCircle;
 	GrpCircleF  = _3DCircleF;
 	GrpPolygon  = _3DPolygon;
 	GrpBoxA     = _3DBoxA;
@@ -149,18 +160,10 @@ void _3DBox(int x1, int y1, int x2, int y2)
 	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,4,D3DDP_WAIT);
 }
 
-// 円 //
-void _3DCircle(int x, int y, int r)
+void GrpLineStrip(VERTEX_XY_SPAN<> xys)
 {
 	if(!bLocked) return;
-
-	for(auto i = 0; i <= 32; i++) { // 円周上の点
-		Set2DPoint(work+i,x+cosl(i*8,r),y+sinl(i*8,r));
-	}
-
-	DxObj.D3Dev->DrawPrimitive(
-		D3DPT_LINESTRIP, D3DVT_TLVERTEX, work, 33, D3DDP_WAIT
-	);
+	DrawVertices(D3DPT_LINESTRIP, xys);
 }
 
 // 円塗りつぶし //

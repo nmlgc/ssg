@@ -5,6 +5,7 @@
 
 #include "EFFECT.H"
 #include "FONTUTY.H"
+#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "game/cast.h"
 #include "game/snd.h"
@@ -95,7 +96,7 @@ void CEffectDraw(void)
 					r = ce->r - max(2, (k * ce->r)/8);
 					if(r < 0) continue;
 					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
-					GrpCircle(ce->x, ce->y, r);
+					GeomCircle({ ce->x, ce->y }, r);
 				}
 			break;
 
@@ -105,7 +106,7 @@ void CEffectDraw(void)
 					//r = ce->r - max(2, (k * (600-ce->r))/16);
 					if(r < 0) continue;
 					GrpSetColor({ 5u, (k + 2u), (k + 2u) });
-					GrpCircle(ce->x, ce->y, r);
+					GeomCircle({ ce->x, ce->y }, r);
 				}
 			break;
 		}
@@ -921,11 +922,11 @@ void WarningEffectDraw(void)
 		GrpLock();
 
 		r = (WarnEfcTime-(256-40))*3;
-		GrpSetColor({ 1, 1, 5 });	GrpCircle(320, 100, (r -= 4));
-		GrpSetColor({ 2, 2, 5 });	GrpCircle(320, 100, (r -= 4));
-		GrpSetColor({ 3, 3, 5 });	GrpCircle(320, 100, (r -= 6));
-		GrpSetColor({ 4, 4, 5 });	GrpCircle(320, 100, (r -= 6));
-		GrpSetColor({ 5, 5, 5 });	GrpCircle(320, 100, (r -= 8));
+		GrpSetColor({ 1, 1, 5 });	GeomCircle({ 320, 100 }, (r -= 4));
+		GrpSetColor({ 2, 2, 5 });	GeomCircle({ 320, 100 }, (r -= 4));
+		GrpSetColor({ 3, 3, 5 });	GeomCircle({ 320, 100 }, (r -= 6));
+		GrpSetColor({ 4, 4, 5 });	GeomCircle({ 320, 100 }, (r -= 6));
+		GrpSetColor({ 5, 5, 5 });	GeomCircle({ 320, 100 }, (r -= 8));
 
 		GrpUnlock();
 	}

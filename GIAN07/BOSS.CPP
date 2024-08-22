@@ -5,6 +5,7 @@
 
 #include "BOSS.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
+#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "EnemyExCtrl.h"
 #include "DirectXUTYs/DD_UTY.H"
@@ -253,7 +254,9 @@ void BossDraw(void)
 				GrpLock();
 				for(uint8_t j = 0; j <= 5; j++) {
 					GrpSetColor({ (5u - j), (5u - j), 5u });
-					GrpCircle(x, y, sinl(e->count*4, 30+j*4)+80);
+					GeomCircle(
+						{ x, y }, (sinl((e->count * 4), (30 + (j * 4))) + 80)
+					);
 				}
 				GrpUnlock();
 			}

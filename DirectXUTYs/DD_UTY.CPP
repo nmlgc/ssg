@@ -93,7 +93,6 @@ void(*GrpSetColor)(RGB216 col)                      = DM_COL;
 void(*GrpSetAlpha)(uint8_t a, uint8_t mode)         = DM_BB;
 void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
-void(*GrpCircle)(int x, int y, int r)               = DM_III;
 void(*GrpCircleF)(int x, int y, int r)              = DM_III;
 void (*GrpPolygon)(VERTEX_XY_SPAN<>)                = DM_PI;
 void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
@@ -940,7 +939,6 @@ static void SetDummyFunc(void)
 	GrpSetAlpha = DM_BB;
 	GrpLine     = DM_IIII;
 	GrpBox      = DM_IIII;
-	GrpCircle   = DM_III;
 	GrpCircleF  = DM_III;
 	GrpPolygon  = DM_PI;
 	GrpBoxA     = DM_IIII;

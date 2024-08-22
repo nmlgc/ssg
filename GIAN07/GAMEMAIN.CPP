@@ -8,6 +8,7 @@
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "FONTUTY.H"
+#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "LENS.H"
 #include "LEVEL.H"
@@ -1253,9 +1254,9 @@ void WeaponSelectProc(bool&)
 
 		if(abs(deg) <= 25) {
 			GrpSetColor({ 2, 2, 5 });
-			GrpCircle(120, 150, (39 + 10 - (2 * abs(deg))));
+			GeomCircle({ 120, 150 }, (39 + 10 - (2 * abs(deg))));
 			GrpSetColor({ 4, 4, 5 });
-			GrpCircle(120, 150, (41 + 10 - (2 * abs(deg))));
+			GeomCircle({ 120, 150 }, (41 + 10 - (2 * abs(deg))));
 		}
 		GrpUnlock();
 

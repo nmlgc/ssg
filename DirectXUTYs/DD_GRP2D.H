@@ -15,6 +15,8 @@
 
 // ヘッダファイル //
 import std.compat;
+#include "game/graphics.h"
+#include "platform/graphics_backend.h"
 
 
 // 関数 //
@@ -28,11 +30,11 @@ void _2DSetAlpha(uint8_t a, uint8_t mode);	// αセット
 
 void _2DLine(int x1, int y1, int x2, int y2);	// 直線
 void _2DBox(int x1, int y1, int x2, int y2);	// 長方形
-void _2DCircle(int x, int y, int r);	// 円
 void _2DCircleF(int x, int y, int r);	// 円塗りつぶし
 void _2DPolygon(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
 void _2DBoxA(int x1, int y1, int x2, int y2);	// α長方形
 
+void GrpPoint(WINDOW_POINT p);
 void DisableAlphaTable(void);
 
 
@@ -48,15 +50,6 @@ inline bool _2DChkPoint(int x, int y)
 		(y < CLIP_Y_MIN) ||
 		(y > CLIP_Y_MAX)
 	);
-}
-
-inline void _2DPset(int x, int y, uint8_t c)
-{
-	extern uint8_t *Grp_Vram;
-	extern uint32_t	Grp_AddrY[GRP_RES.h];
-
-	if(_2DChkPoint(x,y))
-		*(Grp_Vram+x+Grp_AddrY[y]) = c;
 }
 
 // 正方形クリップ : ReturnValue true:クリッピング成功 false:完全に範囲外

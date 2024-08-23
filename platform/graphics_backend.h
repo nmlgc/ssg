@@ -16,4 +16,10 @@ using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
 template <size_t N = std::dynamic_extent> using VERTEX_XY_SPAN = std::span<
 	const VERTEX_XY, N
 >;
+
+enum class TRIANGLE_PRIMITIVE : uint8_t {
+	FAN,
+	STRIP,
+	COUNT
+};
 // ------------

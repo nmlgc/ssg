@@ -6,6 +6,7 @@
 #include "DD_UTY.H"
 #include "constants.h"
 #include "DD_GRP3D.H"
+#include "game/enum_array.h"
 #include "game/ut_math.h"
 #include <assert.h>
 #include <d3d.h>
@@ -66,7 +67,6 @@ void _3DSetup(void)
 	GrpSetAlpha = _3DSetAlpha;
 	GrpLine     = _3DLine;
 	GrpBox      = _3DBox;
-	GrpCircleF  = _3DCircleF;
 	GrpPolygon  = _3DPolygon;
 	GrpBoxA     = _3DBoxA;
 }
@@ -166,34 +166,32 @@ void GrpLineStrip(VERTEX_XY_SPAN<> xys)
 	DrawVertices(D3DPT_LINESTRIP, xys);
 }
 
-// 円塗りつぶし //
-void _3DCircleF(int x, int y, int r)
+constexpr ENUMARRAY<D3DPRIMITIVETYPE, TRIANGLE_PRIMITIVE> D3DPTS = {
+	D3DPT_TRIANGLEFAN, D3DPT_TRIANGLESTRIP
+};
+
+void GrpTriangles(TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> points)
 {
-	int		i;
-
-	if(!bLocked) return;
-
-	Set2DPoint(work,x,y);		// 円の中心
-	for(i=0;i<=32;i++){			// 円周上の点
-		Set2DPoint(work+i+1,x+cosl(i*8,r),y+sinl(i*8,r));
+	if(!bLocked || (points.size() < 3)) {
+		return;
 	}
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLEFAN,D3DVT_TLVERTEX,work,34,D3DDP_WAIT);
+	DrawVertices(D3DPTS[tp], points);
+}
+
+void GrpTrianglesA(TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> points)
+{
+	if(!bLocked || (points.size() < 3)) {
+		return;
+	}
+	AlphaEnable(TRUE);
+	DrawVertices(D3DPTS[tp], points);
+	AlphaEnable(FALSE);
 }
 
 // ポリゴン塗りつぶし //
 void _3DPolygon(VERTEX_XY_SPAN<> p)
 {
-	if(!bLocked || (p.size() < 3)) {
-		return;
-	}
-
-	for(size_t i = 0; i < p.size(); i++) {
-		Set2DPoint(work+i,p[i].x,p[i].y);
-	}
-
-	DxObj.D3Dev->DrawPrimitive(
-		D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, work, p.size(), D3DDP_WAIT
-	);
+	return GrpTriangles(TRIANGLE_PRIMITIVE::FAN, p);
 }
 
 // α長方形 //
@@ -205,67 +203,10 @@ void _3DBoxA(int x1, int y1, int x2, int y2)
 	AlphaEnable(FALSE);
 }
 
-// α円塗りつぶし //
-void GrpCircleFA(int x, int y, int r)
-{
-	int		i;
-
-	if(!bLocked) return;
-	AlphaEnable(TRUE);
-
-	Set2DPoint(work,x,y);		// 円の中心
-	for(i=0;i<=32;i++){			// 円周上の点
-		Set2DPoint(work+i+1,x+cosl(i*8,r),y+sinl(i*8,r));
-	}
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLEFAN,D3DVT_TLVERTEX,work,34,D3DDP_WAIT);
-
-	AlphaEnable(FALSE);
-}
-
 // αポリゴン塗りつぶし //
 void GrpPolygonA(VERTEX_XY_SPAN<> p)
 {
-	if(!bLocked || (p.size() < 3)) {
-		return;
-	}
-
-	AlphaEnable(TRUE);
-
-	for(size_t i = 0; i < p.size(); i++) {
-		Set2DPoint(work+i,p[i].x,p[i].y);
-	}
-
-	DxObj.D3Dev->DrawPrimitive(
-		D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, work, p.size(), D3DDP_WAIT
-	);
-
-	AlphaEnable(FALSE);
-}
-
-// 太い半透明円描画 //
-void GrpFatCircleA(int x, int y, int r, int w)
-{
-	int		i;
-	int		lx,ly;
-	int		wx,wy;
-
-	// 普通の円になってしまう場合 //
-	if(w >= r) {
-		GrpCircleFA(x, y, (r + w));
-	}
-
-	if(!bLocked) return;
-	AlphaEnable(TRUE);
-
-	for(i=0;i<=32;i++){
-		lx = cosl(i*8,r);	ly = sinl(i*8,r);
-		wx = cosl(i*8,w);	wy = sinl(i*8,w);
-		Set2DPoint(work+i*2  ,x+lx-wx,y+ly-wy);
-		Set2DPoint(work+i*2+1,x+lx+wx,y+ly+wy);
-	}
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,33*2,D3DDP_WAIT);
-
-	AlphaEnable(FALSE);
+	return GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //

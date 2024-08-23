@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "LLASER.H"
+#include "GEOMETRY.H"
 #include "MAID.H"
 #include "DirectXUTYs/DD_GRP3D.H"
 #include "DirectXUTYs/DD_UTY.H"
@@ -344,7 +345,7 @@ extern void LLaserDraw(void)
 					break;
 				}
 
-				GrpCircleF(x,y,len);//(lp->w>>6)+4);
+				GeomCircleF({ x, y }, len); // (lp->w >> 6) + 4);
 
 				// GrpSetColor({ 3, 0, 3 }); // lp->c;
 				GrpSetColor(Table8BitB[c]);
@@ -359,7 +360,7 @@ extern void LLaserDraw(void)
 					p[2].y += lp->infy;
 					GrpPolygon(p);
 				}
-				GrpCircleF(x,y,len-len/8);//(lp->w>>6)+2);
+				GeomCircleF({ x, y }, (len - len / 8)); // (lp->w >> 6) + 2);
 
 				// GrpSetColor({ 5, 4, 5 }); // lp->c;
 				GrpSetColor(Table8BitC[c]);
@@ -374,7 +375,7 @@ extern void LLaserDraw(void)
 					p[2].y += lp->infy;
 					GrpPolygon(p);
 				}
-				GrpCircleF(x,y,len-len/4);//lp->w>>6);
+				GeomCircleF({ x, y }, (len - len / 4)); //lp->w >> 6);
 			break;
 
 			// ライン状態の場合 //

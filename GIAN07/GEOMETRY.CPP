@@ -4,7 +4,6 @@
  */
 
 #include "GEOMETRY.H"
-#include "DirectXUTYs/DD_UTY.H"
 #include "game/ut_math.h"
 
 namespace Geometry {
@@ -24,6 +23,28 @@ void ApproximateCircle(
 	}
 }
 
+void ApproximateFatCircle(
+	std::span<VERTEX_XY, (CIRCLE_POINTS * 2)> ret,
+	WINDOW_POINT center,
+	PIXEL_COORD r,
+	PIXEL_COORD w
+)
+{
+	for(auto [i, v] : ret | std::views::chunk(2) | std::views::enumerate) {
+		const uint8_t angle = (i * CIRCLE_STEP);
+		const auto [lx, ly] = std::pair(cosl(angle, r), sinl(angle, r));
+		const auto [wx, wy] = std::pair(cosl(angle, w), sinl(angle, w));
+		v[0] = {
+			static_cast<VERTEX_COORD>(center.x + lx - wx),
+			static_cast<VERTEX_COORD>(center.y + ly - wy),
+		};
+		v[1] = {
+			static_cast<VERTEX_COORD>(center.x + lx + wx),
+			static_cast<VERTEX_COORD>(center.y + ly + wy),
+		};
+	}
+}
+
 } // namespace Geometry
 
 void GeomCircle(WINDOW_POINT center, PIXEL_COORD radius)
@@ -32,5 +53,14 @@ void GeomCircle(WINDOW_POINT center, PIXEL_COORD radius)
 		Geometry::Circle_Approximated(center, radius);
 	} else {
 		Geometry::Circle_Exact(center, radius);
+	}
+}
+
+void GeomCircleF(WINDOW_POINT center, PIXEL_COORD radius)
+{
+	if(DxObj.PixelFormat.IsChanneled()) {
+		Geometry::CircleF_Approximated(center, radius, false);
+	} else {
+		Geometry::CircleF_Exact(center, radius);
 	}
 }

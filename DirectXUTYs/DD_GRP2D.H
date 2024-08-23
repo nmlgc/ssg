@@ -30,11 +30,11 @@ void _2DSetAlpha(uint8_t a, uint8_t mode);	// αセット
 
 void _2DLine(int x1, int y1, int x2, int y2);	// 直線
 void _2DBox(int x1, int y1, int x2, int y2);	// 長方形
-void _2DCircleF(int x, int y, int r);	// 円塗りつぶし
 void _2DPolygon(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
 void _2DBoxA(int x1, int y1, int x2, int y2);	// α長方形
 
 void GrpPoint(WINDOW_POINT p);
+void GrpHLine(int x1, int x2, int y);
 void DisableAlphaTable(void);
 
 

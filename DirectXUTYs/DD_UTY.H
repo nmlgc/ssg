@@ -218,8 +218,7 @@ extern void (*GrpSetAlpha)(uint8_t a, uint8_t mode);
 
 extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
 extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形
-extern void (*GrpCircleF)(int x, int y, int r);	// 円塗りつぶし
-extern void (*GrpPolygon)(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
+extern void (*GrpPolygon)(VERTEX_XY_SPAN<> p);	// ポリゴン塗りつぶし
 
 extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
 

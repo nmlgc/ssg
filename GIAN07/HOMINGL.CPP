@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "HOMINGL.H"
+#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "MAID.H"
 #include "DirectXUTYs/DD_UTY.H"
@@ -229,11 +230,11 @@ void HLaserDraw(void)
 	DegPoint	*p;
 	VERTEX_XY	src[4];
 	void(*AlphaPolygon)(VERTEX_XY_SPAN<>);
-	//void(*AlphaCircle)(int x, int y, int r);
+	// void (*AlphaCircle)(WINDOW_POINT center, WINDOW_POINT radius);
 
 	if(DxObj.PixelFormat.IsChanneled()){
 		AlphaPolygon = GrpPolygonA;
-		//AlphaCircle  = GrpCircleFA;
+		// AlphaCircle  = GeomCircleFA;
 		GrpSetColor({ 1, 2, 5 });
 		GrpSetAlpha(0,ALPHA_ONE);
 	}
@@ -259,7 +260,7 @@ void HLaserDraw(void)
 		if(DxObj.PixelFormat.IsChanneled()) {
 			_CircleA16(p->x, p->y, w, p->d);
 		} else {
-			GrpCircleF(p->x>>6, p->y>>6, w>>6);
+			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, w >> 6);
 		}
 
 		for(i=0; i< HLASER_LEN-1; i++){
@@ -301,7 +302,7 @@ void HLaserDraw(void)
 		if(DxObj.PixelFormat.IsChanneled()) {
 			_CircleA16(p->x, p->y, w, p->d);
 		} else {
-			GrpCircleF(p->x>>6, p->y>>6, w>>6);
+			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, w >> 6);
 		}
 
 		for(i=0; i< HLASER_LEN-1; i++){

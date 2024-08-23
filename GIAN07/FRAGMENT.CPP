@@ -4,9 +4,9 @@
 /*************************************************************************************************/
 
 #include "FRAGMENT.H"
+#include "GEOMETRY.H"
 #include "LOADER.H"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/DD_GRP3D.H"
 #include "game/ut_math.h"
 #include "game/coords.h"
 
@@ -214,7 +214,9 @@ static void _FDraw(const FRAGMENT_DATA *f)
 				GrpLock();
 				GrpSetColor({ 4, 0, 0 });
 				GrpSetAlpha(128,ALPHA_ONE);
-				GrpFatCircleA(f->x>>6,f->y>>6,(60-f->count)*6,5);
+				GeomFatCircleA(
+					{ (f->x >> 6), (f->y >> 6) }, ((60 - f->count) * 6), 5
+				);
 				GrpUnlock();
 			}
 		break;

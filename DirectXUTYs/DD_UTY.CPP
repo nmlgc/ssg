@@ -45,7 +45,6 @@ static void DM_V(void);
 static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d);
 static void DM_COL(RGB216 col);
 static void DM_BB(uint8_t a, uint8_t b);
-static void DM_III(int a, int b, int c);
 static void DM_IIII(int a, int b, int c, int d);
 static void DM_PI(VERTEX_XY_SPAN<>);
 static bool DM_GRPBLT(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
@@ -93,7 +92,6 @@ void(*GrpSetColor)(RGB216 col)                      = DM_COL;
 void(*GrpSetAlpha)(uint8_t a, uint8_t mode)         = DM_BB;
 void(*GrpLine)(int x1, int y1, int x2, int y2)      = DM_IIII;
 void(*GrpBox)(int x1, int y1, int x2, int y2)       = DM_IIII;
-void(*GrpCircleF)(int x, int y, int r)              = DM_III;
 void (*GrpPolygon)(VERTEX_XY_SPAN<>)                = DM_PI;
 void(*GrpBoxA)(int x1, int y1, int x2, int y2)      = DM_IIII;
 bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf) = STD_GrpBlt;
@@ -939,7 +937,6 @@ static void SetDummyFunc(void)
 	GrpSetAlpha = DM_BB;
 	GrpLine     = DM_IIII;
 	GrpBox      = DM_IIII;
-	GrpCircleF  = DM_III;
 	GrpPolygon  = DM_PI;
 	GrpBoxA     = DM_IIII;
 }
@@ -949,7 +946,6 @@ static void DM_V(void) {}
 static void DM_BBBB(uint8_t a, uint8_t b, uint8_t c, uint8_t d){};
 static void DM_COL(RGB216 col) {}
 static void DM_BB(uint8_t a, uint8_t b) {}
-static void DM_III(int a, int b, int c) {}
 static void DM_IIII(int a, int b, int c, int d) {}
 static void DM_PI(VERTEX_XY_SPAN<>) {}
 

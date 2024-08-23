@@ -54,7 +54,6 @@ void _2DSetup(void)
 	GrpSetAlpha = _2DSetAlpha;
 	GrpLine     = _2DLine;
 	GrpBox      = _2DBox;
-	GrpCircleF  = _2DCircleF;
 	GrpPolygon  = _2DPolygon;
 	GrpBoxA     = _2DBoxA;
 
@@ -173,33 +172,6 @@ void GrpPoint(WINDOW_POINT p)
 	}
 }
 
-// 円塗りつぶし //
-void _2DCircleF(int x, int y, int r)
-{
-
-	int si,di;
-	int s;
-	// static int pmin[GRP_RES.h], pmax[GRP_RES.h];
-	//int			ymin,ymax;
-
-	if(Grp_Vram==NULL) return;
-
-	if(r==0){
-		GrpPoint({ x, y });
-		return;
-	}
-
-	for(di=0,si=s=r;si>=di;di++){
-		_2DGrpCHline(x-si,x+si,y-di);
-		_2DGrpCHline(x-si,x+si,y+di);
-		s -= ((di<<1)+1);
-		if(s>=0) continue;
-		_2DGrpCHline(x-di,x+di,y-si);
-		_2DGrpCHline(x-di,x+di,y+si);
-		s += ((--si)<<1);
-	}
-}
-
 // α長方形 //
 void _2DBoxA(int x1, int y1, int x2, int y2)
 {
@@ -222,10 +194,14 @@ static void _2DGrpHline(int x1, int x2_inclusive, int y)
 }
 
 // 横ラインを引く(ｸﾘｯﾋﾟﾝｸﾞ有り) //
-static void _2DGrpCHline(int x1, int x2, int y)
+void GrpHLine(int x1, int x2, int y)
 {
 	extern int CLIP_X_MIN,CLIP_X_MAX,CLIP_Y_MIN,CLIP_Y_MAX;
 	int		temp;
+
+	if(!Grp_Vram) {
+		return;
+	}
 
 	// 完全判定 //
 	if(

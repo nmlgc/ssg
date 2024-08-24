@@ -289,8 +289,8 @@ extern void LLaserDraw(void)
 	};
 
 
-	int n;
-	VERTEX_XY p2[34];
+	constexpr size_t VERTEX_COUNT = 34;
+	std::array<VERTEX_XY, VERTEX_COUNT> p2;
 
 	GrpLock();
 
@@ -321,20 +321,26 @@ extern void LLaserDraw(void)
 					if(DxObj.PixelFormat.IsChanneled()) {
 						// GrpSetColor({ 3, 0, 3 });
 						const RGBA col = Table16Bit[c].ToRGB().WithAlpha(0xFF);
-						GrpSetColor(Table16Bit[c]);
 						GrpSetAlpha(0,ALPHA_ONE);
 						GeomGrdRectA(lp->p, col);
+
+						std::array<VERTEX_RGBA, VERTEX_COUNT> vcs;
+						vcs[0] = { 255, 255, 255, 0xFF };
+						for(auto& vc : vcs | std::views::drop(1)) {
+							vc = col;
+						}
+
 						p2[0].x = x;
 						p2[0].y = y;
 						p2[1].x = lp->p[0].x;
 						p2[1].y = lp->p[0].y;
-						p2[33].x = lp->p[3].x;
-						p2[33].y = lp->p[3].y;
-						for(n=2;n<33;n++){
+						p2[VERTEX_COUNT - 1].x = lp->p[3].x;
+						p2[VERTEX_COUNT - 1].y = lp->p[3].y;
+						for(auto n = 2; n < (VERTEX_COUNT - 1); n++) {
 							p2[n].x = p2[0].x + cosl(lp->d+64+128*(n-1)/32,len);
 							p2[n].y = p2[0].y + sinl(lp->d+64+128*(n-1)/32,len);
 						}
-						GrpGrdPolygonA(p2);
+						GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p2, vcs);
 						break;
 					}
 					// GrpSetColor({ 2, 0, 2 });

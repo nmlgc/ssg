@@ -44,7 +44,6 @@ void GrpTrianglesA(
 	TRIANGLE_PRIMITIVE, VERTEX_XY_SPAN<>, VERTEX_RGBA_SPAN<> colors = {}
 );
 void GrpPolygonA(VERTEX_XY_SPAN<> p);	// αポリゴン塗りつぶし
-void GrpGrdPolygonA(VERTEX_XY_SPAN<> p);	// グラデーション付きポリゴン(レーザー用？)
 void GrpGrdLineEx(int x, int y1, int y2);	// スペアな用グラデーションライン
 
 

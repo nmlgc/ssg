@@ -221,29 +221,6 @@ void GrpPolygonA(VERTEX_XY_SPAN<> p)
 	return GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
 }
 
-// グラデーション付きポリゴン(レーザー用？) //
-void GrpGrdPolygonA(VERTEX_XY_SPAN<> p)
-{
-	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
-	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //
-	const RGBA c1 = Col3D;
-	const RGB c2 = { 255, 255, 255 };
-
-	if(!bLocked) return;
-	AlphaEnable(TRUE);
-
-	Set2DPoint(&work[0], p[0].x, p[0].y, c2.WithAlpha(Col3D.a));
-	for(size_t i = 1; i < p.size(); i++) {
-		Set2DPoint(&work[i], p[i].x, p[i].y, c1);
-	}
-
-	DxObj.D3Dev->DrawPrimitive(
-		D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, work, p.size(), D3DDP_WAIT
-	);
-
-	AlphaEnable(FALSE);
-}
-
 void GrpGrdLineEx(int x, int y1, int y2)
 {
 	if(!bLocked) return;

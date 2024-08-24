@@ -4,13 +4,13 @@
 /*************************************************************************************************/
 
 #include "LASER.H"
+#include "GEOMETRY.H"
 #include "LLASER.H"
 #include "LEVEL.H"
 #include "PRankCtrl.h"
 #include "GIAN.H"
 #include "GIAN07/entity.h"
 #include "DirectXUTYs/DD_UTY.H"
-#include "DirectXUTYs/DD_GRP3D.H"
 #include "game/ut_math.h"
 
 
@@ -360,6 +360,7 @@ static void __fastcall slaser_pset(LASER_DATA *lp)
 
 static void __fastcall SLdraw(const LASER_DATA *lp)
 {
+	constexpr RGB216 col = { 1, 0, 5 };
 	int x,y;
 
 	int tx,ty;
@@ -367,7 +368,7 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 
 	if(lp->flag==LF_CLEAR){
 		// GrpSetColor(laser_color[lp->c]);
-		GrpSetColor({ 1, 0, 5 });
+		GrpSetColor(col);
 		GrpLine(lp->p[0].x,lp->p[0].y,lp->p[1].x,lp->p[1].y);
 		GrpLine(lp->p[3].x,lp->p[3].y,lp->p[2].x,lp->p[2].y);
 		return;
@@ -385,13 +386,12 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 	//GrpSetAlpha(0,ALPHA_ONE);
 	// GrpSetColor({ 4, 1, 0 });
 //	GrpSetAlpha(128,ALPHA_ONE);		// 2000/09/06 に削除
-	GrpSetColor({ 1, 0, 5 });
 
 	if(DxObj.PixelFormat.IsChanneled()) {
-		GrpGrdRect(lp->p);
+		GeomGrdRect(lp->p, col.ToRGB());
 	}
 	else{
-		GrpSetColor({ 1, 0, 5 });
+		GrpSetColor(col);
 		GrpPolygon(lp->p);
 
 		GrpSetColor({ 5, 5, 5 });

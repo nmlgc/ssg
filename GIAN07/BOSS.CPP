@@ -9,7 +9,6 @@
 #include "GIAN.H"
 #include "EnemyExCtrl.h"
 #include "DirectXUTYs/DD_UTY.H"
-#include "../DirectXUTYs/DD_GRP3D.H"
 #include "game/cast.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
@@ -427,10 +426,11 @@ void BossHPG_Draw(void)
 			constexpr WINDOW_COORD bottom = (top + 11);
 			const auto x1 = (left + ((BossHPG.Next * 30 * 8) / BossHPG.Max));
 			const auto x2 = (left + ((BossHPG.Now  * 30 * 8) / BossHPG.Max));
+			constexpr uint8_t alpha = (128 + 64);
+			constexpr RGB216 col    = { 0, 1, 5 };
 
 			GrpLock();
-			GrpSetAlpha(128+64,ALPHA_NORM);//ALPHA_NORM);
-			GrpSetColor({ 0, 1, 5 });
+			GrpSetAlpha(alpha, ALPHA_NORM);
 			if(DxObj.PixelFormat.IsChanneled()){
 				VERTEX_XY Src[4] = {
 					{ 0, top },
@@ -440,20 +440,21 @@ void BossHPG_Draw(void)
 				};
 				if(x1<x2){
 					Src[0].x = Src[3].x = x1;
-					GrpGrdRectA(Src);
+					GeomGrdRectA(Src, col.ToRGB().WithAlpha(alpha));
 				//	GrpBoxA(left, top, x1, bottom);
 					GrpSetColor({ 5, 0, 0 });
 					GrpBoxA(x1, top, x2, bottom);
 				}
 				else{
 					Src[0].x = Src[3].x = x2;
-					GrpGrdRectA(Src);
+					GeomGrdRectA(Src, col.ToRGB().WithAlpha(alpha));
 				//	GrpBoxA(left, top, x2, bottom);
 				}
 			}
 			else{
 				constexpr auto line_top = (top + 5);
 				constexpr auto line_bottom = (bottom - 4);
+				GrpSetColor(col);
 				if(x1<x2){
 					GrpBoxA(left, top, x2, line_top);
 					GrpBoxA(left, line_bottom, x2, bottom);

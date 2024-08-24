@@ -19,6 +19,14 @@ template <class Coord> struct PIXEL_POINT_BASE {
 	Coord x;
 	Coord y;
 
+	// Explicit integer division.
+	PIXEL_POINT_BASE DivInt(int scalar) const {
+		return {
+			.x = static_cast<Coord>(static_cast<int>(x) / scalar),
+			.y = static_cast<Coord>(static_cast<int>(y) / scalar),
+		};
+	}
+
 	constexpr PIXEL_POINT_BASE operator+(const PIXEL_POINT_BASE& other) const {
 		return { (x + other.x), (y + other.y) };
 	}
@@ -138,6 +146,10 @@ template <
 		const PIXEL_POINT_BASE<Coord>& other
 	) const {
 		return { (this->x + other.x), (this->y + other.y) };
+	}
+
+	WINDOW_POINT_BASE operator/(Coord scalar) const {
+		return { (this->x / scalar), (this->y / scalar) };
 	}
 };
 

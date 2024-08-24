@@ -6,7 +6,6 @@
 #include "LLASER.H"
 #include "GEOMETRY.H"
 #include "MAID.H"
-#include "DirectXUTYs/DD_GRP3D.H"
 #include "DirectXUTYs/DD_UTY.H"
 #include "game/snd.h"
 #include "game/ut_math.h"
@@ -321,9 +320,10 @@ extern void LLaserDraw(void)
 					*/
 					if(DxObj.PixelFormat.IsChanneled()) {
 						// GrpSetColor({ 3, 0, 3 });
+						const RGBA col = Table16Bit[c].ToRGB().WithAlpha(0xFF);
 						GrpSetColor(Table16Bit[c]);
 						GrpSetAlpha(0,ALPHA_ONE);
-						GrpGrdRectA(lp->p);
+						GeomGrdRectA(lp->p, col);
 						p2[0].x = x;
 						p2[0].y = y;
 						p2[1].x = lp->p[0].x;

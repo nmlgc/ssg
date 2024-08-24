@@ -122,6 +122,32 @@ inline void FatCircleA_Approximated(
 	ApproximateFatCircle(xys, center, r, w);
 	GrpTrianglesA(TRIANGLE_PRIMITIVE::STRIP, xys);
 }
+
+inline void GrdRect(
+	std::span<const WINDOW_POINT, 4> p, RGBA col_edge, bool alpha
+)
+{
+	const RGBA col_center = { 255, 255, 255, col_edge.a };
+
+	// Use an explicit integer division for a pixel-perfect match of the
+	// original look, even if VERTEX_XY is a floating-point type.
+	const std::array<VERTEX_XY, 6> xys = {
+		p[3],
+		p[2],
+		(p[0] + p[3]).DivInt(2),
+		(p[1] + p[2]).DivInt(2),
+		p[0],
+		p[1],
+	};
+	const std::array<VERTEX_RGBA, 6> colors = {
+		col_edge, col_edge, col_center, col_center, col_edge, col_edge,
+	};
+	if(alpha) {
+		GrpTrianglesA(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
+	} else {
+		GrpTriangles(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
+	}
+}
 // ---------------
 
 } // namespace Geometry
@@ -147,5 +173,17 @@ inline void GeomFatCircleA(WINDOW_POINT center, PIXEL_COORD r, PIXEL_COORD w)
 {
 	assert(DxObj.PixelFormat.IsChanneled());
 	Geometry::FatCircleA_Approximated(center, r, w);
+}
+
+// グラデーション付き長方形(ナナメ可)
+inline void GeomGrdRect(std::span<const WINDOW_POINT, 4> p, RGB col_edge)
+{
+	Geometry::GrdRect(p, col_edge.WithAlpha(0xFF), false);
+}
+
+// グラデーション付き長方形(ナナメ可+α)
+inline void GeomGrdRectA(std::span<const WINDOW_POINT, 4> p, RGBA col_edge)
+{
+	Geometry::GrdRect(p, col_edge, true);
 }
 // ----------

@@ -6,8 +6,8 @@
 #include "MAID.H"
 #include "CONFIG.H"
 #include "FONTUTY.H"
+#include "GEOMETRY.H"
 #include "GIAN.H"
-#include "DirectXUTYs/DD_GRP3D.H"
 #include "game/snd.h"
 #include "game/input.h"
 #include "game/ut_math.h"
@@ -55,6 +55,7 @@ extern void WideBombDraw(void)
 
 void LaserBombDraw(void)
 {
+	constexpr RGBA col_channeled = RGB216{ 0, 0, 5 }.ToRGB().WithAlpha(0xFF);
 	BYTE			d,c;
 	VERTEX_XY	p[4];
 	int				i,w;
@@ -80,9 +81,8 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
-					GrpGrdRectA(p);
+					GeomGrdRectA(p, col_channeled);
 				}
 				else{
 					switch(w){
@@ -106,9 +106,8 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
-					GrpGrdRectA(p);
+					GeomGrdRectA(p, col_channeled);
 				}
 				else{
 					switch(w){
@@ -138,9 +137,8 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
-					GrpGrdRectA(p);
+					GeomGrdRectA(p, col_channeled);
 				}
 				else{
 					GrpSetColor({ c, c, 5u });
@@ -160,9 +158,8 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpSetColor({ 0, 0, 5 });
 					GrpSetAlpha(0,ALPHA_ONE);
-					GrpGrdRectA(p);
+					GeomGrdRectA(p, col_channeled);
 				}
 				else{
 					GrpSetColor({ c, c, 5u });

@@ -32,13 +32,21 @@ inline void Set2DPoint(D3DTLVERTEX *tlv, int x, int y, RGBA c = Col3D)
 	tlv->specular = RGB_MAKE(0,0,0);
 }
 
-void DrawVertices(D3DPRIMITIVETYPE type, VERTEX_XY_SPAN<> xys)
+void DrawVertices(
+	D3DPRIMITIVETYPE type, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
+)
 {
 	const auto count = xys.size();
 	assert(count <= (sizeof(work) / sizeof(work[0])));
 	auto out_p = work;
-	for(const auto point : xys) {
-		Set2DPoint(out_p++, point.x, point.y);
+	if(colors.empty()) {
+		for(const auto point : xys) {
+			Set2DPoint(out_p++, point.x, point.y);
+		}
+	} else {
+		for(const auto [point, color] : std::views::zip(xys, colors)) {
+			Set2DPoint(out_p++, point.x, point.y, color);
+		}
 	}
 	DxObj.D3Dev->DrawPrimitive(type, D3DVT_TLVERTEX, work, count, D3DDP_WAIT);
 }
@@ -163,28 +171,32 @@ void _3DBox(int x1, int y1, int x2, int y2)
 void GrpLineStrip(VERTEX_XY_SPAN<> xys)
 {
 	if(!bLocked) return;
-	DrawVertices(D3DPT_LINESTRIP, xys);
+	DrawVertices(D3DPT_LINESTRIP, xys, {});
 }
 
 constexpr ENUMARRAY<D3DPRIMITIVETYPE, TRIANGLE_PRIMITIVE> D3DPTS = {
 	D3DPT_TRIANGLEFAN, D3DPT_TRIANGLESTRIP
 };
 
-void GrpTriangles(TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> points)
+void GrpTriangles(
+	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
+)
 {
-	if(!bLocked || (points.size() < 3)) {
+	if(!bLocked || (xys.size() < 3)) {
 		return;
 	}
-	DrawVertices(D3DPTS[tp], points);
+	DrawVertices(D3DPTS[tp], xys, colors);
 }
 
-void GrpTrianglesA(TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> points)
+void GrpTrianglesA(
+	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
+)
 {
-	if(!bLocked || (points.size() < 3)) {
+	if(!bLocked || (xys.size() < 3)) {
 		return;
 	}
 	AlphaEnable(TRUE);
-	DrawVertices(D3DPTS[tp], points);
+	DrawVertices(D3DPTS[tp], xys, colors);
 	AlphaEnable(FALSE);
 }
 
@@ -207,39 +219,6 @@ void _3DBoxA(int x1, int y1, int x2, int y2)
 void GrpPolygonA(VERTEX_XY_SPAN<> p)
 {
 	return GrpTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
-}
-
-// グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRect(std::span<const VERTEX_XY, 4> p)
-{
-	const RGBA c1 = Col3D;
-	const RGBA c2 = { 255, 255, 255, Col3D.a };
-	const RGBA c3 = Col3D;
-	// const RGBA c3 = {
-	// 	(Col3D.r >> 1), (Col3D.g >> 1), (Col3D.b >> 1), Col3D.a,
-	// };
-
-	if(!bLocked) return;
-
-	Set2DPoint(&work[0], p[3].x, p[3].y, c3);
-	Set2DPoint(&work[1], p[2].x, p[2].y, c1);
-
-	Set2DPoint(&work[2], ((p[0].x + p[3].x) / 2), ((p[0].y + p[3].y) / 2), c2);
-	Set2DPoint(&work[3], ((p[1].x + p[2].x) / 2), ((p[1].y + p[2].y) / 2), c2);
-
-	Set2DPoint(&work[4], p[0].x, p[0].y, c3);
-	Set2DPoint(&work[5], p[1].x, p[1].y, c1);
-
-	DxObj.D3Dev->DrawPrimitive(D3DPT_TRIANGLESTRIP,D3DVT_TLVERTEX,work,6,D3DDP_WAIT);
-}
-
-// グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRectA(std::span<const VERTEX_XY, 4> p)
-{
-	if(!bLocked) return;
-	AlphaEnable(TRUE);
-	GrpGrdRect(p);
-	AlphaEnable(FALSE);
 }
 
 // グラデーション付きポリゴン(レーザー用？) //

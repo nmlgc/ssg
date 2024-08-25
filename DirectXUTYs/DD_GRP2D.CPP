@@ -92,11 +92,17 @@ void GRAPHICS_GEOMETRY_DDRAW::SetColor(RGB216 col)
 }
 
 // αセット //
-void GRAPHICS_GEOMETRY_DDRAW::SetAlpha(uint8_t a, GRAPHICS_ALPHA mode)
+void GRAPHICS_GEOMETRY_DDRAW::SetAlphaNorm(uint8_t a)
 {
 	Col2D_A    = a;
-	Col2D_Mode = std::to_underlying(mode);
+	Col2D_Mode = ALPHA_NORM;
+	AlphaFlag = TRUE;
+}
 
+void GRAPHICS_GEOMETRY_DDRAW::SetAlphaOne(void)
+{
+	Col2D_A    = 0xFF;
+	Col2D_Mode = ALPHA_ONE;
 	AlphaFlag = TRUE;
 }
 

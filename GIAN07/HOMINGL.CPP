@@ -240,7 +240,7 @@ void HLaserDraw(void)
 	if(DxObj.PixelFormat.IsChanneled()){
 		// AlphaCircle  = GeomCircleFA;
 		GrpGeom->SetColor({ 1, 2, 5 });
-		GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+		GrpGeom->SetAlphaOne();
 	}
 	else{
 		// AlphaCircle  = GeomCircle;

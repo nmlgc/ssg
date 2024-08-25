@@ -33,11 +33,6 @@ enum class TRIANGLE_PRIMITIVE : uint8_t {
 };
 // ------------
 
-enum class GRAPHICS_ALPHA : uint8_t {
-	ONE, 	// 一種の加算α
-	NORM,	// ノーマルなSrc-α
-};
-
 // Base interface for geometry draw calls that can be implemented differently
 // for channeled and palettized pixel modes. Implementations can decide whether
 // to use this interface
@@ -63,7 +58,14 @@ public:
 	virtual void Unlock(void) = 0;	// 図形描画を完了する
 
 	virtual void SetColor(RGB216 col) = 0;	// 色セット
-	virtual void SetAlpha(uint8_t a, GRAPHICS_ALPHA mode) = 0;
+
+	// Enables regular alpha blending.
+	// dstRGB = (srcRGB * [a]) + (dstRGB * (1 - [a]))
+	virtual void SetAlphaNorm(uint8_t a) = 0;
+
+	// Enables additive blending with a fixed alpha factor of 1.
+	// dstRGB = (srcRGB * 1) + dstRGB
+	virtual void SetAlphaOne(void) = 0;
 	// ---------------
 
 	// Draw calls

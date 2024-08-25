@@ -25,7 +25,8 @@ public:
 	void Lock(void) final;
 	void Unlock(void) final;
 	void SetColor(RGB216 col) final;
-	void SetAlpha(uint8_t a, GRAPHICS_ALPHA mode) final;
+	void SetAlphaNorm(uint8_t a) final;
+	void SetAlphaOne(void) final;
 	void DrawLine(int x1, int y1, int x2, int y2) final;
 	void DrawBox(int x1, int y1, int x2, int y2) final;
 	void DrawBoxA(int x1, int y1, int x2, int y2) final;

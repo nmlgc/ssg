@@ -430,7 +430,7 @@ void BossHPG_Draw(void)
 			constexpr RGB216 col    = { 0, 1, 5 };
 
 			GrpGeom->Lock();
-			GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(alpha);
 			if(DxObj.PixelFormat.IsChanneled()){
 				VERTEX_XY Src[4] = {
 					{ 0, top },

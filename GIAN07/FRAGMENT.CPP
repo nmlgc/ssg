@@ -213,7 +213,7 @@ static void _FDraw(const FRAGMENT_DATA *f)
 			if(DxObj.PixelFormat.IsChanneled()){
 				GrpGeom->Lock();
 				GrpGeom->SetColor({ 4, 0, 0 });
-				GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);
+				GrpGeom->SetAlphaOne();
 				GeomFatCircleA(
 					{ (f->x >> 6), (f->y >> 6) }, ((60 - f->count) * 6), 5
 				);

@@ -81,7 +81,7 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+					GrpGeom->SetAlphaOne();
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
@@ -106,7 +106,7 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+					GrpGeom->SetAlphaOne();
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
@@ -137,7 +137,7 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) + SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+					GrpGeom->SetAlphaOne();
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
@@ -158,7 +158,7 @@ void LaserBombDraw(void)
 				p[1].x = (Viv.opx>>6) - SBOPT_DX + lx + wx;
 				p[1].y = (Viv.opy>>6)            + ly + wy;
 				if(DxObj.PixelFormat.IsChanneled()){
-					GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+					GrpGeom->SetAlphaOne();
 					GeomGrdRectA(p, col_channeled);
 				}
 				else{
@@ -226,7 +226,7 @@ extern void StateDraw(void)
 	if(Viv.evade_c){
 		GrpGeom->Lock();
 		GrpGeom->SetColor({ 5, 1, 0 });
-		GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);
+		GrpGeom->SetAlphaOne();
 		for(i=0;i<=10;i++){
 			temp = 128+9+(Viv.evade_c>>2) + (5-i);
 			if(temp > (128 + 8)) {

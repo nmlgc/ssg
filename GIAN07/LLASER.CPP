@@ -321,7 +321,7 @@ extern void LLaserDraw(void)
 					if(DxObj.PixelFormat.IsChanneled()) {
 						// GrpGeom->SetColor({ 3, 0, 3 });
 						const RGBA col = Table16Bit[c].ToRGB().WithAlpha(0xFF);
-						GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
+						GrpGeom->SetAlphaOne();
 						GeomGrdRectA(lp->p, col);
 
 						std::array<VERTEX_RGBA, VERTEX_COUNT> vcs;

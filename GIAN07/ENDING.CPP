@@ -339,14 +339,14 @@ void DrawFadeInfo()
 		GrpGeom->Lock();
 
 		if(EGrpInfo.bWantDisp){
-			GrpGeom->SetAlpha((255 - EGrpInfo.alpha), GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(255 - EGrpInfo.alpha);
 			GrpGeom->SetColor({ 0, 0, 0 });
 			GrpGeom->DrawBoxA(
 				EGrpInfo.x, EGrpInfo.y, (EGrpInfo.x + 320), (EGrpInfo.y + 240)
 			);
 		}
 		if(EStfTask.bWantDisp){
-			GrpGeom->SetAlpha((255 - EStfTask.alpha), GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(255 - EStfTask.alpha);
 			GrpGeom->SetColor({ 0, 0, 0 });
 			if(EStfTask.ox == 320) {
 				GrpGeom->DrawBoxA(0, 0, GRP_RES.w, GRP_RES.h);
@@ -359,7 +359,7 @@ void DrawFadeInfo()
 		if(FlashState){
 			if(FlashState > 256) a = FlashState - 256;
 			else                 a = FlashState;
-			GrpGeom->SetAlpha((255 - a), GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(255 - a);
 			GrpGeom->SetColor({ 5, 5, 5 });
 			GrpGeom->DrawBoxA(0, 0, GRP_RES.w, GRP_RES.h);
 		}

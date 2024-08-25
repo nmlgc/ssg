@@ -156,10 +156,7 @@ void DrawWarning(void)
 
 	if(Warning[0].DegX == 0) {
 		GrpGeom->Lock();
-		GrpGeom->SetAlpha(
-			Cast::down_sign<uint8_t>(128 + sinl(count, 48)),
-			GRAPHICS_ALPHA::NORM
-		);
+		GrpGeom->SetAlphaNorm(Cast::down_sign<uint8_t>(128 + sinl(count, 48)));
 		GrpGeom->SetColor({ 5, 0, 0 });
 		GrpGeom->DrawBoxA(129, (40 + 6), (128 + 384), (60 + 6));
 		GrpGeom->DrawBoxA(

@@ -365,10 +365,7 @@ void SEffectDraw(void)
 				j = (35 - e->time) / 2;
 				GrpGeom->Lock();
 				GrpGeom->SetColor({ 0, 0, 0 });
-				GrpGeom->SetAlpha(
-					Cast::down<uint8_t>((35 - e->time) * 3),
-					GRAPHICS_ALPHA::NORM
-				);
+				GrpGeom->SetAlphaNorm(Cast::down<uint8_t>((35 - e->time) * 3));
 				GrpGeom->DrawBoxA((x - 170), (y - j), (x + 170), (y + j));
 				GrpGeom->Unlock();
 
@@ -420,9 +417,8 @@ void SEffectDraw(void)
 			case(SEFC_MTITLE2): {
 				GrpGeom->Lock();
 				GrpGeom->SetColor({ 0, 0, 0 });
-				GrpGeom->SetAlpha(
-					(sinl(Cast::down<uint8_t>(e->time - 32), 80) + 80),
-					GRAPHICS_ALPHA::NORM
+				GrpGeom->SetAlphaNorm(
+					(sinl(Cast::down<uint8_t>(e->time - 32), 80) + 80)
 				);
 				for(j=0;j<16;j++){
 					temp = sinl(128+j*16,16);

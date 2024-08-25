@@ -647,7 +647,7 @@ void ReplayProc(bool&)
 		GrpBlt(&rc,128,470,GrTama);
 		if(ExTimer<64+32){
 			GrpGeom->Lock();
-			GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(128);
 			GrpGeom->SetColor({ 0, 0, 0 });
 			GrpGeom->DrawBoxA(
 				(128 + 45 - 3), (470 + 4 - 1), (128 + 45 + 72), (470 + 4 + 5)
@@ -713,7 +713,7 @@ void SProjectProc(bool&)
 	const auto fade = [logo](uint8_t black_alpha, uint8_t palette_tone) {
 		if(DxObj.PixelFormat.IsChanneled()){
 			GrpGeom->Lock();
-			GrpGeom->SetAlpha(black_alpha, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(black_alpha);
 			GrpGeom->SetColor({ 0, 0, 0 });
 			GrpGeom->DrawBoxA(logo.left, logo.top, logo.right, logo.bottom);
 			GrpGeom->Unlock();
@@ -1199,7 +1199,7 @@ void WeaponSelectProc(bool&)
 
 		GrpGeom->Lock();
 		GrpGeom->SetColor({ 0, 0, 1 });
-		GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::NORM);
+		GrpGeom->SetAlphaNorm(128);
 		for(i=0;i<3;i++){
 			if(
 				(GameStage != GRAPH_ID_EXSTAGE) ||

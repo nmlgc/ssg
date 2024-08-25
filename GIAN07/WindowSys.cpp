@@ -205,7 +205,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 128;
 
 	GrpGeom->Lock();
-	GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
+	GrpGeom->SetAlphaNorm(alpha);
 
 	GrpGeom->SetColor({ 0, 0, 0 });
 	GrpGeom->DrawBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
@@ -214,13 +214,13 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	GrpGeom->SetColor({ 0, 0, 2 });
 	for(i=0;i<p->NumItems;i++){
 		if(i==ws->Select[ws->SelectDepth]){
-			GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(128);
 			GrpGeom->SetColor({ 5, 0, 0 });
 		}
 		GrpGeom->DrawBoxA(ws->x, top, (ws->x + ws->W), (top + CWIN_ITEM_H));
 		top += CWIN_ITEM_H;
 		if(i==ws->Select[ws->SelectDepth]){
-			GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
+			GrpGeom->SetAlphaNorm(alpha);
 			GrpGeom->SetColor({ 0, 0, 2 });
 		}
 	}
@@ -403,7 +403,6 @@ void MWinMove(void)
 // メッセージウィンドウを描画する(上に同じ) //
 void MWinDraw(void)
 {
-	BYTE	alpha;
 	PIXEL_LTRB	src;
 
 	const auto x = MsgWindow.NowSize.left;	// ウィンドウ左上Ｘ
@@ -417,8 +416,7 @@ void MWinDraw(void)
 
 	// 半透明部の描画 //
 	GrpGeom->Lock();
-	alpha = (DxObj.PixelFormat.IsPalettized()) ? 64+32 : 110;
-	GrpGeom->SetAlpha(alpha, GRAPHICS_ALPHA::NORM);
+	GrpGeom->SetAlphaNorm((DxObj.PixelFormat.IsPalettized()) ? (64 + 32) : 110);
 	GrpGeom->SetColor({ 0, 0, 3 });
 	GrpGeom->DrawBoxA((x + 4), (y + 4), (x + w - 4), (y + h - 4));
 	GrpGeom->Unlock();

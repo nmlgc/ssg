@@ -9,6 +9,7 @@
 #include "game/defer.h"
 #include "game/enum_array.h"
 #include "game/format_bmp.h"
+#include "game/string_format.h"
 #include "constants.h"
 #include <SDL_render.h>
 
@@ -179,6 +180,63 @@ bool PixelFormatSupported(uint32_t fmt)
 }
 // -------
 
+// Pretty API version strings
+// --------------------------
+
+namespace APIVersions {
+constexpr const char FMT[] = "%s %d.%d";
+constexpr size_t PRETTY_SIZE_MAX = 9;
+constexpr size_t FMT_SIZE = ((sizeof(FMT) - 1) + (2 * STRING_NUM_CAP<int>));
+
+struct VERSION {
+	std::u8string_view name_sdl;
+	const char *name_pretty;
+	void (*update)(VERSION& self);
+	char8_t buf[FMT_SIZE + PRETTY_SIZE_MAX + 1];
+};
+
+void UpdateOpenGL(VERSION& self)
+{
+	int major = 0;
+	int minor = 0;
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &major);
+	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
+
+	auto* buf = reinterpret_cast<char *>(self.buf);
+	sprintf(&buf[0], &FMT[0], self.name_pretty, major, minor);
+}
+
+#define TARGET_(pretty, maj, min) pretty " ~" #maj "." #min
+#define TARGET(pretty, maj, min) TARGET_(pretty, maj, min)
+
+constinit VERSION Versions[] = {
+#if SDL_VIDEO_RENDER_OGL
+	{ u8"opengl", "OpenGL", UpdateOpenGL, TARGET(
+		u8"OpenGL", OPENGL_TARGET_CORE_MAJ, OPENGL_TARGET_CORE_MIN
+	) },
+#endif
+#if SDL_VIDEO_RENDER_OGL_ES2
+	{ u8"opengles2", "OpenGL ES", UpdateOpenGL, TARGET(
+		u8"OpenGL ES", 2, OPENGL_TARGET_ES2_MIN
+	) },
+#endif
+};
+
+#undef TARGET
+#undef TARGET_
+
+void Update(int id)
+{
+	const auto name = WndBackend_SDLRendererName(id);
+	auto *version = std::ranges::find(Versions, name, &VERSION::name_sdl);
+	if(version == std::end(Versions)) {
+		return;
+	}
+	version->update(*version);
+}
+} // namespace APIVersions
+// --------------------------
+
 /// Enumeration and pre-initialization queries
 /// ------------------------------------------
 
@@ -201,8 +259,6 @@ constexpr std::pair<std::u8string_view, std::u8string_view> API_NICE[] = {
 	{ u8"direct3d", u8"Direct3D 9" },
 	{ u8"direct3d11", u8"Direct3D 11" },
 	{ u8"direct3d12", u8"Direct3D 12" },
-	{ u8"opengl", u8"OpenGL" },
-	{ u8"opengles2", u8"OpenGL ES 2" },
 	{ u8"software", u8"Software" },
 };
 
@@ -212,6 +268,11 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	for(const auto& nice : API_NICE) {
 		if(nice.first == ret) {
 			return nice.second;
+		}
+	}
+	for(const auto& nice : APIVersions::Versions) {
+		if(nice.name_sdl == ret) {
+			return &nice.buf[0];
 		}
 	}
 	return ret;
@@ -276,6 +337,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 
 	PrimaryRenderer = renderer;
 	SwitchActiveRenderer(PrimaryRenderer);
+	APIVersions::Update(params.api);
 
 	const auto bpp = SDL_BITSPERPIXEL(*sdl_format);
 	const auto pixel_format = BITDEPTHS::find(bpp).pixel_format();

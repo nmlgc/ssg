@@ -210,7 +210,7 @@ WINDOW_INFO InpKey[] = {
 	{ IKeyTitle[1],	InpHelp,	InpFnKeyBomb },
 	{ IKeyTitle[2],	InpHelp,	InpFnKeyShift },
 	{ IKeyTitle[3],	InpHelp,	InpFnKeyCancel },
-	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
 
 char	InpTitle[23];

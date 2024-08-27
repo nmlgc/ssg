@@ -218,9 +218,11 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 		const auto& col = COL[WINDOW_STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
 
+		// Non-centered titles that don't start with spaces shouldn't be
+		// dedented relative to the menu items.
 		const auto left = (!!(p->Title->Flags & WINDOW_FLAGS::CENTER)
 			? TextLayoutXCenter(s, str)
-			: 0
+			: (str.starts_with(' ') ? 0 : CWIN_ITEM_LEFT)
 		);
 		s.Put({ (left + 1), 0 }, str, col.shadow);
 		s.Put({ (left + 0), 0 }, str, col.text);

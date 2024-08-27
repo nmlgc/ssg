@@ -150,19 +150,28 @@ namespace BGMPack {
 	// ----------------
 }
 
+constexpr auto HELP_SUBMENU_EXIT = "一つ前のメニューにもどります";
+
+constexpr WINDOW_CHOICE HRuleItemForArray = { "-------------------" };
+constexpr WINDOW_CHOICE SubmenuExitItemForArray = {
+	"Exit", HELP_SUBMENU_EXIT, CWinExitFn
+};
+WINDOW_CHOICE SubmenuExitItem = SubmenuExitItemForArray;
+WINDOW_CHOICE HRuleItem = HRuleItemForArray;
+
 char	DifTitle[9][20];
 WINDOW_CHOICE DifItem[] = {
 	{ DifTitle[0],	"残り人数?を設定します",	DifFnPlayerStock },
 	{ DifTitle[1],	"ボムの数を設定します",	DifFnBombStock },
 	{ DifTitle[2],	"難易度を設定します",	DifFnDifficulty },
 #ifdef PBG_DEBUG
-	{ "-------------------" },
+	HRuleItemForArray,
 	{ DifTitle[4],	"[DebugMode] 画面に情報を表示するか",	DifFnMsgDisplay },
 	{ DifTitle[5],	"[DebugMode] ステージセレクト",	DifFnStgSelect },
 	{ DifTitle[6],	"[DebugMode] 当たり判定",	DifFnHit },
 	{ DifTitle[7],	"[DebugMode] デモプレイセーブ",	DifFnDemo },
 #endif
-	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	SubmenuExitItemForArray,
 };
 WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
@@ -172,7 +181,7 @@ WINDOW_CHOICE GrpItem[] = {
 	{ GrpTitle[1],	"描画スキップの設定です",	GrpFnSkip },
 	{ GrpTitle[2],	"使用する色数を指定します",	GrpFnBpp },
 	{ GrpTitle[3],	"ウィンドウの表示位置を決めます",	GrpFnWinLocate },
-	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	SubmenuExitItem,
 };
 WINDOW_MENU GrpMenu = { std::span(GrpItem), SetGrpItem };
 
@@ -193,7 +202,7 @@ WINDOW_CHOICE SndItem[] = {
 	{ SndTitleBGMGain,	"毎に曲から音量の違うことが外します",	SndFnBGMGain },
 	{ SndTitleBGMPack,	BGMPack::HELP_DOWNLOAD,	SndFnBGMPack },
 	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
-	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	SubmenuExitItemForArray,
 };
 WINDOW_MENU SndMenu = { std::span(SndItem), SetSndItem };
 static auto& SndItemSE = SndItem[0];
@@ -211,7 +220,7 @@ WINDOW_CHOICE InpKey[] = {
 	{ IKeyTitle[1],	InpHelp,	InpFnKeyBomb },
 	{ IKeyTitle[2],	InpHelp,	InpFnKeyShift },
 	{ IKeyTitle[3],	InpHelp,	InpFnKeyCancel },
-	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	SubmenuExitItemForArray,
 };
 WINDOW_MENU InpKeyMenu = { std::span(InpKey), SetIKeyItem };
 
@@ -221,7 +230,7 @@ WINDOW_CHOICE InpItem[] = {
 	{ InpTitle,	"弾キーのメッセージスキップ設定",	InpFnMsgSkip },
 	{ InpTitle2,	"弾キーの押しっぱなしで低速移動",	InpFnZSpeedDown },
 	{ "Joy Pad",	"パッドの設定をします",	InpKeyMenu },
-	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	SubmenuExitItemForArray,
 };
 WINDOW_MENU InpMenu = { std::span(InpItem), SetInpItem };
 
@@ -230,7 +239,7 @@ char CfgRepTitle[2][23];
 WINDOW_CHOICE CfgRep[] = {
 	{ CfgRepTitle[0],	"リプレイ用データの保存",	CfgRepSave },
 	{ CfgRepTitle[1],	"ステージセレクト",	CfgRepStgSelect },
-	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	SubmenuExitItemForArray,
 };
 WINDOW_MENU CfgRepMenu = { std::span(CfgRep), SetCfgRepItem };
 
@@ -240,7 +249,7 @@ WINDOW_CHOICE CfgItem[] = {
 	{ " Sound / Music",	"ＳＥ／ＢＧＭに関する設定",	SndMenu },
 	{ " Input",	"入力デバイスに関する設定",	InpMenu },
 	{ " Replay",	"リプレイに関する設定",	CfgRepMenu },
-	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	{ " Exit",	HELP_SUBMENU_EXIT,	CWinExitFn },
 };
 WINDOW_MENU CfgMenu = { std::span(CfgItem) };
 
@@ -252,7 +261,7 @@ WINDOW_CHOICE RepItem[] = {
 	{ " Stage 5 デモ再生",	"ステージ５のリプレイ",	RFnStg5 },
 	{ " Stage 6 デモ再生",	"ステージ６のリプレイ",	RFnStg6 },
 	{ " ExStage デモ再生",	"エキストラステージのリプレイ",	RFnStgEx },
-	{ " Exit",	"一つ前のメニューにもどります",	CWinExitFn },
+	{ " Exit",	HELP_SUBMENU_EXIT,	CWinExitFn },
 };
 WINDOW_MENU RepMenu = { std::span(RepItem) };
 

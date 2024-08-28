@@ -62,7 +62,7 @@ int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nShowCmd)
 				((tempdw - WaitTime) >= FRAME_TIME_TARGET) ||
 				(ConfigDat.FPSDivisor.v == 0)
 			) {
-				Key_Read(PadBindings);
+				Key_Read();
 
 				bool quit = false;
 				GameMain(quit);

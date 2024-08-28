@@ -11,7 +11,7 @@
 bool Key_Start(void);	// キー入力開始
 void Key_End(void);	// キー入力終了
 
-void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings);
+void Key_Read(void);
 
 // Returns:
 // • ≥1: ID of the single gamepad button that is being pressed

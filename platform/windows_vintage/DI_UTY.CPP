@@ -258,7 +258,7 @@ std::pair<INPUT_BITS, INPUT_SYSTEM_BITS> Key_Read_DI(void)
 }
 
 
-INPUT_BITS Pad_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
+INPUT_BITS Pad_Read(void)
 {
 	JOYINFOEX	joy;
 	int			x,y;
@@ -270,7 +270,7 @@ INPUT_BITS Pad_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 		x = joy.dwXpos>>11;
 		y = joy.dwYpos>>11;
 
-		for(const auto& binding : PadBindings) {
+		for(const auto& binding : Key_PadBindings) {
 			if(binding.first > 0) {
 				if(joy.dwButtons & (1 << (binding.first - 1))) {
 					val |= binding.second;
@@ -290,11 +290,11 @@ INPUT_BITS Pad_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 }
 
 
-void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
+void Key_Read(void)
 {
 	const auto val = (UsingDirectInput ? Key_Read_DI() : Key_Read_STD());
 	if(val.first == 0) {
-		Pad_Data = Pad_Read(PadBindings);
+		Pad_Data = Pad_Read();
 	}
 
 	Key_Data = (val.first | Pad_Data);

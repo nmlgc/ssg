@@ -60,7 +60,7 @@ int Run()
 	while(!quit) {
 		// Read input events first to remove them from the queue
 		SDL_PumpEvents();
-		Key_Read(PadBindings);
+		Key_Read();
 
 		[[gsl::suppress(type.5)]] SDL_Event event;
 		while(SDL_PeepEvents(

@@ -147,7 +147,7 @@ void Key_End(void)
 	Pads.clear();
 }
 
-void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
+void Key_Read(void)
 {
 	static INPUT_BITS Key_Data_Real = 0;
 
@@ -179,7 +179,7 @@ void Key_Read(const std::span<const INPUT_PAD_BINDING> PadBindings)
 		case SDL_JOYBUTTONUP: {
 			// SDL's numbering starts at 0.
 			const INPUT_PAD_BUTTON id = (event.jbutton.button + 1);
-			for(const auto& binding : PadBindings) {
+			for(const auto& binding : Key_PadBindings) {
 				Key_Check(Pad_Data, id, event.jbutton.state, binding);
 			}
 

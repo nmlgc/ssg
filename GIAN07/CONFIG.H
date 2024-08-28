@@ -197,13 +197,6 @@ struct CONFIG_DATA {
 // Active configuration
 extern CONFIG_DATA ConfigDat;
 
-static constexpr std::array<INPUT_PAD_BINDING, 4> PadBindings = { {
-	{ ConfigDat.PadTama.v, KEY_TAMA },
-	{ ConfigDat.PadBomb.v, KEY_BOMB },
-	{ ConfigDat.PadShift.v, KEY_SHIFT },
-	{ ConfigDat.PadCancel.v, KEY_ESC },
-} };
-
 #ifdef PBG_DEBUG
 	// デバッグ情報管理用構造体 //
 	typedef struct tagDEBUG_DATA{

@@ -31,6 +31,18 @@ bool (*const BGM_MidLoadBuffer)(BYTE_BUFFER_OWNED) = LoadMIDIBuffer;
 bool (*const BGM_MidLoadByHash)(const HASH& hash) = LoadMusicByHash;
 // -----------------
 
+// Pad bindings
+// ------------
+
+static constexpr std::array<INPUT_PAD_BINDING, 4> PadBindings = { {
+	{ ConfigDat.PadTama.v, KEY_TAMA },
+	{ ConfigDat.PadBomb.v, KEY_BOMB },
+	{ ConfigDat.PadShift.v, KEY_SHIFT },
+	{ ConfigDat.PadCancel.v, KEY_ESC },
+} };
+std::span<const INPUT_PAD_BINDING> Key_PadBindings = PadBindings;
+// ------------
+
 bool XInit(void)
 {
 	std::filesystem::current_path(PathForData());

@@ -177,6 +177,7 @@ local ANALYSIS = { cflags = { release = {
 	"/wd26821", -- …
 } } }
 
+local SSG = sourcepath("./")
 main_cfg = CONFIG:branch(SDL_LINK, BLAKE3_LINK, {
 	cflags = {
 		"/std:c++latest",
@@ -192,13 +193,13 @@ main_cfg = CONFIG:branch(SDL_LINK, BLAKE3_LINK, {
 })
 
 modern_cfg = main_cfg:branch(ANALYSIS)
-modern_src += tup.glob("game/*.cpp")
+modern_src += SSG.glob("game/*.cpp")
 modern_src += "game/codecs/flac.cpp"
-modern_src += tup.glob("platform/windows/*.cpp")
-main_src += tup.glob("DirectXUTYs/*.CPP")
-main_src += tup.glob("DirectXUTYs/*.cpp")
-main_src += tup.glob("GIAN07/*.cpp")
-main_src += tup.glob("GIAN07/*.CPP")
+modern_src += SSG.glob("platform/windows/*.cpp")
+main_src += SSG.glob("DirectXUTYs/*.CPP")
+main_src += SSG.glob("DirectXUTYs/*.cpp")
+main_src += SSG.glob("GIAN07/*.cpp")
+main_src += SSG.glob("GIAN07/*.CPP")
 
 main_obj = (
 	cxx(modern_cfg, modern_src) +
@@ -211,8 +212,8 @@ local main_sdl_cfg = main_cfg:branch(ANALYSIS, {
 })
 
 main_sdl_src += "MAIN/main_sdl.cpp"
-main_sdl_src += tup.glob("platform/miniaudio/*.cpp")
-main_sdl_src += tup.glob("platform/sdl/*.cpp")
+main_sdl_src += SSG.glob("platform/miniaudio/*.cpp")
+main_sdl_src += SSG.glob("platform/sdl/*.cpp")
 main_sdl_obj = cxx(main_sdl_cfg, main_sdl_src)
 main_sdl_obj = (main_sdl_obj + xiph_obj)
 exe(

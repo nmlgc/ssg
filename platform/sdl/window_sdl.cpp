@@ -45,14 +45,49 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 	return reinterpret_cast<const char8_t *>(info.name);
 }
 
-SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS&)
+SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 {
 	assert(Window == nullptr);
+
+	uint32_t flags = 0;
+
+	// Set the necessary window flags for certain APIs to avoid
+	// SDL_CreateRenderer()'s janky closing and reopening of the window
+	// with the correct flags.
+	const auto name = WndBackend_SDLRendererName(params.api);
+
+	if(name.starts_with(u8"opengl")) {
+		flags |= SDL_WINDOW_OPENGL;
+		SDL_GL_ResetAttributes();
+
+		// SDL_GL_ResetAttributes() also resets the essential profile mask and
+		// version selection attributes, but chooses the target OpenGL version
+		// via a hardcoded #ifdef priority list that prefers regular OpenGL
+		// over ES 2 over ES 1. If the user requested any of the ES versions,
+		// SDL_CreateRenderer() would still recreate the window because the
+		// `SDL_GL_CONTEXT_PROFILE_MASK` got set to regular/non-ES OpenGL.
+		// So, we're forced to specify the correct flags ourselves after all.
+		const auto [maj, min] = ([name]() -> std::pair<int, int> {
+			if(name.starts_with(u8"opengles")) {
+				SDL_GL_SetAttribute(
+					SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES
+				);
+				if(name == u8"opengles2") {
+					return { 2, OPENGL_TARGET_ES2_MIN };
+				}
+				return { 1, OPENGL_TARGET_ES1_MIN };
+			}
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+			return { OPENGL_TARGET_CORE_MAJ, OPENGL_TARGET_CORE_MIN };
+		})();
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, maj);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, min);
+	}
 
 	constexpr auto res = GRP_RES;
 	constexpr auto left = SDL_WINDOWPOS_CENTERED;
 	constexpr auto top = SDL_WINDOWPOS_CENTERED;
-	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, 0);
+	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, flags);
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
 		return nullptr;

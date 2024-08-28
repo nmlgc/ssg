@@ -8,6 +8,7 @@
 
 import std.compat;
 #include "game/coords.h"
+#include "strings/title.h"
 #include <assert.h>
 
 // The game's native resolution.

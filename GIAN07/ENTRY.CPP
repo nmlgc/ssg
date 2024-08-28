@@ -54,9 +54,6 @@ bool XInit(void)
 	ConfigLoad();
 	Grp_FPSDivisor = ConfigDat.FPSDivisor.v;
 
-	// キーボード(JoyPad)入力を受け付ける //
-	Key_Start();
-
 	// コンフィグ依存の初期化処理
 	if(!GrpBackend_Enum()) {
 		return false;
@@ -69,6 +66,9 @@ bool XInit(void)
 	}
 	ConfigDat.GraphicsParamsApply(maybe_params.value().live);
 	GrpBackend_SetClip(GRP_RES_RECT);
+
+	// キーボード(JoyPad)入力を受け付ける //
+	Key_Start();
 
 	// ＢＧＭの初期化 //
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {

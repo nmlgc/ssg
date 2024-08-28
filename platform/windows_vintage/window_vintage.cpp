@@ -34,7 +34,7 @@ BOOL	bMouseVisible;
 DWORD	WaitTime;
 
 
-HWND WndBackend_Win32Create(void)
+HWND WndBackend_Win32Create(const GRAPHICS_PARAMS&)
 {
 	// 他のところで起動していたらそいつをRestoreする //
 	auto old_gian = FindWindowW(APP_CLASS, nullptr);
@@ -48,6 +48,11 @@ HWND WndBackend_Win32Create(void)
 		return nullptr;
 	}
 
+	return hWndMain;
+}
+
+HWND WndBackend_Win32(void)
+{
 	return hWndMain;
 }
 

@@ -10,6 +10,7 @@
 #include "game/format_bmp.h"
 #include "game/input.h"
 #include "platform/windows/surface_gdi.h"
+#include "platform/window_backend.h"
 #include <assert.h>
 #include <d3d.h>
 #pragma message(PBGWIN_DD_UTY_H)
@@ -260,7 +261,10 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 //	D3DMATERIAL			mat;
 //	D3DMATERIALHANDLE	hmat;
 
-	extern HWND hWndMain;
+	auto hWndMain = WndBackend_Win32();
+	if(hWndMain == nullptr) {
+		hWndMain = WndBackend_Win32Create(params);
+	}
 	if(hWndMain == nullptr) {
 		return GRAPHICS_INIT_RESULT::From(maybe_prev);
 	}

@@ -23,7 +23,7 @@ constexpr auto LOG_CAT = SDL_LOG_CATEGORY_VIDEO;
 
 static SDL_Window *Window;
 
-SDL_Window *WndBackend_SDLCreate(void)
+SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS&)
 {
 	assert(Window == nullptr);
 
@@ -45,17 +45,24 @@ SDL_Window *WndBackend_SDLCreate(void)
 }
 
 #ifdef WIN32
-HWND WndBackend_Win32Create(void)
+HWND WndBackend_Win32(void)
 {
-	auto* window = WndBackend_SDLCreate();
-
+	if(!Window) {
+		return nullptr;
+	}
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
-	if(!SDL_GetWindowWMInfo(window, &wminfo)) {
+	if(!SDL_GetWindowWMInfo(Window, &wminfo)) {
 		Log_Fail(LOG_CAT, "Error retrieving window handle");
 		return nullptr;
 	}
 	return wminfo.info.win.window;
+}
+
+HWND WndBackend_Win32Create(const GRAPHICS_PARAMS& params)
+{
+	WndBackend_SDLCreate(params);
+	return WndBackend_Win32();
 }
 #endif
 

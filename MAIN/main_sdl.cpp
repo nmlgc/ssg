@@ -23,10 +23,6 @@
 #include "game/defer.h"
 #include "strings/title.h"
 
-// Still required for:
-// • DirectDraw
-HWND hWndMain;
-
 #define UTF8_(S) u8 ## S
 #define UTF8(S) UTF8_(S)
 
@@ -39,9 +35,6 @@ int main(int argc, char** args)
 		return 1;
 	}
 	defer(SDL_Quit());
-
-	hWndMain = WndBackend_Win32Create();
-	defer(WndBackend_Cleanup());
 
 	if(!XInit()) {
 		// This is not a SDL error.

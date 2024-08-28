@@ -177,8 +177,11 @@ local ANALYSIS = { cflags = { release = {
 	"/wd26821", -- …
 } } }
 
+--- The game
+-- --------
+
 local SSG = sourcepath("./")
-main_cfg = CONFIG:branch(SDL_LINK, BLAKE3_LINK, {
+local ssg_cfg = CONFIG:branch(BLAKE3_LINK, {
 	cflags = {
 		"/std:c++latest",
 		"/DWIN32",
@@ -188,36 +191,41 @@ main_cfg = CONFIG:branch(SDL_LINK, BLAKE3_LINK, {
 		"/execution-charset:utf-8",
 		debug = "/DPBG_DEBUG",
 	},
-	lflags = "obj/dinput.lib",
 	objdir = "ssg/",
 })
+local modern_cfg = ssg_cfg:branch(ANALYSIS)
 
-modern_cfg = main_cfg:branch(ANALYSIS)
-modern_src += SSG.glob("game/*.cpp")
-modern_src += "game/codecs/flac.cpp"
-modern_src += SSG.glob("platform/windows/*.cpp")
-main_src += SSG.glob("DirectXUTYs/*.CPP")
-main_src += SSG.glob("DirectXUTYs/*.cpp")
-main_src += SSG.glob("GIAN07/*.cpp")
-main_src += SSG.glob("GIAN07/*.CPP")
+-- pbg code
+local ssg_src
+ssg_src += SSG.glob("DirectXUTYs/*.CPP")
+ssg_src += SSG.glob("DirectXUTYs/*.cpp")
+ssg_src += SSG.glob("GIAN07/*.cpp")
+ssg_src += SSG.glob("GIAN07/*.CPP")
 
-main_obj = (
-	cxx(modern_cfg, modern_src) +
-	cxx(modern_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp") +
-	cxx(main_cfg, main_src)
+-- Our platform layer code
+local layers_src = "game/codecs/flac.cpp"
+layers_src += SSG.glob("game/*.cpp")
+layers_src += SSG.glob("platform/miniaudio/*.cpp")
+layers_src += SSG.glob("platform/windows/*.cpp")
+local layers_obj = (
+	cxx(modern_cfg, layers_src) +
+	cxx(modern_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp")
 )
 
-local main_sdl_cfg = main_cfg:branch(ANALYSIS, {
-	lflags = "/SUBSYSTEM:windows"
-})
+-- SDL code
+local p_sdl_cfg = modern_cfg:branch(SDL_LINK, { lflags = "/SUBSYSTEM:windows" })
+local p_sdl_src = SSG.glob("platform/sdl/*.cpp")
+p_sdl_src += "MAIN/main_sdl.cpp"
+local p_sdl_obj = cxx(p_sdl_cfg, p_sdl_src)
 
-main_sdl_src += "MAIN/main_sdl.cpp"
-main_sdl_src += SSG.glob("platform/miniaudio/*.cpp")
-main_sdl_src += SSG.glob("platform/sdl/*.cpp")
-main_sdl_obj = cxx(main_sdl_cfg, main_sdl_src)
-main_sdl_obj = (main_sdl_obj + xiph_obj)
-exe(
-	main_sdl_cfg,
-	(main_sdl_obj + main_obj + blake3_modern_obj + sdl_dll),
-	"GIAN07"
+-- Main/regular build
+local regular_obj = (
+	cxx(ssg_cfg, ssg_src) +
+	layers_obj +
+	p_sdl_obj +
+	xiph_obj +
+	blake3_modern_obj +
+	sdl_dll
 )
+exe(p_sdl_cfg, regular_obj, "GIAN07")
+--- --------

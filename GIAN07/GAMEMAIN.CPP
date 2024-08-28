@@ -1590,9 +1590,9 @@ void GameDraw(void)
 
 bool IsDraw(void)
 {
-	if(ConfigDat.FPSDivisor.v) {
+	if(Grp_FPSDivisor) {
 		DrawCount++;
-		if(DrawCount % ConfigDat.FPSDivisor.v) {
+		if(DrawCount % Grp_FPSDivisor) {
 			return false;
 		}
 	}

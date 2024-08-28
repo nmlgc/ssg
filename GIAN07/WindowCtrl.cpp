@@ -388,7 +388,11 @@ static bool GrpFnChgDevice(INPUT_BITS key)
 
 static bool GrpFnSkip(INPUT_BITS key)
 {
-	return RingFN(SetGrpItem, ConfigDat.FPSDivisor.v, key, 0, FPS_DIVISOR_MAX);
+	const auto ret = RingFN(
+		SetGrpItem, ConfigDat.FPSDivisor.v, key, 0, FPS_DIVISOR_MAX
+	);
+	Grp_FPSDivisor = ConfigDat.FPSDivisor.v;
+	return ret;
 }
 
 static bool GrpFnBpp(INPUT_BITS key)

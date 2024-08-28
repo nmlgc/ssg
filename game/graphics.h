@@ -9,6 +9,13 @@ import std.compat;
 #include "game/pixelformat.h"
 #include <assert.h>
 
+// The backend will target a frame rate of
+//
+// 	[FRAME_TIME_TARGET] / [Grp_FPSDivisor]
+//
+// Setting this to 0 disables any frame rate limitation.
+extern uint8_t Grp_FPSDivisor;
+
 // Paletted graphics //
 // ----------------- //
 

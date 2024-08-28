@@ -19,13 +19,13 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include "constants.h"
-#include "GIAN07/CONFIG.H"
 #include "GIAN07/ENTRY.H"
 #include "GIAN07/GAMEMAIN.H"
 #include "platform/input.h"
 #include "platform/snd_backend.h"
 #include "game/bgm.h"
 #include "game/defer.h"
+#include "game/graphics.h"
 #include "strings/title.h"
 
 // Still required for:
@@ -96,11 +96,11 @@ int Run()
 		if(active) {
 			const auto ticks_start = SDL_GetTicks64();
 			if(
-				(ConfigDat.FPSDivisor.v == 0) ||
+				(Grp_FPSDivisor == 0) ||
 				((ticks_start - ticks_last) >= FRAME_TIME_TARGET)
 			) {
 				GameMain(quit);
-				if(ConfigDat.FPSDivisor.v != 0) {
+				if(Grp_FPSDivisor != 0) {
 					// Since SDL_Delay() works at not-even-exact millisecond
 					// granularity, we subtract 1 and spin for the last
 					// millisecond to ensure that we hit the exact frame

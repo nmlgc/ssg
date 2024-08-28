@@ -9,6 +9,8 @@
 #include "platform/file.h"
 #include "platform/graphics_backend.h"
 
+uint8_t Grp_FPSDivisor = 0;
+
 // Paletted graphics //
 // ----------------- //
 

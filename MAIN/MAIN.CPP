@@ -1,4 +1,3 @@
-#include "../GIAN07/CONFIG.H"
 #include "../GIAN07/ENTRY.H"
 #include "../GIAN07/GAMEMAIN.H"
 #include "strings/title.h"
@@ -6,6 +5,7 @@
 #include "platform/snd_backend.h"
 #include "platform/unicode.h"
 #include "game/bgm.h"
+#include "game/graphics.h"
 #include "game/input.h"
 #include <windows.h>
 #include <mmsystem.h>
@@ -60,7 +60,7 @@ int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nShowCmd)
 			tempdw = timeGetTime();
 			if(
 				((tempdw - WaitTime) >= FRAME_TIME_TARGET) ||
-				(ConfigDat.FPSDivisor.v == 0)
+				(Grp_FPSDivisor == 0)
 			) {
 				Key_Read();
 

@@ -51,6 +51,7 @@ bool XInit(void)
 
 	// コンフィグをロードする //
 	ConfigLoad();
+	Grp_FPSDivisor = ConfigDat.FPSDivisor.v;
 
 	// キーボード(JoyPad)入力を受け付ける //
 	Key_Start();

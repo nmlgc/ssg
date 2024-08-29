@@ -54,7 +54,6 @@ struct GRAPHICS_DDRAW {
 
 	PIXELFORMAT PixelFormat;
 	bool	bNeedChgPal;	// パレットを変更する必要があるか
-	std::optional<uint8_t>	DeviceID;
 
 public:
 	// Ensures that a DirectDraw surface matches its underlying image.

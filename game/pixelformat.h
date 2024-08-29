@@ -51,6 +51,9 @@ public:
 		}
 		constexpr BITDEPTH(const BITDEPTH& other) = default;
 		constexpr BITDEPTH& operator=(const BITDEPTH& other) = default;
+		constexpr std::strong_ordering operator<=>(
+			const BITDEPTH& o
+		) const = default;
 
 		constexpr BITDEPTH(ARRAY::const_iterator it) :
 			bpp((it >= SUPPORTED.end()) ? 0 : *it) {

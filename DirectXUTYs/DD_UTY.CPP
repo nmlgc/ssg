@@ -250,7 +250,9 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	);
 }
 
-std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params)
+std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
+	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
+)
 {
 	HRESULT				dxret;
 	LPDIRECTDRAW		lpDD  = NULL;
@@ -260,11 +262,11 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params)
 
 	extern HWND hWndMain;
 	if(hWndMain == nullptr) {
-		return std::nullopt;
+		return maybe_prev;
 	}
 
 	if(params.device_id >= DxEnumNow) {
-		return std::nullopt;
+		return maybe_prev;
 	}
 	auto& pXDD = DxEnum[params.device_id];
 
@@ -272,25 +274,30 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params)
 	if(!pXDD.BitDepthSupported(params.bitdepth)) {
 		params.bitdepth = pXDD.BitDepthBest();
 		if(!params.bitdepth) {
-			return std::nullopt;
+			return maybe_prev;
 		}
 	}
 
 	const auto maybe_pixel_format = params.bitdepth.pixel_format();
 	if(!maybe_pixel_format) {
-		return std::nullopt;
+		return maybe_prev;
 	}
 	const auto pixel_format = maybe_pixel_format.value();
 
-	// Already running with this configuration? //
-	if(
-		(params.device_id == DxObj.DeviceID) &&
-		(pixel_format == DxObj.PixelFormat)
-	) {
-		return std::nullopt;
+	// Only re-init if any of our supported parameters changed.
+	if(maybe_prev) {
+		const auto& prev = maybe_prev.value();
+		if(
+			(prev.device_id == params.device_id) &&
+			(prev.bitdepth == params.bitdepth)
+		) {
+			return maybe_prev;
+		}
 	}
 
-	GrpBackend_Cleanup();
+	if(maybe_prev) {
+		GrpBackend_Cleanup();
+	}
 	ZeroMemory(&ddsd, sizeof(ddsd));
 
 	try{
@@ -328,7 +335,6 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params)
 		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
 
 		// 2Dの初期化はここでおしまい //
-		DxObj.DeviceID = params.device_id;
 		DxObj.PixelFormat = pixel_format;
 		if(pixel_format.IsPalettized()) throw(true);
 
@@ -373,10 +379,12 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(GRAPHICS_PARAMS params)
 			GrpGeom = &GrpGeom_D3D;
 		}
 
-		for(auto& surf : DxSurf) {
-			if(surf.size) {
-				DxObj.SurfaceCreateUninitialized(surf, surf.size);
-				DxObj.SurfaceRestore(surf);
+		if(maybe_prev) {
+			for(auto& surf : DxSurf) {
+				if(surf.size) {
+					DxObj.SurfaceCreateUninitialized(surf, surf.size);
+					DxObj.SurfaceRestore(surf);
+				}
 			}
 		}
 

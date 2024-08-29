@@ -49,7 +49,9 @@ bool XInit(void)
 	}
 
 	// グラフィックの初期化 //
-	const auto maybe_params = GrpBackend_Init(ConfigDat.GraphicsParams());
+	const auto maybe_params = GrpBackend_Init(
+		std::nullopt, ConfigDat.GraphicsParams()
+	);
 	if(!maybe_params) {
 		return false;
 	}
@@ -78,11 +80,20 @@ void XCleanup(void)
 	Key_End();
 }
 
-void XGrpTry(const GRAPHICS_PARAMS& params)
+void XGrpTry(const GRAPHICS_PARAMS& prev, const GRAPHICS_PARAMS& params)
 {
-	if(const auto live = GrpBackend_Init(params)) {
+	if(prev == params) {
+		return;
+	}
+	auto maybe_live = GrpBackend_Init(prev, params);
+	if(!maybe_live) {
+		// Reset to the configuration that ran previously.
+		maybe_live = GrpBackend_Init(std::nullopt, prev);
+	}
+	if(maybe_live) {
+		const auto& live = maybe_live.value();
 		TextObj.WipeBeforeNextRender();
-		ConfigDat.GraphicsParamsApply(live.value());
+		ConfigDat.GraphicsParamsApply(live);
 
 		// TODO: Assumes that 8-bit mode only ever calls this function within
 		// the main menu.

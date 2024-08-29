@@ -107,6 +107,8 @@ struct GRAPHICS_PARAMS {
 	uint8_t device_id;
 	int8_t api; // Negative = "use default API"
 	BITDEPTH bitdepth;
+
+	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;
 };
 
 // Wraps screenshot handling around GrpBackend_Flip().

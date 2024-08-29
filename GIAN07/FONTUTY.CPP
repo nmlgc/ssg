@@ -65,7 +65,7 @@ extern void GrpPut16(int x, int y, const char *s)
 }
 
 // 16x16 透過フォントで文字列出力(高速) //
-extern void GrpPut16c(int x, int y, char *s)
+extern void GrpPut16c(int x, int y, const char *s)
 {
 	int		sx,tx,ty;
 
@@ -84,7 +84,7 @@ extern void GrpPut16c(int x, int y, char *s)
 }
 
 // 上と同じだが、ｘ移動幅が１６ //
-extern void GrpPut16c2(int x, int y, char *s)
+extern void GrpPut16c2(int x, int y, const char *s)
 {
 	int		sx,tx,ty;
 
@@ -114,7 +114,7 @@ extern void GrpPutc(int x, int y, char c)
 }
 
 // 05x07 べた貼りフォント //
-extern void GrpPut57(int x, int y, char *s)
+extern void GrpPut57(int x, int y, const char *s)
 {
 	PIXEL_LTRB	src;
 	int		sx,tx,ty;
@@ -136,7 +136,7 @@ extern void GrpPut57(int x, int y, char *s)
 }
 
 // 07x11 音楽室用フォント
-extern void GrpPut7B(int x, int y, char *s)
+extern void GrpPut7B(int x, int y, const char *s)
 {
 	PIXEL_LTRB	src;
 	for(;(*s)!='\0';s++,x+=8){
@@ -160,7 +160,7 @@ extern void GrpPut7B(int x, int y, char *s)
 }
 
 // 得点アイテムのスコアを描画 //
-extern void GrpPutScore(int x, int y, char *s)
+extern void GrpPutScore(int x, int y, const char *s)
 {
 	PIXEL_LTRB	src;
 	int		sx,tx,ty;

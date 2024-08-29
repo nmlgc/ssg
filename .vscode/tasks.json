@@ -42,6 +42,32 @@
 					"args": ["/d", "/c"]
 				}
 			}
+		},
+		{
+			"label": "Build vintage graphics binary (Debug)",
+			"type": "shell",
+			"command": "build.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics)d.exe\"",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"shell": {
+					"executable": "cmd",
+					"args": ["/d", "/c"]
+				}
+			}
+		},
+		{
+			"label": "Build vintage graphics binary (Release)",
+			"type": "shell",
+			"command": "build.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics).exe\"",
+			"group": "build",
+			"problemMatcher": "$msCompile",
+			"options": {
+				"shell": {
+					"executable": "cmd",
+					"args": ["/d", "/c"]
+				}
+			}
 		}
 	]
 }

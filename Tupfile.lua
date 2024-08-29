@@ -130,6 +130,12 @@ blake3_src += BLAKE3.join("blake3_dispatch.c")
 blake3_src += BLAKE3.join("blake3_portable.c")
 
 local blake3_modern_cfg = CONFIG:branch(BLAKE3_COMPILE, { objdir = "modern/" })
+local blake3_i586_cfg = CONFIG:branch(BLAKE3_COMPILE, {
+	cflags = {
+		"/DBLAKE3_NO_SSE2", "/DBLAKE3_NO_AVX2", "/DBLAKE3_NO_AVX512"
+	},
+	objdir = "i586/",
+})
 
 -- Each optimized version must be built with the matching Visual C++ `/arch`
 -- flag. This is not only necessary for the compiler to actually emit the
@@ -149,6 +155,7 @@ blake3_modern_obj = (
 	cxx(blake3_arch_cfgs[2], BLAKE3.join("blake3_avx2.c")) +
 	cxx(blake3_arch_cfgs[3], BLAKE3.join("blake3_avx512.c"))
 )
+local blake3_i586_obj = cxx(blake3_i586_cfg, blake3_src)
 -- ------
 
 -- Static analysis using the C++ Core Guideline checker plugin.
@@ -245,4 +252,24 @@ local regular_obj = (
 	sdl_dll
 )
 exe(p_sdl_cfg, regular_obj, "GIAN07")
+--
+-- Vintage DirectDraw/Direct3D build
+local p_vintage_cfg = p_sdl_cfg:branch(ANALYSIS_RELAXED, {
+	cflags = "/DWIN32_VINTAGE", objdir = "vintage/",
+})
+local p_vintage_src = SSG.glob("platform/windows_vintage/DD*.CPP")
+p_vintage_src += SSG.glob("platform/windows_vintage/D2_Polygon.CPP")
+exe(
+	p_vintage_cfg,
+	(
+		cxx(p_vintage_cfg, ssg_src) +
+		layers_obj +
+		p_sdl_obj +
+		cxx(p_vintage_cfg, p_vintage_src) +
+		xiph_obj +
+		blake3_i586_obj +
+		sdl_dll
+	),
+	"GIAN07 (original DirectDraw and Direct3D graphics)"
+)
 --- --------

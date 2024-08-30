@@ -19,6 +19,7 @@ static constexpr auto LOG_CAT = SDL_LOG_CATEGORY_RENDER;
 /// -----
 
 PIXELFORMAT PreferredPixelFormat;
+SDL_ScaleMode TextureScaleMode = SDL_ScaleModeNearest;
 
 // Primary renderer
 // ----------------
@@ -140,6 +141,7 @@ std::span<const SDL_Color> HelpColorsFrom(VERTEX_RGBA_SPAN<> sp)
 SDL_Texture *TexturePostInit(SDL_Texture& tex)
 {
 	SDL_SetTextureUserData(&tex, Renderer);
+	SDL_SetTextureScaleMode(&tex, TextureScaleMode);
 	return &tex;
 }
 
@@ -309,6 +311,23 @@ void PrimaryCleanup(void)
 	WndBackend_Cleanup();
 }
 
+void PrimarySetScale(WINDOW_SIZE scaled_res)
+{
+	if((scaled_res.w % GRP_RES.w) || (scaled_res.h % GRP_RES.h)) {
+		TextureScaleMode = SDL_ScaleModeBest;
+	} else {
+		TextureScaleMode = SDL_ScaleModeNearest;
+	}
+	for(auto& tex : Textures) {
+		if(tex) {
+			SDL_SetTextureScaleMode(tex, TextureScaleMode);
+		}
+	}
+	if(SoftwareTexture) {
+		SDL_SetTextureScaleMode(SoftwareTexture, TextureScaleMode);
+	}
+}
+
 std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 {
 	auto *window = WndBackend_SDLCreate(params);
@@ -371,6 +390,8 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		}
 	}
 
+	PrimarySetScale(params.ScaledRes());
+
 	return GRAPHICS_INIT_RESULT{ .live = params, .reload_surfaces = true };
 }
 
@@ -409,6 +430,8 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		// If we clipped on the raw renderer, the clipping rectangle won't match
 		// the current resolution anymore.
 		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
+
+		PrimarySetScale(res_new);
 	}
 
 	// Should always be applied unconditionally so that the user can change

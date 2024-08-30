@@ -6,6 +6,7 @@
 #pragma once
 
 import std.compat;
+#include "game/coords.h"
 #include "game/enum_flags.h"
 #include "game/pixelformat.h"
 #include <assert.h>
@@ -168,7 +169,14 @@ struct GRAPHICS_PARAMS {
 	BITDEPTH bitdepth;
 
 	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;
+
+	uint8_t Scale4x(void) const;
+	WINDOW_SIZE ScaledRes(void) const;
 };
+
+// Returns the maximum 4× scaling factor for the game window on the current
+// display.
+uint8_t Grp_WindowScale4xMax(void);
 
 struct GRAPHICS_INIT_RESULT {
 	GRAPHICS_PARAMS live;

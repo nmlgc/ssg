@@ -36,6 +36,7 @@ static void DifFnDemo(int_fast8_t delta);
 static void GrpAPIFnDef(int_fast8_t delta);
 static void GrpFnChgDevice(int_fast8_t delta);
 static void GrpFnSetAPI(int_fast8_t delta);
+static void GrpFnScale(int_fast8_t delta);
 static void GrpFnSkip(int_fast8_t delta);
 static void GrpFnBpp(int_fast8_t delta);
 static void GrpFnWinLocate(int_fast8_t delta);
@@ -190,14 +191,25 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 #endif
 
 static char GrpTitleDevice[50];
+#ifdef GRP_SUPPORT_SCALING
+	static char GrpTitleScale[50];
+#endif
 static char GrpTitleSkip[50];
 #ifdef GRP_SUPPORT_BITDEPTH
 	static char GrpTitleBpp[50];
 #endif
 static char GrpTitleMsg[50];
+
+#ifdef GRP_SUPPORT_SCALING
+	static char GrpHelpScale[50];
+#endif
+
 // WINDOW_CHOICE GrpItemDevice = {
 // 	GrpTitleDevice, "ビデオカードの選択", GrpFnChgDevice
 // };
+#ifdef GRP_SUPPORT_SCALING
+	WINDOW_CHOICE GrpItemScale = { GrpTitleScale, GrpHelpScale, GrpFnScale };
+#endif
 WINDOW_CHOICE GrpItemSkip = {
 	GrpTitleSkip, "描画スキップの設定です", GrpFnSkip
 };
@@ -214,6 +226,9 @@ WINDOW_CHOICE GrpItemMsg = {
 #endif
 WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
+#ifdef GRP_SUPPORT_SCALING
+	&GrpItemScale,
+#endif
 	&GrpItemSkip,
 #ifdef GRP_SUPPORT_BITDEPTH
 	&GrpItemBpp,
@@ -464,6 +479,11 @@ static void GrpFnSetAPI(int_fast8_t)
 	XGrpTry([](auto& params) {
 		params.api = (MainWindow.Select[MainWindow.SelectDepth] - 1);
 	});
+}
+
+static void GrpFnScale(int_fast8_t delta)
+{
+	XGrpTryCycleScale(delta);
 }
 
 static void GrpFnSkip(int_fast8_t delta)
@@ -868,6 +888,7 @@ static void SetDifItem(bool)
 
 static void SetGrpItem(bool)
 {
+	const auto params = ConfigDat.GraphicsParams();
 	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
 	const char *const FRate[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
 	const auto u_or_d = ((ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
@@ -875,15 +896,41 @@ static void SetGrpItem(bool)
 		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)
 	);
 	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
+	const auto scale_4x = params.Scale4x();
+	const auto [scale_var1, scale_var2] = (
+		std::pair((scale_4x / 4u), ((scale_4x % 4u) * 25u))
+	);
+	const auto scale_res = params.ScaledRes();
+	const auto [scale_fmt, scale_label] = (
+		std::pair((scale_4x ? "%s[%3u.%02ux ]" : "%s[ Screen ]"), "ScaleFact")
+	);
 
 	// clang-format off
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
+#ifdef GRP_SUPPORT_SCALING
+	sprintf(GrpTitleScale,  scale_fmt, scale_label, scale_var1, scale_var2);
+#endif
 	sprintf(GrpTitleSkip,   "FrameRate[ %s ]", FRate[ConfigDat.FPSDivisor.v]);
 #ifdef GRP_SUPPORT_BITDEPTH
 	sprintf(GrpTitleBpp,    "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
 #endif
 	sprintf(GrpTitleMsg,    "MsgWindow[%s]", UorD[u_or_d]);
 	// clang-format on
+
+	// Help strings
+	// ------------
+#ifdef GRP_SUPPORT_SCALING
+	if(scale_4x == 0) {
+		strcpy(GrpHelpScale, "Game scales to fit the display");
+	} else {
+		const auto [fmt, res] = ((scale_4x == 4)
+			? std::pair("Window size is %d×%d, not scaling", GRP_RES)
+			: std::pair("Game is scaled to %d×%d", scale_res)
+		);
+		sprintf(GrpHelpScale, fmt, res.w, res.h);
+	}
+#endif
+	// ------------
 }
 
 #ifdef GRP_SUPPORT_API

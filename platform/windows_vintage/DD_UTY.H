@@ -82,6 +82,7 @@ extern GRAPHICS_DDRAW	DxObj;
 extern GRAPHICS_GEOMETRY *GrpGeom;
 
 #define GRP_SUPPORT_BITDEPTH
+#undef GRP_SUPPORT_SCALING
 #undef GRP_SUPPORT_API
 
 #endif

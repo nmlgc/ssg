@@ -58,8 +58,16 @@ template <class Coord> struct PIXEL_SIZE_BASE {
 		return { (w - other.x), (h - other.y) };
 	}
 
+	constexpr PIXEL_SIZE_BASE operator*(int factor) const {
+		return { (w * factor), (h * factor) };
+	}
+
 	constexpr PIXEL_SIZE_BASE operator/(int divisor) const {
 		return { (w / divisor), (h / divisor) };
+	}
+
+	constexpr PIXEL_SIZE_BASE operator/(const PIXEL_SIZE_BASE& other) const {
+		return { (w / other.w), (h / other.h) };
 	}
 
 	PIXEL_SIZE_BASE& operator+=(const PIXEL_SIZE_BASE& other) {

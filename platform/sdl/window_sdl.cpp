@@ -45,6 +45,11 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 	return reinterpret_cast<const char8_t *>(info.name);
 }
 
+SDL_Window *WndBackend_SDL(void)
+{
+	return Window;
+}
+
 SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 {
 	assert(Window == nullptr);
@@ -84,7 +89,7 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, min);
 	}
 
-	constexpr auto res = GRP_RES;
+	const auto res = params.ScaledRes();
 	constexpr auto left = SDL_WINDOWPOS_CENTERED;
 	constexpr auto top = SDL_WINDOWPOS_CENTERED;
 	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, flags);

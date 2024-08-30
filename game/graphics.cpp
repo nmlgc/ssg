@@ -85,6 +85,26 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 }
 // -----------
 
+uint8_t GRAPHICS_PARAMS::Scale4x(void) const
+{
+	return window_scale_4x;
+}
+
+WINDOW_SIZE GRAPHICS_PARAMS::ScaledRes(void) const
+{
+	const auto scale = ((Scale4x() == 0)
+		? Grp_WindowScale4xMax()
+		: Scale4x()
+	);
+	return ((GRP_RES * scale) / 4);
+}
+
+uint8_t Grp_WindowScale4xMax(void)
+{
+	const auto factors = ((GrpBackend_DisplaySize() * 4) / GRP_RES);
+	return std::min(factors.w, factors.h);
+}
+
 std::optional<GRAPHICS_INIT_RESULT> Grp_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 )

@@ -277,6 +277,16 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	}
 	return ret;
 }
+
+PIXEL_SIZE GrpBackend_DisplaySize(void)
+{
+	SDL_Rect rect;
+	if(SDL_GetDisplayUsableBounds(0, &rect) != 0) {
+		Log_Fail(LOG_CAT, "Error retrieving display size");
+		return GRP_RES;
+	}
+	return { .w = rect.w, .h = rect.h };
+}
 /// ------------------------------------------
 
 /// Initialization and cleanup
@@ -383,7 +393,30 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		return reinit_full(params);
 	}
 
-	return GRAPHICS_INIT_RESULT::From(maybe_prev);
+	// The following parameters can be changed on the fly, but we don't want to
+	// reflect modifications of any parameters we don't care about.
+	GRAPHICS_INIT_RESULT ret = { .live = prev, .reload_surfaces = false };
+
+	auto *window = WndBackend_SDL();
+	WINDOW_SIZE res_prev{};
+	SDL_GetWindowSize(window, &res_prev.w, &res_prev.h);
+
+	const auto res_new = params.ScaledRes();
+	const bool res_changed = (res_prev != res_new);
+	if(res_changed) {
+		SDL_SetWindowSize(window, res_new.w, res_new.h);
+
+		// If we clipped on the raw renderer, the clipping rectangle won't match
+		// the current resolution anymore.
+		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
+	}
+
+	// Should always be applied unconditionally so that the user can change
+	// from the maximum scale value to 0, both of which result in the same
+	// scaled resolution.
+	ret.live.window_scale_4x = params.window_scale_4x;
+
+	return ret;
 }
 
 void GrpBackend_Cleanup(void)

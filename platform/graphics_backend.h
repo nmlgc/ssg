@@ -22,6 +22,10 @@ Any::string_view GrpBackend_DeviceName(uint8_t id);
 // Rendering APIs.
 int8_t GrpBackend_APICount(void);
 std::u8string_view GrpBackend_APIName(int8_t id);
+
+// Returns the size of the display designated for the game window. Used by
+// Grp_WindowScale4xMax() to cap the window scaling factor.
+PIXEL_SIZE GrpBackend_DisplaySize(void);
 /// ------------------------------------------
 
 /// Initialization and cleanup

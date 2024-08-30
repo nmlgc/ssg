@@ -251,6 +251,11 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	);
 }
 
+PIXEL_SIZE GrpBackend_DisplaySize(void)
+{
+	return GRP_RES;
+}
+
 std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
 )

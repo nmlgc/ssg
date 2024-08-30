@@ -85,6 +85,11 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 }
 // -----------
 
+bool GRAPHICS_PARAMS::ScaleGeometry(void) const
+{
+	return !!(flags & GRAPHICS_PARAM_FLAGS::SCALE_GEOMETRY);
+}
+
 uint8_t GRAPHICS_PARAMS::Scale4x(void) const
 {
 	return window_scale_4x;
@@ -97,6 +102,14 @@ WINDOW_SIZE GRAPHICS_PARAMS::ScaledRes(void) const
 		: Scale4x()
 	);
 	return ((GRP_RES * scale) / 4);
+}
+
+void GRAPHICS_PARAMS::SetFlag(
+	GRAPHICS_PARAM_FLAGS flag,
+	std::underlying_type_t<GRAPHICS_PARAM_FLAGS> value
+)
+{
+	EnumFlagSet(flags, flag, value);
 }
 
 uint8_t Grp_WindowScale4xMax(void)

@@ -23,3 +23,4 @@ void XGrpTry(std::invocable<GRAPHICS_PARAMS&> auto&& patch_func) {
 }
 
 void XGrpTryCycleScale(int_fast8_t delta);
+void XGrpTryCycleScMode(void);

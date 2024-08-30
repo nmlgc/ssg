@@ -170,8 +170,14 @@ struct GRAPHICS_PARAMS {
 
 	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;
 
+	bool ScaleGeometry(void) const;
 	uint8_t Scale4x(void) const;
 	WINDOW_SIZE ScaledRes(void) const;
+
+	void SetFlag(
+		GRAPHICS_PARAM_FLAGS flag,
+		std::underlying_type_t<GRAPHICS_PARAM_FLAGS> value
+	);
 };
 
 // Returns the maximum 4× scaling factor for the game window on the current

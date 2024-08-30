@@ -27,6 +27,10 @@ SDL_ScaleMode TextureScaleMode = SDL_ScaleModeNearest;
 
 SDL_Renderer *PrimaryRenderer = nullptr;
 SDL_RendererInfo PrimaryInfo;
+
+// Rendering target in framebuffer scale mode. Not to be confused with
+// [SoftwareTexture], which is a streaming texture, not a render target.
+SDL_Texture *PrimaryTexture = nullptr;
 // ----------------
 
 // Software renderer
@@ -37,6 +41,9 @@ SDL_Renderer *SoftwareRenderer = nullptr;
 // Used as the destination for software rendering.
 SDL_Surface *SoftwareSurface = nullptr;
 
+// Hardware-accelerated copy of [SoftwareSurface], streamed to every frame.
+// Not to be confused with [PrimaryTexture], which is a render target, not a
+// streaming texture.
 SDL_Texture *SoftwareTexture = nullptr;
 // -----------------
 
@@ -154,6 +161,33 @@ SDL_Texture *HelpCreateTexture(uint32_t format, int access, int w, int h)
 	return TexturePostInit(*ret);
 }
 
+// In SDL 2, switching from a texture render target back to NULL not only
+// resets the renderer's viewport, clipping rectangle, and scaling settings
+// back to the last state they were in on the raw renderer, but also loses any
+// of these state changes made while rendering to the texture. This forces us
+// to manually back up at least the one thing we care about, i.e. the clipping
+// rectangle. SDL 3 fixes this by storing this view state as a part of each
+// render target.
+class SDL2_RENDER_TARGET_QUIRK_WORKAROUND {
+	SDL_Renderer& renderer;
+	bool did_clip{};
+	SDL_Rect clip{};
+
+public:
+	SDL2_RENDER_TARGET_QUIRK_WORKAROUND(SDL_Renderer& renderer) :
+		renderer(renderer), did_clip(SDL_RenderIsClipEnabled(&renderer)) {
+		if(did_clip) {
+			SDL_RenderGetClipRect(&renderer, &clip);
+		}
+	}
+
+	~SDL2_RENDER_TARGET_QUIRK_WORKAROUND() {
+		if(did_clip) {
+			SDL_RenderSetClipRect(&renderer, &clip);
+		}
+	}
+};
+
 template <typename T> [[nodiscard]] T *SafeDestroy(void Destroy(T *), T *v)
 {
 	if(v) {
@@ -163,6 +197,16 @@ template <typename T> [[nodiscard]] T *SafeDestroy(void Destroy(T *), T *v)
 	return v;
 }
 
+int SetRenderTargetFor(const SDL_Renderer *renderer)
+{
+	if(renderer == SoftwareRenderer) {
+		return SDL_SetRenderTarget(PrimaryRenderer, nullptr);
+	} else if((renderer == PrimaryRenderer) && PrimaryTexture) {
+		return SDL_SetRenderTarget(PrimaryRenderer, PrimaryTexture);
+	}
+	return 0;
+}
+
 void SwitchActiveRenderer(SDL_Renderer *new_renderer)
 {
 	for(auto& tex : Textures) {
@@ -170,6 +214,7 @@ void SwitchActiveRenderer(SDL_Renderer *new_renderer)
 			tex = SafeDestroy(SDL_DestroyTexture, tex);
 		}
 	}
+	SetRenderTargetFor(new_renderer);
 	Renderer = new_renderer;
 }
 
@@ -309,13 +354,23 @@ void PrimaryCleanup(void)
 	for(auto& tex : Textures) {
 		tex = SafeDestroy(SDL_DestroyTexture, tex);
 	}
+	PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
 	PrimaryRenderer = SafeDestroy(SDL_DestroyRenderer, PrimaryRenderer);
 	Renderer = nullptr;
 	WndBackend_Cleanup();
 }
 
-void PrimarySetScale(WINDOW_SIZE scaled_res)
+// Returns the new `SCALE_GEOMETRY` flag.
+bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 {
+	const auto set_geometry = [] {
+		PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
+		SDL_RenderSetLogicalSize(PrimaryRenderer, GRP_RES.w, GRP_RES.h);
+		return true;
+	};
+
+	// Update texture filters
+	// ----------------------
 	if((scaled_res.w % GRP_RES.w) || (scaled_res.h % GRP_RES.h)) {
 		TextureScaleMode = SDL_ScaleModeBest;
 	} else {
@@ -329,6 +384,46 @@ void PrimarySetScale(WINDOW_SIZE scaled_res)
 	if(SoftwareTexture) {
 		SDL_SetTextureScaleMode(SoftwareTexture, TextureScaleMode);
 	}
+	if(PrimaryTexture) {
+		SDL_SetTextureScaleMode(PrimaryTexture, TextureScaleMode);
+	}
+	// ----------------------
+
+	if(geometry || (scaled_res == GRP_RES)) {
+		set_geometry();
+		return geometry; // Don't unset the user's choice on 1× scaling!
+	}
+
+	assert(!geometry);
+	if(!SDL_RenderTargetSupported(PrimaryRenderer)) {
+		Log_Fail(LOG_CAT, "Render API does not support render targets");
+		return set_geometry();
+	}
+
+	// Ensure the correct logical size on the primary renderer
+	SDL_SetRenderTarget(PrimaryRenderer, nullptr);
+	SDL_RenderSetLogicalSize(PrimaryRenderer, scaled_res.w, scaled_res.h);
+
+	if(!PrimaryTexture) {
+		assert(SoftwareSurface);
+		const auto format = SoftwareSurface->format->format;
+		const auto& res = GRP_RES;
+		PrimaryTexture = SDL_CreateTexture(
+			PrimaryRenderer, format, SDL_TEXTUREACCESS_TARGET, res.w, res.h
+		);
+		if(!PrimaryTexture) {
+			Log_Fail(LOG_CAT, "Error creating native resolution texture");
+			return set_geometry();
+		}
+		SDL_SetTextureScaleMode(PrimaryTexture, TextureScaleMode);
+	}
+
+	// We might be software-rendering.
+	if(SetRenderTargetFor(Renderer) != 0) {
+		Log_Fail(LOG_CAT, "Error setting texture as render target");
+		return set_geometry();
+	}
+	return geometry;
 }
 
 // Re-centers the window to remain fully on-screen after changing the
@@ -393,7 +488,6 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		return std::nullopt;
 	}
 	SDL_GetRendererInfo(renderer, &PrimaryInfo);
-	SDL_RenderSetLogicalSize(renderer, GRP_RES.w, GRP_RES.h);
 
 	// Determine preferred texture formats.
 	// SDL_GetWindowPixelFormat() is *not* a shortcut we could use for software
@@ -438,7 +532,9 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		}
 	}
 
-	PrimarySetScale(params.ScaledRes());
+	const auto res_new = params.ScaledRes();
+	const auto geometry = PrimarySetScale(params.ScaleGeometry(), res_new);
+	params.SetFlag(GRAPHICS_PARAM_FLAGS::SCALE_GEOMETRY, geometry);
 
 	return GRAPHICS_INIT_RESULT{ .live = params, .reload_surfaces = true };
 }
@@ -465,6 +561,7 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	// The following parameters can be changed on the fly, but we don't want to
 	// reflect modifications of any parameters we don't care about.
 	GRAPHICS_INIT_RESULT ret = { .live = prev, .reload_surfaces = false };
+	using F = GRAPHICS_PARAM_FLAGS;
 
 	auto *window = WndBackend_SDL();
 	WINDOW_SIZE res_prev{};
@@ -482,13 +579,15 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
 
 		RepositionAfterScale(topleft, res_prev, res_new);
-		PrimarySetScale(res_new);
 	}
 
 	// Should always be applied unconditionally so that the user can change
 	// from the maximum scale value to 0, both of which result in the same
 	// scaled resolution.
 	ret.live.window_scale_4x = params.window_scale_4x;
+
+	const auto geometry = PrimarySetScale(params.ScaleGeometry(), res_new);
+	ret.live.SetFlag(F::SCALE_GEOMETRY, geometry);
 
 	return ret;
 }
@@ -543,6 +642,11 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 			SDL_UnlockSurface(SoftwareSurface);
 		}
 		SDL_RenderCopy(PrimaryRenderer, SoftwareTexture, nullptr, nullptr);
+	} else if(PrimaryTexture) {
+		const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
+		SDL_SetRenderTarget(PrimaryRenderer, nullptr);
+		SDL_RenderCopy(PrimaryRenderer, PrimaryTexture, nullptr, nullptr);
+		SDL_SetRenderTarget(PrimaryRenderer, PrimaryTexture);
 	}
 	SDL_RenderPresent(PrimaryRenderer);
 	screenshot_stream.reset();

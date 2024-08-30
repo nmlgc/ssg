@@ -37,6 +37,7 @@ static void GrpAPIFnDef(int_fast8_t delta);
 static void GrpFnChgDevice(int_fast8_t delta);
 static void GrpFnSetAPI(int_fast8_t delta);
 static void GrpFnScale(int_fast8_t delta);
+static void GrpFnScMode(int_fast8_t delta);
 static void GrpFnSkip(int_fast8_t delta);
 static void GrpFnBpp(int_fast8_t delta);
 static void GrpFnWinLocate(int_fast8_t delta);
@@ -193,6 +194,7 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 static char GrpTitleDevice[50];
 #ifdef GRP_SUPPORT_SCALING
 	static char GrpTitleScale[50];
+	static char GrpTitleScMode[50];
 #endif
 static char GrpTitleSkip[50];
 #ifdef GRP_SUPPORT_BITDEPTH
@@ -202,6 +204,7 @@ static char GrpTitleMsg[50];
 
 #ifdef GRP_SUPPORT_SCALING
 	static char GrpHelpScale[50];
+	static char GrpHelpScMode[50];
 #endif
 
 // WINDOW_CHOICE GrpItemDevice = {
@@ -209,6 +212,9 @@ static char GrpTitleMsg[50];
 // };
 #ifdef GRP_SUPPORT_SCALING
 	WINDOW_CHOICE GrpItemScale = { GrpTitleScale, GrpHelpScale, GrpFnScale };
+	WINDOW_CHOICE GrpItemScMode = {
+		GrpTitleScMode, GrpHelpScMode, GrpFnScMode
+	};
 #endif
 WINDOW_CHOICE GrpItemSkip = {
 	GrpTitleSkip, "描画スキップの設定です", GrpFnSkip
@@ -228,6 +234,7 @@ WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
 #ifdef GRP_SUPPORT_SCALING
 	&GrpItemScale,
+	&GrpItemScMode,
 #endif
 	&GrpItemSkip,
 #ifdef GRP_SUPPORT_BITDEPTH
@@ -484,6 +491,11 @@ static void GrpFnSetAPI(int_fast8_t)
 static void GrpFnScale(int_fast8_t delta)
 {
 	XGrpTryCycleScale(delta);
+}
+
+static void GrpFnScMode(int_fast8_t)
+{
+	XGrpTryCycleScMode();
 }
 
 static void GrpFnSkip(int_fast8_t delta)
@@ -889,6 +901,12 @@ static void SetDifItem(bool)
 static void SetGrpItem(bool)
 {
 	const auto params = ConfigDat.GraphicsParams();
+
+	static constexpr std::tuple<const char*, WINDOW_STATE> SCALE_MODES[] = {
+		{ "FrameBuf", WINDOW_STATE::REGULAR },
+		{ "Geometry", WINDOW_STATE::REGULAR },
+		{ "--------", WINDOW_STATE::DISABLED },
+	};
 	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
 	const char *const FRate[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
 	const auto u_or_d = ((ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
@@ -896,6 +914,8 @@ static void SetGrpItem(bool)
 		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)
 	);
 	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
+
+#ifdef GRP_SUPPORT_SCALING
 	const auto scale_4x = params.Scale4x();
 	const auto [scale_var1, scale_var2] = (
 		std::pair((scale_4x / 4u), ((scale_4x % 4u) * 25u))
@@ -905,10 +925,20 @@ static void SetGrpItem(bool)
 		std::pair((scale_4x ? "%s[%3u.%02ux ]" : "%s[ Screen ]"), "ScaleFact")
 	);
 
+	const auto [sc_mode_label, sc_mode_state] = (
+		(scale_4x == 4) ? SCALE_MODES[2] :
+		params.ScaleGeometry() ? SCALE_MODES[1] :
+		SCALE_MODES[0]
+	);
+
+	GrpItemScMode.State = sc_mode_state;
+#endif
+
 	// clang-format off
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
 #ifdef GRP_SUPPORT_SCALING
 	sprintf(GrpTitleScale,  scale_fmt, scale_label, scale_var1, scale_var2);
+	sprintf(GrpTitleScMode, "ScaleMode[%s]", sc_mode_label);
 #endif
 	sprintf(GrpTitleSkip,   "FrameRate[ %s ]", FRate[ConfigDat.FPSDivisor.v]);
 #ifdef GRP_SUPPORT_BITDEPTH
@@ -929,6 +959,12 @@ static void SetGrpItem(bool)
 		);
 		sprintf(GrpHelpScale, fmt, res.w, res.h);
 	}
+
+	auto [sc_mode_fmt, sc_mode_res] = (params.ScaleGeometry()
+		? std::pair("Render at %d×%d, scale each draw call", scale_res)
+		: std::pair("Render at %d×%d, then scale framebuffer", GRP_RES)
+	);
+	sprintf(GrpHelpScMode, sc_mode_fmt, sc_mode_res.w, sc_mode_res.h);
 #endif
 	// ------------
 }

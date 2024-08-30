@@ -62,3 +62,13 @@ template <ENUMFLAGS T> constexpr inline T& operator^=(T& a, const T& b) noexcept
 	a = static_cast<T>(a ^ b);
 	return a;
 }
+
+// Sets the given [flag] in [self] to the value of [val].
+template <ENUMFLAGS T> constexpr void EnumFlagSet(
+	T& self, T flag, std::underlying_type_t<T> val
+)
+{
+	const auto shift = std::countr_zero(std::to_underlying(flag));
+	self = static_cast<T>(std::to_underlying(self) & ~flag);
+	self |= static_cast<T>(static_cast<T>(val << shift) & flag);
+}

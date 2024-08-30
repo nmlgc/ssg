@@ -131,6 +131,13 @@ void XGrpTryCycleScale(int_fast8_t delta)
 	});
 }
 
+void XGrpTryCycleScMode(void)
+{
+	XGrpTry([](auto& params) {
+		params.flags ^= GRAPHICS_PARAM_FLAGS::SCALE_GEOMETRY;
+	});
+}
+
 bool GameFrame(void)
 {
 	bool quit = false;

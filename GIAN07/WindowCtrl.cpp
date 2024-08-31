@@ -763,7 +763,7 @@ static void SetCfgRepItem(bool)
 {
 	if(0 == ConfigDat.StageSelect.v) {
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[false]);
-		strcpy(CfgRepTitle[1], "StageSelect [無 効]");
+		strcpy(CfgRepTitle[1],  "StageSelect [無 効]");
 	}
 	else{
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[true]);
@@ -796,23 +796,16 @@ static void SetGrpItem(bool)
 {
 	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
 	const char *const DMode[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
-	int		i;
-
-#define SetFlagsMacro(src,flag)		((flag) ? src[0] : src[1])
-
+	const auto u_or_d = ((ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
+		? 2
+		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)
+	);
 	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
+
 	sprintf(GrpTitle[0], "Device   [%.7s]", dev.data());
 	sprintf(GrpTitle[1], "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
 	sprintf(GrpTitle[2], "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
-#undef SetFlagsMacro
-
-	if(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE) {
-		i = 2;
-	} else {
-		i = (ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1;
-	}
-
-	sprintf(GrpTitle[3],"MsgWindow[%s]", UorD[i]);
+	sprintf(GrpTitle[3], "MsgWindow[%s]", UorD[u_or_d]);
 }
 
 static void SetSndItem(bool tick)
@@ -881,13 +874,11 @@ static void SetSndItem(bool tick)
 
 static void SetInpItem(bool)
 {
-	int		temp;
+	const auto skip = ((ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) != 0);
+	const auto down = ((ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) != 0);
 
-	temp = ((ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) ? 1 : 0);
-	sprintf(InpTitle,"Z-MessageSkip[%s]",temp ? "ＯＫ" : "禁止");
-
-	temp = ((ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) ? 1 : 0);
-	sprintf(InpTitle2,"Z-SpeedDown  [%s]",temp ? "ＯＫ" : "禁止");
+	sprintf(InpTitle, "Z-MessageSkip[%s]", (skip ? "ＯＫ" : "禁止"));
+	sprintf(InpTitle2,"Z-SpeedDown  [%s]", (down ? "ＯＫ" : "禁止"));
 }
 
 static void SetIKeyItem(bool)

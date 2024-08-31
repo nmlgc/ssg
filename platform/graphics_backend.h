@@ -28,9 +28,9 @@ std::u8string_view GrpBackend_APIName(int8_t id);
 /// --------------------------
 
 // Tries initializing the backend with the closest available configuration for
-// the given [params]. Called after GrpBackend_Enum(). Returns the actual
-// configuration the backend is running, or `std::nullopt` if no valid format
-// could be found.
+// the given [params], which can be assumed to be valid. Called after
+// GrpBackend_Enum(). Returns the actual configuration the backend is running,
+// or `std::nullopt` if no valid format could be found.
 //
 // If [maybe_prev] is valid, this call is supposed to reinitialize an already
 // running backend with new parameters.

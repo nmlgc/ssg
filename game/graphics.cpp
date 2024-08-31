@@ -83,6 +83,19 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 }
 // -----------
 
+std::optional<GRAPHICS_PARAMS> Grp_Init(
+	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
+)
+{
+	const auto api_count = GrpBackend_APICount();
+	const auto device_count = GrpBackend_DeviceCount();
+	if((api_count > 0) && (params.api >= api_count)) {
+		params.api = -1;
+	}
+	params.device_id = std::min(GrpBackend_DeviceCount(), uint8_t{ 0 });
+	return GrpBackend_Init(maybe_prev, params);
+}
+
 void Grp_Flip(void)
 {
 	GrpBackend_Flip((SystemKey_Data & SYSKEY_SNAPSHOT)

@@ -49,7 +49,7 @@ bool XInit(void)
 	}
 
 	// グラフィックの初期化 //
-	const auto maybe_params = GrpBackend_Init(
+	const auto maybe_params = Grp_Init(
 		std::nullopt, ConfigDat.GraphicsParams()
 	);
 	if(!maybe_params) {
@@ -85,10 +85,10 @@ void XGrpTry(const GRAPHICS_PARAMS& prev, const GRAPHICS_PARAMS& params)
 	if(prev == params) {
 		return;
 	}
-	auto maybe_live = GrpBackend_Init(prev, params);
+	auto maybe_live = Grp_Init(prev, params);
 	if(!maybe_live) {
 		// Reset to the configuration that ran previously.
-		maybe_live = GrpBackend_Init(std::nullopt, prev);
+		maybe_live = Grp_Init(std::nullopt, prev);
 	}
 	if(maybe_live) {
 		const auto& live = maybe_live.value();

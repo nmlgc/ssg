@@ -111,5 +111,11 @@ struct GRAPHICS_PARAMS {
 	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;
 };
 
+// Validates and clamps [params] to the supported ranges before passing them on
+// to GrpBackend_Init().
+std::optional<GRAPHICS_PARAMS> Grp_Init(
+	std::optional<const GRAPHICS_PARAMS> maybe_prev, GRAPHICS_PARAMS params
+);
+
 // Wraps screenshot handling around GrpBackend_Flip().
 void Grp_Flip(void);

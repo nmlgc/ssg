@@ -265,9 +265,6 @@ std::optional<GRAPHICS_PARAMS> GrpBackend_Init(
 		return maybe_prev;
 	}
 
-	if(params.device_id >= DxEnumNow) {
-		return maybe_prev;
-	}
 	auto& pXDD = DxEnum[params.device_id];
 
 	// Change bit depth to a supported one, if necessary //

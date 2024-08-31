@@ -79,6 +79,26 @@ template <class Coord> struct PIXEL_SIZE_BASE {
 	std::partial_ordering operator<=>(const PIXEL_SIZE_BASE&) const = default;
 };
 
+template <class Coord> PIXEL_POINT_BASE<Coord> operator+(
+	const PIXEL_POINT_BASE<Coord>& self, const PIXEL_SIZE_BASE<Coord>& other
+) {
+	return { .x = (self.x + other.w), .y = (self.y + other.h) };
+}
+
+template <class Coord> PIXEL_POINT_BASE<Coord> operator-(
+	const PIXEL_POINT_BASE<Coord>& self, const PIXEL_SIZE_BASE<Coord>& other
+) {
+	return { .x = (self.x - other.w), .y = (self.y - other.h) };
+}
+
+template <class Coord> PIXEL_POINT_BASE<Coord>& operator+=(
+	PIXEL_POINT_BASE<Coord>& self, const PIXEL_SIZE_BASE<Coord>& other
+) {
+	self.x += other.w;
+	self.y += other.h;
+	return self;
+}
+
 template <class Coord> PIXEL_POINT_BASE<Coord>& operator-=(
 	PIXEL_POINT_BASE<Coord>& self, const PIXEL_SIZE_BASE<Coord>& other
 ) {

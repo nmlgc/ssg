@@ -328,6 +328,51 @@ void PrimarySetScale(WINDOW_SIZE scaled_res)
 	}
 }
 
+// Re-centers the window to remain fully on-screen after changing the
+// windowed-mode scale factor
+void RepositionAfterScale(
+	const PIXEL_POINT& topleft_prev,
+	const WINDOW_SIZE& res_prev,
+	const WINDOW_SIZE& res_new
+)
+{
+	auto *window = WndBackend_SDL();
+	PIXEL_COORD border_left{};
+	PIXEL_COORD border_top{};
+	PIXEL_COORD border_right{};
+	PIXEL_COORD border_bottom{};
+	SDL_GetWindowBordersSize(
+		window, &border_top, &border_left, &border_bottom, &border_right
+	);
+
+	const auto display_i = SDL_GetWindowDisplayIndex(window);
+	if(display_i < 0) {
+		return;
+	}
+	SDL_Rect display_r{};
+	if(SDL_GetDisplayUsableBounds(display_i, &display_r) != 0) {
+		return;
+	}
+	display_r.x += border_left;
+	display_r.y += border_top;
+	display_r.w -= (border_left + border_right);
+	display_r.h -= (border_top + border_bottom);
+
+	// The window might have been moved to a display with a resolution
+	// smaller than [res_new].
+	const auto max_left = std::max(
+		display_r.x, (display_r.x + display_r.w - res_new.w)
+	);
+	const auto max_top = std::max(
+		display_r.y, (display_r.y + display_r.h - res_new.h)
+	);
+
+	auto topleft = ((topleft_prev + (res_prev / 2)) - (res_new / 2));
+	topleft.x = std::clamp(topleft.x, display_r.x, max_left);
+	topleft.y = std::clamp(topleft.y, display_r.y, max_top);
+	SDL_SetWindowPosition(window, topleft.x, topleft.y);
+}
+
 std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 {
 	auto *window = WndBackend_SDLCreate(params);
@@ -425,12 +470,15 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	const auto res_new = params.ScaledRes();
 	const bool res_changed = (res_prev != res_new);
 	if(res_changed) {
+		PIXEL_POINT topleft{};
+		SDL_GetWindowPosition(window, &topleft.x, &topleft.y);
 		SDL_SetWindowSize(window, res_new.w, res_new.h);
 
 		// If we clipped on the raw renderer, the clipping rectangle won't match
 		// the current resolution anymore.
 		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
 
+		RepositionAfterScale(topleft, res_prev, res_new);
 		PrimarySetScale(res_new);
 	}
 

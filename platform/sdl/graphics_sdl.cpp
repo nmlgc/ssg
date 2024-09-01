@@ -282,8 +282,11 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 
 PIXEL_SIZE GrpBackend_DisplaySize(void)
 {
-	SDL_Rect rect;
-	if(SDL_GetDisplayUsableBounds(0, &rect) != 0) {
+	SDL_Rect rect{};
+	auto *window = WndBackend_SDL();
+	if(SDL_GetDisplayUsableBounds(
+		(window ? std::max(SDL_GetWindowDisplayIndex(window), 0) : 0), &rect
+	) != 0) {
 		Log_Fail(LOG_CAT, "Error retrieving display size");
 		return GRP_RES;
 	}

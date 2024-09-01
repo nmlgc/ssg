@@ -36,6 +36,13 @@ template <ENUMFLAGS T> constexpr inline T operator|(
 	return static_cast<T>(std::to_underlying(a) | std::to_underlying(b));
 }
 
+template <ENUMFLAGS T> constexpr inline T operator^(
+	const T& a, const T& b
+) noexcept
+{
+	return static_cast<T>(std::to_underlying(a) ^ std::to_underlying(b));
+}
+
 template <ENUMFLAGS T> constexpr inline T& operator|=(T& a, const T& b) noexcept
 {
 	a = static_cast<T>(std::to_underlying(a) | std::to_underlying(b));
@@ -47,5 +54,11 @@ template <ENUMFLAGS T> constexpr inline T& operator&=(
 ) noexcept
 {
 	a = static_cast<T>(std::to_underlying(a) & b);
+	return a;
+}
+
+template <ENUMFLAGS T> constexpr inline T& operator^=(T& a, const T& b) noexcept
+{
+	a = static_cast<T>(a ^ b);
 	return a;
 }

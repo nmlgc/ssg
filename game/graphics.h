@@ -6,6 +6,7 @@
 #pragma once
 
 import std.compat;
+#include "game/enum_flags.h"
 #include "game/pixelformat.h"
 #include <assert.h>
 
@@ -110,7 +111,13 @@ void Grp_PaletteSetDefault(void);
 // Required to enable the screenshot feature as a whole.
 void Grp_SetScreenshotPrefix(std::u8string_view prefix);
 
+enum class GRAPHICS_PARAM_FLAGS : uint8_t {
+	_HAS_BITFLAG_OPERATORS,
+	MASK = 0x00,
+};
+
 struct GRAPHICS_PARAMS {
+	GRAPHICS_PARAM_FLAGS flags;
 	uint8_t device_id;
 	int8_t api; // Negative = "use default API"
 	BITDEPTH bitdepth;

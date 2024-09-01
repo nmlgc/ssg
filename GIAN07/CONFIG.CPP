@@ -108,6 +108,10 @@ const struct VERSION_ORIGINAL {
 	// re-locking the Extra Stage even if the checksum was correct.
 	static inline CONFIG_OPTION_VALUE<BITDEPTH> BitDepth8Or16;
 
+	// The original build of the game didn't support all our fullscreen/window
+	// and scaling flags.
+	static inline CONFIG_OPTION_VALUE<uint8_t> GraphFlags;
+
 	// The original build of the game only supported the MIDI and WAVE activity
 	// bits.
 	static inline CONFIG_OPTION_VALUE<uint8_t> SoundFlags;
@@ -122,7 +126,7 @@ const struct VERSION_ORIGINAL {
 		ConfigDat.DeviceID,
 		BitDepth8Or16,
 		ConfigDat.FPSDivisor,
-		ConfigDat.GraphFlags,
+		GraphFlags,
 		SoundFlags,
 		ConfigDat.InputFlags,
 		ConfigDat.DebugFlags,
@@ -230,7 +234,9 @@ bool VersionSave(const VERSION auto& version)
 
 GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
 {
+	const auto flags_shifted = (GraphFlags.v >> GRPF_PARAM_SHIFT);
 	return {
+		.flags = static_cast<GRAPHICS_PARAM_FLAGS>(flags_shifted),
 		.device_id = DeviceID.v,
 		.api = GraphicsAPI.v,
 		.bitdepth = BitDepth.v,
@@ -239,6 +245,8 @@ GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
 
 void CONFIG_DATA::GraphicsParamsApply(const GRAPHICS_PARAMS& params)
 {
+	GraphFlags.v &= ~GRPF_PARAM_MASK;
+	GraphFlags.v |= (std::to_underlying(params.flags) << GRPF_PARAM_SHIFT);
 	DeviceID.v = params.device_id;
 	GraphicsAPI.v = params.api;
 	BitDepth.v = params.bitdepth;
@@ -289,6 +297,7 @@ extern void ConfigSave(void)
 		? BITDEPTHS::find(16)
 		: ConfigDat.BitDepth.v
 	);
+	VERSION_ORIGINAL.GraphFlags.v = (ConfigDat.GraphFlags.v & GRPF_ORIG_MASK);
 	VERSION_ORIGINAL.SoundFlags.v  = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
 	VERSION_ORIGINAL.SoundFlags.v |= (BGM_Enabled() * SNDF_BGM_ENABLE);
 	VERSION_ORIGINAL.CheckSum.v = VERSION_ORIGINAL.CheckSumCalculate();

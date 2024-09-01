@@ -484,17 +484,16 @@ static void GrpFnWinLocate(int_fast8_t delta)
 	static constexpr uint8_t flags[3] = {
 		0, GRPF_WINDOW_UPPER, GRPF_MSG_DISABLE
 	};
-	int		i;
+	auto it = std::ranges::find_if(flags, [](auto f) {
+		return ((ConfigDat.GraphFlags.v & GRPF_ORIG_MASK) == f);
+	});
+	const auto i = ((it != std::end(flags)) ? std::distance(flags, it) : 0);
 
-	for(i=0; i<3; i++){
-		if(ConfigDat.GraphFlags.v == flags[i]) break;
-	}
-	if(i >= 3) i=0;
-
+	ConfigDat.GraphFlags.v &= ~GRPF_ORIG_MASK;
 	if(delta < 0) {
-		ConfigDat.GraphFlags.v = flags[(i + 2) % 3];
+		ConfigDat.GraphFlags.v |= flags[(i + 2) % std::size(flags)];
 	} else {
-		ConfigDat.GraphFlags.v = flags[(i + 1) % 3];
+		ConfigDat.GraphFlags.v |= flags[(i + 1) % std::size(flags)];
 	}
 }
 

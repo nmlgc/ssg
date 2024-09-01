@@ -177,7 +177,9 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
 static char GrpTitleDevice[50];
 static char GrpTitleSkip[50];
+#ifdef GRP_SUPPORT_BITDEPTH
 static char GrpTitleBpp[50];
+#endif
 static char GrpTitleMsg[50];
 // WINDOW_CHOICE GrpItemDevice = {
 // 	GrpTitleDevice, "ビデオカードの選択", GrpFnChgDevice
@@ -194,7 +196,9 @@ WINDOW_CHOICE GrpItemMsg = {
 WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
 	&GrpItemSkip,
+#ifdef GRP_SUPPORT_BITDEPTH
 	&GrpItemBpp,
+#endif
 	&GrpItemMsg,
 	&GrpItemExit,
 } };
@@ -819,7 +823,9 @@ static void SetGrpItem(bool)
 	// clang-format off
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
 	sprintf(GrpTitleSkip,   "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
+#ifdef GRP_SUPPORT_BITDEPTH
 	sprintf(GrpTitleBpp,    "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
+#endif
 	sprintf(GrpTitleMsg,    "MsgWindow[%s]", UorD[u_or_d]);
 	// clang-format on
 }

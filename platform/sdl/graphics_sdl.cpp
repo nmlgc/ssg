@@ -31,6 +31,10 @@ SDL_RendererInfo PrimaryInfo;
 // Rendering target in framebuffer scale mode. Not to be confused with
 // [SoftwareTexture], which is a streaming texture, not a render target.
 SDL_Texture *PrimaryTexture = nullptr;
+
+// Buffer for screenshots at non-native resolutions when using geometry
+// scaling. Allocated on demand.
+SDL_Surface *GeometryScaledBackbuffer = nullptr;
 // ----------------
 
 // Software renderer
@@ -38,7 +42,8 @@ SDL_Texture *PrimaryTexture = nullptr;
 
 SDL_Renderer *SoftwareRenderer = nullptr;
 
-// Used as the destination for software rendering.
+// Used as the destination for software rendering, and as temporary storage for
+// screenshots at native resolution.
 SDL_Surface *SoftwareSurface = nullptr;
 
 // Hardware-accelerated copy of [SoftwareSurface], streamed to every frame.
@@ -389,6 +394,9 @@ bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 	}
 	// ----------------------
 
+	GeometryScaledBackbuffer = SafeDestroy(
+		SDL_FreeSurface, GeometryScaledBackbuffer
+	);
 	if(geometry || (scaled_res == GRP_RES)) {
 		set_geometry();
 		return geometry; // Don't unset the user's choice on 1× scaling!
@@ -626,8 +634,92 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 void GrpBackend_PaletteGet(PALETTE& pal) {}
 bool GrpBackend_PaletteSet(const PALETTE& pal) { return false; }
 
+void MaybeTakeScreenshot(std::unique_ptr<FILE_STREAM_WRITE> stream)
+{
+	if(!stream) {
+		return;
+	}
+
+	SDL_Surface* src = SoftwareSurface;
+	bool fill_src_with_pixels_from_renderer = false;
+
+	if(SoftwareRenderer) {
+		// Software rendering is the ideal case for screenshots, because we
+		// already have a system-memory surface we can save.
+		fill_src_with_pixels_from_renderer = false;
+	} else if(PrimaryTexture) {
+		// Thankfully we can SDL_RenderReadPixels() from a render target to get
+		// a screenshot at the native resolution. [SoftwareSurface] uses the
+		// same size, so let's use it as temporary storage.
+		fill_src_with_pixels_from_renderer = true;
+	} else {
+		// If we aren't scaling, we are lucky and can just do the same we're
+		// doing in the hardware texture case.
+		PIXEL_SIZE scaled_size{};
+		SDL_GetRendererOutputSize(
+			PrimaryRenderer, &scaled_size.w, &scaled_size.h
+		);
+		if(scaled_size == GRP_RES) {
+			fill_src_with_pixels_from_renderer = true;
+		} else {
+			// If we are, we must take a screenshot at the scaled
+			// resolution.
+			if(!GeometryScaledBackbuffer) {
+				const auto format = SoftwareSurface->format->format;
+				GeometryScaledBackbuffer = SDL_CreateRGBSurfaceWithFormat(
+					0, scaled_size.w, scaled_size.h, 0, format
+				);
+			}
+			if(!GeometryScaledBackbuffer) {
+				Log_Fail(
+					LOG_CAT, "Failed to create temporary storage for screenshot"
+				);
+				return;
+			}
+			src = GeometryScaledBackbuffer;
+			fill_src_with_pixels_from_renderer = true;
+		}
+	}
+
+	if(SDL_MUSTLOCK(src)) {
+		SDL_LockSurface(src);
+	}
+	if(fill_src_with_pixels_from_renderer) {
+		if(SDL_RenderReadPixels(
+			PrimaryRenderer,
+			nullptr,
+			src->format->format,
+			src->pixels,
+			src->pitch
+		) != 0) {
+			Log_Fail(LOG_CAT, "Error taking screenshot");
+			return;
+		}
+	}
+	const auto bytes = static_cast<std::byte *>(src->pixels);
+
+	// Negate the height so that we neither have to flip the pixels nor write
+	// RWops for `FILE_STREAM_WRITE` in order to use SDL_SaveBMP_RW().
+	const PIXEL_SIZE size = { .w = src->w, .h = -src->h };
+	assert(src->format->palette == nullptr);
+
+	BMPSave(
+		stream.get(),
+		size,
+		1,
+		src->format->BitsPerPixel,
+		std::span<BGRA>(),
+		std::span(bytes, (src->h * src->pitch))
+	);
+	if(SDL_MUSTLOCK(src)) {
+		SDL_UnlockSurface(src);
+	}
+	stream.reset();
+}
+
 void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 {
+	MaybeTakeScreenshot(std::move(screenshot_stream));
 	if(SoftwareRenderer) {
 		if(SDL_MUSTLOCK(SoftwareSurface)) {
 			SDL_LockSurface(SoftwareSurface);
@@ -649,7 +741,6 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 		SDL_SetRenderTarget(PrimaryRenderer, PrimaryTexture);
 	}
 	SDL_RenderPresent(PrimaryRenderer);
-	screenshot_stream.reset();
 }
 /// -------
 

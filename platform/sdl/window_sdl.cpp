@@ -5,6 +5,7 @@
 
 #include "platform/window_backend.h"
 #include "platform/sdl/log_sdl.h"
+#include "platform/sdl/window_sdl.h"
 #include "platform/graphics_backend.h"
 #include "platform/snd_backend.h"
 #include "platform/input.h"
@@ -28,6 +29,12 @@
 constexpr auto LOG_CAT = SDL_LOG_CATEGORY_VIDEO;
 
 static SDL_Window *Window;
+
+// We can't retrieve the original window position in fullscreen mode via
+// SDL_GetWindowPosition(), so let's back it up before we go fullscreen.
+// Also helpful because these coordinates determine the display that the
+// fullscreen window is placed on.
+static std::optional<std::pair<int16_t, int16_t>> TopleftBeforeFullscreen;
 
 std::u8string_view WndBackend_SDLRendererName(int8_t id)
 {
@@ -89,6 +96,10 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, min);
 	}
 
+	if((params.left != 0) || (params.top != 0)) {
+		TopleftBeforeFullscreen = { params.left, params.top };
+	}
+
 	const auto real_pos = [](int16_t pos) {
 		return (
 			(pos == GRAPHICS_TOPLEFT_UNDEFINED) ? SDL_WINDOWPOS_CENTERED : pos
@@ -98,6 +109,7 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 	const auto res = params.ScaledRes();
 	const auto left = real_pos(params.left);
 	const auto top = real_pos(params.top);
+	flags |= HelpFullscreenFlag(params.FullscreenFlags());
 	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, flags);
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
@@ -140,8 +152,10 @@ void WndBackend_Cleanup(void)
 
 std::optional<std::pair<int16_t, int16_t>> WndBackend_Topleft(void)
 {
-	if(!Window) {
-		return std::nullopt;
+	// A fullscreen window is always positioned at (0, 0), and we don't want to
+	// override any previous windowed position.
+	if(!Window || (SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) {
+		return TopleftBeforeFullscreen;
 	}
 	int left{}, top{};
 	SDL_GetWindowPosition(Window, &left, &top);

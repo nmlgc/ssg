@@ -131,6 +131,13 @@ void XGrpTryCycleScale(int_fast8_t delta)
 	});
 }
 
+void XGrpTryCycleDisp(void)
+{
+	XGrpTry([](auto& params) {
+		params.flags ^= GRAPHICS_PARAM_FLAGS::FULLSCREEN;
+	});
+}
+
 void XGrpTryCycleScMode(void)
 {
 	XGrpTry([](auto& params) {

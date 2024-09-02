@@ -85,6 +85,14 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 }
 // -----------
 
+GRAPHICS_FULLSCREEN_FLAGS GRAPHICS_PARAMS::FullscreenFlags(void) const
+{
+	using F = GRAPHICS_PARAM_FLAGS;
+	return {
+		.fullscreen = !!(flags & F::FULLSCREEN),
+	};
+}
+
 bool GRAPHICS_PARAMS::ScaleGeometry(void) const
 {
 	return !!(flags & GRAPHICS_PARAM_FLAGS::SCALE_GEOMETRY);
@@ -92,7 +100,7 @@ bool GRAPHICS_PARAMS::ScaleGeometry(void) const
 
 uint8_t GRAPHICS_PARAMS::Scale4x(void) const
 {
-	return window_scale_4x;
+	return (!!(flags & GRAPHICS_PARAM_FLAGS::FULLSCREEN) ? 4 : window_scale_4x);
 }
 
 WINDOW_SIZE GRAPHICS_PARAMS::ScaledRes(void) const

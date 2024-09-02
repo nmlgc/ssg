@@ -36,6 +36,7 @@ static void DifFnDemo(int_fast8_t delta);
 static void GrpAPIFnDef(int_fast8_t delta);
 static void GrpFnChgDevice(int_fast8_t delta);
 static void GrpFnSetAPI(int_fast8_t delta);
+static void GrpFnDisp(int_fast8_t delta);
 static void GrpFnScale(int_fast8_t delta);
 static void GrpFnScMode(int_fast8_t delta);
 static void GrpFnSkip(int_fast8_t delta);
@@ -192,6 +193,9 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 #endif
 
 static char GrpTitleDevice[50];
+#ifdef GRP_SUPPORT_WINDOWED
+	static char GrpTitleDisp[50];
+#endif
 #ifdef GRP_SUPPORT_SCALING
 	static char GrpTitleScale[50];
 	static char GrpTitleScMode[50];
@@ -210,6 +214,11 @@ static char GrpTitleMsg[50];
 // WINDOW_CHOICE GrpItemDevice = {
 // 	GrpTitleDevice, "ビデオカードの選択", GrpFnChgDevice
 // };
+#ifdef GRP_SUPPORT_WINDOWED
+	WINDOW_CHOICE GrpItemDisp = {
+		GrpTitleDisp, "Switch between window and fullscreen modes", GrpFnDisp
+	};
+#endif
 #ifdef GRP_SUPPORT_SCALING
 	WINDOW_CHOICE GrpItemScale = { GrpTitleScale, GrpHelpScale, GrpFnScale };
 	WINDOW_CHOICE GrpItemScMode = {
@@ -232,6 +241,9 @@ WINDOW_CHOICE GrpItemMsg = {
 #endif
 WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
+#ifdef GRP_SUPPORT_WINDOWED
+	&GrpItemDisp,
+#endif
 #ifdef GRP_SUPPORT_SCALING
 	&GrpItemScale,
 	&GrpItemScMode,
@@ -486,6 +498,11 @@ static void GrpFnSetAPI(int_fast8_t)
 	XGrpTry([](auto& params) {
 		params.api = (MainWindow.Select[MainWindow.SelectDepth] - 1);
 	});
+}
+
+static void GrpFnDisp(int_fast8_t)
+{
+	XGrpTryCycleDisp();
 }
 
 static void GrpFnScale(int_fast8_t delta)
@@ -902,6 +919,10 @@ static void SetGrpItem(bool)
 {
 	const auto params = ConfigDat.GraphicsParams();
 
+	static constexpr const char *DISPLAY_MODES[] = {
+		"  Window  ",
+		"Fullscreen",
+	};
 	static constexpr std::tuple<const char*, WINDOW_STATE> SCALE_MODES[] = {
 		{ "FrameBuf", WINDOW_STATE::REGULAR },
 		{ "Geometry", WINDOW_STATE::REGULAR },
@@ -914,6 +935,8 @@ static void SetGrpItem(bool)
 		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)
 	);
 	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
+
+	const auto fs = params.FullscreenFlags();
 
 #ifdef GRP_SUPPORT_SCALING
 	const auto scale_4x = params.Scale4x();
@@ -931,11 +954,15 @@ static void SetGrpItem(bool)
 		SCALE_MODES[0]
 	);
 
+	GrpItemScale.SetActive(!fs.fullscreen);
 	GrpItemScMode.State = sc_mode_state;
 #endif
 
 	// clang-format off
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
+#ifdef GRP_SUPPORT_WINDOWED
+	sprintf(GrpTitleDisp,   "Display[%s]", DISPLAY_MODES[fs.fullscreen]);
+#endif
 #ifdef GRP_SUPPORT_SCALING
 	sprintf(GrpTitleScale,  scale_fmt, scale_label, scale_var1, scale_var2);
 	sprintf(GrpTitleScMode, "ScaleMode[%s]", sc_mode_label);

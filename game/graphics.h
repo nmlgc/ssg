@@ -170,6 +170,7 @@ struct GRAPHICS_PARAMS {
 
 	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;
 
+	GRAPHICS_FULLSCREEN_FLAGS FullscreenFlags(void) const;
 	bool ScaleGeometry(void) const;
 	uint8_t Scale4x(void) const;
 	WINDOW_SIZE ScaledRes(void) const;

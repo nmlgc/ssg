@@ -5,6 +5,7 @@
 
 #include "platform/sdl/graphics_sdl.h"
 #include "platform/sdl/log_sdl.h"
+#include "platform/sdl/window_sdl.h"
 #include "platform/window_backend.h"
 #include "game/defer.h"
 #include "game/enum_array.h"
@@ -229,6 +230,26 @@ bool PixelFormatSupported(uint32_t fmt)
 		(SDL_ISPIXELFORMAT_PACKED(fmt) || SDL_ISPIXELFORMAT_INDEXED(fmt)) &&
 		BITDEPTHS::find(SDL_BITSPERPIXEL(fmt))
 	);
+}
+
+bool HelpSwitchFullscreen(
+	const GRAPHICS_FULLSCREEN_FLAGS& fs_prev,
+	const GRAPHICS_FULLSCREEN_FLAGS& fs_new
+)
+{
+	auto *window = WndBackend_SDL();
+	if(SDL_SetWindowFullscreen(window, HelpFullscreenFlag(fs_new)) != 0) {
+		Log_Fail(LOG_CAT, "Error changing display mode");
+		return false;
+	}
+
+	// If we come out of fullscreen mode, recenter the window.
+	if(fs_prev.fullscreen && !fs_new.fullscreen) {
+		const auto disp_i = std::max(SDL_GetWindowDisplayIndex(window), 0);
+		const auto center = SDL_WINDOWPOS_CENTERED_DISPLAY(disp_i);
+		SDL_SetWindowPosition(window, center, center);
+	}
+	return true;
 }
 // -------
 
@@ -571,6 +592,15 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	GRAPHICS_INIT_RESULT ret = { .live = prev, .reload_surfaces = false };
 	using F = GRAPHICS_PARAM_FLAGS;
 
+	const auto fs_prev = prev.FullscreenFlags();
+	const auto fs_new = params.FullscreenFlags();
+
+	// Apply fullscreen changes first, as exclusive fullscreen affects the
+	// display size calculated by ScaledRes().
+	if((fs_prev != fs_new) && HelpSwitchFullscreen(fs_prev, fs_new)) {
+		ret.live.SetFlag(F::FULLSCREEN, fs_new.fullscreen);
+	}
+
 	auto *window = WndBackend_SDL();
 	WINDOW_SIZE res_prev{};
 	SDL_GetWindowSize(window, &res_prev.w, &res_prev.h);
@@ -582,8 +612,8 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		SDL_GetWindowPosition(window, &topleft.x, &topleft.y);
 		SDL_SetWindowSize(window, res_new.w, res_new.h);
 
-		// If we clipped on the raw renderer, the clipping rectangle won't match
-		// the current resolution anymore.
+		// If we clipped on the raw renderer, the clipping rectangle won't
+		// match the current resolution anymore.
 		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
 
 		RepositionAfterScale(topleft, res_prev, res_new);

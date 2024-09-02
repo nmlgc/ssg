@@ -813,7 +813,7 @@ static void SetDifItem(bool)
 static void SetGrpItem(bool)
 {
 	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
-	const char *const DMode[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
+	const char *const FRate[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
 	const auto u_or_d = ((ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
 		? 2
 		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)
@@ -822,7 +822,7 @@ static void SetGrpItem(bool)
 
 	// clang-format off
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
-	sprintf(GrpTitleSkip,   "DrawMode [ %s ]", DMode[ConfigDat.FPSDivisor.v]);
+	sprintf(GrpTitleSkip,   "FrameRate[ %s ]", FRate[ConfigDat.FPSDivisor.v]);
 #ifdef GRP_SUPPORT_BITDEPTH
 	sprintf(GrpTitleBpp,    "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
 #endif

@@ -10,5 +10,7 @@
 
 static constexpr Uint32 HelpFullscreenFlag(const GRAPHICS_FULLSCREEN_FLAGS& fs)
 {
-	return (fs.fullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+	return (!fs.fullscreen ? 0 :
+		(fs.exclusive ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_FULLSCREEN_DESKTOP)
+	);
 }

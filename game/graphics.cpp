@@ -90,6 +90,7 @@ GRAPHICS_FULLSCREEN_FLAGS GRAPHICS_PARAMS::FullscreenFlags(void) const
 	using F = GRAPHICS_PARAM_FLAGS;
 	return {
 		.fullscreen = !!(flags & F::FULLSCREEN),
+		.exclusive = !!(flags & F::FULLSCREEN_EXCLUSIVE),
 	};
 }
 
@@ -100,14 +101,34 @@ bool GRAPHICS_PARAMS::ScaleGeometry(void) const
 
 uint8_t GRAPHICS_PARAMS::Scale4x(void) const
 {
-	return (!!(flags & GRAPHICS_PARAM_FLAGS::FULLSCREEN) ? 4 : window_scale_4x);
+	const auto fs = FullscreenFlags();
+	if(fs.fullscreen) {
+		return (fs.exclusive ? 4 : 0);
+	}
+	return window_scale_4x;
 }
 
 WINDOW_SIZE GRAPHICS_PARAMS::ScaledRes(void) const
 {
-	const auto scale = ((Scale4x() == 0)
+	const auto fs = FullscreenFlags();
+	if(fs.fullscreen) {
+		if(fs.exclusive) {
+			return GRP_RES;
+		}
+		const auto display_s = GrpBackend_DisplaySize(true);
+		{
+			const auto factor_w = (static_cast<float>(display_s.w) / GRP_RES.w);
+			const auto factor_h = (static_cast<float>(display_s.h) / GRP_RES.h);
+			const auto scale = std::min(factor_w, factor_h);
+			return {
+				.w = static_cast<PIXEL_COORD>(GRP_RES.w * scale),
+				.h = static_cast<PIXEL_COORD>(GRP_RES.h * scale),
+			};
+		}
+	}
+	const auto scale = ((window_scale_4x == 0)
 		? Grp_WindowScale4xMax()
-		: Scale4x()
+		: window_scale_4x
 	);
 	return ((GRP_RES * scale) / 4);
 }
@@ -122,7 +143,7 @@ void GRAPHICS_PARAMS::SetFlag(
 
 uint8_t Grp_WindowScale4xMax(void)
 {
-	const auto factors = ((GrpBackend_DisplaySize() * 4) / GRP_RES);
+	const auto factors = ((GrpBackend_DisplaySize(false) * 4) / GRP_RES);
 	return std::min(factors.w, factors.h);
 }
 

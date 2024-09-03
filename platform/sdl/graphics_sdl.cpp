@@ -351,15 +351,24 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	return ret;
 }
 
-PIXEL_SIZE GrpBackend_DisplaySize(void)
+PIXEL_SIZE GrpBackend_DisplaySize(bool fullscreen)
 {
 	SDL_Rect rect{};
+	SDL_DisplayMode display_mode{};
 	auto *window = WndBackend_SDL();
-	if(SDL_GetDisplayUsableBounds(
-		(window ? std::max(SDL_GetWindowDisplayIndex(window), 0) : 0), &rect
-	) != 0) {
+	const auto display_i = (
+		window ? std::max(SDL_GetWindowDisplayIndex(window), 0) : 0
+	);
+	const auto ret = (fullscreen
+		? SDL_GetDesktopDisplayMode(display_i, &display_mode)
+		: SDL_GetDisplayUsableBounds(display_i, &rect)
+	);
+	if(ret != 0) {
 		Log_Fail(LOG_CAT, "Error retrieving display size");
 		return GRP_RES;
+	}
+	if(fullscreen) {
+		return { .w = display_mode.w, .h = display_mode.h };
 	}
 	return { .w = rect.w, .h = rect.h };
 }
@@ -581,10 +590,22 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		return PrimaryInitFull(params);
 	}
 	const auto& prev = maybe_prev.value();
+	const auto fs_prev = prev.FullscreenFlags();
+	const auto fs_new = params.FullscreenFlags();
 
 	// API changes need a complete reinit.
 	if(prev.api != params.api) {
 		return reinit_full(params);
+	}
+
+	if(fs_new.fullscreen && fs_new.exclusive) {
+		// If the window started out as borderless and should later switch to
+		// exclusive, SDL simply doesn't do the mode change:
+		//
+		// 	https://github.com/libsdl-org/SDL/issues/11047
+		if(fs_prev.fullscreen && !fs_prev.exclusive) {
+			return reinit_full(params);
+		}
 	}
 
 	// The following parameters can be changed on the fly, but we don't want to
@@ -592,13 +613,15 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	GRAPHICS_INIT_RESULT ret = { .live = prev, .reload_surfaces = false };
 	using F = GRAPHICS_PARAM_FLAGS;
 
-	const auto fs_prev = prev.FullscreenFlags();
-	const auto fs_new = params.FullscreenFlags();
-
 	// Apply fullscreen changes first, as exclusive fullscreen affects the
 	// display size calculated by ScaledRes().
 	if((fs_prev != fs_new) && HelpSwitchFullscreen(fs_prev, fs_new)) {
+		// If we clipped on the raw renderer, the clipping rectangle won't
+		// match the current resolution anymore.
+		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
+
 		ret.live.SetFlag(F::FULLSCREEN, fs_new.fullscreen);
+		ret.live.SetFlag(F::FULLSCREEN_EXCLUSIVE, fs_new.exclusive);
 	}
 
 	auto *window = WndBackend_SDL();
@@ -685,10 +708,14 @@ void MaybeTakeScreenshot(std::unique_ptr<FILE_STREAM_WRITE> stream)
 	} else {
 		// If we aren't scaling, we are lucky and can just do the same we're
 		// doing in the hardware texture case.
-		PIXEL_SIZE scaled_size{};
-		SDL_GetRendererOutputSize(
-			PrimaryRenderer, &scaled_size.w, &scaled_size.h
-		);
+		SDL_Rect unscaled_viewport{};
+		float scale_x{}, scale_y{};
+		SDL_RenderGetViewport(PrimaryRenderer, &unscaled_viewport);
+		SDL_RenderGetScale(PrimaryRenderer, &scale_x, &scale_y);
+		const PIXEL_SIZE scaled_size = {
+			.w = static_cast<PIXEL_COORD>(unscaled_viewport.w * scale_x),
+			.h = static_cast<PIXEL_COORD>(unscaled_viewport.h * scale_y),
+		};
 		if(scaled_size == GRP_RES) {
 			fill_src_with_pixels_from_renderer = true;
 		} else {

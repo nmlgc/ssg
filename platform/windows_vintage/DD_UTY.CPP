@@ -251,7 +251,7 @@ std::u8string_view GrpBackend_APIName(int8_t id)
 	);
 }
 
-PIXEL_SIZE GrpBackend_DisplaySize(void)
+PIXEL_SIZE GrpBackend_DisplaySize(bool)
 {
 	return GRP_RES;
 }

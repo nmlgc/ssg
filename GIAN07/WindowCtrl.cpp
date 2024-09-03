@@ -37,6 +37,7 @@ static void GrpAPIFnDef(int_fast8_t delta);
 static void GrpFnChgDevice(int_fast8_t delta);
 static void GrpFnSetAPI(int_fast8_t delta);
 static void GrpFnDisp(int_fast8_t delta);
+static void GrpFnFSMode(int_fast8_t delta);
 static void GrpFnScale(int_fast8_t delta);
 static void GrpFnScMode(int_fast8_t delta);
 static void GrpFnSkip(int_fast8_t delta);
@@ -195,6 +196,7 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 static char GrpTitleDevice[50];
 #ifdef GRP_SUPPORT_WINDOWED
 	static char GrpTitleDisp[50];
+	static char GrpTitleFSMode[50];
 #endif
 #ifdef GRP_SUPPORT_SCALING
 	static char GrpTitleScale[50];
@@ -206,6 +208,9 @@ static char GrpTitleSkip[50];
 #endif
 static char GrpTitleMsg[50];
 
+#ifdef GRP_SUPPORT_WINDOWED
+	static char GrpHelpFSMode[50];
+#endif
 #ifdef GRP_SUPPORT_SCALING
 	static char GrpHelpScale[50];
 	static char GrpHelpScMode[50];
@@ -217,6 +222,9 @@ static char GrpTitleMsg[50];
 #ifdef GRP_SUPPORT_WINDOWED
 	WINDOW_CHOICE GrpItemDisp = {
 		GrpTitleDisp, "Switch between window and fullscreen modes", GrpFnDisp
+	};
+	WINDOW_CHOICE GrpItemFSMode = {
+		GrpTitleFSMode, GrpHelpFSMode, GrpFnFSMode
 	};
 #endif
 #ifdef GRP_SUPPORT_SCALING
@@ -243,6 +251,7 @@ WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
 #ifdef GRP_SUPPORT_WINDOWED
 	&GrpItemDisp,
+	&GrpItemFSMode,
 #endif
 #ifdef GRP_SUPPORT_SCALING
 	&GrpItemScale,
@@ -503,6 +512,13 @@ static void GrpFnSetAPI(int_fast8_t)
 static void GrpFnDisp(int_fast8_t)
 {
 	XGrpTryCycleDisp();
+}
+
+static void GrpFnFSMode(int_fast8_t)
+{
+	XGrpTry([](auto& params) {
+		params.flags ^= GRAPHICS_PARAM_FLAGS::FULLSCREEN_EXCLUSIVE;
+	});
 }
 
 static void GrpFnScale(int_fast8_t delta)
@@ -923,6 +939,10 @@ static void SetGrpItem(bool)
 		"  Window  ",
 		"Fullscreen",
 	};
+	static constexpr const char *FULLSCREEN_MODES[] = {
+		"Borderless",
+		"Exclusive ",
+	};
 	static constexpr std::tuple<const char*, WINDOW_STATE> SCALE_MODES[] = {
 		{ "FrameBuf", WINDOW_STATE::REGULAR },
 		{ "Geometry", WINDOW_STATE::REGULAR },
@@ -962,6 +982,7 @@ static void SetGrpItem(bool)
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
 #ifdef GRP_SUPPORT_WINDOWED
 	sprintf(GrpTitleDisp,   "Display[%s]", DISPLAY_MODES[fs.fullscreen]);
+	sprintf(GrpTitleFSMode, "FullScr[%s]", FULLSCREEN_MODES[fs.exclusive]);
 #endif
 #ifdef GRP_SUPPORT_SCALING
 	sprintf(GrpTitleScale,  scale_fmt, scale_label, scale_var1, scale_var2);
@@ -976,6 +997,14 @@ static void SetGrpItem(bool)
 
 	// Help strings
 	// ------------
+#ifdef GRP_SUPPORT_WINDOWED
+	const auto fs_mode_help_fmt = (fs.exclusive
+		? "Fullscreen changes resolution to %dx%d"
+		: "Fullscreen uses a display-sized window"
+	);
+	sprintf(GrpHelpFSMode, fs_mode_help_fmt, GRP_RES.w, GRP_RES.h);
+#endif
+
 #ifdef GRP_SUPPORT_SCALING
 	if(scale_4x == 0) {
 		strcpy(GrpHelpScale, "Game scales to fit the display");

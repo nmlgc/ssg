@@ -115,7 +115,6 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 		Log_Fail(LOG_CAT, "Error creating SDL window");
 		return nullptr;
 	}
-	SDL_ShowCursor(false);
 
 	return Window;
 }

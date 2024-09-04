@@ -380,6 +380,8 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		dxret = DxObj.D3Dev->SetCurrentViewport(DxObj.View);
 		if(dxret!=D3D_OK) throw("SetCurrentViewport に失敗");
 
+		ShowCursor(false);
+
 		throw(true);
 	}
 	catch(const std::u8string_view error) {

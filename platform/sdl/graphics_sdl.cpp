@@ -12,6 +12,7 @@
 #include "game/format_bmp.h"
 #include "game/string_format.h"
 #include "constants.h"
+#include <SDL_mouse.h>
 #include <SDL_render.h>
 
 static constexpr auto LOG_CAT = SDL_LOG_CATEGORY_RENDER;
@@ -586,12 +587,17 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		return PrimaryInitFull(params);
 	};
 
+	const auto fs_new = params.FullscreenFlags();
+
+	// This is the only place that applies to both a full init and a partial
+	// update later...
+	SDL_ShowCursor(!(fs_new.fullscreen && fs_new.exclusive));
+
 	if(!maybe_prev) {
 		return PrimaryInitFull(params);
 	}
 	const auto& prev = maybe_prev.value();
 	const auto fs_prev = prev.FullscreenFlags();
-	const auto fs_new = params.FullscreenFlags();
 
 	// API changes need a complete reinit.
 	if(prev.api != params.api) {

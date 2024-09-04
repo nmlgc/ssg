@@ -935,6 +935,7 @@ static void SetGrpItem(bool)
 {
 	const auto params = ConfigDat.GraphicsParams();
 
+	static constexpr auto aspect = (GRP_RES / std::gcd(GRP_RES.w, GRP_RES.h));
 	static constexpr const char *DISPLAY_MODES[] = {
 		"  Window  ",
 		"Fullscreen",
@@ -942,6 +943,13 @@ static void SetGrpItem(bool)
 	static constexpr const char *FULLSCREEN_MODES[] = {
 		"Borderless",
 		"Exclusive ",
+	};
+	static constexpr ENUMARRAY<
+		std::pair<const char *, const char *>, GRAPHICS_FULLSCREEN_FIT
+	> FITS = {
+		std::pair{ "%s[Integer]", "Use largest integer %d:%d resolution" },
+		std::pair{ "%s[  %d:%d  ]", "Use largest fractional %d:%d resolution" },
+		std::pair{ "%s[Stretch]", "Use aspect ratio of display" },
 	};
 	static constexpr std::tuple<const char*, WINDOW_STATE> SCALE_MODES[] = {
 		{ "FrameBuf", WINDOW_STATE::REGULAR },
@@ -957,15 +965,18 @@ static void SetGrpItem(bool)
 	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
 
 	const auto fs = params.FullscreenFlags();
+	const auto in_borderless_fullscreen = (fs.fullscreen && !fs.exclusive);
 
 #ifdef GRP_SUPPORT_SCALING
 	const auto scale_4x = params.Scale4x();
-	const auto [scale_var1, scale_var2] = (
-		std::pair((scale_4x / 4u), ((scale_4x % 4u) * 25u))
+	const auto [scale_var1, scale_var2] = (in_borderless_fullscreen
+		? std::pair<uint8_t, uint8_t>(aspect.w, aspect.h)
+		: std::pair<uint8_t, uint8_t>((scale_4x / 4u), ((scale_4x % 4u) * 25u))
 	);
 	const auto scale_res = params.ScaledRes();
-	const auto [scale_fmt, scale_label] = (
-		std::pair((scale_4x ? "%s[%3u.%02ux ]" : "%s[ Screen ]"), "ScaleFact")
+	const auto [scale_fmt, scale_label] = (in_borderless_fullscreen
+		? std::pair(FITS[fs.fit].first, "FullScrFit")
+		: std::pair((scale_4x ? "%s[%3u.%02ux ]" : "%s[ Screen ]"), "ScaleFact")
 	);
 
 	const auto [sc_mode_label, sc_mode_state] = (
@@ -974,7 +985,7 @@ static void SetGrpItem(bool)
 		SCALE_MODES[0]
 	);
 
-	GrpItemScale.SetActive(!fs.fullscreen);
+	GrpItemScale.SetActive(!(fs.fullscreen && fs.exclusive));
 	GrpItemScMode.State = sc_mode_state;
 #endif
 
@@ -1006,7 +1017,9 @@ static void SetGrpItem(bool)
 #endif
 
 #ifdef GRP_SUPPORT_SCALING
-	if(scale_4x == 0) {
+	if(in_borderless_fullscreen) {
+		sprintf(GrpHelpScale, FITS[fs.fit].second, aspect.w, aspect.h);
+	} else if(scale_4x == 0) {
 		strcpy(GrpHelpScale, "Game scales to fit the display");
 	} else {
 		const auto [fmt, res] = ((scale_4x == 4)

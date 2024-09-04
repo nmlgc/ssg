@@ -510,6 +510,34 @@ void RepositionAfterScale(
 	SDL_SetWindowPosition(window, topleft.x, topleft.y);
 }
 
+void PrimarySetBorderlessFullscreenFit(
+	GRAPHICS_PARAMS params, const WINDOW_SIZE& scaled_res
+)
+{
+	using FIT = GRAPHICS_FULLSCREEN_FIT;
+	const auto fs = params.FullscreenFlags();
+	auto *target = SDL_GetRenderTarget(PrimaryRenderer);
+	SDL_SetRenderTarget(PrimaryRenderer, nullptr);
+
+	if(fs.fullscreen && !fs.exclusive) {
+		SDL_RenderSetIntegerScale(
+			PrimaryRenderer, ((fs.fit == FIT::INTEGER) ? SDL_TRUE : SDL_FALSE)
+		);
+
+		// SDL_RenderSetLogicalSize() enforces the aspect ratio, which we
+		// explicitly don't want in stretch mode.
+		if(params.ScaleGeometry() && (fs.fit == FIT::STRETCH)) {
+			const auto scale_w = (static_cast<float>(scaled_res.w) / GRP_RES.w);
+			const auto scale_h = (static_cast<float>(scaled_res.h) / GRP_RES.h);
+			SDL_RenderSetScale(PrimaryRenderer, scale_w, scale_h);
+			SDL_RenderSetViewport(PrimaryRenderer, nullptr);
+		}
+	} else {
+		SDL_RenderSetIntegerScale(PrimaryRenderer, SDL_FALSE);
+	}
+	SDL_SetRenderTarget(PrimaryRenderer, target);
+}
+
 std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 {
 	auto *window = WndBackend_SDLCreate(params);
@@ -574,6 +602,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	const auto res_new = params.ScaledRes();
 	const auto geometry = PrimarySetScale(params.ScaleGeometry(), res_new);
 	params.SetFlag(GRAPHICS_PARAM_FLAGS::SCALE_GEOMETRY, geometry);
+	PrimarySetBorderlessFullscreenFit(params, res_new);
 
 	return GRAPHICS_INIT_RESULT{ .live = params, .reload_surfaces = true };
 }
@@ -630,13 +659,18 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 
 	// Apply fullscreen changes first, as exclusive fullscreen affects the
 	// display size calculated by ScaledRes().
-	if((fs_prev != fs_new) && HelpSwitchFullscreen(fs_prev, fs_new)) {
-		// If we clipped on the raw renderer, the clipping rectangle won't
-		// match the current resolution anymore.
-		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
+	if(
+		(fs_prev.fullscreen != fs_new.fullscreen) ||
+		(fs_prev.exclusive != fs_new.exclusive)
+	) {
+		if(HelpSwitchFullscreen(fs_prev, fs_new)) {
+			// If we clipped on the raw renderer, the clipping rectangle won't
+			// match the current resolution anymore.
+			SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
 
-		ret.live.SetFlag(F::FULLSCREEN, fs_new.fullscreen);
-		ret.live.SetFlag(F::FULLSCREEN_EXCLUSIVE, fs_new.exclusive);
+			ret.live.SetFlag(F::FULLSCREEN, fs_new.fullscreen);
+			ret.live.SetFlag(F::FULLSCREEN_EXCLUSIVE, fs_new.exclusive);
+		}
 	}
 
 	auto *window = WndBackend_SDL();
@@ -645,7 +679,7 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 
 	const auto res_new = params.ScaledRes();
 	const bool res_changed = (res_prev != res_new);
-	if(res_changed) {
+	if(res_changed && !fs_new.fullscreen) {
 		PIXEL_POINT topleft{};
 		SDL_GetWindowPosition(window, &topleft.x, &topleft.y);
 		SDL_SetWindowSize(window, res_new.w, res_new.h);
@@ -664,6 +698,9 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 
 	const auto geometry = PrimarySetScale(params.ScaleGeometry(), res_new);
 	ret.live.SetFlag(F::SCALE_GEOMETRY, geometry);
+
+	PrimarySetBorderlessFullscreenFit(params, res_new);
+	ret.live.SetFlag(F::FULLSCREEN_FIT, std::to_underlying(fs_new.fit));
 
 	return ret;
 }
@@ -809,6 +846,17 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 	} else if(PrimaryTexture) {
 		const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
 		SDL_SetRenderTarget(PrimaryRenderer, nullptr);
+
+		// In borderless fullscreen mode, the scaled texture may not cover the
+		// entire window. Technically, we only need to do this once for every
+		// backbuffer after switching the fullscreen fit, but:
+		// 1) SDL has no way of querying the length of the swapchain, and
+		// 2) you are supposed to do this on every frame anyway, as a lot of
+		//    GPUs can use clearing as a performance hint.
+		// Let's measure the performance impact on windowed mode some other
+		// time...
+		GrpBackend_Clear(0, RGB{ 0, 0, 0 });
+
 		SDL_RenderCopy(PrimaryRenderer, PrimaryTexture, nullptr, nullptr);
 		SDL_SetRenderTarget(PrimaryRenderer, PrimaryTexture);
 	}

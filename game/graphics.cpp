@@ -91,6 +91,9 @@ GRAPHICS_FULLSCREEN_FLAGS GRAPHICS_PARAMS::FullscreenFlags(void) const
 	return {
 		.fullscreen = !!(flags & F::FULLSCREEN),
 		.exclusive = !!(flags & F::FULLSCREEN_EXCLUSIVE),
+		.fit = static_cast<GRAPHICS_FULLSCREEN_FIT>(
+			std::to_underlying(flags & F::FULLSCREEN_FIT) >> 2
+		),
 	};
 }
 
@@ -116,7 +119,12 @@ WINDOW_SIZE GRAPHICS_PARAMS::ScaledRes(void) const
 			return GRP_RES;
 		}
 		const auto display_s = GrpBackend_DisplaySize(true);
-		{
+		switch(fs.fit) {
+		case GRAPHICS_FULLSCREEN_FIT::INTEGER: {
+			const auto factors = (display_s / GRP_RES);
+			return (GRP_RES * std::min(factors.w, factors.h));
+		}
+		case GRAPHICS_FULLSCREEN_FIT::ASPECT: {
 			const auto factor_w = (static_cast<float>(display_s.w) / GRP_RES.w);
 			const auto factor_h = (static_cast<float>(display_s.h) / GRP_RES.h);
 			const auto scale = std::min(factor_w, factor_h);
@@ -124,6 +132,11 @@ WINDOW_SIZE GRAPHICS_PARAMS::ScaledRes(void) const
 				.w = static_cast<PIXEL_COORD>(GRP_RES.w * scale),
 				.h = static_cast<PIXEL_COORD>(GRP_RES.h * scale),
 			};
+		}
+		case GRAPHICS_FULLSCREEN_FIT::STRETCH:
+			return display_s;
+		case GRAPHICS_FULLSCREEN_FIT::COUNT:
+			std::unreachable();
 		}
 	}
 	const auto scale = ((window_scale_4x == 0)

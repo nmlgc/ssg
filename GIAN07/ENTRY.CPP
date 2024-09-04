@@ -126,8 +126,18 @@ void XGrpTry(const GRAPHICS_PARAMS& prev, GRAPHICS_PARAMS& params)
 void XGrpTryCycleScale(int_fast8_t delta)
 {
 	XGrpTry([delta](auto& params) {
-		const auto max = (Grp_WindowScale4xMax() + 1);
-		params.window_scale_4x = ((params.window_scale_4x + max + delta) % max);
+		const auto fs = params.FullscreenFlags();
+		if(fs.fullscreen && !fs.exclusive) {
+			using FIT = GRAPHICS_FULLSCREEN_FIT;
+			constexpr auto max = std::to_underlying(FIT::COUNT);
+			const auto fit = ((std::to_underlying(fs.fit) + max + delta) % max);
+			params.SetFlag(GRAPHICS_PARAM_FLAGS::FULLSCREEN_FIT, fit);
+		} else if(!fs.fullscreen) {
+			const auto max = (Grp_WindowScale4xMax() + 1);
+			params.window_scale_4x = (
+				(params.window_scale_4x + max + delta) % max
+			);
+		}
 	});
 }
 

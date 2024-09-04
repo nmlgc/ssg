@@ -598,7 +598,16 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		return reinit_full(params);
 	}
 
+	// As do a few things when switching to exclusive fullscreen.
 	if(fs_new.fullscreen && fs_new.exclusive) {
+		// The Direct3D renderer can only launch into exclusive fullscreen on
+		// the same display the window was spawned on, so let's just throw it
+		// away.
+		const auto name = WndBackend_SDLRendererName(params.api);
+		if(!fs_prev.fullscreen && (name == u8"direct3d")) {
+			return reinit_full(params);
+		}
+
 		// If the window started out as borderless and should later switch to
 		// exclusive, SDL simply doesn't do the mode change:
 		//

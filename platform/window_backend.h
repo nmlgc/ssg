@@ -40,6 +40,9 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS&);
 void WndBackend_Cleanup(void);
 // --------------
 
+// Returns the current top-left position of the game window.
+std::optional<std::pair<int16_t, int16_t>> WndBackend_Topleft(void);
+
 // Runs the main loop each frame, and returns the exit code after the game was
 // quit.
 int WndBackend_Run(void);

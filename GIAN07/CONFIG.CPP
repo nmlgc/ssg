@@ -8,6 +8,7 @@
 #include "CONFIG.H"
 #include "game/bgm.h"
 #include "platform/file.h"
+#include "platform/window_backend.h"
 
 ///// Constants /////
 constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
@@ -313,6 +314,12 @@ extern void ConfigSave(void)
 
 	ConfigDat.SoundFlags.v = VERSION_ORIGINAL.SoundFlags.v;
 	ConfigDat.SoundFlags.v |= (!BGM_GainApply() * SNDF_BGM_NOT_VOL_NORM);
+
+	if(const auto maybe_topleft = WndBackend_Topleft()) {
+		const auto& topleft = maybe_topleft.value();
+		ConfigDat.WindowLeft.v = topleft.first;
+		ConfigDat.WindowTop.v = topleft.second;
+	}
 
 	std::apply([](const auto&... version) {
 		(..., VersionSave(version));

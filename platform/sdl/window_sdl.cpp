@@ -89,9 +89,15 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, min);
 	}
 
+	const auto real_pos = [](int16_t pos) {
+		return (
+			(pos == GRAPHICS_TOPLEFT_UNDEFINED) ? SDL_WINDOWPOS_CENTERED : pos
+		);
+	};
+
 	const auto res = params.ScaledRes();
-	constexpr auto left = SDL_WINDOWPOS_CENTERED;
-	constexpr auto top = SDL_WINDOWPOS_CENTERED;
+	const auto left = real_pos(params.left);
+	const auto top = real_pos(params.top);
 	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, flags);
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
@@ -130,6 +136,22 @@ void WndBackend_Cleanup(void)
 		SDL_DestroyWindow(Window);
 		Window = nullptr;
 	}
+}
+
+std::optional<std::pair<int16_t, int16_t>> WndBackend_Topleft(void)
+{
+	if(!Window) {
+		return std::nullopt;
+	}
+	int left{}, top{};
+	SDL_GetWindowPosition(Window, &left, &top);
+	assert(left > (std::numeric_limits<int16_t>::min)());
+	assert(top > (std::numeric_limits<int16_t>::min)());
+	assert(left <= (std::numeric_limits<int16_t>::max)());
+	assert(top <= (std::numeric_limits<int16_t>::max)());
+	return std::make_pair(
+		static_cast<int16_t>(left), static_cast<int16_t>(top)
+	);
 }
 
 int WndBackend_Run(void)

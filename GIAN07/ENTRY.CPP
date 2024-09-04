@@ -11,6 +11,7 @@
 #include "platform/graphics_backend.h"
 #include "platform/input.h"
 #include "platform/path.h"
+#include "platform/window_backend.h"
 #include "game/bgm.h"
 #include "game/debug.h"
 #include "game/frame.h"
@@ -92,10 +93,15 @@ void XCleanup(void)
 	Key_End();
 }
 
-void XGrpTry(const GRAPHICS_PARAMS& prev, const GRAPHICS_PARAMS& params)
+void XGrpTry(const GRAPHICS_PARAMS& prev, GRAPHICS_PARAMS& params)
 {
 	if(prev == params) {
 		return;
+	}
+	if(const auto maybe_topleft = WndBackend_Topleft()) {
+		const auto& topleft = maybe_topleft.value();
+		params.left = topleft.first;
+		params.top = topleft.second;
 	}
 	auto maybe_result = Grp_Init(prev, params);
 	if(!maybe_result) {

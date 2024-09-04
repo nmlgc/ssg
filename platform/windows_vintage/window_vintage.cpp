@@ -61,6 +61,11 @@ void WndBackend_Cleanup(void)
 	DestroyWindow(hWndMain);
 }
 
+std::optional<std::pair<int16_t, int16_t>> WndBackend_Topleft(void)
+{
+	return std::nullopt;
+}
+
 int WndBackend_Run(void)
 {
 	while(1){

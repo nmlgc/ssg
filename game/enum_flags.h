@@ -18,7 +18,7 @@ template <ENUMFLAGS T> constexpr inline std::underlying_type_t<T> operator~(
 	return ~std::to_underlying(v);
 }
 
-template <ENUMFLAGS T> constexpr inline bool operator&(
+template <ENUMFLAGS T> constexpr inline std::underlying_type_t<T> operator&(
 	const T& a, const T& b
 ) noexcept
 {

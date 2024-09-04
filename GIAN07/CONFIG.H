@@ -70,7 +70,7 @@ template <typename T, T Max> constexpr bool ValidateBelow(T v) {
 	return (v <= Max);
 }
 template <uint8_t Mask> constexpr bool ValidateFlag(uint8_t v) {
-	return !(v & Mask);
+	return ((v & Mask) == 0);
 }
 
 // Option class, with optional validation of the value against a supported

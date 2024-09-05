@@ -16,6 +16,7 @@
 #include <SDL_events.h>
 #include <SDL_hints.h>
 #include <SDL_mouse.h>
+#include <SDL_rect.h>
 #include <SDL_render.h>
 #include <SDL_timer.h>
 #include <SDL_video.h>
@@ -35,6 +36,49 @@ static SDL_Window *Window;
 // Also helpful because these coordinates determine the display that the
 // fullscreen window is placed on.
 static std::optional<std::pair<int16_t, int16_t>> TopleftBeforeFullscreen;
+
+// Don't do a ZUN.
+// (https://github.com/thpatch/thcrap/commit/71c1dcab690f85653cbc9a06c7c55)
+SDL_Rect ClampWindowRect(SDL_Rect window_rect)
+{
+	// SDL_GetRectDisplayIndex() returns the *closest* display, so we need to
+	// manually clamp the window to its bounds.
+	const int display_i = SDL_GetRectDisplayIndex(&window_rect);
+	if(display_i < 0) {
+		return window_rect;
+	}
+	SDL_Rect display_rect{};
+	if(SDL_GetDisplayUsableBounds(display_i, &display_rect) != 0) {
+		return window_rect;
+	}
+
+	const auto clamp_start = [](
+		int win_start, int win_extent, int disp_start, int disp_extent
+	) {
+		if(
+			SDL_WINDOWPOS_ISCENTERED(win_start) ||
+			SDL_WINDOWPOS_ISUNDEFINED(win_start)
+		) {
+			return win_start;
+		}
+		const auto win_end = (win_start + win_extent);
+		const auto disp_end = (disp_start + disp_extent);
+		if(win_end < disp_start) {
+			return disp_start;
+		} else if(win_end > disp_end) {
+			return (disp_end - win_extent);
+		}
+		return win_start;
+	};
+
+	window_rect.x = clamp_start(
+		window_rect.x, window_rect.w, display_rect.x, display_rect.w
+	);
+	window_rect.y = clamp_start(
+		window_rect.y, window_rect.h, display_rect.y, display_rect.h
+	);
+	return window_rect;
+}
 
 std::u8string_view WndBackend_SDLRendererName(int8_t id)
 {
@@ -100,17 +144,27 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 		TopleftBeforeFullscreen = { params.left, params.top };
 	}
 
-	const auto real_pos = [](int16_t pos) {
+	const auto real_pos = [](int16_t pos) -> int {
 		return (
 			(pos == GRAPHICS_TOPLEFT_UNDEFINED) ? SDL_WINDOWPOS_CENTERED : pos
 		);
 	};
 
 	const auto res = params.ScaledRes();
-	const auto left = real_pos(params.left);
-	const auto top = real_pos(params.top);
-	flags |= HelpFullscreenFlag(params.FullscreenFlags());
-	Window = SDL_CreateWindow(GAME_TITLE, left, top, res.w, res.h, flags);
+	const auto fs = params.FullscreenFlags();
+	SDL_Rect rect = {
+		.x = real_pos(params.left),
+		.y = real_pos(params.top),
+		.w = res.w,
+		.h = res.h,
+	};
+	if(!fs.fullscreen) {
+		rect = ClampWindowRect(rect);
+	}
+	flags |= HelpFullscreenFlag(fs);
+	Window = SDL_CreateWindow(
+		GAME_TITLE, rect.x, rect.y, rect.w, rect.h, flags
+	);
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
 		return nullptr;

@@ -8,6 +8,7 @@
 #include "game/string_format.h"
 #include "platform/file.h"
 #include "platform/graphics_backend.h"
+#include "platform/window_backend.h"
 
 uint8_t Grp_FPSDivisor = 0;
 

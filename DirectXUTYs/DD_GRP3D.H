@@ -33,17 +33,17 @@ void _3DLine(int x1, int y1, int x2, int y2);	// 直線
 void _3DBox(int x1, int y1, int x2, int y2);	// 長方形
 void _3DCircle(int x, int y, int r);	// 円
 void _3DCircleF(int x, int y, int r);	// 円塗りつぶし
-void _3DPolygon(std::span<const WINDOW_POINT> p);	// ポリゴン塗りつぶし
+void _3DPolygon(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
 void _3DBoxA(int x1, int y1, int x2, int y2);	// α長方形
 
 
 // ３Ｄ専用関数 //
 void GrpCircleFA(int x, int y, int r);	// α円塗りつぶし
 void GrpFatCircleA(int x, int y, int r, int w);	// 太い円を描く
-void GrpPolygonA(std::span<const WINDOW_POINT> p);	// αポリゴン塗りつぶし
-void GrpGrdRect(std::span<const WINDOW_POINT, 4> p);	// グラデーション付き長方形(ナナメ可)
-void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p);	// グラデーション付き長方形(ナナメ可+α)
-void GrpGrdPolygonA(std::span<const WINDOW_POINT> p);	// グラデーション付きポリゴン(レーザー用？)
+void GrpPolygonA(VERTEX_XY_SPAN<>);	// αポリゴン塗りつぶし
+void GrpGrdRect(std::span<const VERTEX_XY, 4>);	// グラデーション付き長方形(ナナメ可)
+void GrpGrdRectA(std::span<const VERTEX_XY, 4>);	// グラデーション付き長方形(ナナメ可+α)
+void GrpGrdPolygonA(VERTEX_XY_SPAN<>);	// グラデーション付きポリゴン(レーザー用？)
 void GrpGrdLineEx(int x, int y1, int y2);	// スペアな用グラデーションライン
 
 

@@ -14,11 +14,9 @@ enum OUT_EDGE {
 extern int CLIP_X_MIN, CLIP_X_MAX, CLIP_Y_MIN, CLIP_Y_MAX;
 
 
-std::span<const WINDOW_POINT> Grp_PClip(
-	std::span<WINDOW_POINT> temp, std::span<const WINDOW_POINT> src
-)
+VERTEX_XY_SPAN<> Grp_PClip(std::span<VERTEX_XY> temp, VERTEX_XY_SPAN<> src)
 {
-	std::array<WINDOW_POINT, 20> work; // 結果の点の個数(ダミーです)
+	std::array<VERTEX_XY, 20> work; // 結果の点の個数(ダミーです)
 	OUT_EDGE lastout;
 
 	auto left = src[0].x; // 最も左の座標の初期化
@@ -71,9 +69,8 @@ std::span<const WINDOW_POINT> Grp_PClip(
 			const auto oc = getout(cur.y, CLIP_Y_MIN, CLIP_Y_MAX);
 			if(oc != lastout) {
 				if(lastout) {
-					const auto edge = ((lastout == OUT_EDGE::MIN)
-						? CLIP_Y_MIN
-						: CLIP_Y_MAX
+					const decltype(VERTEX_XY::y) edge = (
+						(lastout == OUT_EDGE::MIN) ? CLIP_Y_MIN : CLIP_Y_MAX
 					);
 					if(edge != cur.y) {
 						*(work_p)++ = {
@@ -82,7 +79,7 @@ std::span<const WINDOW_POINT> Grp_PClip(
 					}
 				}
 				if(oc) {
-					const auto edge = ((oc == OUT_EDGE::MIN)
+					const decltype(VERTEX_XY::y) edge = ((oc == OUT_EDGE::MIN)
 						? CLIP_Y_MIN
 						: CLIP_Y_MAX
 					);
@@ -113,7 +110,7 @@ std::span<const WINDOW_POINT> Grp_PClip(
 		const auto oc = getout(cur.x, CLIP_X_MIN, CLIP_X_MAX);
 		if(oc != lastout) {
 			if(lastout) {
-				const auto edge = ((lastout == OUT_EDGE::MIN)
+				const decltype(VERTEX_XY::x) edge = ((lastout == OUT_EDGE::MIN)
 					? CLIP_X_MIN
 					: CLIP_X_MAX
 				);
@@ -124,7 +121,7 @@ std::span<const WINDOW_POINT> Grp_PClip(
 				}
 			}
 			if(oc) {
-				const auto edge = ((oc == OUT_EDGE::MIN)
+				const decltype(VERTEX_XY::x) edge = ((oc == OUT_EDGE::MIN)
 					? CLIP_X_MIN
 					: CLIP_X_MAX
 				);

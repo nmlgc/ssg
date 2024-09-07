@@ -429,7 +429,7 @@ void BossHPG_Draw(void)
 			GrpSetAlpha(128+64,ALPHA_NORM);//ALPHA_NORM);
 			GrpSetColor({ 0, 1, 5 });
 			if(DxObj.PixelFormat.IsChanneled()){
-				WINDOW_POINT Src[4] = {
+				VERTEX_XY Src[4] = {
 					{ 0, top },
 					{ left, top },
 					{ left, bottom },

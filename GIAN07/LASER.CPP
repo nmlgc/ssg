@@ -81,7 +81,7 @@ typedef struct{
 	int wx,wy;	// 表示座標の加算値(太さ)
 	int v;	// 速度
 
-	WINDOW_POINT p[4];	// 表示する座標
+	VERTEX_XY p[4];	// 表示する座標
 
 	char a;	// 加速度(つかうのか??)
 	uint8_t d;	// 進行方向
@@ -360,7 +360,6 @@ static void __fastcall slaser_pset(LASER_DATA *lp)
 
 static void __fastcall SLdraw(const LASER_DATA *lp)
 {
-	static WINDOW_POINT p[4];
 	int x,y;
 
 	int tx,ty;
@@ -396,6 +395,8 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 		GrpPolygon(lp->p);
 
 		GrpSetColor({ 5, 5, 5 });
+
+		VERTEX_XY p[4];
 		p[0].x = p[1].x = lp->p[0].x - lp->wx*3/4;//- wx*4/len;
 		p[0].y = p[1].y = lp->p[0].y - lp->wy*3/4;//- wy*4/len;
 		p[3].x = p[2].x = lp->p[3].x + lp->wx*3/4;//+ wx*4/len;

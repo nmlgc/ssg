@@ -178,7 +178,7 @@ void _3DCircleF(int x, int y, int r)
 }
 
 // ポリゴン塗りつぶし //
-void _3DPolygon(std::span<const WINDOW_POINT> p)
+void _3DPolygon(VERTEX_XY_SPAN<> p)
 {
 	if(!bLocked || (p.size() < 3)) {
 		return;
@@ -220,7 +220,7 @@ void GrpCircleFA(int x, int y, int r)
 }
 
 // αポリゴン塗りつぶし //
-void GrpPolygonA(std::span<const WINDOW_POINT> p)
+void GrpPolygonA(VERTEX_XY_SPAN<> p)
 {
 	if(!bLocked || (p.size() < 3)) {
 		return;
@@ -266,7 +266,7 @@ void GrpFatCircleA(int x, int y, int r, int w)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
+void GrpGrdRect(std::span<const VERTEX_XY, 4> p)
 {
 	const RGBA c1 = Col3D;
 	const RGBA c2 = { 255, 255, 255, Col3D.a };
@@ -290,7 +290,7 @@ void GrpGrdRect(std::span<const WINDOW_POINT, 4> p)
 }
 
 // グラデーション付き長方形(中心部が明るくなる) //
-void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p)
+void GrpGrdRectA(std::span<const VERTEX_XY, 4> p)
 {
 	if(!bLocked) return;
 	AlphaEnable(TRUE);
@@ -299,7 +299,7 @@ void GrpGrdRectA(std::span<const WINDOW_POINT, 4> p)
 }
 
 // グラデーション付きポリゴン(レーザー用？) //
-void GrpGrdPolygonA(std::span<const WINDOW_POINT> p)
+void GrpGrdPolygonA(VERTEX_XY_SPAN<> p)
 {
 	// この関数では最初に指定された頂点の色だけを白とし、他の頂点色は  //
 	// GrpSetColor()で指定されている色なる。なお、αの指定も有効となる //

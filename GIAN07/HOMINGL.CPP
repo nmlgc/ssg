@@ -207,7 +207,7 @@ void HLaserMove(void)
 
 void _CircleA16(int x, int y, int r, uint8_t d)
 {
-	WINDOW_POINT	src[9+1];
+	VERTEX_XY	src[9 + 1];
 	int			i,j;
 
 	for(j=0,i=-64; j<=8; j++){
@@ -227,8 +227,8 @@ void HLaserDraw(void)
 	HLaserData	*hl;
 	int			i,w,current;
 	DegPoint	*p;
-	WINDOW_POINT		src[4];
-	void(*AlphaPolygon)(std::span<const WINDOW_POINT> p);
+	VERTEX_XY	src[4];
+	void(*AlphaPolygon)(VERTEX_XY_SPAN<>);
 	//void(*AlphaCircle)(int x, int y, int r);
 
 	if(DxObj.PixelFormat.IsChanneled()){

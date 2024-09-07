@@ -53,12 +53,12 @@ static int DrawTrapezoid(int y, int dy);	// 台形の描画
 
 
 // ポリゴンの描画 //
-void _2DPolygon(std::span<const WINDOW_POINT> p)
+void _2DPolygon(VERTEX_XY_SPAN<> p)
 {
 	int		i,j,dy;
 	int		nLeft,nRight;
 	int		TopY,BottomY;
-	WINDOW_POINT	temp[100];
+	VERTEX_XY	temp[100];
 
 	p = Grp_PClip(temp, p);
 	const int n = p.size();

@@ -271,7 +271,7 @@ extern void LLaserMove(void)
 extern void LLaserDraw(void)
 {
 	int x, y;
-	WINDOW_POINT	p[4];
+	VERTEX_XY	p[4];
 	int				wx,wy,len;
 
 	static const RGB216 Table16Bit[16] = {
@@ -290,7 +290,7 @@ extern void LLaserDraw(void)
 
 
 	int n;
-	WINDOW_POINT p2[34];
+	VERTEX_XY p2[34];
 
 	GrpLock();
 

@@ -56,7 +56,7 @@ extern void WideBombDraw(void)
 void LaserBombDraw(void)
 {
 	BYTE			d,c;
-	WINDOW_POINT	p[4];
+	VERTEX_XY	p[4];
 	int				i,w;
 	int				lx,ly;
 	int				wx,wy;

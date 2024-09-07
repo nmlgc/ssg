@@ -25,6 +25,7 @@
 #include "game/coords.h"
 #include "game/graphics.h"
 #include "game/pixelformat.h"
+#include "platform/graphics_backend.h"
 #include "platform/windows/surface_ddraw.h"
 
 
@@ -219,7 +220,7 @@ extern void (*GrpLine)(int x1, int y1, int x2, int y2);	// 直線
 extern void (*GrpBox)(int x1, int y1, int x2, int y2);	// 長方形
 extern void (*GrpCircle)(int x, int y, int r);	// 円
 extern void (*GrpCircleF)(int x, int y, int r);	// 円塗りつぶし
-extern void (*GrpPolygon)(std::span<const WINDOW_POINT> p);	// ポリゴン塗りつぶし
+extern void (*GrpPolygon)(VERTEX_XY_SPAN<>);	// ポリゴン塗りつぶし
 
 extern void (*GrpBoxA)(int x1, int y1, int x2, int y2);	// α長方形
 

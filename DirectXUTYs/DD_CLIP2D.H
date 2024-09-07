@@ -14,7 +14,7 @@
 
 // ヘッダファイル //
 import std.compat;
-#include "game/coords.h"
+#include "platform/graphics_backend.h"
 
 
 // 関数 //
@@ -24,9 +24,7 @@ import std.compat;
 // • [src] if all its points were inside the clipping region and nothing needed
 //   to be clipped
 // • A span pointing into [temp] describing the clipped polygon
-std::span<const WINDOW_POINT> Grp_PClip(
-	std::span<WINDOW_POINT> temp, std::span<const WINDOW_POINT> src
-);
+VERTEX_XY_SPAN<> Grp_PClip(std::span<VERTEX_XY> temp, VERTEX_XY_SPAN<> src);
 
 
 #define OUTCODE_X		0x03

@@ -1245,11 +1245,11 @@ void WeaponSelectProc(bool&)
 		GrpLine(400-110,400-300,400-110,400+10);
 		GrpLine(400+110,400-300,400+110,400+10);
 
-		if(abs((char)deg)<=25){
+		if(abs(deg) <= 25) {
 			GrpSetColor(2,2,5);
-			GrpCircle(120,150,39+10-2*abs((char)deg));
+			GrpCircle(120, 150, (39 + 10 - (2 * abs(deg))));
 			GrpSetColor(4,4,5);
-			GrpCircle(120,150,41+10-2*abs((char)deg));
+			GrpCircle(120, 150, (41 + 10 - (2 * abs(deg))));
 		}
 		GrpUnlock();
 

@@ -423,7 +423,7 @@ static void _PutEnemy(const uint8_t *p)
 
 	e = &Enemy[EnemyInd[EnemyNow++]];
 
-	n      = 4 + (((BYTE)p[4])<<2);
+	n = (4 + (p[4] << 2));
 
 	x = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
 	y = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));

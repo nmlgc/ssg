@@ -947,7 +947,7 @@ void parse_ECL(ENEMY_DATA *e)
 				e->cmd_c = (U16LEAt(&cmd[1 + 6]) + 1);
 				e->vx    = ABS_VXRL(I32LEAt(&cmd[1]));
 				e->vy    = e->y;
-				e->amp   = (BYTE)cmd[1+4];
+				e->amp   = cmd[1 + 4];
 				e->vd    = (char)cmd[1+5];
 				//e->d     = 0;
 			}
@@ -966,7 +966,7 @@ void parse_ECL(ENEMY_DATA *e)
 				e->cmd_c = (U16LEAt(&cmd[1 + 6]) + 1);
 				e->vy    = I32LEAt(&cmd[1]);
 				e->vx    = e->x;
-				e->amp   = (BYTE)cmd[1+4];
+				e->amp   = cmd[1 + 4];
 				e->vd    = (char)cmd[1+5];
 				//e->d     = 0;
 			}
@@ -1099,7 +1099,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_DEGA):			// ＠角度絶対指定
 			ECL_DEBUG("ECL_DEGA : %u", cmd[1]);
-			e->d = ABS_DEGRL((BYTE)cmd[1]);
+			e->d = ABS_DEGRL(cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1202,7 +1202,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TAUTO):		// 弾発射モード変更
-			e->t_rep = (BYTE)cmd[1];
+			e->t_rep = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1213,13 +1213,13 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TCMD):			// ＠弾コマンド
-			e->t_cmd.cmd = (BYTE)cmd[1];
+			e->t_cmd.cmd = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_TDEGA):		// ＠弾発射角絶対指定
-			e->t_cmd.d  = (BYTE)cmd[1];
-			e->t_cmd.dw = (BYTE)cmd[1+1];
+			e->t_cmd.d  = cmd[1];
+			e->t_cmd.dw = cmd[1 + 1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1241,8 +1241,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TNUMA):		// ＠弾発射数絶対指定
-			e->t_cmd.n  = (BYTE)cmd[1];
-			e->t_cmd.ns = (BYTE)cmd[1+1];
+			e->t_cmd.n  = cmd[1];
+			e->t_cmd.ns = cmd[1 + 1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1253,7 +1253,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TSPDA):		// ＠弾速度絶対指定
-			e->t_cmd.v = (BYTE)cmd[1];
+			e->t_cmd.v = cmd[1];
 			e->t_cmd.a = (char)cmd[1+1];
 			bRetFlag = FALSE;
 		break;
@@ -1267,17 +1267,17 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TOPT):			// ＠弾オプション
-			e->t_cmd.option = (BYTE)cmd[1];
+			e->t_cmd.option = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_TTYPE):		// ＠弾タイプ
-			e->t_cmd.type = (BYTE)cmd[1];
+			e->t_cmd.type = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_TCOL):			// ＠弾の色もしくは形状
-			e->t_cmd.c = (BYTE)cmd[1];
+			e->t_cmd.c = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1287,7 +1287,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TREP):			// ＠弾の REP 指定
-			e->t_cmd.rep = (BYTE)cmd[1];
+			e->t_cmd.rep = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1317,7 +1317,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LCMD):			// レーザーコマンドセット
-			e->l_cmd.cmd = (BYTE)cmd[1];
+			e->l_cmd.cmd = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1337,8 +1337,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LDEGA):		// レーザー発射角＆幅絶対指定
-			e->l_cmd.d  = (BYTE)cmd[1];
-			e->l_cmd.dw = (BYTE)cmd[2];
+			e->l_cmd.d  = cmd[1];
+			e->l_cmd.dw = cmd[2];
 			bRetFlag = FALSE;
 		break;
 
@@ -1360,7 +1360,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LNUMA):		// レーザーの本数絶対指定
-			e->l_cmd.n = (BYTE)cmd[1];
+			e->l_cmd.n = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1380,12 +1380,12 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LCOL):			// レーザーの色
-			e->l_cmd.c = (BYTE)cmd[1];
+			e->l_cmd.c = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_LTYPE):		// レーザーの種類
-			e->l_cmd.type = (BYTE)cmd[1];
+			e->l_cmd.type = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1463,7 +1463,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_ANM):			// アニメーションセット
 			// anm_ptnEx をセットするのは互換性を保つための配慮 //
-			e->anm_ptn  = e->anm_ptnEx = (BYTE)cmd[1];
+			e->anm_ptn  = e->anm_ptnEx = cmd[1];
 			e->anm_sp   = (char)cmd[2];
 			//if(e->anm_sp==0) e->anm_sp=1;
 			e->g_height = (Anime[e->anm_ptn].size.h << 5);
@@ -1476,7 +1476,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_ANMEX):
 			// 他のパラメータはいっさい変更しない //
-			e->anm_ptnEx = (BYTE)cmd[1];
+			e->anm_ptnEx = cmd[1];
 			bRetFlag = FALSE;
 		break;
 
@@ -1527,12 +1527,12 @@ void parse_ECL(ENEMY_DATA *e)
 
 			// バグに注意注意！！ //
 			if(cmd[0] == ECL_ENEMYSETD){
-				n   = 4 + (((BYTE)cmd[6])<<2);
+				n = (4 + (cmd[6] << 2));
 				InitEnemyDataSTD(new_enemy,x,y,n);
 				new_enemy->d = ID2Value(e, cmd[5]);
 			}
 			else{
-				n   = 4 + (((BYTE)cmd[5])<<2);
+				n = (4 + (cmd[5] << 2));
 				InitEnemyDataSTD(new_enemy,x,y,n);
 			}
 		}
@@ -1742,7 +1742,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		default:				// 未定義の命令が発生！！
-			ECL_DEBUG("Unrecognizable Operation Code %02x",(BYTE)cmd[0]);
+			ECL_DEBUG("Unrecognizable Operation Code %02x", cmd[0]);
 		return;
 	}
 

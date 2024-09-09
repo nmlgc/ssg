@@ -29,7 +29,7 @@ template <class Coord> struct PIXEL_POINT_BASE {
 		return *this;
 	}
 
-	std::strong_ordering operator<=>(const PIXEL_POINT_BASE&) const = default;
+	std::partial_ordering operator<=>(const PIXEL_POINT_BASE&) const = default;
 };
 
 // Area size in unscaled pixel space.
@@ -60,7 +60,7 @@ template <class Coord> struct PIXEL_SIZE_BASE {
 		return *this;
 	}
 
-	std::strong_ordering operator<=>(const PIXEL_SIZE_BASE&) const = default;
+	std::partial_ordering operator<=>(const PIXEL_SIZE_BASE&) const = default;
 };
 
 template <class Coord> PIXEL_POINT_BASE<Coord>& operator-=(

@@ -15,89 +15,101 @@ import std;
 using PIXEL_COORD = int;
 
 // X/Y coordinate in unscaled pixel space. Relative to any origin.
-struct PIXEL_POINT {
-	PIXEL_COORD x;
-	PIXEL_COORD y;
+template <class Coord> struct PIXEL_POINT_BASE {
+	Coord x;
+	Coord y;
 
-	constexpr PIXEL_POINT operator+(const PIXEL_POINT& other) const {
+	constexpr PIXEL_POINT_BASE operator+(const PIXEL_POINT_BASE& other) const {
 		return { (x + other.x), (y + other.y) };
 	}
 
-	std::strong_ordering operator <=>(const PIXEL_POINT& other) const = default;
-};
+	PIXEL_POINT_BASE& operator-=(const PIXEL_POINT_BASE& other) {
+		this->x -= other.x;
+		this->y -= other.y;
+		return *this;
+	}
 
-PIXEL_POINT& operator -=(PIXEL_POINT& self, const PIXEL_POINT& other);
+	std::strong_ordering operator<=>(const PIXEL_POINT_BASE&) const = default;
+};
 
 // Area size in unscaled pixel space.
 // Using signed integers to avoid complicating the conversion into rectangle
 // types, where signed coordinates often represent meaningful points outside
 // the screen.
-struct PIXEL_SIZE {
-	PIXEL_COORD w;
-	PIXEL_COORD h;
+template <class Coord> struct PIXEL_SIZE_BASE {
+	Coord w;
+	Coord h;
 
 	explicit operator bool() const {
 		return ((w > 0) && (h > 0));
 	}
 
-	constexpr PIXEL_SIZE operator-(const PIXEL_POINT& other) const {
+	constexpr PIXEL_SIZE_BASE operator-(
+		const PIXEL_POINT_BASE<Coord>& other
+	) const {
 		return { (w - other.x), (h - other.y) };
 	}
 
-	constexpr PIXEL_SIZE operator/(int divisor) const {
+	constexpr PIXEL_SIZE_BASE operator/(int divisor) const {
 		return { (w / divisor), (h / divisor) };
 	}
 
-	PIXEL_SIZE& operator +=(const PIXEL_SIZE& other) {
+	PIXEL_SIZE_BASE& operator+=(const PIXEL_SIZE_BASE& other) {
 		w += other.w;
 		h += other.h;
 		return *this;
 	}
 
-	std::strong_ordering operator <=>(const PIXEL_SIZE& other) const = default;
+	std::strong_ordering operator<=>(const PIXEL_SIZE_BASE&) const = default;
 };
 
-PIXEL_POINT& operator -=(PIXEL_POINT& self, const PIXEL_SIZE& other);
+template <class Coord> PIXEL_POINT_BASE<Coord>& operator-=(
+	PIXEL_POINT_BASE<Coord>& self, const PIXEL_SIZE_BASE<Coord>& other
+) {
+	self.x -= other.w;
+	self.y -= other.h;
+	return self;
+}
 
 // Left-top-width-height rectangle in unscaled pixel space. Relative to any
 // origin.
-struct PIXEL_LTWH {
-	PIXEL_COORD left = 0;
-	PIXEL_COORD top = 0;
-	PIXEL_COORD w = 0;
-	PIXEL_COORD h = 0;
+template <class Coord> struct PIXEL_LTWH_BASE {
+	Coord left = 0;
+	Coord top = 0;
+	Coord w = 0;
+	Coord h = 0;
 
-	constexpr PIXEL_LTWH() = default;
-	constexpr PIXEL_LTWH(const PIXEL_LTWH&) = default;
-	constexpr PIXEL_LTWH(PIXEL_LTWH&&) = default;
-	constexpr PIXEL_LTWH& operator=(const PIXEL_LTWH&) = default;
-	constexpr PIXEL_LTWH& operator=(PIXEL_LTWH&&) = default;
-	constexpr PIXEL_LTWH(
-		decltype(left) left, decltype(top) top, decltype(w) w, decltype(h) h
-	)
+	constexpr PIXEL_LTWH_BASE() = default;
+	constexpr PIXEL_LTWH_BASE(const PIXEL_LTWH_BASE&) = default;
+	constexpr PIXEL_LTWH_BASE(PIXEL_LTWH_BASE&&) = default;
+	constexpr PIXEL_LTWH_BASE& operator=(const PIXEL_LTWH_BASE&) = default;
+	constexpr PIXEL_LTWH_BASE& operator=(PIXEL_LTWH_BASE&&) = default;
+	constexpr PIXEL_LTWH_BASE(Coord left, Coord top, Coord w, Coord h)
 		: left(left), top(top), w(w), h(h)
 	{
 	}
 
-	constexpr PIXEL_LTWH operator+(const PIXEL_POINT& other) const {
+	constexpr PIXEL_LTWH_BASE operator+(
+		const PIXEL_POINT_BASE<Coord>& other
+	) const {
 		return { (left + other.x), (top + other.y), w, h };
 	}
 };
 
 // Left-top-right-bottom rectangle in unscaled pixel space. Relative to any
 // origin.
-struct PIXEL_LTRB {
-	PIXEL_COORD left;
-	PIXEL_COORD top;
-	PIXEL_COORD right;
-	PIXEL_COORD bottom;
+template <class Coord> struct PIXEL_LTRB_BASE {
+	Coord left;
+	Coord top;
+	Coord right;
+	Coord bottom;
 
-	PIXEL_LTRB() = default;
-	PIXEL_LTRB(const PIXEL_LTRB&) = default;
-	PIXEL_LTRB(PIXEL_LTRB&&) = default;
-	PIXEL_LTRB& operator=(const PIXEL_LTRB&) = default;
-	PIXEL_LTRB& operator=(PIXEL_LTRB&&) = default;
-	constexpr PIXEL_LTRB(
+	PIXEL_LTRB_BASE() = default;
+	PIXEL_LTRB_BASE(const PIXEL_LTRB_BASE&) = default;
+	PIXEL_LTRB_BASE(PIXEL_LTRB_BASE&&) = default;
+	PIXEL_LTRB_BASE& operator=(const PIXEL_LTRB_BASE&) = default;
+	PIXEL_LTRB_BASE& operator=(PIXEL_LTRB_BASE&&) = default;
+	constexpr PIXEL_LTRB_BASE(
 		decltype(left) left,
 		decltype(top) top,
 		decltype(right) right,
@@ -106,11 +118,11 @@ struct PIXEL_LTRB {
 		left(left), top(top), right(right), bottom(bottom) {
 	}
 
-	constexpr PIXEL_LTRB(const PIXEL_LTWH& o) :
+	constexpr PIXEL_LTRB_BASE(const PIXEL_LTWH_BASE<Coord>& o) :
 		left(o.left), top(o.top), right(o.left + o.w), bottom(o.top + o.h) {
 	}
 
-	PIXEL_SIZE Size() const {
+	PIXEL_SIZE_BASE<Coord> Size() const {
 		return { (right - left), (bottom - top) };
 	}
 };
@@ -119,26 +131,43 @@ using WINDOW_COORD = PIXEL_COORD;
 
 // X/Y coordinate in unscaled game window space. The visible area ranges from
 // (0, 0) to (639, 479) inclusive.
-struct WINDOW_POINT : public PIXEL_POINT {
-	constexpr WINDOW_POINT operator+(const PIXEL_POINT& other) const {
-		return { (x + other.x), (y + other.y) };
+template <
+	class Coord
+> struct WINDOW_POINT_BASE : public PIXEL_POINT_BASE<Coord> {
+	constexpr WINDOW_POINT_BASE operator+(
+		const PIXEL_POINT_BASE<Coord>& other
+	) const {
+		return { (this->x + other.x), (this->y + other.y) };
 	}
 };
 
+// Area size in unscaled game window space.
+template <class Coord> using WINDOW_SIZE_BASE = PIXEL_SIZE_BASE<Coord>;
+
 // Left-top-width-height rectangle in unscaled game window space. The visible
 // area ranges from // (0, 0) to (639, 479) inclusive.
-struct WINDOW_LTWH : public PIXEL_LTWH {
-	using PIXEL_LTWH::PIXEL_LTWH;
+template <class Coord> struct WINDOW_LTWH_BASE : public PIXEL_LTWH_BASE<Coord> {
+	using PIXEL_LTWH_BASE<Coord>::PIXEL_LTWH_BASE;
 };
 
 // Left-top-right-bottom rectangle in unscaled game window space. The visible
 // area ranges from (0, 0) to (639, 479) inclusive.
-struct WINDOW_LTRB : public PIXEL_LTRB {
-	using PIXEL_LTRB::PIXEL_LTRB;
+template <class Coord> struct WINDOW_LTRB_BASE : public PIXEL_LTRB_BASE<Coord> {
+	using PIXEL_LTRB_BASE<Coord>::PIXEL_LTRB_BASE;
 
-	constexpr WINDOW_LTRB(const WINDOW_LTWH& o) : PIXEL_LTRB(o) {
+	constexpr WINDOW_LTRB_BASE(const WINDOW_LTWH_BASE<Coord>& o) :
+		PIXEL_LTRB_BASE<Coord>(o) {
 	}
 };
+
+using PIXEL_POINT = PIXEL_POINT_BASE<PIXEL_COORD>;
+using PIXEL_SIZE = PIXEL_SIZE_BASE<PIXEL_COORD>;
+using PIXEL_LTWH = PIXEL_LTWH_BASE<PIXEL_COORD>;
+using PIXEL_LTRB = PIXEL_LTRB_BASE<PIXEL_COORD>;
+using WINDOW_POINT = WINDOW_POINT_BASE<WINDOW_COORD>;
+using WINDOW_SIZE = WINDOW_SIZE_BASE<WINDOW_COORD>;
+using WINDOW_LTWH = WINDOW_LTWH_BASE<WINDOW_COORD>;
+using WINDOW_LTRB = WINDOW_LTRB_BASE<WINDOW_COORD>;
 // -----------------------
 
 // World-space coordinates

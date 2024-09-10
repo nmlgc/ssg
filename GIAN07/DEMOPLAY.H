@@ -7,8 +7,9 @@
 #define PBGWIN_DEMOPLAY_H		"DEMOPLAY : Version 0.02 : Update 2000/04/01"
 //#pragma message(PBGWIN_DEMOPLAY_H)
 
-#include "CONFIG.H"
 #include "game/input.h"
+
+struct CONFIG_DATA;
 
 
 ///// [ 定数 ] /////
@@ -27,12 +28,7 @@ struct DEMOPLAY_CONFIG_DATA {
 	uint8_t InputFlags;
 	uint8_t Padding2[15] = { 0 };
 
-	void operator =(const CONFIG_DATA& config) {
-		GameLevel = config.GameLevel.v;
-		PlayerStock = config.PlayerStock.v;
-		BombStock = config.BombStock.v;
-		InputFlags = config.InputFlags.v;
-	}
+	void operator=(const CONFIG_DATA& config);
 };
 static_assert(sizeof(DEMOPLAY_CONFIG_DATA) == 24);
 

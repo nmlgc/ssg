@@ -117,49 +117,13 @@ template <
 struct CONFIG_OPTION_UTF8 {
 	std::u8string v;
 
-	const size_t Size() const {
-		return (sizeof(U32BE) + (v.size() * sizeof(decltype(v)::value_type)));
-	}
-
-	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor) {
-		const auto maybe_len = cursor.next<U32BE>();
-		if(!maybe_len) {
-			return false;
-		}
-		const auto len = maybe_len.value()[0];
-		const auto maybe_bytes = cursor.next<decltype(v)::value_type>(len);
-		if(!maybe_bytes) {
-			return false;
-		}
-		const auto bytes = maybe_bytes.value();
-		v.resize_and_overwrite(len, [bytes](auto buf, size_t n) {
-			std::ranges::copy(bytes, buf);
-			return n;
-		});
-		return true;
-	}
-
-	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) {
-		if(v.size() > (std::numeric_limits<uint32_t>::max)()) {
-			return false;
-		}
-		auto maybe_len = cursor.next<U32BE>();
-		if(!maybe_len) {
-			return false;
-		}
-		maybe_len.value()[0] = static_cast<U32BE>(v.size());
-		const auto maybe_bytes = cursor.next<decltype(v)::value_type>(v.size());
-		if(!maybe_bytes) {
-			return false;
-		}
-		const auto bytes = maybe_bytes.value();
-		std::ranges::copy(v, bytes.data());
-		return true;
-	}
+	size_t Size() const;
+	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor);
+	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) const;
 };
 
 // オプション保持用構造体 //
-typedef struct tagCONFIG_DATA{
+struct CONFIG_DATA {
 	template <
 		typename T, bool (*Validate)(T) = ValidateAlways
 	> using OPTION = CONFIG_OPTION_VALUE<T, Validate>;
@@ -223,7 +187,7 @@ typedef struct tagCONFIG_DATA{
 
 	// ワケ有りでここにいるのです(チェックサムの範囲外)
 	OPTION_U8_BELOW<STAGE_MAX> StageSelect = { 0 };
-} CONFIG_DATA;
+};
 
 // Active configuration
 extern CONFIG_DATA ConfigDat;

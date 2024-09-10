@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "platform/file.h"
+#include "CONFIG.H"
 #include "LZ_UTY.H"
 #include "GIAN.H"
 #include "DEMOPLAY.H"
@@ -18,6 +19,14 @@ DWORD			DemoBufPtr;						// デモプレイ用バッファPtr(Ｃのそれでは
 CONFIG_DATA		ConfigTemp;						// コンフィグのデータ一時保存用
 
 //DWORD RndBuf[RNDBUF_MAX];
+
+void DEMOPLAY_CONFIG_DATA::operator=(const CONFIG_DATA& config)
+{
+	GameLevel = config.GameLevel.v;
+	PlayerStock = config.PlayerStock.v;
+	BombStock = config.BombStock.v;
+	InputFlags = config.InputFlags.v;
+}
 
 
 

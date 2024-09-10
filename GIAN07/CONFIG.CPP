@@ -12,6 +12,49 @@
 ///// Constants /////
 constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
 
+size_t CONFIG_OPTION_UTF8::Size() const
+{
+	return (sizeof(U32BE) + (v.size() * sizeof(decltype(v)::value_type)));
+}
+
+bool CONFIG_OPTION_UTF8::Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor)
+{
+	const auto maybe_len = cursor.next<U32BE>();
+	if(!maybe_len) {
+		return false;
+	}
+	const auto len = maybe_len.value()[0];
+	const auto maybe_bytes = cursor.next<decltype(v)::value_type>(len);
+	if(!maybe_bytes) {
+		return false;
+	}
+	const auto bytes = maybe_bytes.value();
+	v.resize_and_overwrite(len, [bytes](auto buf, size_t n) {
+		std::ranges::copy(bytes, buf);
+		return n;
+	});
+	return true;
+}
+
+bool CONFIG_OPTION_UTF8::Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) const
+{
+	if(v.size() > (std::numeric_limits<uint32_t>::max)()) {
+		return false;
+	}
+	auto maybe_len = cursor.next<U32BE>();
+	if(!maybe_len) {
+		return false;
+	}
+	maybe_len.value()[0] = static_cast<U32BE>(v.size());
+	const auto maybe_bytes = cursor.next<decltype(v)::value_type>(v.size());
+	if(!maybe_bytes) {
+		return false;
+	}
+	const auto bytes = maybe_bytes.value();
+	std::ranges::copy(v, bytes.data());
+	return true;
+}
+
 // Arrays of configuration options for simple serialization
 template <CONFIG_OPTION... Options> class CONFIG_OPTION_ARRAY {
 private:

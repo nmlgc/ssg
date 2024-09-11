@@ -116,14 +116,13 @@ void ItemMove(void)
 void ItemDraw(void)
 {
 	int				i,j,x,y;
-	BYTE			ptn;
 	PIXEL_LTRB	src;
 
 	for(i=0;i<ItemNow;i++){
 		auto* ip = &Item[ItemInd[i]];
+		const uint8_t ptn = ((ip->count >> 2) & 3);
 		switch(ip->type){
 			case(ITEM_SCORE):
-				ptn = (BYTE)((ip->count>>2)&3);
 				src = PIXEL_LTWH{
 					(384 + (ptn << 4)), (256 + 16), 16, 16
 				};
@@ -134,7 +133,6 @@ void ItemDraw(void)
 
 			case(ITEM_EXTEND):
 				for(j=0; j<8; j++){
-					ptn = (BYTE)((ip->count>>2)&3);
 					src = PIXEL_LTWH{
 						(384 + (16 * 4) + (ptn << 4)), (256 + 16), 16, 16
 					};
@@ -143,7 +141,6 @@ void ItemDraw(void)
 					GrpBlt(&src,x,y,GrTama);
 				}
 
-			//	ptn = (BYTE)((ip->count>>2)&3);
 			//	src = PIXEL_LTWH{
 			//		(384 + (16 * 4) + (ptn << 4)), (256 + 16), 16, 16
 			//	};
@@ -154,7 +151,6 @@ void ItemDraw(void)
 
 			case(ITEM_BOMB):
 				for(j=0; j<8; j++){
-					ptn = (BYTE)((ip->count>>2)&3);
 					src = PIXEL_LTWH{
 						(384 + (16 * 8) + (ptn << 4)), (256 + 16), 16, 16
 					};
@@ -163,7 +159,6 @@ void ItemDraw(void)
 					GrpBlt(&src,x,y,GrTama);
 				}
 
-			//	ptn = (BYTE)((ip->count>>2)&3);
 			//	src = PIXEL_LTWH{
 			//		(384 + (16 * 8) + (ptn << 4)), (256 + 16), 16, 16
 			//	};

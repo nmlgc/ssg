@@ -66,7 +66,7 @@ template <
 
 		void SetFont(FontID font) {
 			if(font_cur != font) {
-				TEXTRENDER_GDI_SESSION_BASE::SetFont(size_t(font));
+				TEXTRENDER_GDI_SESSION_BASE::SetFont(std::to_underlying(font));
 				font_cur = font;
 			}
 		}

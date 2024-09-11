@@ -194,11 +194,11 @@ char GetAddr2Char(int x, int y)
 {
 	// 大文字 //
 	if(y == 0){
-		return (char)('A' + (x % 26));
+		return ('A' + (x % 26));
 	}
 	// 小文字 //
 	else if (y == 1){
-		return (char)('a' + (x % 26));
+		return ('a' + (x % 26));
 	}
 	// その他記号など //
 	else{

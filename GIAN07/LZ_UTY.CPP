@@ -117,9 +117,8 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 		return nullptr;
 	}
 
-	BYTE_BUFFER_OWNED uncompressed = {
-		size_t{ info[filno].size_uncompressed }
-	};
+	const uint32_t size_uncompressed = info[filno].size_uncompressed;
+	BYTE_BUFFER_OWNED uncompressed = { size_uncompressed };
 	if(!uncompressed) {
 		return nullptr;
 	}

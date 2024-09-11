@@ -813,7 +813,7 @@ static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDNam
 
 	if(lpDD->GetCaps(&DriverCaps,&HelCaps)==DD_OK){
 		// ２Ｄでサポートしている解像度をチェック(色数だが...) //
-		dxret = lpDD->EnumDisplayModes(0,NULL,(LPVOID)xenum,ModeEnum);
+		dxret = lpDD->EnumDisplayModes(0, nullptr, xenum, ModeEnum);
 
 		if(dxret==DD_OK){
 			// このドライバで使用できる３Ｄデバイスを列挙         //
@@ -822,7 +822,7 @@ static BOOL FAR __stdcall DriverEnum(GUID FAR *lpGUID,LPSTR lpDDesc,LPSTR lpDNam
 			auto **ptr = reinterpret_cast<void **>(&lpD3D);
 			dxret = lpDD->QueryInterface(IID_IDirect3D2, ptr);
 			if(dxret==DD_OK)
-				lpD3D->EnumDevices(DeviceEnum,(LPVOID)xenum);
+				lpD3D->EnumDevices(DeviceEnum, xenum);
 
 			// この時点で xenum->D3DNow==0 なら３Ｄは使用できないことになる //
 			xenum->name    = lpDName;

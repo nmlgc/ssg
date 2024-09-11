@@ -343,19 +343,18 @@ void GrpSetClip(int sx, int sy, int ex, int ey)
 
 bool GRAPHICS_DDRAW::Restore(void)
 {
-	HRESULT		dxval;
 	int			i;
 
 	if(Prim) {
-		dxval = Prim->Restore();
+		const auto dxval = Prim->Restore();
 		if(dxval!=DD_OK) return FALSE;
 	}
 	if(Back) {
-		Back->Restore();
+		const auto dxval = Back->Restore();
 		if(dxval!=DD_OK) return FALSE;
 	}
 	if(Zbuf) {
-		Zbuf->Restore();
+		const auto dxval = Zbuf->Restore();
 		if(dxval!=DD_OK) return FALSE;
 	}
 

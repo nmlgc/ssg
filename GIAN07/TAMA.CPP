@@ -386,7 +386,30 @@ void tama_draw(void)
 			continue;
 
 			case(TAMA_EXTRA2):
-				d  = (BYTE)(t->d+4)/8;	// 256(-1) -> 32(-1) に変換
+				// The original code spelled this as
+				//
+				// 	d = (BYTE)(t->d+4)/8;
+				//
+				// which is a rather misleading way of expressing the following
+				// operations:
+				//
+				// 1) Promote [t->d] to `int` as per C/C++'s arithmetic rules
+				// 2) Add 4
+				// 3) Take the least significant 8 bits to pretend that it
+				//    actually was an 8-bit addition
+				// 4) Divide the result by 8
+				//
+				// Merely removing the seemingly superfluous cast therefore
+				// leads to a different result (and thus, a different sprite)
+				// as the result of the integer addition is not truncated on
+				// overflow. Spelling the truncation as `& 0xFF` doesn't look
+				// any less superfluous. Cast::down_sign() is the best solution
+				// here, as it enforces its argument to be both larger
+				// (`int` > `uint8_t`) and signed.
+				//
+				// 256(-1) -> 32(-1) に変換
+				d = (Cast::down_sign<uint8_t>(t->d + 4) / 8);
+
 				src.top    = 320 + ((t->c & 3)<<4);	// (c mod 4) * 16
 				src.left   = d * 16;
 				src.bottom = src.top  + 16;
@@ -405,8 +428,12 @@ void tama_draw(void)
 					src.right  = src.left + 16;
 				}
 				else{
-					//d  = (BYTE)(t->d+8)/8;
-					d  = (BYTE)(t->d+4)/8;		// 修正 8 ごとで 32 分割だからズラシは 4
+					// Same as above.
+					//
+					// 修正 8 ごとで 32 分割だからズラシは 4
+					// d = (Cast::down_sign<uint8_t>(t->d + 8) / 8);
+					d  = (Cast::down_sign<uint8_t>(t->d + 4) / 8);
+
 					dx = (d%8) * 32;
 					dy = (d/8) * 32;
 					src.top  = 304 + dy;
@@ -1007,15 +1034,20 @@ void __fastcall tamaOmove(TAMA_DATA *t)
 		return;
 
 		case(TOP_WAVE):		// 波
-			op_temp = sinl((BYTE)(t->count<<2),(t->option&0x0f)<<7);
+			op_temp = sinl(
+				Cast::down_sign<uint8_t>(t->count << 2),
+				((t->option & 0x0f) << 7)
+			);
 			t->x    = t->tx - sinl(t->d,op_temp);
 			t->y    = t->ty + cosl(t->d,op_temp);
 		return;
 
-		case(TOP_ROLL):		// 回転
+		case(TOP_ROLL): { // 回転
+			const auto angle = Cast::down_sign<uint8_t>(t->d + (t->count << 1));
 			op_temp = (t->option&0x0f)<<8;
-			t->x    = t->tx + cosl((BYTE)((t->d)+(t->count<<1)),op_temp);
-			t->y    = t->ty + sinl((BYTE)((t->d)+(t->count<<1)),op_temp);
+			t->x    = (t->tx + cosl(angle, op_temp));
+			t->y    = (t->ty + sinl(angle, op_temp));
+		}
 		return;
 
 		case(TOP_PURU):		// ぷるぷる

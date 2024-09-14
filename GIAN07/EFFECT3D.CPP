@@ -5,6 +5,7 @@
 
 #include "EFFECT3D.H"
 #include "GIAN.H"
+#include "game/cast.h"
 #include <ranges>
 
 #define CIRCLE_MAX			40
@@ -128,7 +129,9 @@ void DrawWarning(void)
 
 	if(Warning[0].DegX == 0) {
 		GrpLock();
-		GrpSetAlpha((BYTE)(128+sinl(count,48)),ALPHA_NORM);
+		GrpSetAlpha(
+			Cast::down_sign<uint8_t>(128 + sinl(count, 48)), ALPHA_NORM
+		);
 		GrpSetColor(5,0,0);
 		GrpBoxA(129,40+6,128+384,60+6);
 		GrpBoxA(129,60+(232-152)-4,128+384,80+(232-152)-4);

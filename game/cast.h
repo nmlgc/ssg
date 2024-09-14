@@ -30,4 +30,13 @@ template <class T, class F> constexpr T sign(F&& f) noexcept
 	return static_cast<T>(std::forward<F>(f));
 }
 
+template <class T, class F> constexpr T down_sign(F&& f) noexcept
+{
+	using To = std::remove_reference_t<T>;
+	using From = std::remove_reference_t<F>;
+	static_assert(sizeof(To) < sizeof(From));
+	static_assert(std::is_signed_v<To> != std::is_signed_v<From>);
+	return static_cast<T>(std::forward<F>(f));
+}
+
 } // namespace Cast

@@ -7,6 +7,7 @@
 #include "FONTUTY.H"
 #include "GIAN.H"
 #include "game/bgm.h"
+#include "game/cast.h"
 
 
 typedef struct tagEndingGrpInfo {
@@ -316,8 +317,14 @@ void DrawFadeInfo()
 			GrpSetPalette(temp_pal);
 		}
 		else if(EGrpInfo.target){
-			FadeoutPaletteGrp(temp_pal, EGrpInfo.target->pal, (BYTE)EGrpInfo.alpha);
-			FadeoutPaletteStf(temp_pal, temp_pal, (BYTE)EStfTask.alpha);
+			FadeoutPaletteGrp(
+				temp_pal,
+				EGrpInfo.target->pal,
+				Cast::down_sign<uint8_t>(EGrpInfo.alpha)
+			);
+			FadeoutPaletteStf(
+				temp_pal, temp_pal, Cast::down_sign<uint8_t>(EStfTask.alpha)
+			);
 			GrpSetPalette(temp_pal);
 		}
 		else{

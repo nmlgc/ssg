@@ -6,6 +6,7 @@
 #include "DD_UTY.H"
 #include "DD_GRP2D.H"					// ２Ｄ用描画関数(公開しないこと)
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
+#include "game/cast.h"
 #include "game/input.h"
 #include "game/screenshot.h"
 #include <assert.h>
@@ -666,7 +667,9 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 			// これでいいのか？ //
 			const auto *bytes = static_cast<uint8_t *>(ddsd.lpSurface);
 			return (
-				bytes[0] + (DWORD{ bytes[1] } << 8) + (DWORD{ bytes[2] } << 16)
+				(Cast::up<DWORD>(bytes[0]) <<  0) +
+				(Cast::up<DWORD>(bytes[1]) <<  8) +
+				(Cast::up<DWORD>(bytes[2]) << 16)
 			);
 		}
 		return *static_cast<decltype(pixel) *>(ddsd.lpSurface);

@@ -160,8 +160,10 @@ int DrawTrapezoid(int y, int dy)
 
 	auto left_x = TZOID_A.x;
 	auto det_x  = TZOID_B.x; // - left_x;
-	const auto left_step = ((uint64_t(TZOID_A.d) << 32) + TZOID_A.dlx);
-	const auto det_step  = ((uint64_t(TZOID_B.d) << 32) + TZOID_B.dlx);
+	const auto a_d = Cast::up<uint64_t>(TZOID_A.d);
+	const auto b_d = Cast::up<uint64_t>(TZOID_B.d);
+	const auto left_step = ((a_d << 32) + TZOID_A.dlx);
+	const auto det_step  = ((b_d << 32) + TZOID_B.dlx);
 
 	do{
 		GrpHLineX((left_x >> 32), (det_x >> 32), y);

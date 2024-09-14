@@ -35,7 +35,9 @@ PATH_STRING ReplayFN(uint8_t stage)
 void DemoplayInit(void)
 {
 	// 乱数の準備 //
-	DemoInfo.RndSeed = (DWORD)(rnd()+1)*(DWORD)(rnd()+1);
+	DemoInfo.RndSeed = (
+		(Cast::up<uint32_t>(rnd()) + 1u) * (Cast::up<uint32_t>(rnd()) + 1u)
+	);
 	rnd_seed_set(DemoInfo.RndSeed);
 
 	DemoInfo.Exp    = Viv.exp;

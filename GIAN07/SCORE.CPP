@@ -292,7 +292,9 @@ static bool SetDefaultScoreData(void)
 		auto temp = maybe_temp.value();
 		for(size_t j = 0; j < temp.size(); j++) {
 			strcpy(temp[j].Name, "????????");
-			temp[j].Score  = ((temp.size() - j) * 1200000); // 1500000;
+			temp[j].Score  = (
+				(temp.size() - j) * uint64_t{ 1200000 } // 1500000
+			);
 			temp[j].Evade  = ((temp.size() - j) * 50);
 			temp[j].Stage  = ((i < 4) ? (temp.size() - j) : 1);
 			temp[j].Weapon = j % 3;

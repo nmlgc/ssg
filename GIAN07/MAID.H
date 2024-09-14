@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_MAID_H)
 
 #include <stdint.h>
+#include "game/cast.h"
 
 
 
@@ -107,7 +108,7 @@ inline void PowerUp(uint8_t damage)
 	Viv.exp2 += damage;
 
 	// Viv.exp(8bit+1bit) ooo oooooo //
-	switch(((uint16_t)Viv.exp+1)>>5){
+	switch((Cast::up<uint16_t>(Viv.exp) + 1) >> 5) {
 		case(0):	if(Viv.exp2>5-3)		Viv.exp++,	Viv.exp2=0;	return;
 		case(1):	if(Viv.exp2>25-15)		Viv.exp++,	Viv.exp2=0;	return;
 		case(2):	if(Viv.exp2>50-20)		Viv.exp++,	Viv.exp2=0;	return;

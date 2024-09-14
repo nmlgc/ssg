@@ -1706,7 +1706,7 @@ void parse_ECL(ENEMY_DATA *e)
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-					e->GR[cmd[1]] = (DWORD)rnd()*rnd();
+					e->GR[cmd[1]] = (Cast::up<uint32_t>(rnd()) * rnd());
 				break;
 
 				default:	// レジスタ指定がおかしい

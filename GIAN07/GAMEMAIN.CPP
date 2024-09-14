@@ -1233,7 +1233,7 @@ void WeaponSelectProc(bool&)
 
 		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
 		GrpBlt(&rc,468,400,GrTama);
-		sprintf(buf,"%d",((WORD)Viv.exp+1)>>5);
+		sprintf(buf, "%d", ((Cast::up<uint16_t>(Viv.exp) + 1) >> 5));
 		GrpPutScore(500,400,buf);
 
 		GrpLock();

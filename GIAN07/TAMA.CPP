@@ -887,7 +887,7 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 		return;
 
 		case(T_ROLL):		// 回転弾
-			t->d += (char)t->vd;
+			t->d += Cast::sign<uint8_t>(t->vd);
 			t->tx += cosl(t->d,t->v);
 			t->ty += sinl(t->d,t->v);
 			if(t->rep == t->count){
@@ -900,7 +900,9 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 
 		case(T_ROLL_A):		// 回転弾(加速) 最初の加速度は"負"にして下さい！
 			t->v  += t->a;
-			if(t->a>0)	t->d += (char)t->vd;
+			if(t->a > 0) {
+				t->d += Cast::sign<uint8_t>(t->vd);
+			}
 			t->tx += cosl(t->d,t->v);
 			t->ty += sinl(t->d,t->v);
 			if( (t->a<0) && (t->v<=0 ) ) t->a = -(t->a);
@@ -917,7 +919,7 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 
 		case(T_ROLL_R):		// 回転弾(反転) 上と同じで加速度に注意！
 			t->v += t->a;
-			t->d += (char)t->vd;
+			t->d += Cast::sign<uint8_t>(t->vd);
 			t->tx += cosl(t->d,t->v);
 			t->ty += sinl(t->d,t->v);
 			if( (t->a<0) && (t->v<=0 ) ){
@@ -948,7 +950,7 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 			t->ty += t->vy;
 			if(t->rep == t->count){
 				t->type = (t->type&0xf0) | T_NORM;	// 上位ビットは一応保存する
-				t->d    = (BYTE)t->vd;
+				t->d    = Cast::sign<uint8_t>(t->vd);
 				t->vx   = cosl(t->d,t->v);
 				t->vy   = sinl(t->d,t->v);
 			}
@@ -980,7 +982,7 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 				if(t->vd<250) t->vd++;
 				t->v -= t->a;
 			}
-			t->d  = t->d + deg_t*((BYTE)t->vd)/255;
+			t->d += (deg_t * (Cast::sign<uint8_t>(t->vd)) / 255);
 			t->vx = cosl(t->d,t->v);
 			t->vy = sinl(t->d,t->v);
 		return;

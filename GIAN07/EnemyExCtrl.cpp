@@ -8,6 +8,7 @@
 #include "LOADER.H"
 #include "MAID.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "game/cast.h"
 #include "game/snd.h"
 
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
@@ -407,7 +408,7 @@ static void BitSTDRoll(void)
 		d = (BitData.BaseAngle>>1) + (delta * bit->BitID);
 
 		// 通常の角度収束処理 //
-		dir = (int)d - (int)(bit->Angle);
+		dir = (Cast::sign<int8_t>(d) - Cast::sign<int8_t>(bit->Angle));
 
 		if(     dir < -128) dir += 256;
 		else if(dir >  128) dir -= 256;

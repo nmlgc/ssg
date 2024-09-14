@@ -521,7 +521,7 @@ void ScreenEffectDraw(void)
 
 		case(SCNEFC_WHITEIN):	// ホワイトイン
 			src = PIXEL_LTWH{
-				((15 - (int(ScreenInfo.count) / 10)) * 16),
+				((15 - (Cast::sign<int>(ScreenInfo.count) / 10)) * 16),
 				(128 + 16),
 				16,
 				16
@@ -535,7 +535,7 @@ void ScreenEffectDraw(void)
 
 		case(SCNEFC_WHITEOUT):	// ホワイトアウト
 			src = PIXEL_LTWH{
-				((int(ScreenInfo.count) / 10) * 16),
+				((Cast::sign<int>(ScreenInfo.count) / 10) * 16),
 				(128 + 16),
 				16,
 				16
@@ -837,9 +837,11 @@ void GrpDrawNote(void)
 	PIXEL_LTRB	rc;
 
 	for(Track=0;Track<16;Track++){
-		GrpPutMidNum( 50,22+Track*24,Mid_VolumeTable[Track]);
-		GrpPutMidNum(125,22+Track*24,Mid_ExpressionTable[Track]);
-		GrpPutMidNum(181,22+Track*24,(int)Mid_PanpodTable[Track]-64);
+		const auto top = (22 + (Track * 24));
+		const auto pan = (Cast::sign<int8_t>(Mid_PanpodTable[Track]) - 64);
+		GrpPutMidNum( 50, top, Mid_VolumeTable[Track]);
+		GrpPutMidNum(125, top, Mid_ExpressionTable[Track]);
+		GrpPutMidNum(181, top, pan);
 
 		LevelSum = num = 0;
 		for(NoteNo=0;NoteNo<128;NoteNo++){

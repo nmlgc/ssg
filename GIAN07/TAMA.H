@@ -147,7 +147,7 @@ typedef struct{
 
 	uint8_t d;	// 進行角
 	uint16_t d16;	// 進行角(固定小数点 x256) -> ｎ％ホーミングでのみ使用する
-	char vd;		// 角速度
+	int8_t vd;	// 角速度
 
 	uint8_t c;	// 弾の色＆形状
 

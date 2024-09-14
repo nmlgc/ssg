@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "DD_CLIP2D.H"
+#include "game/cast.h"
 #include <limits>
 #include <string.h>
 
@@ -34,7 +35,7 @@ inline void SetLineWork(LINE_WORK *w, int x1, int x2, int dy)
 	const auto dx = (x2 - x1);
 	const auto d = (dx / dy);
 	const auto err = (dx % dy);
-	const auto dy_unsigned = std::make_unsigned_t<decltype(dy)>(dy);
+	const auto dy_unsigned = Cast::sign<std::make_unsigned_t<decltype(dy)>>(dy);
 	if(err < 0) {
 		w->d = (d - 1);
 		w->dlx = -((static_cast<uint64_t>(-err) << 32) / dy_unsigned);

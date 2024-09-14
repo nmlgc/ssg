@@ -628,7 +628,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LLDEGR):		// 太レーザー角度相対変更 cmd,id,deg
-			LLaserDegR(e,(char)cmd[2],cmd[1]);	// 順番が逆だから注意ね
+			// 順番が逆だから注意ね
+			LLaserDegR(e, Cast::sign<int8_t>(cmd[2]), cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -821,7 +822,7 @@ void parse_ECL(ENEMY_DATA *e)
 				//e->vy    = sinl(e->d,e->v);
 			}
 			if((--e->cmd_c)!=0){
-				e->v += (char)cmd[1];
+				e->v += Cast::sign<int8_t>(cmd[1]);
 				e->x += cosl(e->d, e->v);
 				e->y += sinl(e->d, e->v);
 
@@ -914,7 +915,7 @@ void parse_ECL(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_ROL : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 1]) + 1);
-				e->vd    = REL_DEGRL((char)cmd[1]);
+				e->vd    = REL_DEGRL(Cast::sign<int8_t>(cmd[1]));
 			}
 			if((--e->cmd_c)!=0){
 				e->x += cosl(e->d,e->v);
@@ -949,7 +950,7 @@ void parse_ECL(ENEMY_DATA *e)
 				e->vx    = ABS_VXRL(I32LEAt(&cmd[1]));
 				e->vy    = e->y;
 				e->amp   = cmd[1 + 4];
-				e->vd    = (char)cmd[1+5];
+				e->vd    = Cast::sign<int8_t>(cmd[1 + 5]);
 				//e->d     = 0;
 			}
 			if((--e->cmd_c)!=0){
@@ -968,7 +969,7 @@ void parse_ECL(ENEMY_DATA *e)
 				e->vy    = I32LEAt(&cmd[1]);
 				e->vx    = e->x;
 				e->amp   = cmd[1 + 4];
-				e->vd    = (char)cmd[1+5];
+				e->vd    = Cast::sign<int8_t>(cmd[1 + 5]);
 				//e->d     = 0;
 			}
 			if((--e->cmd_c)!=0){
@@ -1072,7 +1073,7 @@ void parse_ECL(ENEMY_DATA *e)
 				e->cmd_c = 9999;	// 非ゼロ値であれば、どのような値でも良い
 				e->vx    = cosl(e->d, e->v);
 				e->vy    = sinl(e->d, e->v);
-				e->vd    = (char)cmd[1];		// 重力加速度!!
+				e->vd    = Cast::sign<int8_t>(cmd[1]);	// 重力加速度!!
 				e->flag |= EF_CLIP;				// クリッピング属性を自動的にセットする
 			}
 			else{
@@ -1105,8 +1106,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_DEGR):			// ＠角度相対指定
-			ECL_DEBUG("ECL_DEGR : %d",(char)cmd[1]);
-			e->d += REL_DEGRL((char)cmd[1]);
+			ECL_DEBUG("ECL_DEGR : %d", Cast::sign<int8_t>(cmd[1]));
+			e->d += REL_DEGRL(Cast::sign<int8_t>(cmd[1]));
 			bRetFlag = FALSE;
 		break;
 
@@ -1225,8 +1226,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TDEGR):		// ＠弾発射角相対指定
-			e->t_cmd.d  += (char)cmd[1];
-			e->t_cmd.dw += (char)cmd[1+1];
+			e->t_cmd.d  += Cast::sign<int8_t>(cmd[1]);
+			e->t_cmd.dw += Cast::sign<int8_t>(cmd[1 + 1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1248,22 +1249,25 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TNUMR):		// ＠弾発射数相対指定
-			e->t_cmd.n  += (char)cmd[1];
-			e->t_cmd.ns += (char)cmd[1+1];
+			e->t_cmd.n  += Cast::sign<int8_t>(cmd[1]);
+			e->t_cmd.ns += Cast::sign<int8_t>(cmd[1 + 1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_TSPDA):		// ＠弾速度絶対指定
 			e->t_cmd.v = cmd[1];
-			e->t_cmd.a = (char)cmd[1+1];
+			e->t_cmd.a = Cast::sign<int8_t>(cmd[1 + 1]);
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_TSPDR):		// ＠弾速度相対指定
 			temp = e->t_cmd.v;
-			e->t_cmd.v  = ((temp&0x3f)+(char)cmd[1])&0x3f;	// フラグを外して演算
+
+			// フラグを外して演算
+			e->t_cmd.v = (((temp & 0x3f) + Cast::sign<int8_t>(cmd[1])) & 0x3f);
+
 			e->t_cmd.v |= (temp&0xc0);//(temp&0x3c);						// フラグを書き戻す
-			e->t_cmd.a += (char)cmd[1+1];
+			e->t_cmd.a += Cast::sign<int8_t>(cmd[1 + 1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1283,7 +1287,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TVDEG):		// ＠弾の角速度
-			e->t_cmd.vd = (char)cmd[1];
+			e->t_cmd.vd = Cast::sign<int8_t>(cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1344,8 +1348,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LDEGR):		// レーザー発射角＆幅相対指定
-			e->l_cmd.d  += (char)cmd[1];
-			e->l_cmd.dw += (char)cmd[2];
+			e->l_cmd.d  += Cast::sign<int8_t>(cmd[1]);
+			e->l_cmd.dw += Cast::sign<int8_t>(cmd[2]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1366,7 +1370,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LNUMR):		// レーザーの本数相対指定
-			e->l_cmd.n += (char)cmd[1];
+			e->l_cmd.n += Cast::sign<int8_t>(cmd[1]);
 			bRetFlag = FALSE;
 		break;
 
@@ -1465,7 +1469,7 @@ void parse_ECL(ENEMY_DATA *e)
 		case(ECL_ANM):			// アニメーションセット
 			// anm_ptnEx をセットするのは互換性を保つための配慮 //
 			e->anm_ptn  = e->anm_ptnEx = cmd[1];
-			e->anm_sp   = (char)cmd[2];
+			e->anm_sp   = Cast::sign<int8_t>(cmd[2]);
 			//if(e->anm_sp==0) e->anm_sp=1;
 			e->g_height = (Anime[e->anm_ptn].size.h << 5);
 			e->g_width  = (Anime[e->anm_ptn].size.w << 5);

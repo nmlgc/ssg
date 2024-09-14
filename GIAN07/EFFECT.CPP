@@ -5,6 +5,7 @@
 
 #include "EFFECT.H"
 #include "GIAN.H"
+#include "game/cast.h"
 #include "game/snd.h"
 
 
@@ -346,8 +347,11 @@ void SEffectDraw(void)
 				strcpy(buf,"GAME OVER");
 				for(j=0;j<9;j++){
 					// *37 //
-					x = (e->x>>6) + cosl((BYTE)e->time*3+j*26,e->time*4);
-					y = (e->y>>6) + sinl((BYTE)e->time*3+j*26,e->time*4);
+					const auto angle = Cast::down<uint8_t>(
+						(e->time * 3) + (j * 26)
+					);
+					x = (e->x >> 6) + cosl(angle, e->time * 4);
+					y = (e->y >> 6) + sinl(angle, e->time * 4);
 					GrpPutc(x,y,buf[j]);
 				}
 			break;
@@ -358,7 +362,9 @@ void SEffectDraw(void)
 				j = (35 - e->time) / 2;
 				GrpLock();
 				GrpSetColor(0,0,0);
-				GrpSetAlpha((BYTE)(35-e->time)*3,ALPHA_NORM);
+				GrpSetAlpha(
+					Cast::down<uint8_t>((35 - e->time) * 3), ALPHA_NORM
+				);
 				GrpBoxA(x-170,y-j,x+170,y+j);
 				GrpUnlock();
 
@@ -372,7 +378,7 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_MTITLE3): {
-				degx = (BYTE)(64*2 - e->time);
+				degx = Cast::down<uint8_t>((64 * 2) - e->time);
 				for(j=0;j<e->vx;j++){
 					src = { j, 0, 1, e->vy };
 					temp = sinl(degx,100);
@@ -390,7 +396,7 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_MTITLE1): {
-				degx = (BYTE)e->time;
+				degx = Cast::down<uint8_t>(e->time);
 				for(j=0;j<e->vx;j++){
 					src = { j, 0, 1, e->vy };
 					temp = sinl(degx,160);
@@ -410,7 +416,10 @@ void SEffectDraw(void)
 			case(SEFC_MTITLE2): {
 				GrpLock();
 				GrpSetColor(0,0,0);
-				GrpSetAlpha(sinl((BYTE)e->time-32,80)+80,ALPHA_NORM);
+				GrpSetAlpha(
+					(sinl(Cast::down<uint8_t>(e->time - 32), 80) + 80),
+					ALPHA_NORM
+				);
 				for(j=0;j<16;j++){
 					temp = sinl(128+j*16,16);
 					GrpBoxA((e->x>>6)+temp-16,(e->y>>6)+j,(X_MAX-16)-temp,(e->y>>6)+j+1);
@@ -885,7 +894,7 @@ void WarningEffectMove(void)
 	if(!bEnableWarnEfc) return;
 
 	if(WarnEfcTime<64+128){//64+256){
-		MoveWarning((BYTE)WarnEfcTime);
+		MoveWarning(Cast::down<uint8_t>(WarnEfcTime));
 	}
 	else{
 		MoveWarningR(-1);

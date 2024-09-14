@@ -5,6 +5,7 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
+#include "game/cast.h"
 #include "game/input.h"
 #include "game/snd.h"
 
@@ -370,7 +371,7 @@ static void SetT_A1(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 軽く振り分けるメインショット //
 		Viv.toge_ex += 32;
-		dd = (char)sinl(Viv.toge_ex,6);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 6));
 		TamaSTDForm(TID_WIDE_MAIN);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetDeg(-64+dd,0);
@@ -388,7 +389,7 @@ static void SetT_A2(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット２連 //
 		Viv.toge_ex += 32;
-		dd = (char)sinl(Viv.toge_ex,6);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 6));
 
 		TamaSTDForm(TID_WIDE_MAIN);
 		TamaSetXY(Viv.x-(6*64),Viv.y);
@@ -423,7 +424,7 @@ static void SetT_A3(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット３ＷＡＹ //
 		Viv.toge_ex+=32;
-		dd = (char)sinl(Viv.toge_ex,6);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 6));
 		TamaSTDForm(TID_WIDE_MAIN);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetDeg(-64+dd,4);
@@ -455,7 +456,7 @@ static void SetT_A4(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット３ＷＡＹ //
 		Viv.toge_ex+=32;
-		dd = (char)sinl(Viv.toge_ex,6);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 6));
 		TamaSTDForm(TID_WIDE_MAIN);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetDeg(-64+dd,4);
@@ -492,7 +493,7 @@ static void SetT_A6(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット４ＷＡＹ //
 		Viv.toge_ex+=32;
-		dd = (char)sinl(Viv.toge_ex,6);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 6));
 		TamaSTDForm(TID_WIDE_MAIN);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetDeg(-64+dd,3);
@@ -529,7 +530,7 @@ static void SetT_A8(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット４ＷＡＹ //
 		Viv.toge_ex+=32;
-		dd = (char)sinl(Viv.toge_ex,6);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 6));
 		TamaSTDForm(TID_WIDE_MAIN);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetDeg(-64+dd,3);
@@ -562,7 +563,7 @@ static void SetT_B0(void)
 	if(IsMainShot(Viv.toge_time)){
 		// 軽く振り分けるメインショット //
 		Viv.toge_ex+=32;
-		dd = (char)sinl(Viv.toge_ex,4);
+		dd = Cast::down<int8_t>(sinl(Viv.toge_ex, 4));
 		TamaSTDForm(TID_HOMING_MAIN);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetDeg(-64+dd,0);
@@ -911,7 +912,7 @@ static void SetWideBomb(void)
 
 	if(Viv.bomb_time > WIDE_BOMB_TIME-30) return;
 
-	d  = (BYTE)(Viv.bomb_time*3);
+	d  = Cast::down<uint8_t>(Viv.bomb_time * 3u);
 	l  = (WIDE_BOMB_TIME - Viv.bomb_time)*26;		// 16-32
 	dx = GX_MID + 64*70/2 + cosl(d, l<<1);
 	dy = GY_MID - 64*90/2 + sinl(d<<1, l);

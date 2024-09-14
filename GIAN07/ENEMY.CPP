@@ -8,6 +8,7 @@
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "GIAN07/entity.h"
+#include "game/cast.h"
 #include "game/snd.h"
 
 /*
@@ -364,7 +365,7 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID)
 
 	e->IsDamaged = 0;
 
-	e->tama_c   = (BYTE)rnd();//&0xff;
+	e->tama_c   = Cast::down<uint8_t>(rnd()); // & 0xff;
 	e->t_rep    = 0;			// 弾の発射間隔(０：自動発射しない)
 	e->g_width  = 0;
 	e->g_height = 0;
@@ -1658,18 +1659,24 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_SINL):		// sinl(Gr0,Gr1)
-			if(cmd[1]<ECLREG_MAX && cmd[2]<ECLREG_MAX)
-				e->GR[cmd[1]] = sinl((BYTE)e->GR[cmd[2]],e->GR[cmd[1]]);
-			//else
+			if(cmd[1]<ECLREG_MAX && cmd[2]<ECLREG_MAX) {
+				e->GR[cmd[1]] = sinl(
+					Cast::down<uint8_t>(e->GR[cmd[2]]), e->GR[cmd[1]]
+				);
+			} // else {
 				// 本当はswitch()で判別したいが...
+			// }
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_COSL):		// cosl(Gr0,Gr1)
-			if(cmd[1]<ECLREG_MAX && cmd[2]<ECLREG_MAX)
-				e->GR[cmd[1]] = cosl((BYTE)e->GR[cmd[2]],e->GR[cmd[1]]);
-			//else
+			if(cmd[1]<ECLREG_MAX && cmd[2]<ECLREG_MAX) {
+				e->GR[cmd[1]] = cosl(
+					Cast::down<uint8_t>(e->GR[cmd[2]]), e->GR[cmd[1]]
+				);
+			} // else {
 				// 本当はswitch()で判別したいが...
+			// }
 			bRetFlag = FALSE;
 		break;
 

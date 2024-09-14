@@ -9,6 +9,7 @@
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "game/bgm.h"
+#include "game/cast.h"
 #include "game/input.h"
 #include "game/snd.h"
 
@@ -755,7 +756,9 @@ static void ScrollCmdRasterOpen(void)
 
 	// ちょっと重いかもね... //
 	for(i=j=0;i<31;i++,j+=16){
-		ScrollInfo.RasterDx[i] = (char)sinl(ScrollInfo.RasterDeg+j,ScrollInfo.RasterWidth);
+		ScrollInfo.RasterDx[i] = Cast::down<int8_t>(
+			sinl((ScrollInfo.RasterDeg + j), ScrollInfo.RasterWidth)
+		);
 	}
 
 	ScrollInfo.RasterDeg+=2;
@@ -770,7 +773,9 @@ static void ScrollCmdRasterClose(void)
 
 	// ちょっと重いかもね... //
 	for(i=j=0;i<31;i++,j+=2){
-		ScrollInfo.RasterDx[i] = (char)sinl(ScrollInfo.RasterDeg+j,ScrollInfo.RasterWidth);
+		ScrollInfo.RasterDx[i] = Cast::down<int8_t>(
+			sinl((ScrollInfo.RasterDeg + j), ScrollInfo.RasterWidth)
+		);
 	}
 
 	ScrollInfo.RasterDeg += 8;

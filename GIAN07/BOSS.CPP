@@ -7,6 +7,7 @@
 #include "GIAN.H"
 #include "EnemyExCtrl.h"
 #include "../DirectXUTYs/DD_GRP3D.H"
+#include "game/cast.h"
 #include "game/snd.h"
 
 
@@ -518,7 +519,7 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		if(e.LLaserRef) {
 			LLaserForceClose(&e); // レーザーの強制クローズ
 		}
-		PowerUp((BYTE)e.hp);
+		PowerUp(Cast::down<uint8_t>(e.hp));
 		e.hp    = 0;
 		e.count = 0;
 		e.flag  = EF_BOMB;

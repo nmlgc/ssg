@@ -6,6 +6,7 @@
 #include "TAMA.H"
 #include "GIAN.H"
 #include "LEVEL.H"
+#include "game/cast.h"
 #include "game/snd.h"
 
 
@@ -1111,7 +1112,7 @@ void __fastcall tamaOmove(TAMA_DATA *t)
 					case(TC_ALL):
 						TamaCmd.n  = 10;
 						TamaCmd.v  = 13;
-						TamaCmd.d  = (BYTE)rnd();
+						TamaCmd.d  = Cast::down<uint8_t>(rnd());
 						if(TamaCmd.cmd&TAMA_REN) TamaCmd.v -= 2;
 					break;
 					case(TC_RND):

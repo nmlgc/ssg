@@ -5,6 +5,7 @@
 
 #include "LENS.H"
 #include "DirectXUTYs/DD_UTY.H"
+#include "game/cast.h"
 #include "game/ut_math.h"
 #include <assert.h>
 #include <ddraw.h>
@@ -93,7 +94,7 @@ std::optional<LensInfo> GrpCreateLensBall(
 	assert(r > 0);	// 半径がおかしい
 	assert(r > m);	// 出っ張りは半径より小さくせよ！
 
-	const auto Diameter = (int32_t{ r } * 2);
+	const auto Diameter = (Cast::up_sign<int32_t>(r) * 2);
 
 	// Not even restricting [Diameter] to int8_t would convince Visual Studio's
 	// static analyzer that this can't overflow.
@@ -113,10 +114,10 @@ std::optional<LensInfo> GrpCreateLensBall(
 	const auto Pitch = NewLens.gPitch;
 
 	auto* Table = NewLens.Data.get();
-	const auto r2 = (int32_t{ r } * r);
-	const auto s = isqrt(r2 - (int32_t{ m } * m));
+	const auto r2 = (Cast::up_sign<int32_t>(r) * r);
+	const auto s = isqrt(r2 - (Cast::up_sign<int32_t>(m) * m));
 
-	for(auto i = -int32_t{ r }; i < r; i++){
+	for(auto i = -Cast::up_sign<int32_t>(r); i < r; i++){
 		// ｘ座標の測定だ //
 		dx = (s * s) - (i * i);
 

@@ -23,7 +23,6 @@
 
 // ヘッダファイル //
 #include "game/coords.h"
-#include "game/format_bmp.h"
 #include "game/graphics.h"
 #include "game/pixelformat.h"
 #include "platform/windows/surface_ddraw.h"
@@ -42,6 +41,7 @@
 #define ALPHA_NORM		0x01			// ノーマルなSrc-α
 
 // Forward declarations //
+struct BMP_OWNED;
 struct IDirectDraw2;
 struct IDirectDrawPalette;
 struct IDirectDrawSurface;
@@ -107,7 +107,7 @@ public:
 
 	// Consumes the given .BMP file and sets the given surface to its contents,
 	// re-creating it in the correct size if necessary.
-	bool SurfaceLoad(uint8_t surf_id, BMP_OWNED bmp);
+	bool SurfaceLoad(uint8_t surf_id, BMP_OWNED&& bmp);
 
 	// Mutates the top-left pixel of the DirectDraw (not GDI) surface.
 	bool SurfaceSetColorKey(SURFACE_DDRAW& surf, RGBA col);

@@ -4,6 +4,7 @@
  */
 
 #include "platform/windows/surface_ddraw.h"
+#include "game/format_bmp.h"
 #include <assert.h>
 #include <ddraw.h>
 

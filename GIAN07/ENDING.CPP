@@ -9,6 +9,7 @@
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "game/bgm.h"
 #include "game/cast.h"
+#include "game/endian.h"
 
 
 typedef struct tagEndingGrpInfo {

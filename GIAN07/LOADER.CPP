@@ -12,6 +12,7 @@
 #include "WindowSys.h"
 #include "DirectXUTYs/DD_UTY.H"
 #include "game/enum_array.h"
+#include "game/format_bmp.h"
 #include "game/graphics.h"
 #include "game/hash.h"
 #include "game/midi.h"

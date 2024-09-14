@@ -11,6 +11,7 @@
 #include "GIAN07/entity.h"
 #include "game/cast.h"
 #include "game/debug.h"
+#include "game/endian.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
 

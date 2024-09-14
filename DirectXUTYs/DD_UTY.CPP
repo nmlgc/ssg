@@ -8,6 +8,7 @@
 #include "DD_GRP3D.H"					// ３Ｄ用描画関数(公開しないこと)
 #include "game/cast.h"
 #include "game/debug.h"
+#include "game/format_bmp.h"
 #include "game/input.h"
 #include "game/screenshot.h"
 #include <assert.h>
@@ -490,7 +491,7 @@ bool GRAPHICS_DDRAW::SurfaceCreateBlank(SURFACE_DDRAW& surf, PIXEL_SIZE size)
 	return SurfaceCreateUninitialized(surf, size);
 }
 
-bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED bmp)
+bool GRAPHICS_DDRAW::SurfaceLoad(BYTE surf_id, BMP_OWNED&& bmp)
 {
 	if(surf_id>=SURFACE_MAX) return FALSE;
 
@@ -686,7 +687,7 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	else             return TRUE;
 }
 
-bool SURFACE_GDI::Load(BMP_OWNED bmp)
+bool SURFACE_GDI::Load(const BMP_OWNED& bmp)
 {
 	if(DxObj.PixelFormat.IsPalettized() && !bmp.palette.empty()) {
 		// Yup, we must mutate the .BMP palette in addition to the DirectDraw

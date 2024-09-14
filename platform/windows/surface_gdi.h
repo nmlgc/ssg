@@ -6,11 +6,13 @@
 #pragma once
 
 #include "game/surface.h"
-#include "game/format_bmp.h"
 
 // Only required for the HBITMAP type, which is basically void*.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+
+struct BMP_OWNED;
+struct FILE_STREAM_WRITE;
 
 class SURFACE_GDI : public SURFACE {
 public:
@@ -30,7 +32,7 @@ public:
 	~SURFACE_GDI();
 
 	// Calls Delete() and reinitializes [img].
-	bool Load(BMP_OWNED bmp);
+	bool Load(const BMP_OWNED& bmp);
 
 	// Saves [img] as a .BMP file to the given stream.
 	bool Save(FILE_STREAM_WRITE*) const;

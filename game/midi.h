@@ -19,6 +19,13 @@
 #include "game/volume.h"
 #include "platform/buffer.h"
 
+enum class MID_FLAGS : uint8_t {
+	_HAS_BITFLAG_OPERATORS,
+	NONE = 0x00,
+	FIX_SYSEX_BUGS = 0x01,
+	
+	MASK = FIX_SYSEX_BUGS,
+};
 
 enum class MID_BACKEND_STATE : uint8_t {
 	STOP,	// 停止している
@@ -63,6 +70,9 @@ extern const uint8_t& Mid_TempoNum;
 extern const uint8_t& Mid_TempoDenom;
 
 //// 関数 ////
+
+// Returns the new current MIDI flags.
+[[nodiscard]] MID_FLAGS Mid_SetFlags(MID_FLAGS flags_new);
 
 // Starts outputting the loaded MIDI to the backend.
 void Mid_Play(void);						// 再生する

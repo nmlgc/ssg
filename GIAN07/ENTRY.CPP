@@ -55,6 +55,7 @@ bool XInit(void)
 	// コンフィグをロードする //
 	ConfigLoad();
 	Grp_FPSDivisor = ConfigDat.FPSDivisor.v;
+	ConfigDat.MidFlags.v = Mid_SetFlags(ConfigDat.MidFlags.v);
 
 	// コンフィグ依存の初期化処理
 	if(!GrpBackend_Enum()) {

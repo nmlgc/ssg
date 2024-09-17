@@ -210,6 +210,7 @@ const struct VERSION_02 {
 		ConfigDat.WindowScale4x,
 		ConfigDat.WindowLeft,
 		ConfigDat.WindowTop,
+		ConfigDat.MidFlags,
 	};
 } VERSION_02;
 

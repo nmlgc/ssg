@@ -52,6 +52,7 @@ static void SndFnBGMGain(int_fast8_t delta);
 static void SndFnBGMPack(int_fast8_t delta);
 
 static void MidFnDev(int_fast8_t delta);
+static void MidFnFixes(int_fast8_t delta);
 
 static void InpFnMsgSkip(int_fast8_t delta);
 static void InpFnZSpeedDown(int_fast8_t delta);
@@ -274,8 +275,10 @@ WINDOW_MENU GrpMenu = { SetGrpItem, {
 constexpr auto VOLUME_FLAGS = WINDOW_FLAGS::FAST_REPEAT;
 
 static char MidTitlePort[26];
+static char MidTitleFixes[26];
 WINDOW_CHOICE MidItem[] = {
-	{ MidTitlePort, "MIDI Port (保存はされません)", MidFnDev },
+	{ MidTitlePort,  "MIDI Port (保存はされません)", MidFnDev },
+	{ MidTitleFixes, "Retain SC-88Pro echo on other Roland synths", MidFnFixes },
 	SubmenuExitItemForArray,
 };
 WINDOW_MENU MidMenu      = { std::span(MidItem), SetMidItem };
@@ -719,6 +722,12 @@ static void MidFnDev(int_fast8_t delta)
 	}
 }
 
+static void MidFnFixes(int_fast8_t)
+{
+	const auto flags = (ConfigDat.MidFlags.v ^ MID_FLAGS::FIX_SYSEX_BUGS);
+	ConfigDat.MidFlags.v = Mid_SetFlags(flags);
+}
+
 static void InpFnMsgSkip(int_fast8_t)
 {
 	if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
@@ -1135,6 +1144,9 @@ static void SetMidItem(bool tick)
 		strcpy(MidTitlePort, ">");
 		MidItemPort.State = WINDOW_STATE::DISABLED;
 	}
+	const auto fixes = !!(ConfigDat.MidFlags.v & MID_FLAGS::FIX_SYSEX_BUGS);
+
+	sprintf(MidTitleFixes, "SC88ProFXCompat%s", CHOICE_OFF_ON_NARROW[fixes]);
 }
 
 static void SetInpItem(bool)

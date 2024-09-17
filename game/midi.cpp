@@ -5,6 +5,7 @@
 
 #include "game/midi.h"
 #include "game/endian.h"
+#include "game/enum_flags.h"
 #include "game/volume.h"
 #include "platform/midi_backend.h"
 #include <malloc.h>
@@ -201,6 +202,7 @@ static void Mid_GMReset(void);
 
 // グローバル＆名前空間でローカルな変数 //
 MID_DEVICE	Mid_Dev;
+MID_FLAGS Mid_Flags = MID_FLAGS::NONE;
 static MID_SEQUENCE Mid_Seq;
 uint8_t Mid_PlayTable[16][128];	// スペアナ用
 uint8_t Mid_PlayTable2[16][128];	// レベルメーター用
@@ -212,6 +214,21 @@ uint8_t Mid_VolumeTable[16];	// ボリューム
 
 MID_PLAYTIME Mid_PlayTime;
 
+
+MID_FLAGS Mid_SetFlags(MID_FLAGS flags_new)
+{
+	using F = MID_FLAGS;
+
+	const auto new_sysex = !!(flags_new & F::FIX_SYSEX_BUGS);
+	if(!!(Mid_Flags & F::FIX_SYSEX_BUGS) != new_sysex) {
+		EnumFlagSet(Mid_Flags, F::FIX_SYSEX_BUGS, new_sysex);
+		if(Mid_Dev.state == MID_BACKEND_STATE::PLAY) {
+			Mid_Stop();
+			Mid_Play();
+		}
+	}
+	return Mid_Flags;
+}
 
 void Mid_Play(void)
 {
@@ -665,6 +682,45 @@ void MID_EVENT::Send(void) const
 		}
 		msg[0] = 0xf0;
 		std::ranges::copy(extra_data, (msg + 1));
+
+		/// Patch broken SysEx commands, if requested
+		/// -----------------------------------------
+
+		if(!!(Mid_Flags & MID_FLAGS::FIX_SYSEX_BUGS)) {
+			// The SC-88 and SC-88Pro manuals don't define how invalid Reverb
+			// Macro messages are processed. The observable behavior does in
+			// fact differ across synths:
+			//
+			// • A real-hardware SC-88Pro clamps such invalid messages to the
+			//   valid range:
+			//
+			//   https://twitter.com/Romantique_Tp/status/1766895996645056902
+			//
+			// • The SC-8850 and Sound Canvas VA ignore these invalid messages
+			//   just like any other invalid SysEx message, leaving the Reverb
+			//   Macro at its previous value.
+			//
+			// Replicating the clamping here preserves the SC-88Pro response
+			// for other Roland synths that don't clamp.
+			static constexpr uint8_t SC88_REVERB_MACRO[] = {
+				0x41, 0x10, 0x42, 0x12, 0x40, 0x01, 0x30
+			};
+			if(
+				extra_data.size() == (std::size(SC88_REVERB_MACRO) + 3) &&
+				std::ranges::starts_with(extra_data, SC88_REVERB_MACRO)
+			) {
+				const auto fix = std::min<uint8_t>(msg[8], 7);
+				if(fix != msg[8]) {
+					msg[8] = fix;
+
+					// Fix SysEx checksum
+					const uint8_t payload = (msg[5] + msg[6] + msg[7] + msg[8]);
+					msg[9] = (0x80 - (payload % 0x80));
+				}
+			}
+		}
+		/// -----------------------------------------
+
 		MidBackend_Out({ msg, (extra_data.size() + 1) });
 		_freea(msg);
 		break;

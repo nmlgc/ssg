@@ -7,6 +7,7 @@
 
 #include "LEVEL.H"
 #include "game/endian.h"
+#include "game/midi.h"
 #include "game/input.h"
 #include "game/pixelformat.h"
 #include "game/volume.h"
@@ -77,6 +78,9 @@ template <typename T, T Max> constexpr bool ValidateBelow(T v) {
 template <uint8_t Mask> constexpr bool ValidateFlag(uint8_t v) {
 	return ((v & Mask) == 0);
 }
+template <ENUMFLAGS Flag> constexpr bool ValidateFlag(Flag v) {
+	return ((std::to_underlying(v) & ~std::to_underlying(Flag::MASK)) == 0);
+}
 
 // Option class, with optional validation of the value against a supported
 // static range.
@@ -145,6 +149,9 @@ struct CONFIG_DATA {
 	template <uint8_t Mask> using OPTION_FLAGS = OPTION<
 		uint8_t, ValidateFlag<Mask>
 	>;
+	template <ENUMFLAGS Flag> using OPTION_ENUMFLAGS = OPTION<
+		Flag, ValidateFlag<Flag>
+	>;
 
 	// 32 is the WinMM joy button limit //
 	using OPTION_WINMM_PAD = OPTION_BELOW<INPUT_PAD_BUTTON, 32>;
@@ -181,6 +188,7 @@ struct CONFIG_DATA {
 
 	// サウンド・ＢＧＭ関連 //
 	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };
+	OPTION_ENUMFLAGS<MID_FLAGS> MidFlags = { MID_FLAGS::FIX_SYSEX_BUGS };
 	OPTION_BELOW<VOLUME, VOLUME_MAX> SEVolume  = { (VOLUME_MAX * 4) / 10 };
 	OPTION_BELOW<VOLUME, VOLUME_MAX> BGMVolume = { (VOLUME_MAX * 4) / 10 };
 	OPTION_UTF8 BGMPack;

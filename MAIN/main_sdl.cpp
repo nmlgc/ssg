@@ -25,6 +25,7 @@
 #include "platform/snd_backend.h"
 #include "game/bgm.h"
 #include "game/defer.h"
+#include "game/frame.h"
 #include "game/graphics.h"
 #include "strings/title.h"
 
@@ -99,7 +100,7 @@ int Run()
 				(Grp_FPSDivisor == 0) ||
 				((ticks_start - ticks_last) >= FRAME_TIME_TARGET)
 			) {
-				GameMain(quit);
+				quit = !GameFrame();
 				if(Grp_FPSDivisor != 0) {
 					// Since SDL_Delay() works at not-even-exact millisecond
 					// granularity, we subtract 1 and spin for the last

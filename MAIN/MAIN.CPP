@@ -5,6 +5,7 @@
 #include "platform/snd_backend.h"
 #include "platform/unicode.h"
 #include "game/bgm.h"
+#include "game/frame.h"
 #include "game/graphics.h"
 #include "game/input.h"
 #include <windows.h>
@@ -64,9 +65,7 @@ int __stdcall wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nShowCmd)
 			) {
 				Key_Read();
 
-				bool quit = false;
-				GameMain(quit);
-				if(quit) {
+				if(!GameFrame()) {
 					// DestroyWindow->PostMessage
 					// タスクバーにアイコンが残るのを防止だっけ？
 					PostMessage(hWndMain, WM_SYSCOMMAND, SC_CLOSE, 0);

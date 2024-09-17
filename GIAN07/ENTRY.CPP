@@ -13,6 +13,7 @@
 #include "platform/path.h"
 #include "game/bgm.h"
 #include "game/debug.h"
+#include "game/frame.h"
 #include "game/snd.h"
 
 // Volume controls
@@ -114,4 +115,11 @@ void XGrpTry(const GRAPHICS_PARAMS& prev, const GRAPHICS_PARAMS& params)
 		// the main menu.
 		GrpSurface_PaletteApplyToBackend(SURFACE_ID::TITLE);
 	}
+}
+
+bool GameFrame(void)
+{
+	bool quit = false;
+	GameMain(quit);
+	return !quit;
 }

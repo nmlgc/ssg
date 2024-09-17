@@ -809,7 +809,7 @@ static void SetCfgRepItem(void)
 
 static void SetDifItem(void)
 {
-	const char *const DifItem[4] = {" Easy  "," Normal"," Hard  ","Lunatic" };
+	const char *const dif[4] = {" Easy  "," Normal"," Hard  ","Lunatic" };
 /*
 	{DifTitle[4],	"[DebugMode] 画面に情報を表示するか",	DifFnMsgDisplay,0,0},
 	{DifTitle[5],	"[DebugMode] ステージセレクト",	DifFnStgSelect,0,0},
@@ -817,7 +817,7 @@ static void SetDifItem(void)
 */
 	sprintf(DifTitle[0], "PlayerStock [ %d ]", (ConfigDat.PlayerStock.v + 1));	// +1 に注意
 	sprintf(DifTitle[1], "BombStock   [ %d ]", ConfigDat.BombStock.v);
-	sprintf(DifTitle[2], "Difficulty[%s]", DifItem[ConfigDat.GameLevel.v]);
+	sprintf(DifTitle[2], "Difficulty[%s]", dif[ConfigDat.GameLevel.v]);
 
 #ifdef PBG_DEBUG
 	sprintf(DifTitle[4], "DebugOut  %s", CHOICE_OFF_ON[DebugDat.MsgDisplay]);

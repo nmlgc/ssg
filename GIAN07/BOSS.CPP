@@ -862,7 +862,7 @@ void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
 }
 
 // ビットにレーザーコマンドセット //
-void BossBitLaser(ENEMY_DATA *e, uint8_t LaserCmd)
+void BossBitLaser(ENEMY_DATA *e, uint8_t cmd)
 {
 	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
 		return ((&b.Edat) == e);
@@ -871,7 +871,7 @@ void BossBitLaser(ENEMY_DATA *e, uint8_t LaserCmd)
 		return;
 	}
 
-	BitLaserCommand(LaserCmd);
+	BitLaserCommand(cmd);
 }
 
 // ビット命令送信 //

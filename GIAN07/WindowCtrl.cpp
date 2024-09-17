@@ -523,7 +523,7 @@ static void GrpFnFSMode(int_fast8_t)
 
 static void GrpFnScale(int_fast8_t delta)
 {
-	XGrpTryCycleScale(delta);
+	XGrpTryCycleScale(delta, true);
 }
 
 static void GrpFnScMode(int_fast8_t)

@@ -16,6 +16,7 @@ static_assert(KMOD_SCROLL <= std::numeric_limits<uint16_t>::max());
 enum class KEY_MOD : uint8_t {
 	_HAS_BITFLAG_OPERATORS,
 	NONE = 0x00,
+	LALT = 0x01,
 };
 
 // In-game scancode, received from SDL.
@@ -68,8 +69,9 @@ static constexpr std::pair<KEY_BIND, INPUT_BITS> KeyBindings[] = {
 	{ SDL_SCANCODE_Z,     	KEY_TAMA },
 	{ SDL_SCANCODE_X,     	KEY_BOMB },
 	{ SDL_SCANCODE_LSHIFT,	KEY_SHIFT },
-	{ SDL_SCANCODE_RETURN,	KEY_RETURN },
 	{ SDL_SCANCODE_ESCAPE,	KEY_ESC },
+
+	{ { SDL_SCANCODE_RETURN, KEY_MOD::NONE, KEY_MOD::LALT }, KEY_RETURN },
 };
 static constexpr std::pair<KEY_BIND, INPUT_SYSTEM_BITS> SystemKeyBindings[] = {
 	{ SDL_SCANCODE_P,    	SYSKEY_SNAPSHOT },
@@ -77,6 +79,11 @@ static constexpr std::pair<KEY_BIND, INPUT_SYSTEM_BITS> SystemKeyBindings[] = {
 	{ SDL_SCANCODE_RCTRL,	SYSKEY_SKIP },
 	{ SDL_SCANCODE_F,    	SYSKEY_BGM_FADE },
 	{ SDL_SCANCODE_D,    	SYSKEY_BGM_DEVICE },
+	{ SDL_SCANCODE_F10,  	SYSKEY_GRP_SCALE_DOWN },
+	{ SDL_SCANCODE_F11,  	SYSKEY_GRP_SCALE_UP },
+	{ SDL_SCANCODE_F9,   	SYSKEY_GRP_SCALE_MODE },
+
+	{ { SDL_SCANCODE_RETURN, KEY_MOD::LALT }, SYSKEY_GRP_FULLSCREEN },
 };
 
 template <class Bits> void Key_Flip(Bits& key_data, uint8_t state, Bits bits)
@@ -237,9 +244,11 @@ void Key_Read(void)
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP: {
+			const auto mod = SDL_GetModState();
+
 			const KEY_SCANCODE scancode = {
 				.scancode = static_cast<uint16_t>(event.key.keysym.scancode),
-				.mod = KEY_MOD::NONE,
+				.mod = ((mod & KMOD_LALT) ? KEY_MOD::LALT : KEY_MOD::NONE),
 			};
 			for(const auto& binding : KeyBindings) {
 				if(binding.first.Matches(scancode)) {

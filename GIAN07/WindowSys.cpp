@@ -748,6 +748,10 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 			}
 		}
 	} else {
+		// Hotkeys might be pressed while the cursor is on an item with a menu,
+		// where we wouldn't fall into the branch above...
+		p->SetItems(false);
+
 		// デフォルトのキーボード動作 //
 		if(CWinOKKey(Key_Data)) {
 			// 決定・選択

@@ -400,8 +400,16 @@ void PrimaryCleanup(void)
 bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 {
 	const auto set_geometry = [] {
-		PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
-		SDL_RenderSetLogicalSize(PrimaryRenderer, GRP_RES.w, GRP_RES.h);
+		if(PrimaryTexture) {
+			const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{
+				*PrimaryRenderer
+			};
+			PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
+			SDL_RenderSetLogicalSize(PrimaryRenderer, GRP_RES.w, GRP_RES.h);
+			// [wa] must drop after SDL_RenderSetLogicalSize()!
+		} else {
+			SDL_RenderSetLogicalSize(PrimaryRenderer, GRP_RES.w, GRP_RES.h);
+		}
 		return true;
 	};
 
@@ -439,8 +447,15 @@ bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 		return set_geometry();
 	}
 
-	// Ensure the correct logical size on the primary renderer
+	// Prepare the primary renderer for blitting the primary texture:
+	// • Ensure the correct logical size
+	// • Move the clipping rectangle from the raw renderer onto the texture
+	//   target (won't be needed in SDL 3)
+	// • Stop clipping!!! The primary renderer's clipping region is going to
+	//   apply to the [PrimaryTexture] blit going forward!!!
+	const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
 	SDL_SetRenderTarget(PrimaryRenderer, nullptr);
+	SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
 	SDL_RenderSetLogicalSize(PrimaryRenderer, scaled_res.w, scaled_res.h);
 
 	if(!PrimaryTexture) {
@@ -516,6 +531,10 @@ void PrimarySetBorderlessFullscreenFit(
 {
 	using FIT = GRAPHICS_FULLSCREEN_FIT;
 	const auto fs = params.FullscreenFlags();
+
+	// Yet another state backup dance that won't be necessary in SDL 3...
+	const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
+
 	auto *target = SDL_GetRenderTarget(PrimaryRenderer);
 	SDL_SetRenderTarget(PrimaryRenderer, nullptr);
 

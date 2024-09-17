@@ -15,6 +15,7 @@
 #include "game/bgm.h"
 #include "game/debug.h"
 #include "game/frame.h"
+#include "game/input.h"
 #include "game/snd.h"
 
 // Volume controls
@@ -118,14 +119,16 @@ void XGrpTry(const GRAPHICS_PARAMS& prev, GRAPHICS_PARAMS& params)
 		}
 
 		// TODO: Assumes that 8-bit mode only ever calls this function within
-		// the main menu.
+		// the main menu. If we ever add hotkeys to toggle between 8-bit and
+		// 16-bit modes (https://github.com/nmlgc/ssg/issues/72), this has to
+		// be solved more cleanly as part of the backend.
 		GrpSurface_PaletteApplyToBackend(SURFACE_ID::TITLE);
 	}
 }
 
-void XGrpTryCycleScale(int_fast8_t delta)
+void XGrpTryCycleScale(int_fast8_t delta, bool include_max)
 {
-	XGrpTry([delta](auto& params) {
+	XGrpTry([&](auto& params) {
 		const auto fs = params.FullscreenFlags();
 		if(fs.fullscreen && !fs.exclusive) {
 			using FIT = GRAPHICS_FULLSCREEN_FIT;
@@ -133,7 +136,7 @@ void XGrpTryCycleScale(int_fast8_t delta)
 			const auto fit = ((std::to_underlying(fs.fit) + max + delta) % max);
 			params.SetFlag(GRAPHICS_PARAM_FLAGS::FULLSCREEN_FIT, fit);
 		} else if(!fs.fullscreen) {
-			const auto max = (Grp_WindowScale4xMax() + 1);
+			const auto max = (Grp_WindowScale4xMax() + include_max);
 			params.window_scale_4x = (
 				(params.window_scale_4x + max + delta) % max
 			);
@@ -157,6 +160,32 @@ void XGrpTryCycleScMode(void)
 
 bool GameFrame(void)
 {
+	#ifdef GRP_SUPPORT_WINDOWED
+		if(SystemKey_Data & SYSKEY_GRP_FULLSCREEN) {
+			XGrpTryCycleDisp();
+		}
+	#endif
+	#ifdef GRP_SUPPORT_SCALING
+		if(SystemKey_Data & SYSKEY_GRP_SCALE_UP) {
+			XGrpTryCycleScale(+1, false);
+		}
+		if(SystemKey_Data & SYSKEY_GRP_SCALE_DOWN) {
+			XGrpTryCycleScale(-1, false);
+		}
+		if(SystemKey_Data & SYSKEY_GRP_SCALE_MODE) {
+			XGrpTryCycleScMode();
+		}
+	#endif
+	// Strictly superior to waiting [CWIN_KEYWAIT] frames: We won't get a key
+	// release scancode if we recreate the window on a switch into exclusive
+	// fullscreen, and we save a dependency on `WindowSys.h`.
+	SystemKey_Data &= ~(
+		SYSKEY_GRP_FULLSCREEN |
+		SYSKEY_GRP_SCALE_UP |
+		SYSKEY_GRP_SCALE_DOWN |
+		SYSKEY_GRP_SCALE_MODE
+	);
+
 	bool quit = false;
 	GameMain(quit);
 	return !quit;

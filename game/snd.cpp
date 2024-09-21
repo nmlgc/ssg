@@ -20,7 +20,7 @@ static enum class SND_SYS {
 
 bool Snd_SystemInit(void)
 {
-	if(Initialized & SND_SYS::SYSTEM) {
+	if(!!(Initialized & SND_SYS::SYSTEM)) {
 		return true;
 	}
 	assert(Initialized == SND_SYS::NOTHING);
@@ -33,7 +33,7 @@ bool Snd_SystemInit(void)
 
 bool Snd_SubsystemInit(SND_SYS sys, bool (&SubsystemInit)(void))
 {
-	if(Initialized & sys) {
+	if(!!(Initialized & sys)) {
 		return true;
 	} else if(!Snd_SystemInit() || !SubsystemInit()) {
 		return false;
@@ -46,7 +46,7 @@ bool Snd_SubsystemInit(SND_SYS sys, bool (&SubsystemInit)(void))
 void Snd_Cleanup(SND_SYS sys)
 {
 	auto cleanup_sys = [](SND_SYS should, SND_SYS sys, void (&cleanup)(void)) {
-		if((should & sys) && (Initialized & sys)) {
+		if(!!(should & sys) && !!(Initialized & sys)) {
 			cleanup();
 			Initialized &= ~sys;
 		}
@@ -69,10 +69,10 @@ void Snd_Cleanup(void)
 
 void Snd_UpdateVolumes(void)
 {
-	if(Initialized & SND_SYS::BGM) {
+	if(!!(Initialized & SND_SYS::BGM)) {
 		SndBackend_BGMUpdateVolume();
 	}
-	if(Initialized & SND_SYS::SE) {
+	if(!!(Initialized & SND_SYS::SE)) {
 		SndBackend_SEUpdateVolume();
 	}
 }

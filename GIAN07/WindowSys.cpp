@@ -233,7 +233,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 		const auto& col = COL[WINDOW_INFO::STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
 
-		const auto left = ((p->Flags & WINDOW_INFO::FLAGS::CENTER)
+		const auto left = (!!(p->Flags & WINDOW_INFO::FLAGS::CENTER)
 			? TextLayoutXCenter(s, str)
 			: 0
 		);
@@ -256,7 +256,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 
 			// Adding CWIN_ITEM_LEFT to centered text would throw it off-center,
 			// obviously.
-			const auto left = ((item->Flags & WINDOW_INFO::FLAGS::CENTER)
+			const auto left = (!!(item->Flags & WINDOW_INFO::FLAGS::CENTER)
 				? TextLayoutXCenter(s, str)
 				: CWIN_ITEM_LEFT
 			);
@@ -298,7 +298,7 @@ void MWinInit(const WINDOW_LTRB& rc, MSG_WINDOW_FLAGS flags)
 	MsgWindow.MaxSize = rc;
 	MsgWindow.Flags = flags;
 	MsgWindow.TextTopleft = {
-		.x = ((flags & MSG_WINDOW_FLAGS::WITH_FACE) ? FACE_W : 8),
+		.x = (!!(flags & MSG_WINDOW_FLAGS::WITH_FACE) ? FACE_W : 8),
 		.y = 8,
 	};
 	MsgWindow.TRR = TextObj.Register(rc.Size() - MsgWindow.TextTopleft);
@@ -439,9 +439,10 @@ void MWinDraw(void)
 					continue;
 				}
 				const PIXEL_COORD top = (i * MsgWindow.FontDy);
-				const auto left = ((MsgWindow.Flags & MSG_WINDOW_FLAGS::CENTER)
-					? TextLayoutXCenter(s, line)
-					: 0
+				const auto left = (
+					!!(MsgWindow.Flags & MSG_WINDOW_FLAGS::CENTER)
+						? TextLayoutXCenter(s, line)
+						: 0
 				);
 
 				// 灰色で１どっとずらして描画
@@ -674,7 +675,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		}
 		return;
 	} else if(
-		(p2->Flags & FLAGS::FAST_REPEAT) && CWinOptionKeyDelta(ws->OldKey)
+		!!(p2->Flags & FLAGS::FAST_REPEAT) && CWinOptionKeyDelta(ws->OldKey)
 	) {
 		ws->KeyCount = ws->FastRepeatWait;
 		ws->FastRepeatWait = (std::max)((ws->FastRepeatWait - 2), 0);

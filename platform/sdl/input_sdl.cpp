@@ -4,11 +4,55 @@
  */
 
 #include "platform/input.h"
+#include "game/enum_flags.h"
 #include <SDL_events.h>
 #include <SDL_joystick.h>
 #include <assert.h>
 
-static constexpr std::pair<SDL_Scancode, INPUT_BITS> KeyBindings[] = {
+// Do scancodes and key modes still fit into 16 bits each?
+static_assert(SDL_NUM_SCANCODES <= std::numeric_limits<uint16_t>::max());
+static_assert(KMOD_SCROLL <= std::numeric_limits<uint16_t>::max());
+
+enum class KEY_MOD : uint8_t {
+	_HAS_BITFLAG_OPERATORS,
+	NONE = 0x00,
+};
+
+// In-game scancode, received from SDL.
+struct KEY_SCANCODE {
+	uint16_t scancode;
+	KEY_MOD mod;
+};
+
+// Static key binding.
+struct KEY_BIND {
+	uint16_t scancode;
+
+	// Modifiers that *must* match.
+	KEY_MOD mod_must = KEY_MOD::NONE;
+
+	// Modifiers that *must not* match. Should contain all modifiers of other
+	// bindings that share the same [scancode] to allow the matching to work
+	// independently of the order within the binding array.
+	KEY_MOD mod_filter = KEY_MOD::NONE;
+
+	constexpr KEY_BIND(
+		SDL_Scancode scancode,
+		KEY_MOD mod_must = KEY_MOD::NONE,
+		KEY_MOD mod_filter = KEY_MOD::NONE
+	) : scancode(scancode), mod_must(mod_must), mod_filter(mod_filter) {
+	}
+
+	bool Matches(const KEY_SCANCODE& sc) const {
+		return (
+			(scancode == sc.scancode) &&
+			!(sc.mod & mod_filter) &&
+			((mod_must & sc.mod) == mod_must)
+		);
+	}
+};
+
+static constexpr std::pair<KEY_BIND, INPUT_BITS> KeyBindings[] = {
 	{ SDL_SCANCODE_UP,    	KEY_UP },
 	{ SDL_SCANCODE_DOWN,  	KEY_DOWN },
 	{ SDL_SCANCODE_LEFT,  	KEY_LEFT },
@@ -27,9 +71,7 @@ static constexpr std::pair<SDL_Scancode, INPUT_BITS> KeyBindings[] = {
 	{ SDL_SCANCODE_RETURN,	KEY_RETURN },
 	{ SDL_SCANCODE_ESCAPE,	KEY_ESC },
 };
-static constexpr std::pair<
-	SDL_Scancode, INPUT_SYSTEM_BITS
-> SystemKeyBindings[] = {
+static constexpr std::pair<KEY_BIND, INPUT_SYSTEM_BITS> SystemKeyBindings[] = {
 	{ SDL_SCANCODE_P,    	SYSKEY_SNAPSHOT },
 	{ SDL_SCANCODE_LCTRL,	SYSKEY_SKIP },
 	{ SDL_SCANCODE_RCTRL,	SYSKEY_SKIP },
@@ -37,19 +79,12 @@ static constexpr std::pair<
 	{ SDL_SCANCODE_D,    	SYSKEY_BGM_DEVICE },
 };
 
-template <class BindingID, class Bits> void Key_Check(
-	Bits& key_data,
-	auto scancode_or_button,
-	uint8_t state,
-	const std::pair<BindingID, Bits>& binding
-)
+template <class Bits> void Key_Flip(Bits& key_data, uint8_t state, Bits bits)
 {
-	if(scancode_or_button == binding.first) {
-		if(state == SDL_PRESSED) {
-			key_data |= binding.second;
-		} else if(state == SDL_RELEASED) {
-			key_data &= ~binding.second;
-		}
+	if(state == SDL_PRESSED) {
+		key_data |= bits;
+	} else if(state == SDL_RELEASED) {
+		key_data &= ~bits;
 	}
 }
 
@@ -180,7 +215,9 @@ void Key_Read(void)
 			// SDL's numbering starts at 0.
 			const INPUT_PAD_BUTTON id = (event.jbutton.button + 1);
 			for(const auto& binding : Key_PadBindings) {
-				Key_Check(Pad_Data, id, event.jbutton.state, binding);
+				if(id == binding.first) {
+					Key_Flip(Pad_Data, event.jbutton.state, binding.second);
+				}
 			}
 
 			auto& pad = *Pad_Find(event.jbutton.which);
@@ -200,12 +237,19 @@ void Key_Read(void)
 
 		case SDL_KEYDOWN:
 		case SDL_KEYUP: {
-			const auto scancode = event.key.keysym.scancode;
+			const KEY_SCANCODE scancode = {
+				.scancode = static_cast<uint16_t>(event.key.keysym.scancode),
+				.mod = KEY_MOD::NONE,
+			};
 			for(const auto& binding : KeyBindings) {
-				Key_Check(Key_Data_Real, scancode, event.key.state, binding);
+				if(binding.first.Matches(scancode)) {
+					Key_Flip(Key_Data_Real, event.key.state, binding.second);
+				}
 			}
 			for(const auto& binding : SystemKeyBindings) {
-				Key_Check(SystemKey_Data, scancode, event.key.state, binding);
+				if(binding.first.Matches(scancode)) {
+					Key_Flip(SystemKey_Data, event.key.state, binding.second);
+				}
 			}
 			break;
 		}

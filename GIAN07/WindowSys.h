@@ -109,7 +109,10 @@ struct WINDOW_CHOICE : public WINDOW_LABEL {
 	Narrow::literal	Help;	// ヘルプ文字列へのポインタ(これも実体ではない)
 
 	// 特殊処理用コールバック関数(未使用ならNULL)
-	bool	(*CallBackFn)(INPUT_BITS);
+	bool (*CallBackFn)(INPUT_BITS) = nullptr;
+
+	// Callback function for options (falls back on [CallBackFn] if nullptr)
+	void (*OptionFn)(int_fast8_t delta) = nullptr;
 
 	WINDOW_MENU	*Submenu = nullptr;
 
@@ -129,6 +132,25 @@ struct WINDOW_CHOICE : public WINDOW_LABEL {
 	constexpr WINDOW_CHOICE(
 		const Narrow::literal title,
 		const Narrow::literal help,
+		decltype(OptionFn) option_fn,
+		WINDOW_FLAGS flags = WINDOW_FLAGS::NONE
+	) noexcept :
+		WINDOW_LABEL(title, flags), Help(help), OptionFn(option_fn)
+	{
+	}
+
+	constexpr WINDOW_CHOICE(
+		const Narrow::literal title,
+		const Narrow::literal help,
+		WINDOW_FLAGS flags = WINDOW_FLAGS::NONE
+	) noexcept :
+		WINDOW_LABEL(title, flags), Help(help)
+	{
+	}
+
+	constexpr WINDOW_CHOICE(
+		const Narrow::literal title,
+		const Narrow::literal help,
 		WINDOW_MENU& submenu
 	) noexcept :
 		WINDOW_LABEL(title), Help(help), Submenu(&submenu)
@@ -142,14 +164,18 @@ struct WINDOW_CHOICE : public WINDOW_LABEL {
 struct WINDOW_MENU {
 	WINDOW_LABEL*	Title;
 	WINDOW_CHOICE*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
+	void	(*SetItems)(void) = [] {};
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
 
 	template <size_t N> constexpr WINDOW_MENU(
-		std::span<WINDOW_CHOICE, N> children, WINDOW_LABEL* title = nullptr
+		std::span<WINDOW_CHOICE, N> children,
+		void (*set_items)(void) = [] {},
+		WINDOW_LABEL* title = nullptr
 	) noexcept :
-		Title(title), NumItems(N)
+		Title(title), SetItems(set_items), NumItems(N)
 	{
 		static_assert(N <= WINITEM_MAX);
+		assert(set_items != nullptr);
 		for(size_t i = 0; auto& item : children) {
 			ItemPtr[i++] = &item;
 		}
@@ -253,7 +279,7 @@ template <
 	}
 
 public:
-	static inline WINDOW_MENU Menu = { std::span(Item), &Title };
+	static inline WINDOW_MENU Menu = { std::span(Item), [] {}, &Title };
 
 	static void Init(WINDOW_SYSTEM& sys, size_t sel, WINDOW_SYSTEM* return_to)
 	{
@@ -303,22 +329,6 @@ PIXEL_SIZE CWinTextExtent(Narrow::string_view str);
 // Calculates the rendered width of a whole padded menu item with the given
 // text.
 PIXEL_SIZE CWinItemExtent(Narrow::string_view str);
-
-template <typename ChoiceFunc> static bool OptionFN(
-	INPUT_BITS key, void setitem(void), ChoiceFunc on_return_tama_right_left
-)
-{
-	// It's a menu, we don't care about performance, and switch tables with
-	// these constants add an entire 256-byte table to every function on
-	// modern compilers, even in Release builds.
-	if((key == KEY_BOMB) || (key == KEY_ESC)) {
-		return false;
-	} else if(CWinOptionKeyDelta(key)) {
-		on_return_tama_right_left();
-	}
-	setitem();
-	return true;
-}
 
 // メッセージウィンドウ処理 //
 

@@ -406,12 +406,12 @@ namespace DAT_MISSING {
 		{ },
 		{ },
 		{ },
-		{ "Must be provided from an original game copy.", "", nullptr, CENTER },
+		{ "Must be provided from an original game copy.", "", CENTER },
 		{ },
 		{ "Recheck", "", FnRecheck, CENTER },
 		{ "Quit", "", CWinExitFn, CENTER },
 	}};
-	WINDOW_MENU Menu = { std::span(Info), &Title };
+	WINDOW_MENU Menu = { std::span(Info), [] {}, &Title };
 	WINDOW_SYSTEM Window = { Menu };
 
 	void Proc(bool& quit)

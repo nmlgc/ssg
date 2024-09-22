@@ -709,9 +709,22 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		ws->FastRepeatWait = CWIN_KEYWAIT;
 	}
 
-	if(p2->CallBackFn != NULL){
+	if(p2->OptionFn || p2->CallBackFn) {
 		// コールバック動作時の処理 //
-		if(p2->CallBackFn(Key_Data)==FALSE){
+		const auto ret = ([p, p2] {
+			if(p2->OptionFn) {
+				if(CWinCancelKey(Key_Data)) {
+					return false;
+				} else if(const auto delta = CWinOptionKeyDelta(Key_Data)) {
+					p2->OptionFn(delta);
+				}
+				p->SetItems();
+				return true;
+			}
+
+			return p2->CallBackFn(Key_Data);
+		})();
+		if(ret == false) {
 			if(Depth==0){
 				if(!CWinCancelKey(Key_Data)) {
 					// 後で (CWIN_CLOSE) に変更すること//

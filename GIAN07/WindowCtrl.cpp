@@ -22,40 +22,40 @@
 
 
 
-static bool DifFnPlayerStock(INPUT_BITS key);
-static bool DifFnBombStock(INPUT_BITS key);
-static bool DifFnDifficulty(INPUT_BITS key);
+static void DifFnPlayerStock(int_fast8_t delta);
+static void DifFnBombStock(int_fast8_t delta);
+static void DifFnDifficulty(int_fast8_t delta);
 
 #ifdef PBG_DEBUG
-static bool DifFnMsgDisplay(INPUT_BITS key);
-static bool DifFnStgSelect(INPUT_BITS key);
-static bool DifFnHit(INPUT_BITS key);
-static bool DifFnDemo(INPUT_BITS key);
+static void DifFnMsgDisplay(int_fast8_t delta);
+static void DifFnStgSelect(int_fast8_t delta);
+static void DifFnHit(int_fast8_t delta);
+static void DifFnDemo(int_fast8_t delta);
 #endif
 
-static bool GrpFnChgDevice(INPUT_BITS key);
-static bool GrpFnSkip(INPUT_BITS key);
-static bool GrpFnBpp(INPUT_BITS key);
-static bool GrpFnWinLocate(INPUT_BITS key);
+static void GrpFnChgDevice(int_fast8_t delta);
+static void GrpFnSkip(int_fast8_t delta);
+static void GrpFnBpp(int_fast8_t delta);
+static void GrpFnWinLocate(int_fast8_t delta);
 
-static bool SndFnSE(INPUT_BITS key);
-static bool SndFnBGM(INPUT_BITS key);
-static bool SndFnSEVol(INPUT_BITS key);
-static bool SndFnBGMVol(INPUT_BITS key);
-static bool SndFnBGMGain(INPUT_BITS key);
-static bool SndFnBGMPack(INPUT_BITS key);
-static bool SndFnMIDIDev(INPUT_BITS key);
+static void SndFnSE(int_fast8_t delta);
+static void SndFnBGM(int_fast8_t delta);
+static void SndFnSEVol(int_fast8_t delta);
+static void SndFnBGMVol(int_fast8_t delta);
+static void SndFnBGMGain(int_fast8_t delta);
+static void SndFnBGMPack(int_fast8_t delta);
+static void SndFnMIDIDev(int_fast8_t delta);
 
-static bool InpFnMsgSkip(INPUT_BITS key);
-static bool InpFnZSpeedDown(INPUT_BITS key);
+static void InpFnMsgSkip(int_fast8_t delta);
+static void InpFnZSpeedDown(int_fast8_t delta);
 
 static bool InpFnKeyTama(INPUT_BITS key);
 static bool InpFnKeyBomb(INPUT_BITS key);
 static bool InpFnKeyShift(INPUT_BITS key);
 static bool InpFnKeyCancel(INPUT_BITS key);
 
-static bool CfgRepStgSelect(INPUT_BITS key);
-static bool CfgRepSave(INPUT_BITS key);
+static void CfgRepStgSelect(int_fast8_t delta);
+static void CfgRepSave(int_fast8_t delta);
 
 static bool MainFnGameStart(INPUT_BITS key);
 static bool MainFnExStart(INPUT_BITS key);
@@ -85,17 +85,14 @@ static bool RFnStg5(INPUT_BITS key);
 static bool RFnStg6(INPUT_BITS key);
 static bool RFnStgEx(INPUT_BITS key);
 
-static bool RingFN(
-	void setitem(void), uint8_t& var, INPUT_BITS key, uint8_t min, uint8_t max
+static constexpr void RingStep(
+	uint8_t& var, int_fast8_t delta, uint8_t min, uint8_t max
 )
 {
-	return OptionFN(key, setitem, [&]() {
-		if(key == KEY_LEFT) {
-			var = ((var <= min) ? max : (var - 1));
-		} else {
-			var = ((var == max) ? min : (var + 1));
-		}
-	});
+	var = ((delta < 0)
+		? ((var <= min) ? max : (var - 1))
+		: ((var == max) ? min : (var + 1))
+	);
 }
 
 template <size_t N> struct LABELS {
@@ -167,7 +164,7 @@ WINDOW_CHOICE DifItem[] = {
 #endif
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-WINDOW_MENU DifMenu = { std::span(DifItem) };
+WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
 char	GrpTitle[5][50];
 WINDOW_CHOICE GrpItem[] = {
@@ -177,7 +174,7 @@ WINDOW_CHOICE GrpItem[] = {
 	{ GrpTitle[3],	"ウィンドウの表示位置を決めます",	GrpFnWinLocate },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-WINDOW_MENU GrpMenu = { std::span(GrpItem) };
+WINDOW_MENU GrpMenu = { std::span(GrpItem), SetGrpItem };
 
 constexpr auto VOLUME_FLAGS = WINDOW_FLAGS::FAST_REPEAT;
 
@@ -198,7 +195,7 @@ WINDOW_CHOICE SndItem[] = {
 	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-WINDOW_MENU SndMenu = { std::span(SndItem) };
+WINDOW_MENU SndMenu = { std::span(SndItem), SetSndItem };
 static auto& SndItemSE = SndItem[0];
 static auto& SndItemBGM = SndItem[1];
 static auto& SndItemSEVol = SndItem[2];
@@ -216,7 +213,7 @@ WINDOW_CHOICE InpKey[] = {
 	{ IKeyTitle[3],	InpHelp,	InpFnKeyCancel },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-WINDOW_MENU InpKeyMenu = { std::span(InpKey) };
+WINDOW_MENU InpKeyMenu = { std::span(InpKey), SetIKeyItem };
 
 char	InpTitle[23];
 char	InpTitle2[23];
@@ -226,7 +223,7 @@ WINDOW_CHOICE InpItem[] = {
 	{ "Joy Pad",	"パッドの設定をします",	InpKeyMenu },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-WINDOW_MENU InpMenu = { std::span(InpItem) };
+WINDOW_MENU InpMenu = { std::span(InpItem), SetInpItem };
 
 char CfgRepTitle[2][23];
 
@@ -235,7 +232,7 @@ WINDOW_CHOICE CfgRep[] = {
 	{ CfgRepTitle[1],	"ステージセレクト",	CfgRepStgSelect },
 	{ "Exit",	"一つ前のメニューにもどります",	CWinExitFn },
 };
-WINDOW_MENU CfgRepMenu = { std::span(CfgRep) };
+WINDOW_MENU CfgRepMenu = { std::span(CfgRep), SetCfgRepItem };
 
 WINDOW_CHOICE CfgItem[] = {
 	{ " Difficulty",	"難易度に関する設定",	DifMenu },
@@ -270,21 +267,23 @@ WINDOW_CHOICE MainItem[] = {
 	{ "   Music",	"音楽室に入ります",	MusicFn },
 	{ "   Exit",	"ゲームを終了します",	CWinExitFn }
 };
-WINDOW_MENU MainMenu = { std::span(MainItem), &MainTitle };
+WINDOW_MENU MainMenu = { std::span(MainItem), [] {}, &MainTitle };
 
 WINDOW_LABEL ExitTitle = { "    終了するの？" };
 WINDOW_CHOICE ExitYesNoItem[] = {
 	{ "   お っ け ～ ",	"",	ExitFnYes },
 	{ "   だ め だ め",	"",	ExitFnNo }
 };
-WINDOW_MENU ExitMenu = { std::span(ExitYesNoItem), &ExitTitle };
+WINDOW_MENU ExitMenu = { std::span(ExitYesNoItem), [] {}, &ExitTitle };
 
 WINDOW_LABEL ContinueTitle = { " Ｃｏｎｔｉｎｕｅ？" };
 WINDOW_CHOICE ContinueYesNoItem[] = {
 	{ "   お っ け ～",	"",	ContinueFnYes },
 	{ "   や だ や だ",	"",	ContinueFnNo }
 };
-WINDOW_MENU ContinueMenu = { std::span(ContinueYesNoItem), &ContinueTitle };
+WINDOW_MENU ContinueMenu = {
+	std::span(ContinueYesNoItem), [] {}, &ContinueTitle
+};
 
 WINDOW_MENU_SCROLL<
 	BGMPack::TitleItem, BGMPack::ListSize, BGMPack::Generate, BGMPack::Handle
@@ -336,58 +335,47 @@ void InitContinueWindow(void)
 	ContinueWindow.Init(140);
 }
 
-static bool DifFnPlayerStock(INPUT_BITS key)
+static void DifFnPlayerStock(int_fast8_t delta)
 {
-	return RingFN(
-		SetDifItem, ConfigDat.PlayerStock.v, key, 0, STOCK_PLAYER_MAX
-	);
+	RingStep(ConfigDat.PlayerStock.v, delta, 0, STOCK_PLAYER_MAX);
 }
 
-static bool DifFnBombStock(INPUT_BITS key)
+static void DifFnBombStock(int_fast8_t delta)
 {
-	return RingFN(SetDifItem, ConfigDat.BombStock.v, key, 0, STOCK_BOMB_MAX);
+	RingStep(ConfigDat.BombStock.v, delta, 0, STOCK_BOMB_MAX);
 }
 
-static bool DifFnDifficulty(INPUT_BITS key)
+static void DifFnDifficulty(int_fast8_t delta)
 {
-	return RingFN(
-		SetDifItem, ConfigDat.GameLevel.v, key, GAME_EASY, GAME_LUNATIC
-	);
+	RingStep(ConfigDat.GameLevel.v, delta, GAME_EASY, GAME_LUNATIC);
 }
 
 #ifdef PBG_DEBUG
-static bool DifFnMsgDisplay(INPUT_BITS key)
+static void DifFnMsgDisplay(int_fast8_t)
 {
-	return OptionFN(key, SetDifItem, [] {
-		DebugDat.MsgDisplay = !DebugDat.MsgDisplay;
-	});
+	DebugDat.MsgDisplay = !DebugDat.MsgDisplay;
 }
 
-static bool DifFnStgSelect(INPUT_BITS key)
+static void DifFnStgSelect(int_fast8_t delta)
 {
-	return RingFN(SetDifItem, DebugDat.StgSelect, key, 1, STAGE_MAX);
+	RingStep(DebugDat.StgSelect, delta, 1, STAGE_MAX);
 }
 
-static bool DifFnHit(INPUT_BITS key)
+static void DifFnHit(int_fast8_t)
 {
-	return OptionFN(key, SetDifItem, [] {
-		DebugDat.Hit = !DebugDat.Hit;
-	});
+	DebugDat.Hit = !DebugDat.Hit;
 }
 
-static bool DifFnDemo(INPUT_BITS key)
+static void DifFnDemo(int_fast8_t)
 {
-	return OptionFN(key, SetDifItem, [] {
-		DebugDat.DemoSave = !DebugDat.DemoSave;
-	});
+	DebugDat.DemoSave = !DebugDat.DemoSave;
 }
 
 #endif // PBG_DEBUG
 
-static bool GrpFnChgDevice(INPUT_BITS key)
+static void GrpFnChgDevice(int_fast8_t delta)
 {
-	const int delta = ((key == KEY_LEFT) ? -1 : 2);
-	return OptionFN(key, SetGrpItem, [&]() { XGrpTry([&](auto& params) {
+	XGrpTry([&](auto& params) {
 		// 一つしかデバイスが存在しないときは変更できない //
 		const auto device_count = GrpBackend_DeviceCount();
 		if(device_count <= 1) {
@@ -398,27 +386,23 @@ static bool GrpFnChgDevice(INPUT_BITS key)
 		params.device_id = (
 			(ConfigDat.DeviceID.v + device_count + delta) % device_count
 		);
-	}); });
+	});
 }
 
-static bool GrpFnSkip(INPUT_BITS key)
+static void GrpFnSkip(int_fast8_t delta)
 {
-	const auto ret = RingFN(
-		SetGrpItem, ConfigDat.FPSDivisor.v, key, 0, FPS_DIVISOR_MAX
-	);
+	RingStep(ConfigDat.FPSDivisor.v, delta, 0, FPS_DIVISOR_MAX);
 	Grp_FPSDivisor = ConfigDat.FPSDivisor.v;
-	return ret;
 }
 
-static bool GrpFnBpp(INPUT_BITS key)
+static void GrpFnBpp(int_fast8_t delta)
 {
-	const auto delta = CWinOptionKeyDelta(key);
-	return OptionFN(key, SetGrpItem, [&]() { XGrpTry([delta](auto& params) {
+	XGrpTry([delta](auto& params) {
 		params.bitdepth = ConfigDat.BitDepth.v.cycle(delta < 0);
-	}); });
+	});
 }
 
-static bool GrpFnWinLocate(INPUT_BITS key)
+static void GrpFnWinLocate(int_fast8_t delta)
 {
 	static constexpr uint8_t flags[3] = {
 		0, GRPF_WINDOW_UPPER, GRPF_MSG_DISABLE
@@ -430,89 +414,71 @@ static bool GrpFnWinLocate(INPUT_BITS key)
 	}
 	if(i >= 3) i=0;
 
-	return OptionFN(key, SetGrpItem, [&] {
-		if(key == KEY_LEFT) {
-			ConfigDat.GraphFlags.v = flags[(i + 2) % 3];
-		} else {
-			ConfigDat.GraphFlags.v = flags[(i + 1) % 3];
-		}
-	});
-}
-
-static bool SndFnSE(INPUT_BITS key)
-{
-	return OptionFN(key, SetSndItem, [] {
-		//extern INPUT_OBJ InputObj;
-		//char buf[100];
-		//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-		// DebugOut(buf);
-
-		if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
-			ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
-			Snd_SECleanup();
-		} else {
-			ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;
-			LoadSound();
-		}
-		//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
-		// DebugOut(buf);
-	});
-}
-
-static bool SndFnBGM(INPUT_BITS key)
-{
-	return OptionFN(key, SetSndItem, [] {
-		if(BGM_Enabled()) {
-			BGM_Cleanup();
-		} else {
-			// 成功した場合にだけ有効にする //
-			if(BGM_Init()) {
-				BGM_Switch(0);
-			}
-		}
-	});
-}
-
-static bool SndFnSEVol(INPUT_BITS key)
-{
-	if(const auto delta = CWinOptionKeyDelta(key)) {
-		ConfigDat.SEVolume.v = std::clamp(
-			(ConfigDat.SEVolume.v + delta), 0, int{ VOLUME_MAX }
-		);
-		Snd_UpdateVolumes();
+	if(delta < 0) {
+		ConfigDat.GraphFlags.v = flags[(i + 2) % 3];
+	} else {
+		ConfigDat.GraphFlags.v = flags[(i + 1) % 3];
 	}
-	SetSndItem();
-	return ((key != KEY_BOMB) && (key != KEY_ESC));
 }
 
-static bool SndFnBGMVol(INPUT_BITS key)
+static void SndFnSE(int_fast8_t)
 {
-	if(const auto delta = CWinOptionKeyDelta(key)) {
-		ConfigDat.BGMVolume.v = std::clamp(
-			(ConfigDat.BGMVolume.v + delta), 0, int{ VOLUME_MAX }
-		);
-		BGM_UpdateVolume();
+	//extern INPUT_OBJ InputObj;
+	//char buf[100];
+	//sprintf(buf,"[1] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
+	// DebugOut(buf);
+
+	if(ConfigDat.SoundFlags.v & SNDF_SE_ENABLE) {
+		ConfigDat.SoundFlags.v &= (~SNDF_SE_ENABLE);
+		Snd_SECleanup();
+	} else {
+		ConfigDat.SoundFlags.v |= SNDF_SE_ENABLE;
+		LoadSound();
 	}
-	SetSndItem();
-	return ((key != KEY_BOMB) && (key != KEY_ESC));
+	//sprintf(buf,"[2] DI:%x  Dev:%x",InputObj.pdi,InputObj.pdev);
+	// DebugOut(buf);
 }
 
-static bool SndFnBGMPack(INPUT_BITS key)
+static void SndFnBGM(int_fast8_t)
 {
-	return OptionFN(key, SetSndItem, [] {
-		if(!BGM_PacksAvailable()) {
-			URLOpen(BGMPack::SOUNDTRACK_URL);
-		} else {
-			BGMPack::Open();
+	if(BGM_Enabled()) {
+		BGM_Cleanup();
+	} else {
+		// 成功した場合にだけ有効にする //
+		if(BGM_Init()) {
+			BGM_Switch(0);
 		}
-	});
+	}
 }
 
-static bool SndFnBGMGain(INPUT_BITS key)
+static void SndFnSEVol(int_fast8_t delta)
 {
-	return OptionFN(key, SetSndItem, [] {
-		BGM_SetGainApply(!BGM_GainApply());
-	});
+	ConfigDat.SEVolume.v = std::clamp(
+		(ConfigDat.SEVolume.v + delta), 0, int{ VOLUME_MAX }
+	);
+	Snd_UpdateVolumes();
+}
+
+static void SndFnBGMVol(int_fast8_t delta)
+{
+	ConfigDat.BGMVolume.v = std::clamp(
+		(ConfigDat.BGMVolume.v + delta), 0, int{ VOLUME_MAX }
+	);
+	BGM_UpdateVolume();
+}
+
+static void SndFnBGMPack(int_fast8_t)
+{
+	if(!BGM_PacksAvailable()) {
+		URLOpen(BGMPack::SOUNDTRACK_URL);
+	} else {
+		BGMPack::Open();
+	}
+}
+
+static void SndFnBGMGain(int_fast8_t)
+{
+	BGM_SetGainApply(!BGM_GainApply());
 }
 
 namespace BGMPack {
@@ -596,35 +562,29 @@ namespace BGMPack {
 	}
 }
 
-static bool SndFnMIDIDev(INPUT_BITS key)
+static void SndFnMIDIDev(int_fast8_t delta)
 {
-	return OptionFN(key, SetSndItem, [&] {
-		if(BGM_Enabled()) {
-			BGM_ChangeMIDIDevice((key == KEY_LEFT) ? -1 : 1);
-		}
-	});
+	if(BGM_Enabled()) {
+		BGM_ChangeMIDIDevice(delta);
+	}
 }
 
-static bool InpFnMsgSkip(INPUT_BITS key)
+static void InpFnMsgSkip(int_fast8_t)
 {
-	return OptionFN(key, SetInpItem, [] {
-		if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
-			ConfigDat.InputFlags.v &= (~INPF_Z_MSKIP_ENABLE);
-		} else {
-			ConfigDat.InputFlags.v |= INPF_Z_MSKIP_ENABLE;
-		}
-	});
+	if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
+		ConfigDat.InputFlags.v &= (~INPF_Z_MSKIP_ENABLE);
+	} else {
+		ConfigDat.InputFlags.v |= INPF_Z_MSKIP_ENABLE;
+	}
 }
 
-static bool InpFnZSpeedDown(INPUT_BITS key)
+static void InpFnZSpeedDown(int_fast8_t)
 {
-	return OptionFN(key, SetInpItem, [] {
-		if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
-			ConfigDat.InputFlags.v &= (~INPF_Z_SPDDOWN_ENABLE);
-		} else {
-			ConfigDat.InputFlags.v |= INPF_Z_SPDDOWN_ENABLE;
-		}
-	});
+	if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
+		ConfigDat.InputFlags.v &= (~INPF_Z_SPDDOWN_ENABLE);
+	} else {
+		ConfigDat.InputFlags.v |= INPF_Z_SPDDOWN_ENABLE;
+	}
 }
 
 
@@ -785,17 +745,15 @@ static bool InpFnKeyCancel(INPUT_BITS key)
 }
 
 
-static bool CfgRepStgSelect(INPUT_BITS key)
+static void CfgRepStgSelect(int_fast8_t delta)
 {
-	return RingFN(SetCfgRepItem, ConfigDat.StageSelect.v, key, 1, STAGE_MAX);
+	RingStep(ConfigDat.StageSelect.v, delta, 1, STAGE_MAX);
 }
 
 
-static bool CfgRepSave(INPUT_BITS key)
+static void CfgRepSave(int_fast8_t)
 {
-	return OptionFN(key, SetCfgRepItem, [] {
-		ConfigDat.StageSelect.v = ((ConfigDat.StageSelect.v) ? 0 : 1);
-	});
+	ConfigDat.StageSelect.v = ((ConfigDat.StageSelect.v) ? 0 : 1);
 }
 
 

@@ -447,7 +447,7 @@ void ScreenEffectInit(void)
 	ScreenInfo.cmd   = SCNEFC_NONE;
 	ScreenInfo.count = 0;
 
-	GrpSetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
+	GrpBackend_SetClip(PLAYFIELD_CLIP);
 }
 
 // 画面全体に対するエフェクトをセットする //
@@ -591,10 +591,10 @@ extern void CircleFadeOut(int x, int y, int r)
 			std::clamp((x + r + 1), X_MIN, (X_MAX + 1)),
 			(std::min)((y + r + 1), (Y_MAX + 1))
 		};
-		GrpSetClip(clip);
+		GrpBackend_SetClip(clip);
 	}
 	else{
-		GrpSetClip({ X_MID, Y_MID, X_MID, Y_MID });
+		GrpBackend_SetClip({ X_MID, Y_MID, X_MID, Y_MID });
 	}
 }
 

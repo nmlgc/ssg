@@ -28,6 +28,9 @@ void GrpBackend_Clear(
 	RGB col_channeled = RGB{ 0, 0, 0 }
 );
 
+// Sets the clipping rectangle.
+void GrpBackend_SetClip(const WINDOW_LTRB& rect);
+
 // Returns the current pixel format of the backbuffer.
 PIXELFORMAT GrpBackend_PixelFormat(void);
 

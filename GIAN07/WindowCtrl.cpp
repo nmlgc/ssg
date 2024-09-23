@@ -387,7 +387,6 @@ static bool GrpFnChgDevice(INPUT_BITS key)
 		TextObj.WipeBeforeNextRender();
 		if(DxObj.Init(device_id_new, ConfigDat.BitDepth.v)) {
 			ConfigDat.DeviceID.v = device_id_new;
-			// GrpSetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 		}
 	});
 }
@@ -408,8 +407,6 @@ static bool GrpFnBpp(INPUT_BITS key)
 			ConfigDat.BitDepth.v = bitdepth_new;
 			// GrpBackend_PaletteSet(DxObj.pe);
 			GrpSetPaletteFrom(GrTitle);
-
-			// GrpSetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
 		}
 	});
 }

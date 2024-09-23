@@ -103,7 +103,7 @@ bool EndingInit(void)
 {
 	PALETTE	pal;
 
-	GrpSetClip(GRP_RES_RECT);
+	GrpBackend_SetClip(GRP_RES_RECT);
 	GrpBackend_Clear();
 	Grp_Flip();
 	GrpBackend_Clear();

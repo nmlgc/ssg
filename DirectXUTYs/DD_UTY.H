@@ -136,15 +136,12 @@ extern SURFACE_DDRAW	DxSurf[SURFACE_MAX];
 
 // 初期化など //
 bool GrpEnum(void);	// 使用できるデバイスを列挙する
-void GrpSetClip(const WINDOW_LTRB& rect);	// 3DViewportが生きていたらそちらもセット
 
 void GrpSetPaletteFrom(SURFACE_DDRAW& surf);
 
 // ビットマップ転送(WithClip)
 // Returns `true` if any part of the sprite was blitted.
 extern bool(*GrpBlt)(PIXEL_LTRB *src, int x, int y, SURFACE_DDRAW& surf);
-
-extern void GrpGetClip(WINDOW_LTRB *dest);	// クリッピング枠を取得する
 
 // カラーキー付き転送(クリッピングはないので注意！！) //
 // src の値は変更されません //

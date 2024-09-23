@@ -292,7 +292,7 @@ bool GRAPHICS_DDRAW::Init(uint8_t& device_id, BITDEPTH& bitdepth)
 			GrpGeom = &GrpGeom_D3D;
 		}
 
-		GrpSetClip(GRP_RES_RECT);
+		GrpBackend_SetClip(GRP_RES_RECT);
 
 		for(auto& surf : DxSurf) {
 			if(surf.size) {
@@ -331,17 +331,7 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 	return DxObj.PixelFormat;
 }
 
-// クリッピング枠を取得する //
-void GrpGetClip(WINDOW_LTRB *dest)
-{
-	dest->left   = CLIP_X_MIN;
-	dest->top    = CLIP_Y_MIN;
-
-	dest->right  = (CLIP_X_MAX + 1);
-	dest->bottom = (CLIP_Y_MAX + 1);
-}
-
-void GrpSetClip(const WINDOW_LTRB& rect)
+void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 {
 	D3DVIEWPORT2		view;
 

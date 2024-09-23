@@ -50,6 +50,10 @@
 constexpr WINDOW_COORD Y_MAX = (GRP_RES.h - 1);
 #define Y_MID		((Y_MAX+Y_MIN)/2)
 
+constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
+	X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1)
+};
+
 #define X_RNDV		(-30000)				// Ｘ座標のランダム指定用
 #define Y_RNDV		(-30000)				// Ｙ座標のランダム指定用
 

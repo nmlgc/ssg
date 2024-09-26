@@ -6,6 +6,7 @@
 #pragma once
 
 #include <array>
+#include <assert.h>
 #include <utility>
 
 template <class E> concept ENUMARRAY_ID = (
@@ -39,3 +40,15 @@ public:
 		return BASE::operator[](std::to_underlying(id));
 	}
 };
+
+namespace Cast {
+
+template <ENUMARRAY_ID IDType> constexpr inline IDType down_enum(
+	std::underlying_type_t<IDType> f
+)
+{
+	assert(f < std::to_underlying(IDType::COUNT));
+	return static_cast<IDType>(f);
+}
+
+} // namespace Cast

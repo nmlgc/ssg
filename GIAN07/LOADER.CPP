@@ -346,7 +346,7 @@ namespace DAT {
 		const auto path_data = PathForData();
 		bool ret = true;
 		for(const auto i : std::views::iota(0u, BASENAMES.size())) {
-			const auto id = DAT::PACK_ID(i);
+			const auto id = Cast::down_enum<DAT::PACK_ID>(i);
 			ret &= Packs[id].Load(path_data, id);
 		}
 		return ret;
@@ -432,7 +432,7 @@ namespace DAT_MISSING {
 	void Init(void)
 	{
 		for(const auto i : std::views::iota(0u, DAT::BASENAMES.size())) {
-			const auto id = DAT::PACK_ID(i);
+			const auto id = Cast::down_enum<DAT::PACK_ID>(i);
 			const auto& title = DAT::Packs[id].FilenameWithFoundPrefix();
 			Info[1 + i].Title = title;
 		}

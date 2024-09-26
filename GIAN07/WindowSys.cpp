@@ -572,7 +572,7 @@ void MWinCmd(uint8_t cmd)
 			temp = MsgWindow.MaxSize.bottom - MsgWindow.MaxSize.top - 16;
 			MsgWindow.MaxLine = temp / Ysize;							// 表示可能最大行数
 			MsgWindow.FontDy  =(temp % Ysize)/(temp/Ysize)+Ysize + 1;	// Ｙ増量
-			MsgWindow.FontID  = GIAN_FONT_ID(cmd);	// 使用フォント
+			MsgWindow.FontID  = Cast::down_enum<GIAN_FONT_ID>(cmd);	// 使用フォント
 			[[fallthrough]];
 
 		case(MWCMD_NEWPAGE):		// 改ページする

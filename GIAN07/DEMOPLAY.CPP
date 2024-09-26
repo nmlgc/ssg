@@ -17,7 +17,11 @@ bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作して�
 DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
 INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
 size_t	DemoBufPtr;	// デモプレイ用バッファPtr(Ｃのそれではない)
-CONFIG_DATA		ConfigTemp;						// コンフィグのデータ一時保存用
+struct {
+	uint8_t PlayerStock;
+	uint8_t BombStock;
+	uint8_t InputFlags;
+} ConfigTemp; // コンフィグのデータ一時保存用
 
 //DWORD RndBuf[RNDBUF_MAX];
 
@@ -66,7 +70,9 @@ bool DemoplayLoadSetup()
 
 	// コンフィグの初期化 //
 	// 現在のコンフィグを保持する //
-	ConfigTemp = ConfigDat;
+	ConfigTemp.PlayerStock = ConfigDat.PlayerStock.v;
+	ConfigTemp.BombStock   = ConfigDat.BombStock.v;
+	ConfigTemp.InputFlags  = ConfigDat.InputFlags.v;
 
 	// そのときのコンフィグを転送 //
 	ConfigDat.BombStock.v   = DemoInfo.CfgDat.BombStock;
@@ -164,7 +170,10 @@ INPUT_BITS DemoplayMove(void)
 
 void DemoplayCleanup(void)
 {
-	ConfigDat          = ConfigTemp;
+	ConfigDat.PlayerStock.v = ConfigTemp.PlayerStock;
+	ConfigDat.BombStock.v   = ConfigTemp.BombStock;
+	ConfigDat.InputFlags.v  = ConfigTemp.InputFlags;
+
 	DemoplayLoadEnable = false;
 }
 

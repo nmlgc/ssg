@@ -75,7 +75,7 @@ extern bool ScoreNameInit(void)
 {
 	CurrentDif = CurrentLevel();
 
-	CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
+	CurrentRank = SetScoreString(nullptr, CurrentDif);
 	if(CurrentRank == 0) return GameExit();
 
 	MWinForceClose();
@@ -113,14 +113,14 @@ void ScoreNameProc(bool&)
 			if(ScoreString[4].bMoveEnable) break;
 			Snd_SEPlay(SOUND_ID_SELECT);
 			CurrentDif  = (CurrentDif+4)%5;
-			CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
+			CurrentRank = SetScoreString(nullptr, CurrentDif);
 		break;
 
 		case(KEY_DOWN):		case(KEY_RIGHT):
 			if(ScoreString[4].bMoveEnable) break;
 			Snd_SEPlay(SOUND_ID_SELECT);
 			CurrentDif  = (CurrentDif+1)%5;
-			CurrentRank = (BYTE)SetScoreString(NULL, CurrentDif);
+			CurrentRank = SetScoreString(nullptr, CurrentDif);
 		break;
 
 		case 0:
@@ -427,7 +427,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 	Snd_SEStopAll();
 
 	// ハイスコアで無いならばタイトルに移行する //
-	CurrentRank = (BYTE)SetScoreString(&CurrentName, CurrentLevel());
+	CurrentRank = SetScoreString(&CurrentName, CurrentLevel());
 	if(CurrentRank == 0) return GameExit();
 
 	MWinForceClose();

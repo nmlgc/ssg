@@ -6,6 +6,7 @@
 #include "LZ_UTY.H"
 #include "LEVEL.H"
 #include "SCORE.H"
+#include "game/defer.h"
 #include <ranges>
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
@@ -68,17 +69,18 @@ template <std::unsigned_integral T> void _xPut(
 
 // 現在のスコア列を取得する(名前挿入アリ) //
 // NData == NULL の場合、挿入しません     //
-int SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
+uint8_t SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
 {
 //	static char			*WTable[4] = {"WIDE ","HOMING","LASER","?????"};
 	NR_SCORE_STRING		*Res;
-	int					i,num,rank;
+	int					i,num;
 	int64_t temp;
 
 	Res = ScoreString;
 
 
 	// スコアデータを読み込む //
+	uint8_t rank;
 	if(NData != nullptr) {
 		rank = IsHighScore(NData, Dif);
 		if(rank==0) return 0;
@@ -135,45 +137,37 @@ int SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
 }
 
 
-// ０：ハイスコアでない  それ以外：順位 //
-int IsHighScore(const NR_NAME_DATA *NData, uint8_t Dif)
+uint8_t IsHighScore(const NR_NAME_DATA *NData, uint8_t Dif)
 {
-	int				Rank;
-
 	// ロードできないので失敗！ //
 	if(!LoadScoreData()) return 0;
+	defer(ReleaseScoreData());
 
 	// 難易度でポインタを振り分ける //
 	const auto maybe_temp = GetNList(Dif);
 	if(!maybe_temp) {
-		ReleaseScoreData();
 		return 0;
 	}
 	const auto temp = maybe_temp.value();
 
 	// 該当個所はあるかな？ //
-	for(Rank=0; Rank<NR_RANK_MAX ; Rank++){
+	for(const auto Rank : std::views::iota(0u, temp.size())) {
 		// スコアが等しい場合は、後から入ったほうが下の順位に //
 		// なるようにするのだ（前作[秋霜玉(仮] と同じね）     //
-		if(NData->Score > temp[Rank].Score) break;
+		if(NData->Score > temp[Rank].Score) {
+			// 順位を返す //
+			return (Rank + 1);
+		}
 	}
-	if(Rank == NR_RANK_MAX) Rank = -1;
-
-	// 解放を行う //
-	ReleaseScoreData();
-
-	// 順位を返す //
-	return Rank+1;
+	return 0;
 }
 
 
 // スコアデータを書き出す //
 bool SaveScoreData(NR_NAME_DATA *NData, uint8_t Dif)
 {
-	int				Rank;
-
 	// スコアデータを読み込む //
-	Rank = IsHighScore(NData, Dif);
+	const auto Rank = IsHighScore(NData, Dif);
 
 	// これは、ハイスコアじゃないね //
 	if(Rank == 0) {

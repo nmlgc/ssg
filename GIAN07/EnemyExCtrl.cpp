@@ -513,7 +513,7 @@ void BitLineDraw(void)
 	for(i=0, j=-1; i<n; i++){
 		while(BitData.Bit[++j].pEnemy == NULL);
 
-		RefTable[i] = RefTable[i+n] = BitData.Bit[i].pEnemy;
+		RefTable[i] = RefTable[i + n] = BitData.Bit[j].pEnemy;
 	}
 
 	GrpLock();

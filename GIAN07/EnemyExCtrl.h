@@ -22,8 +22,7 @@
 
 ///// [ 定数 ] /////
 #define SNAKE_MAX				4			// 蛇型の敵の最大数
-#define SNAKEYMOVE_DEGPOINT		240			// 蛇型運動の頂点バッファ数
-#define SNAKEYMOVE_BUF			30			// 蛇型運動格納用敵データの数
+constexpr auto SNAKEYMOVE_POINTS_PER_ENEMY = 8;
 
 #define BIT_MAX					6			// ビットの最大数
 #define BITCMD_STDMOVE			0x00		// 通常の移動を行う
@@ -48,14 +47,19 @@
 ///// [構造体] /////
 
 // 蛇型の敵を管理する構造体 //
-typedef struct tagSNAKYMOVE_DATA{
-	DegPoint		PointBuffer[SNAKEYMOVE_DEGPOINT];	// 頂点バッファ(ExDef.h)
-	ENEMY_DATA		*EnemyPtr[SNAKEYMOVE_BUF];			// 尾となるデータ配列
+template <size_t Len> struct SNAKYMOVE_DATA {
+	// 頂点バッファ(ExDef.h)
+	DegPoint	PointBuffer[Len * SNAKEYMOVE_POINTS_PER_ENEMY];
+
+	ENEMY_DATA	*EnemyPtr[Len];	// 尾となるデータ配列
 	BOSS_DATA		*Parent;							// 親(頭となるデータ)
-	int				Length;			// 長さ
-	int				Head;			// 頭を格納している地点のポインタ
+	size_t	Head;	// 頭を格納している地点のポインタ
 	bool	bIsUse;	// この構造体を使用しているか
-} SNAKYMOVE_DATA;
+
+	constexpr static size_t Length() {
+		return Len;
+	}
+};
 
 
 typedef struct tagBIT_PARAM {
@@ -110,11 +114,6 @@ void BitSelectAttack(uint32_t BitID);	// 攻撃パターンをセットor変更
 void BitLaserCommand(uint8_t Command);	// レーザー系命令を発行
 void BitSendCommand(uint8_t Command, int Param);	// ビット命令を送信
 int  BitGetNum(void);	// 現在のビット数を取得する
-
-
-
-///// [ 変数 ] /////
-extern SNAKYMOVE_DATA	SnakeData[SNAKE_MAX];
 
 
 

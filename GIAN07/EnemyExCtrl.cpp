@@ -10,11 +10,12 @@
 #include "DirectXUTYs/DD_UTY.H"
 #include "game/cast.h"
 #include "game/snd.h"
+#include <ranges>
 
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 
 
-SNAKYMOVE_DATA	SnakeData[SNAKE_MAX];
+SNAKYMOVE_DATA<30> SnakeData[SNAKE_MAX];
 BIT_DATA		BitData;
 
 
@@ -36,7 +37,6 @@ void SnakyInit(void)
 // 蛇型の敵をセットする //
 void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 {
-	int				i;
 	DWORD			n;
 	ENEMY_DATA		*e;
 
@@ -50,26 +50,29 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 	s->bIsUse = TRUE;
 	s->Parent = b;
 	s->Head   = 0;
-	s->Length = len;
+
+	// Hardcoded to 30 in the original game. No way around dynamic allocation
+	// if mods ever want to safely customize it.
+	assert(s->Length() == len);
 
 	// ここでは頂点バッファの初期化を行うのだ //
 	// なお、ループ中断値は後で変更のこと     //
-	for(i=0;i<len*8;i++){
-		s->PointBuffer[i].x = b->Edat.x;
-		s->PointBuffer[i].y = b->Edat.y;
-		s->PointBuffer[i].d = b->Edat.d;
+	for(auto& point : s->PointBuffer) {
+		point.x = b->Edat.x;
+		point.y = b->Edat.y;
+		point.d = b->Edat.d;
 	}
 
 	n = 4 + (TailID<<2);
-	for(i=0;i<len;i++){
+	for(auto& enemy_ptr : s->EnemyPtr) {
 		if(EnemyNow+1<ENEMY_MAX){
 			e = &Enemy[EnemyInd[EnemyNow++]];
 
 			InitEnemyDataX64(e,b->Edat.x,b->Edat.y,n);
-			s->EnemyPtr[i] = e;
+			enemy_ptr = e;
 		}
 		else{
-			s->EnemyPtr[i] = NULL;	// ポインタを無効化
+			enemy_ptr = nullptr; // ポインタを無効化
 		}
 	}
 }
@@ -77,27 +80,28 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 // 蛇型の敵の移動処理 //
 void SnakyMove(void)
 {
-	int j;
 	ENEMY_DATA		*e;
-	BYTE			ptr;
 
 	for(auto& it : SnakeData) {
 		auto *s = &it;
 		if(s->bIsUse==FALSE) continue;
 
 		// バッファ更新処理 //
-		for(j=0;j<s->Length;j++){
+		constexpr auto points = (s->Length() * SNAKEYMOVE_POINTS_PER_ENEMY);
+		for(const auto j : std::views::iota(0u, s->Length())) {
 			e = s->EnemyPtr[j];
 			if(e==NULL) continue;
 
-			ptr = (s->Head+s->Length*8-j*8)%(s->Length*8);
+			const auto ptr = (
+				(s->Head + points - (j * SNAKEYMOVE_POINTS_PER_ENEMY)) % points
+			);
 
 			e->x = s->PointBuffer[ptr].x;
 			e->y = s->PointBuffer[ptr].y;
 			e->d = s->PointBuffer[ptr].d;
 		}
 
-		s->Head = (s->Head+1)%(s->Length*8);
+		s->Head = ((s->Head + 1) % points);
 		s->PointBuffer[s->Head].x = s->Parent->Edat.x;
 		s->PointBuffer[s->Head].y = s->Parent->Edat.y;
 		s->PointBuffer[s->Head].d = s->Parent->Edat.d;
@@ -107,9 +111,6 @@ void SnakyMove(void)
 // 蛇型の敵を殺す
 void SnakyDelete(const BOSS_DATA *b)
 {
-	int				i;
-	ENEMY_DATA		*e;
-
 	auto s = std::ranges::find_if(SnakeData, [b](const auto& s) {
 		return (s.Parent == b);
 	});
@@ -117,10 +118,10 @@ void SnakyDelete(const BOSS_DATA *b)
 		return;
 	}
 
-	for(i=0;i<s->Length;i++){
-		if(s->EnemyPtr[i]==NULL) break;
-
-		e = s->EnemyPtr[i];
+	for(auto& e : s->EnemyPtr) {
+		if(e == nullptr) {
+			break;
+		}
 
 		// Snd_SEPlay(SOUND_ID_BOMB, e->x);
 		if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ

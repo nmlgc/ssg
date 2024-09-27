@@ -7,6 +7,7 @@
 
 #include <array>
 #include <algorithm>
+#include <assert.h>
 
 template <class T, size_t N, typename ShouldDelete> void Indsort(
 	std::array<uint16_t, N>& indices,
@@ -29,6 +30,16 @@ template <class T, size_t N, typename ShouldDelete> void Indsort(
 					break;
 				}
 			}
+
+			// pbg landmine: This looks as if it will write out of bounds on
+			// the last iteration of the loop ([i] == ([count] - 1). It only
+			// doesn't because every [count]-mutating setter function ensures
+			// that it stays ≤([N] - 1), thus reducing the effective [N] by 1.
+			assert(
+				(count <= (N - 1)) ||
+				!"setter function violated entity cap precondition"
+			);
+			#pragma warning(suppress: 28020)
 			std::swap(indices[i], indices[temp]);
 		} else {
 			next++;

@@ -59,7 +59,7 @@ template <size_t N> void Indsort(
 	uint16_t& count,
 	const std::array<ENEMY_DATA, N>& entities
 ) {
-	Indsort(EnemyInd, EnemyNow, Enemy, [](const ENEMY_DATA& e) {
+	Indsort(indices, count, entities, [](const ENEMY_DATA& e) {
 		return (e.flag & EF_DELETE);
 	});
 }

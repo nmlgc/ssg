@@ -176,6 +176,18 @@ bool GameFrame(void)
 			XGrpTryCycleScMode();
 		}
 	#endif
+	if(SystemKey_Data & SYSKEY_GRP_TURBO) {
+		static decltype(Grp_FPSDivisor) fps_divisor_prev = (
+			(Grp_FPSDivisor != 0) ? Grp_FPSDivisor : 1
+		);
+		if(Grp_FPSDivisor != 0) {
+			fps_divisor_prev = Grp_FPSDivisor;
+			ConfigDat.FPSDivisor.v = Grp_FPSDivisor = 0;
+		} else {
+			ConfigDat.FPSDivisor.v = Grp_FPSDivisor = fps_divisor_prev;
+		}
+	}
+
 	// Strictly superior to waiting [CWIN_KEYWAIT] frames: We won't get a key
 	// release scancode if we recreate the window on a switch into exclusive
 	// fullscreen, and we save a dependency on `WindowSys.h`.
@@ -183,7 +195,8 @@ bool GameFrame(void)
 		SYSKEY_GRP_FULLSCREEN |
 		SYSKEY_GRP_SCALE_UP |
 		SYSKEY_GRP_SCALE_DOWN |
-		SYSKEY_GRP_SCALE_MODE
+		SYSKEY_GRP_SCALE_MODE |
+		SYSKEY_GRP_TURBO
 	);
 
 	bool quit = false;

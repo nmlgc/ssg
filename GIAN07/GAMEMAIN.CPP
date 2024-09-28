@@ -24,8 +24,6 @@ DWORD		DemoTimer  = 0;
 BYTE		WeaponKeyWait = 0;
 int	GameOverTimer = 0;
 
-decltype(CONFIG_DATA::GameLevel.v) TempGameLevel = 0;
-
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
 BYTE			CurrentRank;	// ネームレジスト用順位データ
 BYTE			CurrentDif;		// 現在の難易度(スコアネーム表示用)
@@ -66,9 +64,7 @@ void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
-	return (
-		(GameStage == GRAPH_ID_EXSTAGE) ? GAME_EXTRA : ConfigDat.GameLevel.v
-	);
+	return ((GameStage == GRAPH_ID_EXSTAGE) ? GAME_EXTRA : GameLevel);
 }
 
 bool InputLocked;
@@ -496,10 +492,7 @@ bool WeaponSelectInit(bool ExStg)
 	GrpCls();
 	GrpFlip();
 
-	if(ExStg) {
-		TempGameLevel         = ConfigDat.GameLevel.v;
-		ConfigDat.GameLevel.v = GAME_HARD;
-	}
+	GameLevel = (ExStg ? GAME_HARD : ConfigDat.GameLevel.v);
 
 	GameSTD_Init();
 	PlayRankReset();
@@ -835,10 +828,6 @@ extern bool GameExit(bool bNeedChgMusic)
 	TextObj.Clear();
 	GrpCls();
 	GrpFlip();
-
-	if(GameStage == GRAPH_ID_EXSTAGE){
-		ConfigDat.GameLevel.v = TempGameLevel;
-	}
 
 	if(!LoadGraph(GRAPH_ID_TITLE)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");

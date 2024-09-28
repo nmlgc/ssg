@@ -14,6 +14,7 @@
 //char			ScoreTable[8][80];
 uint32_t	GameCount;
 uint8_t	GameStage;
+uint8_t	GameLevel;
 
 
 
@@ -47,7 +48,7 @@ extern void StdStatusOutput(void)
 
 	sprintf(buf,"%s",DItem[PlayRank.GameLevel]);
 	GrpPut16(0,50,buf);
-	sprintf(buf,"%s<Cfg>",DItem[ConfigDat.GameLevel.v]);
+	sprintf(buf,"%s<Lvl>",DItem[GameLevel]);
 	GrpPut16(0,68,buf);
 	sprintf(buf,"Pr %d",PlayRank.Rank);
 	GrpPut16(0,86,buf);

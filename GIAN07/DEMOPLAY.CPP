@@ -58,9 +58,9 @@ bool DemoplayLoadSetup()
 
 	// そのときのコンフィグを転送 //
 	ConfigDat.BombStock.v   = DemoInfo.CfgDat.BombStock;
-	ConfigDat.GameLevel.v   = DemoInfo.CfgDat.GameLevel;
 	ConfigDat.PlayerStock.v = DemoInfo.CfgDat.PlayerStock;
 	ConfigDat.InputFlags.v  = DemoInfo.CfgDat.InputFlags;
+	GameLevel = DemoInfo.CfgDat.GameLevel;
 
 	// 本体の性能記述 //
 	Viv.exp    = DemoInfo.Exp;

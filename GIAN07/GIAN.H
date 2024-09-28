@@ -135,6 +135,7 @@ typedef struct tagHIGH_SCORE{
 //extern char			ScoreTable[8][80];
 extern uint32_t	GameCount;
 extern uint8_t	GameStage;
+extern uint8_t	GameLevel;
 
 
 extern void StdStatusOutput(void);

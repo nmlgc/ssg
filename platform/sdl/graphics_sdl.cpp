@@ -634,18 +634,30 @@ void DrawGeometry(
 	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
 )
 {
-	const auto vertices = HelpFPointsFrom(xys);
-	const auto vertex_count = vertices.size();
+	[[gsl::suppress(type.5)]] SDL_FPoint sdl_vertices[GRP_TRIANGLES_MAX];
+
+	const auto vertex_count = xys.size();
 	const auto sdl_colors = HelpColorsFrom(colors);
 	const auto indices = INDICES[tp];
 	const auto index_count = TriangleIndexCount(vertex_count);
+	assert(vertex_count <= std::size(sdl_vertices));
 	assert(index_count <= indices.size());
 	assert((colors.size() == 1) || (colors.size() == vertex_count));
+
+	// Work around SDL's weird -0.5f offset...
+	float offset_x, offset_y;
+	SDL_RenderGetScale(Renderer, &offset_x, &offset_y);
+	offset_x = (1.0f / (2.0f * offset_x));
+	offset_y = (1.0f / (2.0f * offset_y));
+	auto sdl = std::begin(sdl_vertices);
+	for(const auto& game : xys) {
+		*(sdl++) = { .x = (game.x + offset_x), .y = (game.y + offset_y) };
+	}
 
 	SDL_RenderGeometryRaw(
 		Renderer,
 		nullptr,
-		&vertices.data()->x,
+		&sdl_vertices[0].x,
 		sizeof(SDL_FPoint),
 		sdl_colors.data(),
 		((sdl_colors.size() == 1) ? 0 : sizeof(SDL_Color)),

@@ -64,7 +64,8 @@ template <size_t N> void Indsort(
 	});
 }
 
-static DWORD ID2Value(ENEMY_DATA *e,BYTE id);		// ECLCST_?? からその値に変換する
+// ECLCST_?? からその値に変換する
+static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
 
 
 
@@ -552,7 +553,6 @@ void parse_ECL(ENEMY_DATA *e)
 	BYTE *cmd;
 	BOOL bRetFlag;		// 実行クロック０命令の場合はFALSEにすること
 	BYTE temp;
-	DWORD	dwTemp;
 	int		RegCmp;
 	HLaserInfo		HInfo;
 
@@ -1563,7 +1563,7 @@ void parse_ECL(ENEMY_DATA *e)
 			if(cmd[0] == ECL_ENEMYSETD){
 				n   = 4 + (((BYTE)cmd[6])<<2);
 				InitEnemyDataSTD(new_enemy,x,y,n);
-				new_enemy->d = (BYTE)ID2Value(e,cmd[5]);
+				new_enemy->d = ID2Value(e, cmd[5]);
 			}
 			else{
 				n   = 4 + (((BYTE)cmd[5])<<2);
@@ -1577,47 +1577,48 @@ void parse_ECL(ENEMY_DATA *e)
 			bRetFlag = FALSE;
 		break;
 
-		case(ECL_MOVR):		// レジスタ<->構造体変数の代入
-			dwTemp = ID2Value(e,cmd[2]);
+		case(ECL_MOVR): { // レジスタ<->構造体変数の代入
+			const auto dwTemp = ID2Value(e, cmd[2]);
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
 					e->GR[cmd[1]] = dwTemp;
 				break;
 
-				case(ECLCST_LCMD_D):	e->l_cmd.d = (BYTE)dwTemp;break;	// レーザーコマンド(角度)
-				case(ECLCST_LCMD_DW):	e->l_cmd.dw= (BYTE)dwTemp;break;	// レーザーコマンド(角度差)
-				case(ECLCST_LCMD_N):	e->l_cmd.n = (BYTE)dwTemp;break;	// レーザーコマンド(本数)
-				case(ECLCST_LCMD_C):	e->l_cmd.c = (BYTE)dwTemp;break;	// レーザーコマンド(色)
-				case(ECLCST_LCMD_L):	e->l_cmd.l = dwTemp;break;			// レーザーコマンド(長さ)
-				case(ECLCST_LCMD_V):	e->l_cmd.v = dwTemp;break;			// レーザーコマンド(速度)
+				case(ECLCST_LCMD_D):	e->l_cmd.d = dwTemp; break;	// レーザーコマンド(角度)
+				case(ECLCST_LCMD_DW):	e->l_cmd.dw= dwTemp; break;	// レーザーコマンド(角度差)
+				case(ECLCST_LCMD_N):	e->l_cmd.n = dwTemp; break;	// レーザーコマンド(本数)
+				case(ECLCST_LCMD_C):	e->l_cmd.c = dwTemp; break;	// レーザーコマンド(色)
+				case(ECLCST_LCMD_L):	e->l_cmd.l = dwTemp; break;	// レーザーコマンド(長さ)
+				case(ECLCST_LCMD_V):	e->l_cmd.v = dwTemp; break;	// レーザーコマンド(速度)
 
-				case(ECLCST_TCMD_D):	e->t_cmd.d  = (BYTE)dwTemp;break;	// 弾コマンド(角度)
-				case(ECLCST_TCMD_DW):	e->t_cmd.dw = (BYTE)dwTemp;break;	// 弾コマンド(角度差)
-				case(ECLCST_TCMD_N):	e->t_cmd.n  = (BYTE)dwTemp;break;	// 弾コマンド(個数)
-				case(ECLCST_TCMD_NS):	e->t_cmd.ns = (BYTE)dwTemp;break;	// 弾コマンド(連射数)
-				case(ECLCST_TCMD_V):	e->t_cmd.v  = (BYTE)dwTemp;break;	// 弾コマンド(速度)
-				case(ECLCST_TCMD_C):	e->t_cmd.c  = (BYTE)dwTemp;break;	// 弾コマンド(色)
-				case(ECLCST_TCMD_A):	e->t_cmd.a  = (char)dwTemp;break;	// 弾コマンド(加速度)
+				case(ECLCST_TCMD_D):	e->t_cmd.d  = dwTemp; break;	// 弾コマンド(角度)
+				case(ECLCST_TCMD_DW):	e->t_cmd.dw = dwTemp; break;	// 弾コマンド(角度差)
+				case(ECLCST_TCMD_N):	e->t_cmd.n  = dwTemp; break;	// 弾コマンド(個数)
+				case(ECLCST_TCMD_NS):	e->t_cmd.ns = dwTemp; break;	// 弾コマンド(連射数)
+				case(ECLCST_TCMD_V):	e->t_cmd.v  = dwTemp; break;	// 弾コマンド(速度)
+				case(ECLCST_TCMD_C):	e->t_cmd.c  = dwTemp; break;	// 弾コマンド(色)
+				case(ECLCST_TCMD_A):	e->t_cmd.a  = dwTemp; break;	// 弾コマンド(加速度)
 
 				case(ECLCST_TCMD_REP):
 					//char buf[100];
 					//sprintf(buf,"REP=%d [REG:%d]",dwTemp,cmd[2]);
 					// DebugOut(buf);
-					e->t_cmd.rep= (BYTE)dwTemp;
+					e->t_cmd.rep = dwTemp;
 				break;	// 弾コマンド(繰り返し)
 
-				case(ECLCST_TCMD_VD):	e->t_cmd.vd = (char)dwTemp;break;	// 弾コマンド(角速度)
+				case(ECLCST_TCMD_VD):	e->t_cmd.vd = dwTemp; break;	// 弾コマンド(角速度)
 
-				case(ECLCST_ENEMY_X):	e->x = (int)dwTemp;		break;		// 敵のＸ座標
-				case(ECLCST_ENEMY_Y):	e->y = (int)dwTemp;		break;		// 敵のＸ座標
-				case(ECLCST_ENEMY_D):	e->d = (BYTE)dwTemp;	break;		// 敵の角度
+				case(ECLCST_ENEMY_X):	e->x = dwTemp;	break;	// 敵のＸ座標
+				case(ECLCST_ENEMY_Y):	e->y = dwTemp;	break;	// 敵のＸ座標
+				case(ECLCST_ENEMY_D):	e->d = dwTemp;	break;	// 敵の角度
 
 				default:
 					DebugOut(u8"ナゾのレジスタ指定++");
 				break;
 			}
 			bRetFlag = FALSE;
+		}
 		break;
 
 		case(ECL_MOVC):		// レジスタ<- 定数(即値)の代入
@@ -1666,7 +1667,7 @@ void parse_ECL(ENEMY_DATA *e)
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-					e->GR[cmd[1]] += (int)ID2Value(e,cmd[2]);
+					e->GR[cmd[1]] += ID2Value(e, cmd[2]);
 				break;
 
 				default:	// レジスタ指定がおかしいに
@@ -1680,7 +1681,7 @@ void parse_ECL(ENEMY_DATA *e)
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-					e->GR[cmd[1]] -= (int)ID2Value(e,cmd[2]);
+					e->GR[cmd[1]] -= ID2Value(e, cmd[2]);
 				break;
 
 				default:	// レジスタ指定がおかしいに
@@ -1739,13 +1740,13 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_CMPR):		// レジスタ～レジスタの比較(Reg0,Reg1)
 			if(cmd[1]>=ECLREG_MAX || cmd[2]>=ECLREG_MAX) return;		// エラー
-			RegCmp = ( (int)ID2Value(e,cmd[1]) - (int)ID2Value(e,cmd[2]) );
+			RegCmp = (ID2Value(e, cmd[1]) - ID2Value(e, cmd[2]));
 			bRetFlag = FALSE;
 		break;
 
 		case(ECL_CMPC):		// レジスタ～定数の比較(Reg,Const)
 			if(cmd[1]>=ECLREG_MAX) return;		// エラー
-			RegCmp = ( (int)ID2Value(e,cmd[1]) - (*(int *)&cmd[1+1]) );
+			RegCmp = (ID2Value(e, cmd[1]) - (*(int *)&cmd[1+1]) );
 			bRetFlag = FALSE;
 		break;
 
@@ -1857,35 +1858,40 @@ extern void InitECLInterrupt(ENEMY_DATA *e)
 	}
 }
 
+// Ensure that everything we return fits losslessly into the return type. If
+// this ever fails due to new script commands that return larger values,
+// ID2Value() needs a larger return type.
+#pragma warning(error: 4244)
+
 // ECLCST_?? からその値に変換する //
-static DWORD ID2Value(ENEMY_DATA *e,BYTE id)
+static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id)
 {
 	switch(id){
 		// レジスタ指定の場合 //
 		case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 		case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-		return (DWORD)e->GR[id];
+		return e->GR[id];
 
-		case(ECLCST_LCMD_D):	return (DWORD)e->l_cmd.d;		// レーザーコマンド(角度)
-		case(ECLCST_LCMD_DW):	return (DWORD)e->l_cmd.dw;		// レーザーコマンド(角度差)
-		case(ECLCST_LCMD_N):	return (DWORD)e->l_cmd.n;		// レーザーコマンド(本数)
-		case(ECLCST_LCMD_C):	return (DWORD)e->l_cmd.c;		// レーザーコマンド(色)
-		case(ECLCST_LCMD_L):	return (DWORD)e->l_cmd.l;		// レーザーコマンド(長さ)
-		case(ECLCST_LCMD_V):	return (DWORD)e->l_cmd.v;		// レーザーコマンド(速度)
+		case(ECLCST_LCMD_D):	return e->l_cmd.d;	// レーザーコマンド(角度)
+		case(ECLCST_LCMD_DW):	return e->l_cmd.dw;	// レーザーコマンド(角度差)
+		case(ECLCST_LCMD_N):	return e->l_cmd.n;	// レーザーコマンド(本数)
+		case(ECLCST_LCMD_C):	return e->l_cmd.c;	// レーザーコマンド(色)
+		case(ECLCST_LCMD_L):	return e->l_cmd.l;	// レーザーコマンド(長さ)
+		case(ECLCST_LCMD_V):	return e->l_cmd.v;	// レーザーコマンド(速度)
 
-		case(ECLCST_TCMD_D):	return (DWORD)e->t_cmd.d;		// 弾コマンド(角度)
-		case(ECLCST_TCMD_DW):	return (DWORD)e->t_cmd.dw;		// 弾コマンド(角度差)
-		case(ECLCST_TCMD_N):	return (DWORD)e->t_cmd.n;		// 弾コマンド(個数)
-		case(ECLCST_TCMD_NS):	return (DWORD)e->t_cmd.ns;		// 弾コマンド(連射数)
-		case(ECLCST_TCMD_V):	return (DWORD)e->t_cmd.v;		// 弾コマンド(速度)
-		case(ECLCST_TCMD_C):	return (DWORD)e->t_cmd.c;		// 弾コマンド(色)
-		case(ECLCST_TCMD_A):	return (DWORD)e->t_cmd.a;		// 弾コマンド(加速度)
-		case(ECLCST_TCMD_REP):	return (DWORD)e->t_cmd.rep;		// 弾コマンド(繰り返し)
-		case(ECLCST_TCMD_VD):	return (DWORD)e->t_cmd.vd;		// 弾コマンド(角速度)
+		case(ECLCST_TCMD_D):	return e->t_cmd.d;	// 弾コマンド(角度)
+		case(ECLCST_TCMD_DW):	return e->t_cmd.dw;	// 弾コマンド(角度差)
+		case(ECLCST_TCMD_N):	return e->t_cmd.n;	// 弾コマンド(個数)
+		case(ECLCST_TCMD_NS):	return e->t_cmd.ns;	// 弾コマンド(連射数)
+		case(ECLCST_TCMD_V):	return e->t_cmd.v;	// 弾コマンド(速度)
+		case(ECLCST_TCMD_C):	return e->t_cmd.c;	// 弾コマンド(色)
+		case(ECLCST_TCMD_A):	return e->t_cmd.a;	// 弾コマンド(加速度)
+		case(ECLCST_TCMD_REP):	return e->t_cmd.rep;	// 弾コマンド(繰り返し)
+		case(ECLCST_TCMD_VD):	return e->t_cmd.vd;	// 弾コマンド(角速度)
 
-		case(ECLCST_ENEMY_X):	return (DWORD)e->x;			// 敵のＸ座標
-		case(ECLCST_ENEMY_Y):	return (DWORD)e->y;			// 敵のＹ座標
-		case(ECLCST_ENEMY_D):	return (DWORD)e->d;			// 敵の角度
+		case(ECLCST_ENEMY_X):	return e->x;	// 敵のＸ座標
+		case(ECLCST_ENEMY_Y):	return e->y;	// 敵のＹ座標
+		case(ECLCST_ENEMY_D):	return e->d;	// 敵の角度
 
 		default:
 		return 0;

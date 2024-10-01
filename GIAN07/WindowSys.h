@@ -101,7 +101,7 @@ struct WINDOW_INFO {
 	FLAGS	Flags = FLAGS::NONE;
 
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
-	WINDOW_INFO*	ItemPtr[WINITEM_MAX];	// 次の項目へのポインタ
+	WINDOW_INFO*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
 
 	constexpr WINDOW_INFO(
 		const Narrow::literal title = "",

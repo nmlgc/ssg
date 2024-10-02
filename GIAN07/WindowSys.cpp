@@ -54,7 +54,7 @@ typedef struct tagMSG_WINDOW{
 
 	void MsgBlank() {
 		Line = 0;
-		for(auto msg : Msg) {
+		for(auto& msg : Msg) {
 			msg = {};
 		}
 		Text.clear();
@@ -530,8 +530,8 @@ void MWinMsg(Narrow::string_view s)
 	}
 
 	MsgWindow.Text.clear();
-	for(const auto s : MsgWindow.Msg) {
-		MsgWindow.Text += s;
+	for(decltype(MsgWindow.Line) i = 0; i < MsgWindow.Line; i++) {
+		MsgWindow.Text += MsgWindow.Msg[Line];
 		MsgWindow.Text += '\n';
 	}
 }

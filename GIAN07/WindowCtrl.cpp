@@ -50,7 +50,8 @@ static void SndFnSEVol(int_fast8_t delta);
 static void SndFnBGMVol(int_fast8_t delta);
 static void SndFnBGMGain(int_fast8_t delta);
 static void SndFnBGMPack(int_fast8_t delta);
-static void SndFnMIDIDev(int_fast8_t delta);
+
+static void MidFnDev(int_fast8_t delta);
 
 static void InpFnMsgSkip(int_fast8_t delta);
 static void InpFnZSpeedDown(int_fast8_t delta);
@@ -80,6 +81,7 @@ static void SetDifItem(bool tick = true);
 static void SetGrpItem(bool tick = true);
 static void SetGrpAPIItem(bool tick = true);
 static void SetSndItem(bool tick = true);
+static void SetMidItem(bool tick = true);
 static void SetInpItem(bool tick = true);
 static void SetIKeyItem(bool tick = true);
 static void SetCfgRepItem(bool tick = true);
@@ -271,13 +273,20 @@ WINDOW_MENU GrpMenu = { SetGrpItem, {
 
 constexpr auto VOLUME_FLAGS = WINDOW_FLAGS::FAST_REPEAT;
 
+static char MidTitlePort[26];
+WINDOW_CHOICE MidItem[] = {
+	{ MidTitlePort, "MIDI Port (保存はされません)", MidFnDev },
+	SubmenuExitItemForArray,
+};
+WINDOW_MENU MidMenu      = { std::span(MidItem), SetMidItem };
+static auto& MidItemPort = MidItem[0];
+
 static char SndTitleSE[26];
 static char SndTitleBGM[26];
 static char SndTitleSEVol[26];
 static char SndTitleBGMVol[26];
 static char SndTitleBGMGain[26];
 static char SndTitleBGMPack[26];
-static char SndTitleMIDIPort[26];
 WINDOW_CHOICE SndItem[] = {
 	{ SndTitleSE,	"SEを鳴らすかどうかの設定",	SndFnSE },
 	{ SndTitleBGM,	"BGMを鳴らすかどうかの設定",	SndFnBGM },
@@ -285,7 +294,7 @@ WINDOW_CHOICE SndItem[] = {
 	{ SndTitleBGMVol, "音楽の音量", SndFnBGMVol, VOLUME_FLAGS },
 	{ SndTitleBGMGain,	"毎に曲から音量の違うことが外します",	SndFnBGMGain },
 	{ SndTitleBGMPack,	BGMPack::HELP_DOWNLOAD,	SndFnBGMPack },
-	{ SndTitleMIDIPort,	"MIDI Port (保存はされません)",	SndFnMIDIDev },
+	{ "MIDI",	"Change MIDI playback options",	MidMenu },
 	SubmenuExitItemForArray,
 };
 WINDOW_MENU SndMenu = { std::span(SndItem), SetSndItem };
@@ -295,7 +304,7 @@ static auto& SndItemSEVol = SndItem[2];
 static auto& SndItemBGMVol = SndItem[3];
 static auto& SndItemBGMGain = SndItem[4];
 static auto& SndItemBGMPack = SndItem[5];
-static auto& SndItemMIDIPort = SndItem[6];
+static auto& SndItemMIDI = SndItem[6];
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
@@ -703,7 +712,7 @@ namespace BGMPack {
 	}
 }
 
-static void SndFnMIDIDev(int_fast8_t delta)
+static void MidFnDev(int_fast8_t delta)
 {
 	if(BGM_Enabled()) {
 		BGM_ChangeMIDIDevice(delta);
@@ -1061,12 +1070,8 @@ static void SetGrpAPIItem(bool)
 }
 #endif
 
-static void SetSndItem(bool tick)
+static void SetSndItem(bool)
 {
-	static int now;
-	char	buf[1000];
-	static BYTE time = 0;
-
 	const auto sound_active = (ConfigDat.SoundFlags.v & SNDF_SE_ENABLE);
 	const auto bgm_active = BGM_Enabled();
 
@@ -1100,9 +1105,16 @@ static void SetSndItem(bool tick)
 		sprintf(SndTitleBGMPack, "BGMPack[   ....   ]");
 		SndItemBGMPack.Help = BGMPack::HELP_SET;
 	}
+}
+
+static void SetMidItem(bool tick)
+{
+	static int now;
+	char buf[1000];
+	static uint8_t time;
 
 	const auto maybe_dev = MidBackend_DeviceName();
-	if(bgm_active && maybe_dev) {
+	if(maybe_dev) {
 		if(tick) {
 			time += 16;
 		}
@@ -1117,11 +1129,11 @@ static void SetSndItem(bool tick)
 			now = 0;
 			strcpy(buf, dev.data());
 		}
-		sprintf(SndTitleMIDIPort, ">%.18s", (buf + now));
-		SndItemMIDIPort.State = WINDOW_STATE::REGULAR;
+		sprintf(MidTitlePort, ">%.18s", (buf + now));
+		MidItemPort.State = WINDOW_STATE::REGULAR;
 	} else {
-		strcpy(SndTitleMIDIPort, ">");
-		SndItemMIDIPort.State = WINDOW_STATE::DISABLED;
+		strcpy(MidTitlePort, ">");
+		MidItemPort.State = WINDOW_STATE::DISABLED;
 	}
 }
 

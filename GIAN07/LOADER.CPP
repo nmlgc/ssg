@@ -411,7 +411,7 @@ namespace DAT_MISSING {
 		{ "Recheck", "", FnRecheck, CENTER },
 		{ "Quit", "", CWinExitFn, CENTER },
 	}};
-	WINDOW_MENU Menu = { std::span(Info), [] {}, &Title };
+	WINDOW_MENU Menu = { std::span(Info), [](bool) {}, &Title };
 	WINDOW_SYSTEM Window = { Menu };
 
 	void Proc(bool& quit)

@@ -98,6 +98,7 @@ void WINDOW_CHOICE::SetActive(bool active)
 void WINDOW_SYSTEM::Init(PIXEL_COORD w)
 {
 	W = w;
+	Parent.SetItems(true);
 
 	// Don't forget the header.
 	const auto max_items = (1 + Parent.MaxItems());
@@ -693,6 +694,16 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		return cur;
 	};
 
+	const auto move_to_previous_level = [](WINDOW_SYSTEM& ws) {
+		if(ws.SelectDepth == 0) {
+			return;
+		}
+		ws.SelectDepth--;
+		if(const auto *new_p = CWinSearchActive(&ws)) {
+			new_p->SetItems(false);
+		}
+	};
+
 	// 一部のキーボード入力を処理する(KEY_UP/KEY_DOWN) //
 	if((Key_Data == KEY_UP) || (Key_Data == KEY_DOWN)) {
 		// 一つ上の項目へ / 一つ下の項目へ
@@ -718,7 +729,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 				} else if(const auto delta = CWinOptionKeyDelta(Key_Data)) {
 					p2->OptionFn(delta);
 				}
-				p->SetItems();
+				p->SetItems(true);
 				return true;
 			}
 
@@ -733,9 +744,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 				}
 			}
 			else{
-				if(ws->SelectDepth != 0){
-					ws->SelectDepth--;
-				}
+				move_to_previous_level(*ws);
 			}
 		}
 	} else {
@@ -744,6 +753,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 			// 決定・選択
 			if(p2->Submenu && (p2->Submenu->NumItems != 0)) {
 				p2->Submenu->Title = p2;
+				p2->Submenu->SetItems(false);
 
 				// Jump to the first active item to avoid potentially drawing
 				// the selection cursor on top of a disabled item on the next
@@ -753,9 +763,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 			}
 		} else if(CWinCancelKey(Key_Data)) {
 			// キャンセル
-			if(ws->SelectDepth != 0) {
-				ws->SelectDepth--;
-			}
+			move_to_previous_level(*ws);
 		}
 	}
 }

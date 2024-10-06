@@ -164,12 +164,13 @@ struct WINDOW_CHOICE : public WINDOW_LABEL {
 struct WINDOW_MENU {
 	WINDOW_LABEL*	Title;
 	WINDOW_CHOICE*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
-	void	(*SetItems)(void) = [] {};
+	void	(*SetItems)(bool tick) = [](bool) {};
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
+	uint8_t	Clock;
 
 	template <size_t N> constexpr WINDOW_MENU(
 		std::span<WINDOW_CHOICE, N> children,
-		void (*set_items)(void) = [] {},
+		void (*set_items)(bool) = [](bool) {},
 		WINDOW_LABEL* title = nullptr
 	) noexcept :
 		Title(title), SetItems(set_items), NumItems(N)
@@ -279,7 +280,7 @@ template <
 	}
 
 public:
-	static inline WINDOW_MENU Menu = { std::span(Item), [] {}, &Title };
+	static inline WINDOW_MENU Menu = { std::span(Item), [](bool) {}, &Title };
 
 	static void Init(WINDOW_SYSTEM& sys, size_t sel, WINDOW_SYSTEM* return_to)
 	{

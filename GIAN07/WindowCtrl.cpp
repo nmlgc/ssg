@@ -70,12 +70,12 @@ static bool ContinueFnNo(INPUT_BITS key);
 
 static bool ScoreFn(INPUT_BITS key);
 
-static void SetDifItem(void);
-static void SetGrpItem(void);
-static void SetSndItem(void);
-static void SetInpItem(void);
-static void SetIKeyItem(void);
-static void SetCfgRepItem(void);
+static void SetDifItem(bool tick = true);
+static void SetGrpItem(bool tick = true);
+static void SetSndItem(bool tick = true);
+static void SetInpItem(bool tick = true);
+static void SetIKeyItem(bool tick = true);
+static void SetCfgRepItem(bool tick = true);
 
 static bool RFnStg1(INPUT_BITS key);
 static bool RFnStg2(INPUT_BITS key);
@@ -267,14 +267,14 @@ WINDOW_CHOICE MainItem[] = {
 	{ "   Music",	"音楽室に入ります",	MusicFn },
 	{ "   Exit",	"ゲームを終了します",	CWinExitFn }
 };
-WINDOW_MENU MainMenu = { std::span(MainItem), [] {}, &MainTitle };
+WINDOW_MENU MainMenu = { std::span(MainItem), [](bool) {}, &MainTitle };
 
 WINDOW_LABEL ExitTitle = { "    終了するの？" };
 WINDOW_CHOICE ExitYesNoItem[] = {
 	{ "   お っ け ～ ",	"",	ExitFnYes },
 	{ "   だ め だ め",	"",	ExitFnNo }
 };
-WINDOW_MENU ExitMenu = { std::span(ExitYesNoItem), [] {}, &ExitTitle };
+WINDOW_MENU ExitMenu = { std::span(ExitYesNoItem), [](bool) {}, &ExitTitle };
 
 WINDOW_LABEL ContinueTitle = { " Ｃｏｎｔｉｎｕｅ？" };
 WINDOW_CHOICE ContinueYesNoItem[] = {
@@ -282,7 +282,7 @@ WINDOW_CHOICE ContinueYesNoItem[] = {
 	{ "   や だ や だ",	"",	ContinueFnNo }
 };
 WINDOW_MENU ContinueMenu = {
-	std::span(ContinueYesNoItem), [] {}, &ContinueTitle
+	std::span(ContinueYesNoItem), [](bool) {}, &ContinueTitle
 };
 
 WINDOW_MENU_SCROLL<
@@ -301,13 +301,6 @@ WINDOW_SYSTEM BGMPackWindow = { BGMPackMenu.Menu };
 // メインメニューの初期化 //
 void InitMainWindow(void)
 {
-	SetDifItem();
-	SetGrpItem();
-	SetSndItem();
-	SetInpItem();
-	SetIKeyItem();
-	SetCfgRepItem();
-
 	MainWindow.Init(140);
 
 	//	{ "   Config",	"各種設定を変更します",	CfgItem },
@@ -757,7 +750,7 @@ static void CfgRepSave(int_fast8_t)
 }
 
 
-static void SetCfgRepItem(void)
+static void SetCfgRepItem(bool)
 {
 	if(0 == ConfigDat.StageSelect.v) {
 		sprintf(CfgRepTitle[0], "ReplaySave  %s", CHOICE_OFF_ON[false]);
@@ -770,7 +763,7 @@ static void SetCfgRepItem(void)
 }
 
 
-static void SetDifItem(void)
+static void SetDifItem(bool)
 {
 	const char *const dif[4] = {" Easy  "," Normal"," Hard  ","Lunatic" };
 /*
@@ -790,7 +783,7 @@ static void SetDifItem(void)
 #endif
 }
 
-static void SetGrpItem(void)
+static void SetGrpItem(bool)
 {
 	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
 	const char *const DMode[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
@@ -813,7 +806,7 @@ static void SetGrpItem(void)
 	sprintf(GrpTitle[3],"MsgWindow[%s]", UorD[i]);
 }
 
-static void SetSndItem(void)
+static void SetSndItem(bool tick)
 {
 	static int now;
 	char	buf[1000];
@@ -855,7 +848,9 @@ static void SetSndItem(void)
 
 	const auto maybe_dev = MidBackend_DeviceName();
 	if(bgm_active && maybe_dev) {
-		time+=16;
+		if(tick) {
+			time += 16;
+		}
 		const auto dev = maybe_dev.value();
 		if(dev.size() > 18) {
 			sprintf(buf, "     %s     %s", dev.data(), dev.data());
@@ -875,7 +870,7 @@ static void SetSndItem(void)
 	}
 }
 
-static void SetInpItem(void)
+static void SetInpItem(bool)
 {
 	int		temp;
 
@@ -886,7 +881,7 @@ static void SetInpItem(void)
 	sprintf(InpTitle2,"Z-SpeedDown  [%s]",temp ? "ＯＫ" : "禁止");
 }
 
-static void SetIKeyItem(void)
+static void SetIKeyItem(bool)
 {
 	constexpr LABELS<4> labels = {{ "Shot", "Bomb", "SpeedDown", "ESC" }};
 	auto set = [](char* buf, Narrow::string_view label, INPUT_PAD_BUTTON v) {

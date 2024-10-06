@@ -130,7 +130,7 @@ namespace BGMPack {
 	void Open(void);
 
 	constexpr const char* SOUNDTRACK_URL = (
-		"https://github.com/nmlgc/BGMPacks/releases/tag/P0269"
+		"https://github.com/nmlgc/BGMPacks/releases/tag/2024-10-05"
 	);
 	constexpr const char* HELP_DOWNLOAD = (
 		"収録のサントラをダウンロードします"

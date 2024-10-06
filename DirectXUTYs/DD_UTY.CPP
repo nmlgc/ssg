@@ -263,7 +263,17 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 
 	auto hWndMain = WndBackend_Win32();
 	if(hWndMain == nullptr) {
-		hWndMain = WndBackend_Win32Create(params);
+		// Pass a hardcoded copy to enforce the one and only supported window
+		// mode while keeping [params] as is. This allows frictionless
+		// switching between this graphics backend and the SDL one.
+		using F = GRAPHICS_PARAM_FLAGS;
+		hWndMain = WndBackend_Win32Create({
+			.flags = (F::FULLSCREEN | F::FULLSCREEN_EXCLUSIVE),
+			.api = -1,
+			.window_scale_4x = 4,
+			.left = 0,
+			.top = 0,
+		});
 	}
 	if(hWndMain == nullptr) {
 		return GRAPHICS_INIT_RESULT::From(maybe_prev);

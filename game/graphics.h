@@ -111,15 +111,60 @@ void Grp_PaletteSetDefault(void);
 // Required to enable the screenshot feature as a whole.
 void Grp_SetScreenshotPrefix(std::u8string_view prefix);
 
+enum class GRAPHICS_FULLSCREEN_FIT : uint8_t {
+	// Scale to largest integer resolution
+	INTEGER,
+
+	// Scale to the largest resolution that fits the game's aspect ratio
+	ASPECT,
+
+	// Stretch to entire screen, disregarding the aspect ratio
+	STRETCH,
+
+	COUNT,
+};
+
 enum class GRAPHICS_PARAM_FLAGS : uint8_t {
 	_HAS_BITFLAG_OPERATORS,
-	MASK = 0x00,
+	FULLSCREEN = 0x01,
+	FULLSCREEN_EXCLUSIVE = 0x02,
+
+	// A GRAPHICS_FULLSCREEN_FIT value
+	FULLSCREEN_FIT = (std::to_underlying(GRAPHICS_FULLSCREEN_FIT::COUNT) << 2),
+
+	// Render at the window's resolution instead of at [GRP_RES]
+	SCALE_GEOMETRY = 0x10,
+
+	MASK = (
+		FULLSCREEN | FULLSCREEN_EXCLUSIVE | FULLSCREEN_FIT | SCALE_GEOMETRY
+	),
 };
+
+struct GRAPHICS_FULLSCREEN_FLAGS {
+	bool fullscreen;
+	bool exclusive;
+	GRAPHICS_FULLSCREEN_FIT fit;
+
+	std::strong_ordering operator<=>(
+		const GRAPHICS_FULLSCREEN_FLAGS&
+	) const = default;
+};
+
+constexpr auto GRAPHICS_TOPLEFT_UNDEFINED = (
+	std::numeric_limits<int16_t>::min
+)();
 
 struct GRAPHICS_PARAMS {
 	GRAPHICS_PARAM_FLAGS flags;
 	uint8_t device_id;
 	int8_t api; // Negative = "use default API"
+	uint8_t window_scale_4x; // Scale factor in window mode ×4. 0 = fit display.
+
+	// Across all displays. Can be [GRAPHICS_TOPLEFT_UNDEFINED], in which case
+	// the window backend should pick a reasonable default position.
+	int16_t left;
+	int16_t top;
+
 	BITDEPTH bitdepth;
 
 	std::strong_ordering operator<=>(const GRAPHICS_PARAMS&) const = default;

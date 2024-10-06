@@ -206,6 +206,9 @@ const struct VERSION_02 {
 	static constexpr CONFIG_OPTION_ARRAY Options = {
 		VERSION_01.Options,
 		ConfigDat.GraphicsAPI,
+		ConfigDat.WindowScale4x,
+		ConfigDat.WindowLeft,
+		ConfigDat.WindowTop,
 	};
 } VERSION_02;
 
@@ -239,6 +242,9 @@ GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
 		.flags = static_cast<GRAPHICS_PARAM_FLAGS>(flags_shifted),
 		.device_id = DeviceID.v,
 		.api = GraphicsAPI.v,
+		.window_scale_4x = WindowScale4x.v,
+		.left = WindowLeft.v,
+		.top = WindowTop.v,
 		.bitdepth = BitDepth.v,
 	};
 }
@@ -249,6 +255,9 @@ void CONFIG_DATA::GraphicsParamsApply(const GRAPHICS_PARAMS& params)
 	GraphFlags.v |= (std::to_underlying(params.flags) << GRPF_PARAM_SHIFT);
 	DeviceID.v = params.device_id;
 	GraphicsAPI.v = params.api;
+	WindowScale4x.v = params.window_scale_4x;
+	WindowLeft.v = params.left;
+	WindowTop.v = params.top;
 	BitDepth.v = params.bitdepth;
 }
 

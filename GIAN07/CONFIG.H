@@ -94,12 +94,16 @@ template <
 	// reset to its default.
 	std::optional<T> loaded = std::nullopt;
 
+	using DISK_T = std::conditional_t<
+		std::is_fundamental_v<T>, ENDIAN_SELECT_BIG<T>, T
+	>;
+
 	const size_t Size() const {
 		return sizeof(T);
 	}
 
 	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor) {
-		const auto maybe_loaded = cursor.next<T>();
+		const auto maybe_loaded = cursor.next<DISK_T>();
 		if(!maybe_loaded) {
 			return false;
 		}
@@ -111,7 +115,7 @@ template <
 	}
 
 	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) {
-		auto maybe_v = cursor.next<T>();
+		auto maybe_v = cursor.next<DISK_T>();
 		if(!maybe_v) {
 			return false;
 		}

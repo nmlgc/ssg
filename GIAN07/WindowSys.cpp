@@ -271,13 +271,10 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 // コマンド [Exit] のデフォルト処理関数 //
 bool CWinExitFn(INPUT_BITS key)
 {
-	switch(key){
-		case(KEY_RETURN):case(KEY_TAMA):case(KEY_BOMB):case(KEY_ESC):
-		return FALSE;
-
-		default:
-		return TRUE;
+	if(CWinOKKey(key) || CWinCancelKey(key)) {
+		return false;
 	}
+	return true;
 }
 
 PIXEL_SIZE CWinTextExtent(Narrow::string_view str)
@@ -689,10 +686,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	) {
 		ws->KeyCount = CWIN_KEYWAIT;
 		return;
-	} else if(
-		(ws->OldKey == KEY_TAMA) || (ws->OldKey == KEY_BOMB) ||
-		(ws->OldKey == KEY_RETURN) || (ws->OldKey == KEY_ESC)
-	) {
+	} else if(CWinOKKey(ws->OldKey) || CWinCancelKey(ws->OldKey)) {
 		// いかなる場合もリピートを許可しないキー //
 		if(Key_Data == ws->OldKey) {
 			return;
@@ -704,41 +698,30 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	ws->OldKey = Key_Data;
 
 	// 一部のキーボード入力を処理する(KEY_UP/KEY_DOWN) //
-	switch(Key_Data){
-		case(KEY_UP): // 一つ上の項目へ
-			do {
-				ws->Select[Depth] = (
-					(ws->Select[Depth] + p->NumItems - 1) % p->NumItems
-				);
-			} while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED);
-			Snd_SEPlay(SOUND_ID_SELECT);
-			break;
+	if((Key_Data == KEY_UP) || (Key_Data == KEY_DOWN)) {
+		// 一つ上の項目へ / 一つ下の項目へ
+		const auto delta = ((Key_Data == KEY_UP) ? (p->NumItems - 1) : 1);
 
-		case(KEY_DOWN): // 一つ下の項目へ
-			do {
-				ws->Select[Depth] = ((ws->Select[Depth] + 1) % p->NumItems);
-			} while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED);
-			Snd_SEPlay(SOUND_ID_SELECT);
-			break;
+		do {
+			ws->Select[Depth] = ((ws->Select[Depth] + delta) % p->NumItems);
+		} while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED);
 
-		case(KEY_ESC):case(KEY_BOMB):
-			Snd_SEPlay(SOUND_ID_CANCEL);
-		break;
-
-		case(KEY_TAMA):case(KEY_RETURN):case(KEY_LEFT):case(KEY_RIGHT):
-			Snd_SEPlay(SOUND_ID_SELECT);
-		break;
-
-		case(0):
-			ws->FastRepeatWait = CWIN_KEYWAIT;
-			break;
+		Snd_SEPlay(SOUND_ID_SELECT);
+	} else if(CWinCancelKey(Key_Data)) {
+		Snd_SEPlay(SOUND_ID_CANCEL);
+	} else if(
+		CWinOKKey(Key_Data) || (Key_Data == KEY_LEFT) || (Key_Data == KEY_RIGHT)
+	) {
+		Snd_SEPlay(SOUND_ID_SELECT);
+	} else if(Key_Data == 0) {
+		ws->FastRepeatWait = CWIN_KEYWAIT;
 	}
 
 	if(p2->CallBackFn != NULL){
 		// コールバック動作時の処理 //
 		if(p2->CallBackFn(Key_Data)==FALSE){
 			if(Depth==0){
-				if(Key_Data!=KEY_ESC && Key_Data!=KEY_BOMB){
+				if(!CWinCancelKey(Key_Data)) {
 					// 後で (CWIN_CLOSE) に変更すること//
 					ws->State  = CWIN_DEAD;
 					ws->OldKey = 0;			// ここは結構重要
@@ -750,22 +733,19 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 				}
 			}
 		}
-	}
-	else{
+	} else {
 		// デフォルトのキーボード動作 //
-		switch(Key_Data){
-			case(KEY_TAMA):case(KEY_RETURN):	// 決定・選択
-				if(p2->NumItems!=0){
-					ws->Select[Depth+1] = 0;
-					ws->SelectDepth++;
-				}
-			break;
-
-			case(KEY_BOMB):case(KEY_ESC):		// キャンセル
-				if(ws->SelectDepth != 0){
-					ws->SelectDepth--;
-				}
-			break;
+		if(CWinOKKey(Key_Data)) {
+			// 決定・選択
+			if(p2->NumItems != 0) {
+				ws->Select[Depth + 1] = 0;
+				ws->SelectDepth++;
+			}
+		} else if(CWinCancelKey(Key_Data)) {
+			// キャンセル
+			if(ws->SelectDepth != 0) {
+				ws->SelectDepth--;
+			}
 		}
 	}
 }

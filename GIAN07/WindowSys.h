@@ -270,6 +270,12 @@ constexpr bool CWinOKKey(INPUT_BITS key)
 	return ((key == KEY_RETURN) || (key == KEY_TAMA));
 }
 
+// Returns whether this key represents a "Cancel" action.
+constexpr bool CWinCancelKey(INPUT_BITS key)
+{
+	return ((key == KEY_BOMB) || (key == KEY_ESC));
+}
+
 // Returns the delta that this key would apply to a numeric option value.
 constexpr int_fast8_t CWinOptionKeyDelta(INPUT_BITS key)
 {

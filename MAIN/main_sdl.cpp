@@ -36,6 +36,12 @@ int main(int argc, char** args)
 	}
 	defer(SDL_Quit());
 
+	// OpenGL is either *the* best or close to the best choice everywhere when
+	// it comes to performance (at least as long as we don't batch draw calls):
+	//
+	// 	https://rec98.nmlgc.net/blog/2024-10-22#benchmark-2024-10-22
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+
 	if(!XInit()) {
 		// This is not a SDL error.
 		constexpr auto str = (

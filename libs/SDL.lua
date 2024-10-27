@@ -6,7 +6,8 @@ local SDL_PATHS = {
 ---Builds the SDL submodule for Windows.
 ---@param base_cfg Config
 ---@param version 2 | 3
-function BuildSDL(base_cfg, version)
+---@param bin_suffix string
+function BuildSDL(base_cfg, version, bin_suffix)
 	local name = ((version == 3) and "SDL3" or "SDL2")
 	local SDL = SDL_PATHS[version]
 	local compile = {
@@ -144,7 +145,7 @@ function BuildSDL(base_cfg, version)
 	)
 
 	link.cflags += ("-D" .. name .. "=1")
-	link.linputs = cfg:dll(obj, name)
+	link.linputs = cfg:dll(obj, (name .. bin_suffix))
 	if (version == 2) then
 		local src_winmain = SDL.glob("src/main/windows/*.c")
 		link.linputs = (link.linputs + cfg:cc(src_winmain))

@@ -21,17 +21,21 @@ local function ssg(variant)
 		variant_cfg = CONFIG:branch({
 			cflags = {
 				"/DWIN32_VINTAGE",
+				"/D_WIN32_WINNT=0x0400", -- needed for libwebp
 				"/arch:IA32",
 				"/Zc:threadSafeInit-",
 			},
+			lflags = flag_remove("/MANIFEST:.*"),
 			objdir = "vintage/"
+		}, {
+			lflags = "/MANIFEST:NO" -- Saves 512 to 1024 bytes!
 		})
-		variant_bin_suffix = " (original DirectDraw and Direct3D graphics)"
+		variant_bin_suffix = "_win98"
 		sdl_version = 2
 	end
 
 	local XIPH_LINK = BuildXiph(variant_cfg)
-	local SDL_LINK = BuildSDL(variant_cfg, sdl_version)
+	local SDL_LINK = BuildSDL(variant_cfg, sdl_version, variant_bin_suffix)
 	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
 	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(variant_cfg, variant)
 

@@ -44,9 +44,9 @@
 			}
 		},
 		{
-			"label": "Build vintage graphics binary (Debug)",
+			"label": "Build Windows 98 binary (Debug)",
 			"type": "shell",
-			"command": "build_windows.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics)d.exe\"",
+			"command": "build_windows.bat bin/GIAN07_win98d.exe",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
@@ -57,9 +57,9 @@
 			}
 		},
 		{
-			"label": "Build vintage graphics binary (Release)",
+			"label": "Build Windows 98 binary (Release)",
 			"type": "shell",
-			"command": "build_windows.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics).exe\"",
+			"command": "build_windows.bat bin/GIAN07_win98.exe",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {

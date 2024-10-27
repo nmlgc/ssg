@@ -11,6 +11,9 @@
 #define MA_NO_FLAC
 #define MA_NO_MP3
 #define MA_NO_NULL
+#ifdef WIN32_VINTAGE
+#define MA_NO_WASAPI
+#endif
 
 // Slightly crispier than what you'd get with DirectSound, but 2 would already
 // come with fewer high frequencies in comparison.

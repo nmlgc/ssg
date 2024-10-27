@@ -28,7 +28,11 @@ function BuildLibWebPLosslessEncode(base_cfg, generic)
 			WEBP_HAVE_AVX2 = false,
 		})
 		cfg = cfg:branch({
-			cflags = { ("-I" .. cfg.vars.objdir), "-DHAVE_CONFIG_H" },
+			cflags = {
+				("-I" .. cfg.vars.objdir),
+				"-DHAVE_CONFIG_H",
+				"-DUSE_CREATE_THREAD", -- Avoid _beginthreadex() on Windows 9x
+			},
 		})
 	end
 

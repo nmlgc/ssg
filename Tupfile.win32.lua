@@ -22,6 +22,7 @@ local function ssg(variant)
 			cflags = {
 				"/DWIN32_VINTAGE",
 				"/D_WIN32_WINNT=0x0400", -- needed for libwebp
+				"/D__WIN9X__",
 				"/arch:IA32",
 				"/Zc:threadSafeInit-",
 			},

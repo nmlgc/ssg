@@ -10,6 +10,9 @@ local SDL_PATHS = {
 function BuildSDL(base_cfg, version, bin_suffix)
 	local name = ((version == 3) and "SDL3" or "SDL2")
 	local SDL = SDL_PATHS[version]
+	local modern = not MatchesAny(function(var)
+		return string.match(var, "[/-]D__WIN9X__")
+	end, base_cfg.vars.cflags)
 	local compile = {
 		cflags = "/DDLL_EXPORT",
 		lflags = {
@@ -26,7 +29,7 @@ function BuildSDL(base_cfg, version, bin_suffix)
 		},
 		objdir = (name .. "/"),
 	}
-	if (version == 2) then
+	if ((version == 2) and modern) then
 		compile.lflags.debug = "ucrtd.lib"
 		compile.lflags.release = "ucrt.lib"
 	end
@@ -48,7 +51,9 @@ function BuildSDL(base_cfg, version, bin_suffix)
 	src += SDL.glob("src/audio/directsound/*.c")
 	src += SDL.glob("src/audio/disk/*.c")
 	src += SDL.glob("src/audio/dummy/*.c")
-	src += (SDL.glob("src/audio/wasapi/*.c") - { "winrt.cpp$" })
+	if modern then
+		src += (SDL.glob("src/audio/wasapi/*.c") - { "winrt.cpp$" })
+	end
 	src += SDL.glob("src/core/windows/*.c")
 	src += SDL.glob("src/cpuinfo/*.c")
 	src += SDL.glob("src/dynapi/*.c")
@@ -65,7 +70,13 @@ function BuildSDL(base_cfg, version, bin_suffix)
 	src += SDL.glob("src/joystick/*.c")
 	src += SDL.glob("src/joystick/hidapi/*.c")
 	src += SDL.glob("src/joystick/virtual/*.c")
-	src += SDL.glob("src/joystick/windows/*.c")
+	src += (SDL.glob("src/joystick/windows/*.c") - {
+		"SDL_rawinputjoystick.c$", "SDL_windows_gaming_input.c$",
+	})
+	if modern then
+		src += SDL.join("src/joystick/windows/SDL_rawinputjoystick.c")
+		src += SDL.join("src/joystick/windows/SDL_windows_gaming_input.c")
+	end
 	src += SDL.glob("src/libm/*.c")
 	src += SDL.glob("src/loadso/windows/*.c")
 	src += SDL.glob("src/locale/*.c")
@@ -76,11 +87,19 @@ function BuildSDL(base_cfg, version, bin_suffix)
 	src += SDL.glob("src/power/windows/*.c")
 	src += SDL.glob("src/render/*.c")
 	src += SDL.glob("src/render/direct3d/*.c")
-	src += (SDL.glob("src/render/direct3d11/*.c") - { "winrt.cpp$" })
-	src += (SDL.glob("src/render/direct3d12/*.c") - { "winrt.cpp$" })
-	src += SDL.glob("src/render/opengl/*.c")
-	src += SDL.glob("src/render/opengles2/*.c")
-	src += SDL.glob("src/render/software/*.c")
+	if modern then
+		src += (SDL.glob("src/render/direct3d11/*.c") - { "winrt.cpp$" })
+		src += (SDL.glob("src/render/direct3d12/*.c") - { "winrt.cpp$" })
+		src += SDL.glob("src/render/opengl/*.c")
+		src += SDL.glob("src/render/opengles2/*.c")
+	else
+		-- Even the vintage build should still have SDL_RenderGetD3D11Device()
+		-- and SDL_RenderGetD3D12Device(), which are expected to always exist
+		-- in Windows builds of SDL 2.
+		src += SDL.join("src/render/direct3d11/SDL_render_d3d11.c")
+		src += SDL.join("src/render/direct3d12/SDL_render_d3d12.c")
+	end
+ 	src += SDL.glob("src/render/software/*.c")
 	src += SDL.glob("src/sensor/*.c")
 	src += SDL.glob("src/sensor/windows/*.c")
 	src += (SDL.glob("src/stdlib/*.c") - { "SDL_mslibc.c$" })
@@ -89,8 +108,15 @@ function BuildSDL(base_cfg, version, bin_suffix)
 	src += SDL.glob("src/timer/*.c")
 	src += SDL.glob("src/timer/windows/*.c")
 	src += SDL.glob("src/video/*.c")
+	src += (SDL.glob("src/video/*.c") - { "SDL_vulkan_utils.c$" })
+	if modern then
+		src += SDL.join("src/video/SDL_vulkan_utils.c")
+	end
 	src += SDL.glob("src/video/dummy/*.c")
-	src += SDL.glob("src/video/windows/*.c")
+	src += (SDL.glob("src/video/windows/*.c") - { "SDL_windowsvulkan.c$" })
+	if modern then
+		src += SDL.join("src/video/windows/SDL_windowsvulkan.c")
+	end
 	src += SDL.glob("src/video/yuv2rgb/*.c")
 	src += SDL.join("src/thread/generic/SDL_syscond.c")
 	if (version == 3) then

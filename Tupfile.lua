@@ -1,4 +1,5 @@
 tup.include("libs/tupblocks/Tuprules.lua")
+tup.include("libs/tupblocks/toolchain.msvc.lua")
 
 -- SDL
 -- ---
@@ -83,13 +84,13 @@ sdl_winmain_src += SDL.glob("src/main/windows/*.c")
 sdl_cfg = CONFIG:branch(SDL_COMPILE, SDL_LINK)
 sdl_mslibc_cfg = sdl_cfg:branch({ cflags = { release = flag_remove("/GL") } })
 sdl_obj = (
-	cxx(sdl_cfg, sdl_src) +
-	cxx(sdl_mslibc_cfg, SDL.join("src/stdlib/SDL_mslibc.c")) +
+	cc(sdl_cfg, sdl_src) +
+	cc(sdl_mslibc_cfg, SDL.join("src/stdlib/SDL_mslibc.c")) +
 	rc(sdl_cfg, SDL.join("src/main/windows/version.rc"))
 )
 sdl_dll = (
 	dll(sdl_cfg, sdl_obj, "SDL2") +
-	cxx(sdl_cfg, sdl_winmain_src)
+	cc(sdl_cfg, sdl_winmain_src)
 )
 -- ---
 
@@ -110,7 +111,7 @@ libvorbis_src += (LIBVORBIS.glob("lib/*.c") - {
 	"barkmel.c$", "misc.c$", "psytune.c$", "tone.c$", "vorbisenc.c$"
 })
 
-xiph_obj = (cxx(libogg_cfg, libogg_src) + cxx(libvorbis_cfg, libvorbis_src))
+xiph_obj = (cc(libogg_cfg, libogg_src) + cc(libvorbis_cfg, libvorbis_src))
 -- --------------------
 
 -- BLAKE3
@@ -150,12 +151,12 @@ blake3_arch_cfgs = {
 	blake3_modern_cfg:branch({ cflags = "/arch:AVX512" }),
 }
 blake3_modern_obj = (
-	cxx(blake3_modern_cfg, blake3_src) +
-	cxx(blake3_arch_cfgs[1], BLAKE3.join("blake3_sse2.c")) +
-	cxx(blake3_arch_cfgs[2], BLAKE3.join("blake3_avx2.c")) +
-	cxx(blake3_arch_cfgs[3], BLAKE3.join("blake3_avx512.c"))
+	cc(blake3_modern_cfg, blake3_src) +
+	cc(blake3_arch_cfgs[1], BLAKE3.join("blake3_sse2.c")) +
+	cc(blake3_arch_cfgs[2], BLAKE3.join("blake3_avx2.c")) +
+	cc(blake3_arch_cfgs[3], BLAKE3.join("blake3_avx512.c"))
 )
-local blake3_i586_obj = cxx(blake3_i586_cfg, blake3_src)
+local blake3_i586_obj = cc(blake3_i586_cfg, blake3_src)
 -- ------
 
 -- Static analysis using the C++ Core Guideline checker plugin.

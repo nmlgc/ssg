@@ -21,6 +21,8 @@ local function ssg(variant)
 		variant_cfg = CONFIG:branch({
 			cflags = {
 				"/DWIN32_VINTAGE",
+				"/arch:IA32",
+				"/Zc:threadSafeInit-",
 			},
 			objdir = "vintage/"
 		})

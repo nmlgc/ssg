@@ -17,6 +17,7 @@
 #include "game/snd.h"
 #include "platform/graphics_backend.h"
 #include "platform/path.h"
+#include "platform/thread.h"
 #include <assert.h>
 
 // Hardcoded loop points for ZUN's original MIDI files
@@ -248,23 +249,23 @@ namespace DAT {
 
 	// Packfiles can be in these four states:
 	//
-	// 1) `std::jthread` blank, `PACKFILE_READ` default-constructed:
+	// 1) `THREAD` blank, `PACKFILE_READ` default-constructed:
 	//    Uninitialized, at the start of the process.
 	//
-	// 2) `std::jthread` joinable, `PACKFILE_READ` default-constructed:
+	// 2) `THREAD` joinable, `PACKFILE_READ` default-constructed:
 	//    In the process of loading the packfile and running any post-loading
 	//    code.
 	//
-	// 3) `std::jthread` blank, `PACKFILE_READ` empty:
+	// 3) `THREAD` blank, `PACKFILE_READ` empty:
 	//    Invalid packfile, after FilStartR() returned an error. Currently not
 	//    distinguished from 1), but we might in the future.
 	//
-	// 4) `std::jthread` blank, `PACKFILE_READ` valid:
+	// 4) `THREAD` blank, `PACKFILE_READ` valid:
 	//    Checksums are validated, and the packfile is ready for extraction.
 	//
 	// A single `std::variant` per pack might look like the better way to
 	// represent this, but actually comes with two drawbacks:
-	// • Since `std::jthread` rejoins on destruction, an attempt to change the
+	// • Since `THREAD` rejoins on destruction, an attempt to change the
 	//   variant type from within the thread would deadlock the program.
 	// • Suddenly, we also have to handle the `valueless_by_exception` case in
 	//   the Packfile() function, which can then no longer return the neat
@@ -272,7 +273,7 @@ namespace DAT {
 	class PACK {
 	private:
 		PACKFILE_READ pack;
-		std::jthread load_thread;
+		THREAD load_thread;
 		std::u8string filename_with_found_prefix;
 
 	public:
@@ -282,8 +283,8 @@ namespace DAT {
 		}
 
 		const PACKFILE_READ& BlockUntilLoaded(void) {
-			if(load_thread.joinable()) {
-				load_thread.join();
+			if(load_thread.Joinable()) {
+				load_thread.Join();
 			}
 			return pack;
 		}
@@ -299,17 +300,17 @@ namespace DAT {
 		return Packs[id].BlockUntilLoaded();
 	}
 
-	void LoadMusicHashes(const PACKFILE_READ& in, std::stop_token st)
+	void LoadMusicHashes(const PACKFILE_READ& in, const THREAD_STOP& st)
 	{
 		MusicNum = in.info.size();
 		MusicHashes.reserve(MusicNum);
 
 		for(auto i = 0; i < MusicNum; i++) {
-			if(st.stop_requested()) {
+			if(st) {
 				break;
 			}
 			if(const auto file = in.MemExpand(i)) {
-				if(st.stop_requested()) {
+				if(st) {
 					break;
 				}
 				MusicHashes.emplace_back(Hash({ file.get(), file.size() }));
@@ -346,17 +347,17 @@ namespace DAT {
 			return false;
 		}
 		std::ranges::copy(FOUND, filename_with_found_prefix.begin());
-		load_thread = std::jthread(
-			[this, stream = std::move(stream), id](std::stop_token st) mutable {
-				auto in = FilStartR(std::move(stream));
-				if(id == PACK_ID::MUSIC) {
-					LoadMusicHashes(in, st);
-				} else if(id == PACK_ID::SOUND) {
-					LoadSound(in);
-				}
-				pack = std::move(in);
+		load_thread = ThreadStart([this, stream = std::move(stream), id](
+			const THREAD_STOP& st
+		) mutable {
+			auto in = FilStartR(std::move(stream));
+			if(id == PACK_ID::MUSIC) {
+				LoadMusicHashes(in, st);
+			} else if(id == PACK_ID::SOUND) {
+				LoadSound(in);
 			}
-		);
+			pack = std::move(in);
+		});
 		return true;
 	}
 

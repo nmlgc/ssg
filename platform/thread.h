@@ -5,4 +5,4 @@
 
 #pragma once
 
-#include "platform/c/thread.h"
+#include "platform/sdl/thread_sdl.h"

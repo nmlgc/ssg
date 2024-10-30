@@ -591,6 +591,7 @@ bool GrpBackend_PaletteSet(const PALETTE& pal)
 		}
 	}
 	DxObj.Prim->SetPalette(DxObj.Pal);
+	DxObj.Back->SetPalette(DxObj.Pal); // Required for real 8-bit on Windows 9x!
 	DxObj.bNeedChgPal = TRUE;
 
 	DisableAlphaTable();

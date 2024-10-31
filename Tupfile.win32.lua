@@ -43,7 +43,6 @@ local function ssg(variant)
 		"/w14101", -- Unreferenced local variable
 
 		-- Disabled warnings
-		"/wd4834", -- Discarding `[[nodiscard]]` (C6031 covers this and more)
 		"/wd26408", -- Avoid _malloca()
 		"/wd26432", -- Rule of Five boilerplate
 		"/wd26440", -- `noexcept` all the things

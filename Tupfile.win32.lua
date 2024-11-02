@@ -1,4 +1,5 @@
 tup.include("libs/tupblocks/toolchain.msvc.lua")
+tup.include("libs/9xcompat.lua")
 tup.include("libs/BLAKE3.lua")
 tup.include("libs/libwebp_lossless.lua")
 tup.include("libs/SDL.lua")
@@ -116,10 +117,13 @@ local function ssg(variant)
 	ssg_obj = (ssg_obj + ssg_cfg:cxx(p_modern_src))
 
 	if (variant == VINTAGE) then
+		local COMPAT_LINK = Build9xcompat(variant_cfg)
 		local p_vintage_cfg = ssg_cfg:branch(ANALYSIS_RELAXED)
 		local p_vintage_src = SSG.glob("platform/windows_vintage/DD*.CPP")
 		p_vintage_src += SSG.glob("platform/windows_vintage/D2_Polygon.CPP")
+
 		ssg_obj = (ssg_obj + p_vintage_cfg:cxx(p_vintage_src))
+		ssg_cfg = ssg_cfg:branch(COMPAT_LINK)
 	end
 
 	ssg_obj = (ssg_obj + ssg_ico)

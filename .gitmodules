@@ -36,3 +36,7 @@
 	path = libs/libwebp_lossless
 	url = https://github.com/nmlgc/libwebp_lossless
 	shallow = true
+[submodule "libs/9xcompat"]
+	path = libs/9xcompat
+	url = https://github.com/nmlgc/9xcompat
+	shallow = true

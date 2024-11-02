@@ -7,6 +7,7 @@ if "%VCINSTALLDIR%" == "" (
 
 sh ./version_from_git.sh
 sh ./submodules_check.sh ^
+	libs/9xcompat ^
 	libs/BLAKE3 ^
 	libs/dr_libs ^
 	libs/libogg ^

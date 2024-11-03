@@ -40,12 +40,11 @@ PIXEL_SIZE TextGDIExtent(std::optional<HFONT> font, Narrow::string_view str)
 	const auto font_prev = (font ? SelectObject(hdc, font.value()) : nullptr);
 	const auto ret = UTF::WithUTF16<PIXEL_SIZE>(
 		str, [&](const std::wstring_view str_w) {
-			RECT r = { 0, 0, 0, 0 };
-			constexpr UINT flags = (DT_CALCRECT | DT_SINGLELINE);
-			if(!DrawTextW(hdc, str_w.data(), str_w.size(), &r, flags)) {
+			SIZE ret = { 0, 0 };
+			if(!GetTextExtentPoint32W(hdc, str_w.data(), str_w.size(), &ret)) {
 				return PIXEL_SIZE{ 0, 0 };
 			}
-			return PIXEL_SIZE{ r.right, r.bottom };
+			return PIXEL_SIZE{ ret.cx, ret.cy };
 		}
 	).value_or(PIXEL_SIZE{ 0, 0 });
 	if(font && font_prev) {
@@ -152,14 +151,22 @@ void TEXTRENDER_SESSION::Put(
 		if(color) {
 			SetColor(color.value());
 		}
-		RECT r = {
+		const RECT r = {
 			.left = (rect.left + topleft_rel.x),
 			.top = (rect.top + topleft_rel.y),
 			.right = (rect.left + rect.w),
 			.bottom = (rect.top + rect.h),
 		};
-		constexpr UINT flags = (DT_LEFT | DT_TOP | DT_SINGLELINE);
-		return DrawTextW(hdc, str_w.data(), str_w.size(), &r, flags);
+		return ExtTextOutW(
+			hdc,
+			r.left,
+			r.top,
+			ETO_CLIPPED,
+			&r,
+			str_w.data(),
+			str_w.size(),
+			nullptr
+		);
 	});
 }
 

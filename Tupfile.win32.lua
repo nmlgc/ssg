@@ -1,27 +1,9 @@
 tup.include("libs/tupblocks/toolchain.msvc.lua")
 tup.include("libs/SDL.lua")
+tup.include("libs/xiph.lua")
 
 local SDL_LINK = BuildSDL(CONFIG)
-
--- libogg and libvorbis
--- --------------------
-
-LIBOGG = sourcepath("libs/libogg/")
-LIBVORBIS = sourcepath("libs/libvorbis/")
-
-XIPH_LINK = { cflags = string.format(
-	"-I%sinclude -I%sinclude", LIBOGG.root, LIBVORBIS.root
-)}
-local libogg_cfg = CONFIG:branch(XIPH_LINK, { objdir = "libogg/" })
-libogg_src += LIBOGG.glob("src/*.c")
-
-local libvorbis_cfg = CONFIG:branch(XIPH_LINK, { objdir = "libvorbis/" })
-libvorbis_src += (LIBVORBIS.glob("lib/*.c") - {
-	"barkmel.c$", "misc.c$", "psytune.c$", "tone.c$", "vorbisenc.c$"
-})
-
-xiph_obj = (cc(libogg_cfg, libogg_src) + cc(libvorbis_cfg, libvorbis_src))
--- --------------------
+local XIPH_LINK = BuildXiph(CONFIG)
 
 -- BLAKE3
 -- ------
@@ -115,7 +97,7 @@ modules_cfg = modules_cfg:branch(cxx_std_modules(modules_cfg))
 --- The game
 -- --------
 
-local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, SSG_COMPILE, {
+local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, XIPH_LINK, SSG_COMPILE, {
 	cflags = {
 		"/std:c++latest",
 		"/DWIN32",
@@ -128,10 +110,7 @@ local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, SSG_COMPILE, {
 -- Our platform layer code
 LAYERS_SRC += SSG.glob("platform/miniaudio/*.cpp")
 LAYERS_SRC += SSG.glob("platform/windows/*.cpp")
-local layers_obj = (
-	cxx(ssg_cfg, LAYERS_SRC) +
-	cxx(ssg_cfg:branch(XIPH_LINK), "game/codecs/vorbis.cpp")
-)
+local layers_obj = cxx(ssg_cfg, LAYERS_SRC)
 
 -- SDL code. The graphics backend is compiled separately to keep it switchable.
 local p_sdl_cfg = ssg_cfg:branch(SDL_LINK, { lflags = "/SUBSYSTEM:windows" })
@@ -145,7 +124,6 @@ local regular_obj = (
 	layers_obj +
 	p_sdl_obj +
 	cxx(p_sdl_cfg, "platform/sdl/graphics_sdl.cpp") +
-	xiph_obj +
 	blake3_modern_obj
 )
 exe(p_sdl_cfg, regular_obj, "GIAN07")
@@ -163,7 +141,6 @@ exe(
 		layers_obj +
 		p_sdl_obj +
 		cxx(p_vintage_cfg, p_vintage_src) +
-		xiph_obj +
 		blake3_i586_obj
 	),
 	"GIAN07 (original DirectDraw and Direct3D graphics)"

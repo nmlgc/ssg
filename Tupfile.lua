@@ -13,6 +13,6 @@ SSG_SRC += SSG.glob("GIAN07/*.CPP")
 
 -- Modern game code
 LAYERS_SRC += SSG.glob("game/*.cpp")
-LAYERS_SRC += "game/codecs/flac.cpp"
+LAYERS_SRC += SSG.glob("game/codecs/*.cpp")
 
 tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))

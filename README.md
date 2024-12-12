@@ -2,25 +2,25 @@
 
 ## Building
 
-Currently, the Tup-based build setup only supports compiling with Visual Studio ≥2022.
+This project uses [Tup](https://gittup.org/tup/) as its build system, so install a fitting version for your operating system.
+
+All binaries will be put into the `bin/` subdirectory.
+
+### Windows
+
+Visual Studio ≥2022 is the only compiler supported right now.
 However, since IDE integration is horribly broken for both Makefile and directory projects, we strongly recommend literally *anything else* to edit the code.
-
-You'll therefore need the following:
-
-1. Visual Studio Community ≥2022, with the *Desktop development for C++* workload.\
-   If you haven't already installed the IDE for other projects and don't plan to, you can install only the command-line compilers via the [Build Tools installer](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
-
-2. [Tup](https://gittup.org/tup/) in the latest Windows version.\
-   Place `tup.exe` and its DLLs somewhere in your `PATH`.
-
-3. Your favorite code editor.\
-   A ready-to-use configuration for Visual Studio Code is part of this repository. Make sure to install the default recommended C++ extensions when asked.
+This repo includes a ready-to-use configuration for Visual Studio Code; If you want to use this editor, make sure to install the default recommended C++ extensions when asked.
 
 To build:
 
-1. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
-2. Navigate to the checkout directory of this repository.
-3. Invoke `build.bat` in your way of choice:
+1. Install Visual Studio Community ≥2022, with the *Desktop development for C++* workload.\
+   If you haven't already installed the IDE for other projects and don't plan to, you can install only the command-line compilers via the [Build Tools installer](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
+2. Make sure that `tup.exe` and its DLLs are somewhere in your `PATH`.
+
+3. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
+4. Navigate to the checkout directory of this repository.
+5. Invoke `build.bat` in your way of choice:
    * If you use Visual Studio Code, open the editor from this command-line environment:
 
      ```batch
@@ -31,7 +31,13 @@ To build:
 
    * Or you can always run `build.bat` directly from this shell.
 
-The binary will be put into the `bin/` subdirectory, where you can also place the game's original data files.
+### Linux
+
+Clang ≥18 is the only compiler supported right now.
+Still waiting for GCC to ship [P2465R3 Standard Library Modules](https://wg21.link/P2465R3).
+
+The build is driven by `build.sh`, which sets up the required submodules and environment variables for Tup.
+Some libraries are expected to be installed through the distribution's package manager; check the script for details.
 
 ### Filtering build outputs
 
@@ -48,7 +54,15 @@ build.bat                 # builds all binaries, including the vintage ones
 
 The Visual Studio Code configuration contains build tasks for all five possibilities.
 
-## Debugging
+On Linux:
+
+```sh
+./build.sh bin/GIAN07  # builds only the Release binary
+./build.sh bin/GIAN07d # builds only the Debug binary
+./build.sh             # builds both Debug and Release binaries
+```
+
+## Debugging (Windows only)
 
 .PDB files are generated for Debug and Release builds, so you should get symbol support with any Windows debugger.
 

@@ -4,6 +4,7 @@ local BLAKE3 = sourcepath(tup.getcwd() .. "/BLAKE3/c/")
 ---@param base_cfg Config
 ---@param generic integer Nonzero for a generic build without hand-written optimized versions for modern CPUs
 function BuildBLAKE3(base_cfg, generic)
+	local arch = tup.getconfig("TUP_ARCH")
 	local platform = tup.getconfig("TUP_PLATFORM")
 
 	---@class ConfigShape
@@ -48,6 +49,10 @@ function BuildBLAKE3(base_cfg, generic)
 				cc(arch_cfg_2, BLAKE3.join("blake3_avx2.c")) +
 				cc(arch_cfg_3, BLAKE3.join("blake3_avx512.c"))
 			)
+		else
+			if (arch == "x86_64") then
+				link.linputs = (link.linputs + cc(cfg, BLAKE3.glob("*unix.S")))
+			end
 		end
 	end
 	return link

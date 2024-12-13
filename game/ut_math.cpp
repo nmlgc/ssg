@@ -60,27 +60,27 @@ static const std::array<uint8_t, 256> ATAN256 = {
 };
 
 
-long sinl(uint8_t deg, int length)
+int sinl(uint8_t deg, int length)
 {
 	//return ((long)sinm(deg)*length)/256;
 	return ((static_cast<long>(sinm(deg)) * length) >> 8);
 }
 
-long cosl(uint8_t deg, int length)
+int cosl(uint8_t deg, int length)
 {
 	//return ((long)cosm(deg)*length)/256;
 	return ((static_cast<long>(cosm(deg)) * length) >> 8);
 }
 
 // length*256/(SIN(deg)>0 ? SIN(deg) : 256) //
-long sinDiv(uint8_t deg, int length)
+int sinDiv(uint8_t deg, int length)
 {
 	const int sind = sinm(deg);
 	return (length<<8) / (sind>0 ? sind : 256);
 }
 
 // length*256/(COS(deg)>0 ? COS(deg) : 256) //
-long cosDiv(uint8_t deg, int length)
+int cosDiv(uint8_t deg, int length)
 {
 	const int cosd = cosm(deg);
 	return (length<<8) / (cosd>0 ? cosd : 256);

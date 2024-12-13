@@ -36,14 +36,14 @@ extern const signed int *COS256;
 
 
 // 三角関数2 //
-long sinl(uint8_t deg, int length);	// (SIN(deg) * length) / 256)
-long cosl(uint8_t deg, int length);	// (COS(deg) * length) / 256)
+int sinl(uint8_t deg, int length);	// (SIN(deg) * length) / 256)
+int cosl(uint8_t deg, int length);	// (COS(deg) * length) / 256)
 
 // ((length * 256) / ((SIN(deg) > 0) ? SIN(deg) : 256))
-long sinDiv(uint8_t deg, int length);
+int sinDiv(uint8_t deg, int length);
 
 // ((length * 256) / ((COS(deg) > 0) ? COS(deg) : 256))
-long cosDiv(uint8_t deg, int length);
+int cosDiv(uint8_t deg, int length);
 
 uint8_t atan8(int x, int y);	// ３２ビット版です
 

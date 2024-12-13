@@ -235,7 +235,7 @@ extern void LLaserMove(void)
 					lp->w = 0;
 					if(lp->flag == LLF_CLOSE){
 						lp->flag = LLF_DISABLE;
-						lp->e    = NULL;
+						lp->e    = nullptr;
 					}
 					else                      lp->flag = LLF_LINE;
 				}

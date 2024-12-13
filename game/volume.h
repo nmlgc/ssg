@@ -6,6 +6,7 @@
 #pragma once
 
 import std.compat;
+#include "game/cast.h"
 #include <assert.h>
 
 // Discrete volume values for MIDI and the UI.
@@ -21,8 +22,7 @@ constexpr float VolumeLinear(VOLUME discrete)
 constexpr VOLUME VolumeDiscrete(float linear)
 {
 	assert((linear >= 0.0f) && (linear <= 1.0f));
-	[[gsl::suppress(es.46)]]
-	return ((linear * VOLUME_MAX) + 0.5f);
+	return Cast::down_sign<VOLUME>((linear * VOLUME_MAX) + 0.5f);
 }
 
 // Maps a linear volume value to decibels, using the simple x² curve used by

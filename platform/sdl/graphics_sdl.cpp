@@ -883,7 +883,7 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 /// Surfaces
 /// --------
 
-[[gsl::suppress(con.3)]] bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
+bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
 {
 	auto& tex = Textures[sid];
 	tex = SafeDestroy(SDL_DestroyTexture, tex);
@@ -891,6 +891,7 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 	auto *rwops = SDL_RWFromMem(bmp.buffer.get(), bmp.buffer.size());
 	auto *surf = SDL_LoadBMP_RW(rwops, 1);
 	defer(SDL_FreeSurface(surf));
+	std::ignore = std::move(bmp);
 
 	if(surf->format->format == SDL_PIXELFORMAT_INDEX8) {
 		// The transparent pixel is in the top-left corner.

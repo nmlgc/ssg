@@ -69,7 +69,7 @@ void CEffectDraw(void)
 {
 	int j, r;
 	int					x1, x2, y1, y2;
-	static BYTE dtable[4] = {0, 1, 3, 7};
+	static constexpr uint8_t dtable[4] = { 0, 1, 3, 7 };
 
 	GrpGeom->Lock();
 
@@ -252,8 +252,6 @@ void SetMusicTitle(int y, Narrow::string_view s)
 // エフェクトを動かす(仕様変更の可能性があります) //
 void SEffectMove(void)
 {
-	BYTE			deg;
-
 	for(auto& it : SEffect) {
 		auto *e = &it;
 		switch(e->cmd){
@@ -274,7 +272,7 @@ void SEffectMove(void)
 
 			case(SEFC_STR1_2):
 				if(e->time==0){
-					deg = 128 + rnd()%128;
+					const uint8_t deg = (128 + (rnd() % 128));
 					e->cmd  = SEFC_STR1_3;
 					e->time = 64;
 					e->vx   = cosl(deg,10*64);
@@ -330,7 +328,6 @@ void SEffectDraw(void)
 	int j, k;
 	int				x,y;
 	int				temp;
-	BYTE			degx = 0;
 	PIXEL_LTWH src;
 	char			buf[20];
 
@@ -379,7 +376,7 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_MTITLE3): {
-				degx = Cast::down<uint8_t>((64 * 2) - e->time);
+				const auto degx = Cast::down<uint8_t>((64 * 2) - e->time);
 				for(j=0;j<e->vx;j++){
 					src = { j, 0, 1, e->vy };
 					temp = sinl(degx,100);
@@ -397,7 +394,7 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_MTITLE1): {
-				degx = Cast::down<uint8_t>(e->time);
+				const auto degx = Cast::down<uint8_t>(e->time);
 				for(j=0;j<e->vx;j++){
 					src = { j, 0, 1, e->vy };
 					temp = sinl(degx,160);
@@ -721,10 +718,10 @@ void ObjectLockDraw(void)
 void GrpDrawSpect(int x, int y)
 {
 	int		i,j,temp,temp2;
-	WORD	ftable[128+8+8],ftable2[128];
+	uint16_t ftable[128 + 8 + 8], ftable2[128];
 
-	static WORD ftable3[128+8+8];
-	static BYTE ftable3flag;
+	static uint16_t ftable3[128 + 8 + 8];
+	static uint8_t ftable3flag;
 
 	constexpr PIXEL_LTRB src = {
 		(16 * 16), 0, ((16 * 16) + (8 * 21)), 8
@@ -907,7 +904,7 @@ void GrpDrawNote(void)
 
 
 bool bEnableWarnEfc = false;
-WORD WarnEfcTime = 0;
+uint16_t WarnEfcTime = 0;
 
 // ワーニングの初期化 //
 void WarningEffectInit(void)

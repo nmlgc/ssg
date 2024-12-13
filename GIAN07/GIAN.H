@@ -108,7 +108,7 @@ constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
 /*
 // スコア管理用構造体 //
 typedef struct tagSCORE_DATA{
-	__int64	score;
+	int64_t	score;
 	uint8_t	weapon;
 	char	name[SCORE_NAME];
 } SCORE_DATA;

@@ -26,15 +26,15 @@
 #include <inttypes.h> // for PRId64
 
 
-DWORD		DrawCount = 0;
-DWORD		MidiPlayID = 0;
+decltype(MusicNum) MidiPlayID = 0;
 uint16_t DemoTimer = 0;
-BYTE		WeaponKeyWait = 0;
+uint32_t DrawCount = 0;
+uint8_t WeaponKeyWait = 0;
 int	GameOverTimer = 0;
 
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
-BYTE			CurrentRank;	// ネームレジスト用順位データ
-BYTE			CurrentDif;		// 現在の難易度(スコアネーム表示用)
+uint8_t	CurrentRank;	// ネームレジスト用順位データ
+uint8_t	CurrentDif;	// 現在の難易度(スコアネーム表示用)
 
 MAID		VivTemp;
 
@@ -254,8 +254,8 @@ void NameRegistProc(bool&)
 	int		gx,gy,len;
 	static int	x,y;
 	static int8_t key_time;
-	static BYTE count;
-	static BYTE time;
+	static uint8_t count;
+	static uint8_t time;
 	//char	buf[100],
 	char	c;
 
@@ -622,7 +622,7 @@ extern bool GameReplayInit(int Stage)
 
 void ReplayProc(bool&)
 {
-	static BYTE ExTimer;
+	static uint8_t ExTimer = 0;
 
 	ExTimer = (ExTimer+1)%128;
 
@@ -708,7 +708,7 @@ std::optional<LensInfo> Lens;
 
 void SProjectProc(bool&)
 {
-	static WORD timer = 0;
+	static uint16_t timer = 0;
 
 	constexpr PIXEL_SIZE logo_size = { 320, 42 };
 	constexpr WINDOW_LTRB logo = WINDOW_LTWH{
@@ -728,7 +728,6 @@ void SProjectProc(bool&)
 	};
 
 	constexpr PIXEL_LTRB rc = { 0, 0, logo_size.w, logo_size.h };
-	BYTE	d;
 	int		x, y;
 
 	timer = timer + 1;
@@ -753,7 +752,7 @@ void SProjectProc(bool&)
 			fade((timer * 4), ((255 - timer) * 4));
 		}
 		else if(Lens) {
-			d = timer - 64;
+			const uint8_t d = (timer - 64);
 			x = 320 + sinl(d-64, 240);
 			y = 295 + sinl(d*2, 20);
 			Lens.value().Draw({ x, y });
@@ -1033,7 +1032,7 @@ void GameOverProc(bool&)
 // デモプレイ
 void DemoProc(bool&)
 {
-	static BYTE ExTimer;
+	static uint8_t ExTimer = 0;
 
 	ExTimer = (ExTimer+1)%128;
 
@@ -1071,12 +1070,11 @@ void WeaponSelectProc(bool&)
 {
 	PIXEL_LTRB	rc;
 	int		i,x,y;
-	BYTE	d;
 	char	buf[100];
 
 	static char deg  = 0;
 	static char spd  = 0;
-	static WORD	count = 0;
+	static uint16_t count = 0;
 
 	constexpr PIXEL_LTRB src[4] = {
 		PIXEL_LTWH{  0, 344, 56, 48 },
@@ -1195,7 +1193,7 @@ void WeaponSelectProc(bool&)
 		rc = PIXEL_LTWH{ 0, 272, 64, 24 };
 		GrpSurface_Blit({ (120 - 32), (260 - 12) }, SURFACE_ID::SYSTEM, rc);
 
-		d = ((count/8)%2)<<3;
+		uint8_t d = (((count / 8) % 2) << 3);
 		rc = PIXEL_LTWH{ 72, (272 + d), 56, 8 };
 		GrpSurface_Blit({ (400 - 28 + 4), 420 }, SURFACE_ID::SYSTEM, rc);
 
@@ -1376,7 +1374,7 @@ void PauseProc(bool&)
 void MusicRoomProc(bool&)
 {
 	char	buf[100];
-	static WORD Old_Key;
+	static decltype(Key_Data) Old_Key;
 	static bool DevChgWait;
 
 	const auto playing = BGM_Playing();

@@ -13,9 +13,9 @@
 
 
 typedef struct tagEndingGrpInfo {
-	DWORD		timer;		// 表示用タイマー
-	DWORD		fadein;		// フェードイン時刻
-	DWORD		fadeout;	// フェードアウト時刻
+	uint32_t timer;	// 表示用タイマー
+	decltype(timer) fadein;	// フェードイン時刻
+	decltype(timer) fadeout;	// フェードアウト時刻
 	ENDING_GRP	*target;	// 描画対象
 	short		alpha;		// パレットの状態
 
@@ -25,9 +25,9 @@ typedef struct tagEndingGrpInfo {
 
 // スタッフ描画タスク //
 typedef struct tagEndingStTask{
-	DWORD		timer;		// 表示用タイマー
-	DWORD		fadein;		// フェードイン時刻
-	DWORD		fadeout;	// フェードアウト時刻
+	uint32_t timer;	// 表示用タイマー
+	decltype(timer) fadein;	// フェードイン時刻
+	decltype(timer) fadeout;	// フェードアウト時刻
 
 	uint8_t	StfID[10];	// スタッフＩＤ
 	uint8_t	TitleID;	// タイトル、すなわち役職ＩＤ
@@ -365,25 +365,24 @@ void DrawFadeInfo()
 void EndingSCLDecode()
 {
 	bool bFlag = true;
-	BYTE		*cmd;
-	DWORD		temp;
 
 	while(bFlag){
-		cmd = SCL_Now;
+		const uint8_t *cmd = SCL_Now;
 		switch(cmd[0]){
-			case(SCL_TIME):
-				temp = I32LEAt(&cmd[1]);
+			case(SCL_TIME): {
+				const auto temp = I32LEAt(&cmd[1]);
 				if(temp > GameCount) {
 					bFlag = false;
 				} else {
 					SCL_Now += 5; // cmd(1)+time(4)
 				}
-			break;
+				break;
+			}
 
 			case(SCL_MSG):		// メッセージを出力する
-				EText.Text[EText.NumText++] = reinterpret_cast<char *>(cmd + 1);
+				EText.Text[EText.NumText++] = std::bit_cast<const char *>(cmd + 1);
 				EText.Rerender = true;
-				SCL_Now += (strlen(reinterpret_cast<char *>(cmd + 1)) + 2);
+				SCL_Now += (strlen(std::bit_cast<const char *>(cmd + 1)) + 2);
 			break;
 
 			case(SCL_FACE):		// 顔を表示する

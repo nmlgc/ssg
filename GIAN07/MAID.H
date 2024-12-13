@@ -47,8 +47,8 @@ typedef struct
 	int vx,vy;			// オプションのズレ具合
 	int opx,opy;		// 現在のオプション基本座標
 
-	__int64 score;		// 得点カウンタ
-	__int64	dscore;		// 得点増加値
+	int64_t	score; 	// 得点カウンタ
+	int64_t	dscore;	// 得点増加値
 
 	uint32_t	evade_sum;	// かすり合計
 	int		evadesc;		// かすり得点

@@ -55,20 +55,19 @@ extern void WideBombDraw(void)
 void LaserBombDraw(void)
 {
 	constexpr RGBA col_channeled = RGB216{ 0, 0, 5 }.ToRGB().WithAlpha(0xFF);
-	BYTE			d,c;
 	VERTEX_XY	p[4];
 	int				i,w;
 	int				lx,ly;
 	int				wx,wy;
-	BYTE			LaserDeg;
-
-	LaserDeg = GetLaserDeg();
+	const auto LaserDeg = GetLaserDeg();
 
 	GrpGeom->Lock();
 	if(LaserDeg<58){
 		for(w=3;w>0;w--){
 			for(i=-3;i<=3;i++){
-				d = GetRightLaserDeg(LaserDeg, i); //64+48 - LaserDeg*3 + i*(64-LaserDeg)/2;
+				//64+48 - LaserDeg*3 + i*(64-LaserDeg)/2;
+				const auto d = GetRightLaserDeg(LaserDeg, i);
+
 				lx = cosl(d,850);	ly = sinl(d,850);
 				wx = cosl(d+64,w);	wy = sinl(d+64,w);
 				p[0].x = (Viv.opx>>6) + SBOPT_DX +  0 + wx;
@@ -92,7 +91,9 @@ void LaserBombDraw(void)
 				}
 			}
 			for(i=-3;i<=3;i++){
-				d = GetLeftLaserDeg(LaserDeg, i); //64-48 + LaserDeg*3 + i*(64-LaserDeg)/2;
+				//64-48 + LaserDeg*3 + i*(64-LaserDeg)/2;
+				const auto d = GetLeftLaserDeg(LaserDeg, i);
+
 				lx = cosl(d,850);	ly = sinl(d,850);
 				wx = cosl(d+64,w);	wy = sinl(d+64,w);
 				p[0].x = (Viv.opx>>6) - SBOPT_DX +  0 + wx;
@@ -121,10 +122,12 @@ void LaserBombDraw(void)
 		}
 	}
 	else if(LaserDeg<150){
-		c = 0;
+		uint8_t c = 0;
 		for(w=12-(LaserDeg-64)/8;w>0;w-=2,c++){
 			for(i=-3;i<=3;i++){
-				d = GetRightLaserDeg(LaserDeg, i);// 64+48 - 58*3 + i*(64-min(62,LaserDeg))/2;
+				// 64+48 - 58*3 + i*(64-min(62,LaserDeg))/2;
+				const auto d = GetRightLaserDeg(LaserDeg, i);
+
 				lx = cosl(d,850);	ly = sinl(d,850);
 				wx = cosl(d+64,w);	wy = sinl(d+64,w);
 				p[0].x = (Viv.opx>>6) + SBOPT_DX +  0 + wx;
@@ -144,7 +147,9 @@ void LaserBombDraw(void)
 				}
 			}
 			for(i=-3;i<=3;i++){
-				d = GetLeftLaserDeg(LaserDeg, i); //64-48 + 58*3 + i*(64-min(62,LaserDeg))/2;
+				//64-48 + 58*3 + i*(64-min(62,LaserDeg))/2;
+				const auto d = GetLeftLaserDeg(LaserDeg, i);
+
 				lx = cosl(d,850);	ly = sinl(d,850);
 				wx = cosl(d+64,w);	wy = sinl(d+64,w);
 				p[0].x = (Viv.opx>>6) - SBOPT_DX +  0 + wx;
@@ -181,8 +186,8 @@ extern void MaidDraw(void)
 		{{480,152,480+24,152+24},{504,152,504+24,152+24}},	// 仮
 	};
 
-	static BYTE draw_flag  = 0;
-	static BYTE draw_flag2 = 0;
+	static uint8_t draw_flag  = 0;
+	static uint8_t draw_flag2 = 0;
 
 	const auto x  = ((Viv.x >> 6) - 16);
 	const auto y  = ((Viv.y >> 6) - 24);

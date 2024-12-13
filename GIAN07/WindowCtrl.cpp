@@ -650,7 +650,7 @@ namespace BGMPack {
 		return (ListSize() - 1);
 	}
 
-	static void Open(void)
+	void Open(void)
 	{
 		PIXEL_COORD w = CWinItemExtent(TITLE_FMT).w;
 		w = (std::max)(w, CWinTextExtent(TITLE_DOWNLOAD).w);

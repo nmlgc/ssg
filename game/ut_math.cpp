@@ -36,7 +36,7 @@ extern const signed int SIN256[256+64] = {
 };
 
 ////ｃｏｓテーブル、というのかな？////
-extern const signed int *COS256 = &SIN256[64];
+const signed int *COS256 = &SIN256[64];
 
 
 ////ａｔａｎテーブル////

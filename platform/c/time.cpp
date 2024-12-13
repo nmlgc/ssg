@@ -5,8 +5,6 @@
 
 #include "platform/time.h"
 #include <assert.h>
-#include <chrono>
-#include <time.h>
 
 uint32_t Time_SteadyTicksMS()
 {

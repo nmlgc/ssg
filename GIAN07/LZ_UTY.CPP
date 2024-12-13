@@ -58,7 +58,7 @@ uint8_t BIT_DEVICE_READ::GetBit()
 	return ret;
 }
 
-uint32_t BIT_DEVICE_READ::GetBits(unsigned int bitcount)
+uint32_t BIT_DEVICE_READ::GetBits(size_t bitcount)
 {
 	const auto bytes_remaining = (buffer.size() - cursor.byte);
 	if((bitcount > 24) || (bytes_remaining == 0)) {

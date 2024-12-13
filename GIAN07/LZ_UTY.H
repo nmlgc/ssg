@@ -60,7 +60,7 @@ public:
 
 	// Returns 0xFFFFFFFF if we're at the end of the stream. Supports a maximum
 	// of 24 bits.
-	uint32_t GetBits(unsigned int bitcount);
+	uint32_t GetBits(size_t bitcount);
 };
 
 struct BIT_DEVICE_WRITE {

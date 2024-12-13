@@ -197,9 +197,6 @@ struct MID_SEQUENCE {
 };
 
 
-// ローカルな関数 //
-static void Mid_GMReset(void);
-
 // グローバル＆名前空間でローカルな変数 //
 MID_DEVICE	Mid_Dev;
 MID_FLAGS Mid_Flags = MID_FLAGS::NONE;
@@ -260,7 +257,14 @@ void Mid_Play(void)
 		t.next_time = 0s;
 	}
 
-	Mid_GMReset();
+	// GM SystemOn : F0H 7EH 7FH 09H 01H F7H
+	// Followed by a 50 ms sleep, whose necessity is explained at
+	//
+	// 	https://github.com/nmlgc/ssg/issues/10#issuecomment-1938245315
+	uint8_t msg_gm_system_on[6] = { 0xf0, 0x7e, 0x7f, 0x09, 0x01, 0xf7 };
+	MidBackend_Out(msg_gm_system_on);
+	std::this_thread::sleep_for(50ms); // ここで50ms以上待つこと!
+
 	MidBackend_StartTimer();
 	Mid_Dev.state = MID_BACKEND_STATE::PLAY;
 }
@@ -346,16 +350,6 @@ void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration)
 	Mid_Dev.FadeEndVolume = 0;
 	Mid_Dev.FadeProgress = 0s;
 	Mid_Dev.FadeDuration = duration;
-}
-
-void Mid_GMReset(void)
-{
-	// GM SystemOn : F0H 7EH 7FH 09H 01H F7H //
-	uint8_t msg[6] = { 0xf0, 0x7e, 0x7f, 0x09, 0x01, 0xf7 };
-	MidBackend_Out(msg);
-
-	// ここで50ms以上待つこと! //
-	std::this_thread::sleep_for(50ms);
 }
 
 bool Mid_Load(BYTE_BUFFER_OWNED buffer)

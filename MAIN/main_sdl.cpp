@@ -3,6 +3,7 @@
  *
  */
 
+#ifdef WIN32
 // Enable visual styles for nice-looking SDL message boxes. Taken from the
 // comment in `SDL_windowsmessagebox.c`, which was in turn taken from
 //
@@ -15,6 +16,7 @@
 	" publicKeyToken='6595b64144ccf1df'" \
 	" language='*'\"" \
 )
+#endif
 
 #include <SDL.h>
 #include "GIAN07/ENTRY.H"

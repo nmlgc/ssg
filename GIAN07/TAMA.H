@@ -186,13 +186,13 @@ void tamaind_set(uint16_t tama1);	// 弾の個数の割合をセットする(危
 uint32_t tama2score(void);	// 弾を得点化する(Ret : 得点)
 void  tama2item(uint8_t n);	// 弾の 1/n をアイテム化する
 
-uint8_t __fastcall tama_dir(uint16_t i);	// 弾の進行方向をセットする
-int  __fastcall tama_speed(uint16_t i);	// 弾の初速度をセットする
-uint8_t __fastcall tama_flag(void);	// 弾のフラグを初期化する
+uint8_t tama_dir(uint16_t i);	// 弾の進行方向をセットする
+int tama_speed(uint16_t i);	// 弾の初速度をセットする
+uint8_t tama_flag(void);	// 弾のフラグを初期化する
 
-void __fastcall tamaTmove(TAMA_DATA *t);			// 弾の " Type " による移動を行う
-void __fastcall tamaOmove(TAMA_DATA *t);			// 弾の "Option" による移動を行う
-void __fastcall tamaEmove(TAMA_DATA *t);			// 弾の "Effect" による移動を行う
+void tamaTmove(TAMA_DATA *t);	// 弾の " Type " による移動を行う
+void tamaOmove(TAMA_DATA *t);	// 弾の "Option" による移動を行う
+void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
 
 
 //// かすり用マクロ ////

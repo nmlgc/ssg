@@ -30,10 +30,10 @@ static void easy_cmd(void);				// 難易度：Ｅａｓｙ
 static void hard_cmd(void);				// 難易度：Ｈａｒｄ
 static void luna_cmd(void);				// 難易度：Ｌｕｎａｔｉｃ
 
-int __fastcall NewTamaSpeed(uint16_t i);
-int __fastcall LineCmdNewTamaSpeed(uint16_t i);
-int __fastcall TamaSpeedEx(uint8_t d);
-void __fastcall _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
+int NewTamaSpeed(uint16_t i);
+int LineCmdNewTamaSpeed(uint16_t i);
+int TamaSpeedEx(uint8_t d);
+void _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
 
 
 /*
@@ -193,7 +193,7 @@ void tama_setExtra01(void)
 	}
 }
 
-int __fastcall TamaSpeedEx(uint8_t d)
+int TamaSpeedEx(uint8_t d)
 {
 	int		temp = 0;
 	int		delta;
@@ -482,7 +482,7 @@ void tama_draw(void)
 
 
 // 弾をエフェクトとして描画？ //
-void __fastcall _TamaEffectDraw(const TAMA_DATA *t)
+void _TamaEffectDraw(const TAMA_DATA *t)
 {
 #define RCSET(x, y, w) {(x), (y), (x+w), (y+w)}
 
@@ -739,7 +739,7 @@ static void luna_cmd(void)
 	TamaCmd.ns+=2;		// 連射数_増加
 }
 
-uint8_t __fastcall tama_dir(uint16_t i)
+uint8_t tama_dir(uint16_t i)
 {
 	uint8_t deg = ((TamaCmd.cmd & TAMA_ZSET)
 		? atan8((Viv.x - TamaCmd.x), (Viv.y - TamaCmd.y))
@@ -769,7 +769,7 @@ uint8_t __fastcall tama_dir(uint16_t i)
 	}
 }
 
-int __fastcall NewTamaSpeed(uint16_t i)
+int NewTamaSpeed(uint16_t i)
 {
 	int temp = 0;						// ランダム要素の設定用
 	const int vret = TamaSpeed; // SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
@@ -787,7 +787,7 @@ int __fastcall NewTamaSpeed(uint16_t i)
 		return vret + temp;
 }
 
-int __fastcall LineCmdNewTamaSpeed(uint16_t i)
+int LineCmdNewTamaSpeed(uint16_t i)
 {
 	int		vret = TamaSpeed;		// 速度の基本値をセットする(GIAN.H)
 
@@ -808,7 +808,7 @@ int __fastcall LineCmdNewTamaSpeed(uint16_t i)
 		return vret;
 }
 
-int __fastcall tama_speed(uint16_t i)
+int tama_speed(uint16_t i)
 {
 	int temp = 0;						// ランダム要素の設定用
 	const int vret = SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
@@ -826,7 +826,7 @@ int __fastcall tama_speed(uint16_t i)
 		return vret + temp;
 }
 
-uint8_t __fastcall tama_flag(void)
+uint8_t tama_flag(void)
 {
 	switch(TamaCmd.type){
 		case(T_HOMING):case(T_HOMING_M):
@@ -838,7 +838,7 @@ uint8_t __fastcall tama_flag(void)
 	}
 }
 
-void __fastcall tamaTmove(TAMA_DATA *t)
+void tamaTmove(TAMA_DATA *t)
 {
 	short		deg_t;
 	//ENEMY_DATA	*e;
@@ -1014,7 +1014,7 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 	}
 }
 
-void __fastcall tamaOmove(TAMA_DATA *t)
+void tamaOmove(TAMA_DATA *t)
 {
 	int op_temp = 0;
 
@@ -1161,7 +1161,7 @@ void __fastcall tamaOmove(TAMA_DATA *t)
 	}
 }
 
-void __fastcall tamaEmove(TAMA_DATA *t)
+void tamaEmove(TAMA_DATA *t)
 {
 	// TE_NONE:エフェクト無しはこの関数にこないので記述しても意味無し //
 	// TE_DELETE:消去要請フラグを立てる事を忘れないように！ //

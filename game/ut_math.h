@@ -36,12 +36,16 @@ extern const signed int *COS256;
 
 
 // 三角関数2 //
-long __fastcall sinl(uint8_t deg,int length);	// SIN(deg)*length/256
-long __fastcall cosl(uint8_t deg,int length);	// COS(deg)*length/256
-long __fastcall sinDiv(uint8_t deg, int length);	// length*256/(SIN(deg)>0 ? SIN(deg) : 256)
-long __fastcall cosDiv(uint8_t deg, int length);	// length*256/(COS(deg)>0 ? COS(deg) : 256)
+long sinl(uint8_t deg, int length);	// (SIN(deg) * length) / 256)
+long cosl(uint8_t deg, int length);	// (COS(deg) * length) / 256)
 
-uint8_t __stdcall atan8(int x,int y);				// ３２ビット版です
+// ((length * 256) / ((SIN(deg) > 0) ? SIN(deg) : 256))
+long sinDiv(uint8_t deg, int length);
+
+// ((length * 256) / ((COS(deg) > 0) ? COS(deg) : 256))
+long cosDiv(uint8_t deg, int length);
+
+uint8_t atan8(int x, int y);	// ３２ビット版です
 
 
 // 平方根(整数版) //
@@ -50,8 +54,8 @@ int32_t isqrt(int32_t s);
 
 
 // 乱数 //
-void __fastcall rnd_seed_set(uint32_t val);
-uint16_t __fastcall rnd(void);
+void rnd_seed_set(uint32_t val);
+uint16_t rnd(void);
 
 
 // デバッグ用(後で消すこと) //

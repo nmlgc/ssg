@@ -110,15 +110,15 @@ static void easy_cmdL(void);						// 難易度：Ｅａｓｙ
 static void hard_cmdL(void);						// 難易度：Ｈａｒｄ
 static void luna_cmdL(void);						// 難易度：Ｌｕｎａｔｉｃ
 
-static uint8_t __fastcall laser_dir(uint16_t i); // レーザーの進行方向をセットする
-static void __fastcall slaser_pset(LASER_DATA *lp);		// ４点の座標をセットする(ショート用)
-static void __fastcall SLdraw(const LASER_DATA *lp);	// ショートレーザー描画
+static uint8_t laser_dir(uint16_t i);	// レーザーの進行方向をセットする
+static void slaser_pset(LASER_DATA *lp);	// ４点の座標をセットする(ショート用)
+static void SLdraw(const LASER_DATA *lp);	// ショートレーザー描画
 
-static void __fastcall Lmove(LASER_DATA *lp);			// 種類により分岐し座標を更新する
-static void __fastcall laser_hitchk(LASER_DATA *lp);	// レーザーの当たり判定
+static void Lmove(LASER_DATA *lp);	// 種類により分岐し座標を更新する
+static void laser_hitchk(LASER_DATA *lp);	// レーザーの当たり判定
 
-static void __fastcall REFL_move(LASER_DATA *lp);		// 反射レーザーの移動
-static int  __fastcall REFL_hit(const LASER_DATA *lp);	// ﾘﾌﾚｸﾀｰとの当たり判定(ﾋｯﾄ->非０)
+static void REFL_move(LASER_DATA *lp);	// 反射レーザーの移動
+static int  REFL_hit(const LASER_DATA *lp);	// ﾘﾌﾚｸﾀｰとの当たり判定(ﾋｯﾄ->非０)
 
 
 void laser_set(void)
@@ -316,7 +316,7 @@ static void luna_cmdL(void)
 	LaserCmd.l += (LaserCmd.l>>1);
 }
 
-static uint8_t __fastcall laser_dir(uint16_t i)
+static uint8_t laser_dir(uint16_t i)
 {
 	uint8_t deg = 0;
 
@@ -344,7 +344,7 @@ static uint8_t __fastcall laser_dir(uint16_t i)
 	}
 }
 
-static void __fastcall slaser_pset(LASER_DATA *lp)
+static void slaser_pset(LASER_DATA *lp)
 {
 	lp->p[1].x = lp->p[0].x= (lp->x>>6)+lp->wx;
 	lp->p[1].y = lp->p[0].y= (lp->y>>6)+lp->wy;
@@ -358,7 +358,7 @@ static void __fastcall slaser_pset(LASER_DATA *lp)
 	lp->p[2].y += lp->ly;
 }
 
-static void __fastcall SLdraw(const LASER_DATA *lp)
+static void SLdraw(const LASER_DATA *lp)
 {
 	constexpr RGB216 col = { 1, 0, 5 };
 	int x,y;
@@ -414,7 +414,7 @@ static void __fastcall SLdraw(const LASER_DATA *lp)
 	//Grp_Polygon(temp,4,RGB256(5,5,5));
 }
 
-static void __fastcall Lmove(LASER_DATA *lp)
+static void Lmove(LASER_DATA *lp)
 {
 	//int i;
 	//int ltempx,ltempy;
@@ -471,7 +471,7 @@ static void __fastcall Lmove(LASER_DATA *lp)
 	}
 }
 
-static void __fastcall laser_hitchk(LASER_DATA *lp)
+static void laser_hitchk(LASER_DATA *lp)
 {
 	long tx,ty,w1,length;
 
@@ -519,7 +519,7 @@ static void __fastcall laser_hitchk(LASER_DATA *lp)
 	}
 }
 
-static void __fastcall REFL_move(LASER_DATA *lp)
+static void REFL_move(LASER_DATA *lp)
 {
 	switch(lp->flag){
 		case(LF_NONE):	// E  -->  R	普通に移動
@@ -570,7 +570,7 @@ static void __fastcall REFL_move(LASER_DATA *lp)
 	}
 }
 
-static int __fastcall REFL_hit(const LASER_DATA *lp)
+static int REFL_hit(const LASER_DATA *lp)
 {
 	//REFLECTOR *rp;
 	LLASER_DATA *ll;

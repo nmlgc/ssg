@@ -89,6 +89,8 @@ bool BMPSave(
 	std::span<const std::byte> pixels
 )
 {
+	assert(pixels.size_bytes() <= std::numeric_limits<uint32_t>::max());
+	assert(palette.size() <= std::numeric_limits<uint32_t>::max());
 	const BMP_INFOHEADER header_info = {
 		.biSize = sizeof(BMP_INFOHEADER),
 		.biWidth = size.w,
@@ -96,8 +98,8 @@ bool BMPSave(
 		.biPlanes = planes,
 		.biBitCount = bpp,
 		.biCompression = 0, // BI_RGB
-		.biSizeImage = pixels.size_bytes(),
-		.biClrUsed = palette.size(),
+		.biSizeImage = static_cast<uint32_t>(pixels.size_bytes()),
+		.biClrUsed = static_cast<uint32_t>(palette.size()),
 	};
 	const uint32_t pixel_offset = (
 		sizeof(BMP_FILEHEADER) + header_info.biSize + palette.size_bytes()

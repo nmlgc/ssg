@@ -62,7 +62,7 @@ template <CB_DATA CB> static drflac_bool32 CB_FLAC_Seek(
 	return stream.Seek(offset, whence);
 }
 
-[[gsl::suppress(con.3)]]
+#pragma warning(suppress: 26461) // con.3
 static void CB_FLAC_Meta(void* user_data, drflac_metadata* metadata)
 {
 	if(metadata->type != DRFLAC_METADATA_BLOCK_TYPE_VORBIS_COMMENT) {

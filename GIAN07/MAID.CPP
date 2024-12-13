@@ -516,7 +516,10 @@ extern void score_add(int sc)
 	Viv.dscore += sc;
 }
 
-[[gsl::suppress(f.4, justification: "would only make MSVC suggest to make the functions below `constexpr`, which won't work because they are used in other translation units and this is not a header")]]
+// MSVC's static analyzer suggests to make the functions below `constexpr`,
+// which won't work because they are used in other translation units and this
+// is not a header.
+#pragma warning(suppress: 26497) // f.4
 uint8_t GetLeftOrRightLaserDeg(uint8_t LaserDeg, int i)
 {
 	return ((LaserDeg < 58)

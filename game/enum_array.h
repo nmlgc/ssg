@@ -30,12 +30,12 @@ public:
 	// compile on Visual Studio 2022 17.11.0 Preview 4.0.
 
 	constexpr T& operator[](IDType id) noexcept {
-		[[gsl::suppress(gsl.view)]]
+		#pragma warning(suppress: 26445) // gsl.view
 		return BASE::operator[](std::to_underlying(id));
 	}
 
 	constexpr const T& operator[](IDType id) const noexcept {
-		[[gsl::suppress(gsl.view)]]
+		#pragma warning(suppress: 26445) // gsl.view
 		return BASE::operator[](std::to_underlying(id));
 	}
 };

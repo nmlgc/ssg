@@ -41,7 +41,7 @@ template <
 		if((cursor_new > this->size()) || (cursor_new < cursor)) {
 			return std::nullopt;
 		}
-		[[gsl::suppress(type.1)]]
+		#pragma warning(suppress : 26473) // type.1
 		auto ret = std::span<transfer_const<T>>{
 			reinterpret_cast<transfer_const<T> *>(this->data() + cursor), n
 		};

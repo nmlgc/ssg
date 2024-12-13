@@ -1071,7 +1071,8 @@ void DrawGeometry(
 	TRIANGLE_PRIMITIVE tp, VERTEX_XY_SPAN<> xys, VERTEX_RGBA_SPAN<> colors
 )
 {
-	[[gsl::suppress(type.5)]] SDL_FPoint sdl_vertices[GRP_TRIANGLES_MAX];
+	#pragma warning(suppress : 26494) // type.5
+	SDL_FPoint sdl_vertices[GRP_TRIANGLES_MAX];
 
 	const auto vertex_count = xys.size();
 	const auto sdl_colors = HelpColorsFrom(colors);

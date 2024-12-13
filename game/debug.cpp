@@ -16,7 +16,9 @@ static bool ErrorActive = false;
 
 extern void DebugSetup()
 {
-	[[gsl::suppress(type.5)]] std::array<char, 64> str;
+	#pragma warning(suppress : 26494) // type.5
+	std::array<char, 64> str;
+
 	const auto tm = Time_NowLocal();
 	const auto len = snprintf(
 		str.data(),

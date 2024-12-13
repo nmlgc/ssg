@@ -1496,7 +1496,7 @@ void MusicRoomProc(bool&)
 }
 
 /*
-_inline XAdd(DWORD old,int id)
+inline XAdd(DWORD old,int id)
 {
 	RndBuf[id] += (random_ref-old);
 }

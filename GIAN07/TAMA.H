@@ -208,7 +208,7 @@ inline void TamaEvadeAdd(TAMA_DATA *t)
 }
 
 //// 弾コマンド用マクロ ////
-_inline void TamaSetForm(uint8_t cmd, uint8_t option, uint8_t type, uint8_t c)
+inline void TamaSetForm(uint8_t cmd, uint8_t option, uint8_t type, uint8_t c)
 {
 	TamaCmd.cmd    = cmd;
 	TamaCmd.option = option;
@@ -216,30 +216,30 @@ _inline void TamaSetForm(uint8_t cmd, uint8_t option, uint8_t type, uint8_t c)
 	TamaCmd.c      = c;
 }
 
-_inline void TamaSTDForm(uint8_t c)
+inline void TamaSTDForm(uint8_t c)
 {
 	TamaSetForm(TC_WAY,TOP_NONE,T_NORM,c);
 }
 
-_inline void TamaSetDeg(uint8_t d, uint8_t dw)
+inline void TamaSetDeg(uint8_t d, uint8_t dw)
 {
 	TamaCmd.d  = d;
 	TamaCmd.dw = dw;
 }
 
-_inline void TamaSetNum(uint8_t n, uint8_t ns)
+inline void TamaSetNum(uint8_t n, uint8_t ns)
 {
 	TamaCmd.n  = n;
 	TamaCmd.ns = ns;
 }
 
-_inline void TamaSetSpd(uint8_t v, char a)
+inline void TamaSetSpd(uint8_t v, char a)
 {
 	TamaCmd.v = v;
 	TamaCmd.a = a;
 }
 
-_inline void TamaSetXY(int x,int y)
+inline void TamaSetXY(int x,int y)
 {
 	TamaCmd.x = x;
 	TamaCmd.y = y;

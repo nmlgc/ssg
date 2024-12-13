@@ -37,7 +37,7 @@ void __fastcall _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトと
 
 
 /*
-_inline Debug(uint32_t old, int id)
+inline Debug(uint32_t old, int id)
 {
 	RndBuf[id] += (random_ref-old);
 }

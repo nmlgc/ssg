@@ -102,7 +102,7 @@ bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 }
 
 /*
-_inline Debug(DWORD old,int id)
+inline Debug(DWORD old,int id)
 {
 	RndBuf[id] += (random_ref-old);
 }

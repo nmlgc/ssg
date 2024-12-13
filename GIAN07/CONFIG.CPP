@@ -3,8 +3,6 @@
  *
  */
 
-#pragma once
-
 #include "CONFIG.H"
 #include "game/bgm.h"
 #include "platform/file.h"

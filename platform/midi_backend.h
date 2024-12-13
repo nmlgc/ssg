@@ -5,6 +5,12 @@
 
 #pragma once
 
+#ifdef WIN32
+	#define SUPPORT_MIDI_BACKEND
+#endif
+
+#ifdef SUPPORT_MIDI_BACKEND
+
 import std.compat;
 #include "game/narrow.h"
 
@@ -35,3 +41,5 @@ void MidBackend_Out(std::span<uint8_t> event);
 
 // Stops all currently playing notes.
 void MidBackend_Panic(void);
+
+#endif

@@ -35,6 +35,7 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 
 void MUSICROOM_TEXT::PrerenderMidDev() const
 {
+	#ifdef SUPPORT_MIDI_BACKEND
 	TextObj.Prerender(mid_dev, [](TEXTRENDER_SESSION auto& s) {
 		const auto maybe_dev = MidBackend_DeviceName();
 		if(!maybe_dev) {
@@ -45,6 +46,7 @@ void MUSICROOM_TEXT::PrerenderMidDev() const
 		s.SetColor(ColorDefault);
 		s.Put({ 0, 0 }, { dev.data(), (std::min)(dev.size(), 13u) });
 	});
+	#endif
 }
 
 bool MUSICROOM_TEXT::PrerenderTitleAndComment(

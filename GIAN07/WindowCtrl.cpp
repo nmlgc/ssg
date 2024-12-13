@@ -281,8 +281,10 @@ WINDOW_CHOICE MidItem[] = {
 	{ MidTitleFixes, "Retain SC-88Pro echo on other Roland synths", MidFnFixes },
 	SubmenuExitItemForArray,
 };
-WINDOW_MENU MidMenu      = { std::span(MidItem), SetMidItem };
-static auto& MidItemPort = MidItem[0];
+#ifdef SUPPORT_MIDI_BACKEND
+	WINDOW_MENU MidMenu = { std::span(MidItem), SetMidItem };
+	static auto& MidItemPort = MidItem[0];
+#endif
 
 static char SndTitleSE[26];
 static char SndTitleBGM[26];
@@ -297,7 +299,9 @@ WINDOW_CHOICE SndItem[] = {
 	{ SndTitleBGMVol, "音楽の音量", SndFnBGMVol, VOLUME_FLAGS },
 	{ SndTitleBGMGain,	"毎に曲から音量の違うことが外します",	SndFnBGMGain },
 	{ SndTitleBGMPack,	BGMPack::HELP_DOWNLOAD,	SndFnBGMPack },
+	#ifdef SUPPORT_MIDI_BACKEND
 	{ "MIDI",	"Change MIDI playback options",	MidMenu },
+	#endif
 	SubmenuExitItemForArray,
 };
 WINDOW_MENU SndMenu = { std::span(SndItem), SetSndItem };
@@ -307,7 +311,9 @@ static auto& SndItemSEVol = SndItem[2];
 static auto& SndItemBGMVol = SndItem[3];
 static auto& SndItemBGMGain = SndItem[4];
 static auto& SndItemBGMPack = SndItem[5];
+#ifdef SUPPORT_MIDI_BACKEND
 static auto& SndItemMIDI = SndItem[6];
+#endif
 
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
@@ -1116,6 +1122,7 @@ static void SetSndItem(bool)
 	}
 }
 
+#ifdef SUPPORT_MIDI_BACKEND
 static void SetMidItem(bool tick)
 {
 	static int now;
@@ -1148,6 +1155,7 @@ static void SetMidItem(bool tick)
 
 	sprintf(MidTitleFixes, "SC88ProFXCompat%s", CHOICE_OFF_ON_NARROW[fixes]);
 }
+#endif
 
 static void SetInpItem(bool)
 {

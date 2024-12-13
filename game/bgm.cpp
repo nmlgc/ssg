@@ -46,6 +46,16 @@ const uint8_t& Snd_BGMTempoNum = BGM_Tempo_Num;
 const uint8_t& Snd_BGMTempoDenom = BGM_TEMPO_DENOM;
 // ---------------------
 
+#ifndef SUPPORT_MIDI_BACKEND
+bool MidBackend_Init() { return false; }
+void MidBackend_Cleanup() {}
+bool MidBackend_DeviceChange(int8_t) { return false; }
+void Mid_Play() {}
+void Mid_Stop() {}
+void Mid_Pause() {}
+void Mid_Resume() {}
+#endif
+
 bool BGM_Init(void)
 {
 	BGM_SetTempo(0);

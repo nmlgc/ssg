@@ -6,6 +6,7 @@
 #pragma once
 
 import std.compat;
+#include "game/cast.h"
 #include "game/coords.h"
 #include "game/enum_flags.h"
 #include "game/pixelformat.h"
@@ -87,7 +88,11 @@ struct RGB216 {
 	}
 
 	constexpr RGB ToRGB(void) const {
-		return RGB{ .r = (r * 50u), .g = (g * 50u), .b = (b * 50u) };
+		return RGB{
+			.r = Cast::down<uint8_t>(r * 50u),
+			.g = Cast::down<uint8_t>(g * 50u),
+			.b = Cast::down<uint8_t>(b * 50u),
+		};
 	}
 
 	static void ForEach(std::invocable<const RGB216&> auto&& func) {

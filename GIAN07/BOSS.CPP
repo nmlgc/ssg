@@ -243,7 +243,10 @@ void BossDraw(void)
 			// 霊魂状態 //
 			if(b->ExState == BEXST_SHILD2 && Viv.bomb_time && (e->flag&EF_DRAW)){
 				wing = PIXEL_LTWH{
-					(160 + ((e->count / 2) % 4) * 40), 80, 40, 40
+					(160 + (Cast::sign<int32_t>(e->count / 2) % 4) * 40),
+					80,
+					40,
+					40
 				};
 
 				// pbg quirk: Blitted without clipping?! I'd consider this a

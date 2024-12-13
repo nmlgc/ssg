@@ -186,7 +186,7 @@ std::optional<GRAPHICS_INIT_RESULT> Grp_InitOrFallback(GRAPHICS_PARAMS params)
 
 	const auto api_it = ((api_count > 0)
 		? std::views::iota(int8_t{ -1 }, api_count)
-		: std::views::iota(params.api, int8_t{ params.api + 1 })
+		: std::views::iota(params.api, Cast::down<int8_t>(params.api + 1))
 	);
 
 	for(const auto api : api_it) {

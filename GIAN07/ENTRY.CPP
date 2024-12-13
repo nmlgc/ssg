@@ -161,12 +161,12 @@ void XGrpTryCycleScMode(void)
 
 bool GameFrame(void)
 {
-	#ifdef GRP_SUPPORT_WINDOWED
+	#ifdef SUPPORT_GRP_WINDOWED
 		if(SystemKey_Data & SYSKEY_GRP_FULLSCREEN) {
 			XGrpTryCycleDisp();
 		}
 	#endif
-	#ifdef GRP_SUPPORT_SCALING
+	#ifdef SUPPORT_GRP_SCALING
 		if(SystemKey_Data & SYSKEY_GRP_SCALE_UP) {
 			XGrpTryCycleScale(+1, false);
 		}

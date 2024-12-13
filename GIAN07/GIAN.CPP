@@ -47,7 +47,7 @@ extern void StdStatusOutput(void)
 	GrpPut16(0,0,buf);
 
 #ifdef PBG_DEBUG
-	#ifdef GRP_SUPPORT_BITDEPTH
+	#ifdef SUPPORT_GRP_BITDEPTH
 		sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());
 		GrpPut16(0, 32, buf);
 	#endif

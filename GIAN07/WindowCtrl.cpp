@@ -187,7 +187,7 @@ WINDOW_CHOICE DifItem[] = {
 };
 WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
-#ifdef GRP_SUPPORT_API
+#ifdef SUPPORT_GRP_API
 	char GrpAPIDefTitle[26];
 	WINDOW_CHOICE GrpAPIItemDef = {
 		GrpAPIDefTitle, HELP_API_DEFAULT, GrpAPIFnDef
@@ -197,24 +197,24 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 #endif
 
 static char GrpTitleDevice[50];
-#ifdef GRP_SUPPORT_WINDOWED
+#ifdef SUPPORT_GRP_WINDOWED
 	static char GrpTitleDisp[50];
 	static char GrpTitleFSMode[50];
 #endif
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	static char GrpTitleScale[50];
 	static char GrpTitleScMode[50];
 #endif
 static char GrpTitleSkip[50];
-#ifdef GRP_SUPPORT_BITDEPTH
+#ifdef SUPPORT_GRP_BITDEPTH
 	static char GrpTitleBpp[50];
 #endif
 static char GrpTitleMsg[50];
 
-#ifdef GRP_SUPPORT_WINDOWED
+#ifdef SUPPORT_GRP_WINDOWED
 	static char GrpHelpFSMode[50];
 #endif
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	static char GrpHelpScale[50];
 	static char GrpHelpScMode[50];
 #endif
@@ -222,7 +222,7 @@ static char GrpTitleMsg[50];
 // WINDOW_CHOICE GrpItemDevice = {
 // 	GrpTitleDevice, "ビデオカードの選択", GrpFnChgDevice
 // };
-#ifdef GRP_SUPPORT_WINDOWED
+#ifdef SUPPORT_GRP_WINDOWED
 	WINDOW_CHOICE GrpItemDisp = {
 		GrpTitleDisp, "Switch between window and fullscreen modes", GrpFnDisp
 	};
@@ -230,7 +230,7 @@ static char GrpTitleMsg[50];
 		GrpTitleFSMode, GrpHelpFSMode, GrpFnFSMode
 	};
 #endif
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	WINDOW_CHOICE GrpItemScale = { GrpTitleScale, GrpHelpScale, GrpFnScale };
 	WINDOW_CHOICE GrpItemScMode = {
 		GrpTitleScMode, GrpHelpScMode, GrpFnScMode
@@ -239,7 +239,7 @@ static char GrpTitleMsg[50];
 WINDOW_CHOICE GrpItemSkip = {
 	GrpTitleSkip, "描画スキップの設定です", GrpFnSkip
 };
-#ifdef GRP_SUPPORT_BITDEPTH
+#ifdef SUPPORT_GRP_BITDEPTH
 	WINDOW_CHOICE GrpItemBpp = {
 		GrpTitleBpp, "使用する色数を指定します", GrpFnBpp
 	};
@@ -247,24 +247,24 @@ WINDOW_CHOICE GrpItemSkip = {
 WINDOW_CHOICE GrpItemMsg = {
 	GrpTitleMsg, "ウィンドウの表示位置を決めます", GrpFnWinLocate
 };
-#ifdef GRP_SUPPORT_API
+#ifdef SUPPORT_GRP_API
 	WINDOW_CHOICE GrpItemAPI = { "API",	"Select rendering API",	GrpAPIMenu };
 #endif
 WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
-#ifdef GRP_SUPPORT_WINDOWED
+#ifdef SUPPORT_GRP_WINDOWED
 	&GrpItemDisp,
 	&GrpItemFSMode,
 #endif
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	&GrpItemScale,
 	&GrpItemScMode,
 #endif
 	&GrpItemSkip,
-#ifdef GRP_SUPPORT_BITDEPTH
+#ifdef SUPPORT_GRP_BITDEPTH
 	&GrpItemBpp,
 #endif
-#ifdef GRP_SUPPORT_API
+#ifdef SUPPORT_GRP_API
 	&GrpItemAPI,
 #endif
 	&HRuleItem,
@@ -406,7 +406,7 @@ WINDOW_SYSTEM BGMPackWindow = { BGMPackMenu.Menu };
 // メインメニューの初期化 //
 void InitMainWindow(void)
 {
-	#ifdef GRP_SUPPORT_API
+	#ifdef SUPPORT_GRP_API
 		const auto grp_api_count = GrpBackend_APICount();
 		if(grp_api_count >= 2) {
 			assert(grp_api_count <= GrpAPIItem.size());
@@ -985,7 +985,7 @@ static void SetGrpItem(bool)
 	const auto fs = params.FullscreenFlags();
 	const auto in_borderless_fullscreen = (fs.fullscreen && !fs.exclusive);
 
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	const auto scale_4x = params.Scale4x();
 	const auto [scale_var1, scale_var2] = (in_borderless_fullscreen
 		? std::pair<uint8_t, uint8_t>(aspect.w, aspect.h)
@@ -1009,16 +1009,16 @@ static void SetGrpItem(bool)
 
 	// clang-format off
 	sprintf(GrpTitleDevice, "Device   [%.7s]", dev.data());
-#ifdef GRP_SUPPORT_WINDOWED
+#ifdef SUPPORT_GRP_WINDOWED
 	sprintf(GrpTitleDisp,   "Display[%s]", DISPLAY_MODES[fs.fullscreen]);
 	sprintf(GrpTitleFSMode, "FullScr[%s]", FULLSCREEN_MODES[fs.exclusive]);
 #endif
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	sprintf(GrpTitleScale,  scale_fmt, scale_label, scale_var1, scale_var2);
 	sprintf(GrpTitleScMode, "ScaleMode[%s]", sc_mode_label);
 #endif
 	sprintf(GrpTitleSkip,   "FrameRate[ %s ]", FRate[ConfigDat.FPSDivisor.v]);
-#ifdef GRP_SUPPORT_BITDEPTH
+#ifdef SUPPORT_GRP_BITDEPTH
 	sprintf(GrpTitleBpp,    "BitDepth [ %dBit ]", ConfigDat.BitDepth.v.value());
 #endif
 	sprintf(GrpTitleMsg,    "MsgWindow[%s]", UorD[u_or_d]);
@@ -1026,7 +1026,7 @@ static void SetGrpItem(bool)
 
 	// Help strings
 	// ------------
-#ifdef GRP_SUPPORT_WINDOWED
+#ifdef SUPPORT_GRP_WINDOWED
 	const auto fs_mode_help_fmt = (fs.exclusive
 		? "Fullscreen changes resolution to %dx%d"
 		: "Fullscreen uses a display-sized window"
@@ -1034,7 +1034,7 @@ static void SetGrpItem(bool)
 	sprintf(GrpHelpFSMode, fs_mode_help_fmt, GRP_RES.w, GRP_RES.h);
 #endif
 
-#ifdef GRP_SUPPORT_SCALING
+#ifdef SUPPORT_GRP_SCALING
 	if(in_borderless_fullscreen) {
 		sprintf(GrpHelpScale, FITS[fs.fit].second, aspect.w, aspect.h);
 	} else if(scale_4x == 0) {
@@ -1056,7 +1056,7 @@ static void SetGrpItem(bool)
 	// ------------
 }
 
-#ifdef GRP_SUPPORT_API
+#ifdef SUPPORT_GRP_API
 static void SetGrpAPIItem(bool)
 {
 	const bool is_def_api = (ConfigDat.GraphicsAPI.v < 0);

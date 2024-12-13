@@ -63,7 +63,7 @@ public:
 	// Encoding-erasing conversions from UTF-8 are OK...
 	constexpr string_view(const std::u8string_view other) noexcept :
 		std::string_view(
-			{ reinterpret_cast<const char*>(other.data()), other.size() }
+			{ std::bit_cast<const char*>(other.data()), other.size() }
 		) {
 	}
 	constexpr string_view(const std::u8string& other) noexcept :

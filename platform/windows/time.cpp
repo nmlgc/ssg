@@ -7,6 +7,8 @@
 #include "game/cast.h"
 #include <windows.h>
 
+#pragma comment(lib, "winmm.lib")
+
 uint32_t Time_SteadyTicksMS()
 {
 	return timeGetTime();

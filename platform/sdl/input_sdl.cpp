@@ -194,7 +194,7 @@ void Key_Read(void)
 {
 	static INPUT_BITS Key_Data_Real = 0;
 
-	[[gsl::suppress(type.5)]] SDL_Event event;
+	SDL_Event event;
 	while(SDL_PeepEvents(
 		&event, 1, SDL_GETEVENT, SDL_KEYDOWN, SDL_JOYDEVICEREMOVED
 	) == 1) {

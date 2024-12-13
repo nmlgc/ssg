@@ -110,14 +110,12 @@ void LensInfo::Draw(WINDOW_POINT center)
 		// Capture the pixels under the lens
 		const auto* back_p = Dest;
 		for(auto fov_p = fov.begin(); fov_p != fov.end(); fov_p += Height) {
-			[[gsl::suppress(type.1)]]
 			std::copy_n(reinterpret_cast<const P *>(back_p), Height, fov_p);
 			back_p += pitch;
 		}
 
 		for(decltype(Height) row = 0; row < Height; row++) {
 			auto Width = *(Table++);
-			[[gsl::suppress(type.1)]]
 			auto* p = reinterpret_cast<P *>(Dest + *(Table++));
 
 			while(Width--){

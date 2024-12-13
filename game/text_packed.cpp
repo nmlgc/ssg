@@ -85,8 +85,8 @@ created_splits insert_and_split(const PIXEL_SIZE& nw, const PIXEL_LTWH& sp)
 	// This is why, if we had more of width remaining than we had of height,
 	// we split along the vertical axis, and if we had more of height remaining
 	// than we had of width, we split along the horizontal axis.
-	[[gsl::suppress(type.5)]] PIXEL_LTWH bigger_split;
-	[[gsl::suppress(type.5)]] PIXEL_LTWH lesser_split;
+	PIXEL_LTWH bigger_split;
+	PIXEL_LTWH lesser_split;
 	if(free_w > free_h) {
 		bigger_split = { (sp.left + nw.w), sp.top, free_w, sp.h };
 		lesser_split = { sp.left, (sp.top + nw.h), nw.w, free_h };

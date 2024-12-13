@@ -88,7 +88,10 @@ void SnakyMove(void)
 		}
 
 		// バッファ更新処理 //
-		constexpr auto points = (s->Length() * SNAKEYMOVE_POINTS_PER_ENEMY);
+		using DATA_TYPE = std::remove_reference_t<decltype(*s)>;
+		constexpr auto points = (
+			DATA_TYPE::Length() * SNAKEYMOVE_POINTS_PER_ENEMY
+		);
 		for(const auto j : std::views::iota(0u, s->Length())) {
 			e = s->EnemyPtr[j];
 			if(e==NULL) continue;

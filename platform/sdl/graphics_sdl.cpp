@@ -79,10 +79,10 @@ constinit const auto TRIANGLE_FAN = ([] {
 	constexpr INDEX_TYPE max = GRP_TRIANGLES_MAX;
 	std::array<INDEX_TYPE, TriangleIndexCount(max)> ret;
 	auto ret_p = ret.begin();
-	for(const auto& i : std::views::iota(1u, max) | std::views::adjacent<2>) {
+	for(const auto& i : std::views::iota(0u, (max - 2u))) {
 		*(ret_p++) = 0;
-		*(ret_p++) = std::get<0>(i);
-		*(ret_p++) = std::get<1>(i);
+		*(ret_p++) = (i + 1);
+		*(ret_p++) = (i + 2);
 	}
 	return ret;
 })();
@@ -91,10 +91,10 @@ constinit const auto TRIANGLE_STRIP = ([] {
 	constexpr INDEX_TYPE max = GRP_TRIANGLES_MAX;
 	std::array<INDEX_TYPE, TriangleIndexCount(max)> ret;
 	auto ret_p = ret.begin();
-	for(const auto& i : std::views::iota(0u, max) | std::views::adjacent<3>) {
-		*(ret_p++) = std::get<0>(i);
-		*(ret_p++) = std::get<1>(i);
-		*(ret_p++) = std::get<2>(i);
+	for(const auto& i : std::views::iota(0u, (max - 2u))) {
+		*(ret_p++) = (i + 0);
+		*(ret_p++) = (i + 1);
+		*(ret_p++) = (i + 2);
 	}
 	return ret;
 })();

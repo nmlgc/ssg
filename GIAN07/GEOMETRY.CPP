@@ -16,8 +16,9 @@ void ApproximateCircle(
 	PIXEL_COORD radius
 )
 {
-	for(auto [i, v] : ret | std::views::enumerate) {
-		const uint8_t angle = (i * CIRCLE_STEP);
+	auto i = 0;
+	for(auto& v : ret) {
+		const uint8_t angle = (i++ * CIRCLE_STEP);
 		v.x = (center.x + cosl(angle, radius));
 		v.y = (center.y + sinl(angle, radius));
 	}
@@ -30,7 +31,8 @@ void ApproximateFatCircle(
 	PIXEL_COORD w
 )
 {
-	for(auto [i, v] : ret | std::views::chunk(2) | std::views::enumerate) {
+	auto v = ret.begin();
+	for(const auto i : std::views::iota(0u, CIRCLE_POINTS)) {
 		const uint8_t angle = (i * CIRCLE_STEP);
 		const auto [lx, ly] = std::pair(cosl(angle, r), sinl(angle, r));
 		const auto [wx, wy] = std::pair(cosl(angle, w), sinl(angle, w));
@@ -42,6 +44,7 @@ void ApproximateFatCircle(
 			static_cast<VERTEX_COORD>(center.x + lx + wx),
 			static_cast<VERTEX_COORD>(center.y + ly + wy),
 		};
+		v += 2;
 	}
 }
 

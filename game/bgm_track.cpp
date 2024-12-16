@@ -8,6 +8,12 @@
 #include "game/narrow.h"
 #include "game/volume.h"
 #include <assert.h>
+#include <version> // need the library feature test macros...
+
+#if(__cpp_lib_to_chars < 201611L)
+	#include <locale.h>
+	#include <stdlib.h>
+#endif
 
 namespace BGM {
 
@@ -178,9 +184,29 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 				if(!meta.gain_factor && TagEquals(tag, u8"GAIN FACTOR")) {
 					const auto first = Narrow::string_view(value).data();
 					const auto last = (first + value.size());
-					float parsed = 0;
-					const auto r = std::from_chars(first, last, parsed);
-					if(r.ptr == last) {
+					#if(__cpp_lib_to_chars >= 201611L)
+						float parsed = 0;
+						const auto r = std::from_chars(first, last, parsed);
+						const auto success = (r.ptr == last);
+					#else
+						// Locale braindeath time!
+						// (https://github.com/mpv-player/mpv/commit/1e70e82baa)
+						static locale_t locale_c = nullptr;
+						if(!locale_c) {
+							locale_c = newlocale(LC_NUMERIC_MASK, "C", nullptr);
+							if(locale_c) {
+								atexit([] {
+									freelocale(locale_c);
+									locale_c = nullptr;
+								});
+							}
+						}
+
+						char *parsed_last = nullptr;
+						float parsed = strtof_l(first, &parsed_last, locale_c);
+						const auto success = (parsed_last == last);
+					#endif
+					if(success) {
 						meta.gain_factor = parsed;
 					}
 					return;

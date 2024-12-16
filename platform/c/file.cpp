@@ -5,7 +5,8 @@
 
 #include "platform/file.h"
 #include <assert.h>
-#include <io.h>
+#include <stdio.h> // For fileno() and the `SEEK_*` macros
+#include <sys/stat.h> // The stat types aren't part of the `std` module either
 
 static size_t LoadInplace(std::span<uint8_t> buf, FILE*&& fp)
 {
@@ -50,11 +51,15 @@ static BYTE_BUFFER_OWNED FPReadAll(
 )
 {
 	assert(fp);
-	auto size64 = _filelengthi64(fileno(fp));
-	if(size64 > size_limit) {
+
+	struct stat st;
+	if(fstat(fileno(fp), &st) != 0) {
 		return {};
 	}
-	const size_t size = size64;
+	const size_t size = st.st_size;
+	if(size > size_limit) {
+		return {};
+	}
 
 	auto buf = BYTE_BUFFER_OWNED{ size };
 	if(!buf) {
@@ -132,11 +137,11 @@ public:
 		case SEEK_WHENCE::CURRENT:	origin = SEEK_CUR;	break;
 		case SEEK_WHENCE::END:    	origin = SEEK_END;	break;
 		}
-		return !_fseeki64(fp, offset, origin);
+		return !fseeko64(fp, offset, origin);
 	};
 
 	std::optional<int64_t> Tell() override {
-		auto ret = _ftelli64(fp);
+		auto ret = ftello64(fp);
 		if(ret == -1) {
 			return std::nullopt;
 		}

@@ -7,6 +7,7 @@
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
+#include "platform/text_backend.h"
 #include "game/cast.h"
 #include "game/snd.h"
 #include "game/ut_math.h"

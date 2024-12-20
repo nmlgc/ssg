@@ -4,9 +4,9 @@
  */
 
 #include "ENDING.H"
-#include "FONTUTY.H"
 #include "GIAN.H"
 #include "SCL.H" // ＳＣＬ定義ファイル
+#include "platform/text_backend.h"
 #include "game/bgm.h"
 #include "game/cast.h"
 #include "game/endian.h"

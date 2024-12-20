@@ -5,12 +5,12 @@
 
 #include "GIAN07/ENTRY.H"
 #include "GIAN07/CONFIG.H"
-#include "GIAN07/FONTUTY.H"
 #include "GIAN07/GAMEMAIN.H"
 #include "GIAN07/LOADER.H"
 #include "platform/graphics_backend.h"
 #include "platform/input.h"
 #include "platform/path.h"
+#include "platform/text_backend.h"
 #include "platform/window_backend.h"
 #include "game/bgm.h"
 #include "game/debug.h"

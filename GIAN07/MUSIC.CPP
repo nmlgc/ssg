@@ -4,10 +4,10 @@
  */
 
 #include "MUSIC.H"
-#include "FONTUTY.H"
 #include "game/bgm.h"
 #include "game/string_format.h"
 #include "platform/midi_backend.h"
+#include "platform/text_backend.h"
 
 std::optional<MUSICROOM_TEXT> MusicRoomText;
 

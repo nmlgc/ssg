@@ -16,11 +16,7 @@
 
 
 
-#include "platform/windows/text_gdi.h"
-
-
-
-extern TEXTRENDER_GDI TextObj;
+#include "game/text.h"
 
 
 

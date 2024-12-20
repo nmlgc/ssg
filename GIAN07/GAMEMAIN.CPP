@@ -16,6 +16,7 @@
 #include "SCORE.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
+#include "platform/text_backend.h"
 #include "game/bgm.h"
 #include "game/debug.h"
 #include "game/input.h"

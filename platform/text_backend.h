@@ -24,3 +24,6 @@ template <class T> concept TEXTRENDER_SESSION_PIXELACCESS = requires(
 
 	extern TEXTRENDER_GDI TextObj;
 #endif
+
+// Shuts down the backend, deleting all fonts.
+void TextBackend_Cleanup(void);

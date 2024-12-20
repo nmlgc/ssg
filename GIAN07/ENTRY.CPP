@@ -89,6 +89,7 @@ bool XInit(void)
 void XCleanup(void)
 {
 	ConfigSave();
+	TextBackend_Cleanup();
 	GrpBackend_Cleanup();
 	BGM_Cleanup();
 	Snd_Cleanup();

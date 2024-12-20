@@ -8,6 +8,48 @@
 #include "platform/graphics_backend.h"
 #include "platform/text_backend.h"
 
+#ifdef WIN32
+	#include <windows.h>
+
+	extern constinit const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs = [] {
+		ENUMARRAY<LOGFONTW, FONT_ID> ret;
+
+		LOGFONTW logfont = {
+			.lfEscapement = 0,
+			.lfOrientation = 0,
+			.lfItalic = false,
+			.lfUnderline = false,
+			.lfStrikeOut = false,
+			.lfCharSet = SHIFTJIS_CHARSET,
+			.lfOutPrecision = OUT_TT_ONLY_PRECIS,
+			.lfClipPrecision = CLIP_DEFAULT_PRECIS,
+			.lfQuality = PROOF_QUALITY,
+			.lfPitchAndFamily = FIXED_PITCH,
+			.lfFaceName = L"ＭＳ ゴシック"
+		};
+
+		// ちっこいフォント //
+		logfont.lfHeight = 14;
+		logfont.lfWidth = 7;
+		logfont.lfWeight = FW_NORMAL;
+		ret[FONT_ID::SMALL] = logfont;
+
+		// 並なフォント //
+		logfont.lfHeight = 16;
+		logfont.lfWidth = 8;
+		logfont.lfWeight = FW_NORMAL;
+		ret[FONT_ID::NORMAL] = logfont;
+
+		// でかいフォント //
+		logfont.lfHeight = 24;
+		logfont.lfWidth = 12;
+		logfont.lfWeight = FW_MEDIUM;
+		ret[FONT_ID::LARGE] = logfont;
+
+		return ret;
+	}();
+#endif
+
 // Glyph selection inside the 16×16 font //
 std::optional<PIXEL_LTRB> Glyph16x16(char c)
 {
@@ -180,55 +222,7 @@ extern void GrpPutMidNum(int x, int y, int n)
 	}
 }
 
-struct GDI_FONTS {
-	ENUMARRAY<HFONT, FONT_ID> fonts;
-
-	GDI_FONTS() noexcept
-	{
-		LOGFONTW logfont = {
-			.lfEscapement = 0,
-			.lfOrientation = 0,
-			.lfItalic = false,
-			.lfUnderline = false,
-			.lfStrikeOut = false,
-			.lfCharSet = SHIFTJIS_CHARSET,
-			.lfOutPrecision = OUT_TT_ONLY_PRECIS,
-			.lfClipPrecision = CLIP_DEFAULT_PRECIS,
-			.lfQuality = PROOF_QUALITY,
-			.lfPitchAndFamily = FIXED_PITCH,
-			.lfFaceName = L"ＭＳ ゴシック"
-		};
-
-		// でかいフォント //
-		logfont.lfHeight = 24;
-		logfont.lfWidth = 12;
-		logfont.lfWeight = FW_MEDIUM;
-		fonts[FONT_ID::LARGE] = CreateFontIndirectW(&logfont);
-
-		// 並なフォント //
-		logfont.lfHeight = 16;
-		logfont.lfWidth = 8;
-		logfont.lfWeight = FW_NORMAL;
-		fonts[FONT_ID::NORMAL] = CreateFontIndirectW(&logfont);
-
-		// ちっこいフォント //
-		logfont.lfHeight = 14;
-		logfont.lfWidth = 7;
-		logfont.lfWeight = FW_NORMAL;
-		fonts[FONT_ID::SMALL] = CreateFontIndirectW(&logfont);
-	}
-
-	~GDI_FONTS() {
-		for(auto& font : fonts) {
-			if(font) {
-				DeleteObject(font);
-			}
-		}
-	}
-};
-GDI_FONTS GDIFonts;
-
-TEXTRENDER_GDI TextObj = { GDIFonts.fonts };
+TEXTRENDER_GDI TextObj;
 
 PIXEL_SIZE DrawGrdFont(
 	TEXTRENDER_RECT_ID rect_id, std::span<const Narrow::string_view> strs

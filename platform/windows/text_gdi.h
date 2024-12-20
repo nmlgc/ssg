@@ -8,7 +8,6 @@
 #include "game/text_packed.h"
 #include "platform/graphics_backend.h"
 #include <assert.h>
-#include <windows.h>
 
 class TEXTRENDER_GDI_SESSION {
 protected:
@@ -16,7 +15,6 @@ protected:
 	// Thankfully, this type doesn't even require <windows.h>.
 	using HGDIOBJ = void *;
 
-	const ENUMARRAY<HFONT, FONT_ID>& fonts;
 	std::optional<HGDIOBJ> font_initial = std::nullopt;
 
 	// A COLORREF created with the RGB macro always has 0x00 in the topmost 8
@@ -56,17 +54,13 @@ public:
 		return f(p);
 	}
 
-	TEXTRENDER_GDI_SESSION(
-		const PIXEL_LTWH& rect, const ENUMARRAY<HFONT, FONT_ID>& fonts
-	);
+	TEXTRENDER_GDI_SESSION(const PIXEL_LTWH& rect);
 	~TEXTRENDER_GDI_SESSION();
 };
 
 static_assert(TEXTRENDER_SESSION<TEXTRENDER_GDI_SESSION>);
 
 class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
-	ENUMARRAY<HFONT, FONT_ID>& fonts;
-
 	bool Wipe();
 
 	// Common rendering preparation code.
@@ -75,10 +69,6 @@ class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
 	);
 
 public:
-	// Can share the font array with other GDI renderers.
-	TEXTRENDER_GDI(decltype(fonts)& fonts) : fonts(fonts) {
-	}
-
 	void WipeBeforeNextRender();
 
 	PIXEL_SIZE TextExtent(FONT_ID font, Narrow::string_view str);

@@ -7,6 +7,31 @@
 #include "platform/windows/surface_gdi.h"
 #include "platform/windows/utf.h"
 
+extern const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs;
+
+static class {
+	ENUMARRAY<HFONT, FONT_ID> arr;
+
+public:
+	HFONT ForID(FONT_ID font)
+	{
+		if(!arr[font]) {
+			arr[font] = CreateFontIndirectW(&FontSpecs[font]);
+		}
+		return arr[font];
+	}
+
+	void Cleanup(void)
+	{
+		for(auto& font : arr) {
+			if(font) {
+				DeleteObject(font);
+				font = nullptr;
+			}
+		}
+	}
+} Fonts;
+
 PIXEL_SIZE TextGDIExtent(std::optional<HFONT> font, Narrow::string_view str)
 {
 	const auto hdc = GrpSurface_GDIText_Surface().dc;
@@ -56,9 +81,8 @@ void TEXTRENDER_GDI_SESSION::PIXELACCESS::Set(
 	SetRaw(xy_rel, RGB(color.r, color.g, color.b));
 }
 
-TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(
-	const PIXEL_LTWH& rect, const ENUMARRAY<HFONT, FONT_ID>& fonts
-) : rect(rect), fonts(fonts)
+TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(const PIXEL_LTWH& rect) :
+	rect(rect)
 {
 	const auto hdc = GrpSurface_GDIText_Surface().dc;
 
@@ -88,7 +112,7 @@ void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 {
 	if(font_cur != font) {
 		const auto hdc = GrpSurface_GDIText_Surface().dc;
-		auto font_prev = SelectObject(hdc, fonts[font]);
+		auto font_prev = SelectObject(hdc, Fonts.ForID(font));
 		if(!font_initial) {
 			font_initial = font_prev;
 		}
@@ -159,7 +183,7 @@ std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::PreparePrerender(
 		return std::nullopt;
 	}
 	assert(rect_id < rects.size());
-	return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect, fonts };
+	return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect };
 }
 
 void TEXTRENDER_GDI::WipeBeforeNextRender()
@@ -173,7 +197,7 @@ void TEXTRENDER_GDI::WipeBeforeNextRender()
 
 PIXEL_SIZE TEXTRENDER_GDI::TextExtent(FONT_ID font, Narrow::string_view str)
 {
-	return TextGDIExtent(fonts[font], str);
+	return TextGDIExtent(Fonts.ForID(font), str);
 }
 
 bool TEXTRENDER_GDI::Blit(
@@ -184,4 +208,9 @@ bool TEXTRENDER_GDI::Blit(
 {
 	const PIXEL_LTRB rect = Subrect(rect_id, subrect);
 	return GrpSurface_Blit(dst, SURFACE_ID::TEXT, rect);
+}
+
+void TextBackend_Cleanup(void)
+{
+	Fonts.Cleanup();
 }

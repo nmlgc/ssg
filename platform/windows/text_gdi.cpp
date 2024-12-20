@@ -3,7 +3,7 @@
  *
  */
 
-#include "platform/windows/text_gdi.h"
+#include "platform/text_backend.h"
 #include "platform/windows/surface_gdi.h"
 #include "platform/windows/utf.h"
 
@@ -26,6 +26,35 @@ PIXEL_SIZE TextGDIExtent(
 		SelectObject(hdc, font_prev);
 	}
 	return ret;
+}
+
+uint32_t TEXTRENDER_GDI_SESSION::PIXELACCESS::GetRaw(const PIXEL_POINT& xy_rel)
+{
+	const auto hdc = GrpSurface_GDIText_Surface().dc;
+	return GetPixel(hdc, (rect.left + xy_rel.x), (rect.top + xy_rel.y));
+}
+
+void TEXTRENDER_GDI_SESSION::PIXELACCESS::SetRaw(
+	const PIXEL_POINT& xy_rel, uint32_t color
+)
+{
+	const auto hdc = GrpSurface_GDIText_Surface().dc;
+	SetPixelV(hdc, (rect.left + xy_rel.x), (rect.top + xy_rel.y), color);
+}
+
+RGBA TEXTRENDER_GDI_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
+{
+	const auto ret = GetRaw(xy_rel);
+	return RGBA{
+		.r = GetRValue(ret), .g = GetGValue(ret), .b = GetBValue(ret)
+	};
+}
+
+void TEXTRENDER_GDI_SESSION::PIXELACCESS::Set(
+	const PIXEL_POINT& xy_rel, const RGBA color
+)
+{
+	SetRaw(xy_rel, RGB(color.r, color.g, color.b));
 }
 
 TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(

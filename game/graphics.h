@@ -28,6 +28,8 @@ struct RGBA {
 	uint8_t g;
 	uint8_t b;
 	uint8_t a;
+
+	constexpr bool operator==(const RGBA& other) const = default;
 };
 static_assert(sizeof(RGBA) == 4);
 

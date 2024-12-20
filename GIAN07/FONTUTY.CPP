@@ -237,10 +237,16 @@ PIXEL_SIZE DrawGrdFont(
 	PIXEL_SIZE extent = { 0, 0 };
 	TextObj.Prerender(rect_id, [&](TEXTRENDER_SESSION auto& s) {
 		// ここら辺は、一種の常套手段か？ //
-		const auto old = GetPixel(s.hdc, 0, 0);
-		SetPixelV(s.hdc, 0, 0, RGB(255, 255, 255));
-		const auto temp = GetPixel(s.hdc, 0, 0);
-		SetPixelV(s.hdc, 0, 0, old);
+		const auto temp = s.PixelAccess([](
+			TEXTRENDER_SESSION_PIXELACCESS auto& p
+		) {
+			const PIXEL_POINT coord = { 0, 0 };
+			const auto old = p.GetRaw(coord);
+			p.Set(coord, RGBA{ 255, 255, 255 });
+			const auto temp = p.GetRaw(coord);
+			p.SetRaw(coord, old);
+			return temp;
+		});
 
 		s.SetFont(FONT_ID::NORMAL);
 		for(const auto& str : strs) {
@@ -254,15 +260,18 @@ PIXEL_SIZE DrawGrdFont(
 		constexpr auto FSIZE = 8;
 		const PIXEL_COORD w = extent.w;
 		const PIXEL_COORD h = extent.h;
-		for(auto y = (s.rect.top + 1); y < (s.rect.top + h); y++) {
-			const auto gradient = (255 + FSIZE - (y * FSIZE));
-			const COLORREF color = RGB(gradient, gradient, 255);
-			for(auto x = (s.rect.left + 1); x < (s.rect.left + w); x++) {
-				if(GetPixel(s.hdc, x, y) == temp) { // RGB(255, 255, 255)
-					SetPixelV(s.hdc, x, y, color);
+
+		s.PixelAccess([&](TEXTRENDER_SESSION_PIXELACCESS auto& p) {
+			for(auto y = 1; y < h; y++) {
+				const uint8_t gradient = (255 + FSIZE - (y * FSIZE));
+				const RGBA color = { gradient, gradient, 255 };
+				for(auto x = 1; x < w; x++) {
+					if(p.GetRaw({ x, y }) == temp) { // RGB(255, 255, 255)
+						p.Set({ x, y }, color);
+					}
 				}
 			}
-		}
+		});
 	});
 	return extent;
 }

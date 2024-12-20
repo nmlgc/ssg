@@ -23,6 +23,21 @@ protected:
 
 	FONT_ID font_cur = FONT_ID::COUNT;
 
+	class PIXELACCESS {
+		const PIXEL_LTWH rect;
+
+	public:
+		uint32_t GetRaw(const PIXEL_POINT& xy_rel);
+		void SetRaw(const PIXEL_POINT& xy_rel, uint32_t col);
+
+		RGBA Get(const PIXEL_POINT& xy_rel);
+		void Set(const PIXEL_POINT& xy_rel, const RGBA col);
+
+		PIXELACCESS(const PIXEL_LTWH rect) : rect(rect) {
+		}
+	};
+	static_assert(TEXTRENDER_SESSION_PIXELACCESS<PIXELACCESS>);
+
 public:
 	const PIXEL_LTWH rect;
 	HDC hdc;
@@ -35,6 +50,10 @@ public:
 		Narrow::string_view str,
 		std::optional<RGBA> color = std::nullopt
 	);
+	auto PixelAccess(std::invocable<PIXELACCESS&> auto f) {
+		PIXELACCESS p = { rect };
+		return f(p);
+	}
 
 	TEXTRENDER_GDI_SESSION(
 		const PIXEL_LTWH& rect, HDC hdc, const ENUMARRAY<HFONT, FONT_ID>& fonts

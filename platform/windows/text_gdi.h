@@ -12,9 +12,11 @@
 
 class TEXTRENDER_GDI_SESSION {
 protected:
-	const ENUMARRAY<HFONT, FONT_ID>& fonts;
-
 	// HFONT would require a cast of the value returned from SelectObject().
+	// Thankfully, this type doesn't even require <windows.h>.
+	using HGDIOBJ = void *;
+
+	const ENUMARRAY<HFONT, FONT_ID>& fonts;
 	std::optional<HGDIOBJ> font_initial = std::nullopt;
 
 	// A COLORREF created with the RGB macro always has 0x00 in the topmost 8

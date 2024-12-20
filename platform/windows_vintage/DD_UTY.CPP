@@ -574,7 +574,7 @@ bool GRAPHICS_DDRAW::SurfaceCreateUninitialized(
 	return true;
 }
 
-SURFACE_GDI& GrpSurface_GDIText_Surface(void)
+SURFACE_GDI& GrpSurface_GDIText_Surface(void) noexcept
 {
 	return DxSurf[SURFACE_ID::TEXT];
 }

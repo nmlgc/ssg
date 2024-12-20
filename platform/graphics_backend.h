@@ -117,7 +117,7 @@ void GrpSurface_BlitOpaque(
 	class SURFACE_GDI;
 
 	// Returns a reference to the backend's designated GDI text surface.
-	SURFACE_GDI& GrpSurface_GDIText_Surface(void);
+	SURFACE_GDI& GrpSurface_GDIText_Surface(void) noexcept;
 
 	// (Re-)creates the backend's designated GDI text surface with the given
 	// size and undefined initial contents. [w] and [h] have already been

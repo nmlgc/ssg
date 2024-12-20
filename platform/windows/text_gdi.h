@@ -40,7 +40,6 @@ protected:
 
 public:
 	const PIXEL_LTWH rect;
-	HDC hdc;
 
 	void SetFont(FONT_ID font);
 	void SetColor(const RGBA& color);
@@ -56,7 +55,7 @@ public:
 	}
 
 	TEXTRENDER_GDI_SESSION(
-		const PIXEL_LTWH& rect, HDC hdc, const ENUMARRAY<HFONT, FONT_ID>& fonts
+		const PIXEL_LTWH& rect, const ENUMARRAY<HFONT, FONT_ID>& fonts
 	);
 	~TEXTRENDER_GDI_SESSION();
 };

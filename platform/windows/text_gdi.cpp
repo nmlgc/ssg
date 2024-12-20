@@ -7,10 +7,9 @@
 #include "platform/windows/surface_gdi.h"
 #include "platform/windows/utf.h"
 
-PIXEL_SIZE TextGDIExtent(
-	HDC hdc, std::optional<HFONT> font, Narrow::string_view str
-)
+PIXEL_SIZE TextGDIExtent(std::optional<HFONT> font, Narrow::string_view str)
 {
+	const auto hdc = GrpSurface_GDIText_Surface().dc;
 	const auto font_prev = (font ? SelectObject(hdc, font.value()) : nullptr);
 	const auto ret = UTF::WithUTF16<PIXEL_SIZE>(
 		str, [&](const std::wstring_view str_w) {
@@ -58,10 +57,11 @@ void TEXTRENDER_GDI_SESSION::PIXELACCESS::Set(
 }
 
 TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(
-	const PIXEL_LTWH& rect, HDC hdc, const ENUMARRAY<HFONT, FONT_ID>& fonts
-) :
-	rect(rect), hdc(hdc), fonts(fonts)
+	const PIXEL_LTWH& rect, const ENUMARRAY<HFONT, FONT_ID>& fonts
+) : rect(rect), fonts(fonts)
 {
+	const auto hdc = GrpSurface_GDIText_Surface().dc;
+
 	// Clear the rectangle, for two reasons:
 	// • The caller is free to render multiple transparent strings on top
 	//   of each other, so we can't rely on SetBkMode(hdc, OPAQUE).
@@ -79,6 +79,7 @@ TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(
 TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
 {
 	if(font_initial) {
+		const auto hdc = GrpSurface_GDIText_Surface().dc;
 		SelectObject(hdc, font_initial.value());
 	}
 }
@@ -86,6 +87,7 @@ TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
 void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 {
 	if(font_cur != font) {
+		const auto hdc = GrpSurface_GDIText_Surface().dc;
 		auto font_prev = SelectObject(hdc, fonts[font]);
 		if(!font_initial) {
 			font_initial = font_prev;
@@ -97,6 +99,7 @@ void TEXTRENDER_GDI_SESSION::SetColor(const RGBA& color)
 {
 	const COLORREF color_gdi = RGB(color.r, color.g, color.b);
 	if(color_cur != color_gdi) {
+		const auto hdc = GrpSurface_GDIText_Surface().dc;
 		SetTextColor(hdc, color_gdi);
 		color_cur = color_gdi;
 	}
@@ -104,7 +107,7 @@ void TEXTRENDER_GDI_SESSION::SetColor(const RGBA& color)
 
 PIXEL_SIZE TEXTRENDER_GDI_SESSION::Extent(Narrow::string_view str)
 {
-	return TextGDIExtent(hdc, std::nullopt, str);
+	return TextGDIExtent(std::nullopt, str);
 }
 
 void TEXTRENDER_GDI_SESSION::Put(
@@ -114,6 +117,7 @@ void TEXTRENDER_GDI_SESSION::Put(
 )
 {
 	UTF::WithUTF16<int>(str, [&](const std::wstring_view str_w) {
+		const auto hdc = GrpSurface_GDIText_Surface().dc;
 		if(color) {
 			SetColor(color.value());
 		}
@@ -150,12 +154,12 @@ std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::PreparePrerender(
 	TEXTRENDER_RECT_ID rect_id
 )
 {
-	auto& surf = GrpSurface_GDIText_Surface();
+	const auto& surf = GrpSurface_GDIText_Surface();
 	if((surf.size != bounds) && !Wipe()) {
 		return std::nullopt;
 	}
 	assert(rect_id < rects.size());
-	return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect, surf.dc, fonts };
+	return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect, fonts };
 }
 
 void TEXTRENDER_GDI::WipeBeforeNextRender()
@@ -169,7 +173,7 @@ void TEXTRENDER_GDI::WipeBeforeNextRender()
 
 PIXEL_SIZE TEXTRENDER_GDI::TextExtent(FONT_ID font, Narrow::string_view str)
 {
-	return TextGDIExtent(GrpSurface_GDIText_Surface().dc, fonts[font], str);
+	return TextGDIExtent(fonts[font], str);
 }
 
 bool TEXTRENDER_GDI::Blit(

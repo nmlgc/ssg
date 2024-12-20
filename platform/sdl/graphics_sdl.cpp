@@ -1021,7 +1021,7 @@ static SURFACE_GDI GrText;
 static uint32_t GDIText_ColorKey;
 static uint32_t GDIText_AlphaMask;
 
-SURFACE_GDI& GrpSurface_GDIText_Surface(void)
+SURFACE_GDI& GrpSurface_GDIText_Surface(void) noexcept
 {
 	return GrText;
 }

@@ -119,7 +119,7 @@ SDL_Color HelpColorFrom(const RGBA& o)
 	return SDL_Color{ .r = o.r, .g = o.g, .b = o.b, .a = o.a };
 }
 
-SDL_Rect HelpRectFrom(const PIXEL_LTWH& o)
+SDL_Rect HelpRectFrom(const PIXEL_LTWH& o) noexcept
 {
 	return SDL_Rect{ .x = o.left, .y = o.top, .w = o.w, .h = o.h };
 }
@@ -883,6 +883,30 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 /// Surfaces
 /// --------
 
+bool CreateTextureWithFormat(
+	SURFACE_ID sid, uint32_t fmt, const PIXEL_SIZE& size
+)
+{
+	auto& tex = Textures[sid];
+	tex = SafeDestroy(SDL_DestroyTexture, tex);
+
+	tex = HelpCreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING, size.w, size.h);
+	if(!tex) {
+		Log_Fail(LOG_CAT, "Error creating blank texture");
+		return false;
+	}
+	if(SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND) != 0) {
+		Log_Fail(LOG_CAT, "Error enabling alpha blending for GDI text texture");
+		return false;
+	}
+	return true;
+}
+
+bool GrpSurface_CreateUninitialized(SURFACE_ID sid, const PIXEL_SIZE& size)
+{
+	return CreateTextureWithFormat(sid, SoftwareSurface->format->format, size);
+}
+
 bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
 {
 	auto& tex = Textures[sid];
@@ -915,6 +939,28 @@ bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
 }
 
 bool GrpSurface_PaletteApplyToBackend(SURFACE_ID) { return true; }
+
+bool GrpSurface_Update(
+	SURFACE_ID sid,
+	const PIXEL_LTWH* subrect,
+	std::tuple<const std::byte *, size_t> pixels
+) noexcept
+{
+	const auto [buf, pitch] = pixels;
+	if(pitch > std::numeric_limits<int>::max()) {
+		SDL_LogCritical(
+			LOG_CAT, "Pitch of %zu bytes does not fit into an integer.", pitch
+		);
+		return false;
+	}
+
+	auto *tex = Textures[sid];
+	if(!subrect) {
+		return (SDL_UpdateTexture(tex, nullptr, buf, pitch) == 0);
+	}
+	const auto rect = HelpRectFrom(*subrect);
+	return (SDL_UpdateTexture(tex, &rect, buf, pitch) == 0);
+}
 
 bool GrpSurface_Blit(
 	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
@@ -965,9 +1011,6 @@ SURFACE_GDI& GrpSurface_GDIText_Surface(void)
 
 bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
 {
-	auto& tex = Textures[SURFACE_ID::TEXT];
-
-	tex = SafeDestroy(SDL_DestroyTexture, tex);
 	GrText.Delete();
 
 	const auto formats = std::span(
@@ -1016,19 +1059,9 @@ bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
 	}
 	GrText.size = { w, h };
 	GrText.stock_img = SelectObject(GrText.dc, GrText.img);
-
-	tex = HelpCreateTexture(
-		GDITEXT_SDL_FORMAT, SDL_TEXTUREACCESS_STREAMING, w, h
+	return CreateTextureWithFormat(
+		SURFACE_ID::TEXT, GDITEXT_SDL_FORMAT, { w, h }
 	);
-	if(!tex) {
-		Log_Fail(LOG_CAT, "Error creating blank texture");
-		return false;
-	}
-	if(SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND) != 0) {
-		Log_Fail(LOG_CAT, "Error enabling alpha blending for GDI text texture");
-		return false;
-	}
-	return true;
 }
 
 bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)
@@ -1057,10 +1090,8 @@ bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)
 		}
 		row_p += dib.dsBm.bmWidthBytes;
 	};
-
-	auto *tex = Textures[SURFACE_ID::TEXT];
-	const auto rect = HelpRectFrom(r);
-	return (SDL_UpdateTexture(tex, &rect, pixels, dib.dsBm.bmWidthBytes) == 0);
+	const auto pitch = static_cast<size_t>(dib.dsBm.bmWidthBytes);
+	return GrpSurface_Update(SURFACE_ID::TEXT, &r, { pixels, pitch });
 }
 #endif
 // -------------------------------

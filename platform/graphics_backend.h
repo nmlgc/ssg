@@ -76,11 +76,25 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
 /// --------
 struct BMP_OWNED;
 
+// (Re-)creates the texture in the given surface slot with the given size,
+// using the format indicated by GrpBackend_PixelFormat(), and with undefined
+// initial contents.
+bool GrpSurface_CreateUninitialized(SURFACE_ID sid, const PIXEL_SIZE& size);
+
 // Consumes the given .BMP file and sets the given surface to its contents,
 // re-creating it in the correct size if necessary.
 bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp);
 
 bool GrpSurface_PaletteApplyToBackend(SURFACE_ID sid);
+
+// Uploads [pixels] (consisting of a pointer and a row pitch) to a [subrect] of
+// [sid]. [subrect] can be a `nullptr` to overwrite the entire texture. The
+// [pixels] have to use the format indicated by GrpBackend_PixelFormat().
+bool GrpSurface_Update(
+	SURFACE_ID sid,
+	const PIXEL_LTWH* subrect,
+	std::tuple<const std::byte *, size_t> pixels
+) noexcept;
 
 // Blits the given [src] rectangle inside [sid] to the given top-left point
 // on the backbuffer while clipping the destination rectangle to the clipping

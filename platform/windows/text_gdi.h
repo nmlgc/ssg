@@ -30,8 +30,8 @@ protected:
 		uint32_t GetRaw(const PIXEL_POINT& xy_rel);
 		void SetRaw(const PIXEL_POINT& xy_rel, uint32_t col);
 
-		RGBA Get(const PIXEL_POINT& xy_rel);
-		void Set(const PIXEL_POINT& xy_rel, const RGBA col);
+		RGB Get(const PIXEL_POINT& xy_rel);
+		void Set(const PIXEL_POINT& xy_rel, const RGB col);
 
 		PIXELACCESS(const PIXEL_LTWH rect) : rect(rect) {
 		}
@@ -42,12 +42,12 @@ public:
 	const PIXEL_LTWH rect;
 
 	void SetFont(FONT_ID font);
-	void SetColor(const RGBA& color);
+	void SetColor(const RGB color);
 	PIXEL_SIZE Extent(Narrow::string_view str);
 	void Put(
 		const PIXEL_POINT& topleft_rel,
 		Narrow::string_view str,
-		std::optional<RGBA> color = std::nullopt
+		std::optional<RGB> color = std::nullopt
 	);
 	auto PixelAccess(std::invocable<PIXELACCESS&> auto f) {
 		PIXELACCESS p = { rect };

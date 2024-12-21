@@ -11,8 +11,8 @@
 
 std::optional<MUSICROOM_TEXT> MusicRoomText;
 
-static constexpr RGBA ColorHighlight = {  51, 102, 153 };
-static constexpr RGBA ColorDefault   = { 153, 204, 255 };
+static constexpr RGB ColorHighlight = {  51, 102, 153 };
+static constexpr RGB ColorDefault   = { 153, 204, 255 };
 
 MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 {

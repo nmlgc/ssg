@@ -236,7 +236,7 @@ PIXEL_SIZE DrawGrdFont(
 		) {
 			const PIXEL_POINT coord = { 0, 0 };
 			const auto old = p.GetRaw(coord);
-			p.Set(coord, RGBA{ 255, 255, 255 });
+			p.Set(coord, RGB{ 255, 255, 255 });
 			const auto temp = p.GetRaw(coord);
 			p.SetRaw(coord, old);
 			return temp;
@@ -244,10 +244,10 @@ PIXEL_SIZE DrawGrdFont(
 
 		s.SetFont(FONT_ID::NORMAL);
 		for(const auto& str : strs) {
-			s.Put({ (extent.w + 2), 2 }, str, RGBA{   0,   0, 128 });
-			s.Put({ (extent.w + 1), 2 }, str, RGBA{   0,   0, 128 });
-			s.Put({ (extent.w + 1), 1 }, str, RGBA{ 255, 255, 255 });
-			s.Put({ (extent.w + 0), 1 }, str, RGBA{ 255, 255, 255 });
+			s.Put({ (extent.w + 2), 2 }, str, RGB{   0,   0, 128 });
+			s.Put({ (extent.w + 1), 2 }, str, RGB{   0,   0, 128 });
+			s.Put({ (extent.w + 1), 1 }, str, RGB{ 255, 255, 255 });
+			s.Put({ (extent.w + 0), 1 }, str, RGB{ 255, 255, 255 });
 			extent += s.Extent(str);
 		}
 
@@ -258,7 +258,7 @@ PIXEL_SIZE DrawGrdFont(
 		s.PixelAccess([&](TEXTRENDER_SESSION_PIXELACCESS auto& p) {
 			for(auto y = 1; y < h; y++) {
 				const uint8_t gradient = (255 + FSIZE - (y * FSIZE));
-				const RGBA color = { gradient, gradient, 255 };
+				const RGB color = { gradient, gradient, 255 };
 				for(auto x = 1; x < w; x++) {
 					if(p.GetRaw({ x, y }) == temp) { // RGB(255, 255, 255)
 						p.Set({ x, y }, color);

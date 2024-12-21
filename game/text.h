@@ -20,7 +20,7 @@ template <class T> concept TEXTRENDER_SESSION = (
 		T t,
 		PIXEL_POINT topleft_rel,
 		Narrow::string_view str,
-		RGBA color,
+		RGB color,
 		FONT_ID font
 	) {
 		{ t.rect } -> std::same_as<const PIXEL_LTWH&>;

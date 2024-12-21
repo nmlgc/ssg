@@ -66,16 +66,14 @@ void TEXTRENDER_GDI_SESSION::PIXELACCESS::SetRaw(
 	SetPixelV(hdc, (rect.left + xy_rel.x), (rect.top + xy_rel.y), color);
 }
 
-RGBA TEXTRENDER_GDI_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
+RGB TEXTRENDER_GDI_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
 {
 	const auto ret = GetRaw(xy_rel);
-	return RGBA{
-		.r = GetRValue(ret), .g = GetGValue(ret), .b = GetBValue(ret)
-	};
+	return RGB{ .r = GetRValue(ret), .g = GetGValue(ret), .b = GetBValue(ret) };
 }
 
 void TEXTRENDER_GDI_SESSION::PIXELACCESS::Set(
-	const PIXEL_POINT& xy_rel, const RGBA color
+	const PIXEL_POINT& xy_rel, const RGB color
 )
 {
 	SetRaw(xy_rel, RGB(color.r, color.g, color.b));
@@ -120,7 +118,7 @@ void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 	}
 }
 
-void TEXTRENDER_GDI_SESSION::SetColor(const RGBA& color)
+void TEXTRENDER_GDI_SESSION::SetColor(const RGB color)
 {
 	const COLORREF color_gdi = RGB(color.r, color.g, color.b);
 	if(color_cur != color_gdi) {
@@ -138,7 +136,7 @@ PIXEL_SIZE TEXTRENDER_GDI_SESSION::Extent(Narrow::string_view str)
 void TEXTRENDER_GDI_SESSION::Put(
 	const PIXEL_POINT& topleft_rel,
 	Narrow::string_view str,
-	std::optional<RGBA> color
+	std::optional<RGB> color
 )
 {
 	UTF::WithUTF16<int>(str, [&](const std::wstring_view str_w) {

@@ -172,8 +172,8 @@ void CWinMove(WINDOW_SYSTEM *ws)
 void CWinDraw(WINDOW_SYSTEM *ws)
 {
 	struct COLOR_PAIR {
-		RGBA shadow;
-		RGBA text;
+		RGB shadow;
+		RGB text;
 	};
 
 	static constexpr ENUMARRAY<COLOR_PAIR, WINDOW_STATE> COL = {{
@@ -432,9 +432,9 @@ void MWinDraw(void)
 				);
 
 				// 灰色で１どっとずらして描画
-				s.Put({ (left + 1), top }, line, RGBA{ 128, 128, 128 });
+				s.Put({ (left + 1), top }, line, RGB{ 128, 128, 128 });
 				// 白で表示すべき位置に表示
-				s.Put({ (left + 0), top }, line, RGBA{ 255, 255, 255 });
+				s.Put({ (left + 0), top }, line, RGB{ 255, 255, 255 });
 			}
 		});
 	}

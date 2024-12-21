@@ -41,6 +41,8 @@ struct RGB {
 	constexpr RGBA WithAlpha(uint8_t a) const {
 		return RGBA{ .r = r, .g = g, .b = b, .a = a };
 	}
+
+	constexpr bool operator==(const RGB& other) const = default;
 };
 static_assert(sizeof(RGB) == 3);
 

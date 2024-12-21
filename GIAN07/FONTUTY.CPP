@@ -48,6 +48,16 @@
 
 		return ret;
 	}();
+#elif defined(LINUX)
+	#define GOTHIC "MS Gothic,IPAMonaGothic "
+
+	extern constinit const ENUMARRAY<const char *, FONT_ID> FontSpecs = {
+		(GOTHIC "Regular 14px"),
+		(GOTHIC "Regular 16px"),
+		(GOTHIC "Medium 24px"),
+	};
+
+	#undef GOTHIC
 #endif
 
 // Glyph selection inside the 16×16 font //

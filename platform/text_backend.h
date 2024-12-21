@@ -21,6 +21,8 @@ template <class T> concept TEXTRENDER_SESSION_PIXELACCESS = requires(
 
 #ifdef WIN32
 	#include "platform/windows/text_gdi.h"
+#elif defined(LINUX)
+	#include "platform/pangocairo/text_pangocairo.h"
 #endif
 
 // Shuts down the backend, deleting all fonts.

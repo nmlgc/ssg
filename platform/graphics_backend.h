@@ -126,7 +126,7 @@ void GrpSurface_BlitOpaque(
 	// GrpSurface_GDIText_Update() to upload them to the backend.
 	bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey);
 
-	bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r);
+	bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r) noexcept;
 	// -------------------------------
 #endif
 /// --------

@@ -49,14 +49,6 @@ PIXEL_COORD TextLayoutXCenter(auto& s, Narrow::string_view str) {
 	return ((s.rect.w - s.Extent(str).w) / 2);
 }
 
-// Concept that describes valid text rendering session functors in game code.
-template <typename F, class Session> concept TEXTRENDER_SESSION_FUNC = (
-	TEXTRENDER_SESSION<Session> &&
-	requires(F f, Session& s) {
-		{ f(s) };
-	}
-);
-
 // Just here to keep the TEXTRENDER concept from requiring an impossible
 // template parameter for the session functor.
 struct TEXTRENDER_SESSION_FUNC_ARCHETYPE {

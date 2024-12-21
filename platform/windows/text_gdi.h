@@ -7,7 +7,6 @@
 
 #include "game/text_packed.h"
 #include "platform/graphics_backend.h"
-#include <assert.h>
 
 class TEXTRENDER_GDI_SESSION {
 protected:
@@ -60,55 +59,15 @@ public:
 
 static_assert(TEXTRENDER_SESSION<TEXTRENDER_GDI_SESSION>);
 
-class TEXTRENDER_GDI : public TEXTRENDER_PACKED {
-	bool Wipe();
+class TEXTRENDER_GDI : public TEXTRENDER_PACKED<TEXTRENDER_GDI_SESSION> {
+	friend class TEXTRENDER_PACKED;
 
-	// Common rendering preparation code.
-	std::optional<TEXTRENDER_GDI_SESSION> PreparePrerender(
-		TEXTRENDER_RECT_ID rect_id
-	);
+	bool Wipe();
+	std::optional<TEXTRENDER_GDI_SESSION> Session(TEXTRENDER_RECT_ID rect_id);
 
 public:
 	void WipeBeforeNextRender();
-
 	PIXEL_SIZE TextExtent(FONT_ID font, Narrow::string_view str);
-
-	bool Prerender(
-		TEXTRENDER_RECT_ID rect_id,
-		TEXTRENDER_SESSION_FUNC<TEXTRENDER_GDI_SESSION> auto func
-	) {
-		auto maybe_session = PreparePrerender(rect_id);
-		if(!maybe_session) {
-			return false;
-		}
-		auto& session = maybe_session.value();
-		func(session);
-		return GrpSurface_GDIText_Update(session.rect);
-	}
-
-	bool Blit(
-		WINDOW_POINT dst,
-		TEXTRENDER_RECT_ID rect_id,
-		std::optional<PIXEL_LTWH> subrect = std::nullopt
-	);
-
-	bool Render(
-		WINDOW_POINT dst,
-		TEXTRENDER_RECT_ID rect_id,
-		Narrow::string_view contents,
-		TEXTRENDER_SESSION_FUNC<TEXTRENDER_GDI_SESSION> auto func,
-		std::optional<PIXEL_LTWH> subrect = std::nullopt
-	) {
-		assert(rect_id < rects.size());
-		auto& rect = rects[rect_id];
-		if(rect.contents != contents) {
-			if(!Prerender(rect_id, func)) {
-				return false;
-			}
-			rect.contents = contents;
-		}
-		return Blit(dst, rect_id, subrect);
-	}
 };
 
 static_assert(TEXTRENDER<TEXTRENDER_GDI>);

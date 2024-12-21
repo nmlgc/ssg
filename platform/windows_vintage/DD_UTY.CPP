@@ -100,7 +100,7 @@ int CLIP_Y_MAX = (GRP_RES.h - 1);
 static constexpr bool Fullscreen = true;
 
 bool STD_GrpBlt(const PIXEL_LTRB& src, int x, int y, SURFACE_DDRAW& surf);
-bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r);
+bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r) noexcept;
 
 
 // Ｚバッファを必要なら生成し、接続する //
@@ -604,7 +604,7 @@ bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
 	);
 }
 
-bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r)
+bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r) noexcept
 {
 	return SurfaceUpdateFromGDI(DxSurf[SURFACE_ID::TEXT], r);
 }
@@ -858,7 +858,7 @@ bool GRAPHICS_DDRAW::SurfaceRestore(SURFACE_DDRAW& surf)
 	return SurfaceSetColorKeyFromFirstPixel(surf);
 }
 
-bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r)
+bool SurfaceUpdateFromGDI(SURFACE_DDRAW& surf, const PIXEL_LTWH& r) noexcept
 {
 	HDC ddraw_dc;
 	if(surf.surf->GetDC(&ddraw_dc) != DD_OK) {

@@ -104,6 +104,7 @@ TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
 		const auto hdc = GrpSurface_GDIText_Surface().dc;
 		SelectObject(hdc, font_initial.value());
 	}
+	GrpSurface_GDIText_Update(rect);
 }
 
 void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
@@ -173,7 +174,7 @@ bool TEXTRENDER_GDI::Wipe()
 	);
 }
 
-std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::PreparePrerender(
+std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::Session(
 	TEXTRENDER_RECT_ID rect_id
 )
 {
@@ -197,16 +198,6 @@ void TEXTRENDER_GDI::WipeBeforeNextRender()
 PIXEL_SIZE TEXTRENDER_GDI::TextExtent(FONT_ID font, Narrow::string_view str)
 {
 	return TextGDIExtent(Fonts.ForID(font), str);
-}
-
-bool TEXTRENDER_GDI::Blit(
-	WINDOW_POINT dst,
-	TEXTRENDER_RECT_ID rect_id,
-	std::optional<PIXEL_LTWH> subrect
-)
-{
-	const PIXEL_LTRB rect = Subrect(rect_id, subrect);
-	return GrpSurface_Blit(dst, SURFACE_ID::TEXT, rect);
 }
 
 void TextBackend_Cleanup(void)

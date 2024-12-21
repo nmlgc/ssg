@@ -10,6 +10,7 @@
  */
 
 #include "game/text_packed.h"
+#include "platform/graphics_backend.h"
 #include <assert.h>
 
 struct created_splits {
@@ -97,7 +98,7 @@ created_splits insert_and_split(const PIXEL_SIZE& nw, const PIXEL_LTWH& sp)
 	return created_splits(bigger_split, lesser_split);
 }
 
-PIXEL_LTWH TEXTRENDER_PACKED::Insert(const PIXEL_SIZE& subrect_size)
+PIXEL_LTWH TEXTRENDER_PACKED_BASE::Insert(const PIXEL_SIZE& subrect_size)
 {
 	PIXEL_LTWH* closest = nullptr;
 
@@ -159,7 +160,7 @@ PIXEL_LTWH TEXTRENDER_PACKED::Insert(const PIXEL_SIZE& subrect_size)
 	return Insert(subrect_size);
 }
 
-PIXEL_LTWH TEXTRENDER_PACKED::Subrect(
+PIXEL_LTWH TEXTRENDER_PACKED_BASE::Subrect(
 	TEXTRENDER_RECT_ID rect_id, std::optional<PIXEL_LTWH> maybe_subrect
 ) {
 	assert(rect_id < rects.size());
@@ -174,13 +175,13 @@ PIXEL_LTWH TEXTRENDER_PACKED::Subrect(
 	return ret;
 }
 
-TEXTRENDER_RECT_ID TEXTRENDER_PACKED::Register(const PIXEL_SIZE& size)
+TEXTRENDER_RECT_ID TEXTRENDER_PACKED_BASE::Register(const PIXEL_SIZE& size)
 {
 	rects.emplace_back(Insert(size));
 	return static_cast<TEXTRENDER_RECT_ID>(rects.size() - 1);
 }
 
-bool TEXTRENDER_PACKED::Wipe()
+bool TEXTRENDER_PACKED_BASE::Wipe()
 {
 	for(auto& rect : rects) {
 		rect.contents = std::nullopt;
@@ -188,9 +189,19 @@ bool TEXTRENDER_PACKED::Wipe()
 	return true;
 }
 
-void TEXTRENDER_PACKED::Clear()
+void TEXTRENDER_PACKED_BASE::Clear()
 {
 	bounds = {};
 	spaces.clear();
 	rects.clear();
+}
+
+bool TEXTRENDER_PACKED_BASE::Blit(
+	WINDOW_POINT dst,
+	TEXTRENDER_RECT_ID rect_id,
+	std::optional<PIXEL_LTWH> subrect
+)
+{
+	const PIXEL_LTRB rect = Subrect(rect_id, subrect);
+	return GrpSurface_Blit(dst, SURFACE_ID::TEXT, rect);
 }

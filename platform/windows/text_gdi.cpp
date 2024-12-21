@@ -9,6 +9,8 @@
 
 extern const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs;
 
+TEXTRENDER_GDI TextObj;
+
 static class {
 	ENUMARRAY<HFONT, FONT_ID> arr;
 

@@ -21,8 +21,6 @@ template <class T> concept TEXTRENDER_SESSION_PIXELACCESS = requires(
 
 #ifdef WIN32
 	#include "platform/windows/text_gdi.h"
-
-	extern TEXTRENDER_GDI TextObj;
 #endif
 
 // Shuts down the backend, deleting all fonts.

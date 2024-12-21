@@ -71,3 +71,5 @@ public:
 };
 
 static_assert(TEXTRENDER<TEXTRENDER_GDI>);
+
+extern TEXTRENDER_GDI TextObj;

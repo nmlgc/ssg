@@ -222,8 +222,6 @@ extern void GrpPutMidNum(int x, int y, int n)
 	}
 }
 
-TEXTRENDER_GDI TextObj;
-
 PIXEL_SIZE DrawGrdFont(
 	TEXTRENDER_RECT_ID rect_id, std::span<const Narrow::string_view> strs
 )

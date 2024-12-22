@@ -116,6 +116,7 @@ void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 		if(!font_initial) {
 			font_initial = font_prev;
 		}
+		font_cur = font;
 	}
 }
 

@@ -18,12 +18,12 @@ TIME_OF_DAY Time_NowLocal()
 	const auto& tm   = *std::localtime(&ctime);
 
 	// Signed integers! Yay!
-	assert(tm.tm_year > 0);
-	assert(tm.tm_mon > 0);
-	assert(tm.tm_mday > 0);
-	assert(tm.tm_hour > 0);
-	assert(tm.tm_min > 0);
-	assert(tm.tm_sec > 0);
+	assert(tm.tm_year >= 0);
+	assert(tm.tm_mon >= 0);
+	assert(tm.tm_mday >= 0);
+	assert(tm.tm_hour >= 0);
+	assert(tm.tm_min >= 0);
+	assert(tm.tm_sec >= 0);
 
 	return TIME_OF_DAY{
 		.year   = static_cast<uint32_t>(1900 + tm.tm_year),

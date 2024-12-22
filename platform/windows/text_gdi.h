@@ -21,6 +21,7 @@ protected:
 	uint32_t color_cur = -1;
 
 	FONT_ID font_cur = FONT_ID::COUNT;
+	const PIXEL_LTWH rect;
 
 	class PIXELACCESS {
 		const PIXEL_LTWH rect;
@@ -38,8 +39,7 @@ protected:
 	static_assert(TEXTRENDER_SESSION_PIXELACCESS<PIXELACCESS>);
 
 public:
-	const PIXEL_LTWH rect;
-
+	PIXEL_SIZE RectSize(void) const;
 	void SetFont(FONT_ID font);
 	void SetColor(const RGB color);
 	PIXEL_SIZE Extent(Narrow::string_view str);

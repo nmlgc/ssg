@@ -109,6 +109,11 @@ TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
 	GrpSurface_GDIText_Update(rect);
 }
 
+PIXEL_SIZE TEXTRENDER_GDI_SESSION::RectSize(void) const
+{
+	return { rect.w, rect.h };
+}
+
 void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 {
 	if(font_cur != font) {

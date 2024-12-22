@@ -23,7 +23,7 @@ template <class T> concept TEXTRENDER_SESSION = (
 		RGB color,
 		FONT_ID font
 	) {
-		{ t.rect } -> std::same_as<const PIXEL_LTWH&>;
+		{ t.RectSize() } -> std::same_as<PIXEL_SIZE>;
 
 		t.SetFont(font);
 		t.SetColor(color);
@@ -44,9 +44,11 @@ template <class T> concept TEXTRENDER_SESSION = (
 	}
 );
 
-// Horizontally [str] on [s]'s rectangle.
-PIXEL_COORD TextLayoutXCenter(auto& s, Narrow::string_view str) {
-	return ((s.rect.w - s.Extent(str).w) / 2);
+// Horizontally centers [str] on [s]'s rectangle.
+PIXEL_COORD TextLayoutXCenter(
+	TEXTRENDER_SESSION auto& s, Narrow::string_view str
+) {
+	return ((s.RectSize().w - s.Extent(str).w) / 2);
 }
 
 // Just here to keep the TEXTRENDER concept from requiring an impossible

@@ -962,6 +962,18 @@ bool GrpSurface_Update(
 	return (SDL_UpdateTexture(tex, &rect, buf, pitch) == 0);
 }
 
+
+PIXEL_SIZE GrpSurface_Size(SURFACE_ID sid)
+{
+	PIXEL_SIZE ret = { 0, 0 };
+	auto *tex = Textures[sid];
+	if(!tex) {
+		return ret;
+	}
+	SDL_QueryTexture(tex, nullptr, nullptr, &ret.w, &ret.h);
+	return ret;
+}
+
 bool GrpSurface_Blit(
 	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
 )

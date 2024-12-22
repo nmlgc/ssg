@@ -96,6 +96,9 @@ bool GrpSurface_Update(
 	std::tuple<const std::byte *, size_t> pixels
 ) noexcept;
 
+// Returns the size of the given surface.
+PIXEL_SIZE GrpSurface_Size(SURFACE_ID sid);
+
 // Blits the given [src] rectangle inside [sid] to the given top-left point
 // on the backbuffer while clipping the destination rectangle to the clipping
 // area. Returns `true` if any part of the sprite was blitted.

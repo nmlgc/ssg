@@ -9,6 +9,9 @@ local XIPH_LINK = BuildXiph(CONFIG)
 MODERN = 0
 VINTAGE = 1
 
+-- Icon
+local ssg_ico = rc(CONFIG, SSG.join("GIAN07/GIAN07.rc"))
+
 ---@param variant integer
 local function ssg(variant)
 	local variant_cfg
@@ -108,6 +111,7 @@ local function ssg(variant)
 		ssg_obj = (ssg_obj + cxx(p_vintage_cfg, p_vintage_src))
 	end
 
+	ssg_obj = (ssg_obj + ssg_ico)
 	exe(platform_cfg, ssg_obj, ("GIAN07" .. variant_bin_suffix))
 end
 

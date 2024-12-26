@@ -229,6 +229,11 @@ void SwitchActiveRenderer(SDL_Renderer *new_renderer)
 
 bool PixelFormatSupported(uint32_t fmt)
 {
+	// Both screenshots and the Pango/Cairo text backend currently expect ARGB
+	// order.
+	if(SDL_PIXELORDER(fmt) == SDL_PACKEDORDER_ABGR) {
+		return false;
+	}
 	return (
 		(SDL_ISPIXELFORMAT_PACKED(fmt) || SDL_ISPIXELFORMAT_INDEXED(fmt)) &&
 		BITDEPTHS::find(SDL_BITSPERPIXEL(fmt))

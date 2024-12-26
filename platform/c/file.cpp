@@ -160,6 +160,10 @@ public:
 	}
 
 	bool Write(BYTE_BUFFER_BORROWED buf) override {
+		// fwrite() won't return 1 if we try to write a zero-sized buffer.
+		if(buf.empty()) {
+			return true;
+		}
 		return (fwrite(buf.data(), buf.size(), 1, fp) == 1);
 	};
 };

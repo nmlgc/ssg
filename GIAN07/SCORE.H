@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_SCORE_H)
 
 import std.compat;
+#include "game/string_format.h"
 
 
 
@@ -41,8 +42,8 @@ typedef struct tagNR_SCORE_STRING{
 	bool	bMoveEnable;	// 移動可能か？
 
 	char	Name[NR_NAME_LEN];		// 名前
-	char	Score[11+1];			// 得点
-	char	Evade[6+1];				// かすり
+	char	Score[STRING_NUM_CAP<decltype(NR_NAME_DATA::Score)> + 1]; // 得点
+	char	Evade[STRING_NUM_CAP<decltype(NR_NAME_DATA::Evade)> + 1]; // かすり
 	char	Stage[1+1];				// ステージ
 	uint8_t	Weapon;	// 装備
 } NR_SCORE_STRING;

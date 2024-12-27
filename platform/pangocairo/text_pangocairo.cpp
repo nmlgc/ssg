@@ -4,10 +4,17 @@
  */
 
 #include "platform/text_backend.h"
+#include "game/defer.h"
+#include <fontconfig/fontconfig.h>
 #include <pango/pangocairo.h>
 
 constexpr auto FORMAT = CAIRO_FORMAT_ARGB32;
 extern const ENUMARRAY<const char *, FONT_ID> FontSpecs;
+
+struct PANGOCAIRO_FONT {
+	PangoFontDescription *desc = nullptr;
+	cairo_hint_metrics_t hint_metrics = CAIRO_HINT_METRICS_DEFAULT;
+};
 
 struct PANGOCAIRO_STATE {
 	cairo_surface_t *surf = nullptr;
@@ -23,9 +30,58 @@ struct PANGOCAIRO_STATE {
 	explicit operator bool(void) const;
 	PANGOCAIRO_STATE& operator=(PANGOCAIRO_STATE&&) noexcept;
 
+	void SetFont(const PANGOCAIRO_FONT *);
 	void SetText(Narrow::string_view);
-	PIXEL_SIZE Extent(PangoFontDescription *, Narrow::string_view);
+	PIXEL_SIZE Extent(const PANGOCAIRO_FONT *, Narrow::string_view);
 };
+
+// Pango's hinting (which is, *of course*, controlled by a property in Cairo
+// that overrides Fontconfig and can't be overridden itself) renders MS Gothic
+// and IPAMonaGothic bitmaps 1 pixel lower than GDI… *except* for MS Gothic at
+// 16px, which happens to render pixel-perfectly. To check whether the game is
+// actually using the optionally installable MS Gothic, we have to run Pango's
+// font substitution, but the mere call to pango_font_map_load_font() already
+// irrevocably applies Cairo's default metric hinting value to the respective
+// entry in the Pango context's font map. Applying the Fontconfig substitutions
+// is all we want here anyway.
+bool MetricHintingNeededFor(PangoFontDescription *desc)
+{
+	const auto *family_in = pango_font_description_get_family(desc);
+	const auto size = pango_font_description_get_size(desc);
+	if(!family_in) {
+		return false;
+	}
+	FcPattern *pat_in = FcPatternCreate();
+	if(!pat_in) {
+		return false;
+	}
+	defer(FcPatternDestroy(pat_in));
+
+	// PangoFc only exposes a conversion from `PangoFontDescription` to
+	// `FcPattern`, but *of course* not the other way around...
+	auto **families = g_strsplit(family_in, ",", -1);
+	for(auto i = 0; families[i] != nullptr; i++) {
+		auto *family = std::bit_cast<FcChar8 *>(families[i]);
+		FcPatternAddString(pat_in, FC_FAMILY, family);
+	}
+	g_strfreev(families);
+
+	FcConfigSubstitute(nullptr, pat_in, FcMatchPattern);
+	FcDefaultSubstitute(pat_in);
+
+	FcResult result;
+	auto* pat_out = FcFontMatch(nullptr, pat_in, &result);
+	defer(FcPatternDestroy(pat_out));
+
+	char *family_out = nullptr;
+	const auto matched = FcPatternGetString(
+		pat_out, FC_FAMILY, 0, std::bit_cast<FcChar8 **>(&family_out)
+	);
+	if(matched != FcResultMatch) {
+		return false;
+	}
+	return (!strcmp(family_out, "MS Gothic") && (size == (16 * PANGO_SCALE)));
+}
 
 // State
 // -----
@@ -37,13 +93,19 @@ TEXTRENDER_PANGOCAIRO TextObj;
 PANGOCAIRO_STATE State;
 
 static class {
-	ENUMARRAY<PangoFontDescription *, FONT_ID> arr;
+	ENUMARRAY<PANGOCAIRO_FONT, FONT_ID> arr;
 
 public:
-	PangoFontDescription *ForID(FONT_ID font)
+	const PANGOCAIRO_FONT& ForID(FONT_ID font)
 	{
-		if(!arr[font]) {
-			arr[font] = pango_font_description_from_string(FontSpecs[font]);
+		if(!arr[font].desc) {
+			arr[font].desc = pango_font_description_from_string(
+				FontSpecs[font]
+			);
+			arr[font].hint_metrics = (MetricHintingNeededFor(arr[font].desc)
+				? CAIRO_HINT_METRICS_ON
+				: CAIRO_HINT_METRICS_OFF
+			);
 		}
 		return arr[font];
 	}
@@ -51,8 +113,8 @@ public:
 	void Cleanup(void)
 	{
 		for(auto& font : arr) {
-			pango_font_description_free(font);
-			font = nullptr;
+			pango_font_description_free(font.desc);
+			font.desc = nullptr;
 		}
 	}
 } Fonts;
@@ -100,6 +162,28 @@ PANGOCAIRO_STATE& PANGOCAIRO_STATE::operator=(PANGOCAIRO_STATE&& other) noexcept
 	return *this;
 };
 
+void PANGOCAIRO_STATE::SetFont(const PANGOCAIRO_FONT *font)
+{
+	if(!font) {
+		return;
+	}
+	auto *opts = cairo_font_options_create();
+	assert(opts != nullptr); // Documentation says this will never fail
+	cairo_get_font_options(cr, opts);
+
+	// Each PangoLayout has its own copy of Cairo's font options, which we (of
+	// *course*) can't get to from the outside, forcing us to recreate the
+	// layout...
+	if(cairo_font_options_get_hint_metrics(opts) != font->hint_metrics) {
+		cairo_font_options_set_hint_metrics(opts, font->hint_metrics);
+		cairo_set_font_options(cr, opts);
+		g_object_unref(layout);
+		layout = pango_cairo_create_layout(cr);
+	}
+	cairo_font_options_destroy(opts);
+	pango_layout_set_font_description(layout, font->desc);
+}
+
 void PANGOCAIRO_STATE::SetText(Narrow::string_view str)
 {
 	const auto* in_buf = str.data();
@@ -118,13 +202,11 @@ void PANGOCAIRO_STATE::SetText(Narrow::string_view str)
 }
 
 PIXEL_SIZE PANGOCAIRO_STATE::Extent(
-	PangoFontDescription *font, Narrow::string_view str
+	const PANGOCAIRO_FONT *font, Narrow::string_view str
 )
 {
 	PIXEL_SIZE ret = { 0, 0 };
-	if(font) {
-		pango_layout_set_font_description(layout, font);
-	}
+	SetFont(font);
 	SetText(str);
 	pango_layout_get_pixel_size(layout, &ret.w, &ret.h);
 	return ret;
@@ -205,7 +287,7 @@ PIXEL_SIZE TEXTRENDER_PANGOCAIRO_SESSION::RectSize(void) const
 void TEXTRENDER_PANGOCAIRO_SESSION::SetFont(FONT_ID font)
 {
 	if(font_cur != font) {
-		pango_layout_set_font_description(State.layout, Fonts.ForID(font));
+		State.SetFont(&Fonts.ForID(font));
 		font_cur = font;
 	}
 }
@@ -290,7 +372,7 @@ PIXEL_SIZE TEXTRENDER_PANGOCAIRO::TextExtent(
 	if(!State) {
 		State = { cairo_image_surface_create(FORMAT, 0, 0) };
 	}
-	return State.Extent(Fonts.ForID(font), str);
+	return State.Extent(&Fonts.ForID(font), str);
 }
 
 void TextBackend_Cleanup(void)

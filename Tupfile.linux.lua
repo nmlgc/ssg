@@ -1,7 +1,7 @@
 tup.include("libs/tupblocks/toolchain.clang.lua")
 tup.include("libs/BLAKE3.lua")
 
-local PLATFORM_LINK = EnvConfig("sdl2", "pangocairo")
+local PLATFORM_LINK = EnvConfig("sdl2", "pangocairo", "fontconfig")
 local XIPH_LINK = EnvConfig("ogg", "vorbis", "vorbisfile")
 local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 

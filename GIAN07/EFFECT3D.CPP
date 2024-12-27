@@ -787,8 +787,7 @@ void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 	case(STG4ROCK_ACCMOVE2): {
 		for(auto& it : Rock) {
 			it.State = STG4ROCK_ACCMOVE2;
-			it.a = (it.v / 12);
-			24; // ((3 - p->GrpID) * 3);
+			it.a = (it.v / 12); // 24; // ((3 - p->GrpID) * 3);
 			it.count = 0;
 		}
 /*		for(auto& it : Rock) {

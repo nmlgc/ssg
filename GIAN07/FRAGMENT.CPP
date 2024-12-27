@@ -28,8 +28,8 @@ void fragment_set(int x, int y, uint8_t cmd)
 		for(i=0;i<FRAGMENT_MAX;i++){
 			f = Fragment+i;
 			if(f->count){
-				f->vx = (f->x-x)/16;f->count;
-				f->vy = (f->y-y)/16;f->count;
+				f->vx = ((f->x - x) / 16); // f->count;
+				f->vy = ((f->y - y) / 16); // f->count;
 			}
 		}
 	}

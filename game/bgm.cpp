@@ -173,7 +173,8 @@ static bool BGM_Load(unsigned int id)
 
 		// Try loading a waveform track
 		bool waveform_new = false;
-		if(Waveform = BGM::TrackOpen(PackPath)) {
+		Waveform = BGM::TrackOpen(PackPath);
+		if(Waveform) {
 			if(SndBackend_BGMLoad(Waveform)) {
 				waveform_new = true;
 			}

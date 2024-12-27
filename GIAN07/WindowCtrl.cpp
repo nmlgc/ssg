@@ -78,6 +78,7 @@ static bool ContinueFnNo(INPUT_BITS key);
 
 static bool ScoreFn(INPUT_BITS key);
 
+static void SetMainItem(bool tick = true);
 static void SetDifItem(bool tick = true);
 static void SetGrpItem(bool tick = true);
 static void SetGrpAPIItem(bool tick = true);
@@ -378,7 +379,8 @@ WINDOW_CHOICE MainItem[] = {
 	{ "   Music",	"音楽室に入ります",	MusicFn },
 	{ "   Exit",	"ゲームを終了します",	CWinExitFn }
 };
-WINDOW_MENU MainMenu = { std::span(MainItem), [](bool) {}, &MainTitle };
+WINDOW_MENU MainMenu = { std::span(MainItem), SetMainItem, &MainTitle };
+static auto& MainItemMusic = MainItem[5];
 
 WINDOW_LABEL ExitTitle = { "    終了するの？" };
 WINDOW_CHOICE ExitYesNoItem[] = {
@@ -831,9 +833,7 @@ static bool ScoreFn(INPUT_BITS key)
 static bool MusicFn(INPUT_BITS key)
 {
 	if(CWinOKKey(key)) {
-		if(BGM_Enabled()) {
-			MusicRoomInit();
-		}
+		MusicRoomInit();
 	}
 	return true;
 }
@@ -919,6 +919,11 @@ static void CfgRepStgSelect(int_fast8_t delta)
 static void CfgRepSave(int_fast8_t)
 {
 	ConfigDat.StageSelect.v = ((ConfigDat.StageSelect.v) ? 0 : 1);
+}
+
+static void SetMainItem(bool)
+{
+	MainItemMusic.SetActive(BGM_Enabled());
 }
 
 

@@ -108,7 +108,7 @@ static constexpr void RingStep(
 
 template <size_t N> struct LABELS {
 	const std::array<Narrow::string_view, N> str;
-	const size_t w;
+	const int w;
 
 	constexpr LABELS(std::array<Narrow::string_view, N> strs) :
 		str(strs),

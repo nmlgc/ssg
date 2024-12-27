@@ -18,7 +18,9 @@ namespace String {
 		std::array<char, ((std::max)(Width, STRING_NUM_CAP<T>) + 1)> str;
 		const size_t len;
 
-		Num(T v) : len(sprintf(str.data(), "%0*u", Width, v)) {
+		Num(T v) : len(
+			sprintf(str.data(), "%0*u", static_cast<int>(Width), v)
+		) {
 		}
 	};
 }

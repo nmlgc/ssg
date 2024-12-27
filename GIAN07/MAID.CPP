@@ -11,6 +11,7 @@
 #include "game/snd.h"
 #include "game/input.h"
 #include "game/ut_math.h"
+#include <inttypes.h> // for PRId64
 
 
 MAID			Viv;					// 麗しきメイドさん構造体
@@ -246,7 +247,7 @@ extern void StateDraw(void)
 	GrpPut57(128 + 95,16 + 91-80,buf);
 
 	// 得点表示 //
-	sprintf(buf, "%9lld", Viv.score);
+	sprintf(buf, "%9" PRId64, Viv.score);
 	GrpPut16(128, 0, buf);
 
 	// 仮の残機＆残りボム表示 //

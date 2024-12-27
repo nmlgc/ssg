@@ -7,6 +7,7 @@
 #include "LEVEL.H"
 #include "SCORE.H"
 #include "game/defer.h"
+#include <inttypes.h> // for PRId64
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
 using NR_CONST_SCORE_LIST = std::span<const NR_NAME_DATA, NR_RANK_MAX>;
@@ -125,7 +126,7 @@ uint8_t SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
 		//strcpy(Res[i].Weapon, WTable[p[i].Weapon % 4]);
 		Res[i].Weapon = p[i].Weapon % 4;
 
-		sprintf(Res[i].Score,"%11I64d",p[i].Score);
+		sprintf(Res[i].Score, "%11" PRId64, p[i].Score);
 		sprintf(Res[i].Evade, "%6u", p[i].Evade);
 		sprintf(Res[i].Stage,"%1d" ,p[i].Stage);
 	}

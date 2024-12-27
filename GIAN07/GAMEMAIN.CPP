@@ -23,6 +23,7 @@
 #include "game/snd.h"
 #include "game/ut_math.h"
 #include "platform/time.h"
+#include <inttypes.h> // for PRId64
 
 
 DWORD		DrawCount = 0;
@@ -1469,7 +1470,7 @@ void MusicRoomProc(bool&)
 
 		if(Mid_Loaded()) {
 			BlitBG({ 504,  59, 136,  24 });	// MIDI TIMER
-			sprintf(buf, "%07lld", Mid_PlayTime.pulse_interpolated);
+			sprintf(buf, "%07" PRId64, Mid_PlayTime.pulse_interpolated);
 			GrpPut7B(560,64+2+2,buf);
 			//TextOut(hdc,561,64+2,buf,strlen(buf));
 		}

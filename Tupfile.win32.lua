@@ -1,4 +1,5 @@
 tup.include("libs/tupblocks/toolchain.msvc.lua")
+tup.include("libs/BLAKE3.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
@@ -24,54 +25,7 @@ local function ssg(variant)
 		variant_bin_suffix = " (original DirectDraw and Direct3D graphics)"
 	end
 
-	-- BLAKE3
-	-- ------
-
-	BLAKE3 = sourcepath("libs/BLAKE3/c/")
-	BLAKE3_COMPILE = {
-		objdir = "BLAKE3/",
-
-		-- Visual C++ has no SSE4.1 flag, and I don't trust the /arch:AVX option
-		cflags = { "/DBLAKE3_NO_SSE41" },
-	}
-	if (variant == VINTAGE) then
-		BLAKE3_COMPILE.cflags += {
-			"/DBLAKE3_NO_SSE2", "/DBLAKE3_NO_AVX2", "/DBLAKE3_NO_AVX512",
-		}
-	end
-	BLAKE3_LINK = { cflags = ("-I" .. BLAKE3.root) }
-
-	local blake3_src
-	blake3_src += BLAKE3.join("blake3.c")
-	blake3_src += BLAKE3.join("blake3_dispatch.c")
-	blake3_src += BLAKE3.join("blake3_portable.c")
-
-	local blake3_cfg = variant_cfg:branch(BLAKE3_COMPILE)
-
-	local blake3_obj = cc(blake3_cfg, blake3_src)
-	if (variant == MODERN) then
-		-- Each optimized version must be built with the matching MSVC `/arch`
-		-- flag. This is not only necessary for the compiler to actually emit
-		-- the intended instructions, but also prevents newer instruction sets
-		-- from accidentally appearing in older code. (For example, globally
-		-- setting `/arch:AVX512` for all of these files would cause AVX-512
-		-- instructions to also appear in the AVX2 version, breaking it on
-		-- those CPUs.)
-		-- That's why they recommend the ASM versions, but they're
-		-- 64-bit-exclusive…
-		local blake3_arch_cfgs = {
-			blake3_cfg:branch({ cflags = "/arch:SSE2" }),
-			blake3_cfg:branch({ cflags = "/arch:AVX2" }),
-			blake3_cfg:branch({ cflags = "/arch:AVX512" }),
-		}
-		blake3_obj = (
-			blake3_obj +
-			cc(blake3_arch_cfgs[1], BLAKE3.join("blake3_sse2.c")) +
-			cc(blake3_arch_cfgs[2], BLAKE3.join("blake3_avx2.c")) +
-			cc(blake3_arch_cfgs[3], BLAKE3.join("blake3_avx512.c"))
-		)
-	end
-	-- ------
+	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
 
 	-- Static analysis using the C++ Core Guideline checker plugin.
 	local ANALYSIS = { cflags = { release = {
@@ -155,7 +109,6 @@ local function ssg(variant)
 		ssg_obj = (ssg_obj + cxx(p_vintage_cfg, p_vintage_src))
 	end
 
-	ssg_obj = (ssg_obj + blake3_obj)
 	exe(platform_cfg, ssg_obj, ("GIAN07" .. variant_bin_suffix))
 end
 

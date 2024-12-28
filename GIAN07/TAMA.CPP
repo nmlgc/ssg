@@ -993,7 +993,13 @@ void __fastcall tamaTmove(TAMA_DATA *t)
 				t->v += t->a;
 			}
 			else{
-				if(t->vd<250) t->vd++;
+				// pbg quirk: Was probably intended to compare the unsigned
+				// representation against 0xFA? Since `t->vd` is a `int8_t`,
+				// this is always true. Visual Studio 2022 optimizes this
+				// comparison away in Release mode, Clang throws a warning.
+				//
+				// 	if(t->vd<250)
+				t->vd++;
 				t->v -= t->a;
 			}
 			t->d += (deg_t * (Cast::sign<uint8_t>(t->vd)) / 255);

@@ -565,11 +565,9 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	);
 	if(!renderer) {
 		const auto api_name = GrpBackend_APIName(params.api);
+		const auto* api = std::bit_cast<const char *>(api_name.data());
 		SDL_LogCritical(
-			LOG_CAT,
-			"Error creating %s renderer: %s",
-			(api_name.empty() ? u8"?" : api_name.data()),
-			SDL_GetError()
+			LOG_CAT, "Error creating %s renderer: %s", api, SDL_GetError()
 		);
 		WndBackend_Cleanup();
 		return std::nullopt;

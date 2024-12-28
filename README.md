@@ -2,7 +2,7 @@
 
 ## Building
 
-Currently, this project can only be built for 32-bit Windows, with Visual Studio ≥2022 and a Tup-based build setup.
+Currently, the Tup-based build setup only supports compiling with Visual Studio ≥2022.
 However, since IDE integration is horribly broken for both Makefile and directory projects, we strongly recommend literally *anything else* to edit the code.
 
 You'll therefore need the following:
@@ -33,16 +33,20 @@ To build:
 
 The binary will be put into the `bin/` subdirectory, where you can also place the game's original data files.
 
-By default, both Debug and Release configurations are built.
-If you only need one of them and want to speed up the build process, you can pick a single one by passing its binary file name as a parameter to `build.bat`:
+### Filtering build outputs
+
+By default, the process builds both Debug and Release configurations of all binaries.
+If you only need a few of them and want to speed up the build process, you can specify any number of target binary filenames as a parameter to the build batch file.
+
+On Windows:
 
 ```sh
-build.bat bin/GIAN07.exe  # builds only in Release mode
-build.bat bin/GIAN07d.exe # builds only in Debug mode
-build.bat                 # builds in both modes
+build.bat bin/GIAN07.exe  # builds only the modern Release binary
+build.bat bin/GIAN07d.exe # builds only the modern Debug binary
+build.bat                 # builds all binaries, including the vintage ones
 ```
 
-The Visual Studio Code configuration contains build tasks for all three possibilities.
+The Visual Studio Code configuration contains build tasks for all five possibilities.
 
 ## Debugging
 

@@ -29,8 +29,8 @@ typedef struct tagEndingStTask{
 	DWORD		fadein;		// フェードイン時刻
 	DWORD		fadeout;	// フェードアウト時刻
 
-	DWORD		StfID[10];	// スタッフＩＤ
-	DWORD		TitleID;	// タイトル、すなわち役職ＩＤ
+	uint8_t	StfID[10];	// スタッフＩＤ
+	uint8_t	TitleID;	// タイトル、すなわち役職ＩＤ
 
 	short	NumStf;	// 全スタッフ数
 	short		alpha;		// パレットの状態
@@ -75,7 +75,7 @@ const PIXEL_LTRB StaffMember[7] = {
 };
 
 // フラッシュの状態 //
-DWORD FlashState = 0;
+uint16_t FlashState = 0;
 
 
 void UpdateGrpInfo();		// グラフィックの更新(内部データ)
@@ -289,13 +289,13 @@ void EndingText::Prerender()
 }
 
 
-void FlashPaletteGrp(PALETTE& dest, const PALETTE& pal, DWORD a)
+void FlashPaletteGrp(PALETTE& dest, const PALETTE& pal, uint16_t a)
 {
 	const uint16_t a16 = ((a > 256) ? (a - 256): a);
 	for(int i = 0; i < dest.size(); i++){
-		dest[i].r = min(256, (256 * (256 - a) + (pal[i].r * a16)) / 256);
-		dest[i].g = min(256, (256 * (256 - a) + (pal[i].g * a16)) / 256);
-		dest[i].b = min(256, (256 * (256 - a) + (pal[i].b * a16)) / 256);
+		dest[i].r = (std::min)(256, (256 * (256 - a) + (pal[i].r * a16)) / 256);
+		dest[i].g = (std::min)(256, (256 * (256 - a) + (pal[i].g * a16)) / 256);
+		dest[i].b = (std::min)(256, (256 * (256 - a) + (pal[i].b * a16)) / 256);
 	}
 }
 
@@ -304,7 +304,6 @@ void FlashPaletteGrp(PALETTE& dest, const PALETTE& pal, DWORD a)
 void DrawFadeInfo()
 {
 	PALETTE	temp_pal;
-	WORD			a;
 
 	// フェードアウト関連
 	if(GrpGeom_FB()) {
@@ -351,9 +350,7 @@ void DrawFadeInfo()
 			}
 		}
 		if(FlashState){
-			if(FlashState > 256) a = FlashState - 256;
-			else                 a = FlashState;
-			GrpGeom->SetAlphaNorm(255 - a);
+			GrpGeom->SetAlphaNorm(255 - FlashState);
 			GrpGeom->SetColor({ 5, 5, 5 });
 			GrpGeom->DrawBoxA(0, 0, GRP_RES.w, GRP_RES.h);
 		}

@@ -28,7 +28,7 @@
 
 DWORD		DrawCount = 0;
 DWORD		MidiPlayID = 0;
-DWORD		DemoTimer  = 0;
+uint16_t DemoTimer = 0;
 BYTE		WeaponKeyWait = 0;
 int	GameOverTimer = 0;
 
@@ -1377,14 +1377,14 @@ void MusicRoomProc(bool&)
 {
 	char	buf[100];
 	static WORD Old_Key;
-	static BYTE DevChgWait;
+	static bool DevChgWait;
 
 	const auto playing = BGM_Playing();
 
 	if(Key_Data!=Old_Key){
 		switch(Key_Data){
 			case(KEY_ESC):case(KEY_BOMB):
-				DevChgWait = 0;
+				DevChgWait = false;
 				GameExit();
 			return;
 
@@ -1421,17 +1421,17 @@ void MusicRoomProc(bool&)
 	BGM_UpdateMIDITables();
 
 	if((playing == BGM_PLAYING::MIDI) && (SystemKey_Data & SYSKEY_BGM_DEVICE)) {
-		if(DevChgWait==0){
+		if(!DevChgWait) {
 			BGM_ChangeMIDIDevice(1);
 			if(MusicRoomText) {
 				MusicRoomText.value().PrerenderMidDev();
 			}
-			DevChgWait = 1;
+			DevChgWait = true;
 		}
 	}
 	else{
 		// 押されていなければ再び有効化する //
-		DevChgWait = 0;
+		DevChgWait = false;
 	}
 
 	if(IsDraw()){

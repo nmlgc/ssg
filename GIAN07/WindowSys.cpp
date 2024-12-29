@@ -629,8 +629,11 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	using FLAGS = WINDOW_FLAGS;
 
 	if(ws->FirstWait){
-		if(Key_Data) return;
-		else         ws->FirstWait = FALSE;
+		if(Key_Data) {
+			return;
+		} else {
+			ws->FirstWait = false;
+		}
 	}
 
 	// 操作性が悪かった点を修正 //

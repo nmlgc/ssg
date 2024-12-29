@@ -906,19 +906,19 @@ void GrpDrawNote(void)
 }
 
 
-BOOL bEnableWarnEfc = FALSE;
+bool bEnableWarnEfc = false;
 WORD WarnEfcTime = 0;
 
 // ワーニングの初期化 //
 void WarningEffectInit(void)
 {
-	bEnableWarnEfc = FALSE;
+	bEnableWarnEfc = false;
 }
 
 // ワーニングの発動！！ //
 void WarningEffectSet(void)
 {
-	bEnableWarnEfc = TRUE;
+	bEnableWarnEfc = true;
 	WarnEfcTime    = 0;
 	InitWarning();
 }
@@ -935,7 +935,9 @@ void WarningEffectMove(void)
 		MoveWarningR(-1);
 	}
 
-	if((WarnEfcTime++) == 256+10) bEnableWarnEfc = FALSE;
+	if((WarnEfcTime++) == (256 + 10)) {
+		bEnableWarnEfc = false;
+	}
 }
 
 // ワーニングの描画 //

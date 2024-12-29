@@ -362,7 +362,7 @@ extern void MaidMove(void)
 		//if(Viv.bomb_time%60==0) fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
 	}
 
-	Viv.BuzzSound = FALSE;
+	Viv.BuzzSound = false;
 }
 
 // 初期化 //
@@ -387,7 +387,7 @@ extern void MaidSet(void)
 
 	Viv.muteki    = VIVDEAD_VAL;
 
-	Viv.bGameOver = FALSE;
+	Viv.bGameOver = false;
 
 	Viv.toge_ex   = 0;
 	Viv.toge_time = 0;
@@ -395,7 +395,7 @@ extern void MaidSet(void)
 	Viv.lay_grp   = 0;
 	Viv.ShiftCounter = 0;
 
-	Viv.BuzzSound = FALSE;
+	Viv.BuzzSound = false;
 }
 
 // 次のステージの準備 //
@@ -415,7 +415,7 @@ extern void MaidNextStage(void)
 	Viv.bomb_time = 0;
 	Viv.ShiftCounter = 0;
 
-	Viv.BuzzSound = FALSE;
+	Viv.BuzzSound = false;
 }
 
 extern void MaidDead(void)
@@ -458,7 +458,7 @@ extern void MaidDead(void)
 	}
 	else{
 		// 残機の残っていない場合 //
-		Viv.bGameOver = TRUE;
+		Viv.bGameOver = true;
 		Viv.score    += Viv.dscore;			// 得点吐き出し
 
 		// かすり系リセット //
@@ -487,9 +487,9 @@ extern void evade_addEx(int x, int y, uint8_t n)
 	PlayRankAdd(n<<2);
 
 	if(n){
-		if(Viv.BuzzSound == FALSE){
+		if(Viv.BuzzSound == false) {
 			Snd_SEPlay(SOUND_ID_BUZZ, x);
-			Viv.BuzzSound = TRUE;
+			Viv.BuzzSound = true;
 		}
 		fragment_set(x,y,FRG_EVADE);
 		fragment_set(x,y,FRG_EVADE);

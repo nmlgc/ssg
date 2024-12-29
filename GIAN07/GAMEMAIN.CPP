@@ -92,7 +92,7 @@ extern bool ScoreNameInit(void)
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 
 	GrpBackend_SetClip(GRP_RES_RECT);
@@ -100,7 +100,7 @@ extern bool ScoreNameInit(void)
 	InputLocked = Key_Data;
 	GameMain = ScoreNameProc;
 
-	return TRUE;
+	return true;
 }
 
 // スコアネームの表示 //
@@ -114,7 +114,7 @@ void ScoreNameProc(bool&)
 				break;
 			}
 			Snd_SEPlay(SOUND_ID_CANCEL);
-			GameExit(FALSE);
+			GameExit(false);
 		return;
 
 		case(KEY_UP):case(KEY_LEFT):
@@ -153,9 +153,9 @@ void ScoreDraw(void)
 		if(v > 64*2){
 			//v = max(v,20*64);
 			ScoreString[i].x -= v;
+		} else {
+			ScoreString[i].bMoveEnable = false;
 		}
-		else
-			ScoreString[i].bMoveEnable = FALSE;
 
 		src = PIXEL_LTWH{ 0, (64 + (32 * i)), 400, 32 };
 		const WINDOW_POINT topleft = {
@@ -449,7 +449,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 
 	if(!LoadGraph(GRAPH_ID_NAMEREGIST)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 
 	GrpBackend_SetClip(GRP_RES_RECT);
@@ -461,7 +461,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 		BGM_Switch(19);
 	}
 
-	return TRUE;
+	return true;
 }
 
 // ゲームを立ち上げる際に必ず行う初期化関数群 //
@@ -523,7 +523,7 @@ bool WeaponSelectInit(bool ExStg)
 
 	VivTemp = Viv;
 
-	return TRUE;
+	return true;
 }
 
 bool GameInit(void(*NextProc)(bool& quit))
@@ -550,7 +550,7 @@ bool GameInit(void(*NextProc)(bool& quit))
 	}
 	GrpBackend_SetClip(PLAYFIELD_CLIP);
 	GameMain = NextProc;
-	return TRUE;
+	return true;
 }
 
 // 次のステージに移行する //
@@ -572,14 +572,14 @@ extern bool GameNextStage(void)
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 	if(!LoadStageData(GameStage)){
 		DebugOut(u8"ENEMY.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -593,7 +593,7 @@ extern bool GameReplayInit(int Stage)
 
 	if(!DemoplayLoadReplay(GameStage)) {
 		// DebugOut(u8"デモプレイデータが存在せず");
-		return FALSE;
+		return false;
 	}
 
 	PlayRankReset();
@@ -605,12 +605,12 @@ extern bool GameReplayInit(int Stage)
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		DemoplayCleanup();
-		return FALSE;
+		return false;
 	}
 	if(!LoadStageData(GameStage)){
 		DebugOut(u8"ENEMY.DAT が破壊されています");
 		DemoplayCleanup();
-		return FALSE;
+		return false;
 	}
 
 	if(GameStage == GRAPH_ID_EXSTAGE){
@@ -686,18 +686,18 @@ bool DemoInit(void)
 
 	if(!DemoplayLoadDemo(GameStage)) {
 		// DebugOut(u8"デモプレイデータが存在せず");
-		return FALSE;
+		return false;
 	}
 
 	PlayRankReset();
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 	if(!LoadStageData(GameStage)){
 		DebugOut(u8"ENEMY.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 
 	return GameInit(DemoProc);
@@ -771,7 +771,7 @@ bool SProjectInit(void)
 
 	if(!LoadGraph(GRAPH_ID_SPROJECT)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 
 	// レンズをすでに作成しているのなら、破棄する //
@@ -782,7 +782,7 @@ bool SProjectInit(void)
 
 	GameMain = SProjectProc;
 
-	return TRUE;
+	return true;
 }
 
 
@@ -798,7 +798,7 @@ extern bool MusicRoomInit(void)
 
 	if(!LoadGraph(GRAPH_ID_MUSICROOM)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 
 	GrpBackend_SetClip(GRP_RES_RECT);
@@ -816,20 +816,20 @@ extern bool MusicRoomInit(void)
 	if(!LoadMusicRoomComment(0)){
 		DebugOut(u8"ENEMY.DAT がはかいされています");
 		GameExit();
-		return FALSE;
+		return false;
 	}
 /*
 	if(!LoadMusic(0)){
 		DebugOut(u8"MUSIC.DAT が破壊されています");
 		GameExit();
-		return FALSE;
+		return false;
 	}
 */
 //	BGM_Play();
 
 	GameMain = MusicRoomProc;
 
-	return TRUE;
+	return true;
 }
 
 // ゲームを再開する(ESC 抜けから) //
@@ -848,7 +848,7 @@ extern bool GameExit(bool bNeedChgMusic)
 
 	if(!LoadGraph(GRAPH_ID_TITLE)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return FALSE;
+		return false;
 	}
 	GrpBackend_SetClip(GRP_RES_RECT);
 
@@ -880,7 +880,7 @@ extern bool GameExit(bool bNeedChgMusic)
 
 	GameMain  = TitleProc;
 
-	return TRUE;
+	return true;
 }
 
 // ゲームオーバーの前処理
@@ -925,7 +925,7 @@ void GameProc(bool&)
 	if(Key_Data & KEY_ESC){
 		if(ConfigDat.StageSelect.v) {
 			DemoplaySaveReplay();
-			GameExit(TRUE);
+			GameExit(true);
 			return;
 		}
 
@@ -984,13 +984,16 @@ void GameOverProc0(bool&)
 		// ステージセレクトが有効な場合 //
 		if(ConfigDat.StageSelect.v) {
 			DemoplaySaveReplay();
-			if(GameStage == GRAPH_ID_EXSTAGE) NameRegistInit(TRUE);
-			else                              GameExit(TRUE);
+			if(GameStage == GRAPH_ID_EXSTAGE) {
+				NameRegistInit(true);
+			} else {
+				GameExit(true);
+			}
 			return;
 		}
 
 		if(Viv.credit == 0){
-			NameRegistInit(TRUE);
+			NameRegistInit(true);
 			//GameExit();
 			return;			// 仮
 		}
@@ -1037,12 +1040,12 @@ void DemoProc(bool&)
 	if(Key_Data) Key_Data = KEY_ESC;
 	else         Key_Data = DemoplayMove();
 
-	IsDemoplay = TRUE;
+	IsDemoplay = true;
 
 	// ＥＳＣが押されたら即、終了 //
 	if(Key_Data & KEY_ESC){
 		DemoplayCleanup();
-		IsDemoplay = FALSE;
+		IsDemoplay = false;
 		GameExit();
 		return;
 	}
@@ -1051,7 +1054,7 @@ void DemoProc(bool&)
 
 	if(GameMain != DemoProc){
 		DemoplayCleanup();	// 後始末
-		IsDemoplay = FALSE;
+		IsDemoplay = false;
 		GameExit();					// 強制終了させる(ゲームオーバー対策)
 		return;
 	}
@@ -1177,7 +1180,7 @@ void WeaponSelectProc(bool&)
 		case(KEY_ESC):case(KEY_BOMB):
 			if(spd) break;
 			Snd_SEPlay(SOUND_ID_CANCEL);
-			GameExit(FALSE);
+			GameExit(false);
 		return;
 	}
 
@@ -1598,5 +1601,5 @@ bool IsDraw(void)
 		}
 	}
 
-	return TRUE;
+	return true;
 }

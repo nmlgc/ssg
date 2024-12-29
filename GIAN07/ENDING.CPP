@@ -20,7 +20,7 @@ typedef struct tagEndingGrpInfo {
 	short		alpha;		// パレットの状態
 
 	int			x, y;		// 表示する左上
-	BOOL		bWantDisp;	// 表示するかどうか
+	bool	bWantDisp;	// 表示するかどうか
 } EndingGrpInfo;
 
 // スタッフ描画タスク //
@@ -37,7 +37,7 @@ typedef struct tagEndingStTask{
 
 	int			ox, oy;		// 表示基準座標
 
-	BOOL		bWantDisp;	// 表示するのかな
+	bool	bWantDisp;	// 表示するのかな
 } EndingStTask;
 
 typedef struct tagEndingText {
@@ -108,8 +108,9 @@ bool EndingInit(void)
 	Grp_Flip();
 	GrpBackend_Clear();
 
-	if(!LoadGraph(GRAPH_ID_ENDING)) return FALSE;
-	if(!LoadStageData(GRAPH_ID_ENDING)) return FALSE;
+	if(!LoadGraph(GRAPH_ID_ENDING) || !LoadStageData(GRAPH_ID_ENDING)) {
+		return false;
+	}
 	BGM_Stop();
 
 
@@ -122,15 +123,15 @@ bool EndingInit(void)
 
 	FlashState = 0;
 
-	EGrpInfo.bWantDisp = FALSE;
-	EStfTask.bWantDisp = FALSE;
+	EGrpInfo.bWantDisp = false;
+	EStfTask.bWantDisp = false;
 
 	TextObj.Clear();
 	EText.NumText = 0;
 	EText.Rect = TextObj.Register({ GRP_RES.w, 131 });
 	EText.Rerender = true;
 
-	return TRUE;
+	return true;
 }
 
 
@@ -208,7 +209,7 @@ void UpdateGrpInfo()
 	}
 
 	if(EGrpInfo.bWantDisp && EGrpInfo.alpha==0)
-		EGrpInfo.bWantDisp = FALSE;
+		EGrpInfo.bWantDisp = false;
 }
 
 
@@ -226,7 +227,7 @@ void UpdateStfInfo()
 	}
 
 	if(EStfTask.bWantDisp && EStfTask.alpha==0)
-		EStfTask.bWantDisp = FALSE;
+		EStfTask.bWantDisp = false;
 }
 
 
@@ -366,7 +367,7 @@ void DrawFadeInfo()
 // エンディング用 SCL のデコード //
 void EndingSCLDecode()
 {
-	BOOL		bFlag = TRUE;
+	bool bFlag = true;
 	BYTE		*cmd;
 	DWORD		temp;
 
@@ -375,8 +376,11 @@ void EndingSCLDecode()
 		switch(cmd[0]){
 			case(SCL_TIME):
 				temp = I32LEAt(&cmd[1]);
-				if(temp>GameCount) bFlag    = FALSE;
-				else               SCL_Now += 5;		// cmd(1)+time(4)
+				if(temp > GameCount) {
+					bFlag = false;
+				} else {
+					SCL_Now += 5; // cmd(1)+time(4)
+				}
 			break;
 
 			case(SCL_MSG):		// メッセージを出力する
@@ -418,7 +422,7 @@ void EndingSCLDecode()
 				EGrpInfo.alpha   = 0;
 				EGrpInfo.target  = EndingGrp + cmd[1];
 				EGrpInfo.timer   = 0;
-				EGrpInfo.bWantDisp = TRUE;
+				EGrpInfo.bWantDisp = true;
 				SCL_Now += 2;
 			break;
 
@@ -455,7 +459,7 @@ void EndingSCLDecode()
 					EStfTask.timer    = 0;
 					EStfTask.NumStf   = 0;
 					EStfTask.TitleID  = cmd[1]-128;
-					EStfTask.bWantDisp = TRUE;
+					EStfTask.bWantDisp = true;
 				}
 				else{
 					EStfTask.StfID[EStfTask.NumStf++] = cmd[1];
@@ -470,9 +474,9 @@ void EndingSCLDecode()
 			break;
 
 			case(SCL_END):		// カウントも変更させずにリターンするのだ
-				EGrpInfo.bWantDisp = FALSE;
-				EStfTask.bWantDisp = FALSE;
-				NameRegistInit(FALSE);
+				EGrpInfo.bWantDisp = false;
+				EStfTask.bWantDisp = false;
+				NameRegistInit(false);
 			return;
 
 			case(SCL_MUSIC):

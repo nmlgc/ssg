@@ -3,8 +3,10 @@
  *
  */
 
-#include "platform/path.h"
+// SDL headers must come first to avoid import→#include bugs on Clang 19.
 #include <SDL_filesystem.h>
+
+#include "platform/path.h"
 
 constexpr auto SDL_free_deleter = [](auto* p) { SDL_free(p); };
 static std::unique_ptr<char8_t[], decltype(SDL_free_deleter)> PathData = {

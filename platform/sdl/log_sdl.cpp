@@ -3,8 +3,10 @@
  *
  */
 
-#include "platform/sdl/log_sdl.h"
+// SDL headers must come first to avoid import→#include bugs on Clang 19.
 #include <SDL_messagebox.h>
+
+#include "platform/sdl/log_sdl.h"
 
 const char *log_title = nullptr;
 SDL_LogOutputFunction log_default_func;

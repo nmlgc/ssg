@@ -3,16 +3,7 @@
  *
  */
 
-#include "platform/window_backend.h"
-#include "platform/sdl/log_sdl.h"
-#include "platform/sdl/window_sdl.h"
-#include "platform/graphics_backend.h"
-#include "platform/snd_backend.h"
-#include "platform/input.h"
-#include "constants.h"
-#include "game/bgm.h"
-#include "game/frame.h"
-#include "game/graphics.h"
+// SDL headers must come first to avoid import→#include bugs on Clang 19.
 #include <SDL_events.h>
 #include <SDL_hints.h>
 #include <SDL_mouse.h>
@@ -23,6 +14,17 @@
 #ifdef WIN32_VINTAGE
 	#include <SDL_syswm.h>
 #endif
+
+#include "platform/window_backend.h"
+#include "platform/sdl/log_sdl.h"
+#include "platform/sdl/window_sdl.h"
+#include "platform/graphics_backend.h"
+#include "platform/snd_backend.h"
+#include "platform/input.h"
+#include "constants.h"
+#include "game/bgm.h"
+#include "game/frame.h"
+#include "game/graphics.h"
 
 constexpr auto LOG_CAT = SDL_LOG_CATEGORY_VIDEO;
 

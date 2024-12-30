@@ -3,11 +3,13 @@
  *
  */
 
-#include "platform/input.h"
-#include "game/enum_flags.h"
+// SDL headers must come first to avoid import→#include bugs on Clang 19.
 #include <SDL_events.h>
 #include <SDL_joystick.h>
 #include <assert.h>
+
+#include "platform/input.h"
+#include "game/enum_flags.h"
 
 // Do scancodes and key modes still fit into 16 bits each?
 static_assert(SDL_NUM_SCANCODES <= std::numeric_limits<uint16_t>::max());

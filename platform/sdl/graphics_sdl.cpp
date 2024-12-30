@@ -3,6 +3,10 @@
  *
  */
 
+// SDL headers must come first to avoid import→#include bugs on Clang 19.
+#include <SDL_mouse.h>
+#include <SDL_render.h>
+
 #include "platform/sdl/graphics_sdl.h"
 #include "platform/sdl/log_sdl.h"
 #include "platform/sdl/window_sdl.h"
@@ -12,8 +16,6 @@
 #include "game/format_bmp.h"
 #include "game/string_format.h"
 #include "constants.h"
-#include <SDL_mouse.h>
-#include <SDL_render.h>
 
 static constexpr auto LOG_CAT = SDL_LOG_CATEGORY_RENDER;
 

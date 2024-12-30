@@ -31,7 +31,6 @@ void Log_Init(const char8_t *title)
 
 	// The easiest workaround for SDL_ShowSimpleMessageBox()'s lack of built-in
 	// string interpolation: Route errors through the log system instead.
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
 	SDL_LogGetOutputFunction(&log_default_func, &log_default_data);
 	SDL_LogSetOutputFunction(LogCriticalAsMessageBox, nullptr);
 }

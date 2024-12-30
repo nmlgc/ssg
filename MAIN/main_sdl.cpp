@@ -38,6 +38,14 @@ int main(int argc, char** args)
 	}
 	defer(SDL_Quit());
 
+	// The X11 and Wayland backends load their dynamic symbols by trying to
+	// look up each function in each of the hardcoded .so files until it's
+	// found. This ends up throwing a lot of symbol loading errors at DEBUG
+	// level during SDL_VideoInit() that might confuse Linux users, but we'd
+	// like this log level for everything we call ourselves. So let's only
+	// activate it after SDL_Init().
+	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
+
 	// Use the backend API's line drawing algorithm, which at least gives us
 	// pixel-perfect accuracy with pbg's original 16-bit code when using
 	// Direct3D and framebuffer scaling. It does make sense to set this hint

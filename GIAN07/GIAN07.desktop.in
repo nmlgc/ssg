@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Version=1.5
+Name=Shuusou Gyoku
+Name[ja]=秋霜玉
+Name[zh]=秋霜玉
+GenericName=Seihou 1
+GenericName[ja]=西方Project第1作
+GenericName[zh]=西方系列第一作
+Exec=GIAN07
+Icon=<icon>
+Categories=Game;Shooter;
+
+# Allow these romaji keywords in Japanese and Chinese locales
+Keywords=seihou;shuusou;gyoku;

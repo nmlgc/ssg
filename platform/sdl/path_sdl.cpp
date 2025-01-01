@@ -23,12 +23,21 @@ std::u8string_view PathForData(void)
 	#ifdef WIN32
 		auto* path_base = SDL_GetBasePath();
 	#else
-		auto* path_base = SDL_GetPrefPath(GAME_ORG, GAME_APP);
+		#ifdef PATH_XDG_DATA_HOME_HAS_APP_ID
+			auto* path_base = SDL_GetPrefPath(nullptr, "");
+		#else
+			auto* path_base = SDL_GetPrefPath(GAME_ORG, GAME_APP);
+		#endif
 	#endif
 	if(!path_base) {
 		return {};
 	}
 	PathData.reset(std::bit_cast<char8_t *>(path_base));
 	PathDataView = PathData.get();
+
+	// Remove the unsightly second slash in case we passed an empty app
+	if(PathDataView.ends_with(u8"//")) {
+		PathDataView.remove_suffix(1);
+	}
 	return PathDataView;
 }

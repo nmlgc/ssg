@@ -17,6 +17,7 @@
 #include "game/frame.h"
 #include "game/input.h"
 #include "game/snd.h"
+#include "obj/platform_constants.h"
 
 // Volume controls
 // ---------------
@@ -49,6 +50,20 @@ std::span<const INPUT_PAD_BINDING> Key_PadBindings = PadBindings;
 bool XInit(void)
 {
 	std::filesystem::current_path(PathForData());
+
+	#ifdef WIN32
+		// User data and game data directories are one and the same on Windows,
+		// and we already ship with the skeleton in place.
+	#elif !defined(PATH_SKELETON)
+		#pragma message("No user data skeleton directory defined. This does not matter for development builds, but package builds should set the environment variable `PATH_SKELETON` accordingly.")
+	#else
+		using copy_opts = std::filesystem::copy_options;
+
+		auto path_data = PathForData();
+		std::error_code ec;
+		const auto opts = (copy_opts::skip_existing | copy_opts::recursive);
+		std::filesystem::copy(PATH_SKELETON, PathForData(), opts, ec);
+	#endif
 
 	DebugSetup();
 

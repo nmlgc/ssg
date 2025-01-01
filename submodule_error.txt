@@ -1,0 +1,11 @@
+Error: Submodule "<module>": Checked-out commit does not match the recorded commit in Git:
+
+	Recorded: <recorded>
+	 Current: <current>
+
+If you just pulled this repository, run
+
+	git submodule update <module>
+
+Otherwise, resolve the conflict manually.
+Exiting the build process just to be safe.

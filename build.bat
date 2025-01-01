@@ -60,15 +60,9 @@ exit /b
 		'git submodule status --cached %module%'
 	) do set hash_recorded="%%i"
 	@echo off
-	echo Error: Submodule "%module%": Checked-out commit does not match the recorded commit in Git:
-	echo:
-	echo 	Recorded: %hash_recorded:~2,40%
-	echo 	 Current: %line:~1,40%
-	echo:
-	echo If you just pulled this repository, run
-	echo:
-	echo 	git submodule update %module%
-	echo:
-	echo Otherwise, resolve the conflict manually.
-	echo Exiting the build process just to be safe.
+	sed ^
+		-e "s:<recorded>/%hash_recorded:~2,40%:g" ^
+		-e "s:<current>/%line:~1,40%:g" ^
+		-e "s:<module>:%module%:g" ^
+		.\submodule_error.txt
 	exit 1

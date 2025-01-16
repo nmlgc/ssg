@@ -49,6 +49,14 @@ submodules_check() {
 	done
 }
 
+# We can't commit this file directly because Tup's database initialization
+# check literally just looks for the directory, and refuses to auto-initialize
+# the database if it already exists. (Also, Windows doesn't need it.)
+[ ! -d .tup ] && tup init
+[ ! -f .tup/options ] &&
+echo "[updater]
+	full_deps = 1 ; Necessary to track compiler updates on Linux" > .tup/options
+
 # Libraries that either aren't packaged by any distro or that we always want
 # to use the vendored version of
 submodules_check libs/tupblocks libs/dr_libs libs/miniaudio

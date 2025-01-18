@@ -39,6 +39,8 @@ Still waiting for GCC to ship [P2465R3 Standard Library Modules](https://wg21.li
 The build is driven by `build.sh`, which sets up the required submodules and environment variables for Tup.
 Some libraries are expected to be installed through the distribution's package manager; check the script for details.
 
+Use `install.sh` to copy all files to their standard install locations.
+
 ### Filtering build outputs
 
 By default, the process builds both Debug and Release configurations of all binaries.

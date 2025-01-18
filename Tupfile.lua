@@ -7,6 +7,10 @@ SSG_COMPILE.objdir = "ssg/"
 
 SSG = sourcepath("./")
 
+PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
+	"APP_NAME",
+})
+
 -- pbg code
 SSG_SRC += SSG.glob("GIAN07/*.cpp")
 SSG_SRC += SSG.glob("GIAN07/*.CPP")

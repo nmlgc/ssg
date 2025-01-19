@@ -700,14 +700,10 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	const auto res_new = params.ScaledRes();
 	const bool res_changed = (res_prev != res_new);
 	if(res_changed && !fs_new.fullscreen) {
+		const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
 		PIXEL_POINT topleft{};
 		SDL_GetWindowPosition(window, &topleft.x, &topleft.y);
 		SDL_SetWindowSize(window, res_new.w, res_new.h);
-
-		// If we clipped on the raw renderer, the clipping rectangle won't
-		// match the current resolution anymore.
-		SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
-
 		RepositionAfterScale(topleft, res_prev, res_new);
 	}
 

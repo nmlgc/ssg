@@ -449,11 +449,11 @@ bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 
 	// Prepare the primary renderer for blitting the primary texture:
 	// • Ensure the correct logical size
-	// • Move the clipping rectangle from the raw renderer onto the texture
+	// • Move the renderer's clipping rectangle onto whatever new renderer we
 	//   target (won't be needed in SDL 3)
-	// • Stop clipping!!! The primary renderer's clipping region is going to
-	//   apply to the [PrimaryTexture] blit going forward!!!
-	const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
+	// • Stop clipping on the primary renderer!!! Its clipping region is going
+	//   to apply to the [PrimaryTexture] blit going forward!!!
+	const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *Renderer };
 	SDL_SetRenderTarget(PrimaryRenderer, nullptr);
 	SDL_RenderSetClipRect(PrimaryRenderer, nullptr);
 	SDL_RenderSetLogicalSize(PrimaryRenderer, scaled_res.w, scaled_res.h);

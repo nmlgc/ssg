@@ -35,7 +35,7 @@
 	<description>
 		<p>Requires the data files of an existing game copy. If they are missing, the game indicates their expected location at startup.</p>
 		<p>MIDI playback is not yet implemented for Linux. To get background music, download and set up a BGM pack through the <code>Config</code> → <code>Sound / Music</code> → <code>BGMPack</code> option.</p>
-		<p>This release comes bundled with IPAMonaGothic, a free and metric-compatible alternative for the MS Gothic font used in the original Windows version. For pixel-perfect text rendering, put <code>msgothic.ttc</code> into one of your system's standard font directoires, as listed by <code>fc-cache -v</code>.</p>
+		<p>This release comes bundled with IPAMonaGothic, a free and metric-compatible alternative for the MS Gothic font used in the original Windows version. For pixel-perfect text rendering, put <code>msgothic.ttc</code> into one of your system's standard font directories, as listed by <code>fc-cache -v</code>.</p>
 	</description>
 
 	<launchable type="desktop-id">net.nmlgc.rec98.sh01.desktop</launchable>

@@ -14,6 +14,11 @@
 		<name>ReC98</name>
 	</developer>
 
+	<branding>
+		<color type="primary" scheme_preference="light">#dde4fa</color>
+		<color type="primary" scheme_preference="dark">#4646b4</color>
+	</branding>
+
 	<url type="bugtracker">https://github.com/nmlgc/ssg/issues</url>
 	<url type="homepage">https://rec98.nmlgc.net</url>
 	<url type="donation">https://rec98.nmlgc.net/donate</url>

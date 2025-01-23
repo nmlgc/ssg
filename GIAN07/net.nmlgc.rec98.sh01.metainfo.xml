@@ -53,6 +53,11 @@
 	<content_rating type="oars-1.1" />
 
 	<releases>
+		<release version="P0303-1" date="2025-01-23">
+			<description>
+				<p>Fixed controller support for the Flatpak release</p>
+			</description>
+		</release>
 		<release version="P0303" date="2025-01-21">
 			<url type="details">https://github.com/nmlgc/ssg/releases/tag/P0303</url>
 			<description>

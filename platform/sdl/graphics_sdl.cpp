@@ -291,16 +291,12 @@ void UpdateOpenGL(VERSION& self)
 #define TARGET(pretty, maj, min) TARGET_(pretty, maj, min)
 
 constinit VERSION Versions[] = {
-#if SDL_VIDEO_RENDER_OGL
 	{ u8"opengl", "OpenGL", UpdateOpenGL, TARGET(
 		u8"OpenGL", OPENGL_TARGET_CORE_MAJ, OPENGL_TARGET_CORE_MIN
 	) },
-#endif
-#if SDL_VIDEO_RENDER_OGL_ES2
 	{ u8"opengles2", "OpenGL ES", UpdateOpenGL, TARGET(
 		u8"OpenGL ES", 2, OPENGL_TARGET_ES2_MIN
 	) },
-#endif
 };
 
 #undef TARGET

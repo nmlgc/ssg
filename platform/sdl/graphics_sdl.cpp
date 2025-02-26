@@ -5,6 +5,7 @@
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
 #ifdef SDL3
+#include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_render.h>
 
@@ -321,19 +322,55 @@ constexpr std::pair<std::u8string_view, std::u8string_view> API_NICE[] = {
 	{ u8"direct3d11", u8"Direct3D 11" },
 	{ u8"direct3d12", u8"Direct3D 12" },
 	{ u8"software", u8"Software" },
+	{ u8"vulkan", u8"Vulkan" },
 };
 
 namespace APIVersions {
-constexpr const char FMT[] = "%s %d.%d";
+constexpr const char GPU_FMT[] = "GPU (%s)";
+constexpr const char OPENGL_FMT[] = "%s %d.%d";
 constexpr size_t PRETTY_SIZE_MAX = 9;
-constexpr size_t FMT_SIZE = ((sizeof(FMT) - 1) + (2 * STRING_NUM_CAP<int>));
+constexpr size_t API_SIZE_MAX = std::ranges::max_element(
+	API_NICE, [](const auto& a, const auto& b) {
+		return (a.second.size() < b.second.size());
+	}
+)->second.size();
+constexpr size_t FMT_SIZE = std::max(
+	(sizeof(GPU_FMT) + API_SIZE_MAX),
+	(PRETTY_SIZE_MAX + 1 + STRING_NUM_CAP<int> + 1 + STRING_NUM_CAP<int>)
+);
 
 struct VERSION {
 	std::u8string_view name_sdl;
 	const char *name_pretty;
 	void (*update)(VERSION& self);
-	char8_t buf[FMT_SIZE + PRETTY_SIZE_MAX + 1];
+	char8_t buf[FMT_SIZE + 1];
 };
+
+#ifdef SDL3
+void UpdateGPU(VERSION& self)
+{
+	const auto props = SDL_GetRendererProperties(PrimaryRenderer);
+	auto *gpu_device = static_cast<SDL_GPUDevice *>(SDL_GetPointerProperty(
+		props, SDL_PROP_RENDERER_GPU_DEVICE_POINTER, nullptr
+	));
+
+	std::u8string_view device_name = reinterpret_cast<const char8_t *>(
+		SDL_GetGPUDeviceDriver(gpu_device)
+	);
+	for(const auto& nice : API_NICE) {
+		if(nice.first == device_name) {
+			device_name = nice.second;
+			break;
+		}
+	}
+	auto *buf = reinterpret_cast<char *>(self.buf);
+	const auto *via_name = (device_name.empty()
+		? "?"
+		: reinterpret_cast<const char *>(device_name.data())
+	);
+	sprintf(&buf[0], &GPU_FMT[0], via_name);
+}
+#endif
 
 void UpdateOpenGL(VERSION& self)
 {
@@ -343,13 +380,16 @@ void UpdateOpenGL(VERSION& self)
 	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &minor);
 
 	auto* buf = reinterpret_cast<char *>(self.buf);
-	sprintf(&buf[0], &FMT[0], self.name_pretty, major, minor);
+	sprintf(&buf[0], &OPENGL_FMT[0], self.name_pretty, major, minor);
 }
 
 #define TARGET_(pretty, maj, min) pretty " ~" #maj "." #min
 #define TARGET(pretty, maj, min) TARGET_(pretty, maj, min)
 
 constinit VERSION Versions[] = {
+#ifdef SDL3
+	{ u8"gpu", nullptr, UpdateGPU, u8"GPU" },
+#endif
 	{ u8"opengl", "OpenGL", UpdateOpenGL, TARGET(
 		u8"OpenGL", OPENGL_TARGET_CORE_MAJ, OPENGL_TARGET_CORE_MIN
 	) },

@@ -18,7 +18,14 @@
 )
 #endif
 
+#ifdef SDL3
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+#else
 #include <SDL.h>
+#endif
+#include "platform/sdl/sdl2_wrap.h"
+
 #include "GIAN07/ENTRY.H"
 #include "platform/window_backend.h"
 #include "platform/sdl/log_sdl.h"
@@ -33,7 +40,14 @@ int main(int argc, char** args)
 {
 	Log_Init(UTF8(GAME_TITLE));
 
-#if (defined(LINUX) && defined(APP_ID))
+#ifdef SDL3
+#ifndef APP_ID
+#define APP_ID "GIAN07"
+#endif
+	// SDL 3 automatically pulls the Desktop Entry name from the new app
+	// metadata, avoiding the need for the environment variable below.
+	SDL_SetAppMetadata(GAME_TITLE, nullptr, APP_ID);
+#elif (defined(LINUX) && defined(APP_ID))
 	// Tell the Desktop Entry name to the X11 (or Wayland!) window manager, and
 	// hope that it uses this name to pick the Desktop Entry's icon.
 	//
@@ -51,7 +65,7 @@ int main(int argc, char** args)
 	SDL_setenv("SDL_VIDEO_X11_WMCLASS", APP_ID, 1);
 #endif
 
-	if(SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0) {
+	if(HelpFailed(SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_VIDEO))) {
 		Log_Fail(SDL_LOG_CATEGORY_VIDEO, "Error initializing SDL");
 		return 1;
 	}
@@ -63,7 +77,7 @@ int main(int argc, char** args)
 	// level during SDL_VideoInit() that might confuse Linux users, but we'd
 	// like this log level for everything we call ourselves. So let's only
 	// activate it after SDL_Init().
-	SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
+	SDL_SetLogPriorities(SDL_LOG_PRIORITY_VERBOSE);
 
 	// Use the backend API's line drawing algorithm, which at least gives us
 	// pixel-perfect accuracy with pbg's original 16-bit code when using

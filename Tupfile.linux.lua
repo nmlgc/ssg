@@ -1,6 +1,8 @@
 tup.include("libs/tupblocks/toolchain.clang.lua")
 tup.include("libs/BLAKE3.lua")
 
+SDL = "SDL2"
+
 local PLATFORM_LINK = EnvConfig("sdl2", "pangocairo", "fontconfig")
 local XIPH_LINK = EnvConfig("ogg", "vorbis", "vorbisfile")
 local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
@@ -11,7 +13,7 @@ CONFIG = CONFIG:branch({ cflags = "-pthread" })
 
 local ssg_cfg = CONFIG:branch(
 	BLAKE3_LINK, XIPH_LINK, SSG_COMPILE, CONFIG:cxx_std_modules(), {
-		cflags = { "-DLINUX" },
+		cflags = { "-DLINUX", ("-D" .. string.upper(SDL) .. "=1") },
 	}
 )
 local ssg_obj = ssg_cfg:cxx(SSG_SRC)

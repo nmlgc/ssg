@@ -4,6 +4,15 @@
  */
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
+#ifdef SDL3
+#include <SDL3/SDL_events.h>
+#include <SDL3/SDL_hints.h>
+#include <SDL3/SDL_mouse.h>
+#include <SDL3/SDL_rect.h>
+#include <SDL3/SDL_render.h>
+#include <SDL3/SDL_timer.h>
+#include <SDL3/SDL_video.h>
+#else
 #include <SDL_events.h>
 #include <SDL_hints.h>
 #include <SDL_mouse.h>
@@ -14,6 +23,8 @@
 #ifdef WIN32_VINTAGE
 #include <SDL_syswm.h>
 #endif
+#endif
+#include "platform/sdl/sdl2_wrap.h"
 
 #include "platform/window_backend.h"
 #include "platform/sdl/log_sdl.h"
@@ -46,22 +57,40 @@ std::pair<int16_t, int16_t> HelpGetWindowPosition(SDL_Window *window)
 
 SDL_DisplayID HelpGetDisplayForWindow(void)
 {
+#ifdef SDL3
+	if(!Window) {
+		return SDL_GetPrimaryDisplay();
+	}
+	const auto ret = SDL_GetDisplayForWindow(Window);
+	if(ret == 0) {
+		return SDL_GetPrimaryDisplay();
+	}
+	return ret;
+#else
 	if(!Window) {
 		return 0;
 	}
 	return std::max(SDL_GetWindowDisplayIndex(Window), 0);
+#endif
 }
 
 // Don't do a ZUN.
 // (https://github.com/thpatch/thcrap/commit/71c1dcab690f85653cbc9a06c7c55)
 SDL_Rect ClampWindowRect(SDL_Rect window_rect)
 {
-	// SDL_GetRectDisplayIndex() returns the *closest* display, so we need to
+	// SDL_GetDisplayForRect() returns the *closest* display, so we need to
 	// manually clamp the window to its bounds.
-	const int display_i = SDL_GetRectDisplayIndex(&window_rect);
+#ifdef SDL3
+	const auto display_i = SDL_GetDisplayForRect(&window_rect);
+	if(display_i == 0) {
+		return window_rect;
+	}
+#else
+	const auto display_i = SDL_GetRectDisplayIndex(&window_rect);
 	if(display_i < 0) {
 		return window_rect;
 	}
+#endif
 	SDL_Rect display_rect{};
 	if(SDL_GetDisplayUsableBounds(display_i, &display_rect) != 0) {
 		return window_rect;
@@ -95,6 +124,38 @@ SDL_Rect ClampWindowRect(SDL_Rect window_rect)
 	return window_rect;
 }
 
+#ifdef SDL3
+std::optional<GRAPHICS_FULLSCREEN_FLAGS> HelpSetFullscreenMode(
+	SDL_Window *window, GRAPHICS_FULLSCREEN_FLAGS fs
+)
+{
+	if(fs.fullscreen && fs.exclusive) {
+		#pragma warning(suppress : 26494) // type.5
+		SDL_DisplayMode mode;
+
+		constexpr auto rate = (1000.0f / FRAME_TIME_TARGET);
+		if(!SDL_GetClosestFullscreenDisplayMode(
+			HelpGetDisplayForWindow(), GRP_RES.w, GRP_RES.h, rate, false, &mode
+		)) {
+			Log_Fail(
+				LOG_CAT,
+				"Could not find a display mode for exclusive fullscreen, falling back on borderless"
+			);
+			fs.exclusive = false;
+			return HelpSetFullscreenMode(window, fs);
+		}
+		SDL_SetWindowFullscreenMode(window, &mode);
+	} else {
+		SDL_SetWindowFullscreenMode(window, nullptr);
+	}
+	if(!SDL_SetWindowFullscreen(window, fs.fullscreen)) {
+		Log_Fail(LOG_CAT, "Error changing display mode");
+		return std::nullopt;
+	}
+	return fs;
+}
+#endif
+
 std::u8string_view WndBackend_SDLRendererName(int8_t id)
 {
 	if(id < 0) {
@@ -104,11 +165,18 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 		};
 		return reinterpret_cast<const char8_t *>(ret);
 	}
+#ifdef SDL3
+	const auto ret = SDL_GetRenderDriver(id);
+#else
 	SDL_RendererInfo info;
-	if(SDL_GetRenderDriverInfo(id, &info) != 0) {
+	const auto ret = (
+		(SDL_GetRenderDriverInfo(id, &info) == 0) ? info.name : ""
+	);
+#endif
+	if(!ret) {
 		return {};
 	}
-	return reinterpret_cast<const char8_t *>(info.name);
+	return reinterpret_cast<const char8_t *>(ret);
 }
 
 SDL_Window *WndBackend_SDL(void)
@@ -178,15 +246,46 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 	if(!fs.fullscreen) {
 		rect = ClampWindowRect(rect);
 	}
+
+#ifdef SDL3
+	const SDL_PropertiesID props = SDL_CreateProperties();
+	SDL_SetStringProperty(
+		props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, GAME_TITLE
+	);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, rect.x);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, rect.y);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, rect.w);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, rect.h);
+	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_FLAGS_NUMBER, flags);
+
+	// SDL 3 can only enter exclusive fullscreen after the window has been
+	// created, so...
+	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_HIDDEN_BOOLEAN, true);
+
+	Window = SDL_CreateWindowWithProperties(props);
+	SDL_DestroyProperties(props);
+#else
 	flags |= HelpFullscreenFlag(fs);
 	Window = SDL_CreateWindow(
 		GAME_TITLE, rect.x, rect.y, rect.w, rect.h, flags
 	);
+#endif
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
 		return std::nullopt;
 	}
-
+#ifdef SDL3
+	const auto maybe_fs_actual = HelpSetFullscreenMode(Window, fs);
+	if(!maybe_fs_actual) {
+		SDL_DestroyWindow(Window);
+		return std::nullopt;
+	}
+	const auto fs_actual = maybe_fs_actual.value();
+	using F = GRAPHICS_PARAM_FLAGS;
+	params.SetFlag(F::FULLSCREEN, fs_actual.fullscreen);
+	params.SetFlag(F::FULLSCREEN_EXCLUSIVE, fs_actual.exclusive);
+	SDL_ShowWindow(Window);
+#endif
 	return params;
 }
 
@@ -196,13 +295,24 @@ HWND WndBackend_Win32(void)
 	if(!Window) {
 		return nullptr;
 	}
+	HWND ret = nullptr;
+#ifdef SDL3
+	ret = static_cast<HWND>(SDL_GetPointerProperty(
+		SDL_GetWindowProperties(Window),
+		SDL_PROP_WINDOW_WIN32_HWND_POINTER,
+		nullptr
+	));
+#else
 	SDL_SysWMinfo wminfo;
 	SDL_VERSION(&wminfo.version);
-	if(!SDL_GetWindowWMInfo(Window, &wminfo)) {
-		Log_Fail(LOG_CAT, "Error retrieving window handle");
-		return nullptr;
+	if(SDL_GetWindowWMInfo(Window, &wminfo)) {
+		ret = wminfo.info.win.window;
 	}
-	return wminfo.info.win.window;
+#endif
+	if(!ret) {
+		Log_Fail(LOG_CAT, "Error retrieving window handle");
+	}
+	return ret;
 }
 #endif
 
@@ -237,29 +347,30 @@ int WndBackend_Run(void)
 
 		SDL_Event event;
 		while(SDL_PeepEvents(
-			&event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT
+			&event, 1, SDL_GETEVENT, SDL_EVENT_FIRST, SDL_EVENT_LAST
 		) == 1) {
 			switch(event.type) {
-			case SDL_QUIT:
+			case SDL_EVENT_QUIT:
 				return 0;
 
-			case SDL_WINDOWEVENT: {
-				switch(event.window.event) {
-				case SDL_WINDOWEVENT_FOCUS_LOST:
-					BGM_Pause();
-					SndBackend_PauseAll();
-					active = false;
-					break;
-				case SDL_WINDOWEVENT_FOCUS_GAINED:
-					BGM_Resume();
-					SndBackend_ResumeAll();
-					active = true;
-					break;
-				default:
-					break;
-				}
+#ifdef SDL2
+			case SDL_WINDOWEVENT: switch(event.window.event) {
+#endif
+			case SDL_EVENT_WINDOW_FOCUS_LOST:
+				BGM_Pause();
+				SndBackend_PauseAll();
+				active = false;
 				break;
-			}
+
+			case SDL_EVENT_WINDOW_FOCUS_GAINED:
+				BGM_Resume();
+				SndBackend_ResumeAll();
+				active = true;
+				break;
+#ifdef SDL2
+			default: break; }
+			break;
+#endif
 
 			default:
 				break;
@@ -267,7 +378,7 @@ int WndBackend_Run(void)
 		}
 
 		if(active) {
-			const auto ticks_start = SDL_GetTicks64();
+			const auto ticks_start = SDL_GetTicks();
 			if(
 				(Grp_FPSDivisor == 0) ||
 				((ticks_start - ticks_last) >= FRAME_TIME_TARGET)
@@ -278,7 +389,7 @@ int WndBackend_Run(void)
 					// granularity, we subtract 1 and spin for the last
 					// millisecond to ensure that we hit the exact frame
 					// boundary.
-					const auto ticks_frame = (SDL_GetTicks64() - ticks_start);
+					const auto ticks_frame = (SDL_GetTicks() - ticks_start);
 					if(ticks_frame < (FRAME_TIME_TARGET - 1)) {
 						SDL_Delay((FRAME_TIME_TARGET - 1) - ticks_frame);
 					}

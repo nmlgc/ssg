@@ -190,7 +190,7 @@ WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 #ifdef SUPPORT_GRP_API
 char GrpAPIDefTitle[26];
 WINDOW_CHOICE GrpAPIItemDef = { GrpAPIDefTitle, HELP_API_DEFAULT, GrpAPIFnDef };
-std::array<WINDOW_CHOICE, 6> GrpAPIItem;
+std::array<WINDOW_CHOICE, 8> GrpAPIItem;
 WINDOW_MENU GrpAPIMenu = { std::span<WINDOW_CHOICE, 0>(), SetGrpAPIItem };
 #endif
 

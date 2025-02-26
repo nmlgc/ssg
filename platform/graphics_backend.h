@@ -142,8 +142,27 @@ using VERTEX_COORD = WINDOW_COORD;
 #else
 using VERTEX_COORD = float;
 #endif
+
 using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
+
+#if (defined(SDL3) && !defined(WIN32_VINTAGE))
+struct VERTEX_RGBA {
+	float r;
+	float g;
+	float b;
+	float a;
+
+	VERTEX_RGBA() = default;
+	VERTEX_RGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) :
+		r(r / 255.0f), g(g / 255.0f), b(b / 255.0f), a(a / 255.0f) {
+	}
+	VERTEX_RGBA(const RGBA& o) :
+		r(o.r / 255.0f), g(o.g / 255.0f), b(o.b / 255.0f), a(o.a / 255.0f) {
+	}
+};
+#else
 using VERTEX_RGBA = RGBA;
+#endif
 
 template <size_t N = std::dynamic_extent> using VERTEX_XY_SPAN = std::span<
 	const VERTEX_XY, N

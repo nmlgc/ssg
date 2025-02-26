@@ -3,7 +3,7 @@ tup.include("libs/BLAKE3.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
-local SDL_LINK = BuildSDL(CONFIG)
+local SDL_LINK = BuildSDL(CONFIG, 2)
 local XIPH_LINK = BuildXiph(CONFIG)
 
 MODERN = 0
@@ -76,15 +76,18 @@ local function ssg(variant)
 	-- The game
 	-- --------
 
-	local ssg_cfg = modules_cfg:branch(BLAKE3_LINK, XIPH_LINK, SSG_COMPILE, {
-		cflags = {
-			"/std:c++latest",
-			"/DWIN32",
-			"/EHsc",
-			"/source-charset:utf-8",
-			"/execution-charset:utf-8",
-		},
-	})
+	local ssg_cfg = modules_cfg:branch(
+		BLAKE3_LINK, XIPH_LINK, SDL_LINK, SSG_COMPILE, {
+			cflags = {
+				"/std:c++latest",
+				"/DWIN32",
+				"/EHsc",
+				"/source-charset:utf-8",
+				"/execution-charset:utf-8",
+			},
+			lflags = "/SUBSYSTEM:windows",
+		}
+	)
 	local ssg_obj = ssg_cfg:branch(ANALYSIS_RELAXED):cxx(SSG_SRC)
 
 	-- Our platform layer code
@@ -92,9 +95,6 @@ local function ssg(variant)
 	LAYERS_SRC += SSG.glob("platform/windows/*.cpp")
 	ssg_obj = (ssg_obj + ssg_cfg:cxx(LAYERS_SRC))
 
-	local platform_cfg = ssg_cfg:branch(SDL_LINK, {
-		lflags = "/SUBSYSTEM:windows"
-	})
 	local p_modern_src = (
 		SSG.glob("platform/sdl/*.cpp") - { "graphics_sdl.cpp$" }
 	)
@@ -103,17 +103,17 @@ local function ssg(variant)
 	end
 	p_modern_src += "MAIN/main_sdl.cpp"
 	p_modern_src.extra_inputs += PLATFORM_CONSTANTS
-	ssg_obj = (ssg_obj + platform_cfg:cxx(p_modern_src))
+	ssg_obj = (ssg_obj + ssg_cfg:cxx(p_modern_src))
 
 	if (variant == VINTAGE) then
-		local p_vintage_cfg = platform_cfg:branch(ANALYSIS_RELAXED)
+		local p_vintage_cfg = ssg_cfg:branch(ANALYSIS_RELAXED)
 		local p_vintage_src = SSG.glob("platform/windows_vintage/DD*.CPP")
 		p_vintage_src += SSG.glob("platform/windows_vintage/D2_Polygon.CPP")
 		ssg_obj = (ssg_obj + p_vintage_cfg:cxx(p_vintage_src))
 	end
 
 	ssg_obj = (ssg_obj + ssg_ico)
-	platform_cfg:exe(ssg_obj, ("GIAN07" .. variant_bin_suffix))
+	ssg_cfg:exe(ssg_obj, ("GIAN07" .. variant_bin_suffix))
 end
 
 ssg(MODERN)

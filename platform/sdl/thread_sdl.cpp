@@ -3,7 +3,12 @@
  *
  */
 
+#ifdef SDL3
+#include <SDL3/SDL_thread.h>
+#else
 #include <SDL_thread.h>
+#endif
+
 #include "platform/sdl/thread_sdl.h"
 
 THREAD::THREAD(SDL_Thread *sdl_thread, std::unique_ptr<THREAD_STOP> st) :

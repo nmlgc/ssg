@@ -4,7 +4,12 @@
  */
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
+#ifdef SDL3
+#include <SDL3/SDL_messagebox.h>
+#else
 #include <SDL_messagebox.h>
+#endif
+#include "platform/sdl/sdl2_wrap.h"
 
 #include "platform/sdl/log_sdl.h"
 
@@ -31,8 +36,8 @@ void Log_Init(const char8_t *title)
 
 	// The easiest workaround for SDL_ShowSimpleMessageBox()'s lack of built-in
 	// string interpolation: Route errors through the log system instead.
-	SDL_LogGetOutputFunction(&log_default_func, &log_default_data);
-	SDL_LogSetOutputFunction(LogCriticalAsMessageBox, nullptr);
+	SDL_GetLogOutputFunction(&log_default_func, &log_default_data);
+	SDL_SetLogOutputFunction(LogCriticalAsMessageBox, nullptr);
 }
 
 void Log_Fail(SDL_LogCategory category, const char *msg)

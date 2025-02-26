@@ -269,6 +269,13 @@ bool HelpSwitchFullscreen(
 // Pretty API version strings
 // --------------------------
 
+constexpr std::pair<std::u8string_view, std::u8string_view> API_NICE[] = {
+	{ u8"direct3d", u8"Direct3D 9" },
+	{ u8"direct3d11", u8"Direct3D 11" },
+	{ u8"direct3d12", u8"Direct3D 12" },
+	{ u8"software", u8"Software" },
+};
+
 namespace APIVersions {
 constexpr const char FMT[] = "%s %d.%d";
 constexpr size_t PRETTY_SIZE_MAX = 9;
@@ -336,13 +343,6 @@ int8_t GrpBackend_APICount(void)
 {
 	return SDL_GetNumRenderDrivers();
 }
-
-constexpr std::pair<std::u8string_view, std::u8string_view> API_NICE[] = {
-	{ u8"direct3d", u8"Direct3D 9" },
-	{ u8"direct3d11", u8"Direct3D 11" },
-	{ u8"direct3d12", u8"Direct3D 12" },
-	{ u8"software", u8"Software" },
-};
 
 std::u8string_view GrpBackend_APIName(int8_t id)
 {

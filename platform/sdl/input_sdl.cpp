@@ -9,6 +9,7 @@
 #include <assert.h>
 
 #include "platform/input.h"
+#include "game/defer.h"
 #include "game/enum_flags.h"
 
 // Do scancodes and key modes still fit into 16 bits each?
@@ -108,61 +109,57 @@ struct JOYPAD {
 
 static std::vector<JOYPAD> Pads;
 
-void Pad_Open(int device_index)
+// SDL provides two abstractions for joypads:
+//
+// • SDL_Joystick, which uses numbered axes or buttons with no semantic
+//   meaning, but works with every joypad ever
+// • SDL_GameController, which provides a standardized interface for the
+//   typical kind of modern gamepad with two analog sticks, a D-pad, and at
+//   least 4 face and 2 shoulder buttons, but doesn't work with joypads that
+//   don't match this standard
+//
+// For buttons, SDL_Joystick's numbered IDs are exactly what we want. WinMM
+// does the same, and the Joy Pad menu is designed around that. For axes,
+// however, there is no UI, and SDL_Joystick provides no way of identifying
+// which axis IDs correspond to a joypad's "main" X/Y axis, so we can only
+// guess. Luckily, all joypads we've tested map their main X axis to ID 0 and
+// their main Y axis to ID 1.
+//
+// But we can still *try* opening a joypad via SDL_GameController. If that
+// succeeds, we can correct this initial guess with the actual SDL_Joystick
+// axis IDs (= the "bind") for the standard X and Y axes:
+//
+// 	https://discourse.libsdl.org/t/difference-between-joysticks-and-game-controllers/24028/2
+std::tuple<decltype(JOYPAD::axis_x), decltype(JOYPAD::axis_y)> Pad_GetAxisIDs(
+	int device_index
+)
 {
-	auto* joystick = SDL_JoystickOpen(device_index);
-	if(!joystick) {
-		return;
-	}
-
-	// SDL provides two abstractions for joypads:
-	//
-	// • SDL_Joystick, which uses numbered axes or buttons with no semantic
-	//   meaning, but works with every joypad ever
-	// • SDL_GameController, which provides a standardized interface for the
-	//   typical kind of modern gamepad with two analog sticks, a D-pad, and at
-	//   least 4 face and 2 shoulder buttons, but doesn't work with joypads
-	//   that don't match this standard
-	//
-	// For buttons, SDL_Joystick's numbered IDs are exactly what we want. WinMM
-	// does the same, and the Joy Pad menu is designed around that. For axes,
-	// however, there is no UI, and SDL_Joystick provides no way of identifying
-	// which axis IDs correspond to a joypad's "main" X/Y axis, so we can only
-	// guess. Luckily, all joypads we've tested map their main X axis to ID 0
-	// and their main Y axis to ID 1.
-	//
-	// But we can still *try* opening a joypad via SDL_GameController. If that
-	// succeeds, we can correct this initial guess with the actual SDL_Joystick
-	// axis IDs (= the "bind") for the standard X and Y axes:
-	//
-	// 	https://discourse.libsdl.org/t/difference-between-joysticks-and-game-controllers/24028/2
 	decltype(JOYPAD::axis_x) axis_x = 0;
 	decltype(JOYPAD::axis_y) axis_y = 1;
 
-	if(SDL_IsGameController(device_index)) {
-		auto* controller = SDL_GameControllerOpen(device_index);
-		if(controller) {
-			SDL_GameControllerButtonBind bind;
-			bind = SDL_GameControllerGetBindForAxis(
-				controller, SDL_CONTROLLER_AXIS_LEFTX
-			);
-			if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
-				axis_x = bind.value.axis;
-			}
-			bind = SDL_GameControllerGetBindForAxis(
-				controller, SDL_CONTROLLER_AXIS_LEFTY
-			);
-			if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
-				axis_y = bind.value.axis;
-			}
-			SDL_GameControllerClose(controller);
-		}
+	if(!SDL_IsGameController(device_index)) {
+		return { axis_x, axis_y };
 	}
-	Pads.emplace_back(JOYPAD{
-		.joystick = joystick,
-		.axis_x = axis_x,
-		.axis_y = axis_y,
-	});
+	auto *controller = SDL_GameControllerOpen(device_index);
+	if(!controller) {
+		return { axis_x, axis_y };
+	}
+	defer(SDL_GameControllerClose(controller));
+
+	SDL_GameControllerButtonBind bind;
+	bind = SDL_GameControllerGetBindForAxis(
+		controller, SDL_CONTROLLER_AXIS_LEFTX
+	);
+	if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+		axis_x = bind.value.axis;
+	}
+	bind = SDL_GameControllerGetBindForAxis(
+		controller, SDL_CONTROLLER_AXIS_LEFTY
+	);
+	if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
+		axis_y = bind.value.axis;
+	}
+	return { axis_x, axis_y };
 }
 
 std::vector<JOYPAD>::iterator Pad_Find(SDL_JoystickID id)
@@ -177,8 +174,8 @@ std::vector<JOYPAD>::iterator Pad_Find(SDL_JoystickID id)
 
 bool Key_Start(void)
 {
-	// No need to call Pad_Open() here. SDL will send a SDL_JOYDEVICEADDED
-	// event for every joystick attached at startup.
+	// SDL will send a SDL_JOYDEVICEADDED event for every joystick attached at
+	// startup.
 
 	SDL_StopTextInput();
 	return true;
@@ -276,9 +273,19 @@ void Key_Read(void)
 			break;
 		}
 
-		case SDL_JOYDEVICEADDED:
-			Pad_Open(event.jdevice.which);
+		case SDL_JOYDEVICEADDED: {
+			auto *joystick = SDL_JoystickOpen(event.jdevice.which);
+			if(!joystick) {
+				break;
+			}
+			const auto [axis_x, axis_y] = Pad_GetAxisIDs(event.jdevice.which);
+			Pads.emplace_back(JOYPAD{
+				.joystick = joystick,
+				.axis_x = axis_x,
+				.axis_y = axis_y,
+			});
 			break;
+		}
 
 		default:
 			break;

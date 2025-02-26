@@ -1,9 +1,10 @@
 tup.include("libs/tupblocks/toolchain.clang.lua")
 tup.include("libs/BLAKE3.lua")
 
-SDL = "SDL2"
+tup.import("SDL")
+SDL = SDL[1]
 
-local PLATFORM_LINK = EnvConfig("sdl2", "pangocairo", "fontconfig")
+local PLATFORM_LINK = EnvConfig(SDL, "pangocairo", "fontconfig")
 local XIPH_LINK = EnvConfig("ogg", "vorbis", "vorbisfile")
 local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 

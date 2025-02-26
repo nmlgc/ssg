@@ -1,5 +1,12 @@
 #!/bin/sh
 
+if [ "$#" -eq 0 ] || { [ "$1" != "sdl2" ] && [ "$1" != "sdl3" ]; }; then
+	>&2 echo "Usage: $0 sdl2|sdl3 [tup-targets...]"
+	exit 1
+fi
+export SDL="$1"
+shift
+
 # We can't commit this file directly because Tup's database initialization
 # check literally just looks for the directory, and refuses to auto-initialize
 # the database if it already exists. (Also, Windows doesn't need it.)
@@ -20,7 +27,7 @@ echo "[updater]
 
 # Libraries that are supposed to be installed through the system's package
 # manager
-pkg_config_env_required sdl2 ogg vorbis vorbisfile pangocairo fontconfig
+pkg_config_env_required "$SDL" ogg vorbis vorbisfile pangocairo fontconfig
 
 # Vendored libraries that we only use when they aren't installed system-wide
 pkg_config_env_optional libblake3

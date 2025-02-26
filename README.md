@@ -14,13 +14,14 @@ This repo includes a ready-to-use configuration for Visual Studio Code; If you w
 
 To build:
 
-1. Install Visual Studio Community ≥2022, with the *Desktop development for C++* workload.\
+1. Install [Git for Windows](https://gitforwindows.org/).
+2. Install Visual Studio Community ≥2022, with the *Desktop development for C++* workload.\
    If you haven't already installed the IDE for other projects and don't plan to, you can install only the command-line compilers via the [Build Tools installer](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022).
-2. Make sure that `tup.exe` and its DLLs are somewhere in your `PATH`.
+3. Make sure that `tup.exe` and its DLLs are somewhere in your `PATH`.
 
-3. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
-4. Navigate to the checkout directory of this repository.
-5. Invoke `build_windows.bat` in your way of choice:
+4. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
+5. Navigate to the checkout directory of this repository.
+6. Invoke `build_windows.bat` in your way of choice:
    * If you use Visual Studio Code, open the editor from this command-line environment:
 
      ```batch

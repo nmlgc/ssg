@@ -6,7 +6,7 @@
 		{
 			"label": "Build (everything)",
 			"type": "shell",
-			"command": "build.bat",
+			"command": "build_windows.bat",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
@@ -20,7 +20,7 @@
 		{
 			"label": "Build regular binary (Debug)",
 			"type": "shell",
-			"command": "build.bat bin/GIAN07d.exe",
+			"command": "build_windows.bat bin/GIAN07d.exe",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
@@ -33,7 +33,7 @@
 		{
 			"label": "Build regular binary (Release)",
 			"type": "shell",
-			"command": "build.bat bin/GIAN07.exe",
+			"command": "build_windows.bat bin/GIAN07.exe",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
@@ -46,7 +46,7 @@
 		{
 			"label": "Build vintage graphics binary (Debug)",
 			"type": "shell",
-			"command": "build.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics)d.exe\"",
+			"command": "build_windows.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics)d.exe\"",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
@@ -59,7 +59,7 @@
 		{
 			"label": "Build vintage graphics binary (Release)",
 			"type": "shell",
-			"command": "build.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics).exe\"",
+			"command": "build_windows.bat \"bin/GIAN07 (original DirectDraw and Direct3D graphics).exe\"",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {

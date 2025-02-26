@@ -20,7 +20,7 @@ To build:
 
 3. Open Visual Studio's *x64_x86 Cross Tools Command Prompt*.
 4. Navigate to the checkout directory of this repository.
-5. Invoke `build.bat` in your way of choice:
+5. Invoke `build_windows.bat` in your way of choice:
    * If you use Visual Studio Code, open the editor from this command-line environment:
 
      ```batch
@@ -29,17 +29,17 @@ To build:
 
      Then, you can run the build task with the default `Ctrl-Shift-B` keybinding.
 
-   * Or you can always run `build.bat` directly from this shell.
+   * Or you can always run `build_windows.bat` directly from this shell.
 
 ### Linux
 
 Clang ≥18 is the only compiler supported right now.
 Still waiting for GCC to ship [P2465R3 Standard Library Modules](https://wg21.link/P2465R3).
 
-The build is driven by `build.sh`, which sets up the required submodules and environment variables for Tup.
+The build is driven by `build_linux.sh`, which sets up the required submodules and environment variables for Tup.
 Some libraries are expected to be installed through the distribution's package manager; check the script for details.
 
-Use `install.sh` to copy all files to their standard install locations.
+Use `install_linux.sh` to copy a compiled release build to its standard install locations.
 
 ### Filtering build outputs
 
@@ -49,9 +49,9 @@ If you only need a few of them and want to speed up the build process, you can s
 On Windows:
 
 ```sh
-build.bat bin/GIAN07.exe  # builds only the modern Release binary
-build.bat bin/GIAN07d.exe # builds only the modern Debug binary
-build.bat                 # builds all binaries, including the vintage ones
+build_windows.bat bin/GIAN07.exe  # builds only the modern Release binary
+build_windows.bat bin/GIAN07d.exe # builds only the modern Debug binary
+build_windows.bat                 # builds all binaries, including the vintage ones
 ```
 
 The Visual Studio Code configuration contains build tasks for all five possibilities.
@@ -59,9 +59,9 @@ The Visual Studio Code configuration contains build tasks for all five possibili
 On Linux:
 
 ```sh
-./build.sh bin/GIAN07  # builds only the Release binary
-./build.sh bin/GIAN07d # builds only the Debug binary
-./build.sh             # builds both Debug and Release binaries
+./build_linux.sh bin/GIAN07  # builds only the Release binary
+./build_linux.sh bin/GIAN07d # builds only the Debug binary
+./build_linux.sh             # builds both Debug and Release binaries
 ```
 
 ## Debugging (Windows only)

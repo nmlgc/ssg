@@ -27,10 +27,7 @@ THREAD& THREAD::operator=(THREAD&& other) noexcept
 
 THREAD::~THREAD()
 {
-	if(st) {
-		st->store(true);
-	}
-	Join();
+	Abort();
 }
 
 SDL_Thread *HelpCreateThread(int(*fn)(void *), void *data)
@@ -49,4 +46,12 @@ void THREAD::Join() noexcept
 		SDL_WaitThread(sdl_thread, nullptr);
 		sdl_thread = nullptr;
 	}
+}
+
+void THREAD::Abort() noexcept
+{
+	if(st) {
+		st->store(true);
+	}
+	Join();
 }

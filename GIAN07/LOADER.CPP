@@ -288,6 +288,13 @@ namespace DAT {
 			}
 			return pack;
 		}
+
+		void AbortLoading(void)
+		{
+			if(load_thread.Joinable()) {
+				load_thread.Abort();
+			}
+		}
 	};
 	ENUMARRAY<PACK, PACK_ID> Packs;
 
@@ -481,6 +488,14 @@ void LoaderInit(void)
 		// Call a different *Init() function here to quickly test a different
 		// game state.
 		SProjectInit();
+	}
+}
+
+void LoaderCleanup(void)
+{
+	// Cleanly shut down any loading threads that might not have joined yet
+	for(auto& pack : DAT::Packs) {
+		pack.AbortLoading();
 	}
 }
 

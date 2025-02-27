@@ -103,6 +103,7 @@ bool XInit(void)
 
 void XCleanup(void)
 {
+	LoaderCleanup();
 	ConfigSave();
 	TextBackend_Cleanup();
 	GrpBackend_Cleanup();

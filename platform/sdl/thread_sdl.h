@@ -22,6 +22,7 @@ class THREAD {
 public:
 	bool Joinable() const noexcept;
 	void Join() noexcept;
+	void Abort() noexcept;
 
 	THREAD() noexcept = default;
 	THREAD(SDL_Thread *sdl_thread, std::unique_ptr<THREAD_STOP> st);

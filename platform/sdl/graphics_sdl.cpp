@@ -858,6 +858,7 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 {
 	MaybeTakeScreenshot(std::move(screenshot_stream));
 	if(SoftwareRenderer) {
+		SDL_RenderFlush(SoftwareRenderer);
 		if(SDL_MUSTLOCK(SoftwareSurface)) {
 			SDL_LockSurface(SoftwareSurface);
 		}
@@ -1310,6 +1311,9 @@ bool GrpBackend_PixelAccessEnd(void)
 
 std::tuple<std::byte *, size_t> GrpBackend_PixelAccessLock(void)
 {
+	// Necessary in SDL 3!
+	SDL_RenderFlush(SoftwareRenderer);
+
 	if(SDL_MUSTLOCK(SoftwareSurface)) {
 		if(SDL_LockSurface(SoftwareSurface) != 0) {
 			Log_Fail(LOG_CAT, "Error locking CPU backbuffer");

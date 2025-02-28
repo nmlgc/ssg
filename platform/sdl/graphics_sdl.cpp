@@ -1133,7 +1133,7 @@ bool CreateTextureWithFormat(
 		return false;
 	}
 	if(HelpFailed(SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND))) {
-		Log_Fail(LOG_CAT, "Error enabling alpha blending for GDI text texture");
+		Log_Fail(LOG_CAT, "Error enabling alpha blending for texture");
 		return false;
 	}
 	return true;

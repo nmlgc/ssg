@@ -250,8 +250,8 @@ bool HelpSwitchFullscreen(
 
 	// If we come out of fullscreen mode, recenter the window.
 	if(fs_prev.fullscreen && !fs_new.fullscreen) {
-		const auto disp_i = std::max(SDL_GetWindowDisplayIndex(window), 0);
-		const auto center = SDL_WINDOWPOS_CENTERED_DISPLAY(disp_i);
+		const auto display_i = HelpGetDisplayForWindow();
+		const auto center = SDL_WINDOWPOS_CENTERED_DISPLAY(display_i);
 		SDL_SetWindowPosition(window, center, center);
 	}
 	return true;
@@ -356,10 +356,7 @@ PIXEL_SIZE GrpBackend_DisplaySize(bool fullscreen)
 {
 	SDL_Rect rect{};
 	SDL_DisplayMode display_mode{};
-	auto *window = WndBackend_SDL();
-	const auto display_i = (
-		window ? std::max(SDL_GetWindowDisplayIndex(window), 0) : 0
-	);
+	const auto display_i = HelpGetDisplayForWindow();
 	const auto ret = (fullscreen
 		? SDL_GetDesktopDisplayMode(display_i, &display_mode)
 		: SDL_GetDisplayUsableBounds(display_i, &rect)

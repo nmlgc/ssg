@@ -44,6 +44,14 @@ std::pair<int16_t, int16_t> HelpGetWindowPosition(SDL_Window *window)
 	);
 }
 
+SDL_DisplayID HelpGetDisplayForWindow(void)
+{
+	if(!Window) {
+		return 0;
+	}
+	return std::max(SDL_GetWindowDisplayIndex(Window), 0);
+}
+
 // Don't do a ZUN.
 // (https://github.com/thpatch/thcrap/commit/71c1dcab690f85653cbc9a06c7c55)
 SDL_Rect ClampWindowRect(SDL_Rect window_rect)

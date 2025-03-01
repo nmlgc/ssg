@@ -54,7 +54,7 @@ static constexpr std::u8string_view EXT = u8".BMP";
 static NUM_TYPE ScreenshotNum = 0;
 static std::u8string ScreenshotBuf;
 
-void Grp_SetScreenshotPrefix(std::u8string_view prefix)
+void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 {
 	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + EXT.size());
 	ScreenshotBuf.resize_and_overwrite(cap, [&](auto *p, size_t) {

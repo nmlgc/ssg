@@ -107,8 +107,12 @@ struct RGB216 {
 void Grp_PaletteSetDefault(void);
 // ----------------- //
 
+// Screenshots
+// -----------
+
 // Required to enable the screenshot feature as a whole.
-void Grp_SetScreenshotPrefix(std::u8string_view prefix);
+void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
+// -----------
 
 enum class GRAPHICS_FULLSCREEN_FIT : uint8_t {
 	// Scale to largest integer resolution

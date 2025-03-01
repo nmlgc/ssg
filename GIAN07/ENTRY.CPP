@@ -96,7 +96,7 @@ bool XInit(void)
 		ConfigDat.BGMPack.v.clear();
 	}
 	BGM_SetGainApply(!(ConfigDat.SoundFlags.v & SNDF_BGM_NOT_VOL_NORM));
-	Grp_SetScreenshotPrefix(u8"秋霜");
+	Grp_ScreenshotSetPrefix(u8"秋霜");
 	LoaderInit();
 	return true;
 }

@@ -188,7 +188,7 @@ void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
 	}
 }
 
-bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
+bool DDrawSaveScreenshot(FILE_STREAM_WRITE *stream, IDirectDrawSurface *surf)
 {
 	if(!surf || !stream) {
 		return false;
@@ -224,19 +224,19 @@ bool DDrawSaveSurface(FILE_STREAM_WRITE* stream, IDirectDrawSurface* surf)
 	}
 
 	const uint16_t bpp = desc.ddpfPixelFormat.dwRGBBitCount;
-	const PIXEL_SIZE size = {
+	const PIXEL_SIZE_BASE<unsigned int> size = {
 		// The rows of DirectDraw surfaces tend to be aligned to larger
 		// boundaries than the DWORD alignment of .BMP files. Let's just round
 		// up the .BMP width to that stride so that we can directly write the
 		// surface memory in a single block, without trimming the rows.
-		static_cast<int32_t>(desc.lPitch / (bpp / 8)),
-		-static_cast<int32_t>(desc.dwHeight)
+		.w = static_cast<unsigned int>(desc.lPitch / (bpp / 8)),
+		.h = desc.dwHeight,
 	};
 	const std::span<const std::byte> pixels = {
 		static_cast<const std::byte *>(desc.lpSurface),
 		static_cast<size_t>(desc.lPitch * desc.dwHeight),
 	};
-	const auto ret = BMPSave(stream, size, 1, bpp, palette, pixels);
+	const auto ret = Grp_ScreenshotSave(stream, size, bpp, palette, pixels);
 	surf->Unlock(nullptr);
 	return ret;
 }
@@ -722,7 +722,7 @@ GRAPHICS_GEOMETRY_DDRAW *GrpGeom_FB(void)
 void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 {
 	if(auto *stream = screenshot_stream.get()) {
-		DDrawSaveSurface(stream, DxObj.Back);
+		DDrawSaveScreenshot(stream, DxObj.Back);
 	}
 
 	if(Fullscreen) {

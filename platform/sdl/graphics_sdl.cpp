@@ -994,10 +994,12 @@ void SaveSurfaceAsScreenshot(
 #else
 	assert(src->format->palette == nullptr);
 #endif
-
-	// Negate the height so that we neither have to flip the pixels nor write
-	// RWops for `FILE_STREAM_WRITE` in order to use SDL_SaveBMP_RW().
-	const PIXEL_SIZE size = { .w = src->w, .h = -src->h };
+	assert(src->w >= 0);
+	assert(src->h >= 0);
+	const PIXEL_SIZE_BASE<unsigned int> size = {
+		.w = Cast::sign<unsigned int>(src->w),
+		.h = Cast::sign<unsigned int>(src->h),
+	};
 
 	if(SDL_MUSTLOCK(src)) {
 		SDL_LockSurface(src);
@@ -1006,7 +1008,7 @@ void SaveSurfaceAsScreenshot(
 		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
 	);
 	const auto bpp = SDL_BITSPERPIXEL(HelpFormatFrom(src));
-	BMPSave(stream.get(), size, 1, bpp, {}, pixels);
+	Grp_ScreenshotSave(stream.get(), size, bpp, {}, pixels);
 	if(SDL_MUSTLOCK(src)) {
 		SDL_UnlockSurface(src);
 	}

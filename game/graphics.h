@@ -110,8 +110,20 @@ void Grp_PaletteSetDefault(void);
 // Screenshots
 // -----------
 
+struct BGRA;
+struct FILE_STREAM_WRITE;
+
 // Required to enable the screenshot feature as a whole.
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
+
+// Saves the given bitmap in the screenshot format to [stream].
+bool Grp_ScreenshotSave(
+	FILE_STREAM_WRITE *stream,
+	PIXEL_SIZE_BASE<unsigned int> size,
+	uint8_t bpp,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels
+);
 // -----------
 
 enum class GRAPHICS_FULLSCREEN_FIT : uint8_t {

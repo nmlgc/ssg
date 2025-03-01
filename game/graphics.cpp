@@ -4,6 +4,7 @@
  */
 
 #include "game/graphics.h"
+#include "game/format_bmp.h"
 #include "game/input.h"
 #include "game/string_format.h"
 #include "platform/file.h"
@@ -82,6 +83,23 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 		}
 	}
 	return nullptr;
+}
+
+bool Grp_ScreenshotSave(
+	FILE_STREAM_WRITE *stream,
+	PIXEL_SIZE_BASE<unsigned int> size,
+	uint8_t bpp,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels
+)
+{
+	assert(size.w < std::numeric_limits<PIXEL_COORD>::max());
+	assert(size.h < std::numeric_limits<PIXEL_COORD>::max());
+	const PIXEL_SIZE bmp_size = {
+		.w = Cast::sign<PIXEL_COORD>(size.w),
+		.h = -Cast::sign<PIXEL_COORD>(size.h),
+	};
+	return BMPSave(stream, bmp_size, 1, bpp, palette, pixels);
 }
 // -----------
 

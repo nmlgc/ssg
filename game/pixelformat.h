@@ -7,22 +7,38 @@
 
 import std.compat;
 
-// (We don't really care about the value of whatever variant type this holds,
-// just about the type itself.)
-struct PIXELFORMAT : public std::variant<uint8_t, uint16_t, uint32_t> {
-	// Not worth auto-generating at all.
-	using LARGEST = uint32_t;
+struct PIXELFORMAT {
+	enum FORMAT {
+		PALETTE8,
+		ANY16,
+		ANY32,
+	} format;
+
+	enum SIZE {
+		SIZE8 = 1,
+		SIZE16 = 2,
+		SIZE32 = 4,
+	};
 
 	bool IsPalettized() const {
-		return std::holds_alternative<uint8_t>(*this);
+		return (format == PALETTE8);
 	}
 
 	bool IsChanneled() const {
 		return !IsPalettized();
 	}
 
-	std::strong_ordering operator <=>(const PIXELFORMAT& other) const {
-		return (index() <=> other.index());
+	SIZE PixelSize() const {
+		switch(format) {
+		case PALETTE8:	return SIZE8;
+		case ANY16:   	return SIZE16;
+		case ANY32:   	return SIZE32;
+		}
+		std::unreachable();
+	}
+
+	size_t PixelByteSize() const {
+		return static_cast<size_t>(PixelSize());
 	}
 };
 
@@ -67,13 +83,12 @@ public:
 			return bpp;
 		}
 
-		// Adding std::monostate to PIXELFORMAT would just make it awful to
-		// use.
 		std::optional<PIXELFORMAT> pixel_format() const {
+			using F = PIXELFORMAT;
 			switch(bpp) {
-			case  8:	return std::make_optional<PIXELFORMAT>(uint8_t{});
-			case 16:	return std::make_optional<PIXELFORMAT>(uint16_t{});
-			case 32:	return std::make_optional<PIXELFORMAT>(uint32_t{});
+			case 8: 	return std::make_optional<PIXELFORMAT>(F::PALETTE8);
+			case 16:	return std::make_optional<PIXELFORMAT>(F::ANY16);
+			case 32:	return std::make_optional<PIXELFORMAT>(F::ANY32);
 			default:	return std::nullopt;
 			}
 		}

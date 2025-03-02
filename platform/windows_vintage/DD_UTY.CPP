@@ -773,18 +773,18 @@ bool GRAPHICS_DDRAW::SurfaceSetColorKeyFromFirstPixel(SURFACE_DDRAW& surf)
 	}
 
 	// はじっこの色獲得＆カラーキー準備 //
-	const auto temp = std::visit([&ddsd](auto pixel) -> DWORD {
-		if(sizeof(decltype(pixel)) == 3) {
-			// これでいいのか？ //
-			const auto *bytes = static_cast<uint8_t *>(ddsd.lpSurface);
-			return (
-				(Cast::up<DWORD>(bytes[0]) <<  0) +
-				(Cast::up<DWORD>(bytes[1]) <<  8) +
-				(Cast::up<DWORD>(bytes[2]) << 16)
-			);
-		}
-		return *static_cast<decltype(pixel) *>(ddsd.lpSurface);
-	}, PixelFormat);
+	DWORD temp = 0;
+	switch(PixelFormat.PixelSize()) {
+	case PIXELFORMAT::SIZE8:
+		temp = *static_cast<uint8_t *>(ddsd.lpSurface);
+		break;
+	case PIXELFORMAT::SIZE16:
+		temp = *static_cast<uint16_t *>(ddsd.lpSurface);
+		break;
+	case PIXELFORMAT::SIZE32:
+		temp = *static_cast<uint32_t *>(ddsd.lpSurface);
+		break;
+	}
 
 	// Unlock する //
 	const auto dxval = surf.surf->Unlock(nullptr);

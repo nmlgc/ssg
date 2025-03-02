@@ -6,7 +6,7 @@
 #pragma once
 
 #ifdef WIN32
-	#define SUPPORT_MIDI_BACKEND
+#define SUPPORT_MIDI_BACKEND
 #endif
 
 #ifdef SUPPORT_MIDI_BACKEND

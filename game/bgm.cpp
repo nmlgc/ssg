@@ -358,9 +358,9 @@ static std::filesystem::directory_iterator DataPathIterator(
 }
 
 #ifdef _MSC_VER
-	// Disable the false-positive C26495 warning:
-	// https://developercommunity.visualstudio.com/t/10746697
-	#pragma warning(disable: 26495)
+// Disable the false-positive C26495 warning:
+// https://developercommunity.visualstudio.com/t/10746697
+#pragma warning(disable: 26495)
 #endif
 
 static auto BGM_PackIterator(void)
@@ -371,7 +371,7 @@ static auto BGM_PackIterator(void)
 }
 
 #ifdef _MSC_VER
-	#pragma warning(default: 26495)
+#pragma warning(default: 26495)
 #endif
 
 bool BGM_PacksAvailable(bool invalidate_cache)

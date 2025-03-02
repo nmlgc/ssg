@@ -998,9 +998,9 @@ void GrpSurface_BlitOpaque(
 	SDL_SetTextureBlendMode(tex, prev);
 }
 
+#ifdef WIN32
 // Win32 GDI text rendering bridge
 // -------------------------------
-#ifdef WIN32
 
 #include "platform/windows/surface_gdi.h"
 
@@ -1106,8 +1106,8 @@ bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r) noexcept
 	const auto pitch = static_cast<size_t>(dib.dsBm.bmWidthBytes);
 	return GrpSurface_Update(SURFACE_ID::TEXT, &r, { pixels, pitch });
 }
-#endif
 // -------------------------------
+#endif
 /// --------
 
 /// Geometry

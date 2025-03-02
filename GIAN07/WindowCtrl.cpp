@@ -188,67 +188,61 @@ WINDOW_CHOICE DifItem[] = {
 WINDOW_MENU DifMenu = { std::span(DifItem), SetDifItem };
 
 #ifdef SUPPORT_GRP_API
-	char GrpAPIDefTitle[26];
-	WINDOW_CHOICE GrpAPIItemDef = {
-		GrpAPIDefTitle, HELP_API_DEFAULT, GrpAPIFnDef
-	};
-	std::array<WINDOW_CHOICE, 6> GrpAPIItem;
-	WINDOW_MENU GrpAPIMenu = { std::span<WINDOW_CHOICE, 0>(), SetGrpAPIItem };
+char GrpAPIDefTitle[26];
+WINDOW_CHOICE GrpAPIItemDef = { GrpAPIDefTitle, HELP_API_DEFAULT, GrpAPIFnDef };
+std::array<WINDOW_CHOICE, 6> GrpAPIItem;
+WINDOW_MENU GrpAPIMenu = { std::span<WINDOW_CHOICE, 0>(), SetGrpAPIItem };
 #endif
 
 static char GrpTitleDevice[50];
 #ifdef SUPPORT_GRP_WINDOWED
-	static char GrpTitleDisp[50];
-	static char GrpTitleFSMode[50];
+static char GrpTitleDisp[50];
+static char GrpTitleFSMode[50];
 #endif
 #ifdef SUPPORT_GRP_SCALING
-	static char GrpTitleScale[50];
-	static char GrpTitleScMode[50];
+static char GrpTitleScale[50];
+static char GrpTitleScMode[50];
 #endif
 static char GrpTitleSkip[50];
 #ifdef SUPPORT_GRP_BITDEPTH
-	static char GrpTitleBpp[50];
+static char GrpTitleBpp[50];
 #endif
 static char GrpTitleMsg[50];
 
 #ifdef SUPPORT_GRP_WINDOWED
-	static char GrpHelpFSMode[50];
+static char GrpHelpFSMode[50];
 #endif
 #ifdef SUPPORT_GRP_SCALING
-	static char GrpHelpScale[50];
-	static char GrpHelpScMode[50];
+static char GrpHelpScale[50];
+static char GrpHelpScMode[50];
 #endif
 
 // WINDOW_CHOICE GrpItemDevice = {
 // 	GrpTitleDevice, "ビデオカードの選択", GrpFnChgDevice
 // };
 #ifdef SUPPORT_GRP_WINDOWED
-	WINDOW_CHOICE GrpItemDisp = {
-		GrpTitleDisp, "Switch between window and fullscreen modes", GrpFnDisp
-	};
-	WINDOW_CHOICE GrpItemFSMode = {
-		GrpTitleFSMode, GrpHelpFSMode, GrpFnFSMode
-	};
+WINDOW_CHOICE GrpItemDisp = {
+	GrpTitleDisp, "Switch between window and fullscreen modes", GrpFnDisp
+};
+WINDOW_CHOICE GrpItemFSMode = { GrpTitleFSMode, GrpHelpFSMode, GrpFnFSMode };
 #endif
 #ifdef SUPPORT_GRP_SCALING
-	WINDOW_CHOICE GrpItemScale = { GrpTitleScale, GrpHelpScale, GrpFnScale };
-	WINDOW_CHOICE GrpItemScMode = {
-		GrpTitleScMode, GrpHelpScMode, GrpFnScMode
-	};
+WINDOW_CHOICE GrpItemScale = { GrpTitleScale, GrpHelpScale, GrpFnScale };
+WINDOW_CHOICE GrpItemScMode = { GrpTitleScMode, GrpHelpScMode, GrpFnScMode };
 #endif
 WINDOW_CHOICE GrpItemSkip = {
 	GrpTitleSkip, "描画スキップの設定です", GrpFnSkip
 };
 #ifdef SUPPORT_GRP_BITDEPTH
-	WINDOW_CHOICE GrpItemBpp = {
-		GrpTitleBpp, "使用する色数を指定します", GrpFnBpp
-	};
+WINDOW_CHOICE GrpItemBpp = {
+	GrpTitleBpp, "使用する色数を指定します", GrpFnBpp
+};
 #endif
 WINDOW_CHOICE GrpItemMsg = {
 	GrpTitleMsg, "ウィンドウの表示位置を決めます", GrpFnWinLocate
 };
 #ifdef SUPPORT_GRP_API
-	WINDOW_CHOICE GrpItemAPI = { "API",	"Select rendering API",	GrpAPIMenu };
+WINDOW_CHOICE GrpItemAPI = { "API",	"Select rendering API",	GrpAPIMenu };
 #endif
 WINDOW_CHOICE GrpItemExit = SubmenuExitItem;
 WINDOW_MENU GrpMenu = { SetGrpItem, {
@@ -282,8 +276,8 @@ WINDOW_CHOICE MidItem[] = {
 	SubmenuExitItemForArray,
 };
 #ifdef SUPPORT_MIDI_BACKEND
-	WINDOW_MENU MidMenu = { std::span(MidItem), SetMidItem };
-	static auto& MidItemPort = MidItem[0];
+WINDOW_MENU MidMenu = { std::span(MidItem), SetMidItem };
+static auto& MidItemPort = MidItem[0];
 #endif
 
 static char SndTitleSE[26];
@@ -299,9 +293,9 @@ WINDOW_CHOICE SndItem[] = {
 	{ SndTitleBGMVol, "音楽の音量", SndFnBGMVol, VOLUME_FLAGS },
 	{ SndTitleBGMGain,	"毎に曲から音量の違うことが外します",	SndFnBGMGain },
 	{ SndTitleBGMPack,	BGMPack::HELP_DOWNLOAD,	SndFnBGMPack },
-	#ifdef SUPPORT_MIDI_BACKEND
+#ifdef SUPPORT_MIDI_BACKEND
 	{ "MIDI",	"Change MIDI playback options",	MidMenu },
-	#endif
+#endif
 	SubmenuExitItemForArray,
 };
 WINDOW_MENU SndMenu = { std::span(SndItem), SetSndItem };
@@ -413,25 +407,25 @@ WINDOW_SYSTEM BGMPackWindow = { BGMPackMenu.Menu };
 // メインメニューの初期化 //
 void InitMainWindow(void)
 {
-	#ifdef SUPPORT_GRP_API
-		const auto grp_api_count = GrpBackend_APICount();
-		if(grp_api_count >= 2) {
-			assert(grp_api_count <= GrpAPIItem.size());
-			auto* menu_p = GrpAPIMenu.ItemPtr;
+#ifdef SUPPORT_GRP_API
+	const auto grp_api_count = GrpBackend_APICount();
+	if(grp_api_count >= 2) {
+		assert(grp_api_count <= GrpAPIItem.size());
+		auto* menu_p = GrpAPIMenu.ItemPtr;
 
-			*(menu_p++) = &GrpAPIItemDef;
-			for(const auto i : std::views::iota(0, grp_api_count)) {
-				const Narrow::string_view name = GrpBackend_APIName(i);
-				assert(!name.empty());
-				GrpAPIItem[i] = { name.data(), HELP_API_SPECIFIC, GrpFnSetAPI };
-				*(menu_p++) = &GrpAPIItem[i];
-			}
-			*(menu_p++) = &SubmenuExitItem;
-			GrpAPIMenu.NumItems = std::distance(GrpAPIMenu.ItemPtr, menu_p);
-		} else {
-			GrpItemAPI.State = WINDOW_STATE::DISABLED;
+		*(menu_p++) = &GrpAPIItemDef;
+		for(const auto i : std::views::iota(0, grp_api_count)) {
+			const Narrow::string_view name = GrpBackend_APIName(i);
+			assert(!name.empty());
+			GrpAPIItem[i] = { name.data(), HELP_API_SPECIFIC, GrpFnSetAPI };
+			*(menu_p++) = &GrpAPIItem[i];
 		}
-	#endif
+		*(menu_p++) = &SubmenuExitItem;
+		GrpAPIMenu.NumItems = std::distance(GrpAPIMenu.ItemPtr, menu_p);
+	} else {
+		GrpItemAPI.State = WINDOW_STATE::DISABLED;
+	}
+#endif
 
 	MainWindow.Init(140);
 
@@ -495,7 +489,6 @@ static void DifFnDemo(int_fast8_t)
 {
 	DebugDat.DemoSave = !DebugDat.DemoSave;
 }
-
 #endif // PBG_DEBUG
 
 static void GrpAPIFnDef(int_fast8_t)

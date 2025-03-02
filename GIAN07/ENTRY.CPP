@@ -51,19 +51,19 @@ bool XInit(void)
 {
 	std::filesystem::current_path(PathForData());
 
-	#ifdef WIN32
-		// User data and game data directories are one and the same on Windows,
-		// and we already ship with the skeleton in place.
-	#elif !defined(PATH_SKELETON)
-		#pragma message("No user data skeleton directory defined. This does not matter for development builds, but package builds should set the environment variable `PATH_SKELETON` accordingly.")
-	#else
-		using copy_opts = std::filesystem::copy_options;
+#ifdef WIN32
+	// User data and game data directories are one and the same on Windows,
+	// and we already ship with the skeleton in place.
+#elif !defined(PATH_SKELETON)
+	#pragma message("No user data skeleton directory defined. This does not matter for development builds, but package builds should set the environment variable `PATH_SKELETON` accordingly.")
+#else
+	using copy_opts = std::filesystem::copy_options;
 
-		auto path_data = PathForData();
-		std::error_code ec;
-		const auto opts = (copy_opts::skip_existing | copy_opts::recursive);
-		std::filesystem::copy(PATH_SKELETON, PathForData(), opts, ec);
-	#endif
+	auto path_data = PathForData();
+	std::error_code ec;
+	const auto opts = (copy_opts::skip_existing | copy_opts::recursive);
+	std::filesystem::copy(PATH_SKELETON, PathForData(), opts, ec);
+#endif
 
 	DebugSetup();
 
@@ -177,22 +177,22 @@ void XGrpTryCycleScMode(void)
 
 bool GameFrame(void)
 {
-	#ifdef SUPPORT_GRP_WINDOWED
-		if(SystemKey_Data & SYSKEY_GRP_FULLSCREEN) {
-			XGrpTryCycleDisp();
-		}
-	#endif
-	#ifdef SUPPORT_GRP_SCALING
-		if(SystemKey_Data & SYSKEY_GRP_SCALE_UP) {
-			XGrpTryCycleScale(+1, false);
-		}
-		if(SystemKey_Data & SYSKEY_GRP_SCALE_DOWN) {
-			XGrpTryCycleScale(-1, false);
-		}
-		if(SystemKey_Data & SYSKEY_GRP_SCALE_MODE) {
-			XGrpTryCycleScMode();
-		}
-	#endif
+#ifdef SUPPORT_GRP_WINDOWED
+	if(SystemKey_Data & SYSKEY_GRP_FULLSCREEN) {
+		XGrpTryCycleDisp();
+	}
+#endif
+#ifdef SUPPORT_GRP_SCALING
+	if(SystemKey_Data & SYSKEY_GRP_SCALE_UP) {
+		XGrpTryCycleScale(+1, false);
+	}
+	if(SystemKey_Data & SYSKEY_GRP_SCALE_DOWN) {
+		XGrpTryCycleScale(-1, false);
+	}
+	if(SystemKey_Data & SYSKEY_GRP_SCALE_MODE) {
+		XGrpTryCycleScMode();
+	}
+#endif
 	if(SystemKey_Data & SYSKEY_GRP_TURBO) {
 		static decltype(Grp_FPSDivisor) fps_divisor_prev = (
 			(Grp_FPSDivisor != 0) ? Grp_FPSDivisor : 1

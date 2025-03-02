@@ -9,55 +9,55 @@
 #include "platform/text_backend.h"
 
 #ifdef WIN32
-	#include <windows.h>
+#include <windows.h>
 
-	extern constinit const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs = [] {
-		ENUMARRAY<LOGFONTW, FONT_ID> ret;
+extern constinit const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs = [] {
+	ENUMARRAY<LOGFONTW, FONT_ID> ret;
 
-		LOGFONTW logfont = {
-			.lfEscapement = 0,
-			.lfOrientation = 0,
-			.lfItalic = false,
-			.lfUnderline = false,
-			.lfStrikeOut = false,
-			.lfCharSet = SHIFTJIS_CHARSET,
-			.lfOutPrecision = OUT_TT_ONLY_PRECIS,
-			.lfClipPrecision = CLIP_DEFAULT_PRECIS,
-			.lfQuality = PROOF_QUALITY,
-			.lfPitchAndFamily = FIXED_PITCH,
-			.lfFaceName = L"ＭＳ ゴシック"
-		};
-
-		// ちっこいフォント //
-		logfont.lfHeight = 14;
-		logfont.lfWidth = 7;
-		logfont.lfWeight = FW_NORMAL;
-		ret[FONT_ID::SMALL] = logfont;
-
-		// 並なフォント //
-		logfont.lfHeight = 16;
-		logfont.lfWidth = 8;
-		logfont.lfWeight = FW_NORMAL;
-		ret[FONT_ID::NORMAL] = logfont;
-
-		// でかいフォント //
-		logfont.lfHeight = 24;
-		logfont.lfWidth = 12;
-		logfont.lfWeight = FW_MEDIUM;
-		ret[FONT_ID::LARGE] = logfont;
-
-		return ret;
-	}();
-#elif defined(LINUX)
-	#define GOTHIC "MS Gothic,IPAMonaGothic "
-
-	extern constinit const ENUMARRAY<const char *, FONT_ID> FontSpecs = {
-		(GOTHIC "Regular 14px"),
-		(GOTHIC "Regular 16px"),
-		(GOTHIC "Medium 24px"),
+	LOGFONTW logfont = {
+		.lfEscapement = 0,
+		.lfOrientation = 0,
+		.lfItalic = false,
+		.lfUnderline = false,
+		.lfStrikeOut = false,
+		.lfCharSet = SHIFTJIS_CHARSET,
+		.lfOutPrecision = OUT_TT_ONLY_PRECIS,
+		.lfClipPrecision = CLIP_DEFAULT_PRECIS,
+		.lfQuality = PROOF_QUALITY,
+		.lfPitchAndFamily = FIXED_PITCH,
+		.lfFaceName = L"ＭＳ ゴシック"
 	};
 
-	#undef GOTHIC
+	// ちっこいフォント //
+	logfont.lfHeight = 14;
+	logfont.lfWidth = 7;
+	logfont.lfWeight = FW_NORMAL;
+	ret[FONT_ID::SMALL] = logfont;
+
+	// 並なフォント //
+	logfont.lfHeight = 16;
+	logfont.lfWidth = 8;
+	logfont.lfWeight = FW_NORMAL;
+	ret[FONT_ID::NORMAL] = logfont;
+
+	// でかいフォント //
+	logfont.lfHeight = 24;
+	logfont.lfWidth = 12;
+	logfont.lfWeight = FW_MEDIUM;
+	ret[FONT_ID::LARGE] = logfont;
+
+	return ret;
+}();
+#elif defined(LINUX)
+#define GOTHIC "MS Gothic,IPAMonaGothic "
+
+extern constinit const ENUMARRAY<const char *, FONT_ID> FontSpecs = {
+	(GOTHIC "Regular 14px"),
+	(GOTHIC "Regular 16px"),
+	(GOTHIC "Medium 24px"),
+};
+
+#undef GOTHIC
 #endif
 
 // Glyph selection inside the 16×16 font //

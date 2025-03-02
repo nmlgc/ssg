@@ -20,15 +20,13 @@ std::u8string_view PathForData(void)
 	if(PathDataView.data() != nullptr) {
 		return PathDataView;
 	}
-	#ifdef WIN32
-		auto* path_base = SDL_GetBasePath();
-	#else
-		#ifdef PATH_XDG_DATA_HOME_HAS_APP_ID
-			auto* path_base = SDL_GetPrefPath(nullptr, "");
-		#else
-			auto* path_base = SDL_GetPrefPath(GAME_ORG, GAME_APP);
-		#endif
-	#endif
+#ifdef WIN32
+	auto* path_base = SDL_GetBasePath();
+#elif defined(PATH_XDG_DATA_HOME_HAS_APP_ID)
+	auto* path_base = SDL_GetPrefPath(nullptr, "");
+#else
+	auto* path_base = SDL_GetPrefPath(GAME_ORG, GAME_APP);
+#endif
 	if(!path_base) {
 		return {};
 	}

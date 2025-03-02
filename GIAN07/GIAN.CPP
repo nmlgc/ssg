@@ -47,10 +47,10 @@ extern void StdStatusOutput(void)
 	GrpPut16(0,0,buf);
 
 #ifdef PBG_DEBUG
-	#ifdef SUPPORT_GRP_BITDEPTH
-		sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());
-		GrpPut16(0, 32, buf);
-	#endif
+#ifdef SUPPORT_GRP_BITDEPTH
+	sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());
+	GrpPut16(0, 32, buf);
+#endif
 	//sprintf(buf,"%s",DItem[ConfigDat.GameLevel.v]);
 	//GrpPut16(0,50,buf);
 
@@ -93,8 +93,8 @@ extern void StdStatusOutput(void)
 	sprintf(buf," %5d",GameCount);
 	GrpPut16(column2_left, 120, buf);
 #else
-//	GrpPut16(0,440,"G07");
-//	GrpPut16(0,460,"12/5 Ver");
+	// GrpPut16(0,440,"G07");
+	// GrpPut16(0,460,"12/5 Ver");
 #endif
 
 	const auto tm = Time_NowLocal();

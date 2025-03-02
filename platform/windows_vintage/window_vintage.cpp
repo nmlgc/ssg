@@ -143,9 +143,9 @@ long FAR __stdcall WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam)
 		case WM_IME_KEYUP:		case WM_IME_NOTIFY:				case WM_IME_SELECT:
 		case WM_IME_SETCONTEXT:	case WM_IME_STARTCOMPOSITION:
 
-		#if(WINVER >= 0x0500)
-			case WM_IME_REQUEST:
-		#endif
+#if(WINVER >= 0x0500)
+		case WM_IME_REQUEST:
+#endif
 
 		return 1;
 

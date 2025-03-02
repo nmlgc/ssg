@@ -22,8 +22,8 @@ import std.compat;
 
 // マクロ //
 #ifndef max
-	#define max(a,b)	((a>b) ? (a) : (b))
-	#define min(a,b)	((a<b) ? (a) : (b))
+#define max(a,b)	((a>b) ? (a) : (b))
+#define min(a,b)	((a<b) ? (a) : (b))
 #endif
 
 #define sinm(deg) (SIN256[(unsigned char)deg]) // SINﾃｰﾌﾞﾙ参照用ﾏｸﾛ

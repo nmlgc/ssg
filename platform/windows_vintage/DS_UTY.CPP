@@ -14,20 +14,21 @@
 #pragma comment(lib,"dsound.lib")
 
 #if   DIRECTSOUND_VERSION == 0x0700
-	#pragma message("      DirectSound : Version 7.00")
+#pragma message("      DirectSound : Version 7.00")
 #elif DIRECTSOUND_VERSION == 0x0600
-	#pragma message("      DirectSound : Version 6.00")
+#pragma message("      DirectSound : Version 6.00")
 #elif DIRECTSOUND_VERSION == 0x0500
-	#pragma message("      DirectSound : Version 5.00")
+#pragma message("      DirectSound : Version 5.00")
 #elif DIRECTSOUND_VERSION == 0x0300
-	#pragma message("      DirectSound : Version 3.00")
+#pragma message("      DirectSound : Version 3.00")
 #else
-	#pragma message("      DirectSound : Version <= 6.00???")
+#pragma message("      DirectSound : Version <= 6.00???")
 #endif
 
 #ifndef DSBCAPS_CTRLDEFAULT
-	#define DSBCAPS_CTRLDEFAULT \
-		(DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY)
+#define DSBCAPS_CTRLDEFAULT ( \
+	DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY \\
+)
 #endif
 
 //#pragma optimize("",off)

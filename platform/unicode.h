@@ -6,9 +6,9 @@
 #pragma once
 
 #ifdef WIN32
-	#include "platform/windows/unicode.h"
+#include "platform/windows/unicode.h"
 #else
-	#include "platform/c/unicode.h"
+#include "platform/c/unicode.h"
 #endif
 
 using UNICODE_CODEUNIT = UNICODE_STRING::value_type;

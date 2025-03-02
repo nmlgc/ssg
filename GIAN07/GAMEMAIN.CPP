@@ -1137,12 +1137,12 @@ void WeaponSelectProc(bool&)
 
 			Snd_SEPlay(SOUND_ID_SELECT);
 			if(GameStage != GRAPH_ID_EXSTAGE){
-			#ifdef PBG_DEBUG
+#ifdef PBG_DEBUG
 				GameStage = DebugDat.StgSelect;
 				if(GameStage==2) Viv.exp = 160;
 				if(GameStage>=3) Viv.exp = 255;
 				if(DebugDat.DemoSave) DemoplayInit();
-			#else
+#else
 				// リプレイ用の処理を追加 //
 				if(ConfigDat.StageSelect.v) {
 					GameStage = ConfigDat.StageSelect.v;
@@ -1153,7 +1153,7 @@ void WeaponSelectProc(bool&)
 				else{
 					GameStage = 1;
 				}
-			#endif
+#endif
 			}
 			else{
 				Viv.credit = 0;
@@ -1282,9 +1282,9 @@ void WeaponSelectProc(bool&)
 		TextOut(hdc,0,0,buf,strlen(buf));
 		DxObj.Back->ReleaseDC(hdc);
 
-		#ifdef PBG_DEBUG
-			StdStatusOutput();
-		#endif
+#ifdef PBG_DEBUG
+		StdStatusOutput();
+#endif
 */
 		Grp_Flip();
 	}
@@ -1347,9 +1347,9 @@ void TitleProc(bool& quit)
 		// GrpSurface_Blit({ (320 - 175), 77 }, SURFACE_ID::TITLE, src);
 		MWinDraw();
 		CWinDraw(window_active);
-		#ifdef PBG_DEBUG
-			StdStatusOutput();
-		#endif
+#ifdef PBG_DEBUG
+		StdStatusOutput();
+#endif
 
 		Grp_Flip();
 	}

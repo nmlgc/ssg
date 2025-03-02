@@ -112,22 +112,22 @@ void GrpSurface_BlitOpaque(
 );
 
 #ifdef WIN32
-	// Win32 GDI text rendering bridge
-	// -------------------------------
-	class SURFACE_GDI;
+// Win32 GDI text rendering bridge
+// -------------------------------
+class SURFACE_GDI;
 
-	// Returns a reference to the backend's designated GDI text surface.
-	SURFACE_GDI& GrpSurface_GDIText_Surface(void) noexcept;
+// Returns a reference to the backend's designated GDI text surface.
+SURFACE_GDI& GrpSurface_GDIText_Surface(void) noexcept;
 
-	// (Re-)creates the backend's designated GDI text surface with the given
-	// size and undefined initial contents. [w] and [h] have already been
-	// validated to fit into the positive range of a signed 32-bit integer.
-	// After filling it with the intended pixels, call
-	// GrpSurface_GDIText_Update() to upload them to the backend.
-	bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey);
+// (Re-)creates the backend's designated GDI text surface with the given size
+// and undefined initial contents. [w] and [h] have already been validated to
+// fit into the positive range of a signed 32-bit integer. After filling it
+// with the intended pixels, call GrpSurface_GDIText_Update() to upload them to
+// the backend.
+bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey);
 
-	bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r) noexcept;
-	// -------------------------------
+bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r) noexcept;
+// -------------------------------
 #endif
 /// --------
 
@@ -138,9 +138,9 @@ void GrpSurface_BlitOpaque(
 // ------------
 
 #ifdef WIN32_VINTAGE
-	using VERTEX_COORD = WINDOW_COORD;
+using VERTEX_COORD = WINDOW_COORD;
 #else
-	using VERTEX_COORD = float;
+using VERTEX_COORD = float;
 #endif
 using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
 using VERTEX_RGBA = RGBA;
@@ -284,7 +284,7 @@ void GrpBackend_PixelAccessEdit(auto func)
 /// ------------------------------------
 
 #ifdef WIN32_VINTAGE
-	#include "platform/windows_vintage/DD_UTY.H"
+#include "platform/windows_vintage/DD_UTY.H"
 #else
-	#include "platform/sdl/graphics_sdl.h"
+#include "platform/sdl/graphics_sdl.h"
 #endif

@@ -20,13 +20,13 @@
 #pragma comment(lib, "user32.lib")
 
 #if   DIRECTDRAW_VERSION == 0x0700
-	#pragma message("      DirectDraw  : Version 7.00")
+#pragma message("      DirectDraw  : Version 7.00")
 #elif DIRECTDRAW_VERSION == 0x0600
-	#pragma message("      DirectDraw  : Version 6.00")
+#pragma message("      DirectDraw  : Version 6.00")
 #elif DIRECTDRAW_VERSION == 0x0500
-	#pragma message("      DirectDraw  : Version 5.00")
+#pragma message("      DirectDraw  : Version 5.00")
 #elif DIRECTDRAW_VERSION == 0x0300
-	#pragma message("      DirectDraw  : Version 3.00")
+#pragma message("      DirectDraw  : Version 3.00")
 #endif
 
 

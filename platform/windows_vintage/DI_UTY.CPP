@@ -20,13 +20,13 @@
 #pragma comment(lib, "winmm.lib")
 
 #if   DIRECTINPUT_VERSION == 0x0700
-	#pragma message("      DirectInput : Version 7.00")
+#pragma message("      DirectInput : Version 7.00")
 #elif DIRECTINPUT_VERSION == 0x0600
-	#pragma message("      DirectInput : Version 6.00")
+#pragma message("      DirectInput : Version 6.00")
 #elif DIRECTINPUT_VERSION == 0x0500
-	#pragma message("      DirectInput : Version 5.00")
+#pragma message("      DirectInput : Version 5.00")
 #elif DIRECTINPUT_VERSION == 0x0300
-	#pragma message("      DirectInput : Version 3.00")
+#pragma message("      DirectInput : Version 3.00")
 #endif
 
 //#pragma optimize("",off)

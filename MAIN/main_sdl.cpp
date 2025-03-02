@@ -33,23 +33,23 @@ int main(int argc, char** args)
 {
 	Log_Init(UTF8(GAME_TITLE));
 
-	#if(defined(LINUX) && defined(APP_ID))
-		// Tell the Desktop Entry name to the X11 (or Wayland!) window manager,
-		// and hope that it uses this name to pick the Desktop Entry's icon.
-		//
-		// SDL_SetWindowIcon() only allows sending a single icon, which is the
-		// wrong approach if you have multiple lovingly hand-crafted variants
-		// of your icon at different resolutions. It should be the WM's job to
-		// pick the closest available version because we can't possibly know
-		// how many pixels it allotted for the icon. SDL_GetWindowBordersSize()
-		// is a hack at best because it only tells us the total size of the
-		// decorations, not the intended icon size. What should we do if we
-		// have a 16-pixel and a 32-pixel icon but get a decoration size of 22?
-		//
-		/// (Also, SDL_WindowIcon() still works this way even in SDL 3 where
-		// `SDL_Surface` gained support for alternate-resolution images.)
-		SDL_setenv("SDL_VIDEO_X11_WMCLASS", APP_ID, 1);
-	#endif
+#if (defined(LINUX) && defined(APP_ID))
+	// Tell the Desktop Entry name to the X11 (or Wayland!) window manager, and
+	// hope that it uses this name to pick the Desktop Entry's icon.
+	//
+	// SDL_SetWindowIcon() only allows sending a single icon, which is the
+	// wrong approach if you have multiple lovingly hand-crafted variants of
+	// your icon at different resolutions. It should be the WM's job to pick
+	// the closest available version because we can't possibly know how many
+	// pixels it allotted for the icon. SDL_GetWindowBordersSize() is a hack at
+	// best because it only tells us the total size of the decorations, not the
+	// intended icon size. What should we do if we have a 16-pixel and a
+	// 32-pixel icon but get a decoration size of 22?
+	//
+	/// (Also, SDL_WindowIcon() still works this way even in SDL 3 where
+	// `SDL_Surface` gained support for alternate-resolution images.)
+	SDL_setenv("SDL_VIDEO_X11_WMCLASS", APP_ID, 1);
+#endif
 
 	if(SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0) {
 		Log_Fail(SDL_LOG_CATEGORY_VIDEO, "Error initializing SDL");

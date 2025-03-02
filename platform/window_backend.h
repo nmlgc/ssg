@@ -27,14 +27,14 @@ SDL_Window *WndBackend_SDL(void);
 SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS&);
 
 #ifdef WIN32_VINTAGE
-	#include <windows.h>
+#include <windows.h>
 
-	// Returns the Win32 handle of the current window.
-	HWND WndBackend_Win32(void);
+// Returns the Win32 handle of the current window.
+HWND WndBackend_Win32(void);
 
-	// Creates the game window and returns its Win32 handle. Fails if the
-	// window already exists.
-	HWND WndBackend_Win32Create(const GRAPHICS_PARAMS&);
+// Creates the game window and returns its Win32 handle. Fails if the window
+// already exists.
+HWND WndBackend_Win32Create(const GRAPHICS_PARAMS&);
 #endif
 
 void WndBackend_Cleanup(void);

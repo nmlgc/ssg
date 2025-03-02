@@ -6,6 +6,7 @@
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
 #include <SDL_mouse.h>
 #include <SDL_render.h>
+#include "platform/sdl/sdl2_wrap.h"
 
 #include "platform/sdl/graphics_sdl.h"
 #include "platform/sdl/log_sdl.h"
@@ -22,7 +23,7 @@ static constexpr auto LOG_CAT = SDL_LOG_CATEGORY_RENDER;
 /// State
 /// -----
 
-PIXELFORMAT PreferredPixelFormat;
+std::optional<PIXELFORMAT> PreferredPixelFormat;
 SDL_ScaleMode TextureScaleMode = SDL_ScaleModeNearest;
 
 // Primary renderer
@@ -31,6 +32,7 @@ SDL_ScaleMode TextureScaleMode = SDL_ScaleModeNearest;
 
 SDL_Renderer *PrimaryRenderer = nullptr;
 SDL_RendererInfo PrimaryInfo;
+std::span<const SDL_PixelFormat> PrimaryFormats;
 
 // Rendering target in framebuffer scale mode. Not to be confused with
 // [SoftwareTexture], which is a streaming texture, not a render target.
@@ -109,6 +111,14 @@ constinit const ENUMARRAY<
 // Helpers
 // -------
 
+std::optional<PIXELFORMAT> HelpPixelFormatFrom(SDL_PixelFormat format)
+{
+	if((SDL_BITSPERPIXEL(format) == 32) && SDL_ISPIXELFORMAT_PACKED(format)) {
+		return std::make_optional<PIXELFORMAT>(uint32_t{});
+	}
+	return std::nullopt;
+}
+
 SDL_FPoint HelpFPointFrom(const WINDOW_POINT& p)
 {
 	return SDL_FPoint{ static_cast<float>(p.x), static_cast<float>(p.y) };
@@ -156,7 +166,7 @@ SDL_Texture *TexturePostInit(SDL_Texture& tex)
 	return &tex;
 }
 
-SDL_Texture *HelpCreateTexture(uint32_t format, int access, int w, int h)
+SDL_Texture *HelpCreateTexture(SDL_PixelFormat format, int access, int w, int h)
 {
 	auto *ret = SDL_CreateTexture(Renderer, format, access, w, h);
 	if(!ret) {
@@ -220,19 +230,6 @@ void SwitchActiveRenderer(SDL_Renderer *new_renderer)
 	}
 	SetRenderTargetFor(new_renderer);
 	Renderer = new_renderer;
-}
-
-bool PixelFormatSupported(uint32_t fmt)
-{
-	// Both screenshots and the Pango/Cairo text backend currently expect ARGB
-	// order.
-	if(SDL_PIXELORDER(fmt) == SDL_PACKEDORDER_ABGR) {
-		return false;
-	}
-	return (
-		(SDL_ISPIXELFORMAT_PACKED(fmt) || SDL_ISPIXELFORMAT_INDEXED(fmt)) &&
-		BITDEPTHS::find(SDL_BITSPERPIXEL(fmt))
-	);
 }
 
 bool HelpSwitchFullscreen(
@@ -578,15 +575,30 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	}
 	SDL_GetRendererInfo(renderer, &PrimaryInfo);
 
-	// Determine preferred texture formats.
+	// Determine the preferred texture format. We don't overwrite
+	// [params.bitdepth] here to allow frictionless switching between the old
+	// DirectDraw/Direct3D backend and this one.
 	// SDL_GetWindowPixelFormat() is *not* a shortcut we could use for software
 	// rendering mode. On my system, it always returns the 24-bit RGB888, which
 	// we don't support.
-	const auto formats = std::span(
+	PrimaryFormats = std::span(
 		&PrimaryInfo.texture_formats[0], PrimaryInfo.num_texture_formats
 	);
-	const auto sdl_format = std::ranges::find_if(formats, PixelFormatSupported);
-	if(sdl_format == formats.end()) {
+	SDL_PixelFormat sdl_format = SDL_PIXELFORMAT_UNKNOWN;
+	for(const auto format : PrimaryFormats) {
+		// Both screenshots and the Pango/Cairo text backend currently expect
+		// ARGB order.
+		if(SDL_PIXELORDER(format) == SDL_PACKEDORDER_ABGR) {
+			continue;
+		}
+
+		PreferredPixelFormat = HelpPixelFormatFrom(format);
+		if(PreferredPixelFormat) {
+			sdl_format = format;
+			break;
+		}
+	}
+	if(!PreferredPixelFormat || (sdl_format == SDL_PIXELFORMAT_UNKNOWN)) {
 		SDL_LogCritical(
 			LOG_CAT,
 			"The \"%s\" renderer does not support any of the game's supported software rendering pixel formats.",
@@ -599,21 +611,11 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	SwitchActiveRenderer(PrimaryRenderer);
 	APIVersions::Update(params.api);
 
-	const auto bpp = SDL_BITSPERPIXEL(*sdl_format);
-	const auto pixel_format = BITDEPTHS::find(bpp).pixel_format();
-	if(!pixel_format) {
-		assert(!"The pixel format should always be valid here");
-		std::unreachable();
-	}
-	// We don't overwrite [params.bitdepth] here to allow frictionless
-	// switching between the old DirectDraw/Direct3D backend and this one.
-	PreferredPixelFormat = pixel_format.value();
-
 	// Ensure that the software surface uses the preferred format
-	if(!SoftwareSurface || (SoftwareSurface->format->format != *sdl_format)) {
+	if(!SoftwareSurface || (SoftwareSurface->format->format != sdl_format)) {
 		SoftwareSurface = SafeDestroy(SDL_FreeSurface, SoftwareSurface);
 		SoftwareSurface = SDL_CreateRGBSurfaceWithFormat(
-			0, GRP_RES.w, GRP_RES.h, 0, *sdl_format
+			0, GRP_RES.w, GRP_RES.h, 0, sdl_format
 		);
 		if(!SoftwareSurface) {
 			Log_Fail(LOG_CAT, "Error creating surface for software rendering");
@@ -756,7 +758,11 @@ void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 
 PIXELFORMAT GrpBackend_PixelFormat(void)
 {
-	return PreferredPixelFormat;
+	if(!PreferredPixelFormat) {
+		assert(!"The pixel format should always be valid here");
+		std::unreachable();
+	}
+	return PreferredPixelFormat.value();
 }
 
 void GrpBackend_PaletteGet(PALETTE& pal) {}
@@ -892,7 +898,7 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 /// --------
 
 bool CreateTextureWithFormat(
-	SURFACE_ID sid, uint32_t fmt, const PIXEL_SIZE& size
+	SURFACE_ID sid, SDL_PixelFormat fmt, const PIXEL_SIZE& size
 )
 {
 	auto& tex = Textures[sid];
@@ -1017,7 +1023,7 @@ void GrpSurface_BlitOpaque(
 // memory order for 32-bit bitmaps. Might as well limit the GDI code to that
 // one specific format then.
 static constexpr auto GDITEXT_BPP = 32;
-static constexpr uint32_t GDITEXT_SDL_FORMAT = SDL_PIXELFORMAT_ARGB8888;
+static constexpr auto GDITEXT_SDL_FORMAT = SDL_PIXELFORMAT_ARGB8888;
 
 static SURFACE_GDI GrText;
 
@@ -1033,10 +1039,7 @@ bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
 {
 	GrText.Delete();
 
-	const auto formats = std::span(
-		&PrimaryInfo.texture_formats[0], PrimaryInfo.num_texture_formats
-	);
-	if(std::ranges::find(formats, GDITEXT_SDL_FORMAT) == formats.end()) {
+	if(!std::ranges::contains(PrimaryFormats, GDITEXT_SDL_FORMAT)) {
 		SDL_LogCritical(
 			LOG_CAT,
 			"Renderer \"%s\" does not support the BGRA8888 pixel format required for rendering text via GDI.",

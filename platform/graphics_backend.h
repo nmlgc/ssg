@@ -294,10 +294,17 @@ void GrpBackend_PixelAccessEdit(auto func)
 	if(pitch == 0) {
 		return;
 	}
-	std::visit(
-		[&](auto P) { func.template operator()<decltype(P)>(pixels, pitch); },
-		GrpBackend_PixelFormat()
-	);
+	switch(GrpBackend_PixelFormat().PixelSize()) {
+	case PIXELFORMAT::SIZE8:
+		func.template operator()<uint8_t>(pixels, pitch);
+		break;
+	case PIXELFORMAT::SIZE16:
+		func.template operator()<uint16_t>(pixels, pitch);
+		break;
+	case PIXELFORMAT::SIZE32:
+		func.template operator()<uint32_t>(pixels, pitch);
+		break;
+	}
 	GrpBackend_PixelAccessUnlock();
 }
 /// ------------------------------------

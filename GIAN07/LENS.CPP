@@ -19,9 +19,7 @@ std::optional<LensInfo> GrpCreateLensBall(uint16_t r, uint16_t m)
 
 	// Since the surface pitch can be different than its with, [Table] will
 	// still contain byte offsets, regardless of our main pixel format.
-	const auto BitWeight = std::visit([](auto pixel) {
-		return sizeof(pixel);
-	}, GrpBackend_PixelFormat());
+	const auto BitWeight = GrpBackend_PixelFormat().PixelByteSize();
 
 	assert(r > 0);	// 半径がおかしい
 	assert(r > m);	// 出っ張りは半径より小さくせよ！

@@ -143,7 +143,7 @@ SDL_PixelFormat HelpFormatFrom(const SDL_Surface *surface)
 std::optional<PIXELFORMAT> HelpPixelFormatFrom(SDL_PixelFormat format)
 {
 	if((SDL_BITSPERPIXEL(format) == 32) && SDL_ISPIXELFORMAT_PACKED(format)) {
-		return std::make_optional<PIXELFORMAT>(uint32_t{});
+		return std::make_optional<PIXELFORMAT>(PIXELFORMAT::ANY32);
 	}
 	return std::nullopt;
 }

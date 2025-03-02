@@ -114,11 +114,6 @@ SDL_FPoint HelpFPointFrom(const WINDOW_POINT& p)
 	return SDL_FPoint{ static_cast<float>(p.x), static_cast<float>(p.y) };
 }
 
-SDL_Color HelpColorFrom(const RGBA& o)
-{
-	return SDL_Color{ .r = o.r, .g = o.g, .b = o.b, .a = o.a };
-}
-
 SDL_Rect HelpRectFrom(const PIXEL_LTWH& o) noexcept
 {
 	return SDL_Rect{ .x = o.left, .y = o.top, .w = o.w, .h = o.h };
@@ -1238,7 +1233,7 @@ void GRAPHICS_GEOMETRY_SDL::DrawTriangles(
 )
 {
 	if(colors.empty()) {
-		const RGBA single = { .r = Col.r, .g = Col.g, .b = Col.b, .a = 0xFF };
+		const VERTEX_RGBA single = { Col.r, Col.g, Col.b, 0xFF };
 		DrawGeometry(tp, xys, std::span(&single, 1));
 	} else {
 		DrawGeometry(tp, xys, colors);
@@ -1250,7 +1245,12 @@ void GRAPHICS_GEOMETRY_SDL::DrawTrianglesA(
 )
 {
 	DrawWithAlpha([&] {
-		DrawGeometry(tp, xys, (colors.empty() ? std::span(&Col, 1) : colors));
+		if(colors.empty()) {
+			const VERTEX_RGBA single = { Col.r, Col.g, Col.b, Col.a };
+			DrawGeometry(tp, xys, std::span(&single, 1));
+		} else {
+			DrawGeometry(tp, xys, colors);
+		}
 	});
 }
 
@@ -1264,7 +1264,7 @@ void GRAPHICS_GEOMETRY_SDL::DrawGrdLineEx(int x, int y1, RGB c1, int y2, RGB c2)
 		{ static_cast<VERTEX_COORD>(x + 1), static_cast<VERTEX_COORD>(y1) },
 		{ static_cast<VERTEX_COORD>(x + 1), static_cast<VERTEX_COORD>(y2) },
 	};
-	const RGBA colors[4] = { c1a, c2a, c1a, c2a };
+	const VERTEX_RGBA colors[4] = { c1a, c2a, c1a, c2a };
 	DrawGeometry(TRIANGLE_PRIMITIVE::STRIP, xys, colors);
 }
 

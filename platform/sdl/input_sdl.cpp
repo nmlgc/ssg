@@ -90,11 +90,16 @@ static constexpr std::pair<KEY_BIND, INPUT_SYSTEM_BITS> SystemKeyBindings[] = {
 	{ { SDL_SCANCODE_RETURN, KEY_MOD::LALT }, SYSKEY_GRP_FULLSCREEN },
 };
 
-template <class Bits> void Key_Flip(Bits& key_data, uint8_t state, Bits bits)
+template <class Bits> void Key_Flip(
+	Bits& key_data, const auto& key_or_jbutton, Bits bits
+)
 {
-	if(state == SDL_PRESSED) {
+	const auto down = (
+		key_or_jbutton.state
+	);
+	if(down) {
 		key_data |= bits;
-	} else if(state == SDL_RELEASED) {
+	} else {
 		key_data &= ~bits;
 	}
 }
@@ -223,18 +228,18 @@ void Key_Read(void)
 			const INPUT_PAD_BUTTON id = (event.jbutton.button + 1);
 			for(const auto& binding : Key_PadBindings) {
 				if(id == binding.first) {
-					Key_Flip(Pad_Data, event.jbutton.state, binding.second);
+					Key_Flip(Pad_Data, event.jbutton, binding.second);
 				}
 			}
 
 			auto& pad = *Pad_Find(event.jbutton.which);
 			using HELD = std::numeric_limits<decltype(pad.button_pressed_last)>;
-			if(event.jbutton.state == SDL_PRESSED) {
+			if(event.jbutton.state) {
 				if(pad.buttons_held < HELD::max()) {
 					pad.buttons_held++;
 				}
 				pad.button_pressed_last = id;
-			} else if(event.jbutton.state == SDL_RELEASED) {
+			} else {
 				if(pad.buttons_held > HELD::min()) {
 					pad.buttons_held--;
 				}
@@ -252,12 +257,12 @@ void Key_Read(void)
 			};
 			for(const auto& binding : KeyBindings) {
 				if(binding.first.Matches(scancode)) {
-					Key_Flip(Key_Data_Real, event.key.state, binding.second);
+					Key_Flip(Key_Data_Real, event.key, binding.second);
 				}
 			}
 			for(const auto& binding : SystemKeyBindings) {
 				if(binding.first.Matches(scancode)) {
-					Key_Flip(SystemKey_Data, event.key.state, binding.second);
+					Key_Flip(SystemKey_Data, event.key, binding.second);
 				}
 			}
 			break;

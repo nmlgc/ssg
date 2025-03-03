@@ -119,23 +119,23 @@ std::optional<PIXELFORMAT> HelpPixelFormatFrom(SDL_PixelFormat format)
 	return std::nullopt;
 }
 
-SDL_FPoint HelpFPointFrom(const WINDOW_POINT& p)
+template <typename Rect> Rect HelpRectTo(const PIXEL_LTWH& o) noexcept
 {
-	return SDL_FPoint{ static_cast<float>(p.x), static_cast<float>(p.y) };
+	return Rect{
+		.x = static_cast<decltype(Rect::x)>(o.left),
+		.y = static_cast<decltype(Rect::y)>(o.top),
+		.w = static_cast<decltype(Rect::w)>(o.w),
+		.h = static_cast<decltype(Rect::h)>(o.h),
+	};
 }
 
-SDL_Rect HelpRectFrom(const PIXEL_LTWH& o) noexcept
+template <typename Rect> Rect HelpRectTo(const PIXEL_LTRB& o)
 {
-	return SDL_Rect{ .x = o.left, .y = o.top, .w = o.w, .h = o.h };
-}
-
-SDL_Rect HelpRectFrom(const PIXEL_LTRB& o)
-{
-	return SDL_Rect{
-		.x = o.left,
-		.y = o.top,
-		.w = (o.right - o.left),
-		.h = (o.bottom - o.top),
+	return Rect{
+		.x = static_cast<decltype(Rect::x)>(o.left),
+		.y = static_cast<decltype(Rect::y)>(o.top),
+		.w = static_cast<decltype(Rect::w)>(o.right - o.left),
+		.h = static_cast<decltype(Rect::h)>(o.bottom - o.top),
 	};
 }
 
@@ -752,7 +752,7 @@ void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 	if(!Renderer) {
 		return;
 	}
-	const auto sdl_rect = HelpRectFrom(rect);
+	const auto sdl_rect = HelpRectTo<SDL_Rect>(rect);
 	SDL_RenderSetClipRect(Renderer, &sdl_rect);
 }
 
@@ -972,7 +972,7 @@ bool GrpSurface_Update(
 	if(!subrect) {
 		return (SDL_UpdateTexture(tex, nullptr, buf, pitch) == 0);
 	}
-	const auto rect = HelpRectFrom(*subrect);
+	const auto rect = HelpRectTo<SDL_Rect>(*subrect);
 	return (SDL_UpdateTexture(tex, &rect, buf, pitch) == 0);
 }
 
@@ -992,11 +992,15 @@ bool GrpSurface_Blit(
 	WINDOW_POINT topleft, SURFACE_ID sid, const PIXEL_LTRB& src
 )
 {
-	const auto rect_src = HelpRectFrom(src);
-	const SDL_Rect rect_dst = {
-		.x = topleft.x, .y = topleft.y, .w = rect_src.w, .h = rect_src.h
+	const auto tex = Textures[sid];
+	const auto rect_src = HelpRectTo<SDL_Rect>(src);
+	const SDL_FRect rect_dst = {
+		.x = static_cast<float>(topleft.x),
+		.y = static_cast<float>(topleft.y),
+		.w = static_cast<float>(rect_src.w),
+		.h = static_cast<float>(rect_src.h),
 	};
-	return (SDL_RenderCopy(Renderer, Textures[sid], &rect_src, &rect_dst) == 0);
+	return (SDL_RenderCopyF(Renderer, tex, &rect_src, &rect_dst) == 0);
 }
 
 void GrpSurface_BlitOpaque(
@@ -1211,8 +1215,13 @@ void GRAPHICS_GEOMETRY_SDL::DrawLine(int x1, int y1, int x2, int y2)
 
 void GRAPHICS_GEOMETRY_SDL::DrawBox(int x1, int y1, int x2, int y2)
 {
-	const SDL_Rect rect = { .x = x1, .y = y1, .w = (x2 - x1), .h = (y2 - y1) };
-	SDL_RenderFillRect(Renderer, &rect);
+	const SDL_FRect rect = {
+		.x = static_cast<float>(x1),
+		.y = static_cast<float>(y1),
+		.w = static_cast<float>(x2 - x1),
+		.h = static_cast<float>(y2 - y1),
+	};
+	SDL_RenderFillRectF(Renderer, &rect);
 }
 
 void GRAPHICS_GEOMETRY_SDL::DrawBoxA(int x1, int y1, int x2, int y2)

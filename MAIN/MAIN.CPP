@@ -9,7 +9,7 @@
 
 int __stdcall wWinMain(HINSTANCE, HINSTANCE, LPWSTR, int)
 {
-	if(!WndBackend_Win32Create()) {
+	if(!WndBackend_Create({})) {
 		return FALSE;
 	}
 	defer(WndBackend_Cleanup());

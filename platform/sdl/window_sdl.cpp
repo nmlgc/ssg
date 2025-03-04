@@ -116,7 +116,7 @@ SDL_Window *WndBackend_SDL(void)
 	return Window;
 }
 
-SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
+std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 {
 	assert(Window == nullptr);
 
@@ -184,10 +184,10 @@ SDL_Window *WndBackend_SDLCreate(const GRAPHICS_PARAMS& params)
 	);
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
-		return nullptr;
+		return std::nullopt;
 	}
 
-	return Window;
+	return params;
 }
 
 #ifdef WIN32_VINTAGE
@@ -203,12 +203,6 @@ HWND WndBackend_Win32(void)
 		return nullptr;
 	}
 	return wminfo.info.win.window;
-}
-
-HWND WndBackend_Win32Create(const GRAPHICS_PARAMS& params)
-{
-	WndBackend_SDLCreate(params);
-	return WndBackend_Win32();
 }
 #endif
 

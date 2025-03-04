@@ -557,9 +557,14 @@ void PrimarySetBorderlessFullscreenFit(
 
 std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 {
-	auto *window = WndBackend_SDLCreate(params);
+	const auto maybe_params = WndBackend_Create(params);
+	if(!maybe_params) {
+		return std::nullopt;
+	}
+	params = maybe_params.value();
+
 	auto *renderer = SDL_CreateRenderer(
-		window, params.api, SDL_RENDERER_ACCELERATED
+		WndBackend_SDL(), params.api, SDL_RENDERER_ACCELERATED
 	);
 	if(!renderer) {
 		const auto api_name = GrpBackend_APIName(params.api);

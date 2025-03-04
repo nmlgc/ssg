@@ -116,9 +116,9 @@ struct FILE_STREAM_WRITE;
 // Required to enable the screenshot feature as a whole.
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
 
-// Saves the given bitmap in the screenshot format to [stream].
+// Saves the given bitmap in the screenshot format to a file with the
+// screenshot prefix.
 bool Grp_ScreenshotSave(
-	FILE_STREAM_WRITE *stream,
 	PIXEL_SIZE_BASE<unsigned int> size,
 	uint8_t bpp,
 	std::span<BGRA> palette,

@@ -982,11 +982,8 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 void GrpBackend_PaletteGet(PALETTE& pal) {}
 bool GrpBackend_PaletteSet(const PALETTE& pal) { return false; }
 
-void SaveSurfaceAsScreenshot(
-	std::unique_ptr<FILE_STREAM_WRITE> stream, SDL_Surface *src
-)
+void SaveSurfaceAsScreenshot(SDL_Surface *src)
 {
-	assert(stream);
 	assert(src);
 	assert(src->pitch >= 0);
 #ifdef SDL3
@@ -1008,23 +1005,18 @@ void SaveSurfaceAsScreenshot(
 		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
 	);
 	const auto bpp = SDL_BITSPERPIXEL(HelpFormatFrom(src));
-	Grp_ScreenshotSave(stream.get(), size, bpp, {}, pixels);
+	Grp_ScreenshotSave(size, bpp, {}, pixels);
 	if(SDL_MUSTLOCK(src)) {
 		SDL_UnlockSurface(src);
 	}
-	stream.reset();
 }
 
-void MaybeTakeScreenshot(std::unique_ptr<FILE_STREAM_WRITE> stream)
+void TakeScreenshot(void)
 {
-	if(!stream) {
-		return;
-	}
-
 	if(SoftwareRenderer) {
 		// Software rendering is the ideal case for screenshots, because we
 		// already have a system-memory surface we can save.
-		SaveSurfaceAsScreenshot(std::move(stream), SoftwareSurface);
+		SaveSurfaceAsScreenshot(SoftwareSurface);
 		return;
 	}
 
@@ -1085,12 +1077,14 @@ void MaybeTakeScreenshot(std::unique_ptr<FILE_STREAM_WRITE> stream)
 		SDL_UnlockSurface(src);
 	}
 #endif
-	SaveSurfaceAsScreenshot(std::move(stream), src);
+	SaveSurfaceAsScreenshot(src);
 }
 
-void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
+void GrpBackend_Flip(bool take_screenshot)
 {
-	MaybeTakeScreenshot(std::move(screenshot_stream));
+	if(take_screenshot) {
+		TakeScreenshot();
+	}
 	if(SoftwareRenderer) {
 		SDL_FlushRenderer(SoftwareRenderer);
 		if(SDL_MUSTLOCK(SoftwareSurface)) {

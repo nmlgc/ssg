@@ -86,7 +86,6 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 }
 
 bool Grp_ScreenshotSave(
-	FILE_STREAM_WRITE *stream,
 	PIXEL_SIZE_BASE<unsigned int> size,
 	uint8_t bpp,
 	std::span<BGRA> palette,
@@ -99,7 +98,11 @@ bool Grp_ScreenshotSave(
 		.w = Cast::sign<PIXEL_COORD>(size.w),
 		.h = -Cast::sign<PIXEL_COORD>(size.h),
 	};
-	return BMPSave(stream, bmp_size, 1, bpp, palette, pixels);
+	const auto stream = Grp_NextScreenshotStream();
+	if(!stream) {
+		return false;
+	}
+	return BMPSave(stream.get(), bmp_size, 1, bpp, palette, pixels);
 }
 // -----------
 
@@ -221,8 +224,5 @@ std::optional<GRAPHICS_INIT_RESULT> Grp_InitOrFallback(GRAPHICS_PARAMS params)
 
 void Grp_Flip(void)
 {
-	GrpBackend_Flip((SystemKey_Data & SYSKEY_SNAPSHOT)
-		? Grp_NextScreenshotStream()
-		: nullptr
-	);
+	GrpBackend_Flip((SystemKey_Data & SYSKEY_SNAPSHOT) && ScreenshotBuf.size());
 }

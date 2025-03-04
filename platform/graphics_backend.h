@@ -69,7 +69,7 @@ void GrpBackend_PaletteGet(PALETTE& pal);
 bool GrpBackend_PaletteSet(const PALETTE& pal);
 
 struct FILE_STREAM_WRITE;
-void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream);
+void GrpBackend_Flip(bool take_screenshot);
 /// -------
 
 /// Surfaces

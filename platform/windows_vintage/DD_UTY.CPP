@@ -188,9 +188,9 @@ void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
 	}
 }
 
-bool DDrawSaveScreenshot(FILE_STREAM_WRITE *stream, IDirectDrawSurface *surf)
+bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 {
-	if(!surf || !stream) {
+	if(!surf) {
 		return false;
 	}
 	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
@@ -236,7 +236,7 @@ bool DDrawSaveScreenshot(FILE_STREAM_WRITE *stream, IDirectDrawSurface *surf)
 		static_cast<const std::byte *>(desc.lpSurface),
 		static_cast<size_t>(desc.lPitch * desc.dwHeight),
 	};
-	const auto ret = Grp_ScreenshotSave(stream, size, bpp, palette, pixels);
+	const auto ret = Grp_ScreenshotSave(size, bpp, palette, pixels);
 	surf->Unlock(nullptr);
 	return ret;
 }
@@ -719,10 +719,10 @@ GRAPHICS_GEOMETRY_DDRAW *GrpGeom_FB(void)
 }
 
 
-void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
+void GrpBackend_Flip(bool take_screenshot)
 {
-	if(auto *stream = screenshot_stream.get()) {
-		DDrawSaveScreenshot(stream, DxObj.Back);
+	if(take_screenshot) {
+		DDrawSaveScreenshot(DxObj.Back);
 	}
 
 	if(Fullscreen) {
@@ -739,7 +739,6 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 			return DxObj.Prim->Blt(nullptr, DxObj.Back, nullptr, 0, nullptr);
 		});
 	}
-	screenshot_stream.reset();
 }
 
 // クリッピングをかける

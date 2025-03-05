@@ -358,7 +358,9 @@ std::optional<TEXTRENDER_SESSION> TEXTRENDER::Session(
 
 	if(GrpSurface_Size(SURFACE_ID::TEXT) != bounds) {
 		TEXTRENDER_PACKED::Wipe();
-		if(!GrpSurface_CreateUninitialized(SURFACE_ID::TEXT, bounds)) {
+		if(!GrpSurface_CreateUninitialized(
+			SURFACE_ID::TEXT, bounds, PIXELFORMAT{ PIXELFORMAT::BGRA8888 }
+		)) {
 			return std::nullopt;
 		}
 	}

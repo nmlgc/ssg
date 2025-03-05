@@ -154,6 +154,16 @@ std::optional<PIXELFORMAT> HelpPixelFormatFrom(SDL_PixelFormat format)
 	}
 }
 
+SDL_PixelFormat HelpPixelFormatFrom(PIXELFORMAT format)
+{
+	switch(format.format) {
+	case PIXELFORMAT::RGBA8888: return SDL_PIXELFORMAT_ABGR8888;
+	case PIXELFORMAT::BGRA8888: return SDL_PIXELFORMAT_ARGB8888;
+	case PIXELFORMAT::BGRX8888: return SDL_PIXELFORMAT_XRGB8888;
+	default:                    return SDL_PIXELFORMAT_UNKNOWN;
+	}
+}
+
 template <typename Rect> Rect HelpRectTo(const PIXEL_LTWH& o) noexcept
 {
 	return Rect{
@@ -772,8 +782,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		}
 		const auto pixel_format = maybe_pixel_format.value();
 
-		// Both screenshots and the Pango/Cairo text backend currently expect
-		// in-memory BGRA order.
+		// Screenshots currently expect in-memory BGRA order.
 		if(pixel_format.format == PIXELFORMAT::RGBA8888) {
 			continue;
 		}
@@ -1150,9 +1159,11 @@ bool CreateTextureWithFormat(
 	return true;
 }
 
-bool GrpSurface_CreateUninitialized(SURFACE_ID sid, const PIXEL_SIZE& size)
+bool GrpSurface_CreateUninitialized(
+	SURFACE_ID sid, const PIXEL_SIZE& size, PIXELFORMAT format
+)
 {
-	return CreateTextureWithFormat(sid, HelpFormatFrom(SoftwareSurface), size);
+	return CreateTextureWithFormat(sid, HelpPixelFormatFrom(format), size);
 }
 
 bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)

@@ -142,10 +142,16 @@ SDL_PixelFormat HelpFormatFrom(const SDL_Surface *surface)
 
 std::optional<PIXELFORMAT> HelpPixelFormatFrom(SDL_PixelFormat format)
 {
-	if((SDL_BITSPERPIXEL(format) == 32) && SDL_ISPIXELFORMAT_PACKED(format)) {
-		return std::make_optional<PIXELFORMAT>(PIXELFORMAT::ANY32);
+	switch(format) {
+	case SDL_PIXELFORMAT_ABGR8888:
+		return std::make_optional<PIXELFORMAT>(PIXELFORMAT::RGBA8888);
+	case SDL_PIXELFORMAT_ARGB8888:
+		return std::make_optional<PIXELFORMAT>(PIXELFORMAT::BGRA8888);
+	case SDL_PIXELFORMAT_XRGB8888:
+		return std::make_optional<PIXELFORMAT>(PIXELFORMAT::BGRX8888);
+	default:
+		return std::nullopt;
 	}
-	return std::nullopt;
 }
 
 template <typename Rect> Rect HelpRectTo(const PIXEL_LTWH& o) noexcept
@@ -760,17 +766,21 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	// we don't support.
 	SDL_PixelFormat sdl_format = SDL_PIXELFORMAT_UNKNOWN;
 	for(const auto format : PrimaryFormats) {
+		const auto maybe_pixel_format = HelpPixelFormatFrom(format);
+		if(!maybe_pixel_format) {
+			continue;
+		}
+		const auto pixel_format = maybe_pixel_format.value();
+
 		// Both screenshots and the Pango/Cairo text backend currently expect
-		// ARGB order.
-		if(SDL_PIXELORDER(format) == SDL_PACKEDORDER_ABGR) {
+		// in-memory BGRA order.
+		if(pixel_format.format == PIXELFORMAT::RGBA8888) {
 			continue;
 		}
 
-		PreferredPixelFormat = HelpPixelFormatFrom(format);
-		if(PreferredPixelFormat) {
-			sdl_format = format;
-			break;
-		}
+		PreferredPixelFormat = pixel_format;
+		sdl_format = format;
+		break;
 	}
 	if(!PreferredPixelFormat || (sdl_format == SDL_PIXELFORMAT_UNKNOWN)) {
 		const auto api_name = GrpBackend_APIName(params.api);

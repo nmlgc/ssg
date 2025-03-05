@@ -30,10 +30,15 @@ struct BGRA {
 static_assert(sizeof(BGRA) == 4);
 
 struct PIXELFORMAT {
+	// All specific formats are in memory byte order.
 	enum FORMAT {
 		PALETTE8,
 		ANY16,
+
 		ANY32,
+		BGRX8888,
+		BGRA8888,
+		RGBA8888,
 	} format;
 
 	enum SIZE {
@@ -54,7 +59,10 @@ struct PIXELFORMAT {
 		switch(format) {
 		case PALETTE8:	return SIZE8;
 		case ANY16:   	return SIZE16;
-		case ANY32:   	return SIZE32;
+		case ANY32:
+		case BGRX8888:
+		case BGRA8888:
+		case RGBA8888:  return SIZE32;
 		}
 		std::unreachable();
 	}

@@ -11,7 +11,8 @@ sh ./submodules_check.sh ^
 	libs/libogg ^
 	libs/libvorbis ^
 	libs/miniaudio ^
-	libs/SDL ^
+	libs/SDL2 ^
+	libs/SDL3 ^
 	libs/tupblocks
 if %errorlevel% neq 0 exit /b %errorlevel%
 

@@ -1,7 +1,11 @@
-[submodule "libs/SDL"]
-	path = libs/SDL
+[submodule "libs/SDL2"]
+	path = libs/SDL2
 	url = https://github.com/libsdl-org/SDL
 	branch = SDL2
+	shallow = true
+[submodule "libs/SDL3"]
+	path = libs/SDL3
+	url = https://github.com/libsdl-org/SDL
 	shallow = true
 [submodule "libs/miniaudio"]
 	path = libs/miniaudio

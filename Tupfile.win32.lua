@@ -3,7 +3,6 @@ tup.include("libs/BLAKE3.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
-local SDL_LINK = BuildSDL(CONFIG, 2)
 local XIPH_LINK = BuildXiph(CONFIG)
 
 MODERN = 0
@@ -14,6 +13,7 @@ local ssg_ico = CONFIG:rc(SSG.join("GIAN07/GIAN07.rc"))
 
 ---@param variant integer
 local function ssg(variant)
+	local sdl_version = 3
 	local variant_cfg
 	local variant_bin_suffix = ""
 	if (variant == MODERN) then
@@ -26,8 +26,10 @@ local function ssg(variant)
 			objdir = "vintage/"
 		})
 		variant_bin_suffix = " (original DirectDraw and Direct3D graphics)"
+		sdl_version = 2
 	end
 
+	local SDL_LINK = BuildSDL(variant_cfg, sdl_version)
 	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
 
 	-- Static analysis using the C++ Core Guideline checker plugin.

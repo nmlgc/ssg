@@ -1,10 +1,14 @@
-local SDL = sourcepath(tup.getcwd() .. "/SDL/")
+local SDL_PATHS = {
+	[2] = sourcepath(tup.getcwd() .. "/SDL2/"),
+	[3] = sourcepath(tup.getcwd() .. "/SDL3/"),
+}
 
 ---Builds the SDL submodule for Windows.
 ---@param base_cfg Config
 ---@param version 2 | 3
 function BuildSDL(base_cfg, version)
 	local name = ((version == 3) and "SDL3" or "SDL2")
+	local SDL = SDL_PATHS[version]
 	local compile = {
 		cflags = "/DDLL_EXPORT",
 		lflags = {

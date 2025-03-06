@@ -416,7 +416,7 @@ namespace DAT_MISSING {
 	bool FnRecheck(INPUT_BITS key) {
 		if((key == KEY_BOMB) || (key == KEY_ESC)) {
 			return false;
-		} else if(CWinOptionKeyDelta(key) && DAT::Check()) {
+		} else if(Input_OptionKeyDelta(key) && DAT::Check()) {
 			FoundAll = true;
 			return false;
 		}

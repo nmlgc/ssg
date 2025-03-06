@@ -697,7 +697,7 @@ namespace BGMPack {
 
 	static bool Handle(INPUT_BITS key, size_t selected)
 	{
-		if(CWinOKKey(key)) {
+		if(Input_IsOK(key)) {
 			if(selected == SelDownload()) {
 				URLOpen(BGMPack::SOUNDTRACK_URL);
 			} else {
@@ -797,7 +797,7 @@ static bool RFnStgEx(INPUT_BITS key)
 
 static bool MainFnGameStart(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		//EndingInit();
 		WeaponSelectInit(false);
 	}
@@ -806,7 +806,7 @@ static bool MainFnGameStart(INPUT_BITS key)
 
 static bool MainFnExStart(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		if(ConfigDat.ExtraStgFlags.v) {
 			WeaponSelectInit(true);
 		}
@@ -816,7 +816,7 @@ static bool MainFnExStart(INPUT_BITS key)
 
 static bool ScoreFn(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		ScoreNameInit();
 	}
 	return true;
@@ -824,7 +824,7 @@ static bool ScoreFn(INPUT_BITS key)
 
 static bool MusicFn(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		MusicRoomInit();
 	}
 	return true;
@@ -832,7 +832,7 @@ static bool MusicFn(INPUT_BITS key)
 
 static bool ExitFnYes(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		GameExit();
 		return false;
 	}
@@ -841,7 +841,7 @@ static bool ExitFnYes(INPUT_BITS key)
 
 static bool ExitFnNo(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		GameRestart();
 		return false;
 	}
@@ -850,7 +850,7 @@ static bool ExitFnNo(INPUT_BITS key)
 
 static bool ContinueFnYes(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		GameContinue();
 		return false;
 	}
@@ -859,7 +859,7 @@ static bool ContinueFnYes(INPUT_BITS key)
 
 static bool ContinueFnNo(INPUT_BITS key)
 {
-	if(CWinOKKey(key)) {
+	if(Input_IsOK(key)) {
 		NameRegistInit(true);
 		// GameExit();
 		return false;

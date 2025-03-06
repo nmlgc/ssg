@@ -31,6 +31,15 @@ constexpr INPUT_BITS KEY_URIGHT = (KEY_UP | KEY_RIGHT);
 constexpr INPUT_BITS KEY_DLEFT  = (KEY_DOWN | KEY_LEFT);
 constexpr INPUT_BITS KEY_DRIGHT = (KEY_DOWN | KEY_RIGHT);
 
+// Returns whether this key represents an "OK" action.
+bool Input_IsOK(INPUT_BITS key);
+
+// Returns whether this key represents a "Cancel" action.
+bool Input_IsCancel(INPUT_BITS key);
+
+// Returns the delta that this key would apply to a numeric option value.
+int_fast8_t Input_OptionKeyDelta(INPUT_BITS key);
+
 // Additional virtual keys for inputs that were read using GetAsyncKeyState()
 // in the original game. Treated separately to not complicate any existing
 // comparisons of [Key_Data] with 0.

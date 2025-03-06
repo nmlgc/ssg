@@ -10,6 +10,7 @@
 #include "GAMEMAIN.H"
 #include "LEVEL.H"
 #include "LOADER.H"
+#include "MUSIC.H"
 #include "platform/input.h"
 #include "platform/midi_backend.h"
 #include "platform/input.h"
@@ -825,6 +826,7 @@ static bool ScoreFn(INPUT_BITS key)
 static bool MusicFn(INPUT_BITS key)
 {
 	if(Input_IsOK(key)) {
+		MWinForceClose();
 		MusicRoomInit();
 	}
 	return true;

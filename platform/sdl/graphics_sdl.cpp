@@ -485,7 +485,7 @@ bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 
 // Re-centers the window to remain fully on-screen after changing the
 // windowed-mode scale factor
-void RepositionAfterScale(
+PIXEL_POINT RepositionAfterScale(
 	const PIXEL_POINT& topleft_prev,
 	const WINDOW_SIZE& res_prev,
 	const WINDOW_SIZE& res_new
@@ -502,11 +502,11 @@ void RepositionAfterScale(
 
 	const auto display_i = SDL_GetWindowDisplayIndex(window);
 	if(display_i < 0) {
-		return;
+		return topleft_prev;
 	}
 	SDL_Rect display_r{};
 	if(SDL_GetDisplayUsableBounds(display_i, &display_r) != 0) {
-		return;
+		return topleft_prev;
 	}
 	display_r.x += border_left;
 	display_r.y += border_top;
@@ -526,6 +526,7 @@ void RepositionAfterScale(
 	topleft.x = std::clamp(topleft.x, display_r.x, max_left);
 	topleft.y = std::clamp(topleft.y, display_r.y, max_top);
 	SDL_SetWindowPosition(window, topleft.x, topleft.y);
+	return topleft;
 }
 
 void PrimarySetBorderlessFullscreenFit(
@@ -705,7 +706,12 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		PIXEL_POINT topleft{};
 		SDL_GetWindowPosition(window, &topleft.x, &topleft.y);
 		SDL_SetWindowSize(window, res_new.w, res_new.h);
-		RepositionAfterScale(topleft, res_prev, res_new);
+		topleft = RepositionAfterScale(topleft, res_prev, res_new);
+		ret.live.left = topleft.x;
+		ret.live.top = topleft.y;
+	} else {
+		ret.live.left = params.left;
+		ret.live.top = params.top;
 	}
 
 	// Should always be applied unconditionally so that the user can change

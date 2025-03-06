@@ -51,6 +51,4 @@ extern bool ScoreNameInit(void);	// お名前表示画面
 
 extern bool GameNextStage(void);	// 次のステージに移行する
 
-extern bool MusicRoomInit(void);	// 音楽室の初期化をする
-
 #endif

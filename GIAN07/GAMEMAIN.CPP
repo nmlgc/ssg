@@ -20,14 +20,11 @@
 #include "game/bgm.h"
 #include "game/debug.h"
 #include "game/input.h"
-#include "game/midi.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
 #include "platform/time.h"
-#include <inttypes.h> // for PRId64
 
 
-decltype(MusicNum) MidiPlayID = 0;
 uint16_t DemoTimer = 0;
 uint32_t DrawCount = 0;
 uint8_t WeaponKeyWait = 0;
@@ -48,7 +45,6 @@ void GameProc(bool&);
 void GameOverProc0(bool&);	// ゲームオーバー出現用
 void GameOverProc(bool&);	// ゲームオーバー
 void PauseProc(bool&);
-void MusicRoomProc(bool&);	// 音楽室
 void DemoProc(bool&);	// デモプレイ
 void NameRegistProc(bool&);	// お名前入力
 
@@ -786,52 +782,6 @@ bool SProjectInit(void)
 }
 
 
-// 音楽室の初期化をする //
-extern bool MusicRoomInit(void)
-{
-	TextObj.Clear();
-	MusicRoomText = MUSICROOM_TEXT::Register();
-
-	MWinForceClose();
-	GrpBackend_Clear();
-	Grp_Flip();
-
-	if(!LoadGraph(GRAPH_ID_MUSICROOM)){
-		DebugOut(u8"GRAPH.DAT が破壊されています");
-		return false;
-	}
-
-	GrpBackend_SetClip(GRP_RES_RECT);
-
-	MidiPlayID = 0;
-
-	BGM_SetTempo(0);
-
-	// Still necessary because the note arrays aren't actually processed
-	// outside of the Music Room.
-	Mid_TableInit();
-/*
-	BGM_Stop();
-*/
-	if(!LoadMusicRoomComment(0)){
-		DebugOut(u8"ENEMY.DAT がはかいされています");
-		GameExit();
-		return false;
-	}
-/*
-	if(!LoadMusic(0)){
-		DebugOut(u8"MUSIC.DAT が破壊されています");
-		GameExit();
-		return false;
-	}
-*/
-//	BGM_Play();
-
-	GameMain = MusicRoomProc;
-
-	return true;
-}
-
 // ゲームを再開する(ESC 抜けから) //
 extern void GameRestart(void)
 {
@@ -1366,132 +1316,6 @@ void PauseProc(bool&)
 		GrpBackend_SetClip(GRP_RES_RECT);
 		CWinDraw(&ExitWindow);
 		GrpBackend_SetClip(PLAYFIELD_CLIP);
-
-		Grp_Flip();
-	}
-}
-
-// 音楽室 //
-void MusicRoomProc(bool&)
-{
-	char	buf[100];
-	static decltype(Key_Data) Old_Key;
-	static bool DevChgWait;
-
-	const auto playing = BGM_Playing();
-
-	if(Key_Data!=Old_Key){
-		switch(Key_Data){
-			case(KEY_ESC):case(KEY_BOMB):
-				DevChgWait = false;
-				GameExit();
-			return;
-
-			case(KEY_RIGHT):
-				MidiPlayID += 2; [[fallthrough]];
-			case(KEY_LEFT):
-				BGM_Stop();
-				MidiPlayID = (MidiPlayID+MusicNum-1)%MusicNum;
-				BGM_Switch(MidiPlayID);
-				LoadMusicRoomComment(MidiPlayID);
-			break;
-		}
-
-		Old_Key = Key_Data;
-	}
-
-	switch(Key_Data){
-		case(KEY_UP):
-			BGM_SetTempo(BGM_GetTempo() + 1);
-		break;
-		case(KEY_DOWN):
-			BGM_SetTempo(BGM_GetTempo() - 1);
-		break;
-
-		case(KEY_SHIFT):
-			BGM_SetTempo(0);
-		break;
-	}
-
-	if(SystemKey_Data & SYSKEY_BGM_FADE) {
-		BGM_FadeOut(120);
-	}
-
-	BGM_UpdateMIDITables();
-
-	if((playing == BGM_PLAYING::MIDI) && (SystemKey_Data & SYSKEY_BGM_DEVICE)) {
-		if(!DevChgWait) {
-			BGM_ChangeMIDIDevice(1);
-			if(MusicRoomText) {
-				MusicRoomText.value().PrerenderMidDev();
-			}
-			DevChgWait = true;
-		}
-	}
-	else{
-		// 押されていなければ再び有効化する //
-		DevChgWait = false;
-	}
-
-	if(IsDraw()){
-		GrpBackend_Clear();
-
-		auto BlitBG = [](const PIXEL_LTWH& rect) {
-			GrpSurface_Blit({ rect.left, rect.top }, SURFACE_ID::MUSIC, rect);
-		};
-
-		auto BlitLegend = [](const PIXEL_LTWH& rect) {
-			const PIXEL_LTRB src = (rect + PIXEL_POINT{ 0, 392 });
-			GrpSurface_Blit(
-				{ (8 + rect.left), (410 + rect.top) }, SURFACE_ID::MUSIC, src
-			);
-		};
-
-		BlitBG({   0,   0, 504, 392 });	// From keyboard to spectrum analyzer
-		BlitBG({ 504,   0, 136,  59 });	// Down to PASSED TIME
-		BlitBG({ 504, 108, 136, 284 });	// Everything below MIDI DEVICE
-
-		BlitLegend({   0,  0, 176,  40 });	// Left side
-		BlitLegend({ 176, 11, 464,  29 });	// Right side without device key
-
-		if(playing == BGM_PLAYING::MIDI) {
-			BlitBG({ 504, 83, 136, 25 });   	// MIDI DEVICE
-			BlitLegend({ 176, 0, 176, 11 });	// Device change key
-		}
-
-		//GrpDrawSpect(0,480);
-		GrpDrawSpect(352,128);
-		GrpDrawNote();
-
-		const auto millis = BGM_PlayTime().count();
-		const auto m = ((millis / 1000) / 60);
-		const auto s = ((millis / 1000) % 60);
-		sprintf(buf,"%02d : %02d",m,s);
-		GrpPut7B(560,40+2+2,buf);
-		//TextOut(hdc,561,40+2,buf,strlen(buf));
-
-		if(Mid_Loaded()) {
-			BlitBG({ 504,  59, 136,  24 });	// MIDI TIMER
-			sprintf(buf, "%07" PRId64, Mid_PlayTime.pulse_interpolated);
-			GrpPut7B(560,64+2+2,buf);
-			//TextOut(hdc,561,64+2,buf,strlen(buf));
-		}
-
-		sprintf(buf, "%3d", BGM_GetTempo());
-		GrpPut7B(560,112+2+2,buf);
-		//TextOut(hdc,561,112+2,buf,strlen(buf));
-		//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));
-
-		if(MusicRoomText) {
-			const auto& text = MusicRoomText.value();
-
-			if(playing == BGM_PLAYING::MIDI) {
-				TextObj.Blit({ (540 + 2), (96 - 3) }, text.mid_dev);
-			}
-			TextObj.Blit({  400,       (144 +  2) }, text.title);
-			TextObj.Blit({ (400 - 40), (144 + 30) }, text.comment);
-			TextObj.Blit({ (200 - 50),  460       }, text.version);
-		}
 
 		Grp_Flip();
 	}

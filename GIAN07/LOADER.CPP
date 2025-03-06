@@ -1271,18 +1271,12 @@ bool LoadSound(void)
 }
 
 
-// MusicRoom のコメントをロードする //
-bool LoadMusicRoomComment(int no)
+BYTE_BUFFER_OWNED LoadMusicRoomComment(int no)
 {
 	if((no < 0) || (no > 19)) {
 		return false;
 	}
-	if(!MusicRoomText) {
-		return false;
-	}
-	const auto& text = MusicRoomText.value();
-	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
-	return text.PrerenderTitleAndComment(enemy.MemExpand(27 + no), no);
+	return DAT::Packfile(DAT::PACK_ID::ENEMY).MemExpand(27 + no);
 }
 
 BYTE_BUFFER_OWNED LoadDemo(int stage)

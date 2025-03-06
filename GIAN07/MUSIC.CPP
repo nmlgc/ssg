@@ -13,6 +13,7 @@
 #include "game/input.h"
 #include "game/midi.h"
 #include "game/string_format.h"
+#include "game/text.h"
 #include "game/ut_math.h"
 #include "platform/midi_backend.h"
 #include "platform/text_backend.h"
@@ -30,48 +31,78 @@ static constexpr RGB ColorDefault   = { 153, 204, 255 };
 // State
 // -----
 
+struct MUSICROOM_TEXT {
+	TEXTRENDER_RECT_ID mid_dev;
+	TEXTRENDER_RECT_ID title;
+	TEXTRENDER_RECT_ID comment;
+	TEXTRENDER_RECT_ID version;
+	BYTE_BUFFER_OWNED comment_buf = nullptr;
+
+	void RenderVersion(WINDOW_POINT topleft) const;
+	void RenderMidDev(WINDOW_POINT topleft) const;
+	void RenderTitle(WINDOW_POINT topleft) const;
+	void RenderComment(WINDOW_POINT topleft) const;
+};
+
 decltype(MusicNum) MidiPlayID = 0;
 std::optional<MUSICROOM_TEXT> MusicRoomText;
 // -----
 
-MUSICROOM_TEXT MUSICROOM_TEXT::Register()
+void MUSICROOM_TEXT::RenderVersion(WINDOW_POINT topleft) const
 {
-	const MUSICROOM_TEXT ret = {
-		.mid_dev = TextObj.Register({ 98, 13 }),
-		.title = TextObj.Register({ 240, 16 }),
-		.comment = TextObj.Register({ 272, 192 }),
-		.version = TextObj.Register({ 490, 13 }),
-	};
-
-	TextObj.Prerender(ret.version, [](TEXTRENDER_SESSION& s) {
+	static constexpr Narrow::string_view VERSION = (
+		"秋霜玉    Version 1.005     ★デモ対応版＃★"
+	);
+	TextObj.Render(topleft, version, VERSION, [](TEXTRENDER_SESSION& s) {
 		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
-		s.Put({ 0, 0 }, "秋霜玉    Version 1.005     ★デモ対応版＃★");
+		s.Put({ 0, 0 }, VERSION);
 	});
-	ret.PrerenderMidDev();
-
-	return ret;
 }
 
-void MUSICROOM_TEXT::PrerenderMidDev() const
+void MUSICROOM_TEXT::RenderMidDev(WINDOW_POINT topleft) const
 {
 #ifdef SUPPORT_MIDI_BACKEND
-	TextObj.Prerender(mid_dev, [](TEXTRENDER_SESSION& s) {
-		const auto maybe_dev = MidBackend_DeviceName();
-		if(!maybe_dev) {
-			return;
-		}
-		const auto dev = maybe_dev.value();
+	const auto maybe_dev_full = MidBackend_DeviceName();
+	if(!maybe_dev_full) {
+		return;
+	}
+	const auto dev_full = maybe_dev_full.value();
+	const Narrow::string_view dev = {
+		dev_full.data(), (std::min)(dev_full.size(), 13u)
+	};
+	TextObj.Render(topleft, mid_dev, dev, [&dev](TEXTRENDER_SESSION& s) {
 		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
-		s.Put({ 0, 0 }, { dev.data(), (std::min)(dev.size(), 13u) });
+		s.Put({ 0, 0 }, dev);
 	});
 #endif
 }
 
-bool MUSICROOM_TEXT::PrerenderTitleAndComment(
-	BYTE_BUFFER_OWNED buffer, unsigned int number
-) const
+void MUSICROOM_TEXT::RenderTitle(WINDOW_POINT topleft) const
+{
+	// Some modders might assign the same title to consecutive tracks, but it's
+	// not possible to change the track title without switching to a different
+	// track first.
+	char num_buf[1 + STRING_NUM_CAP<decltype(MidiPlayID)> + 1];
+	const size_t num_len = sprintf(num_buf, "#%02u", (MidiPlayID + 1));
+	Narrow::string_view num = { num_buf, num_len };
+
+	TextObj.Render(topleft, title, num, [&num](TEXTRENDER_SESSION& s) {
+		const auto& title = BGM_Title();
+
+		// GDI would calculate a trailing space as 4 pixels wide, not 8.
+		const auto title_left = (s.Extent(num).w + 8);
+
+		s.SetFont(FONT_ID::NORMAL);
+		s.Put({ 1, 0 }, num, ColorHighlight);
+		s.Put({ (title_left + 1), 0 }, title, ColorHighlight);
+		s.Put({ 0, 0 }, num, ColorDefault);
+		s.Put({ (title_left + 0), 0 }, title, ColorDefault);
+	});
+}
+
+void MUSICROOM_TEXT::RenderComment(WINDOW_POINT topleft) const
 {
 	struct LINE {
 		char c[19 * 2];
@@ -81,33 +112,18 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 		}
 	};
 
-	auto cursor = buffer.cursor();
-	TextObj.Prerender(title, [&](TEXTRENDER_SESSION& s) {
-		// Skip the title in the comment and take it from the BGM instead.
+	Narrow::string_view comment_str = {};
+	BYTE_BUFFER_CURSOR<const uint8_t> cursor = { std::span<const uint8_t>() };
+	if(BGM_LoadedOriginalMIDI()) {
+		// Skip the title in the comment
+		cursor = comment_buf.cursor();
 		cursor.next<LINE>();
-
-		const auto& title = BGM_Title();
-		Narrow::string buf;
-		const auto len = (
-			1 + STRING_NUM_CAP<decltype(number)> + 1 + title.size()
-		);
-		buf.resize_and_overwrite(len, [&](decltype(buf)::value_type* p, auto) {
-			const auto* start = p;
-			*(p++) = '#';
-			p += sprintf(p, "%02u", (number + 1));
-			*(p++) = ' ';
-			p = std::ranges::copy(title, p).out;
-			return (p - start);
-		});
-		s.SetFont(FONT_ID::NORMAL);
-		s.Put({ 1, 0 }, buf, ColorHighlight);
-		s.Put({ 0, 0 }, buf, ColorDefault);
-	});
-
-	TextObj.Prerender(comment, [&cursor](TEXTRENDER_SESSION& s) {
-		if(!BGM_LoadedOriginalMIDI()) {
-			return;
-		}
+		comment_str = {
+			(std::bit_cast<const char *>(comment_buf.get()) + cursor.cursor),
+			(comment_buf.size() - cursor.cursor),
+		};
+	}
+	TextObj.Render(topleft, comment, comment_str, [&](TEXTRENDER_SESSION& s) {
 		int y = 0;
 		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
@@ -116,14 +132,11 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 			y += 16;
 		}
 	});
-	return true;
 }
 
 bool MusicRoomInit(void)
 {
 	TextObj.Clear();
-	MusicRoomText = MUSICROOM_TEXT::Register();
-
 	GrpBackend_Clear();
 	Grp_Flip();
 
@@ -143,11 +156,23 @@ bool MusicRoomInit(void)
 	Mid_TableInit();
 
 	// BGM_Stop();
-	if(!LoadMusicRoomComment(0)) {
+	auto comment_buf = LoadMusicRoomComment(0);
+	if(!comment_buf) {
 		DebugOut(u8"ENEMY.DAT がはかいされています");
 		GameExit();
 		return false;
 	}
+
+	MusicRoomText = MUSICROOM_TEXT
+	{
+		.mid_dev = TextObj.Register({  98,  13 }),
+		.title   = TextObj.Register({ 240,  16 }),
+		.comment = TextObj.Register({ 272, 192 }),
+		.version = TextObj.Register({ 490,  13 }),
+
+		.comment_buf = std::move(comment_buf),
+	};
+
 /*
 	if(!LoadMusic(0)) {
 		DebugOut(u8"MUSIC.DAT が破壊されています");
@@ -359,6 +384,12 @@ void GrpDrawNote(void)
 
 void MusicRoomProc(bool&)
 {
+	if(!MusicRoomText) {
+		assert(!"Music Room not initialized?");
+		std::unreachable();
+	}
+	auto& text = MusicRoomText.value();
+
 	char buf[100];
 	static decltype(Key_Data) Old_Key;
 	static bool DevChgWait;
@@ -368,6 +399,7 @@ void MusicRoomProc(bool&)
 	if(Key_Data != Old_Key) {
 		if(Input_IsCancel(Key_Data)) {
 			DevChgWait = false;
+			MusicRoomText = std::nullopt;
 			GameExit();
 			return;
 		}
@@ -378,7 +410,7 @@ void MusicRoomProc(bool&)
 			BGM_Stop();
 			MidiPlayID = ((MidiPlayID + MusicNum - 1) % MusicNum);
 			BGM_Switch(MidiPlayID);
-			LoadMusicRoomComment(MidiPlayID);
+			text.comment_buf = LoadMusicRoomComment(MidiPlayID);
 		}
 		Old_Key = Key_Data;
 	}
@@ -398,9 +430,6 @@ void MusicRoomProc(bool&)
 	if((playing == BGM_PLAYING::MIDI) && (SystemKey_Data & SYSKEY_BGM_DEVICE)) {
 		if(!DevChgWait) {
 			BGM_ChangeMIDIDevice(1);
-			if(MusicRoomText) {
-				MusicRoomText.value().PrerenderMidDev();
-			}
 			DevChgWait = true;
 		}
 	} else {
@@ -457,16 +486,14 @@ void MusicRoomProc(bool&)
 		//TextOut(hdc,561,112+2,buf,strlen(buf));
 		//SetTextColor(hdc,RGB(255*5/5,255*2/5,255*1/5));
 
-		if(MusicRoomText) {
-			const auto& text = MusicRoomText.value();
-
-			if(playing == BGM_PLAYING::MIDI) {
-				TextObj.Blit({ (540 + 2), (96 - 3) }, text.mid_dev);
-			}
-			TextObj.Blit({  400,       (144 +  2) }, text.title);
-			TextObj.Blit({ (400 - 40), (144 + 30) }, text.comment);
-			TextObj.Blit({ (200 - 50),  460       }, text.version);
+#ifdef SUPPORT_MIDI_BACKEND
+		if(playing == BGM_PLAYING::MIDI) {
+			text.RenderMidDev({ (540 + 2), (96 - 3) });
 		}
+#endif
+		text.RenderTitle({    400,       (144 +  2) });
+		text.RenderComment({ (400 - 40), (144 + 30) });
+		text.RenderVersion({ (200 - 50),  460       });
 
 		Grp_Flip();
 	}

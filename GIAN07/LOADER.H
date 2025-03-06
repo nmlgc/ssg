@@ -96,7 +96,10 @@ bool LoadMusic(unsigned int id);	// ｎ番目の曲をロードする
 bool LoadMusicByHash(const HASH& hash);
 bool LoadMIDIBuffer(BYTE_BUFFER_OWNED);
 bool LoadSound(void);	// 全ての Sound データをロードする
-bool LoadMusicRoomComment(int no);	// MusicRoom のコメントをロードする
+
+// MusicRoom のコメントをロードする
+BYTE_BUFFER_OWNED LoadMusicRoomComment(int no);
+
 BYTE_BUFFER_OWNED LoadDemo(int stage);
 
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする

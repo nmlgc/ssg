@@ -26,6 +26,13 @@ platform_src += SSG.glob("platform/miniaudio/*.cpp")
 platform_src += SSG.glob("platform/pangocairo/*.cpp")
 platform_src += "MAIN/main_sdl.cpp"
 platform_src.extra_inputs += PLATFORM_CONSTANTS
-ssg_obj = (ssg_obj + platform_cfg:cxx(platform_src))
+ssg_obj = (
+	ssg_obj +
+	platform_cfg:cxx(platform_src) +
+
+	-- Clang does not like C being compiled with clang++, and non-C++ clang
+	-- does not like module-related switches.
+	CONFIG:branch(SSG_COMPILE):cc(SSG.glob("platform/miniaudio/*.c"))
+)
 
 platform_cfg:exe(ssg_obj, "GIAN07")

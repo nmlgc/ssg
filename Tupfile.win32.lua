@@ -88,7 +88,7 @@ local function ssg(variant)
 	local ssg_obj = ssg_cfg:branch(ANALYSIS_RELAXED):cxx(SSG_SRC)
 
 	-- Our platform layer code
-	LAYERS_SRC += SSG.glob("platform/miniaudio/*.cpp")
+	LAYERS_SRC += SSG.glob("platform/miniaudio/*.c*")
 	LAYERS_SRC += SSG.glob("platform/windows/*.cpp")
 	ssg_obj = (ssg_obj + ssg_cfg:cxx(LAYERS_SRC))
 

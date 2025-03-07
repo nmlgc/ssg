@@ -5,6 +5,7 @@ if "%VCINSTALLDIR%" == "" (
 	exit 1
 )
 
+sh ./version_from_git.sh
 sh ./submodules_check.sh ^
 	libs/BLAKE3 ^
 	libs/dr_libs ^

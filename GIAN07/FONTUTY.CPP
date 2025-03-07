@@ -233,7 +233,11 @@ extern void GrpPutMidNum(int x, int y, int n)
 }
 
 PIXEL_SIZE DrawGrdFont(
-	TEXTRENDER_SESSION& s, std::span<const Narrow::string_view> strs
+	TEXTRENDER_SESSION& s,
+	std::span<const Narrow::string_view> strs,
+	FONT_ID font,
+	bool shadow,
+	uint8_t (*gradient_func)(PIXEL_COORD y)
 )
 {
 	PIXEL_SIZE extent = { 0, 0 };
@@ -248,24 +252,24 @@ PIXEL_SIZE DrawGrdFont(
 		return temp;
 	});
 
-	s.SetFont(FONT_ID::NORMAL);
+	s.SetFont(font);
 	for(const auto& str : strs) {
-		s.Put({ (extent.w + 2), 2 }, str, RGB{   0,   0, 128 });
-		s.Put({ (extent.w + 1), 2 }, str, RGB{   0,   0, 128 });
-		s.Put({ (extent.w + 1), 1 }, str, RGB{ 255, 255, 255 });
-		s.Put({ (extent.w + 0), 1 }, str, RGB{ 255, 255, 255 });
+		if(shadow) {
+			s.Put({ (extent.w + 2), 2 }, str, RGB{   0,   0, 128 });
+			s.Put({ (extent.w + 1), 2 }, str, RGB{   0,   0, 128 });
+			s.Put({ (extent.w + 1), 1 }, str, RGB{ 255, 255, 255 });
+			s.Put({ (extent.w + 0), 1 }, str, RGB{ 255, 255, 255 });
+		} else {
+			s.Put({ extent.w, 0 }, str, RGB{ 255, 255, 255 });
+		}
 		extent += s.Extent(str);
 	}
 
-	constexpr auto FSIZE = 8;
-	const PIXEL_COORD w = extent.w;
-	const PIXEL_COORD h = extent.h;
-
 	s.PixelAccess([&](TEXTRENDER_SESSION::PIXELACCESS& p) {
-		for(auto y = 1; y < h; y++) {
-			const uint8_t gradient = (255 + FSIZE - (y * FSIZE));
+		for(PIXEL_COORD y = shadow; y < extent.h; y++) {
+			const uint8_t gradient = gradient_func(y);
 			const RGB color = { gradient, gradient, 255 };
-			for(auto x = 1; x < w; x++) {
+			for(PIXEL_COORD x = shadow; x < extent.w; x++) {
 				if(p.GetRaw({ x, y }) == temp) { // RGB(255, 255, 255)
 					p.Set({ x, y }, color);
 				}

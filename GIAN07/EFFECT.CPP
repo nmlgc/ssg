@@ -261,7 +261,10 @@ void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
 {
 	const auto mtitle = MTitleStrs[1];
 	TextObj.Render(topleft, MTitleRect, mtitle, [](TEXTRENDER_SESSION& s) {
-		DrawGrdFont(s, MTitleStrs);
+		const auto gradient_func = [](PIXEL_COORD y) -> uint8_t {
+			return (255 + 8 - (y * 8));
+		};
+		DrawGrdFont(s, MTitleStrs, FONT_ID::NORMAL, true, gradient_func);
 	}, subrect);
 }
 

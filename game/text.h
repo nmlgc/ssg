@@ -84,20 +84,9 @@ template <class T> concept TEXTRENDER_BASE = requires(
 	// font.
 	{ t.TextExtent(font, contents) } -> std::same_as<PIXEL_SIZE>;
 
-	// Retained interface
-	// ------------------
-	// Explicit prerendering with later blitting.
-
-	{ t.Prerender(rect_id, func) } -> std::same_as<bool>;
-	t.Blit(dst, rect_id, subrect);
-	// ------------------
-
-	// Immediate interface
-	// -------------------
 	// Associates the results of [func] with the given [contents], thus caching
 	// the result rendered to [rect_id]. [func] will only be called again if
 	// the [contents] changed.
 
 	t.Render(dst, rect_id, contents, func, subrect);
-	// -------------------
 };

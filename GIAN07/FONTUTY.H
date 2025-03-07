@@ -30,6 +30,39 @@ extern void GrpPutScore(int x, int y, const char *s);	// 得点アイテムの�
 
 extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画する
 
+// 5-pixel variable-width font in [SURFACE_ID::SYSTEM]. Supports A-Z.
+// ------------------------------------------------------------------
+
+constexpr PIXEL_COORD GrpExtent5(const char c)
+{
+	switch(c) {
+		if(!((c >= 'A') && (c <= 'Z'))) {
+			assert(!"Character not supported in 5-pixel system font");
+			return 0;
+		}
+		case 'I':	return 3;	break;
+		case 'M':
+		case 'T':
+		case 'V':
+		case 'W':
+		case 'Y':	return 5;	break;
+		default: 	return 4;	break;
+		}
+}
+
+constexpr PIXEL_SIZE GrpExtent5(const std::string_view s)
+{
+	PIXEL_SIZE ret = { 0, 5 };
+	for(const char c : s) {
+		ret.w += (GrpExtent5(c) + 1);
+	}
+	ret.w = (std::max)(0, (ret.w - 1));
+	return ret;
+}
+
+void GrpPut55(WINDOW_POINT topleft, const std::string_view s);
+// ------------------------------------------------------------------
+
 // グラデーション付きフォントを描画する
 PIXEL_SIZE DrawGrdFont(
 	TEXTRENDER_SESSION& s,

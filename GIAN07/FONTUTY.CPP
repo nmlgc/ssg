@@ -210,6 +210,19 @@ extern void GrpPutScore(int x, int y, const char *s)
 	}
 }
 
+void GrpPut55(WINDOW_POINT topleft, const std::string_view s)
+{
+	for(const char c : s) {
+		const auto w = GrpExtent5(c);
+		if(w == 0) {
+			continue;
+		}
+		const auto src = PIXEL_LTWH{ (((c - 'A') << 3) + 128), 99, w, 5 };
+		GrpSurface_Blit(topleft, SURFACE_ID::SYSTEM, src);
+		topleft.x += (w + 1);
+	}
+}
+
 // MIDI 用フォントを描画する //
 extern void GrpPutMidNum(int x, int y, int n)
 {

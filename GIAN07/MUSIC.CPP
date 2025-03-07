@@ -23,7 +23,7 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 		.version = TextObj.Register({ 490, 13 }),
 	};
 
-	TextObj.Prerender(ret.version, [](TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(ret.version, [](TEXTRENDER_SESSION& s) {
 		s.SetFont(FONT_ID::SMALL);
 		s.SetColor(ColorDefault);
 		s.Put({ 0, 0 }, "秋霜玉    Version 1.005     ★デモ対応版＃★");
@@ -36,7 +36,7 @@ MUSICROOM_TEXT MUSICROOM_TEXT::Register()
 void MUSICROOM_TEXT::PrerenderMidDev() const
 {
 #ifdef SUPPORT_MIDI_BACKEND
-	TextObj.Prerender(mid_dev, [](TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(mid_dev, [](TEXTRENDER_SESSION& s) {
 		const auto maybe_dev = MidBackend_DeviceName();
 		if(!maybe_dev) {
 			return;
@@ -62,7 +62,7 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 	};
 
 	auto cursor = buffer.cursor();
-	TextObj.Prerender(title, [&](TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(title, [&](TEXTRENDER_SESSION& s) {
 		// Skip the title in the comment and take it from the BGM instead.
 		cursor.next<LINE>();
 
@@ -84,7 +84,7 @@ bool MUSICROOM_TEXT::PrerenderTitleAndComment(
 		s.Put({ 0, 0 }, buf, ColorDefault);
 	});
 
-	TextObj.Prerender(comment, [&cursor](TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(comment, [&cursor](TEXTRENDER_SESSION& s) {
 		if(!BGM_LoadedOriginalMIDI()) {
 			return;
 		}

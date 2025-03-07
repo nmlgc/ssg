@@ -9,7 +9,7 @@
 
 extern const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs;
 
-TEXTRENDER_GDI TextObj;
+TEXTRENDER TextObj;
 
 static class {
 	ENUMARRAY<HFONT, FONT_ID> arr;
@@ -54,13 +54,13 @@ PIXEL_SIZE TextGDIExtent(std::optional<HFONT> font, Narrow::string_view str)
 	return ret;
 }
 
-uint32_t TEXTRENDER_GDI_SESSION::PIXELACCESS::GetRaw(const PIXEL_POINT& xy_rel)
+uint32_t TEXTRENDER_SESSION::PIXELACCESS::GetRaw(const PIXEL_POINT& xy_rel)
 {
 	const auto hdc = GrpSurface_GDIText_Surface().dc;
 	return GetPixel(hdc, (rect.left + xy_rel.x), (rect.top + xy_rel.y));
 }
 
-void TEXTRENDER_GDI_SESSION::PIXELACCESS::SetRaw(
+void TEXTRENDER_SESSION::PIXELACCESS::SetRaw(
 	const PIXEL_POINT& xy_rel, uint32_t color
 )
 {
@@ -68,20 +68,20 @@ void TEXTRENDER_GDI_SESSION::PIXELACCESS::SetRaw(
 	SetPixelV(hdc, (rect.left + xy_rel.x), (rect.top + xy_rel.y), color);
 }
 
-RGB TEXTRENDER_GDI_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
+RGB TEXTRENDER_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
 {
 	const auto ret = GetRaw(xy_rel);
 	return RGB{ .r = GetRValue(ret), .g = GetGValue(ret), .b = GetBValue(ret) };
 }
 
-void TEXTRENDER_GDI_SESSION::PIXELACCESS::Set(
+void TEXTRENDER_SESSION::PIXELACCESS::Set(
 	const PIXEL_POINT& xy_rel, const RGB color
 )
 {
 	SetRaw(xy_rel, RGB(color.r, color.g, color.b));
 }
 
-TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(const PIXEL_LTWH& rect) :
+TEXTRENDER_SESSION::TEXTRENDER_SESSION(const PIXEL_LTWH& rect) :
 	rect(rect)
 {
 	const auto hdc = GrpSurface_GDIText_Surface().dc;
@@ -100,7 +100,7 @@ TEXTRENDER_GDI_SESSION::TEXTRENDER_GDI_SESSION(const PIXEL_LTWH& rect) :
 	assert(background_mode_set_to_transparent);
 }
 
-TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
+TEXTRENDER_SESSION::~TEXTRENDER_SESSION()
 {
 	if(font_initial) {
 		const auto hdc = GrpSurface_GDIText_Surface().dc;
@@ -109,12 +109,12 @@ TEXTRENDER_GDI_SESSION::~TEXTRENDER_GDI_SESSION()
 	GrpSurface_GDIText_Update(rect);
 }
 
-PIXEL_SIZE TEXTRENDER_GDI_SESSION::RectSize(void) const
+PIXEL_SIZE TEXTRENDER_SESSION::RectSize(void) const
 {
 	return { rect.w, rect.h };
 }
 
-void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
+void TEXTRENDER_SESSION::SetFont(FONT_ID font)
 {
 	if(font_cur != font) {
 		const auto hdc = GrpSurface_GDIText_Surface().dc;
@@ -126,7 +126,7 @@ void TEXTRENDER_GDI_SESSION::SetFont(FONT_ID font)
 	}
 }
 
-void TEXTRENDER_GDI_SESSION::SetColor(const RGB color)
+void TEXTRENDER_SESSION::SetColor(const RGB color)
 {
 	const COLORREF color_gdi = RGB(color.r, color.g, color.b);
 	if(color_cur != color_gdi) {
@@ -136,12 +136,12 @@ void TEXTRENDER_GDI_SESSION::SetColor(const RGB color)
 	}
 }
 
-PIXEL_SIZE TEXTRENDER_GDI_SESSION::Extent(Narrow::string_view str)
+PIXEL_SIZE TEXTRENDER_SESSION::Extent(Narrow::string_view str)
 {
 	return TextGDIExtent(std::nullopt, str);
 }
 
-void TEXTRENDER_GDI_SESSION::Put(
+void TEXTRENDER_SESSION::Put(
 	const PIXEL_POINT& topleft_rel,
 	Narrow::string_view str,
 	std::optional<RGB> color
@@ -163,7 +163,7 @@ void TEXTRENDER_GDI_SESSION::Put(
 	});
 }
 
-bool TEXTRENDER_GDI::Wipe()
+bool TEXTRENDER::Wipe()
 {
 	if(
 		!bounds ||
@@ -181,7 +181,7 @@ bool TEXTRENDER_GDI::Wipe()
 	);
 }
 
-std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::Session(
+std::optional<TEXTRENDER_SESSION> TEXTRENDER::Session(
 	TEXTRENDER_RECT_ID rect_id
 )
 {
@@ -190,10 +190,10 @@ std::optional<TEXTRENDER_GDI_SESSION> TEXTRENDER_GDI::Session(
 		return std::nullopt;
 	}
 	assert(rect_id < rects.size());
-	return TEXTRENDER_GDI_SESSION{ rects[rect_id].rect };
+	return TEXTRENDER_SESSION{ rects[rect_id].rect };
 }
 
-void TEXTRENDER_GDI::WipeBeforeNextRender()
+void TEXTRENDER::WipeBeforeNextRender()
 {
 	TEXTRENDER_PACKED::Wipe();
 
@@ -202,7 +202,7 @@ void TEXTRENDER_GDI::WipeBeforeNextRender()
 	GrpSurface_GDIText_Surface().size = { 0, 0 };
 }
 
-PIXEL_SIZE TEXTRENDER_GDI::TextExtent(FONT_ID font, Narrow::string_view str)
+PIXEL_SIZE TEXTRENDER::TextExtent(FONT_ID font, Narrow::string_view str)
 {
 	return TextGDIExtent(Fonts.ForID(font), str);
 }

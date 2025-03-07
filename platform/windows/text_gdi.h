@@ -8,7 +8,7 @@
 #include "game/text_packed.h"
 #include "platform/graphics_backend.h"
 
-class TEXTRENDER_GDI_SESSION {
+class TEXTRENDER_SESSION {
 protected:
 	// HFONT would require a cast of the value returned from SelectObject().
 	// Thankfully, this type doesn't even require <windows.h>.
@@ -23,8 +23,14 @@ protected:
 	FONT_ID font_cur = FONT_ID::COUNT;
 	const PIXEL_LTWH rect;
 
+public:
 	class PIXELACCESS {
+		friend class TEXTRENDER_SESSION;
+
 		const PIXEL_LTWH rect;
+
+		PIXELACCESS(const PIXEL_LTWH rect) : rect(rect) {
+		}
 
 	public:
 		uint32_t GetRaw(const PIXEL_POINT& xy_rel);
@@ -32,13 +38,8 @@ protected:
 
 		RGB Get(const PIXEL_POINT& xy_rel);
 		void Set(const PIXEL_POINT& xy_rel, const RGB col);
-
-		PIXELACCESS(const PIXEL_LTWH rect) : rect(rect) {
-		}
 	};
-	static_assert(TEXTRENDER_SESSION_PIXELACCESS<PIXELACCESS>);
 
-public:
 	PIXEL_SIZE RectSize(void) const;
 	void SetFont(FONT_ID font);
 	void SetColor(const RGB color);
@@ -53,23 +54,17 @@ public:
 		return f(p);
 	}
 
-	TEXTRENDER_GDI_SESSION(const PIXEL_LTWH& rect);
-	~TEXTRENDER_GDI_SESSION();
+	TEXTRENDER_SESSION(const PIXEL_LTWH& rect);
+	~TEXTRENDER_SESSION();
 };
 
-static_assert(TEXTRENDER_SESSION<TEXTRENDER_GDI_SESSION>);
-
-class TEXTRENDER_GDI : public TEXTRENDER_PACKED<TEXTRENDER_GDI_SESSION> {
+class TEXTRENDER : public TEXTRENDER_PACKED {
 	friend class TEXTRENDER_PACKED;
 
 	bool Wipe();
-	std::optional<TEXTRENDER_GDI_SESSION> Session(TEXTRENDER_RECT_ID rect_id);
+	std::optional<TEXTRENDER_SESSION> Session(TEXTRENDER_RECT_ID rect_id);
 
 public:
 	void WipeBeforeNextRender();
 	PIXEL_SIZE TextExtent(FONT_ID font, Narrow::string_view str);
 };
-
-static_assert(TEXTRENDER<TEXTRENDER_GDI>);
-
-extern TEXTRENDER_GDI TextObj;

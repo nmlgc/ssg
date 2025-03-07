@@ -23,7 +23,55 @@
 #include "game/snd.h"
 #include "game/ut_math.h"
 #include "platform/time.h"
+#include "obj/version.h"
 
+
+namespace Version {
+struct LINE {
+	TEXTRENDER_RECT_ID trr;
+	WINDOW_COORD left;
+};
+
+LINE Line[1];
+
+constexpr std::string_view BUILD_LABEL = "BUILD";
+constexpr Narrow::string_view BUILD_VALUE = (" " VERSION_TAG);
+
+void Init(void)
+{
+	const auto build_w = TextObj.TextExtent(FONT_ID::TINY, BUILD_VALUE).w;
+	Line[0].trr = TextObj.Register({ 136, 10 });
+	Line[0].left = (GRP_RES.w - build_w);
+}
+
+void Render(PIXEL_COORD top)
+{
+	// Matches the font rendered by GrpPutScore().
+	const auto gradient_func = [](PIXEL_COORD y) -> uint8_t {
+		return ((y <= 3) ? 254 : (y <= 6) ? 220 : 180);
+	};
+
+	constexpr auto BUILD_LABEL_EXTENT = GrpExtent5(BUILD_LABEL);
+	const WINDOW_POINT build_label_topleft = {{
+		.x = (Line[0].left - BUILD_LABEL_EXTENT.w),
+
+		// MS Gothic 10 is actually 7 pixels high and starts at a Y coordinate
+		// of 2.
+		.y = (top + 2 + 7 - BUILD_LABEL_EXTENT.h)
+	}};
+
+	GrpPut55(build_label_topleft, BUILD_LABEL);
+	TextObj.Render(
+		{ Line[0].left, top },
+		Line[0].trr,
+		BUILD_VALUE,
+		[gradient_func](auto& s) {
+			const std::span strs = { &BUILD_VALUE, 1 };
+			DrawGrdFont(s, strs, FONT_ID::TINY, false, gradient_func);
+		}
+	);
+}
+};
 
 uint16_t DemoTimer = 0;
 uint32_t DrawCount = 0;
@@ -828,6 +876,8 @@ extern bool GameExit(bool bNeedChgMusic)
 	// MainWindow.Open({ 150, 200 }, 0);
 	// MainWindow.Open({ 250, 150 }, 0);
 
+	Version::Init();
+
 	GameMain  = TitleProc;
 
 	return true;
@@ -1297,6 +1347,10 @@ void TitleProc(bool& quit)
 		// GrpSurface_Blit({ (320 - 175), 77 }, SURFACE_ID::TITLE, src);
 		MWinDraw();
 		CWinDraw(window_active);
+
+		// Placing this here avoids flickering with the Vulkan backend if any
+		// of the above windows had to re-render text?!
+		Version::Render(438);
 #ifdef PBG_DEBUG
 		StdStatusOutput();
 #endif

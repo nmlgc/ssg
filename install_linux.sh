@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ "$#" -lt 1 ]; then
-	>&2 echo "Usage: ROOT= PATH_SKELETON= $0 APP_NAME"
+	>&2 echo "Usage: ROOT= PATH_SKELETON= $0 APP_ID"
 	exit 1
 fi
 

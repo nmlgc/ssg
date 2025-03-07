@@ -33,7 +33,7 @@ int main(int argc, char** args)
 {
 	Log_Init(UTF8(GAME_TITLE));
 
-	#if(defined(LINUX) && defined(APP_NAME))
+	#if(defined(LINUX) && defined(APP_ID))
 		// Tell the Desktop Entry name to the X11 (or Wayland!) window manager,
 		// and hope that it uses this name to pick the Desktop Entry's icon.
 		//
@@ -48,7 +48,7 @@ int main(int argc, char** args)
 		//
 		/// (Also, SDL_WindowIcon() still works this way even in SDL 3 where
 		// `SDL_Surface` gained support for alternate-resolution images.)
-		SDL_setenv("SDL_VIDEO_X11_WMCLASS", APP_NAME, 1);
+		SDL_setenv("SDL_VIDEO_X11_WMCLASS", APP_ID, 1);
 	#endif
 
 	if(SDL_Init(SDL_INIT_JOYSTICK | SDL_INIT_TIMER | SDL_INIT_VIDEO) < 0) {

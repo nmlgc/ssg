@@ -8,7 +8,7 @@ SSG_COMPILE.objdir = "ssg/"
 SSG = sourcepath("./")
 
 PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
-	"APP_NAME", "PATH_SKELETON"
+	"APP_ID", "PATH_SKELETON"
 })
 
 -- pbg code

@@ -216,7 +216,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	WINDOW_POINT topleft = { ws->x, ws->y };
 	const auto trr = ws->TRRs[0];
 	const Narrow::string_view str = p->Title->Title;
-	TextObj.Render(topleft, trr, str, [=](TEXTRENDER_SESSION auto& s) {
+	TextObj.Render(topleft, trr, str, [=](TEXTRENDER_SESSION& s) {
 		const auto& col = COL[WINDOW_STATE::REGULAR];
 		s.SetFont(CWIN_FONT);
 
@@ -239,7 +239,7 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 			? str
 			: ""
 		);
-		TextObj.Render(topleft, trr, c, [=](TEXTRENDER_SESSION auto& s) {
+		TextObj.Render(topleft, trr, c, [=](TEXTRENDER_SESSION& s) {
 			const auto& col = COL[item->State];
 			s.SetFont(CWIN_FONT);
 
@@ -414,7 +414,7 @@ void MWinDraw(void)
 		const auto topleft = (WINDOW_POINT{ x, y } + MsgWindow.TextTopleft);
 		const auto trr = MsgWindow.TRR.value();
 		const auto& text = MsgWindow.Text;
-		TextObj.Render(topleft, trr, text, [](TEXTRENDER_SESSION auto& s) {
+		TextObj.Render(topleft, trr, text, [](TEXTRENDER_SESSION& s) {
 			// セットされたフォントで描画
 			s.SetFont(MsgWindow.FontID);
 			for(auto i = 0; i < MsgWindow.Line; i++) {

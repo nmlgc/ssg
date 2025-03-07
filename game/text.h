@@ -15,7 +15,7 @@ using TEXTRENDER_RECT_ID = unsigned int;
 
 // Concept for a text render session on a single rectangle, abstracting away
 // the rasterizer.
-template <class T> concept TEXTRENDER_SESSION = (
+template <class T> concept TEXTRENDER_SESSION_BASE = (
 	ENUMARRAY_ID<FONT_ID> && requires (
 		T t,
 		PIXEL_POINT topleft_rel,
@@ -37,37 +37,27 @@ template <class T> concept TEXTRENDER_SESSION = (
 		t.Put(topleft_rel, str);
 
 		// Convenience overload to change the color before rendering the text.
-		// (Not adding one for the font, since the ID is templated. This
-		// allows Put() to be fully implemented within a type-erased base
-		// class.)
 		t.Put(topleft_rel, str, color);
 	}
 );
+class TEXTRENDER_SESSION;
 
 // Horizontally centers [str] on [s]'s rectangle.
 PIXEL_COORD TextLayoutXCenter(
-	TEXTRENDER_SESSION auto& s, Narrow::string_view str
+	TEXTRENDER_SESSION_BASE auto& s, Narrow::string_view str
 ) {
 	return ((s.RectSize().w - s.Extent(str).w) / 2);
 }
 
-// Just here to keep the TEXTRENDER concept from requiring an impossible
-// template parameter for the session functor.
-struct TEXTRENDER_SESSION_FUNC_ARCHETYPE {
-	TEXTRENDER_SESSION_FUNC_ARCHETYPE() = delete;
-	void operator()(TEXTRENDER_SESSION auto& s) {
-	}
-};
-
 // Concept for a text rendering backend.
-template <class T> concept TEXTRENDER = requires(
+template <class T> concept TEXTRENDER_BASE = requires(
 	T t,
 	FONT_ID font,
 	PIXEL_SIZE size,
 	WINDOW_POINT dst,
 	Narrow::string_view contents,
 	TEXTRENDER_RECT_ID rect_id,
-	TEXTRENDER_SESSION_FUNC_ARCHETYPE& func,
+	void (*func)(TEXTRENDER_SESSION&),
 	std::optional<PIXEL_LTWH> subrect
 ) {
 	// Rectangle management

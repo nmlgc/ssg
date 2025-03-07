@@ -263,7 +263,7 @@ void DrawStfInfo()
 // テキストの描画 //
 void EndingText::Prerender()
 {
-	TextObj.Prerender(Rect, [this](TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(Rect, [this](TEXTRENDER_SESSION& s) {
 		int max = 0;
 
 		for(decltype(NumText) i = 0; i < NumText; i++) {

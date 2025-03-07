@@ -86,7 +86,7 @@ bool MetricHintingNeededFor(PangoFontDescription *desc)
 // State
 // -----
 
-TEXTRENDER_PANGOCAIRO TextObj;
+TEXTRENDER TextObj;
 
 // The single surface for the largest rectangle, enlarged by Session() as
 // necessary.
@@ -212,28 +212,24 @@ PIXEL_SIZE PANGOCAIRO_STATE::Extent(
 	return ret;
 }
 
-uint32_t& TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::PixelAt(
-	const PIXEL_POINT& xy_rel
-)
+uint32_t& TEXTRENDER_SESSION::PIXELACCESS::PixelAt(const PIXEL_POINT& xy_rel)
 {
 	return (std::bit_cast<uint32_t *>(buf + (stride * xy_rel.y)))[xy_rel.x];
 }
 
-uint32_t TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::GetRaw(
-	const PIXEL_POINT& xy_rel
-)
+uint32_t TEXTRENDER_SESSION::PIXELACCESS::GetRaw(const PIXEL_POINT& xy_rel)
 {
 	return PixelAt(xy_rel);
 }
 
-void TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::SetRaw(
+void TEXTRENDER_SESSION::PIXELACCESS::SetRaw(
 	const PIXEL_POINT& xy_rel, uint32_t color
 )
 {
 	PixelAt(xy_rel) = color;
 }
 
-RGB TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
+RGB TEXTRENDER_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
 {
 	const auto ret = GetRaw(xy_rel);
 	const uint8_t b = (ret >>  0);
@@ -242,32 +238,31 @@ RGB TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::Get(const PIXEL_POINT& xy_rel)
 	return RGB{ .r = r, .g = g, .b = b };
 }
 
-void TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::Set(
+void TEXTRENDER_SESSION::PIXELACCESS::Set(
 	const PIXEL_POINT& xy_rel, const RGB c
 )
 {
 	SetRaw(xy_rel, (0xFF000000u | (c.r << 16u) | (c.g << 8u) | c.b));
 }
 
-TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::PIXELACCESS(void)
+TEXTRENDER_SESSION::PIXELACCESS::PIXELACCESS(void)
 {
 	cairo_surface_flush(State.surf);
 	buf = cairo_image_surface_get_data(State.surf);
 	stride = cairo_image_surface_get_stride(State.surf);
 }
 
-TEXTRENDER_PANGOCAIRO_SESSION::PIXELACCESS::~PIXELACCESS(void)
+TEXTRENDER_SESSION::PIXELACCESS::~PIXELACCESS(void)
 {
 	cairo_surface_mark_dirty(State.surf);
 }
 
-TEXTRENDER_PANGOCAIRO_SESSION::TEXTRENDER_PANGOCAIRO_SESSION(
-	const PIXEL_LTWH rect
-) : tex_origin(rect.left, rect.top), size(rect.w, rect.h)
+TEXTRENDER_SESSION::TEXTRENDER_SESSION(const PIXEL_LTWH rect) :
+	tex_origin(rect.left, rect.top), size(rect.w, rect.h)
 {
 }
 
-TEXTRENDER_PANGOCAIRO_SESSION::~TEXTRENDER_PANGOCAIRO_SESSION()
+TEXTRENDER_SESSION::~TEXTRENDER_SESSION()
 {
 	cairo_surface_flush(State.surf);
 	const auto *buf = cairo_image_surface_get_data(State.surf);
@@ -279,12 +274,12 @@ TEXTRENDER_PANGOCAIRO_SESSION::~TEXTRENDER_PANGOCAIRO_SESSION()
 	);
 }
 
-PIXEL_SIZE TEXTRENDER_PANGOCAIRO_SESSION::RectSize(void) const
+PIXEL_SIZE TEXTRENDER_SESSION::RectSize(void) const
 {
 	return size;
 }
 
-void TEXTRENDER_PANGOCAIRO_SESSION::SetFont(FONT_ID font)
+void TEXTRENDER_SESSION::SetFont(FONT_ID font)
 {
 	if(font_cur != font) {
 		State.SetFont(&Fonts.ForID(font));
@@ -292,7 +287,7 @@ void TEXTRENDER_PANGOCAIRO_SESSION::SetFont(FONT_ID font)
 	}
 }
 
-void TEXTRENDER_PANGOCAIRO_SESSION::SetColor(const RGB& color)
+void TEXTRENDER_SESSION::SetColor(const RGB& color)
 {
 	if(color_cur != color) {
 		cairo_set_source_rgb(
@@ -302,12 +297,12 @@ void TEXTRENDER_PANGOCAIRO_SESSION::SetColor(const RGB& color)
 	}
 }
 
-PIXEL_SIZE TEXTRENDER_PANGOCAIRO_SESSION::Extent(Narrow::string_view str)
+PIXEL_SIZE TEXTRENDER_SESSION::Extent(Narrow::string_view str)
 {
 	return State.Extent(nullptr, str);
 }
 
-void TEXTRENDER_PANGOCAIRO_SESSION::Put(
+void TEXTRENDER_SESSION::Put(
 	const PIXEL_POINT& topleft_rel,
 	Narrow::string_view str,
 	std::optional<RGB> color
@@ -321,7 +316,7 @@ void TEXTRENDER_PANGOCAIRO_SESSION::Put(
 	pango_cairo_show_layout(State.cr, State.layout);
 }
 
-std::optional<TEXTRENDER_PANGOCAIRO_SESSION> TEXTRENDER_PANGOCAIRO::Session(
+std::optional<TEXTRENDER_SESSION> TEXTRENDER::Session(
 	TEXTRENDER_RECT_ID rect_id
 )
 {
@@ -356,17 +351,15 @@ std::optional<TEXTRENDER_PANGOCAIRO_SESSION> TEXTRENDER_PANGOCAIRO::Session(
 			return std::nullopt;
 		}
 	}
-	return std::make_optional<TEXTRENDER_PANGOCAIRO_SESSION>(rect);
+	return std::make_optional<TEXTRENDER_SESSION>(rect);
 }
 
-void TEXTRENDER_PANGOCAIRO::WipeBeforeNextRender()
+void TEXTRENDER::WipeBeforeNextRender()
 {
 	TEXTRENDER_PACKED::Wipe();
 }
 
-PIXEL_SIZE TEXTRENDER_PANGOCAIRO::TextExtent(
-	FONT_ID font, Narrow::string_view str
-)
+PIXEL_SIZE TEXTRENDER::TextExtent(FONT_ID font, Narrow::string_view str)
 {
 	// Luckily, Pango calculates extents just fine on 0×0 surfaces.
 	if(!State) {

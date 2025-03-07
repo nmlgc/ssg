@@ -237,11 +237,9 @@ PIXEL_SIZE DrawGrdFont(
 )
 {
 	PIXEL_SIZE extent = { 0, 0 };
-	TextObj.Prerender(rect_id, [&](TEXTRENDER_SESSION auto& s) {
+	TextObj.Prerender(rect_id, [&](TEXTRENDER_SESSION& s) {
 		// ここら辺は、一種の常套手段か？ //
-		const auto temp = s.PixelAccess([](
-			TEXTRENDER_SESSION_PIXELACCESS auto& p
-		) {
+		const auto temp = s.PixelAccess([](TEXTRENDER_SESSION::PIXELACCESS& p) {
 			const PIXEL_POINT coord = { 0, 0 };
 			const auto old = p.GetRaw(coord);
 			p.Set(coord, RGB{ 255, 255, 255 });
@@ -263,7 +261,7 @@ PIXEL_SIZE DrawGrdFont(
 		const PIXEL_COORD w = extent.w;
 		const PIXEL_COORD h = extent.h;
 
-		s.PixelAccess([&](TEXTRENDER_SESSION_PIXELACCESS auto& p) {
+		s.PixelAccess([&](TEXTRENDER_SESSION::PIXELACCESS& p) {
 			for(auto y = 1; y < h; y++) {
 				const uint8_t gradient = (255 + FSIZE - (y * FSIZE));
 				const RGB color = { gradient, gradient, 255 };

@@ -71,9 +71,14 @@ static constexpr SURFACE_ID operator+(SURFACE_ID lhs, uint8_t rhs)
 }
 
 enum class FONT_ID : uint8_t {
+	// IDs referenced by original game data
 	SMALL = 0,	// フォント(小さい文字用)
 	NORMAL = 1,	// フォント(通常の文字用)
 	LARGE = 2,	// フォント(大きい文字用)
+
+	// Newly added in this fork
+	TINY = 3,
+
 	COUNT,
 };
 // --------

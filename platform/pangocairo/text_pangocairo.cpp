@@ -37,8 +37,12 @@ struct PANGOCAIRO_STATE {
 
 // Pango's hinting (which is, *of course*, controlled by a property in Cairo
 // that overrides Fontconfig and can't be overridden itself) renders MS Gothic
-// and IPAMonaGothic bitmaps 1 pixel lower than GDI… *except* for MS Gothic at
-// 16px, which happens to render pixel-perfectly. To check whether the game is
+// and IPAMonaGothic bitmaps 1 pixel lower than GDI… *except* for
+//
+// • MS Gothic at 10px and 16px, and
+// • IPAMonaGothic at 10px,
+//
+// which happen to render pixel-perfectly. To check whether the game is
 // actually using the optionally installable MS Gothic, we have to run Pango's
 // font substitution, but the mere call to pango_font_map_load_font() already
 // irrevocably applies Cairo's default metric hinting value to the respective
@@ -80,7 +84,14 @@ bool MetricHintingNeededFor(PangoFontDescription *desc)
 	if(matched != FcResultMatch) {
 		return false;
 	}
-	return (!strcmp(family_out, "MS Gothic") && (size == (16 * PANGO_SCALE)));
+
+	const auto is_ms_gothic = !strcmp(family_out, "MS Gothic");
+	const auto is_ipamona_gothic = !strcmp(family_out, "IPAMonaGothic");
+	switch(size) {
+	case (10 * PANGO_SCALE):	return (is_ms_gothic || is_ipamona_gothic);
+	case (16 * PANGO_SCALE):	return is_ms_gothic;
+	}
+	return false;
 }
 
 // State

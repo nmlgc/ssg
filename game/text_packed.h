@@ -47,20 +47,6 @@ public:
 		std::optional<PIXEL_LTWH> subrect = std::nullopt
 	);
 
-	template <typename Self> bool Prerender(
-		this Self&& self,
-		TEXTRENDER_RECT_ID rect_id,
-		std::invocable<TEXTRENDER_SESSION&> auto func
-	) {
-		auto maybe_session = self.Session(rect_id);
-		if(!maybe_session) {
-			return false;
-		}
-		auto& session = maybe_session.value();
-		func(session);
-		return true;
-	}
-
 	template <typename Self> bool Render(
 		this Self&& self,
 		WINDOW_POINT dst,
@@ -72,9 +58,11 @@ public:
 		assert(rect_id < self.rects.size());
 		auto& rect = self.rects[rect_id];
 		if(rect.contents != contents) {
-			if(!self.Prerender(rect_id, func)) {
+			auto maybe_session = self.Session(rect_id);
+			if(!maybe_session) {
 				return false;
 			}
+			func(maybe_session.value());
 			rect.contents = contents;
 		}
 		return self.Blit(dst, rect_id, subrect);

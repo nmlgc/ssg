@@ -233,45 +233,45 @@ extern void GrpPutMidNum(int x, int y, int n)
 }
 
 PIXEL_SIZE DrawGrdFont(
-	TEXTRENDER_RECT_ID rect_id, std::span<const Narrow::string_view> strs
+	TEXTRENDER_SESSION& s, std::span<const Narrow::string_view> strs
 )
 {
 	PIXEL_SIZE extent = { 0, 0 };
-	TextObj.Prerender(rect_id, [&](TEXTRENDER_SESSION& s) {
-		// ここら辺は、一種の常套手段か？ //
-		const auto temp = s.PixelAccess([](TEXTRENDER_SESSION::PIXELACCESS& p) {
-			const PIXEL_POINT coord = { 0, 0 };
-			const auto old = p.GetRaw(coord);
-			p.Set(coord, RGB{ 255, 255, 255 });
-			const auto temp = p.GetRaw(coord);
-			p.SetRaw(coord, old);
-			return temp;
-		});
+	
+	// ここら辺は、一種の常套手段か？ //
+	const auto temp = s.PixelAccess([](TEXTRENDER_SESSION::PIXELACCESS& p) {
+		const PIXEL_POINT coord = { 0, 0 };
+		const auto old = p.GetRaw(coord);
+		p.Set(coord, RGB{ 255, 255, 255 });
+		const auto temp = p.GetRaw(coord);
+		p.SetRaw(coord, old);
+		return temp;
+	});
 
-		s.SetFont(FONT_ID::NORMAL);
-		for(const auto& str : strs) {
-			s.Put({ (extent.w + 2), 2 }, str, RGB{   0,   0, 128 });
-			s.Put({ (extent.w + 1), 2 }, str, RGB{   0,   0, 128 });
-			s.Put({ (extent.w + 1), 1 }, str, RGB{ 255, 255, 255 });
-			s.Put({ (extent.w + 0), 1 }, str, RGB{ 255, 255, 255 });
-			extent += s.Extent(str);
-		}
+	s.SetFont(FONT_ID::NORMAL);
+	for(const auto& str : strs) {
+		s.Put({ (extent.w + 2), 2 }, str, RGB{   0,   0, 128 });
+		s.Put({ (extent.w + 1), 2 }, str, RGB{   0,   0, 128 });
+		s.Put({ (extent.w + 1), 1 }, str, RGB{ 255, 255, 255 });
+		s.Put({ (extent.w + 0), 1 }, str, RGB{ 255, 255, 255 });
+		extent += s.Extent(str);
+	}
 
-		constexpr auto FSIZE = 8;
-		const PIXEL_COORD w = extent.w;
-		const PIXEL_COORD h = extent.h;
+	constexpr auto FSIZE = 8;
+	const PIXEL_COORD w = extent.w;
+	const PIXEL_COORD h = extent.h;
 
-		s.PixelAccess([&](TEXTRENDER_SESSION::PIXELACCESS& p) {
-			for(auto y = 1; y < h; y++) {
-				const uint8_t gradient = (255 + FSIZE - (y * FSIZE));
-				const RGB color = { gradient, gradient, 255 };
-				for(auto x = 1; x < w; x++) {
-					if(p.GetRaw({ x, y }) == temp) { // RGB(255, 255, 255)
-						p.Set({ x, y }, color);
-					}
+	s.PixelAccess([&](TEXTRENDER_SESSION::PIXELACCESS& p) {
+		for(auto y = 1; y < h; y++) {
+			const uint8_t gradient = (255 + FSIZE - (y * FSIZE));
+			const RGB color = { gradient, gradient, 255 };
+			for(auto x = 1; x < w; x++) {
+				if(p.GetRaw({ x, y }) == temp) { // RGB(255, 255, 255)
+					p.Set({ x, y }, color);
 				}
 			}
-		});
+		}
 	});
+
 	return extent;
 }

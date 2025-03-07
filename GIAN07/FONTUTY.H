@@ -32,7 +32,7 @@ extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画�
 
 // グラデーション付きフォントを描画する
 PIXEL_SIZE DrawGrdFont(
-	TEXTRENDER_RECT_ID rect_id, std::span<const Narrow::string_view> strs
+	TEXTRENDER_SESSION& s, std::span<const Narrow::string_view> strs
 );
 
 

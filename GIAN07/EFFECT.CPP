@@ -19,6 +19,10 @@ LOCKON_INFO			LockInfo[LOCKON_MAX];
 SCREENEFC_INFO		ScreenInfo;
 TEXTRENDER_RECT_ID	MTitleRect;
 
+// Print the ♪ separately, since it can be combined with a music title in
+// any encoding.
+Narrow::string_view MTitleStrs[2] = { "♪ " };
+
 
 extern void CircleFadeOut(int x, int y, int r);
 
@@ -234,10 +238,13 @@ void SetMusicTitle(int y, Narrow::string_view s)
 		return;
 	}
 
-	// Print the ♪ separately, since it can be combined with a music title in
-	// any encoding.
-	const std::array<Narrow::string_view, 2> strs = { "♪ ", s };
-	const auto extent = DrawGrdFont(MTitleRect, strs);
+	MTitleStrs[1] = s;
+	PIXEL_SIZE extent = { 0, 0 };
+	for(const auto s : MTitleStrs) {
+		const auto s_extent = TextObj.TextExtent(FONT_ID::NORMAL, s);
+		extent.w += s_extent.w;
+		extent.h = s_extent.h;
+	};
 
 	// 曲のタイトルが長すぎる場合、どうしましょう？ //
 	auto x = (std::max)((640 - 128 - 32 - extent.w), 128);
@@ -248,6 +255,14 @@ void SetMusicTitle(int y, Narrow::string_view s)
 	e->time = (64 * 2);
 	e->vx   = extent.w;
 	e->vy   = extent.h;
+}
+
+void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
+{
+	const auto mtitle = MTitleStrs[1];
+	TextObj.Render(topleft, MTitleRect, mtitle, [](TEXTRENDER_SESSION& s) {
+		DrawGrdFont(s, MTitleStrs);
+	}, subrect);
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
@@ -388,7 +403,7 @@ void SEffectDraw(void)
 						const auto x = (
 							(e->x >> 6) + sinl((degx + (j / 2)), temp) + j + k
 						);
-						TextObj.Blit({ x, y }, MTitleRect, src);
+						MTitleRender({ x, y }, src);
 					}
 				}
 			}
@@ -406,7 +421,7 @@ void SEffectDraw(void)
 						const auto x = (
 							(e->x >> 6) + sinl((degx + (j / 2)), temp) + j + k
 						);
-						TextObj.Blit({ x, y }, MTitleRect, src);
+						MTitleRender({ x, y }, src);
 					}
 				}
 			}
@@ -429,7 +444,7 @@ void SEffectDraw(void)
 				}
 				GrpGeom->Unlock();
 				src = { 0, 0, e->vx, e->vy };
-				TextObj.Blit({ (e->x >> 6), (e->y >> 6) }, MTitleRect, src);
+				MTitleRender({ (e->x >> 6), (e->y >> 6) }, src);
 			}
 			break;
 

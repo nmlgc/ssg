@@ -44,9 +44,16 @@ typedef struct tagEndingText {
 	Narrow::string_view Text[10];	// 表示するテキストへのポインタ
 	int		NumText;		// 現在格納されているテキストの数
 	TEXTRENDER_RECT_ID Rect;
-	bool Rerender;
 
-	void Prerender();
+	// Contains all text from [Text], concatenated with '\n'.
+	Narrow::string TextStr;
+
+	void Blank(void) {
+		NumText = 0;
+		TextStr.clear();
+	}
+
+	void Render(WINDOW_POINT topleft);
 } EndingText;
 
 
@@ -127,9 +134,8 @@ bool EndingInit(void)
 	EStfTask.bWantDisp = false;
 
 	TextObj.Clear();
-	EText.NumText = 0;
+	EText.Blank();
 	EText.Rect = TextObj.Register({ GRP_RES.w, 131 });
-	EText.Rerender = true;
 
 	return true;
 }
@@ -166,11 +172,7 @@ void EndingDraw(void)
 	// それぞれのグラフィックを描画するで //
 	DrawGrpInfo();
 	DrawStfInfo();
-	if(EText.Rerender) {
-		EText.Prerender();
-		EText.Rerender = false;
-	}
-	TextObj.Blit({ 0, 349 }, EText.Rect);
+	EText.Render({ 0, 349 });
 
 	// フェード情報の反映ぢゃ //
 	DrawFadeInfo();
@@ -261,9 +263,9 @@ void DrawStfInfo()
 
 
 // テキストの描画 //
-void EndingText::Prerender()
+void EndingText::Render(WINDOW_POINT topleft)
 {
-	TextObj.Prerender(Rect, [this](TEXTRENDER_SESSION& s) {
+	TextObj.Render(topleft, Rect, TextStr, [this](TEXTRENDER_SESSION& s) {
 		int max = 0;
 
 		for(decltype(NumText) i = 0; i < NumText; i++) {
@@ -379,11 +381,15 @@ void EndingSCLDecode()
 				break;
 			}
 
-			case(SCL_MSG):		// メッセージを出力する
-				EText.Text[EText.NumText++] = std::bit_cast<const char *>(cmd + 1);
-				EText.Rerender = true;
-				SCL_Now += (strlen(std::bit_cast<const char *>(cmd + 1)) + 2);
-			break;
+			case(SCL_MSG): { // メッセージを出力する
+				const auto* line_p = std::bit_cast<const char *>(cmd + 1);
+				const Narrow::string_view line = line_p;
+				EText.Text[EText.NumText++] = line;
+				EText.TextStr += line_p;
+				EText.TextStr += '\n';
+				SCL_Now += (line.length() + 2);
+				break;
+			}
 
 			case(SCL_FACE):		// 顔を表示する
 				switch(cmd[1]){
@@ -464,8 +470,7 @@ void EndingSCLDecode()
 			break;
 
 			case(SCL_NPG):		// 新しいページに変更する
-				EText.NumText = 0;
-				EText.Rerender = true;
+				EText.Blank();
 				SCL_Now++;
 			break;
 

@@ -7,6 +7,8 @@ fi
 export SDL="$1"
 shift
 
+./version_from_git.sh
+
 # We can't commit this file directly because Tup's database initialization
 # check literally just looks for the directory, and refuses to auto-initialize
 # the database if it already exists. (Also, Windows doesn't need it.)

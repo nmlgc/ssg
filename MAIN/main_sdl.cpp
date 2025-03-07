@@ -32,6 +32,7 @@
 #include "game/defer.h"
 #include "strings/title.h"
 #include "obj/platform_constants.h"
+#include "obj/version.h"
 
 #define UTF8_(S) u8 ## S
 #define UTF8(S) UTF8_(S)
@@ -46,7 +47,7 @@ int main(int argc, char** args)
 #endif
 	// SDL 3 automatically pulls the Desktop Entry name from the new app
 	// metadata, avoiding the need for the environment variable below.
-	SDL_SetAppMetadata(GAME_TITLE, nullptr, APP_ID);
+	SDL_SetAppMetadata(GAME_TITLE, VERSION_TAG, APP_ID);
 #elif (defined(LINUX) && defined(APP_ID))
 	// Tell the Desktop Entry name to the X11 (or Wayland!) window manager, and
 	// hope that it uses this name to pick the Desktop Entry's icon.

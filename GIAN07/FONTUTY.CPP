@@ -46,6 +46,12 @@ extern constinit const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs = [] {
 	logfont.lfWeight = FW_MEDIUM;
 	ret[FONT_ID::LARGE] = logfont;
 
+	// Tiny //
+	logfont.lfHeight = 10;
+	logfont.lfWidth = 0;
+	logfont.lfWeight = FW_NORMAL;
+	ret[FONT_ID::TINY] = logfont;
+
 	return ret;
 }();
 #elif defined(LINUX)
@@ -55,6 +61,7 @@ extern constinit const ENUMARRAY<const char *, FONT_ID> FontSpecs = {
 	(GOTHIC "Regular 14px"),
 	(GOTHIC "Regular 16px"),
 	(GOTHIC "Medium 24px"),
+	(GOTHIC "Regular 10px"),
 };
 
 #undef GOTHIC

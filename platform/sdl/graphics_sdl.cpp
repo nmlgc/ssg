@@ -860,6 +860,12 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		PIXEL_POINT topleft{};
 		SDL_GetWindowPosition(window, &topleft.x, &topleft.y);
 		SDL_SetWindowSize(window, res_new.w, res_new.h);
+
+#ifdef SDL3
+		// Necessary for the X11 backend.
+		SDL_SyncWindow(window);
+#endif
+
 		topleft = RepositionAfterScale(topleft, res_prev, res_new);
 		ret.live.left = topleft.x;
 		ret.live.top = topleft.y;

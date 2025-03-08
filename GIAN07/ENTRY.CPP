@@ -205,6 +205,13 @@ bool GameFrame(void)
 			ConfigDat.FPSDivisor.v = Grp_FPSDivisor = fps_divisor_prev;
 		}
 	}
+#ifdef SUPPORT_GRP_API
+	if(SystemKey_Data & SYSKEY_GRP_API) {
+		XGrpTry([](auto& params) {
+			params.api = ((params.api + 1) % GrpBackend_APICount());
+		});
+	}
+#endif
 
 	// Strictly superior to waiting [CWIN_KEYWAIT] frames: We won't get a key
 	// release scancode if we recreate the window on a switch into exclusive
@@ -214,7 +221,8 @@ bool GameFrame(void)
 		SYSKEY_GRP_SCALE_UP |
 		SYSKEY_GRP_SCALE_DOWN |
 		SYSKEY_GRP_SCALE_MODE |
-		SYSKEY_GRP_TURBO
+		SYSKEY_GRP_TURBO |
+		SYSKEY_GRP_API
 	);
 
 	bool quit = false;

@@ -873,6 +873,7 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 			SDL_UnlockSurface(SoftwareSurface);
 		}
 		SDL_RenderCopy(PrimaryRenderer, SoftwareTexture, nullptr, nullptr);
+		SDL_RenderPresent(PrimaryRenderer);
 	} else if(PrimaryTexture) {
 		const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *PrimaryRenderer };
 		SDL_SetRenderTarget(PrimaryRenderer, nullptr);
@@ -888,9 +889,16 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 		GrpBackend_Clear(0, RGB{ 0, 0, 0 });
 
 		SDL_RenderCopy(PrimaryRenderer, PrimaryTexture, nullptr, nullptr);
+
+		// SDL_RenderPresent() is not allowed to be called when rendering to a
+		// texture, and fails as of SDL 3.2.8:
+		//
+		// 	https://github.com/libsdl-org/SDL/issues/12432
+		SDL_RenderPresent(PrimaryRenderer);
 		SDL_SetRenderTarget(PrimaryRenderer, PrimaryTexture);
+	} else {
+		SDL_RenderPresent(PrimaryRenderer);
 	}
-	SDL_RenderPresent(PrimaryRenderer);
 }
 /// -------
 

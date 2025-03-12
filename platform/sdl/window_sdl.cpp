@@ -176,11 +176,17 @@ int8_t WndBackend_ValidateRenderDriver(const std::u8string_view hint)
 			return i;
 		}
 	}
+	const auto *default_driver = (GRP_SDL_DEFAULT_API
+		? GRP_SDL_DEFAULT_API
+		: HelpDriverName(0).data()
+	);
 	SDL_LogCritical(
 		LOG_CAT,
 		"Unsupported renderer \"%s\" specified in " SDL_HINT_RENDER_DRIVER
-		" hint, falling back to the default.",
-		std::bit_cast<const char *>(hint.data())
+		" hint, falling back to %s default (%s).",
+		std::bit_cast<const char *>(hint.data()),
+		(GRP_SDL_DEFAULT_API ? "the" : "SDL's"),
+		std::bit_cast<const char *>(default_driver)
 	);
 #ifdef SDL3
 	SDL_UnsetEnvironmentVariable(SDL_GetEnvironment(), SDL_HINT_RENDER_DRIVER);
@@ -203,15 +209,21 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 		return HelpDriverName(id);
 	}
 
-	const auto *hint = std::bit_cast<const char8_t *>(
+	auto *hint = std::bit_cast<const char8_t *>(
 		SDL_GetHint(SDL_HINT_RENDER_DRIVER)
 	);
+	if(!hint) {
+		hint = GRP_SDL_DEFAULT_API;
+	}
 	if(!hint || (hint[0] == '\0')) {
 		// SDL tries to initialize drivers in order.
 		return HelpDriverName(0);
 	}
 	id = WndBackend_ValidateRenderDriver(hint);
-	return HelpDriverName((id < 0) ? 0 : id);
+	if(id < 0) {
+		return (GRP_SDL_DEFAULT_API ? GRP_SDL_DEFAULT_API : HelpDriverName(0));
+	}
+	return HelpDriverName(id);
 }
 
 SDL_Window *WndBackend_SDL(void)
@@ -226,6 +238,15 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 	uint32_t flags = 0;
 
 #ifndef WIN32_VINTAGE
+	if(GRP_SDL_DEFAULT_API) {
+		if((params.api < 0) && !SDL_GetHint(SDL_HINT_RENDER_DRIVER)) {
+			SDL_SetHint(
+				SDL_HINT_RENDER_DRIVER,
+				std::bit_cast<const char *>(GRP_SDL_DEFAULT_API)
+			);
+		}
+	}
+
 	// Set the necessary window flags for certain APIs to avoid
 	// SDL_CreateRenderer()'s janky closing and reopening of the window with
 	// the correct flags.

@@ -156,15 +156,8 @@ std::optional<GRAPHICS_FULLSCREEN_FLAGS> HelpSetFullscreenMode(
 }
 #endif
 
-std::u8string_view WndBackend_SDLRendererName(int8_t id)
+std::u8string_view HelpDriverName(int8_t id)
 {
-	if(id < 0) {
-		const auto ret = SDL_GetHint(SDL_HINT_RENDER_DRIVER);
-		if(!ret) {
-			return {};
-		};
-		return reinterpret_cast<const char8_t *>(ret);
-	}
 #ifdef SDL3
 	const auto ret = SDL_GetRenderDriver(id);
 #else
@@ -173,10 +166,52 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 		(SDL_GetRenderDriverInfo(id, &info) == 0) ? info.name : ""
 	);
 #endif
-	if(!ret) {
-		return {};
-	}
 	return reinterpret_cast<const char8_t *>(ret);
+}
+
+int8_t WndBackend_ValidateRenderDriver(const std::u8string_view hint)
+{
+	for(const auto i : std::views::iota(0, SDL_GetNumRenderDrivers())) {
+		if(HelpDriverName(i) == hint) {
+			return i;
+		}
+	}
+	SDL_LogCritical(
+		LOG_CAT,
+		"Unsupported renderer \"%s\" specified in " SDL_HINT_RENDER_DRIVER
+		" hint, falling back to the default.",
+		std::bit_cast<const char *>(hint.data())
+	);
+#ifdef SDL3
+	SDL_UnsetEnvironmentVariable(SDL_GetEnvironment(), SDL_HINT_RENDER_DRIVER);
+#else
+	SDL_setenv(SDL_HINT_RENDER_DRIVER, "", 1);
+#endif
+	// If this succeeds, the hint came from SDL, not the environment.
+	if(SDL_GetHint(SDL_HINT_RENDER_DRIVER)) {
+		SDL_SetHintWithPriority(
+			SDL_HINT_RENDER_DRIVER, nullptr, SDL_HINT_OVERRIDE
+		);
+	}
+	return -1;
+}
+
+std::u8string_view WndBackend_SDLRendererName(int8_t id)
+{
+	assert(id < SDL_GetNumRenderDrivers());
+	if(id >= 0) {
+		return HelpDriverName(id);
+	}
+
+	const auto *hint = std::bit_cast<const char8_t *>(
+		SDL_GetHint(SDL_HINT_RENDER_DRIVER)
+	);
+	if(!hint || (hint[0] == '\0')) {
+		// SDL tries to initialize drivers in order.
+		return HelpDriverName(0);
+	}
+	id = WndBackend_ValidateRenderDriver(hint);
+	return HelpDriverName((id < 0) ? 0 : id);
 }
 
 SDL_Window *WndBackend_SDL(void)

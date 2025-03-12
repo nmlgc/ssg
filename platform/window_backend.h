@@ -15,10 +15,6 @@ struct GRAPHICS_PARAMS;
 
 typedef struct SDL_Window SDL_Window;
 
-// Looks like it belongs into `graphics_sdl`, but is also needed for window
-// creation.
-std::u8string_view WndBackend_SDLRendererName(int8_t id);
-
 // Returns the SDL handle of the current window.
 SDL_Window *WndBackend_SDL(void);
 

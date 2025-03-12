@@ -238,7 +238,32 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 	uint32_t flags = 0;
 
 #ifndef WIN32_VINTAGE
-	if(GRP_SDL_DEFAULT_API) {
+	// The driver/API parameter takes precedence over the environment variable,
+	// which is a bad idea in case the user is stuck on an API that might
+	// initialize successfully but refuses to render properly. Let's reverse
+	// that behavior to provide a way of overriding [params.api] with a
+	// specific renderer.
+	// Note that we need to directly access the environment variable because
+	// SDL's hint system does not indicate where the hint came from. Also, we
+	// only want this override to apply to the first init call – if it didn't,
+	// the user couldn't specify a different API for subsequent init calls.
+#ifdef SDL3
+	auto *env = SDL_GetEnvironment();
+	const auto *driver_env_ptr = (
+		SDL_GetEnvironmentVariable(env, SDL_HINT_RENDER_DRIVER)
+	);
+	SDL_UnsetEnvironmentVariable(env, SDL_HINT_RENDER_DRIVER);
+#else
+	const auto *driver_env_ptr = (SDL_getenv(SDL_HINT_RENDER_DRIVER));
+	SDL_setenv(SDL_HINT_RENDER_DRIVER, "", 1);
+#endif
+
+	// We can actually get empty strings on SDL 2 here!
+	if(driver_env_ptr && (driver_env_ptr[0] != '\0')) {
+		params.api = WndBackend_ValidateRenderDriver(
+			std::bit_cast<const char8_t *>(driver_env_ptr)
+		);
+	} else if(GRP_SDL_DEFAULT_API) {
 		if((params.api < 0) && !SDL_GetHint(SDL_HINT_RENDER_DRIVER)) {
 			SDL_SetHint(
 				SDL_HINT_RENDER_DRIVER,

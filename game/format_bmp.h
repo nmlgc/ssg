@@ -8,6 +8,7 @@
 #include "platform/file.h"
 #include "game/coords.h"
 #include "game/endian.h"
+#include "game/pixelformat.h"
 
 // Platform-independent .BMP header types
 // --------------------------------------
@@ -42,14 +43,6 @@ struct BMP_INFOHEADER {
 	uint32_t Stride() const {
 		return ((((biWidth * biBitCount) + 31u) & ~31) / 8u);
 	}
-};
-
-// Same as the standard Win32 RGBQUAD structure, renamed to avoid collisions.
-struct BGRA {
-	uint8_t b;
-	uint8_t g;
-	uint8_t r;
-	uint8_t a;
 };
 
 #pragma pack(pop)

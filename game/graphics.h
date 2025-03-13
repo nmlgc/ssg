@@ -22,17 +22,6 @@ extern uint8_t Grp_FPSDivisor;
 // Paletted graphics //
 // ----------------- //
 
-// RGBA color structure, identical to Win32 GDI's PALETTEENTRY.
-struct RGBA {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-	uint8_t a;
-
-	constexpr bool operator==(const RGBA& other) const = default;
-};
-static_assert(sizeof(RGBA) == 4);
-
 struct RGB {
 	uint8_t r;
 	uint8_t g;

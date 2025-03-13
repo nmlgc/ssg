@@ -484,7 +484,7 @@ bool DestroySoftwareRenderer(void)
 	return false;
 }
 
-void PrimaryCleanup(void)
+std::nullopt_t PrimaryCleanup(void)
 {
 	for(auto& tex : Textures) {
 		tex = SafeDestroy(SDL_DestroyTexture, tex);
@@ -492,7 +492,14 @@ void PrimaryCleanup(void)
 	PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
 	PrimaryRenderer = SafeDestroy(SDL_DestroyRenderer, PrimaryRenderer);
 	Renderer = nullptr;
+
+	// On my system, switching from any Direct3D version to OpenGL sometimes
+	// breaks rendering and freezes the window on the last frame rendered by
+	// Direct3D. So it makes sense to unconditionally destroy and recreate the
+	// window when switching APIs. (Also feels more effective, in a way.)
 	WndBackend_Cleanup();
+
+	return std::nullopt;
 }
 
 // Returns the new `SCALE_GEOMETRY` flag.
@@ -716,24 +723,23 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 
 #ifdef SDL3
 	const auto *driver = SDL_GetRenderDriver(params.api);
-	auto *renderer = SDL_CreateRenderer(WndBackend_SDL(), driver);
+	PrimaryRenderer = SDL_CreateRenderer(WndBackend_SDL(), driver);
 #else
-	auto *renderer = SDL_CreateRenderer(
+	PrimaryRenderer = SDL_CreateRenderer(
 		WndBackend_SDL(), params.api, SDL_RENDERER_ACCELERATED
 	);
 #endif
-	if(!renderer) {
+	if(!PrimaryRenderer) {
 		const auto api_name = GrpBackend_APIName(params.api);
 		const auto* api = std::bit_cast<const char *>(api_name.data());
 		SDL_LogCritical(
 			LOG_CAT, "Error creating %s renderer: %s", api, SDL_GetError()
 		);
-		WndBackend_Cleanup();
-		return std::nullopt;
+		return PrimaryCleanup();
 	}
 
 #ifdef SDL3
-	const auto props = SDL_GetRendererProperties(renderer);
+	const auto props = SDL_GetRendererProperties(PrimaryRenderer);
 	const auto *formats_start = static_cast<const SDL_PixelFormat *>(
 		SDL_GetPointerProperty(
 			props, SDL_PROP_RENDERER_TEXTURE_FORMATS_POINTER, nullptr
@@ -748,7 +754,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		static_cast<size_t>(formats_end - formats_start),
 	};
 #else
-	SDL_GetRendererInfo(renderer, &PrimaryInfo);
+	SDL_GetRendererInfo(PrimaryRenderer, &PrimaryInfo);
 	PrimaryFormats = std::span(
 		&PrimaryInfo.texture_formats[0], PrimaryInfo.num_texture_formats
 	);
@@ -781,10 +787,9 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 			"The \"%s\" renderer does not support any of the game's supported software rendering pixel formats.",
 			std::bit_cast<const char *>(api_name.data())
 		);
-		return std::nullopt;
+		return PrimaryCleanup();
 	}
 
-	PrimaryRenderer = renderer;
 	SwitchActiveRenderer(PrimaryRenderer);
 	APIVersions::Update(params.api);
 
@@ -794,7 +799,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		SoftwareSurface = SDL_CreateSurface(GRP_RES.w, GRP_RES.h, sdl_format);
 		if(!SoftwareSurface) {
 			Log_Fail(LOG_CAT, "Error creating surface for software rendering");
-			return std::nullopt;
+			return PrimaryCleanup();
 		}
 	}
 

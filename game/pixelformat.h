@@ -30,12 +30,14 @@ struct BGRA {
 static_assert(sizeof(BGRA) == 4);
 
 struct PIXELFORMAT {
-	// All specific formats are in memory byte order.
+	// All specific formats are in memory byte order. The alpha channel must
+	// always be valid for formats with an `A` (i.e., 0xFF everywhere for fully
+	// opaque images like render backbuffers or the like), and always be
+	// ignored for formats with a `X`.
 	enum FORMAT {
 		PALETTE8,
-		ANY16,
-
-		ANY32,
+		RGB565_LE16,   // GGGBBBBB RRRRRGGG
+		ARGB1555_LE16, // GGGBBBBB ARRRRRGG
 		BGRX8888,
 		BGRA8888,
 		RGBA8888,
@@ -57,12 +59,12 @@ struct PIXELFORMAT {
 
 	SIZE PixelSize() const {
 		switch(format) {
-		case PALETTE8:	return SIZE8;
-		case ANY16:   	return SIZE16;
-		case ANY32:
+		case PALETTE8:      return SIZE8;
+		case RGB565_LE16:
+		case ARGB1555_LE16: return SIZE16;
 		case BGRX8888:
 		case BGRA8888:
-		case RGBA8888:  return SIZE32;
+		case RGBA8888:      return SIZE32;
 		}
 		std::unreachable();
 	}
@@ -111,16 +113,6 @@ public:
 
 		uint8_t value() const {
 			return bpp;
-		}
-
-		std::optional<PIXELFORMAT> pixel_format() const {
-			using F = PIXELFORMAT;
-			switch(bpp) {
-			case 8: 	return std::make_optional<PIXELFORMAT>(F::PALETTE8);
-			case 16:	return std::make_optional<PIXELFORMAT>(F::ANY16);
-			case 32:	return std::make_optional<PIXELFORMAT>(F::ANY32);
-			default:	return std::nullopt;
-			}
 		}
 
 		// Cycles through all supported bit depths.

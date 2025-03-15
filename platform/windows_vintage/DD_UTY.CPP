@@ -130,6 +130,44 @@ ENUMARRAY<SURFACE_DDRAW, SURFACE_ID> DxSurf;
 // 図形描画用関数ポインタの実体 //
 bool (*GrpBlt)(const PIXEL_LTRB&, int, int, SURFACE_DDRAW&) = STD_GrpBlt;
 
+std::optional<PIXELFORMAT> HelpPixelFormatFrom(const DDPIXELFORMAT& ddpf)
+{
+	if(ddpf.dwFlags & DDPF_PALETTEINDEXED8) {
+		return PIXELFORMAT{ PIXELFORMAT::PALETTE8 };
+	}
+	if(ddpf.dwFlags & DDPF_RGB) {
+		if(ddpf.dwRGBBitCount == 16) {
+			if(
+				(ddpf.dwRBitMask == 0x7C00) &&
+				(ddpf.dwGBitMask == 0x03E0) &&
+				(ddpf.dwBBitMask == 0x001F) &&
+				(ddpf.dwRGBAlphaBitMask == 0x8000)
+			) {
+				return PIXELFORMAT{ PIXELFORMAT::ARGB1555_LE16 };
+			} else if(
+				(ddpf.dwRBitMask == 0xF800) &&
+				(ddpf.dwGBitMask == 0x07E0) &&
+				(ddpf.dwBBitMask == 0x001F)
+			) {
+				return PIXELFORMAT{ PIXELFORMAT::RGB565_LE16 };
+			}
+		} else if(ddpf.dwRGBBitCount == 32) {
+			if(
+				(ddpf.dwRBitMask == 0x00FF0000) &&
+				(ddpf.dwGBitMask == 0x0000FF00) &&
+				(ddpf.dwBBitMask == 0x000000FF)
+			) {
+				if(ddpf.dwRGBAlphaBitMask == 0xFF000000) {
+					return PIXELFORMAT{ PIXELFORMAT::BGRA8888 };
+				} else if(ddpf.dwRGBAlphaBitMask == 0) {
+					return PIXELFORMAT{ PIXELFORMAT::BGRX8888 };
+				}
+			}
+		}
+	}
+	return std::nullopt;
+}
+
 // Templating the functor avoids both the need for #including <functional> and
 // any potential runtime exceptions related to the call.
 void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
@@ -297,12 +335,6 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		}
 	}
 
-	const auto maybe_pixel_format = params.bitdepth.pixel_format();
-	if(!maybe_pixel_format) {
-		return GRAPHICS_INIT_RESULT::From(maybe_prev);
-	}
-	const auto pixel_format = maybe_pixel_format.value();
-
 	// Only re-init if any of our supported parameters changed.
 	if(maybe_prev) {
 		const auto& prev = maybe_prev.value();
@@ -353,9 +385,22 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		dxret = DxObj.Prim->GetAttachedSurface(&ddscaps, &DxObj.Back);
 		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
 
+		// Get the exact pixel format //
+		DDPIXELFORMAT ddpf = { .dwSize = sizeof(ddpf) };
+		dxret = DxObj.Prim->GetPixelFormat(&ddpf);
+		if(dxret != DD_OK) {
+			throw("Failed to retrieve pixel format");
+		}
+		const auto maybe_pixel_format = HelpPixelFormatFrom(ddpf);
+		if(!maybe_pixel_format) {
+			throw("Unsupported pixel format");
+		}
+		DxObj.PixelFormat = maybe_pixel_format.value();
+
 		// 2Dの初期化はここでおしまい //
-		DxObj.PixelFormat = pixel_format;
-		if(pixel_format.IsPalettized()) throw(true);
+		if(DxObj.PixelFormat.IsPalettized()) {
+			throw(true);
+		}
 
 		// Direct3D Object の取得 //
 		auto** d3d_ptr = reinterpret_cast<void **>(&DxObj.D3);
@@ -393,7 +438,7 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		return std::nullopt;
 	}
 	catch(const bool) {
-		if(pixel_format.IsPalettized()) {
+		if(DxObj.PixelFormat.IsPalettized()) {
 			GrpGeom = &GrpGeom_DDraw;
 			GrpGeom_DDraw.Setup();
 		} else {

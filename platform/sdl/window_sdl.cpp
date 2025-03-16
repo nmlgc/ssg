@@ -29,12 +29,20 @@
 constexpr auto LOG_CAT = SDL_LOG_CATEGORY_VIDEO;
 
 static SDL_Window *Window;
+std::optional<std::pair<int16_t, int16_t>> TopleftBeforeFullscreen;
 
-// We can't retrieve the original window position in fullscreen mode via
-// SDL_GetWindowPosition(), so let's back it up before we go fullscreen.
-// Also helpful because these coordinates determine the display that the
-// fullscreen window is placed on.
-static std::optional<std::pair<int16_t, int16_t>> TopleftBeforeFullscreen;
+std::pair<int16_t, int16_t> HelpGetWindowPosition(SDL_Window *window)
+{
+	int left{}, top{};
+	SDL_GetWindowPosition(window, &left, &top);
+	assert(left > (std::numeric_limits<int16_t>::min)());
+	assert(top > (std::numeric_limits<int16_t>::min)());
+	assert(left <= (std::numeric_limits<int16_t>::max)());
+	assert(top <= (std::numeric_limits<int16_t>::max)());
+	return std::make_pair(
+		static_cast<int16_t>(left), static_cast<int16_t>(top)
+	);
+}
 
 // Don't do a ZUN.
 // (https://github.com/thpatch/thcrap/commit/71c1dcab690f85653cbc9a06c7c55)
@@ -211,15 +219,7 @@ std::optional<std::pair<int16_t, int16_t>> WndBackend_Topleft(void)
 	if(!Window || (SDL_GetWindowFlags(Window) & SDL_WINDOW_FULLSCREEN)) {
 		return TopleftBeforeFullscreen;
 	}
-	int left{}, top{};
-	SDL_GetWindowPosition(Window, &left, &top);
-	assert(left > (std::numeric_limits<int16_t>::min)());
-	assert(top > (std::numeric_limits<int16_t>::min)());
-	assert(left <= (std::numeric_limits<int16_t>::max)());
-	assert(top <= (std::numeric_limits<int16_t>::max)());
-	return std::make_pair(
-		static_cast<int16_t>(left), static_cast<int16_t>(top)
-	);
+	return HelpGetWindowPosition(Window);
 }
 
 int WndBackend_Run(void)

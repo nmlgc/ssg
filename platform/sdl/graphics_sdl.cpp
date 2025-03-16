@@ -246,6 +246,11 @@ bool HelpSwitchFullscreen(
 )
 {
 	auto *window = WndBackend_SDL();
+
+	if(!fs_prev.fullscreen && fs_new.fullscreen) {
+		TopleftBeforeFullscreen = HelpGetWindowPosition(window);
+	}
+
 	if(SDL_SetWindowFullscreen(window, HelpFullscreenFlag(fs_new)) != 0) {
 		Log_Fail(LOG_CAT, "Error changing display mode");
 		return false;

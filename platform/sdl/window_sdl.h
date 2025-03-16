@@ -8,6 +8,14 @@
 #include <SDL_video.h>
 #include "game/graphics.h"
 
+// We can't retrieve the original window position in fullscreen mode via
+// SDL_GetWindowPosition(), so let's back it up before we go fullscreen.
+// Also helpful because these coordinates determine the display that the
+// fullscreen window is placed on.
+extern std::optional<std::pair<int16_t, int16_t>> TopleftBeforeFullscreen;
+
+std::pair<int16_t, int16_t> HelpGetWindowPosition(SDL_Window *window);
+
 static constexpr Uint32 HelpFullscreenFlag(const GRAPHICS_FULLSCREEN_FLAGS& fs)
 {
 	return (!fs.fullscreen ? 0 :

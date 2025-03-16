@@ -768,91 +768,94 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 void GrpBackend_PaletteGet(PALETTE& pal) {}
 bool GrpBackend_PaletteSet(const PALETTE& pal) { return false; }
 
+void SaveSurfaceAsScreenshot(
+	std::unique_ptr<FILE_STREAM_WRITE> stream, SDL_Surface *src
+)
+{
+	assert(stream);
+	assert(src);
+	assert(src->pitch >= 0);
+	assert(src->format->palette == nullptr);
+
+	// Negate the height so that we neither have to flip the pixels nor write
+	// RWops for `FILE_STREAM_WRITE` in order to use SDL_SaveBMP_RW().
+	const PIXEL_SIZE size = { .w = src->w, .h = -src->h };
+
+	if(SDL_MUSTLOCK(src)) {
+		SDL_LockSurface(src);
+	}
+	const auto pixels = std::span(
+		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
+	);
+	BMPSave(stream.get(), size, 1, src->format->BitsPerPixel, {}, pixels);
+	if(SDL_MUSTLOCK(src)) {
+		SDL_UnlockSurface(src);
+	}
+	stream.reset();
+}
+
 void MaybeTakeScreenshot(std::unique_ptr<FILE_STREAM_WRITE> stream)
 {
 	if(!stream) {
 		return;
 	}
 
-	SDL_Surface* src = SoftwareSurface;
-	bool fill_src_with_pixels_from_renderer = false;
-
 	if(SoftwareRenderer) {
 		// Software rendering is the ideal case for screenshots, because we
 		// already have a system-memory surface we can save.
-		fill_src_with_pixels_from_renderer = false;
-	} else if(PrimaryTexture) {
-		// Thankfully we can SDL_RenderReadPixels() from a render target to get
-		// a screenshot at the native resolution. [SoftwareSurface] uses the
-		// same size, so let's use it as temporary storage.
-		fill_src_with_pixels_from_renderer = true;
-	} else {
-		// If we aren't scaling, we are lucky and can just do the same we're
-		// doing in the hardware texture case.
+		SaveSurfaceAsScreenshot(std::move(stream), SoftwareSurface);
+		return;
+	}
+
+	SDL_Surface *src = ([] {
+		if(PrimaryTexture) {
+			// Thankfully we can SDL_RenderReadPixels() from a render target to
+			// get a screenshot at the native resolution. [SoftwareSurface]
+			// uses the same size, so let's use it as temporary storage.
+			return SoftwareSurface;
+		}
+
+		// If we aren't scaling, we are lucky and can just do the same we do in
+		// the hardware texture case.
 		SDL_Rect unscaled_viewport{};
 		float scale_x{}, scale_y{};
 		SDL_RenderGetViewport(PrimaryRenderer, &unscaled_viewport);
 		SDL_RenderGetScale(PrimaryRenderer, &scale_x, &scale_y);
-		const PIXEL_SIZE scaled_size = {
-			.w = static_cast<PIXEL_COORD>(unscaled_viewport.w * scale_x),
-			.h = static_cast<PIXEL_COORD>(unscaled_viewport.h * scale_y),
-		};
-		if(scaled_size == GRP_RES) {
-			fill_src_with_pixels_from_renderer = true;
-		} else {
-			// If we are, we must take a screenshot at the scaled
-			// resolution.
-			if(!GeometryScaledBackbuffer) {
-				const auto format = SoftwareSurface->format->format;
-				GeometryScaledBackbuffer = SDL_CreateRGBSurfaceWithFormat(
-					0, scaled_size.w, scaled_size.h, 0, format
-				);
-			}
-			if(!GeometryScaledBackbuffer) {
-				Log_Fail(
-					LOG_CAT, "Failed to create temporary storage for screenshot"
-				);
-				return;
-			}
-			src = GeometryScaledBackbuffer;
-			fill_src_with_pixels_from_renderer = true;
+		const PIXEL_COORD scaled_w = (unscaled_viewport.w * scale_x);
+		const PIXEL_COORD scaled_h = (unscaled_viewport.h * scale_y);
+		if(
+			(scaled_w == SoftwareSurface->w) && (scaled_h == SoftwareSurface->h)
+		) {
+			return SoftwareSurface;
 		}
+
+		// If we are, we must take a screenshot at the scaled resolution.
+		if(!GeometryScaledBackbuffer) {
+			const auto format = SoftwareSurface->format->format;
+			GeometryScaledBackbuffer = SDL_CreateRGBSurfaceWithFormat(
+				0, scaled_w, scaled_h, 0, format
+			);
+		}
+		return GeometryScaledBackbuffer;
+	})();
+	if(!src) {
+		Log_Fail(LOG_CAT, "Failed to create temporary storage for screenshot");
+		return;
 	}
 
 	if(SDL_MUSTLOCK(src)) {
 		SDL_LockSurface(src);
 	}
-	if(fill_src_with_pixels_from_renderer) {
-		if(SDL_RenderReadPixels(
-			PrimaryRenderer,
-			nullptr,
-			src->format->format,
-			src->pixels,
-			src->pitch
-		) != 0) {
-			Log_Fail(LOG_CAT, "Error taking screenshot");
-			return;
-		}
+	if(SDL_RenderReadPixels(
+		PrimaryRenderer, nullptr, src->format->format, src->pixels, src->pitch
+	) != 0) {
+		Log_Fail(LOG_CAT, "Error taking screenshot");
+		return;
 	}
-	const auto bytes = static_cast<std::byte *>(src->pixels);
-
-	// Negate the height so that we neither have to flip the pixels nor write
-	// RWops for `FILE_STREAM_WRITE` in order to use SDL_SaveBMP_RW().
-	const PIXEL_SIZE size = { .w = src->w, .h = -src->h };
-	assert(src->format->palette == nullptr);
-
-	BMPSave(
-		stream.get(),
-		size,
-		1,
-		src->format->BitsPerPixel,
-		std::span<BGRA>(),
-		std::span(bytes, (src->h * src->pitch))
-	);
 	if(SDL_MUSTLOCK(src)) {
 		SDL_UnlockSurface(src);
 	}
-	stream.reset();
+	SaveSurfaceAsScreenshot(std::move(stream), src);
 }
 
 void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)

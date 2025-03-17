@@ -991,6 +991,18 @@ void SaveSurfaceAsScreenshot(SDL_Surface *src)
 #else
 	assert(src->format->palette == nullptr);
 #endif
+
+	const auto sdl_format = HelpFormatFrom(src);
+	const auto maybe_format = HelpPixelFormatFrom(sdl_format);
+	if(!maybe_format || !BMPSaveSupports(maybe_format.value())) {
+		SDL_LogCritical(
+			LOG_CAT,
+			"Screenshot buffer uses %s, which is not supported for BMP.",
+			SDL_GetPixelFormatName(sdl_format)
+		);
+		return;
+	}
+
 	assert(src->w >= 0);
 	assert(src->h >= 0);
 	const PIXEL_SIZE_BASE<unsigned int> size = {
@@ -1005,7 +1017,7 @@ void SaveSurfaceAsScreenshot(SDL_Surface *src)
 		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
 	);
 	const auto bpp = SDL_BITSPERPIXEL(HelpFormatFrom(src));
-	Grp_ScreenshotSave(size, bpp, {}, pixels);
+	Grp_ScreenshotSave(size, maybe_format.value(), {}, pixels);
 	if(SDL_MUSTLOCK(src)) {
 		SDL_UnlockSurface(src);
 	}

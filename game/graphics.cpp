@@ -88,11 +88,15 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 
 bool Grp_ScreenshotSave(
 	PIXEL_SIZE_BASE<unsigned int> size,
-	uint8_t bpp,
+	PIXELFORMAT format,
 	std::span<BGRA> palette,
 	std::span<const std::byte> pixels
 )
 {
+	if(!BMPSaveSupports(format)) {
+		assert(!"Unsupported pixel format?");
+		return false;
+	}
 	assert(size.w < std::numeric_limits<PIXEL_COORD>::max());
 	assert(size.h < std::numeric_limits<PIXEL_COORD>::max());
 	const PIXEL_SIZE bmp_size = {
@@ -103,6 +107,7 @@ bool Grp_ScreenshotSave(
 	if(!stream) {
 		return false;
 	}
+	const auto bpp = (format.PixelByteSize() * 8);
 	return BMPSave(stream.get(), bmp_size, 1, bpp, palette, pixels);
 }
 // -----------

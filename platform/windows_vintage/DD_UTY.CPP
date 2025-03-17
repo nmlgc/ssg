@@ -6,6 +6,7 @@
 #include "DD_UTY.H"
 #include "game/cast.h"
 #include "game/debug.h"
+#include "game/defer.h"
 #include "game/enum_array.h"
 #include "game/format_bmp.h"
 #include "game/input.h"
@@ -222,6 +223,7 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		assert(!"Negative pitch?");
 		return false;
 	}
+	defer(surf->Unlock(nullptr));
 
 	const uint16_t bpp = desc.ddpfPixelFormat.dwRGBBitCount;
 	const PIXEL_SIZE_BASE<unsigned int> size = {
@@ -236,9 +238,12 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		static_cast<const std::byte *>(desc.lpSurface),
 		static_cast<size_t>(desc.lPitch * desc.dwHeight),
 	};
-	const auto ret = Grp_ScreenshotSave(size, bpp, palette, pixels);
-	surf->Unlock(nullptr);
-	return ret;
+	const auto maybe_format = HelpPixelFormatFrom(desc.ddpfPixelFormat);
+	if(!maybe_format || !BMPSaveSupports(maybe_format.value())) {
+		DebugOut(u8"Backbuffer format not supported for screenshots");
+		return false;
+	}
+	return Grp_ScreenshotSave(size, maybe_format.value(), palette, pixels);
 }
 
 

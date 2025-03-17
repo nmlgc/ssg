@@ -80,6 +80,19 @@ std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
 	return BMP_OWNED{ std::move(buffer), header_info, palette, pixels };
 }
 
+bool BMPSaveSupports(PIXELFORMAT format)
+{
+	switch(format.format) {
+	case PIXELFORMAT::PALETTE8:
+	case PIXELFORMAT::ARGB1555_LE16:
+	case PIXELFORMAT::BGRX8888:
+	case PIXELFORMAT::BGRA8888:
+		return true;
+	default:
+		return false;
+	}
+}
+
 bool BMPSave(
 	FILE_STREAM_WRITE* stream,
 	PIXEL_SIZE size,

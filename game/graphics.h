@@ -120,7 +120,7 @@ void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
 // screenshot prefix.
 bool Grp_ScreenshotSave(
 	PIXEL_SIZE_BASE<unsigned int> size,
-	uint8_t bpp,
+	PIXELFORMAT format,
 	std::span<BGRA> palette,
 	std::span<const std::byte> pixels
 );

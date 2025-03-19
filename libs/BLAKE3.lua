@@ -7,10 +7,10 @@ function BuildBLAKE3(base_cfg, generic)
 	local arch = tup.getconfig("TUP_ARCH")
 	local platform = tup.getconfig("TUP_PLATFORM")
 
-	---@class ConfigShape
+	---@type ConfigShape
 	local link = { cflags = ("-I" .. BLAKE3.root) }
 
-	---@class ConfigShape
+	---@type ConfigShape
 	local compile = { objdir = "BLAKE3/", cflags = {} }
 	if (platform == "win32") then
 		-- Visual C++ has no SSE4.1 flag, and I don't trust the /arch:AVX option
@@ -28,7 +28,7 @@ function BuildBLAKE3(base_cfg, generic)
 	src += BLAKE3.join("blake3_dispatch.c")
 	src += BLAKE3.join("blake3_portable.c")
 
-	link.linputs = cc(cfg, src)
+	link.linputs = cfg:cc(src)
 	if (generic == 0) then
 		if (platform == "win32") then
 			-- Each optimized version must be built with the matching MSVC
@@ -45,13 +45,13 @@ function BuildBLAKE3(base_cfg, generic)
 			local arch_cfg_3 = cfg:branch({ cflags = "/arch:AVX512" })
 			link.linputs = (
 				link.linputs +
-				cc(arch_cfg_1, BLAKE3.join("blake3_sse2.c")) +
-				cc(arch_cfg_2, BLAKE3.join("blake3_avx2.c")) +
-				cc(arch_cfg_3, BLAKE3.join("blake3_avx512.c"))
+				arch_cfg_1:cc(BLAKE3.join("blake3_sse2.c")) +
+				arch_cfg_2:cc(BLAKE3.join("blake3_avx2.c")) +
+				arch_cfg_3:cc(BLAKE3.join("blake3_avx512.c"))
 			)
 		else
 			if (arch == "x86_64") then
-				link.linputs = (link.linputs + cc(cfg, BLAKE3.glob("*unix.S")))
+				link.linputs = (link.linputs + cfg:cc(BLAKE3.glob("*unix.S")))
 			end
 		end
 	end

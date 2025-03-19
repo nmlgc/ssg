@@ -10,7 +10,7 @@ MODERN = 0
 VINTAGE = 1
 
 -- Icon
-local ssg_ico = rc(CONFIG, SSG.join("GIAN07/GIAN07.rc"))
+local ssg_ico = CONFIG:rc(SSG.join("GIAN07/GIAN07.rc"))
 
 ---@param variant integer
 local function ssg(variant)
@@ -71,7 +71,7 @@ local function ssg(variant)
 	} } }
 
 	local modules_cfg = variant_cfg:branch(ANALYSIS)
-	modules_cfg = modules_cfg:branch(cxx_std_modules(modules_cfg))
+	modules_cfg = modules_cfg:branch(modules_cfg:cxx_std_modules())
 
 	-- The game
 	-- --------
@@ -85,12 +85,12 @@ local function ssg(variant)
 			"/execution-charset:utf-8",
 		},
 	})
-	local ssg_obj = cxx(ssg_cfg:branch(ANALYSIS_RELAXED), SSG_SRC)
+	local ssg_obj = ssg_cfg:branch(ANALYSIS_RELAXED):cxx(SSG_SRC)
 
 	-- Our platform layer code
 	LAYERS_SRC += SSG.glob("platform/miniaudio/*.cpp")
 	LAYERS_SRC += SSG.glob("platform/windows/*.cpp")
-	ssg_obj = (ssg_obj + cxx(ssg_cfg, LAYERS_SRC))
+	ssg_obj = (ssg_obj + ssg_cfg:cxx(LAYERS_SRC))
 
 	local platform_cfg = ssg_cfg:branch(SDL_LINK, {
 		lflags = "/SUBSYSTEM:windows"
@@ -103,17 +103,17 @@ local function ssg(variant)
 	end
 	p_modern_src += "MAIN/main_sdl.cpp"
 	p_modern_src.extra_inputs += PLATFORM_CONSTANTS
-	ssg_obj = (ssg_obj + cxx(platform_cfg, p_modern_src))
+	ssg_obj = (ssg_obj + platform_cfg:cxx(p_modern_src))
 
 	if (variant == VINTAGE) then
 		local p_vintage_cfg = platform_cfg:branch(ANALYSIS_RELAXED)
 		local p_vintage_src = SSG.glob("platform/windows_vintage/DD*.CPP")
 		p_vintage_src += SSG.glob("platform/windows_vintage/D2_Polygon.CPP")
-		ssg_obj = (ssg_obj + cxx(p_vintage_cfg, p_vintage_src))
+		ssg_obj = (ssg_obj + p_vintage_cfg:cxx(p_vintage_src))
 	end
 
 	ssg_obj = (ssg_obj + ssg_ico)
-	exe(platform_cfg, ssg_obj, ("GIAN07" .. variant_bin_suffix))
+	platform_cfg:exe(ssg_obj, ("GIAN07" .. variant_bin_suffix))
 end
 
 ssg(MODERN)

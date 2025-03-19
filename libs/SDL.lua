@@ -22,7 +22,7 @@ function BuildSDL(base_cfg)
 		objdir = "SDL/",
 	}
 
-	---@class ConfigShape
+	---@type ConfigShape
 	local link = {
 		cflags = ("-I" .. SDL.join("include/")),
 		lflags = { "shell32.lib" }, -- for SDL_main()'s CommandLineToArgvW()
@@ -86,10 +86,10 @@ function BuildSDL(base_cfg)
 		{ cflags = { release = flag_remove("/GL") } }
 	)
 	local obj = (
-		cc(cfg, src) +
-		cc(mslibc_cfg, SDL.join("src/stdlib/SDL_mslibc.c")) +
-		rc(cfg, SDL.join("src/main/windows/version.rc"))
+		cfg:cc(src) +
+		mslibc_cfg:cc(SDL.join("src/stdlib/SDL_mslibc.c")) +
+		cfg:rc(SDL.join("src/main/windows/version.rc"))
 	)
-	link.linputs = (dll(cfg, obj, "SDL2") + cc(cfg, src_winmain))
+	link.linputs = (cfg:dll(obj, "SDL2") + cfg:cc(src_winmain))
 	return link
 end

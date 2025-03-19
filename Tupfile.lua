@@ -1,6 +1,6 @@
 tup.include("libs/tupblocks/Tuprules.lua")
 
----@class ConfigShape
+---@type ConfigShape
 SSG_COMPILE = {}
 SSG_COMPILE.cflags = { "-I.", "-IGIAN07/", debug = "-DPBG_DEBUG" }
 SSG_COMPILE.objdir = "ssg/"

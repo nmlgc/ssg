@@ -16,6 +16,9 @@ function BuildXiph(base_cfg)
 		"barkmel.c$", "misc.c$", "psytune.c$", "tone.c$", "vorbisenc.c$"
 	})
 
-	link.linputs = (libogg_cfg:cc(libogg_src) + libvorbis_cfg:cc(libvorbis_src))
+	link.linputs = (
+		libogg_cfg:lib(libogg_cfg:cc(libogg_src), "libogg") +
+		libogg_cfg:lib(libvorbis_cfg:cc(libvorbis_src), "libvorbis")
+	)
 	return link
 end

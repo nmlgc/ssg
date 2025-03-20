@@ -11,6 +11,7 @@ sh ./submodules_check.sh ^
 	libs/dr_libs ^
 	libs/libogg ^
 	libs/libvorbis ^
+	libs/libwebp_lossless ^
 	libs/miniaudio ^
 	libs/SDL2 ^
 	libs/SDL3 ^

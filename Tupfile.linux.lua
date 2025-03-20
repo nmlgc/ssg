@@ -5,7 +5,7 @@ tup.import("SDL")
 SDL = SDL[1]
 
 local PLATFORM_LINK = EnvConfig(SDL, "pangocairo", "fontconfig")
-local XIPH_LINK = EnvConfig("ogg", "vorbis", "vorbisfile")
+local LAYERS_LINK = EnvConfig("libwebp", "ogg", "vorbis", "vorbisfile")
 local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 
 -- Since Pango/Cairo adds -pthread to a later configuration, the C++ standard
@@ -13,7 +13,7 @@ local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 CONFIG = CONFIG:branch({ cflags = "-pthread" })
 
 local ssg_cfg = CONFIG:branch(
-	BLAKE3_LINK, XIPH_LINK, SSG_COMPILE, CONFIG:cxx_std_modules(), {
+	BLAKE3_LINK, LAYERS_LINK, SSG_COMPILE, CONFIG:cxx_std_modules(), {
 		cflags = { "-DLINUX", ("-D" .. string.upper(SDL) .. "=1") },
 	}
 )

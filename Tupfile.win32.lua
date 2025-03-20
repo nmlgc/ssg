@@ -1,5 +1,6 @@
 tup.include("libs/tupblocks/toolchain.msvc.lua")
 tup.include("libs/BLAKE3.lua")
+tup.include("libs/libwebp_lossless.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
@@ -31,6 +32,7 @@ local function ssg(variant)
 
 	local SDL_LINK = BuildSDL(variant_cfg, sdl_version)
 	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
+	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(variant_cfg, variant)
 
 	-- Static analysis using the C++ Core Guideline checker plugin.
 	local ANALYSIS = { cflags = { release = {
@@ -79,7 +81,7 @@ local function ssg(variant)
 	-- --------
 
 	local ssg_cfg = modules_cfg:branch(
-		BLAKE3_LINK, XIPH_LINK, SDL_LINK, SSG_COMPILE, {
+		BLAKE3_LINK, LIBWEBP_LINK, XIPH_LINK, SDL_LINK, SSG_COMPILE, {
 			cflags = {
 				"/std:c++latest",
 				"/DWIN32",

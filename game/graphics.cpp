@@ -50,22 +50,23 @@ void Grp_PaletteSetDefault(void)
 // -----------
 
 using NUM_TYPE = unsigned int;
-static constexpr std::u8string_view EXT = u8".BMP";
 
 static NUM_TYPE ScreenshotNum = 0;
 static std::u8string ScreenshotBuf;
 
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 {
-	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + EXT.size());
+	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + 4);
 	ScreenshotBuf.resize_and_overwrite(cap, [&](auto *p, size_t) {
 		return (std::ranges::copy(prefix, p).out - p);
 	});
 }
 
-// Increments the screenshot number to the next file that doesn't exist yet,
-// then opens a write stream for that file.
-std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
+// Increments the screenshot number to the next file with the given extension
+// that doesn't exist yet, then opens a write stream for that file.
+std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
+	std::u8string_view ext
+)
 {
 	if(ScreenshotBuf.size() == 0) {
 		return nullptr;
@@ -75,7 +76,7 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream()
 	while(ScreenshotNum < (std::numeric_limits<NUM_TYPE>::max)()) {
 		const auto prefix_len = ScreenshotBuf.size();
 		StringCatNum<4>(ScreenshotNum++, ScreenshotBuf);
-		ScreenshotBuf += EXT;
+		ScreenshotBuf += ext;
 		auto ret = FileStreamWrite(ScreenshotBuf.c_str(), true);
 		ScreenshotBuf.resize(prefix_len);
 		if(ret) {
@@ -98,7 +99,7 @@ bool Grp_ScreenshotSave(
 		.w = Cast::sign<PIXEL_COORD>(size.w),
 		.h = -Cast::sign<PIXEL_COORD>(size.h),
 	};
-	const auto stream = Grp_NextScreenshotStream();
+	const auto stream = Grp_NextScreenshotStream(u8".BMP");
 	if(!stream) {
 		return false;
 	}

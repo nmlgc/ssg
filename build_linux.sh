@@ -29,7 +29,14 @@ echo "[updater]
 
 # Libraries that are supposed to be installed through the system's package
 # manager
-pkg_config_env_required "$SDL" ogg vorbis vorbisfile pangocairo fontconfig
+pkg_config_env_required \
+	"$SDL" \
+	fontconfig \
+	libwebp \
+	ogg \
+	pangocairo \
+	vorbis \
+	vorbisfile \
 
 # Vendored libraries that we only use when they aren't installed system-wide
 pkg_config_env_optional libblake3

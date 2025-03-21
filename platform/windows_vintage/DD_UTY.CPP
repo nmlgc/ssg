@@ -239,7 +239,7 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		static_cast<size_t>(desc.lPitch * desc.dwHeight),
 	};
 	const auto maybe_format = HelpPixelFormatFrom(desc.ddpfPixelFormat);
-	if(!maybe_format || !BMPSaveSupports(maybe_format.value())) {
+	if(!maybe_format) {
 		DebugOut(u8"Backbuffer format not supported for screenshots");
 		return false;
 	}

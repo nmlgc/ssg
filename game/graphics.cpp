@@ -4,11 +4,13 @@
  */
 
 #include "game/graphics.h"
+#include "game/defer.h"
 #include "game/format_bmp.h"
 #include "game/input.h"
 #include "game/string_format.h"
 #include "platform/file.h"
 #include "platform/graphics_backend.h"
+#include <webp/encode.h>
 
 uint8_t Grp_FPSDivisor = 0;
 
@@ -56,7 +58,7 @@ static std::u8string ScreenshotBuf;
 
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 {
-	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + 4);
+	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + 5);
 	ScreenshotBuf.resize_and_overwrite(cap, [&](auto *p, size_t) {
 		return (std::ranges::copy(prefix, p).out - p);
 	});
@@ -86,7 +88,7 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 	return nullptr;
 }
 
-bool Grp_ScreenshotSave(
+static bool ScreenshotSaveBMP(
 	PIXEL_SIZE_BASE<unsigned int> size,
 	PIXELFORMAT format,
 	std::span<BGRA> palette,
@@ -109,6 +111,93 @@ bool Grp_ScreenshotSave(
 	}
 	const auto bpp = (format.PixelByteSize() * 8);
 	return BMPSave(stream.get(), bmp_size, 1, bpp, palette, pixels);
+}
+
+static bool ScreenshotSaveWebP(
+	PIXEL_SIZE_BASE<unsigned int> size,
+	PIXELFORMAT format,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels,
+	int z
+)
+{
+	if((size.w > WEBP_MAX_DIMENSION) || (size.h > WEBP_MAX_DIMENSION)) {
+		return false;
+	}
+
+	WebPPicture pic;
+	if(!WebPPictureInit(&pic)) {
+		return false;
+	}
+	defer(WebPPictureFree(&pic));
+
+	pic.width = size.w;
+	pic.height = size.h;
+	pic.argb_stride = size.w;
+
+	// Must also be set to opt into lossless import!
+	pic.use_argb = true;
+
+	decltype(WebPPictureImportRGBX) *import_func_32bpp = nullptr;
+	switch(format.format) {
+	case PIXELFORMAT::BGRA8888:
+		// Yup, "argb" is little-endian and this is actually BGRA...
+		pic.argb = std::bit_cast<uint32_t *>(pixels.data());
+		break;
+	case PIXELFORMAT::BGRX8888:
+		// … but these are big-endian!
+		import_func_32bpp = WebPPictureImportBGRX;
+		break;
+	case PIXELFORMAT::RGBA8888:
+		import_func_32bpp = WebPPictureImportRGBA;
+		break;
+	default:
+		return false;
+	}
+	if(import_func_32bpp) {
+		const auto *bytes = std::bit_cast<uint8_t *>(pixels.data());
+		if(!import_func_32bpp(&pic, bytes, (size.w * sizeof(uint32_t)))) {
+			return false;
+		}
+	}
+
+	WebPConfig config;
+	if(!WebPConfigInit(&config)) {
+		return false;
+	}
+	if(!WebPConfigLosslessPreset(&config, z)) {
+		return false;
+	}
+	config.thread_level = 1;
+
+	WebPMemoryWriter wrt;
+	WebPMemoryWriterInit(&wrt);
+	defer(WebPMemoryWriterClear(&wrt));
+	pic.writer = WebPMemoryWrite;
+	pic.custom_ptr = &wrt;
+
+	const auto ret = WebPEncode(&config, &pic);
+	if(!ret) {
+		return false;
+	}
+	const auto stream = Grp_NextScreenshotStream(u8".webp");
+	if(!stream) {
+		return false;
+	}
+	return stream->Write({ wrt.mem, wrt.size });
+}
+
+bool Grp_ScreenshotSave(
+	PIXEL_SIZE_BASE<unsigned int> size,
+	PIXELFORMAT format,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels
+)
+{
+	return (
+		ScreenshotSaveWebP(size, format, palette, pixels, 0) ||
+		ScreenshotSaveBMP(size, format, palette, pixels)
+	);
 }
 // -----------
 

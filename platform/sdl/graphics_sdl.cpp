@@ -781,15 +781,13 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 			continue;
 		}
 		const auto pixel_format = maybe_pixel_format.value();
-
-		// Screenshots currently expect in-memory BGRA order.
-		if(pixel_format.format == PIXELFORMAT::RGBA8888) {
-			continue;
-		}
-
 		PreferredPixelFormat = pixel_format;
 		sdl_format = format;
-		break;
+
+		// Both libwebp and BMP highly favor in-memory BGRA order.
+		if(pixel_format.format == PIXELFORMAT::BGRA8888) {
+			break;
+		}
 	}
 	if(!PreferredPixelFormat || (sdl_format == SDL_PIXELFORMAT_UNKNOWN)) {
 		const auto api_name = GrpBackend_APIName(params.api);
@@ -994,10 +992,10 @@ void SaveSurfaceAsScreenshot(SDL_Surface *src)
 
 	const auto sdl_format = HelpFormatFrom(src);
 	const auto maybe_format = HelpPixelFormatFrom(sdl_format);
-	if(!maybe_format || !BMPSaveSupports(maybe_format.value())) {
+	if(!maybe_format) {
 		SDL_LogCritical(
 			LOG_CAT,
-			"Screenshot buffer uses %s, which is not supported for BMP.",
+			"Screenshot buffer format %s is not supported.",
 			SDL_GetPixelFormatName(sdl_format)
 		);
 		return;
@@ -1016,7 +1014,6 @@ void SaveSurfaceAsScreenshot(SDL_Surface *src)
 	const auto pixels = std::span(
 		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
 	);
-	const auto bpp = SDL_BITSPERPIXEL(HelpFormatFrom(src));
 	Grp_ScreenshotSave(size, maybe_format.value(), {}, pixels);
 	if(SDL_MUSTLOCK(src)) {
 		SDL_UnlockSurface(src);

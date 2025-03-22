@@ -136,6 +136,15 @@ WINDOW_MENU Menu = { std::span(Item), SetItem };
 } // namespace Dif
 
 namespace Grp {
+namespace Screenshot {
+static void SetItem(bool tick = true);
+
+WINDOW_CHOICE Item[] = {
+	SubmenuExitItemForArray,
+};
+WINDOW_MENU Menu = { std::span(Item), SetItem };
+} // namespace Screenshot
+
 namespace API {
 static void FnDef(int_fast8_t delta);
 static void FnOverride(int_fast8_t delta);
@@ -202,6 +211,9 @@ WINDOW_CHOICE ItemBpp = { TitleBpp, "使用する色数を指定します", FnBp
 WINDOW_CHOICE ItemMsg = {
 	TitleMsg, "ウィンドウの表示位置を決めます", FnWinLocate
 };
+WINDOW_CHOICE ItemScreenshot = {
+	"Screenshots", "Customize the screenshot format", Screenshot::Menu
+};
 #ifdef SUPPORT_GRP_API
 WINDOW_CHOICE ItemAPI = { "API", "Select rendering API", API::Menu };
 #endif
@@ -219,6 +231,7 @@ WINDOW_MENU Menu = { SetItem, {
 #ifdef SUPPORT_GRP_BITDEPTH
 	&ItemBpp,
 #endif
+	&ItemScreenshot,
 #ifdef SUPPORT_GRP_API
 	&ItemAPI,
 #endif
@@ -1039,6 +1052,10 @@ static void Main::Cfg::Grp::SetItem(bool)
 	sprintf(HelpScMode, sc_mode_fmt, sc_mode_res.w, sc_mode_res.h);
 #endif
 	// ------------
+}
+
+static void Main::Cfg::Grp::Screenshot::SetItem(bool)
+{
 }
 
 #ifdef SUPPORT_GRP_API

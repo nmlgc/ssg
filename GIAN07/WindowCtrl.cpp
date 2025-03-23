@@ -101,8 +101,8 @@ constexpr WINDOW_CHOICE HRuleItemForArray = { "-------------------" };
 constexpr WINDOW_CHOICE SubmenuExitItemForArray = {
 	"Exit", HELP_SUBMENU_EXIT, CWinExitFn
 };
-WINDOW_CHOICE SubmenuExitItem = SubmenuExitItemForArray;
-WINDOW_CHOICE HRuleItem = HRuleItemForArray;
+constinit WINDOW_CHOICE SubmenuExitItem = SubmenuExitItemForArray;
+constinit WINDOW_CHOICE HRuleItem = HRuleItemForArray;
 
 namespace Main {
 namespace Cfg {
@@ -144,7 +144,7 @@ static void SetItem(bool tick = true);
 #ifdef SUPPORT_GRP_API
 char TitleDef[26];
 WINDOW_CHOICE ItemDef = { TitleDef, HELP_API_DEFAULT, FnDef };
-std::array<WINDOW_CHOICE, 8> Item;
+constinit WINDOW_CHOICE Item[8];
 WINDOW_MENU Menu = { std::span<WINDOW_CHOICE, 0>(), SetItem };
 #endif
 }
@@ -205,7 +205,7 @@ WINDOW_CHOICE ItemMsg = {
 #ifdef SUPPORT_GRP_API
 WINDOW_CHOICE ItemAPI = { "API", "Select rendering API", API::Menu };
 #endif
-WINDOW_CHOICE ItemExit = SubmenuExitItem;
+WINDOW_CHOICE ItemExit = SubmenuExitItemForArray;
 WINDOW_MENU Menu = { SetItem, {
 #ifdef SUPPORT_GRP_WINDOWED
 	&ItemDisp,
@@ -896,7 +896,12 @@ static void Main::Cfg::Rep::SetItem(bool)
 
 static void Main::Cfg::Dif::SetItem(bool)
 {
-	const char *const dif[4] = {" Easy  "," Normal"," Hard  ","Lunatic" };
+	static constexpr const char *const dif[4] = {
+		" Easy  ",
+		" Normal",
+		" Hard  ",
+		"Lunatic",
+	};
 /*
 	{Title[3], "[DebugMode] 画面に情報を表示するか", FnMsgDisplay,0,0},
 	{Title[4], "[DebugMode] ステージセレクト", FnStgSelect,0,0},
@@ -940,8 +945,17 @@ static void Main::Cfg::Grp::SetItem(bool)
 		{ "Geometry", WINDOW_STATE::REGULAR },
 		{ "--------", WINDOW_STATE::DISABLED },
 	};
-	const char *const UorD[3] = { "上のほう", "下のほう", "描画せず" };
-	const char *const FRate[4] = { "おまけ", "60Fps", "30Fps", "20Fps" };
+	static constexpr const char *const UorD[3] = {
+		"上のほう",
+		"下のほう",
+		"描画せず",
+	};
+	static constexpr const char *const FRate[4] = {
+		"おまけ",
+		"60Fps",
+		"30Fps",
+		"20Fps",
+	};
 	const auto u_or_d = ((ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
 		? 2
 		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)

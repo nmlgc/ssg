@@ -56,11 +56,7 @@ static void MidFnFixes(int_fast8_t delta);
 
 static void InpFnMsgSkip(int_fast8_t delta);
 static void InpFnZSpeedDown(int_fast8_t delta);
-
-static bool InpFnKeyTama(INPUT_BITS key);
-static bool InpFnKeyBomb(INPUT_BITS key);
-static bool InpFnKeyShift(INPUT_BITS key);
-static bool InpFnKeyCancel(INPUT_BITS key);
+template <INPUT_PAD_BUTTON& ConfigPad> bool InpFnPad(INPUT_BITS key);
 
 static void CfgRepStgSelect(int_fast8_t delta);
 static void CfgRepSave(int_fast8_t delta);
@@ -88,13 +84,7 @@ static void SetInpItem(bool tick = true);
 static void SetIKeyItem(bool tick = true);
 static void SetCfgRepItem(bool tick = true);
 
-static bool RFnStg1(INPUT_BITS key);
-static bool RFnStg2(INPUT_BITS key);
-static bool RFnStg3(INPUT_BITS key);
-static bool RFnStg4(INPUT_BITS key);
-static bool RFnStg5(INPUT_BITS key);
-static bool RFnStg6(INPUT_BITS key);
-static bool RFnStgEx(INPUT_BITS key);
+template <int Stage> bool RFnStg(INPUT_BITS key);
 
 static constexpr void RingStep(
 	uint8_t& var, int_fast8_t delta, uint8_t min, uint8_t max
@@ -313,10 +303,10 @@ static auto& SndItemMIDI = SndItem[6];
 char IKeyTitle[4][20];
 char InpHelp[] = "パッド上のボタンを押すと変更";
 WINDOW_CHOICE InpKey[] = {
-	{ IKeyTitle[0],	InpHelp,	InpFnKeyTama },
-	{ IKeyTitle[1],	InpHelp,	InpFnKeyBomb },
-	{ IKeyTitle[2],	InpHelp,	InpFnKeyShift },
-	{ IKeyTitle[3],	InpHelp,	InpFnKeyCancel },
+	{ IKeyTitle[0], InpHelp, InpFnPad<ConfigDat.PadTama.v> },
+	{ IKeyTitle[1], InpHelp, InpFnPad<ConfigDat.PadBomb.v> },
+	{ IKeyTitle[2], InpHelp, InpFnPad<ConfigDat.PadShift.v> },
+	{ IKeyTitle[3], InpHelp, InpFnPad<ConfigDat.PadCancel.v> },
 	SubmenuExitItemForArray,
 };
 WINDOW_MENU InpKeyMenu = { std::span(InpKey), SetIKeyItem };
@@ -350,15 +340,16 @@ WINDOW_CHOICE CfgItem[] = {
 };
 WINDOW_MENU CfgMenu = { std::span(CfgItem) };
 
+constexpr auto RFnStgEx = RFnStg<GRAPH_ID_EXSTAGE>;
 WINDOW_CHOICE RepItem[] = {
-	{ " Stage 1 デモ再生",	"ステージ１のリプレイ",	RFnStg1 },
-	{ " Stage 2 デモ再生",	"ステージ２のリプレイ",	RFnStg2 },
-	{ " Stage 3 デモ再生",	"ステージ３のリプレイ",	RFnStg3 },
-	{ " Stage 4 デモ再生",	"ステージ４のリプレイ",	RFnStg4 },
-	{ " Stage 5 デモ再生",	"ステージ５のリプレイ",	RFnStg5 },
-	{ " Stage 6 デモ再生",	"ステージ６のリプレイ",	RFnStg6 },
-	{ " ExStage デモ再生",	"エキストラステージのリプレイ",	RFnStgEx },
-	{ " Exit",	HELP_SUBMENU_EXIT,	CWinExitFn },
+	{ " Stage 1 デモ再生", "ステージ１のリプレイ", RFnStg<1> },
+	{ " Stage 2 デモ再生", "ステージ２のリプレイ", RFnStg<2> },
+	{ " Stage 3 デモ再生", "ステージ３のリプレイ", RFnStg<3> },
+	{ " Stage 4 デモ再生", "ステージ４のリプレイ", RFnStg<4> },
+	{ " Stage 5 デモ再生", "ステージ５のリプレイ", RFnStg<5> },
+	{ " Stage 6 デモ再生", "ステージ６のリプレイ", RFnStg<6> },
+	{ " ExStage デモ再生", "エキストラステージのリプレイ", RFnStgEx },
+	{ " Exit", HELP_SUBMENU_EXIT, CWinExitFn },
 };
 WINDOW_MENU RepMenu = { std::span(RepItem) };
 
@@ -752,46 +743,16 @@ static bool RFnStg(int stage, INPUT_BITS key)
 {
 	if((key == KEY_BOMB) || (key == KEY_ESC)) {
 		return false;
-	} else if((key == KEY_RETURN) || (key == KEY_TAMA)) {
+	} else if(Input_IsOK(key)) {
 		GameReplayInit(stage);
 	}
 	return true;
 }
 
 
-static bool RFnStg1(INPUT_BITS key)
+template <int Stage> bool RFnStg(INPUT_BITS key)
 {
-	return RFnStg(1, key);
-}
-
-static bool RFnStg2(INPUT_BITS key)
-{
-	return RFnStg(2, key);
-}
-
-static bool RFnStg3(INPUT_BITS key)
-{
-	return RFnStg(3, key);
-}
-
-static bool RFnStg4(INPUT_BITS key)
-{
-	return RFnStg(4, key);
-}
-
-static bool RFnStg5(INPUT_BITS key)
-{
-	return RFnStg(5, key);
-}
-
-static bool RFnStg6(INPUT_BITS key)
-{
-	return RFnStg(6, key);
-}
-
-static bool RFnStgEx(INPUT_BITS key)
-{
-	return RFnStg(GRAPH_ID_EXSTAGE, key);
+	return RFnStg(Stage, key);
 }
 
 
@@ -869,9 +830,7 @@ static bool ContinueFnNo(INPUT_BITS key)
 	return true;
 }
 
-static bool InpFnKey(
-	INPUT_PAD_BUTTON& config_pad, INPUT_BITS pad_config_key, INPUT_BITS key
-)
+static bool InpFnPad(INPUT_PAD_BUTTON& config_pad, INPUT_BITS key)
 {
 	key &= (~Pad_Data);
 	const auto temp = Key_PadSingle();
@@ -879,28 +838,13 @@ static bool InpFnKey(
 		config_pad = temp.value();
 		SetIKeyItem();
 	}
-
-	return ((key != KEY_RETURN) && (key != KEY_TAMA));
+	return !Input_IsOK(key);
 }
 
-static bool InpFnKeyTama(INPUT_BITS key)
-{
-	return InpFnKey(ConfigDat.PadTama.v, KEY_TAMA, key);
-}
 
-static bool InpFnKeyBomb(INPUT_BITS key)
+template <INPUT_PAD_BUTTON& ConfigPad> bool InpFnPad(INPUT_BITS key)
 {
-	return InpFnKey(ConfigDat.PadBomb.v, KEY_BOMB, key);
-}
-
-static bool InpFnKeyShift(INPUT_BITS key)
-{
-	return InpFnKey(ConfigDat.PadShift.v, KEY_SHIFT, key);
-}
-
-static bool InpFnKeyCancel(INPUT_BITS key)
-{
-	return InpFnKey(ConfigDat.PadCancel.v, KEY_ESC, key);
+	return InpFnPad(ConfigPad, key);
 }
 
 

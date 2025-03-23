@@ -19,6 +19,12 @@
 #include "game/snd.h"
 #include "obj/platform_constants.h"
 
+// Screenshots
+// -----------
+
+const uint8_t& Grp_ScreenshotEffort = ConfigDat.ScreenshotEffort.v;
+// -----------
+
 // Volume controls
 // ---------------
 

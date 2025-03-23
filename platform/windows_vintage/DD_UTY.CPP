@@ -194,6 +194,7 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 	if(!surf) {
 		return false;
 	}
+	const auto t_start = std::chrono::steady_clock::now();
 	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
 	const auto palette = [surf, &bgra_memory]() -> std::span<BGRA> {
 		IDirectDrawPalette* pal = nullptr;
@@ -257,7 +258,7 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		format = { PIXELFORMAT::BGRX8888 };
 	}
 
-	return Grp_ScreenshotSave(size, format, palette, pixels);
+	return Grp_ScreenshotSave(size, format, palette, pixels, t_start);
 }
 
 

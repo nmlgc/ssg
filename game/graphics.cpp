@@ -151,6 +151,27 @@ static bool ScreenshotSaveWebP(
 	case PIXELFORMAT::RGBA8888:
 		import_func_32bpp = WebPPictureImportRGBA;
 		break;
+	case PIXELFORMAT::PALETTE8:
+		// The WebP repo has equivalent code in WebPImportColorMappedARGB(),
+		// but Linux distributions typically don't package the `extras` module
+		// this function belongs to.
+		assert(palette.size() == (sizeof(uint8_t) << 8));
+		if(!WebPPictureAlloc(&pic)) {
+			return false;
+		}
+		{
+			auto *src_p = std::bit_cast<uint8_t *>(pixels.data());
+			auto *dst_p = pic.argb;
+			for(const auto y : std::views::iota(0, pic.height)) {
+				for(const auto x : std::views::iota(0, pic.width)) {
+					const auto c = U32LEAt(&palette[src_p[x]]);
+					dst_p[x] = (c | 0xFF000000u);
+				}
+				src_p += size.w;
+				dst_p += pic.argb_stride;
+			}
+		}
+		break;
 	default:
 		return false;
 	}

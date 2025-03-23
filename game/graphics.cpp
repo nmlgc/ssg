@@ -215,10 +215,15 @@ bool Grp_ScreenshotSave(
 	std::span<const std::byte> pixels
 )
 {
-	return (
-		ScreenshotSaveWebP(size, format, palette, pixels, 0) ||
-		ScreenshotSaveBMP(size, format, palette, pixels)
-	);
+	auto ret = false;
+	const auto effort = Grp_ScreenshotEffort;
+	if(effort != 0) {
+		ret = ScreenshotSaveWebP(size, format, palette, pixels, (effort - 1));
+	}
+	if(!ret) {
+		ret = ScreenshotSaveBMP(size, format, palette, pixels);
+	}
+	return ret;
 }
 // -----------
 

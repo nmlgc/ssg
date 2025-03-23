@@ -113,6 +113,12 @@ void Grp_PaletteSetDefault(void);
 struct BGRA;
 struct FILE_STREAM_WRITE;
 
+// 0 = BMP, 10 = max-effort WebP.
+constexpr uint8_t GRP_SCREENSHOT_EFFORT_COUNT = 11;
+constexpr uint8_t GRP_SCREENSHOT_EFFORT_MAX = (GRP_SCREENSHOT_EFFORT_COUNT - 1);
+
+extern const uint8_t& Grp_ScreenshotEffort;
+
 // Required to enable the screenshot feature as a whole.
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
 

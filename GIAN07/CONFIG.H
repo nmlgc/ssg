@@ -185,6 +185,7 @@ struct CONFIG_DATA {
 
 	// グラフィックに関するフラグ
 	OPTION_FLAGS<GRPF_MASK> GraphFlags = { 0 };
+	OPTION_U8_BELOW<GRP_SCREENSHOT_EFFORT_MAX> ScreenshotEffort = { 0 };
 
 	// サウンド・ＢＧＭ関連 //
 	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };

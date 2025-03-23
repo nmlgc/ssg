@@ -137,12 +137,16 @@ WINDOW_MENU Menu = { std::span(Item), SetItem };
 
 namespace Grp {
 namespace Screenshot {
+static void FnFormat(int_fast8_t delta);
 static void SetItem(bool tick = true);
 
+static char TitleFormat[50];
 WINDOW_CHOICE Item[] = {
+	{ TitleFormat, "", FnFormat },
 	SubmenuExitItemForArray,
 };
 WINDOW_MENU Menu = { std::span(Item), SetItem };
+static auto& ItemFormat = Item[0];
 } // namespace Screenshot
 
 namespace API {
@@ -509,6 +513,11 @@ static void Main::Cfg::Dif::FnDemo(int_fast8_t)
 	DebugDat.DemoSave = !DebugDat.DemoSave;
 }
 #endif // PBG_DEBUG
+
+static void Main::Cfg::Grp::Screenshot::FnFormat(int_fast8_t delta)
+{
+	RingStep(ConfigDat.ScreenshotEffort.v, delta, 0, GRP_SCREENSHOT_EFFORT_MAX);
+}
 
 static void Main::Cfg::Grp::API::FnDef(int_fast8_t)
 {
@@ -1056,6 +1065,34 @@ static void Main::Cfg::Grp::SetItem(bool)
 
 static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 {
+#ifdef WIN32_VINTAGE
+	auto effort = ConfigDat.ScreenshotEffort.v;
+	if(ConfigDat.BitDepth.v.value() == 16) {
+		effort = 0;
+		ItemFormat.Flags |= WINDOW_FLAGS::DISABLED;
+	} else {
+		ItemFormat.Flags &= ~WINDOW_FLAGS::DISABLED;
+	};
+#else
+	const auto effort = ConfigDat.ScreenshotEffort.v;
+#endif
+	char format_buf[8];
+	auto format_for = [&format_buf](decltype(effort) effort) -> const char * {
+		if(effort == 0) {
+			return "  BMP  ";
+		}
+		strcpy(format_buf, "WebP z");
+		format_buf[6] = ('0' + (effort - 1));
+		format_buf[7] = '\0';
+		return &format_buf[0];
+	};
+
+	sprintf(TitleFormat, "Format    [%s]", format_for(effort));
+	if(effort == 0) {
+		ItemFormat.Help = "Saving as uncompressed .BMP";
+	} else {
+		ItemFormat.Help = "Lossless compression (higher = slower)";
+	}
 }
 
 #ifdef SUPPORT_GRP_API

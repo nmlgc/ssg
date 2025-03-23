@@ -209,6 +209,7 @@ const struct VERSION_02 {
 		ConfigDat.WindowLeft,
 		ConfigDat.WindowTop,
 		ConfigDat.MidFlags,
+		ConfigDat.ScreenshotEffort,
 	};
 } VERSION_02;
 

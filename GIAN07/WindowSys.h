@@ -166,7 +166,6 @@ struct WINDOW_MENU {
 	WINDOW_CHOICE*	ItemPtr[WINITEM_MAX] = { nullptr };	// 次の項目へのポインタ
 	void	(*SetItems)(bool tick) = [](bool) {};
 	uint8_t	NumItems;	// 項目数(<ITEM_MAX)
-	uint8_t	Clock;
 
 	template <size_t N> constexpr WINDOW_MENU(
 		std::span<WINDOW_CHOICE, N> children,

@@ -980,7 +980,9 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 void GrpBackend_PaletteGet(PALETTE& pal) {}
 bool GrpBackend_PaletteSet(const PALETTE& pal) { return false; }
 
-void SaveSurfaceAsScreenshot(SDL_Surface *src)
+void SaveSurfaceAsScreenshot(
+	SDL_Surface *src, const std::chrono::steady_clock::time_point t_start
+)
 {
 	assert(src);
 	assert(src->pitch >= 0);
@@ -1014,7 +1016,7 @@ void SaveSurfaceAsScreenshot(SDL_Surface *src)
 	const auto pixels = std::span(
 		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
 	);
-	Grp_ScreenshotSave(size, maybe_format.value(), {}, pixels);
+	Grp_ScreenshotSave(size, maybe_format.value(), {}, pixels, t_start);
 	if(SDL_MUSTLOCK(src)) {
 		SDL_UnlockSurface(src);
 	}
@@ -1022,10 +1024,14 @@ void SaveSurfaceAsScreenshot(SDL_Surface *src)
 
 void TakeScreenshot(void)
 {
+	// The rendering itself should not impact screenshot timing.
+	SDL_FlushRenderer(*Renderer);
+	const auto t_start = std::chrono::steady_clock::now();
+
 	if(SoftwareRenderer) {
 		// Software rendering is the ideal case for screenshots, because we
 		// already have a system-memory surface we can save.
-		SaveSurfaceAsScreenshot(SoftwareSurface);
+		SaveSurfaceAsScreenshot(SoftwareSurface, t_start);
 		return;
 	}
 
@@ -1086,7 +1092,7 @@ void TakeScreenshot(void)
 		SDL_UnlockSurface(src);
 	}
 #endif
-	SaveSurfaceAsScreenshot(src);
+	SaveSurfaceAsScreenshot(src, t_start);
 }
 
 void GrpBackend_Flip(bool take_screenshot)

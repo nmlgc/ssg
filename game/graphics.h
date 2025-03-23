@@ -119,16 +119,23 @@ constexpr uint8_t GRP_SCREENSHOT_EFFORT_MAX = (GRP_SCREENSHOT_EFFORT_COUNT - 1);
 
 extern const uint8_t& Grp_ScreenshotEffort;
 
+// 0 = not yet tried, -1 = last attempt failed.
+extern std::chrono::steady_clock::duration Grp_ScreenshotTimes[
+	GRP_SCREENSHOT_EFFORT_COUNT
+];
+
 // Required to enable the screenshot feature as a whole.
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
 
 // Saves the given bitmap in the screenshot format to a file with the
-// screenshot prefix.
+// screenshot prefix. [t_start] represents the very beginning of the backend's
+// capturing process.
 bool Grp_ScreenshotSave(
 	PIXEL_SIZE_BASE<unsigned int> size,
 	PIXELFORMAT format,
 	std::span<BGRA> palette,
-	std::span<const std::byte> pixels
+	std::span<const std::byte> pixels,
+	const std::chrono::steady_clock::time_point t_start
 );
 // -----------
 

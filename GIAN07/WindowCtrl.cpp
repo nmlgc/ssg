@@ -20,6 +20,8 @@
 #include "game/snd.h"
 #include "game/string_format.h"
 
+using namespace std::chrono_literals;
+
 
 
 static bool ExitFnYes(INPUT_BITS key);
@@ -141,10 +143,20 @@ static void FnFormat(int_fast8_t delta);
 static void SetItem(bool tick = true);
 
 static char TitleFormat[50];
-WINDOW_CHOICE Item[] = {
-	{ TitleFormat, "", FnFormat },
-	SubmenuExitItemForArray,
-};
+static char TitlePerf[GRP_SCREENSHOT_EFFORT_COUNT][50];
+static char HelpPerf[50];
+constinit auto Item = ([] {
+	std::array<WINDOW_CHOICE, (2 + GRP_SCREENSHOT_EFFORT_COUNT + 2)> ret{};
+	auto item_p = ret.begin();
+	*(item_p++) = { TitleFormat, "", FnFormat };
+	*(item_p++) = { "--- Performance ---" };
+	for(const auto& title : Screenshot::TitlePerf) {
+		*(item_p++) = WINDOW_CHOICE{ title, HelpPerf, FnFormat };
+	}
+	*(item_p++) = HRuleItemForArray;
+	*(item_p++) = SubmenuExitItemForArray;
+	return ret;
+})();
 WINDOW_MENU Menu = { std::span(Item), SetItem };
 static auto& ItemFormat = Item[0];
 } // namespace Screenshot
@@ -1077,9 +1089,15 @@ static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 	const auto effort = ConfigDat.ScreenshotEffort.v;
 #endif
 	char format_buf[8];
-	auto format_for = [&format_buf](decltype(effort) effort) -> const char * {
+	enum class ALIGN { LEFT, CENTER };
+	const auto format_for = [&format_buf](
+		decltype(effort) effort, ALIGN align
+	) -> const char * {
 		if(effort == 0) {
-			return "  BMP  ";
+			switch(align) {
+				case ALIGN::LEFT:   return "BMP    ";
+				case ALIGN::CENTER: return "  BMP  ";
+			}
 		}
 		strcpy(format_buf, "WebP z");
 		format_buf[6] = ('0' + (effort - 1));
@@ -1087,11 +1105,70 @@ static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 		return &format_buf[0];
 	};
 
-	sprintf(TitleFormat, "Format    [%s]", format_for(effort));
+	const auto split_into_fraction = [](auto v) {
+		const auto ret_int = (v / 1000);
+		const auto ret_frac = ((v % 1000) / 10);
+		return std::pair(ret_int, ret_frac);
+	};
+
+	sprintf(TitleFormat, "Format    [%s]", format_for(effort, ALIGN::CENTER));
 	if(effort == 0) {
 		ItemFormat.Help = "Saving as uncompressed .BMP";
 	} else {
 		ItemFormat.Help = "Lossless compression (higher = slower)";
+	}
+
+	for(const auto i : std::views::iota(0u, GRP_SCREENSHOT_EFFORT_COUNT)) {
+		auto& item = Item[2 + i];
+		const auto hovered = (
+			MainWindow.Select[MainWindow.SelectDepth] == (2 + i)
+		);
+		const auto format = format_for(i, ALIGN::LEFT);
+		const auto time = Grp_ScreenshotTimes[i];
+		EnumFlagSet(item.Flags, WINDOW_FLAGS::HIGHLIGHT, (i == effort));
+		if(time < 0s) {
+			sprintf(TitlePerf[i], "%s[  FAILED  ]", format);
+			if(hovered) {
+				strcpy(HelpPerf, "https://github.com/nmlgc/ssg/issues/23");
+			}
+		} else if(time == 0s) {
+			sprintf(TitlePerf[i], "%s[    ？    ]", format);
+			if(hovered) {
+				strcpy(HelpPerf, "Not yet measured");
+			}
+		} else {
+			const auto [time_int, time_frac] = split_into_fraction(
+				std::chrono::duration_cast<decltype(0us)>(time).count() + 5
+			);
+			sprintf(
+				TitlePerf[i], "%s[%5lld.%02lldms]", format, time_int, time_frac
+			);
+			if(hovered) {
+				constexpr auto target_ms = decltype(0ms)(FRAME_TIME_TARGET);
+				if(time > (target_ms * ConfigDat.FPSDivisor.v)) {
+					const auto fps = split_into_fraction((1000s / time));
+					sprintf(
+						HelpPerf,
+						"Frame rate will drop to ～%lld.%02lld FPS",
+						fps.first,
+						fps.second
+					);
+				} else {
+					// Easier to just hardcode the numbers than to calculate
+					// and format this without using floating-point variables...
+					static constexpr const char *FPS[3] = {
+						"62.5", "30", "20"
+					};
+					assert(ConfigDat.FPSDivisor.v > 0);
+					assert((ConfigDat.FPSDivisor.v - 1) < std::size(FPS));
+					sprintf(
+						HelpPerf,
+						"Frame rate will stay at %s FPS",
+						FPS[ConfigDat.FPSDivisor.v - 1]
+					);
+				}
+			}
+		}
 	}
 }
 

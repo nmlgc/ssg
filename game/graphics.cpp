@@ -13,6 +13,9 @@
 #include <webp/encode.h>
 
 uint8_t Grp_FPSDivisor = 0;
+std::chrono::steady_clock::duration Grp_ScreenshotTimes[
+	GRP_SCREENSHOT_EFFORT_COUNT
+];
 
 // Paletted graphics //
 // ----------------- //
@@ -212,17 +215,26 @@ bool Grp_ScreenshotSave(
 	PIXEL_SIZE_BASE<unsigned int> size,
 	PIXELFORMAT format,
 	std::span<BGRA> palette,
-	std::span<const std::byte> pixels
+	std::span<const std::byte> pixels,
+	const std::chrono::steady_clock::time_point t_start
 )
 {
+	constexpr auto DURATION_FAILED = std::chrono::steady_clock::duration(-1);
+
 	auto ret = false;
-	const auto effort = Grp_ScreenshotEffort;
+	auto effort = Grp_ScreenshotEffort;
 	if(effort != 0) {
 		ret = ScreenshotSaveWebP(size, format, palette, pixels, (effort - 1));
+		if(!ret) {
+			Grp_ScreenshotTimes[effort] = DURATION_FAILED;
+		}
 	}
 	if(!ret) {
+		effort = 0;
 		ret = ScreenshotSaveBMP(size, format, palette, pixels);
 	}
+	const auto t_end = std::chrono::steady_clock::now();
+	Grp_ScreenshotTimes[effort] = (ret ? (t_end - t_start) : DURATION_FAILED);
 	return ret;
 }
 // -----------

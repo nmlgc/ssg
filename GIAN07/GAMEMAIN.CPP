@@ -25,6 +25,7 @@
 #include "platform/time.h"
 #include "obj/version.h"
 
+constexpr WINDOW_POINT MAIN_WINDOW_TOPLEFT = { 400, 250 };
 
 namespace Version {
 struct LINE {
@@ -872,7 +873,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	// Must come after the BGM switch to correctly initialize the sound
 	// configuration menu.
 	InitMainWindow();
-	MainWindow.Open({ 400, 250 }, 0);
+	MainWindow.Open(MAIN_WINDOW_TOPLEFT, 0);
 	// MainWindow.Open({ 150, 200 }, 0);
 	// MainWindow.Open({ 250, 150 }, 0);
 
@@ -1338,6 +1339,14 @@ void TitleProc(bool& quit)
 			default:
 				quit = true;
 			return;
+		}
+	}
+
+	// Silly hack for excessively tall submenus...
+	if(const auto *active_menu = CWinSearchActive(&MainWindow)) {
+		MainWindow.y = MAIN_WINDOW_TOPLEFT.y;
+		if(active_menu->NumItems > 9) {
+			MainWindow.y -= ((active_menu->NumItems - 9) * CWIN_ITEM_H);
 		}
 	}
 

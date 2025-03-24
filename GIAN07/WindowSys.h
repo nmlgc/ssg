@@ -27,6 +27,9 @@
 
 
 
+// Constants
+// ---------
+
 // 最大数に関する定数 //
 #define WINITEM_MAX		20			// 項目の最大数
 #define WINDOW_DEPTH	10			// ウィンドウの深さ
@@ -40,6 +43,15 @@
 #define CWIN_NEXT		0x04		// 次のウィンドウに移行中
 #define CWIN_BEFORE		0x05		// 前のウィンドウに移行中
 #define CWIN_INIT		0xff		// 初期化処理中
+
+constexpr auto CWIN_FONT = FONT_ID::SMALL;
+
+constexpr PIXEL_COORD CWIN_ITEM_LEFT = 8;
+constexpr PIXEL_COORD CWIN_ITEM_H = 16;
+constexpr PIXEL_COORD CWIN_MAX_H = ((WINITEM_MAX + 1) * CWIN_ITEM_H);
+
+constexpr PIXEL_COORD FACE_W = 96;
+constexpr PIXEL_COORD FACE_H = 96;
 
 // メッセージウィンドウ・コマンド //
 #define MWCMD_SMALLFONT		0x00		// スモールフォントを使用する
@@ -62,6 +74,7 @@
 
 // その他の定数 //
 #define CWIN_KEYWAIT	8
+// ---------
 
 
 
@@ -309,6 +322,9 @@ public:
 void CWinMove(WINDOW_SYSTEM *ws);				// コマンドウィンドウを１フレーム動作させる
 void CWinDraw(WINDOW_SYSTEM *ws);				// コマンドウィンドウの描画
 bool CWinExitFn(INPUT_BITS key);	// コマンド [Exit] のデフォルト処理関数
+
+// アクティブなウィンドウを探す
+WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws);
 
 // Calculates the rendered width of the given text in the menu item font,
 // without any padding.

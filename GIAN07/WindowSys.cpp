@@ -12,19 +12,6 @@
 #include "game/ut_math.h"
 
 
-// Constants
-// ---------
-
-constexpr auto CWIN_FONT = FONT_ID::SMALL;
-
-constexpr PIXEL_COORD CWIN_ITEM_LEFT = 8;
-constexpr PIXEL_COORD CWIN_ITEM_H = 16;
-constexpr PIXEL_COORD CWIN_MAX_H = ((WINITEM_MAX + 1) * CWIN_ITEM_H);
-
-constexpr PIXEL_COORD FACE_W = 96;
-constexpr PIXEL_COORD FACE_H = 96;
-// ---------
-
 ///// [構造体] /////
 
 // メッセージウィンドウ管理用構造体 //
@@ -66,7 +53,6 @@ typedef struct tagMSG_WINDOW{
 
 ///// [非公開関数] /////
 
-static WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws);	// アクティブなウィンドウを探す
 static void CWinKeyEvent(WINDOW_SYSTEM *ws);				// キーボード入力を処理する
 
 static void DrawWindowFrame(int x,int y,int w,int h);		// ウィンドウ枠を描画する
@@ -612,7 +598,7 @@ void MWinHelp(WINDOW_SYSTEM *ws)
 }
 
 // アクティブなウィンドウを探す //
-static WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws)
+WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws)
 {
 	int				i;
 

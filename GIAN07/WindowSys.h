@@ -6,6 +6,7 @@
 #ifndef PBGWIN_WINDOWSYS_H
 #define PBGWIN_WINDOWSYS_H		"WINDOWSYS : Version 0.24 : Update 2000/02/28"
 
+#include "game/enum_flags.h"
 #include "game/input.h"
 #include "game/text.h"
 
@@ -66,13 +67,6 @@
 
 ///// [構造体] /////
 
-enum class WINDOW_STATE : uint8_t {
-	REGULAR = 0,
-	HIGHLIGHT = 1,
-	DISABLED = 2,
-	COUNT,
-};
-
 enum class WINDOW_FLAGS : uint8_t {
 	_HAS_BITFLAG_OPERATORS,
 	NONE = 0x00,
@@ -82,6 +76,14 @@ enum class WINDOW_FLAGS : uint8_t {
 
 	// Horizontally centered text.
 	CENTER = 0x02,
+
+	// Cannot be selected.
+	DISABLED = 0x04,
+
+	// Rendered in the highlight color.
+	HIGHLIGHT = 0x08,
+
+	FORCE_RERENDER = 0x10,
 };
 
 struct WINDOW_MENU;
@@ -91,10 +93,9 @@ struct WINDOW_LABEL {
 	Narrow::literal	Title;	// タイトル文字列へのポインタ(実体ではない！)
 
 	WINDOW_FLAGS	Flags = WINDOW_FLAGS::NONE;
-	WINDOW_STATE	State = WINDOW_STATE::REGULAR;
 
-	// Required for forcing the item to be re-rendered after a state change.
-	WINDOW_STATE	StatePrev = WINDOW_STATE::COUNT;
+	// Required for forcing the item to be re-rendered after a flag change.
+	WINDOW_FLAGS	FlagsPrev = WINDOW_FLAGS::FORCE_RERENDER;
 
 	constexpr WINDOW_LABEL(
 		const Narrow::literal title = "",
@@ -125,7 +126,7 @@ struct WINDOW_CHOICE : public WINDOW_LABEL {
 		WINDOW_LABEL(title, flags), Help(help), CallBackFn(callback_fn)
 	{
 		if(!callback_fn) {
-			State = WINDOW_STATE::DISABLED;
+			Flags |= WINDOW_FLAGS::DISABLED;
 		}
 	}
 

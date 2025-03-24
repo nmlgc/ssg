@@ -431,7 +431,7 @@ void InitMainWindow(void)
 		*(menu_p++) = &SubmenuExitItem;
 		API::Menu.NumItems = std::distance(API::Menu.ItemPtr, menu_p);
 	} else {
-		ItemAPI.State = WINDOW_STATE::DISABLED;
+		ItemAPI.Flags |= WINDOW_FLAGS::DISABLED;
 	}
 #endif
 
@@ -688,10 +688,15 @@ namespace BGMPack {
 			ret.Title = Packs[generated - 1];
 			ret.Help = "";
 		}
-		ret.State = ((generated == SelAtOpen)
-			? WINDOW_STATE::HIGHLIGHT
-			: WINDOW_STATE::REGULAR
+
+		// `WINDOW_FLAGS::DISABLED` is set by default if a `WINDOW_CHOICE` is
+		// constructed without text, so we must indeed overwrite the entire
+		// flag field.
+		ret.Flags = ((generated == SelAtOpen)
+			? WINDOW_FLAGS::HIGHLIGHT
+			: WINDOW_FLAGS::NONE
 		);
+
 		if(generated == selected) {
 			if((generated == sel_none) || (generated == sel_download)) {
 				std::ranges::copy(TITLE, Title).out[0] = '\0';
@@ -940,10 +945,10 @@ static void Main::Cfg::Grp::SetItem(bool)
 		std::pair{ "%s[  %d:%d  ]", "Use largest fractional %d:%d resolution" },
 		std::pair{ "%s[Stretch]", "Use aspect ratio of display" },
 	};
-	static constexpr std::tuple<const char*, WINDOW_STATE> SCALE_MODES[] = {
-		{ "FrameBuf", WINDOW_STATE::REGULAR },
-		{ "Geometry", WINDOW_STATE::REGULAR },
-		{ "--------", WINDOW_STATE::DISABLED },
+	static constexpr std::tuple<const char*, bool> SCALE_MODES[] = {
+		{ "FrameBuf", false },
+		{ "Geometry", false },
+		{ "--------", true },
 	};
 	static constexpr const char *const UorD[3] = {
 		"上のほう",
@@ -977,14 +982,14 @@ static void Main::Cfg::Grp::SetItem(bool)
 		: std::pair((scale_4x ? "%s[%3u.%02ux ]" : "%s[ Screen ]"), "ScaleFact")
 	);
 
-	const auto [sc_mode_label, sc_mode_state] = (
+	const auto [sc_mode_label, sc_mode_disabled] = (
 		(scale_4x == 4) ? SCALE_MODES[2] :
 		params.ScaleGeometry() ? SCALE_MODES[1] :
 		SCALE_MODES[0]
 	);
 
 	ItemScale.SetActive(!(fs.fullscreen && fs.exclusive));
-	ItemScMode.State = sc_mode_state;
+	EnumFlagSet(ItemScMode.Flags, WINDOW_FLAGS::DISABLED, sc_mode_disabled);
 #endif
 
 	// clang-format off
@@ -1049,10 +1054,8 @@ static void Main::Cfg::Grp::API::SetItem(bool)
 
 	ItemDef.SetActive(!is_def_api);
 	for(auto& api : Item | std::views::take(GrpBackend_APICount())) {
-		api.State = (!strcmp(api_active.data(), api.Title.ptr)
-			? WINDOW_STATE::HIGHLIGHT
-			: WINDOW_STATE::REGULAR
-		);
+		const auto is_selected = !strcmp(api_active.data(), api.Title.ptr);
+		EnumFlagSet(api.Flags, WINDOW_FLAGS::HIGHLIGHT, is_selected);
 	}
 
 	sprintf(TitleDef, "UseDefault  %s", CHOICE_OFF_ON[is_def_api]);
@@ -1120,11 +1123,10 @@ static void Main::Cfg::Snd::Mid::SetItem(bool tick)
 			strcpy(buf, dev.data());
 		}
 		sprintf(TitlePort, ">%.18s", (buf + now));
-		ItemPort.State = WINDOW_STATE::REGULAR;
 	} else {
 		strcpy(TitlePort, ">");
-		ItemPort.State = WINDOW_STATE::DISABLED;
 	}
+	EnumFlagSet(ItemPort.Flags, WINDOW_FLAGS::DISABLED, !maybe_dev);
 	const auto fixes = !!(ConfigDat.MidFlags.v & MID_FLAGS::FIX_SYSEX_BUGS);
 
 	sprintf(TitleFixes, "SC88ProFXCompat%s", CHOICE_OFF_ON_NARROW[fixes]);

@@ -93,7 +93,7 @@ uint8_t WINDOW_MENU::MaxItems() const
 
 void WINDOW_CHOICE::SetActive(bool active)
 {
-	State = (active ? WINDOW_STATE::REGULAR : WINDOW_STATE::DISABLED);
+	EnumFlagSet(Flags, WINDOW_FLAGS::DISABLED, !active);
 }
 
 void WINDOW_SYSTEM::Init(PIXEL_COORD w)
@@ -168,19 +168,42 @@ void CWinMove(WINDOW_SYSTEM *ws)
 	ws->Count++;
 }
 
-// コマンドウィンドウの描画 //
-void CWinDraw(WINDOW_SYSTEM *ws)
+void CWinDrawLabel(
+	TEXTRENDER_SESSION& s, const WINDOW_LABEL& label, bool is_title
+)
 {
 	struct COLOR_PAIR {
 		RGB shadow;
 		RGB text;
 	};
 
-	static constexpr ENUMARRAY<COLOR_PAIR, WINDOW_STATE> COL = {{
-		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255, 255 } }, // Regular
-		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255,  70 } }, // Highlight
-		COLOR_PAIR{ {  96,  96,  96 }, { 192, 192, 192 } }, // Disabled
-	}};
+	static constexpr COLOR_PAIR COL[2][2] = {
+		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255, 255 } }, // Active, regular
+		COLOR_PAIR{ { 128, 128, 128 }, { 255, 255,  70 } }, // Active, HL
+		COLOR_PAIR{ {  96,  96,  96 }, { 192, 192, 192 } }, // Disabled, regular
+		COLOR_PAIR{ {  96,  96,  96 }, { 192, 192,  70 } }, // Disabled, HL
+	};
+
+	const auto disabled = !!(label.Flags & WINDOW_FLAGS::DISABLED);
+	const auto highlight = !!(label.Flags & WINDOW_FLAGS::HIGHLIGHT);
+	const auto& col = COL[disabled][highlight];
+	s.SetFont(CWIN_FONT);
+
+	// Adding CWIN_ITEM_LEFT to centered text would throw it off-center,
+	// obviously. Also, non-centered titles that don't start with spaces
+	// shouldn't be dedented relative to the menu items.
+	const auto starts_with_space = (label.Title.ptr && (*label.Title.ptr == ' '));
+	const auto left = (!!(label.Flags & WINDOW_FLAGS::CENTER)
+		? TextLayoutXCenter(s, label.Title)
+		: ((is_title && starts_with_space) ? 0 : CWIN_ITEM_LEFT)
+	);
+	s.Put({ (left + 1), 0 }, label.Title, col.shadow);
+	s.Put({ (left + 0), 0 }, label.Title, col.text);
+}
+
+// コマンドウィンドウの描画 //
+void CWinDraw(WINDOW_SYSTEM *ws)
+{
 	int				i;
 	WINDOW_COORD	top = ws->y;
 
@@ -217,42 +240,21 @@ void CWinDraw(WINDOW_SYSTEM *ws)
 	const auto trr = ws->TRRs[0];
 	const Narrow::string_view str = p->Title->Title;
 	TextObj.Render(topleft, trr, str, [=](TEXTRENDER_SESSION& s) {
-		const auto& col = COL[WINDOW_STATE::REGULAR];
-		s.SetFont(CWIN_FONT);
-
-		// Non-centered titles that don't start with spaces shouldn't be
-		// dedented relative to the menu items.
-		const auto left = (!!(p->Title->Flags & WINDOW_FLAGS::CENTER)
-			? TextLayoutXCenter(s, str)
-			: (str.starts_with(' ') ? 0 : CWIN_ITEM_LEFT)
-		);
-		s.Put({ (left + 1), 0 }, str, col.shadow);
-		s.Put({ (left + 0), 0 }, str, col.text);
+		CWinDrawLabel(s, *p->Title, true);
 	});
 	topleft.y += (CWIN_ITEM_H + 1); // ???
 
 	for(i = 0; i < p->NumItems; i++) {
 		const auto trr = ws->TRRs[1 + i];
 		auto* item = p->ItemPtr[i];
-		const Narrow::string_view str = item->Title;
-		const Narrow::string_view c = ((item->State == item->StatePrev)
-			? str
+		const Narrow::string_view c = ((item->Flags == item->FlagsPrev)
+			? item->Title
 			: ""
 		);
 		TextObj.Render(topleft, trr, c, [=](TEXTRENDER_SESSION& s) {
-			const auto& col = COL[item->State];
-			s.SetFont(CWIN_FONT);
-
-			// Adding CWIN_ITEM_LEFT to centered text would throw it off-center,
-			// obviously.
-			const auto left = (!!(item->Flags & WINDOW_FLAGS::CENTER)
-				? TextLayoutXCenter(s, str)
-				: CWIN_ITEM_LEFT
-			);
-			s.Put({ (left + 1), 0 }, str, col.shadow);
-			s.Put({ (left + 0), 0 }, str, col.text);
+			CWinDrawLabel(s, *item, false);
 		});
-		item->StatePrev = item->State;
+		item->FlagsPrev = item->Flags;
 		topleft.y += CWIN_ITEM_H;
 	}
 }
@@ -626,9 +628,6 @@ static WINDOW_MENU *CWinSearchActive(WINDOW_SYSTEM *ws)
 // キーボード入力を処理する //
 static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 {
-	using STATE = WINDOW_STATE;
-	using FLAGS = WINDOW_FLAGS;
-
 	if(ws->FirstWait){
 		if(Key_Data) {
 			return;
@@ -649,7 +648,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	auto Depth = ws->SelectDepth;
 
 	// In case the item just disabled itself...
-	while(p->ItemPtr[ws->Select[Depth]]->State == STATE::DISABLED) {
+	while(!!(p->ItemPtr[ws->Select[Depth]]->Flags & WINDOW_FLAGS::DISABLED)) {
 		ws->Select[Depth] = ((ws->Select[Depth] + 1) % p->NumItems);
 	}
 
@@ -664,7 +663,8 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 		}
 		return;
 	} else if(
-		!!(p2->Flags & FLAGS::FAST_REPEAT) && Input_OptionKeyDelta(ws->OldKey)
+		!!(p2->Flags & WINDOW_FLAGS::FAST_REPEAT) &&
+		Input_OptionKeyDelta(ws->OldKey)
 	) {
 		ws->KeyCount = ws->FastRepeatWait;
 		ws->FastRepeatWait = (std::max)((ws->FastRepeatWait - 2), 0);
@@ -694,7 +694,7 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 	) {
 		do {
 			cur = ((cur + menu.NumItems + direction) % menu.NumItems);
-		} while(menu.ItemPtr[cur]->State == STATE::DISABLED);
+		} while(!!(menu.ItemPtr[cur]->Flags & WINDOW_FLAGS::DISABLED));
 		return cur;
 	};
 

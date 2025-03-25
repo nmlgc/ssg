@@ -224,6 +224,9 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		return false;
 	}
 	defer(surf->Unlock(nullptr));
+	if(!desc.lpSurface) {
+		return false;
+	}
 
 	const uint16_t bpp = desc.ddpfPixelFormat.dwRGBBitCount;
 	const PIXEL_SIZE_BASE<unsigned int> size = {
@@ -243,7 +246,18 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		DebugOut(u8"Backbuffer format not supported for screenshots");
 		return false;
 	}
-	return Grp_ScreenshotSave(size, maybe_format.value(), palette, pixels);
+
+	// DxWnd might return BGRA8888 in 32-bit mode but leave the alpha channel
+	// mostly at 0x00 (except for the Direct3D-rendered parts, which receive a
+	// value lower than 0xFF). Checking the alpha value at (0, 0) should be
+	// enough to detect this.
+	auto format = maybe_format.value();
+	const auto *first_pixel = static_cast<const BGRA *>(desc.lpSurface);
+	if((format.format == PIXELFORMAT::BGRA8888) && (first_pixel->a != 0xFF)) {
+		format = { PIXELFORMAT::BGRX8888 };
+	}
+
+	return Grp_ScreenshotSave(size, format, palette, pixels);
 }
 
 

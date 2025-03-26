@@ -721,6 +721,10 @@ static void CWinKeyEvent(WINDOW_SYSTEM *ws)
 				return true;
 			}
 
+			// The item text may need to change while the cursor is on a
+			// non-option item...
+			p->SetItems(false);
+
 			return p2->CallBackFn(Key_Data);
 		})();
 		if(ret == false) {

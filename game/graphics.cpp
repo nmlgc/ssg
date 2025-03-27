@@ -58,6 +58,7 @@ using NUM_TYPE = unsigned int;
 
 static NUM_TYPE ScreenshotNum = 0;
 static std::u8string ScreenshotBuf;
+static std::filesystem::path ScreenshotPath;
 
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 {
@@ -65,6 +66,8 @@ void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 	ScreenshotBuf.resize_and_overwrite(cap, [&](auto *p, size_t) {
 		return (std::ranges::copy(prefix, p).out - p);
 	});
+	ScreenshotPath = ScreenshotBuf;
+	ScreenshotPath.remove_filename();
 }
 
 // Increments the screenshot number to the next file with the given extension
@@ -74,6 +77,14 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 )
 {
 	if(ScreenshotBuf.size() == 0) {
+		return nullptr;
+	}
+
+	// Users might delete the directory while the game is running, after all.
+	std::error_code ec;
+	std::filesystem::create_directory(ScreenshotPath, ec);
+	if(ec) {
+		ScreenshotBuf.clear();
 		return nullptr;
 	}
 

@@ -53,6 +53,15 @@
 	<content_rating type="oars-1.1" />
 
 	<releases>
+		<release version="P0309" date="2025-04-03">
+			<description><ul>
+				<li>Optional screenshot compression using lossless WebP, with a configurable size/speed tradeoff</li>
+				<li>Screenshots are now placed into a <code>screenshots/</code> subdirectory within the game data folder, without the <code>秋霜</code> prefix</li>
+				<li>Build tag in the bottom-right corner of the main menu</li>
+				<li>Fixed various window position bugs</li>
+				<li>Fixed vanishing Music Room and in-game music title text after using hotkeys</li>
+			</ul></description>
+		</release>
 		<release version="P0303-1" date="2025-01-23">
 			<description>
 				<p>Fixed controller support for the Flatpak release</p>

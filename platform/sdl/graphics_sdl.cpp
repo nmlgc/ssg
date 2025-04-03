@@ -75,7 +75,8 @@ SDL_Surface *SoftwareSurface = nullptr;
 SDL_Texture *SoftwareTexture = nullptr;
 // -----------------
 
-SDL_Renderer *Renderer = nullptr;
+// Either [PrimaryRenderer] or [SoftwareRenderer].
+SDL_Renderer **Renderer = &PrimaryRenderer;
 
 // Storing their associated renderer (primary or software) in the user data.
 ENUMARRAY<SDL_Texture *, SURFACE_ID> Textures;
@@ -185,10 +186,10 @@ std::span<const SDL_COLOR> HelpColorsFrom(VERTEX_RGBA_SPAN<> sp)
 	return { std::bit_cast<const SDL_COLOR *>(sp.data()), sp.size() };
 }
 
-SDL_Texture *TexturePostInit(SDL_Texture& tex)
+SDL_Texture *TexturePostInit(SDL_Texture& tex, SDL_Renderer *renderer)
 {
 #ifdef SDL2
-	SDL_SetTextureUserData(&tex, Renderer);
+	SDL_SetTextureUserData(&tex, renderer);
 #endif
 	SDL_SetTextureScaleMode(&tex, TextureScaleMode);
 	return &tex;
@@ -248,7 +249,7 @@ bool SetRenderTargetFor(const SDL_Renderer *renderer)
 	return true;
 }
 
-void SwitchActiveRenderer(SDL_Renderer *new_renderer)
+void SwitchActiveRenderer(SDL_Renderer **new_renderer)
 {
 	for(auto& tex : Textures) {
 		if(!tex) {
@@ -261,11 +262,11 @@ void SwitchActiveRenderer(SDL_Renderer *new_renderer)
 			SDL_GetTextureUserData(tex)
 #endif
 		);
-		if(tex && (renderer == Renderer)) {
+		if(tex && (renderer == *Renderer)) {
 			tex = SafeDestroy(SDL_DestroyTexture, tex);
 		}
 	}
-	SetRenderTargetFor(new_renderer);
+	SetRenderTargetFor(*new_renderer);
 	Renderer = new_renderer;
 }
 
@@ -480,7 +481,6 @@ std::nullopt_t PrimaryCleanup(void)
 	}
 	PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
 	PrimaryRenderer = SafeDestroy(SDL_DestroyRenderer, PrimaryRenderer);
-	Renderer = nullptr;
 
 	// On my system, switching from any Direct3D version to OpenGL sometimes
 	// breaks rendering and freezes the window on the last frame rendered by
@@ -570,7 +570,7 @@ bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 	//   target (won't be needed in SDL 3)
 	// • Stop clipping on the primary renderer!!! Its clipping region is going
 	//   to apply to the [PrimaryTexture] blit going forward!!!
-	const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ *Renderer };
+	const auto wa = SDL2_RENDER_TARGET_QUIRK_WORKAROUND{ **Renderer };
 	SDL_SetRenderTarget(PrimaryRenderer, nullptr);
 	SDL_SetRenderClipRect(PrimaryRenderer, nullptr);
 #ifdef SDL3
@@ -599,7 +599,7 @@ bool PrimarySetScale(bool geometry, const WINDOW_SIZE& scaled_res)
 	}
 
 	// We might be software-rendering.
-	if(!SetRenderTargetFor(Renderer)) {
+	if(!SetRenderTargetFor(*Renderer)) {
 		Log_Fail(LOG_CAT, "Error setting texture as render target");
 		return set_geometry();
 	}
@@ -779,7 +779,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		return PrimaryCleanup();
 	}
 
-	SwitchActiveRenderer(PrimaryRenderer);
+	SetRenderTargetFor(PrimaryRenderer);
 	APIVersions::Update(params.api);
 
 	// Ensure that the software surface uses the preferred format
@@ -935,17 +935,17 @@ void GrpBackend_Cleanup(void)
 
 void GrpBackend_Clear(uint8_t, RGB col)
 {
-	SDL_SetRenderDrawColor(Renderer, col.r, col.g, col.b, 0xFF);
-	SDL_RenderClear(Renderer);
+	SDL_SetRenderDrawColor(*Renderer, col.r, col.g, col.b, 0xFF);
+	SDL_RenderClear(*Renderer);
 }
 
 void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 {
-	if(!Renderer) {
+	if(!*Renderer) {
 		return;
 	}
 	const auto sdl_rect = HelpRectTo<SDL_Rect>(rect);
-	SDL_SetRenderClipRect(Renderer, &sdl_rect);
+	SDL_SetRenderClipRect(*Renderer, &sdl_rect);
 }
 
 PIXELFORMAT GrpBackend_PixelFormat(void)
@@ -1122,13 +1122,13 @@ bool CreateTextureWithFormat(
 	tex = SafeDestroy(SDL_DestroyTexture, tex);
 
 	tex = SDL_CreateTexture(
-		Renderer, fmt, SDL_TEXTUREACCESS_STREAMING, size.w, size.h
+		*Renderer, fmt, SDL_TEXTUREACCESS_STREAMING, size.w, size.h
 	);
 	if(!tex) {
 		Log_Fail(LOG_CAT, "Error creating blank texture");
 		return false;
 	}
-	TexturePostInit(*tex);
+	TexturePostInit(*tex, *Renderer);
 	if(HelpFailed(SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND))) {
 		Log_Fail(LOG_CAT, "Error enabling alpha blending for texture");
 		return false;
@@ -1163,12 +1163,12 @@ bool GrpSurface_Load(SURFACE_ID sid, BMP_OWNED&& bmp)
 		SDL_SetSurfaceColorKey(surf, true, key);
 	}
 
-	tex = SDL_CreateTextureFromSurface(Renderer, surf);
+	tex = SDL_CreateTextureFromSurface(*Renderer, surf);
 	if(!tex) {
 		Log_Fail(LOG_CAT, "Error loading .BMP as texture");
 		return false;
 	}
-	TexturePostInit(*tex);
+	TexturePostInit(*tex, *Renderer);
 	return true;
 }
 
@@ -1237,9 +1237,9 @@ bool GrpSurface_Blit(
 		.h = static_cast<float>(rect_src.h),
 	};
 #ifdef SDL3
-	return SDL_RenderTexture(Renderer, tex, &rect_src, &rect_dst);
+	return SDL_RenderTexture(*Renderer, tex, &rect_src, &rect_dst);
 #else
-	return (SDL_RenderCopyF(Renderer, tex, &rect_src, &rect_dst) == 0);
+	return (SDL_RenderCopyF(*Renderer, tex, &rect_src, &rect_dst) == 0);
 #endif
 }
 
@@ -1398,7 +1398,7 @@ void DrawGeometry(
 
 	// Work around SDL's weird -0.5f offset...
 	float offset_x, offset_y;
-	SDL_GetRenderScale(Renderer, &offset_x, &offset_y);
+	SDL_GetRenderScale(*Renderer, &offset_x, &offset_y);
 	offset_x = (1.0f / (2.0f * offset_x));
 	offset_y = (1.0f / (2.0f * offset_y));
 	auto sdl = std::begin(sdl_vertices);
@@ -1407,7 +1407,7 @@ void DrawGeometry(
 	}
 
 	SDL_RenderGeometryRaw(
-		Renderer,
+		*Renderer,
 		nullptr,
 		&sdl_vertices[0].x,
 		sizeof(SDL_FPoint),
@@ -1424,11 +1424,11 @@ void DrawGeometry(
 
 static void DrawWithAlpha(auto func)
 {
-	SDL_SetRenderDrawBlendMode(Renderer, AlphaMode);
-	SDL_SetRenderDrawColor(Renderer, Col.r, Col.g, Col.b, Col.a);
+	SDL_SetRenderDrawBlendMode(*Renderer, AlphaMode);
+	SDL_SetRenderDrawColor(*Renderer, Col.r, Col.g, Col.b, Col.a);
 	func();
-	SDL_SetRenderDrawColor(Renderer, Col.r, Col.g, Col.b, 0xFF);
-	SDL_SetRenderDrawBlendMode(Renderer, SDL_BLENDMODE_NONE);
+	SDL_SetRenderDrawColor(*Renderer, Col.r, Col.g, Col.b, 0xFF);
+	SDL_SetRenderDrawBlendMode(*Renderer, SDL_BLENDMODE_NONE);
 }
 
 GRAPHICS_GEOMETRY_SDL *GrpGeom_Poly(void)
@@ -1447,7 +1447,7 @@ void GRAPHICS_GEOMETRY_SDL::SetColor(RGB216 col)
 	Col.r = rgb.r;
 	Col.g = rgb.g;
 	Col.b = rgb.b;
-	SDL_SetRenderDrawColor(Renderer, Col.r, Col.g, Col.b, 0xFF);
+	SDL_SetRenderDrawColor(*Renderer, Col.r, Col.g, Col.b, 0xFF);
 }
 
 void GRAPHICS_GEOMETRY_SDL::SetAlphaNorm(uint8_t a)
@@ -1464,7 +1464,7 @@ void GRAPHICS_GEOMETRY_SDL::SetAlphaOne(void)
 
 void GRAPHICS_GEOMETRY_SDL::DrawLine(int x1, int y1, int x2, int y2)
 {
-	SDL_RenderLine(Renderer, x1, y1, x2, y2);
+	SDL_RenderLine(*Renderer, x1, y1, x2, y2);
 }
 
 void GRAPHICS_GEOMETRY_SDL::DrawBox(int x1, int y1, int x2, int y2)
@@ -1475,7 +1475,7 @@ void GRAPHICS_GEOMETRY_SDL::DrawBox(int x1, int y1, int x2, int y2)
 		.w = static_cast<float>(x2 - x1),
 		.h = static_cast<float>(y2 - y1),
 	};
-	SDL_RenderFillRect(Renderer, &rect);
+	SDL_RenderFillRect(*Renderer, &rect);
 }
 
 void GRAPHICS_GEOMETRY_SDL::DrawBoxA(int x1, int y1, int x2, int y2)
@@ -1491,7 +1491,7 @@ void GRAPHICS_GEOMETRY_SDL::DrawTriangleFan(VERTEX_XY_SPAN<> xys)
 void GRAPHICS_GEOMETRY_SDL::DrawLineStrip(VERTEX_XY_SPAN<> xys)
 {
 	const auto points = HelpFPointsFrom(xys);
-	SDL_RenderLines(Renderer, points.data(), points.size());
+	SDL_RenderLines(*Renderer, points.data(), points.size());
 }
 
 void GRAPHICS_GEOMETRY_SDL::DrawTriangles(
@@ -1557,13 +1557,13 @@ bool GrpBackend_PixelAccessStart(void)
 		Log_Fail(LOG_CAT, "Error creating software rendering texture");
 		return DestroySoftwareRenderer();
 	}
-	TexturePostInit(*SoftwareTexture);
+	TexturePostInit(*SoftwareTexture, PrimaryRenderer);
 	SoftwareRenderer = SDL_CreateSoftwareRenderer(SoftwareSurface);
 	if(!SoftwareRenderer) {
 		Log_Fail(LOG_CAT, "Error creating software renderer");
 		return DestroySoftwareRenderer();
 	}
-	SwitchActiveRenderer(SoftwareRenderer);
+	SwitchActiveRenderer(&SoftwareRenderer);
 	return true;
 }
 
@@ -1572,7 +1572,7 @@ bool GrpBackend_PixelAccessEnd(void)
 	if(!SoftwareRenderer) {
 		return true;
 	}
-	SwitchActiveRenderer(PrimaryRenderer);
+	SwitchActiveRenderer(&PrimaryRenderer);
 	DestroySoftwareRenderer();
 	return true;
 }

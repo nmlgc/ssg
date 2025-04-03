@@ -73,6 +73,8 @@ SDL_Surface *SoftwareSurface = nullptr;
 // Not to be confused with [PrimaryTexture], which is a render target, not a
 // streaming texture.
 SDL_Texture *SoftwareTexture = nullptr;
+
+static SDL_Texture *EnsureSoftwareTexture(void);
 // -----------------
 
 // Either [PrimaryRenderer] or [SoftwareRenderer].
@@ -479,6 +481,7 @@ std::nullopt_t PrimaryCleanup(void)
 	for(auto& tex : Textures) {
 		tex = SafeDestroy(SDL_DestroyTexture, tex);
 	}
+	SoftwareTexture = SafeDestroy(SDL_DestroyTexture, SoftwareTexture);
 	PrimaryTexture = SafeDestroy(SDL_DestroyTexture, PrimaryTexture);
 	PrimaryRenderer = SafeDestroy(SDL_DestroyRenderer, PrimaryRenderer);
 
@@ -1072,15 +1075,16 @@ void GrpBackend_Flip(std::unique_ptr<FILE_STREAM_WRITE> screenshot_stream)
 		if(SDL_MUSTLOCK(SoftwareSurface)) {
 			SDL_LockSurface(SoftwareSurface);
 		}
-		SDL_UpdateTexture(
-			SoftwareTexture,
-			nullptr,
-			SoftwareSurface->pixels,
-			SoftwareSurface->pitch
-		);
-		if(SDL_MUSTLOCK(SoftwareSurface)) {
+		defer(if(SDL_MUSTLOCK(SoftwareSurface)) {
 			SDL_UnlockSurface(SoftwareSurface);
+		});
+		auto *tex = EnsureSoftwareTexture();
+		if(!tex) {
+			return;
 		}
+		SDL_UpdateTexture(
+			tex, nullptr, SoftwareSurface->pixels, SoftwareSurface->pitch
+		);
 		SDL_RenderTexture(PrimaryRenderer, SoftwareTexture, nullptr, nullptr);
 		SDL_RenderPresent(PrimaryRenderer);
 	} else if(PrimaryTexture) {
@@ -1541,10 +1545,10 @@ void GRAPHICS_GEOMETRY_SDL::DrawHLine(int, int, int) {}
 /// Software rendering with pixel access
 /// ------------------------------------
 
-bool GrpBackend_PixelAccessStart(void)
+static SDL_Texture *EnsureSoftwareTexture(void)
 {
-	if(SoftwareRenderer) {
-		return true;
+	if(SoftwareTexture) {
+		return SoftwareTexture;
 	}
 	SoftwareTexture = SDL_CreateTexture(
 		PrimaryRenderer,
@@ -1555,16 +1559,25 @@ bool GrpBackend_PixelAccessStart(void)
 	);
 	if(!SoftwareTexture) {
 		Log_Fail(LOG_CAT, "Error creating software rendering texture");
-		return DestroySoftwareRenderer();
+		DestroySoftwareRenderer();
+		return nullptr;
 	}
 	TexturePostInit(*SoftwareTexture, PrimaryRenderer);
+	return SoftwareTexture;
+}
+
+bool GrpBackend_PixelAccessStart(void)
+{
+	if(SoftwareRenderer) {
+		return true;
+	}
 	SoftwareRenderer = SDL_CreateSoftwareRenderer(SoftwareSurface);
 	if(!SoftwareRenderer) {
 		Log_Fail(LOG_CAT, "Error creating software renderer");
 		return DestroySoftwareRenderer();
 	}
 	SwitchActiveRenderer(&SoftwareRenderer);
-	return true;
+	return (EnsureSoftwareTexture() != nullptr);
 }
 
 bool GrpBackend_PixelAccessEnd(void)

@@ -194,17 +194,6 @@ SDL_Texture *TexturePostInit(SDL_Texture& tex)
 	return &tex;
 }
 
-SDL_Texture *HelpCreateTexture(
-	SDL_PixelFormat format, SDL_TextureAccess access, int w, int h
-)
-{
-	auto *ret = SDL_CreateTexture(Renderer, format, access, w, h);
-	if(!ret) {
-		return ret;
-	}
-	return TexturePostInit(*ret);
-}
-
 // In SDL 2, switching from a texture render target back to NULL not only
 // resets the renderer's viewport, clipping rectangle, and scaling settings
 // back to the last state they were in on the raw renderer, but also loses any
@@ -1132,11 +1121,14 @@ bool CreateTextureWithFormat(
 	auto& tex = Textures[sid];
 	tex = SafeDestroy(SDL_DestroyTexture, tex);
 
-	tex = HelpCreateTexture(fmt, SDL_TEXTUREACCESS_STREAMING, size.w, size.h);
+	tex = SDL_CreateTexture(
+		Renderer, fmt, SDL_TEXTUREACCESS_STREAMING, size.w, size.h
+	);
 	if(!tex) {
 		Log_Fail(LOG_CAT, "Error creating blank texture");
 		return false;
 	}
+	TexturePostInit(*tex);
 	if(HelpFailed(SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND))) {
 		Log_Fail(LOG_CAT, "Error enabling alpha blending for texture");
 		return false;
@@ -1554,7 +1546,8 @@ bool GrpBackend_PixelAccessStart(void)
 	if(SoftwareRenderer) {
 		return true;
 	}
-	SoftwareTexture = HelpCreateTexture(
+	SoftwareTexture = SDL_CreateTexture(
+		PrimaryRenderer,
 		HelpFormatFrom(SoftwareSurface),
 		SDL_TEXTUREACCESS_STREAMING,
 		SoftwareSurface->w,
@@ -1564,6 +1557,7 @@ bool GrpBackend_PixelAccessStart(void)
 		Log_Fail(LOG_CAT, "Error creating software rendering texture");
 		return DestroySoftwareRenderer();
 	}
+	TexturePostInit(*SoftwareTexture);
 	SoftwareRenderer = SDL_CreateSoftwareRenderer(SoftwareSurface);
 	if(!SoftwareRenderer) {
 		Log_Fail(LOG_CAT, "Error creating software renderer");

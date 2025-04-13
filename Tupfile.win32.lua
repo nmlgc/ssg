@@ -4,8 +4,6 @@ tup.include("libs/libwebp_lossless.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
-local XIPH_LINK = BuildXiph(CONFIG)
-
 MODERN = 0
 VINTAGE = 1
 
@@ -30,6 +28,7 @@ local function ssg(variant)
 		sdl_version = 2
 	end
 
+	local XIPH_LINK = BuildXiph(variant_cfg)
 	local SDL_LINK = BuildSDL(variant_cfg, sdl_version)
 	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
 	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(variant_cfg, variant)

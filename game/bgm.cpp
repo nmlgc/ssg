@@ -366,7 +366,9 @@ static std::filesystem::directory_iterator DataPathIterator(
 static auto BGM_PackIterator(void)
 {
 	return (DataPathIterator(BGM_ROOT) | std::views::filter([](const auto& d) {
-		return d.is_directory();
+		std::error_code ec;
+		const auto ret = d.is_directory(ec);
+		return (!ec && ret);
 	}));
 }
 

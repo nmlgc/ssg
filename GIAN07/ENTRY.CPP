@@ -55,7 +55,12 @@ std::span<const INPUT_PAD_BINDING> Key_PadBindings = PadBindings;
 
 bool XInit(void)
 {
-	std::filesystem::current_path(PathForData());
+	const auto path_data = PathForData();
+	std::error_code ec;
+	std::filesystem::current_path(path_data, ec);
+	if(ec) {
+		return false;
+	}
 
 #ifdef WIN32
 	// User data and game data directories are one and the same on Windows,
@@ -65,10 +70,8 @@ bool XInit(void)
 #else
 	using copy_opts = std::filesystem::copy_options;
 
-	auto path_data = PathForData();
-	std::error_code ec;
 	const auto opts = (copy_opts::skip_existing | copy_opts::recursive);
-	std::filesystem::copy(PATH_SKELETON, PathForData(), opts, ec);
+	std::filesystem::copy(PATH_SKELETON, path_data, opts, ec);
 #endif
 
 	DebugSetup();

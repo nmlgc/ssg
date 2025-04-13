@@ -18,6 +18,11 @@
 #include "game/input.h"
 #include "game/snd.h"
 #include "obj/platform_constants.h"
+#if (defined(WIN32) && !defined(WIN32_VINTAGE))
+extern "C" __declspec(dllimport) int __stdcall DeleteFileW(
+	const wchar_t *lpFileName
+);
+#endif
 
 // Screenshots
 // -----------
@@ -65,6 +70,52 @@ bool XInit(void)
 #ifdef WIN32
 	// User data and game data directories are one and the same on Windows,
 	// and we already ship with the skeleton in place.
+	// The release archive might have added some 0-byte binaries that we need
+	// to get rid of, though.
+	const auto remove_0_byte_binaries = ([&] {
+		constexpr PATH_STRING_VIEW EXE = _PATH(".exe");
+		constexpr PATH_STRING_VIEW DLL = _PATH(".dll");
+		const auto ext_equal = [](PATH_CODEUNIT a, PATH_CODEUNIT b) {
+			return (tolower(a) == tolower(b));
+		};
+
+		const auto opts = (
+			std::filesystem::directory_options::skip_permission_denied
+		);
+		std::filesystem::directory_iterator bin(path_data, opts, ec);
+		if(ec) {
+			return false;
+		}
+		for(const auto& d : bin) {
+			const auto is_regular = d.is_regular_file(ec);
+			if(ec || !is_regular) {
+				continue;
+			}
+			const auto size = d.file_size(ec);
+			if(ec || (size != 0)) {
+				continue;
+			}
+			const auto path = d.path();
+			const auto ext_p = path.extension();
+			const PATH_STRING_VIEW ext = ext_p.native();
+			if(
+				!std::ranges::equal(ext, EXE, ext_equal) &&
+				!std::ranges::equal(ext, DLL, ext_equal)
+			) {
+				continue;
+			}
+			// std::filesystem::remove() implements potentially delayed
+			// deletion through symlinks by using SetFileInformationByHandle()
+			// with `FILE_DISPOSITION_FLAG_DELETE`. That function is not
+			// available on Windows 9x or KernelEx, we don't need that level of
+			// certainty, and I'm planning to migrate file I/O to SDL anyway.
+			//
+			// TODO: Don't forget to remove the DeleteFileW() declaration at
+			// the top of the file.
+			DeleteFileW(path.c_str());
+		}
+		return true;
+	})();
 #elif !defined(PATH_SKELETON)
 	#pragma message("No user data skeleton directory defined. This does not matter for development builds, but package builds should set the environment variable `PATH_SKELETON` accordingly.")
 #else

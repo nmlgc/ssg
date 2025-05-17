@@ -25,15 +25,6 @@ struct {
 
 //DWORD RndBuf[RNDBUF_MAX];
 
-void DEMOPLAY_CONFIG_DATA::operator=(const CONFIG_DATA& config)
-{
-	GameLevel = config.GameLevel.v;
-	PlayerStock = config.PlayerStock.v;
-	BombStock = config.BombStock.v;
-	InputFlags = config.InputFlags.v;
-}
-
-
 
 PATH_STRING ReplayFN(uint8_t stage)
 {
@@ -56,7 +47,10 @@ void DemoplayInit(void)
 
 	DemoInfo.Exp    = Viv.exp;
 	DemoInfo.Weapon = Viv.weapon;
-	DemoInfo.CfgDat = ConfigDat;
+	DemoInfo.CfgDat.GameLevel = GameLevel;
+	DemoInfo.CfgDat.PlayerStock = Viv.left;
+	DemoInfo.CfgDat.BombStock = ConfigDat.BombStock.v;
+	DemoInfo.CfgDat.InputFlags = ConfigDat.InputFlags.v;
 
 	DemoFrameCur = 0;
 	DemoplaySaveEnable = true;

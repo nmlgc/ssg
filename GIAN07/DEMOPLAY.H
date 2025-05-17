@@ -27,8 +27,6 @@ struct DEMOPLAY_CONFIG_DATA {
 	uint8_t Padding1[5] = { 0 };
 	uint8_t InputFlags;
 	uint8_t Padding2[15] = { 0 };
-
-	void operator=(const CONFIG_DATA& config);
 };
 static_assert(sizeof(DEMOPLAY_CONFIG_DATA) == 24);
 

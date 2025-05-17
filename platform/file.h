@@ -8,6 +8,12 @@
 #include "platform/buffer.h"
 #include "platform/unicode.h"
 
+enum class FILE_FLAGS : uint8_t {
+	_HAS_BITFLAG_OPERATORS,
+	NONE = 0x0,
+	FAIL_IF_EXISTS = 0x01,
+};
+
 // Fills [buf] with the first [buf.size_bytes()] read from the file with the
 // given name, and returns the number of bytes read. Successful if the returned
 // value is equal to [buf.size_bytes()].
@@ -96,9 +102,9 @@ std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s);
 std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s);
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const PATH_LITERAL s, bool fail_if_exists = false
+	const PATH_LITERAL s, FILE_FLAGS flags = FILE_FLAGS::NONE
 );
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const char8_t* s, bool fail_if_exists = false
+	const char8_t* s, FILE_FLAGS flags = FILE_FLAGS::NONE
 );
 // -------

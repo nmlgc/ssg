@@ -7,6 +7,7 @@
 
 #include "platform/windows/utf.h"
 #include "platform/file.h"
+#include "game/enum_flags.h"
 #include <assert.h>
 #include <windows.h>
 
@@ -227,10 +228,14 @@ std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s)
 }
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const PATH_LITERAL s, bool fail_if_exists
+	const PATH_LITERAL s, FILE_FLAGS flags
 )
 {
-	auto handle = OpenWrite(s, (fail_if_exists ? CREATE_NEW : CREATE_ALWAYS));
+	const auto disposition = (!!(flags & FILE_FLAGS::FAIL_IF_EXISTS)
+		? CREATE_NEW
+		: CREATE_ALWAYS
+	);
+	auto handle = OpenWrite(s, disposition);
 	if(handle == INVALID_HANDLE_VALUE) {
 		return nullptr;
 	}
@@ -240,12 +245,12 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 }
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const char8_t* s, bool fail_if_exists
+	const char8_t* s, FILE_FLAGS flags
 )
 {
 	return UTF::WithUTF16<std::unique_ptr<FILE_STREAM_WRITE>>(
-		s, [](const std::wstring_view str_w) {
-			return FileStreamWrite(str_w.data(), true);
+		s, [flags](const std::wstring_view str_w) {
+			return FileStreamWrite(str_w.data(), flags);
 		}
 	).value_or(nullptr);
 }

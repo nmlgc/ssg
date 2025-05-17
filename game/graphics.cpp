@@ -93,7 +93,9 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 		const auto prefix_len = ScreenshotBuf.size();
 		StringCatNum<4>(ScreenshotNum++, ScreenshotBuf);
 		ScreenshotBuf += ext;
-		auto ret = FileStreamWrite(ScreenshotBuf.c_str(), true);
+		auto ret = FileStreamWrite(
+			ScreenshotBuf.c_str(), FILE_FLAGS::FAIL_IF_EXISTS
+		);
 		ScreenshotBuf.resize(prefix_len);
 		if(ret) {
 			return ret;

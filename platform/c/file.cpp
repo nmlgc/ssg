@@ -4,6 +4,7 @@
  */
 
 #include "platform/file.h"
+#include "game/enum_flags.h"
 #include <assert.h>
 #include <stdio.h> // For fileno() and the `SEEK_*` macros
 #include <sys/stat.h> // The stat types aren't part of the `std` module either
@@ -183,10 +184,11 @@ std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s)
 }
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const PATH_LITERAL s, bool fail_if_exists
+	const PATH_LITERAL s, FILE_FLAGS flags
 )
 {
-	auto* fp = fopen(s, (fail_if_exists ? "wxb" : "wb"));
+	const auto *mode = (!!(flags & FILE_FLAGS::FAIL_IF_EXISTS) ? "wxb" : "wb");
+	auto* fp = fopen(s, mode);
 	if(!fp) {
 		return nullptr;
 	}
@@ -194,11 +196,9 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 }
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const char8_t* s, bool fail_if_exists
+	const char8_t* s, FILE_FLAGS flags
 )
 {
-	return FileStreamWrite(
-		reinterpret_cast<const PATH_LITERAL>(s), fail_if_exists
-	);
+	return FileStreamWrite(std::bit_cast<const PATH_LITERAL>(s), flags);
 }
 // -------

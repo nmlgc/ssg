@@ -53,6 +53,16 @@
 	<content_rating type="oars-1.1" />
 
 	<releases>
+		<release version="P0310-1" date="2025-05-18">
+			<description>
+				<p>Fixed two replay-related bugs:</p><ul>
+					<li>Extra Stage replays recorded in ≥P0295 were highly likely to desync</li>
+					<li>≥P0217 saved twice as many replay frames as necessary</li>
+				</ul><p>
+					Watching an affected replay will now repair the desync and recompress the file. Marking the replay file as read-only bypasses both fixes.
+				</p>
+			</description>
+		</release>
 		<release version="P0309" date="2025-04-03">
 			<description><ul>
 				<li>Optional screenshot compression using lossless WebP, with a configurable size/speed tradeoff</li>

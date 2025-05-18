@@ -16,7 +16,7 @@ bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作して�
 bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作しているか
 DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
 INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
-size_t	DemoBufPtr;	// デモプレイ用バッファPtr(Ｃのそれではない)
+static uint32_t DemoFrameCur;
 struct {
 	uint8_t PlayerStock;
 	uint8_t BombStock;
@@ -58,14 +58,14 @@ void DemoplayInit(void)
 	DemoInfo.Weapon = Viv.weapon;
 	DemoInfo.CfgDat = ConfigDat;
 
-	DemoBufPtr         = 0;
+	DemoFrameCur = 0;
 	DemoplaySaveEnable = true;
 }
 
 
 bool DemoplayLoadSetup()
 {
-	DemoBufPtr = 0;
+	DemoFrameCur = 0;
 	DemoplayLoadEnable = true;
 
 	// コンフィグの初期化 //
@@ -100,11 +100,11 @@ bool DemoplayRecord(INPUT_BITS key)
 		return false;
 	}
 
-	DemoBuffer[DemoBufPtr++] = key;
+	DemoBuffer[DemoFrameCur++] = key;
 
 	// バッファが最後に来たか、ＥＳＣが押された場合 //
-	if(DemoBufPtr==DEMOBUF_MAX || (key&KEY_ESC)){
-		DemoBufPtr--;
+	if((DemoFrameCur == DEMOBUF_MAX) || (key & KEY_ESC)) {
+		DemoFrameCur--;
 		return true;
 	}
 	return false;
@@ -115,14 +115,14 @@ void DemoplaySaveDemo(void)
 {
 	if(!DemoplaySaveEnable) return;
 
-	DemoBuffer[DemoBufPtr] = KEY_ESC;
-	DemoInfo.DataSize = DemoBufPtr+1;
+	DemoBuffer[DemoFrameCur] = KEY_ESC;
+	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
 	PATH_CODEUNIT fn[] = _PATH("STG_Demo.DAT");
 	fn[3] = ('0' + GameStage);
 
 	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {
-		std::span(&DemoInfo, 1), std::span(DemoBuffer, (DemoBufPtr + 1)),
+		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
 	};
 	FileWrite(fn, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
 
@@ -143,7 +143,7 @@ bool DemoplayLoadDemo(int stage)
 		DemoInfo = maybe_info.value()[0];
 	}
 	{
-		const auto maybe_inputs = temp_cursor.next<uint16_t>(DemoInfo.DataSize);
+		const auto maybe_inputs = temp_cursor.next<uint16_t>(DemoInfo.FrameCount);
 		if(!maybe_inputs) {
 			return false;
 		}
@@ -158,11 +158,11 @@ INPUT_BITS DemoplayMove(void)
 {
 	if(!DemoplayLoadEnable) return KEY_ESC;
 
-	const auto ptr = DemoBufPtr;
-	if(ptr>=DemoInfo.DataSize){
+	const auto ptr = DemoFrameCur;
+	if(ptr>=DemoInfo.FrameCount){
 		DemoplayLoadEnable = false;
 	}
-	else DemoBufPtr++;
+	else DemoFrameCur++;
 
 	return DemoBuffer[ptr];
 }
@@ -185,10 +185,10 @@ void DemoplaySaveReplay(void)
 	// すぐさま、無効化する //
 	DemoplaySaveEnable = false;
 
-	DemoBuffer[DemoBufPtr] = KEY_ESC;
-	DemoInfo.DataSize = DemoBufPtr+1;
+	DemoBuffer[DemoFrameCur] = KEY_ESC;
+	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
-	const auto demo_size = (sizeof(INPUT_BITS) * DemoInfo.DataSize);
+	const auto demo_size = (sizeof(INPUT_BITS) * DemoInfo.FrameCount);
 	PACKFILE_WRITE out = { {
 		std::span(&DemoInfo, 1), std::span(DemoBuffer, demo_size),
 	} };
@@ -217,6 +217,6 @@ bool DemoplayLoadReplay(int stage)
 	if(NULL == temp){
 		return false;
 	}
-	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * DemoInfo.DataSize));
+	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * DemoInfo.FrameCount));
 	return DemoplayLoadSetup();
 }

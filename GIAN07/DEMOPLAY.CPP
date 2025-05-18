@@ -195,7 +195,7 @@ bool DemoplayLoadReplay(int stage)
 {
 	BYTE_BUFFER_OWNED	temp;
 
-	const auto fn = ReplayFN(GameStage);
+	const auto fn = ReplayFN(stage);
 	const auto in = FilStartR(fn.c_str());
 
 	// ヘッダの格納先は０番である //
@@ -211,5 +211,43 @@ bool DemoplayLoadReplay(int stage)
 		return false;
 	}
 	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * DemoInfo.FrameCount));
+
+	// Repair any replay-related bugs from earlier builds
+	// --------------------------------------------------
+
+	bool repair = false;
+	const auto file_level = DemoInfo.CfgDat.GameLevel;
+	const auto file_lives = DemoInfo.CfgDat.PlayerStock;
+	
+	// ≥P0295 was writing the configured difficulty and starting lives for the
+	// regular 6 stages instead of the fixed values for the Extra Stage.
+	// MODDERS: If this bug doesn't apply to you because you modded an earlier
+	// build, mark the affected files as read-only to skip this patch.
+	if(
+		(stage == GRAPH_ID_EXSTAGE) &&
+		((file_level != EXTRA_LEVEL) || (file_lives != EXTRA_LIVES))
+	) {
+		DemoInfo.CfgDat.GameLevel = EXTRA_LEVEL;
+		DemoInfo.CfgDat.PlayerStock = EXTRA_LIVES;
+		repair = true;
+	}
+
+	// ≥P0217 was writing twice as many frames as recorded.
+	if(temp.size() != (sizeof(INPUT_BITS) * DemoInfo.FrameCount)) {
+		repair = true;
+	}
+
+	if(repair) {
+		PACKFILE_WRITE out = { {
+			std::span(&DemoInfo, 1),
+			std::span(DemoBuffer, DemoInfo.FrameCount),
+		} };
+		if(!out.Write(fn.c_str(), FILE_FLAGS::PRESERVE_TIMESTAMPS)) {
+			// Repair denied by file being read-only? OK, bro, you're the boss!
+			DemoInfo.CfgDat.GameLevel = file_level;
+			DemoInfo.CfgDat.PlayerStock = file_lives;
+		}
+	}
+	// --------------------------------------------------
 	return DemoplayLoadSetup();
 }

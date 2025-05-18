@@ -211,7 +211,7 @@ BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)
 	return device.buffer;
 }
 
-bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
+bool PACKFILE_WRITE::Write(const PATH_LITERAL s, FILE_FLAGS flags) const
 {
 	PBG_FILEHEAD head = { .n = files.size() };
 	std::vector<PBG_FILEINFO> info(files.size());
@@ -224,7 +224,7 @@ bool PACKFILE_WRITE::Write(const PATH_LITERAL s) const
 		);
 	};
 
-	auto stream = FileStreamWrite(s);
+	auto stream = FileStreamWrite(s, flags);
 	if(!stream) {
 		return false;
 	}

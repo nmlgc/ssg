@@ -551,7 +551,7 @@ bool WeaponSelectInit(bool ExStg)
 	GrpBackend_Clear();
 	Grp_Flip();
 
-	GameLevel = (ExStg ? GAME_HARD : ConfigDat.GameLevel.v);
+	GameLevel = (ExStg ? EXTRA_LEVEL : ConfigDat.GameLevel.v);
 
 	GameSTD_Init();
 	PlayRankReset();
@@ -1158,7 +1158,7 @@ void WeaponSelectProc(bool&)
 			}
 			else{
 				Viv.credit = 0;
-				Viv.left   = 2;
+				Viv.left   = EXTRA_LIVES;
 				Viv.exp    = 255;
 				if(ConfigDat.StageSelect.v) {
 					DemoplayInit();

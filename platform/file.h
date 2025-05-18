@@ -12,6 +12,7 @@ enum class FILE_FLAGS : uint8_t {
 	_HAS_BITFLAG_OPERATORS,
 	NONE = 0x0,
 	FAIL_IF_EXISTS = 0x01,
+	PRESERVE_TIMESTAMPS = 0x02,
 };
 
 // Fills [buf] with the first [buf.size_bytes()] read from the file with the

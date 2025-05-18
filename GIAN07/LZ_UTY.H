@@ -6,6 +6,7 @@
 #pragma once
 
 #include "platform/buffer.h"
+#include "platform/file.h"
 #include "platform/unicode.h"
 #include "game/endian.h"
 
@@ -105,7 +106,7 @@ struct PACKFILE_READ {
 struct PACKFILE_WRITE {
 	std::vector<BYTE_BUFFER_BORROWED> files;
 
-	bool Write(const PATH_LITERAL s) const;
+	bool Write(const PATH_LITERAL s, FILE_FLAGS flags = FILE_FLAGS::NONE) const;
 };
 
 BIT_FILE_READ BitFilCreateR(const PATH_LITERAL s);

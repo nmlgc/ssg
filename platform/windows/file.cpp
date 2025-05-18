@@ -7,9 +7,15 @@
 
 #include "platform/windows/utf.h"
 #include "platform/file.h"
+#include "game/defer.h"
 #include "game/enum_flags.h"
 #include <assert.h>
 #include <windows.h>
+
+struct TIMESTAMPS {
+	FILETIME ctime;
+	FILETIME mtime;
+};
 
 static HANDLE OpenRead(const PATH_LITERAL s)
 {
@@ -26,7 +32,11 @@ static HANDLE OpenRead(const PATH_LITERAL s)
 
 static HANDLE OpenWrite(const PATH_LITERAL s, DWORD disposition)
 {
-	return CreateFileW(s, GENERIC_WRITE, 0, nullptr, disposition, 0, nullptr);
+	// Use `FILE_GENERIC_WRITE` instead of `GENERIC_WRITE` to ensure that we
+	// can write attributes.
+	return CreateFileW(
+		s, FILE_GENERIC_WRITE, 0, nullptr, disposition, 0, nullptr
+	);
 }
 
 static size_t HandleRead(std::span<uint8_t> buf, HANDLE handle)
@@ -161,14 +171,21 @@ bool FileAppend(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 
 struct FILE_STREAM_WIN32 : public FILE_STREAM_READ, FILE_STREAM_WRITE {
 	HANDLE handle;
+	std::optional<TIMESTAMPS> maybe_timestamps;
 
 public:
-	FILE_STREAM_WIN32(HANDLE handle) :
-		handle(handle) {
+	FILE_STREAM_WIN32(
+		HANDLE handle,
+		std::optional<TIMESTAMPS> maybe_timestamps = std::nullopt
+	) : handle(handle), maybe_timestamps(maybe_timestamps) {
 		assert(handle != INVALID_HANDLE_VALUE);
 	}
 
 	~FILE_STREAM_WIN32() {
+		if(maybe_timestamps) {
+			const auto& timestamps = maybe_timestamps.value();
+			SetFileTime(handle, &timestamps.ctime, nullptr, &timestamps.mtime);
+		}
 		CloseHandle(handle);
 	}
 
@@ -231,6 +248,22 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, FILE_FLAGS flags
 )
 {
+	const auto maybe_timestamps = ([&] -> std::optional<TIMESTAMPS> {
+		if(!(flags & FILE_FLAGS::PRESERVE_TIMESTAMPS)) {
+			return std::nullopt;
+		}
+		auto handle = OpenRead(s);
+		if(handle == INVALID_HANDLE_VALUE) {
+			return std::nullopt;
+		}
+		defer(CloseHandle(handle));
+		TIMESTAMPS ret;
+		if(!GetFileTime(handle, &ret.ctime, nullptr, &ret.mtime)) {
+			return std::nullopt;
+		}
+		return ret;
+	})();
+
 	const auto disposition = (!!(flags & FILE_FLAGS::FAIL_IF_EXISTS)
 		? CREATE_NEW
 		: CREATE_ALWAYS
@@ -240,7 +273,7 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 		return nullptr;
 	}
 	return std::unique_ptr<FILE_STREAM_WIN32>(
-		new (std::nothrow) FILE_STREAM_WIN32(handle)
+		new (std::nothrow) FILE_STREAM_WIN32(handle, maybe_timestamps)
 	);
 }
 

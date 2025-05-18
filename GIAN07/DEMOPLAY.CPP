@@ -188,9 +188,8 @@ void DemoplaySaveReplay(void)
 	DemoBuffer[DemoFrameCur] = KEY_ESC;
 	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
-	const auto demo_size = (sizeof(INPUT_BITS) * DemoInfo.FrameCount);
 	PACKFILE_WRITE out = { {
-		std::span(&DemoInfo, 1), std::span(DemoBuffer, demo_size),
+		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
 	} };
 
 	const auto fn = ReplayFN(GameStage);

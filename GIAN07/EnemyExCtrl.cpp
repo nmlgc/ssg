@@ -408,7 +408,7 @@ static void BitSTDRoll(void)
 		const uint8_t d = ((BitData.BaseAngle >> 1) + (delta * bit->BitID));
 
 		// 通常の角度収束処理 //
-		dir = (Cast::sign<int8_t>(d) - Cast::sign<int8_t>(bit->Angle));
+		dir = (Cast::up_sign<int>(d) - Cast::up_sign<int>(bit->Angle));
 
 		if(     dir < -128) dir += 256;
 		else if(dir >  128) dir -= 256;

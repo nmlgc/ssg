@@ -53,6 +53,11 @@
 	<content_rating type="oars-1.1" />
 
 	<releases>
+		<release version="P0310-2" date="2025-08-12">
+			<description>
+				<p>⚠️ Fixed a gameplay-forking bug in the rotation calculation of Marisa's bits, introduced in P0295. In rare cases, the now restored original behavior might invalidate and desync Extra Stage replays recorded on ≥P0295 and ≤P0310-1.</p>
+			</description>
+		</release>
 		<release version="P0310-1" date="2025-05-18">
 			<description>
 				<p>Fixed two replay-related bugs:</p><ul>

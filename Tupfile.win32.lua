@@ -40,7 +40,6 @@ local function ssg(variant)
 			lflags = "/MANIFEST:NO" -- Saves 512 to 1024 bytes!
 		})
 		variant_bin_suffix = "_win98"
-		sdl_version = 2
 	end
 
 	local XIPH_LINK = BuildXiph(variant_cfg)

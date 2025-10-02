@@ -24,11 +24,16 @@ function BuildSDL(base_cfg, version, bin_suffix)
 			"oleaut32.lib",
 			"setupapi.lib",
 			"user32.lib",
+			"uuid.lib",
 			"version.lib",
 			"winmm.lib",
 		},
 		objdir = (name .. "/"),
 	}
+	if ((version == 3) and not modern) then
+		compile.cflags += "/GS-"
+		compile.lflags += "/NODEFAULTLIB"
+	end
 	if ((version == 2) and modern) then
 		compile.lflags.debug = "ucrtd.lib"
 		compile.lflags.release = "ucrt.lib"
@@ -101,8 +106,12 @@ function BuildSDL(base_cfg, version, bin_suffix)
 	end
  	src += SDL.glob("src/render/software/*.c")
 	src += SDL.glob("src/sensor/*.c")
-	src += SDL.glob("src/sensor/windows/*.c")
-	src += (SDL.glob("src/stdlib/*.c") - { "SDL_mslibc.c$" })
+	if modern then
+		src += SDL.glob("src/sensor/windows/*.c")
+	else
+		src += SDL.glob("src/sensor/dummy/*.c")
+	end
+	src += (SDL.glob("src/stdlib/*.c") - { "SDL_mem.+.c$", "SDL_mslibc.c$" })
 	src += SDL.glob("src/thread/*.c")
 	src += SDL.glob("src/thread/windows/*.c")
 	src += SDL.glob("src/timer/*.c")
@@ -164,9 +173,12 @@ function BuildSDL(base_cfg, version, bin_suffix)
 	local mslibc_cfg = cfg:branch(
 		{ cflags = { release = flag_remove("/GL") } }
 	)
+	local mslibc_src
+	mslibc_src += SDL.glob("src/stdlib/SDL_mem*.c")
+	mslibc_src += SDL.join("src/stdlib/SDL_mslibc.c")
 	local obj = (
 		cfg:cc(src) +
-		mslibc_cfg:cc(SDL.join("src/stdlib/SDL_mslibc.c")) +
+		mslibc_cfg:cc(mslibc_src) +
 		cfg:rc(version_rc)
 	)
 

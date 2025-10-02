@@ -6,6 +6,7 @@
 [submodule "libs/SDL3"]
 	path = libs/SDL3
 	url = https://github.com/nmlgc/SDL
+	branch = SDL3_win9x
 	shallow = true
 [submodule "libs/miniaudio"]
 	path = libs/miniaudio

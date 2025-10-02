@@ -17,7 +17,14 @@ local function ssg(variant)
 	local variant_cfg
 	local variant_bin_suffix = ""
 	if (variant == MODERN) then
-		variant_cfg = CONFIG:branch({ objdir = "modern/" })
+		variant_cfg = CONFIG:branch({
+			cflags = {
+				-- WebP only uses multithreading for effort levels 8 and 9,
+				-- where it does significantly boost performance.
+				"-DWEBP_USE_THREAD",
+			},
+			objdir = "modern/"
+		})
 	elseif (variant == VINTAGE) then
 		variant_cfg = CONFIG:branch({
 			cflags = {

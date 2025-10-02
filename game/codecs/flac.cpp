@@ -55,11 +55,32 @@ template <CB_DATA CB> static drflac_bool32 CB_FLAC_Seek(
 )
 {
 	auto& stream = static_cast<CB *>(user_data)->stream();
-	const auto whence = ((origin == drflac_seek_origin_start)
-		? SEEK_WHENCE::BEGIN
-		: SEEK_WHENCE::CURRENT
+	static_assert(
+		std::to_underlying(DRFLAC_SEEK_SET) ==
+		std::to_underlying(SEEK_WHENCE::BEGIN)
 	);
-	return stream.Seek(offset, whence);
+	static_assert(
+		std::to_underlying(DRFLAC_SEEK_CUR) ==
+		std::to_underlying(SEEK_WHENCE::CURRENT)
+	);
+	static_assert(
+		std::to_underlying(DRFLAC_SEEK_END) ==
+		std::to_underlying(SEEK_WHENCE::END)
+	);
+	return stream.Seek(offset, static_cast<SEEK_WHENCE>(origin));
+}
+
+template <CB_DATA CB> static drflac_bool32 CB_FLAC_Tell(
+	void* user_data, drflac_int64 *cursor
+)
+{
+	auto& stream = static_cast<CB *>(user_data)->stream();
+	const auto ret = stream.Tell();
+	if(!cursor || !ret) {
+		return DRFLAC_FALSE;
+	}
+	*cursor = ret.value();
+	return DRFLAC_TRUE;
 }
 
 #pragma warning(suppress: 26461) // con.3
@@ -133,6 +154,7 @@ std::unique_ptr<PCM_PART> FLAC_Open(
 		auto* ff = drflac_open_with_metadata(
 			CB_FLAC_Read<CB_DATA_STREAM_AND_METADATA>,
 			CB_FLAC_Seek<CB_DATA_STREAM_AND_METADATA>,
+			CB_FLAC_Tell<CB_DATA_STREAM_AND_METADATA>,
 			CB_FLAC_Meta,
 			&data,
 			nullptr
@@ -149,6 +171,7 @@ std::unique_ptr<PCM_PART> FLAC_Open(
 	auto* ff = drflac_open(
 		CB_FLAC_Read<CB_DATA_STREAM>,
 		CB_FLAC_Seek<CB_DATA_STREAM>,
+		CB_FLAC_Tell<CB_DATA_STREAM>,
 		&stream,
 		nullptr
 	);

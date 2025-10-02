@@ -25,7 +25,7 @@ echo "[updater]
 	libs/miniaudio \
 	|| exit 1
 
-. ./libs/tupblocks/pkg_config_env.sh
+. ./libs/tupblocks/tupblocks.sh
 
 # Libraries that are supposed to be installed through the system's package
 # manager

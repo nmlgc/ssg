@@ -14,10 +14,6 @@ function BuildLibWebPLosslessEncode(base_cfg, generic)
 			"-DWEBP_DISABLE_STATS",
 			"-DWEBP_NEAR_LOSSLESS=0", -- We want actual lossless, not "near"
 			"-DWEBP_REDUCE_SIZE",
-
-			-- WebP only uses multithreading for effort levels 8 and 9, where
-			-- it does significantly boost performance.
-			"-DWEBP_USE_THREAD",
 		},
 		objdir = "libwebp/",
 	})

@@ -4,16 +4,12 @@
  */
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
-#ifdef SDL3
 #include <SDL3/SDL_filesystem.h>
-#else
-#include <SDL_filesystem.h>
-#endif
 
 #include "platform/path.h"
 #include "constants.h"
 
-#if (!defined(WIN32) || !defined(SDL3))
+#ifndef WIN32
 	constexpr auto SDL_free_deleter = [](auto* p) { SDL_free(p); };
 	static std::unique_ptr<char8_t[], decltype(SDL_free_deleter)> PathData = {
 		nullptr
@@ -27,12 +23,7 @@ std::u8string_view PathForData(void)
 		return PathDataView;
 	}
 #ifdef WIN32
-#ifdef SDL3
 	PathDataView = std::bit_cast<const char8_t *>(SDL_GetBasePath());
-#else
-	PathData.reset(std::bit_cast<char8_t *>(SDL_GetBasePath()));
-	PathDataView = PathData.get();
-#endif
 #else
 #ifdef PATH_XDG_DATA_HOME_HAS_APP_ID
 	auto* path_base = SDL_GetPrefPath(nullptr, "");

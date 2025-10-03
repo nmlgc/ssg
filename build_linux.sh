@@ -1,12 +1,5 @@
 #!/bin/sh
 
-if [ "$#" -eq 0 ] || { [ "$1" != "sdl2" ] && [ "$1" != "sdl3" ]; }; then
-	>&2 echo "Usage: $0 sdl2|sdl3 [tup-targets...]"
-	exit 1
-fi
-export SDL="$1"
-shift
-
 ./version_from_git.sh
 
 # We can't commit this file directly because Tup's database initialization
@@ -30,7 +23,7 @@ echo "[updater]
 # Libraries that are supposed to be installed through the system's package
 # manager
 pkg_config_env_required \
-	"$SDL" \
+	sdl3 \
 	fontconfig \
 	libwebp \
 	ogg \

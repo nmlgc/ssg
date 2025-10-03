@@ -105,17 +105,13 @@ constexpr int SND_X_MID = PixelToWorld(320);
 constexpr int SND_X_PER_DECIBEL = PixelToWorld(25);
 // -----------------------------------------------------------
 
-// OpenGL is either *the* best or close to the best choice everywhere when it
-// comes to performance (at least on SDL 2, which doesn't batch draw calls by
-// default):
+// At least on Windows, SDL 3's default graphics API (Direct3D 11) also appears
+// to be the most performant choice:
 //
-// 	https://rec98.nmlgc.net/blog/2024-10-22#benchmark-2024-10-22
+// 	https://rec98.nmlgc.net/blog/2025-04-09#sdl3-2025-04-09
 //
-// Yes, this means that SDL 2 users have to manually pick any of the Direct3D
-// APIs to get accurate line drawing, but great performance on everything out
-// of the box is more important.
-#ifdef SDL3
+// Hence, Windows builds also get pixel-perfect line rendering compared to
+// pbg's original build by default:
+//
+// 	https://rec98.nmlgc.net/blog/2024-10-22#lines-2024-10-22
 constexpr const char8_t *GRP_SDL_DEFAULT_API = nullptr;
-#else
-constexpr const char8_t *GRP_SDL_DEFAULT_API = u8"opengl";
-#endif

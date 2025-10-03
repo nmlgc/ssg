@@ -13,7 +13,6 @@ local ssg_ico = CONFIG:rc(SSG.join("GIAN07/GIAN07.rc"))
 
 ---@param variant integer
 local function ssg(variant)
-	local sdl_version = 3
 	local variant_cfg
 	local variant_bin_suffix = ""
 	if (variant == MODERN) then
@@ -43,7 +42,7 @@ local function ssg(variant)
 	end
 
 	local XIPH_LINK = BuildXiph(variant_cfg)
-	local SDL_LINK = BuildSDL(variant_cfg, sdl_version, variant_bin_suffix)
+	local SDL_LINK = BuildSDL(variant_cfg, variant_bin_suffix)
 	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
 	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(variant_cfg, variant)
 

@@ -4,19 +4,13 @@
  */
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
-#ifdef SDL3
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_joystick.h>
-#else
-#include <SDL_events.h>
-#include <SDL_joystick.h>
-#endif
-#include "platform/sdl/sdl2_wrap.h"
-#include <assert.h>
 
 #include "platform/input.h"
 #include "game/defer.h"
 #include "game/enum_flags.h"
+#include <assert.h>
 
 // Do scancodes and key modes still fit into 16 bits each?
 static_assert(SDL_SCANCODE_COUNT <= std::numeric_limits<uint16_t>::max());
@@ -101,14 +95,7 @@ template <class Bits> void Key_Flip(
 	Bits& key_data, const auto& key_or_jbutton, Bits bits
 )
 {
-	const auto down = (
-#ifdef SDL3
-		key_or_jbutton.down
-#else
-		key_or_jbutton.state
-#endif
-	);
-	if(down) {
+	if(key_or_jbutton.down) {
 		key_data |= bits;
 	} else {
 		key_data &= ~bits;
@@ -162,7 +149,6 @@ std::tuple<decltype(JOYPAD::axis_x), decltype(JOYPAD::axis_y)> Pad_GetAxisIDs(
 	}
 	defer(SDL_CloseGamepad(gamepad));
 
-#ifdef SDL3
 	int binding_count = 0;
 	auto **bindings = SDL_GetGamepadBindings(gamepad, &binding_count);
 	if(!bindings) {
@@ -183,17 +169,6 @@ std::tuple<decltype(JOYPAD::axis_x), decltype(JOYPAD::axis_y)> Pad_GetAxisIDs(
 			}
 		}
 	}
-#else
-	SDL_GameControllerButtonBind bind;
-	bind = SDL_GameControllerGetBindForAxis(gamepad, SDL_CONTROLLER_AXIS_LEFTX);
-	if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
-		axis_x = bind.value.axis;
-	}
-	bind = SDL_GameControllerGetBindForAxis(gamepad, SDL_CONTROLLER_AXIS_LEFTY);
-	if(bind.bindType == SDL_CONTROLLER_BINDTYPE_AXIS) {
-		axis_y = bind.value.axis;
-	}
-#endif
 	return { axis_x, axis_y };
 }
 
@@ -211,9 +186,6 @@ bool Key_Start(void)
 {
 	// SDL will send a SDL_EVENT_JOYSTICK_ADDED event for every joystick
 	// attached at startup.
-#ifdef SDL2
-	SDL_StopTextInput();
-#endif
 	return true;
 }
 
@@ -265,14 +237,7 @@ void Key_Read(void)
 
 			auto& pad = *Pad_Find(event.jbutton.which);
 			using HELD = std::numeric_limits<decltype(pad.button_pressed_last)>;
-			const auto down = (
-#ifdef SDL3
-				event.jbutton.down
-#else
-				event.jbutton.state
-#endif
-			);
-			if(down) {
+			if(event.jbutton.down) {
 				if(pad.buttons_held < HELD::max()) {
 					pad.buttons_held++;
 				}
@@ -290,11 +255,7 @@ void Key_Read(void)
 			const auto mod = SDL_GetModState();
 
 			const KEY_SCANCODE scancode = {
-#ifdef SDL3
 				.scancode = static_cast<uint16_t>(event.key.scancode),
-#else
-				.scancode = static_cast<uint16_t>(event.key.keysym.scancode),
-#endif
 				.mod = ((mod & SDL_KMOD_LALT) ? KEY_MOD::LALT : KEY_MOD::NONE),
 			};
 			for(const auto& binding : KeyBindings) {

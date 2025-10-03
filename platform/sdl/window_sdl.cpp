@@ -4,7 +4,6 @@
  */
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
-#ifdef SDL3
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_hints.h>
 #include <SDL3/SDL_mouse.h>
@@ -12,19 +11,6 @@
 #include <SDL3/SDL_render.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
-#else
-#include <SDL_events.h>
-#include <SDL_hints.h>
-#include <SDL_mouse.h>
-#include <SDL_rect.h>
-#include <SDL_render.h>
-#include <SDL_timer.h>
-#include <SDL_video.h>
-#ifdef WIN32_VINTAGE
-#include <SDL_syswm.h>
-#endif
-#endif
-#include "platform/sdl/sdl2_wrap.h"
 
 #include "platform/window_backend.h"
 #include "platform/sdl/log_sdl.h"
@@ -57,7 +43,6 @@ std::pair<int16_t, int16_t> HelpGetWindowPosition(SDL_Window *window)
 
 SDL_DisplayID HelpGetDisplayForWindow(void)
 {
-#ifdef SDL3
 	if(!Window) {
 		return SDL_GetPrimaryDisplay();
 	}
@@ -66,12 +51,6 @@ SDL_DisplayID HelpGetDisplayForWindow(void)
 		return SDL_GetPrimaryDisplay();
 	}
 	return ret;
-#else
-	if(!Window) {
-		return 0;
-	}
-	return std::max(SDL_GetWindowDisplayIndex(Window), 0);
-#endif
 }
 
 // Don't do a ZUN.
@@ -80,17 +59,10 @@ SDL_Rect ClampWindowRect(SDL_Rect window_rect)
 {
 	// SDL_GetDisplayForRect() returns the *closest* display, so we need to
 	// manually clamp the window to its bounds.
-#ifdef SDL3
 	const auto display_i = SDL_GetDisplayForRect(&window_rect);
 	if(display_i == 0) {
 		return window_rect;
 	}
-#else
-	const auto display_i = SDL_GetRectDisplayIndex(&window_rect);
-	if(display_i < 0) {
-		return window_rect;
-	}
-#endif
 	SDL_Rect display_rect{};
 	if(SDL_GetDisplayUsableBounds(display_i, &display_rect) != 0) {
 		return window_rect;
@@ -124,7 +96,6 @@ SDL_Rect ClampWindowRect(SDL_Rect window_rect)
 	return window_rect;
 }
 
-#ifdef SDL3
 std::optional<GRAPHICS_FULLSCREEN_FLAGS> HelpSetFullscreenMode(
 	SDL_Window *window, GRAPHICS_FULLSCREEN_FLAGS fs
 )
@@ -154,18 +125,10 @@ std::optional<GRAPHICS_FULLSCREEN_FLAGS> HelpSetFullscreenMode(
 	}
 	return fs;
 }
-#endif
 
 std::u8string_view HelpDriverName(int8_t id)
 {
-#ifdef SDL3
 	const auto ret = SDL_GetRenderDriver(id);
-#else
-	SDL_RendererInfo info;
-	const auto ret = (
-		(SDL_GetRenderDriverInfo(id, &info) == 0) ? info.name : ""
-	);
-#endif
 	return reinterpret_cast<const char8_t *>(ret);
 }
 
@@ -188,11 +151,8 @@ int8_t WndBackend_ValidateRenderDriver(const std::u8string_view hint)
 		(GRP_SDL_DEFAULT_API ? "the" : "SDL's"),
 		std::bit_cast<const char *>(default_driver)
 	);
-#ifdef SDL3
 	SDL_UnsetEnvironmentVariable(SDL_GetEnvironment(), SDL_HINT_RENDER_DRIVER);
-#else
-	SDL_setenv(SDL_HINT_RENDER_DRIVER, "", 1);
-#endif
+
 	// If this succeeds, the hint came from SDL, not the environment.
 	if(SDL_GetHint(SDL_HINT_RENDER_DRIVER)) {
 		SDL_SetHintWithPriority(
@@ -235,8 +195,6 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 {
 	assert(Window == nullptr);
 
-	uint32_t flags = 0;
-
 #ifndef WIN32_VINTAGE
 	// The driver/API parameter takes precedence over the environment variable,
 	// which is a bad idea in case the user is stuck on an API that might
@@ -247,16 +205,11 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 	// SDL's hint system does not indicate where the hint came from. Also, we
 	// only want this override to apply to the first init call – if it didn't,
 	// the user couldn't specify a different API for subsequent init calls.
-#ifdef SDL3
 	auto *env = SDL_GetEnvironment();
 	const auto *driver_env_ptr = (
 		SDL_GetEnvironmentVariable(env, SDL_HINT_RENDER_DRIVER)
 	);
 	SDL_UnsetEnvironmentVariable(env, SDL_HINT_RENDER_DRIVER);
-#else
-	const auto *driver_env_ptr = (SDL_getenv(SDL_HINT_RENDER_DRIVER));
-	SDL_setenv(SDL_HINT_RENDER_DRIVER, "", 1);
-#endif
 
 	// We can actually get empty strings on SDL 2 here!
 	if(driver_env_ptr && (driver_env_ptr[0] != '\0')) {
@@ -276,7 +229,7 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 	// SDL_CreateRenderer()'s janky closing and reopening of the window with
 	// the correct flags.
 	const auto name = WndBackend_SDLRendererName(params.api);
-
+	uint32_t flags = 0;
 	if(name.starts_with(u8"opengl")) {
 		flags |= SDL_WINDOW_OPENGL;
 		SDL_GL_ResetAttributes();
@@ -304,6 +257,8 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, maj);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, min);
 	}
+#else
+	constexpr uint32_t flags = 0;
 #endif
 
 	if((params.left != 0) || (params.top != 0)) {
@@ -328,7 +283,6 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 		rect = ClampWindowRect(rect);
 	}
 
-#ifdef SDL3
 	const SDL_PropertiesID props = SDL_CreateProperties();
 	SDL_SetStringProperty(
 		props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, GAME_TITLE
@@ -345,17 +299,10 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 
 	Window = SDL_CreateWindowWithProperties(props);
 	SDL_DestroyProperties(props);
-#else
-	flags |= HelpFullscreenFlag(fs);
-	Window = SDL_CreateWindow(
-		GAME_TITLE, rect.x, rect.y, rect.w, rect.h, flags
-	);
-#endif
 	if(!Window) {
 		Log_Fail(LOG_CAT, "Error creating SDL window");
 		return std::nullopt;
 	}
-#ifdef SDL3
 	const auto maybe_fs_actual = HelpSetFullscreenMode(Window, fs);
 	if(!maybe_fs_actual) {
 		SDL_DestroyWindow(Window);
@@ -366,7 +313,6 @@ std::optional<GRAPHICS_PARAMS> WndBackend_Create(GRAPHICS_PARAMS params)
 	params.SetFlag(F::FULLSCREEN, fs_actual.fullscreen);
 	params.SetFlag(F::FULLSCREEN_EXCLUSIVE, fs_actual.exclusive);
 	SDL_ShowWindow(Window);
-#endif
 	return params;
 }
 
@@ -377,19 +323,11 @@ HWND WndBackend_Win32(void)
 		return nullptr;
 	}
 	HWND ret = nullptr;
-#ifdef SDL3
 	ret = static_cast<HWND>(SDL_GetPointerProperty(
 		SDL_GetWindowProperties(Window),
 		SDL_PROP_WINDOW_WIN32_HWND_POINTER,
 		nullptr
 	));
-#else
-	SDL_SysWMinfo wminfo;
-	SDL_VERSION(&wminfo.version);
-	if(SDL_GetWindowWMInfo(Window, &wminfo)) {
-		ret = wminfo.info.win.window;
-	}
-#endif
 	if(!ret) {
 		Log_Fail(LOG_CAT, "Error retrieving window handle");
 	}
@@ -434,9 +372,6 @@ int WndBackend_Run(void)
 			case SDL_EVENT_QUIT:
 				return 0;
 
-#ifdef SDL2
-			case SDL_WINDOWEVENT: switch(event.window.event) {
-#endif
 			case SDL_EVENT_WINDOW_FOCUS_LOST:
 				BGM_Pause();
 				SndBackend_PauseAll();
@@ -448,10 +383,6 @@ int WndBackend_Run(void)
 				SndBackend_ResumeAll();
 				active = true;
 				break;
-#ifdef SDL2
-			default: break; }
-			break;
-#endif
 
 			default:
 				break;

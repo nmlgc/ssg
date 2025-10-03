@@ -4,12 +4,7 @@
  */
 
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
-#ifdef SDL3
 #include <SDL3/SDL_messagebox.h>
-#else
-#include <SDL_messagebox.h>
-#endif
-#include "platform/sdl/sdl2_wrap.h"
 
 #include "platform/sdl/log_sdl.h"
 

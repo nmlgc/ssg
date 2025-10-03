@@ -146,7 +146,7 @@ using VERTEX_COORD = float;
 
 using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
 
-#if (defined(SDL3) && !defined(WIN32_VINTAGE))
+#ifndef WIN32_VINTAGE
 struct VERTEX_RGBA {
 	float r;
 	float g;

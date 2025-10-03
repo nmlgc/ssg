@@ -1,10 +1,7 @@
 tup.include("libs/tupblocks/toolchain.clang.lua")
 tup.include("libs/BLAKE3.lua")
 
-tup.import("SDL")
-SDL = SDL[1]
-
-local PLATFORM_LINK = EnvConfig(SDL, "pangocairo", "fontconfig")
+local PLATFORM_LINK = EnvConfig("sdl3", "pangocairo", "fontconfig")
 local LAYERS_LINK = EnvConfig("libwebp", "ogg", "vorbis", "vorbisfile")
 local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 
@@ -14,7 +11,7 @@ CONFIG = CONFIG:branch({ cflags = "-pthread" })
 
 local ssg_cfg = CONFIG:branch(
 	BLAKE3_LINK, LAYERS_LINK, SSG_COMPILE, CONFIG:cxx_std_modules(), {
-		cflags = { "-DLINUX", ("-D" .. string.upper(SDL) .. "=1") },
+		cflags = { "-DLINUX", "-DSDL3=1" },
 	}
 )
 local ssg_obj = ssg_cfg:cxx(SSG_SRC)

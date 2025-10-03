@@ -1,8 +1,3 @@
-[submodule "libs/SDL2"]
-	path = libs/SDL2
-	url = https://github.com/nmlgc/SDL
-	branch = SDL2_win9x
-	shallow = true
 [submodule "libs/SDL3"]
 	path = libs/SDL3
 	url = https://github.com/nmlgc/SDL

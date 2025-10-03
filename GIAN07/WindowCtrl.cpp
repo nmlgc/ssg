@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <SDL3/SDL_misc.h>
+
 #include "WindowCtrl.h"
 #include "WindowSys.h"
 #include "CONFIG.H"
@@ -13,8 +15,6 @@
 #include "MUSIC.H"
 #include "platform/input.h"
 #include "platform/midi_backend.h"
-#include "platform/input.h"
-#include "platform/urlopen.h"
 #include "game/bgm.h"
 #include "game/midi.h"
 #include "game/snd.h"
@@ -663,7 +663,7 @@ static void Main::Cfg::Snd::FnBGMVol(int_fast8_t delta)
 static void Main::Cfg::Snd::FnBGMPack(int_fast8_t)
 {
 	if(!BGM_PacksAvailable()) {
-		URLOpen(BGMPack::SOUNDTRACK_URL);
+		SDL_OpenURL(BGMPack::SOUNDTRACK_URL);
 	} else {
 		BGMPack::Open();
 	}
@@ -744,7 +744,7 @@ namespace BGMPack {
 	{
 		if(Input_IsOK(key)) {
 			if(selected == SelDownload()) {
-				URLOpen(BGMPack::SOUNDTRACK_URL);
+				SDL_OpenURL(BGMPack::SOUNDTRACK_URL);
 			} else {
 				if(selected == SelNone()) {
 					ConfigDat.BGMPack.clear();

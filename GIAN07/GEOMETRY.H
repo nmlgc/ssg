@@ -84,7 +84,7 @@ void CircleF_Approximated(
 	xys[0].x = static_cast<VERTEX_COORD>(center.x);
 	xys[0].y = static_cast<VERTEX_COORD>(center.y);
 	ApproximateCircle(
-		std::span(xys).subspan<1, CIRCLE_POINTS>(), center, radius
+		std::span(xys).template subspan<1, CIRCLE_POINTS>(), center, radius
 	);
 	if(alpha) {
 		gp.DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, xys);

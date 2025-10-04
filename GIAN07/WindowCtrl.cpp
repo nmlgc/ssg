@@ -46,11 +46,10 @@ template <size_t N> struct LABELS {
 
 	constexpr LABELS(std::array<Narrow::string_view, N> strs) :
 		str(strs),
-		w(std::reduce(
-			strs.begin(), strs.end(), size_t{}, [](auto cur, const auto& str) {
-				return (std::max)(cur, str.length());
-			}
-		)) {
+		w(std::ranges::max_element(strs, [](const auto& a, const auto& b) {
+			return (a.length() < b.length());
+		})->length())
+	{
 	}
 };
 
@@ -1275,7 +1274,9 @@ static void Main::Cfg::Inp::SetItem(bool)
 
 static void Main::Cfg::Inp::Pad::SetItem(bool)
 {
-	constexpr LABELS<4> labels = {{ "Shot", "Bomb", "SpeedDown", "ESC" }};
+	static constexpr const LABELS<4> labels = {
+		{ "Shot", "Bomb", "SpeedDown", "ESC" }
+	};
 	auto set = [](char* buf, Narrow::string_view label, INPUT_PAD_BUTTON v) {
 		if(v > 0) {
 			sprintf(buf, "%-*s[Button%2d]", labels.w, label.data(), v);

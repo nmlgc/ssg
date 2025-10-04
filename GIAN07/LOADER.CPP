@@ -466,7 +466,7 @@ namespace DAT_MISSING {
 			Info[1 + i].Title = title;
 		}
 		const auto w = (std::max)(CWinTextExtent(TITLE).w, (std::ranges::max)(
-			Info | std::views::transform([](const auto& info) {
+			std::views::transform(Info, [](const auto& info) {
 				return (CWinItemExtent(info.Title).w + 8);
 			})
 		));

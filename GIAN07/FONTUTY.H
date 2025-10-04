@@ -35,11 +35,11 @@ extern void GrpPutMidNum(int x, int y, int n);	// MIDI 用フォントを描画�
 
 constexpr PIXEL_COORD GrpExtent5(const char c)
 {
+	if(!((c >= 'A') && (c <= 'Z'))) {
+		assert(!"Character not supported in 5-pixel system font");
+		return 0;
+	}
 	switch(c) {
-		if(!((c >= 'A') && (c <= 'Z'))) {
-			assert(!"Character not supported in 5-pixel system font");
-			return 0;
-		}
 		case 'I':	return 3;	break;
 		case 'M':
 		case 'T':
@@ -47,7 +47,7 @@ constexpr PIXEL_COORD GrpExtent5(const char c)
 		case 'W':
 		case 'Y':	return 5;	break;
 		default: 	return 4;	break;
-		}
+	}
 }
 
 constexpr PIXEL_SIZE GrpExtent5(const std::string_view s)

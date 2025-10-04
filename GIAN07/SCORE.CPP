@@ -3,11 +3,14 @@
 /*                                                                           */
 /*                                                                           */
 
+// GCC 15 throws `error: conflicting declaration 'typedef struct imaxdiv_t
+// imaxdiv_t'` if this appears after a module import.
+#include <inttypes.h> // for PRId64
+
 #include "LZ_UTY.H"
 #include "LEVEL.H"
 #include "SCORE.H"
 #include "game/defer.h"
-#include <inttypes.h> // for PRId64
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;
 using NR_CONST_SCORE_LIST = std::span<const NR_NAME_DATA, NR_RANK_MAX>;

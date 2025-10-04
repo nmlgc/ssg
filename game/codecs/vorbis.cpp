@@ -4,11 +4,13 @@
  *   Adapted from thcrap's bgmmod module.
  */
 
-#include "game/bgm_track.h"
-#include <assert.h>
-
+// GCC 15 throws an internal compiler error if this appears after a module
+// import.
 #define OV_EXCLUDE_STATIC_CALLBACKS
 #include <vorbis/vorbisfile.h>
+
+#include "game/bgm_track.h"
+#include <assert.h>
 
 namespace BGM {
 

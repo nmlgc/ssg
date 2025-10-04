@@ -4,11 +4,14 @@
  *   Adapted from thcrap's bgmmod module.
  */
 
-#include "game/bgm_track.h"
-
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO
+
+// GCC 15 throws `error: conflicting declaration 'typedef struct max_align_t
+// max_align_t'` if this appears after a module import.
 #include <libs/dr_libs/dr_flac.h>
+
+#include "game/bgm_track.h"
 
 namespace BGM {
 

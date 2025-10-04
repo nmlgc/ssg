@@ -4,16 +4,18 @@
  *   Adapted from thcrap's bgmmod module.
  */
 
+// GCC 15 throws `error: redefinition of 'void std::__terminate()'` if this
+// appears after a module import.
+#if(__cpp_lib_to_chars < 201611L)
+#include <locale.h>
+#include <stdlib.h>
+#endif
+
 #include "game/bgm_track.h"
 #include "game/narrow.h"
 #include "game/volume.h"
 #include <assert.h>
 #include <version> // need the library feature test macros...
-
-#if(__cpp_lib_to_chars < 201611L)
-#include <locale.h>
-#include <stdlib.h>
-#endif
 
 namespace BGM {
 

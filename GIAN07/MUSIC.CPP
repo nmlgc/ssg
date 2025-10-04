@@ -3,6 +3,10 @@
  *
  */
 
+// GCC 15 throws `error: conflicting declaration 'typedef struct imaxdiv_t
+// imaxdiv_t'` if this appears after a module import.
+#include <inttypes.h> // for PRId64
+
 #include "MUSIC.H"
 #include "EFFECT.H"
 #include "FONTUTY.H"
@@ -17,7 +21,6 @@
 #include "game/ut_math.h"
 #include "platform/midi_backend.h"
 #include "platform/text_backend.h"
-#include <inttypes.h> // for PRId64
 
 extern bool IsDraw();
 

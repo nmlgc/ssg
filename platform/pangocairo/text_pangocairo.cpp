@@ -3,10 +3,13 @@
  *
  */
 
-#include "platform/text_backend.h"
-#include "game/defer.h"
+// GCC 15 throws `error: redefinition of 'struct timespec'` if this appears
+// after a module import.
 #include <fontconfig/fontconfig.h>
 #include <pango/pangocairo.h>
+
+#include "platform/text_backend.h"
+#include "game/defer.h"
 
 constexpr auto FORMAT = CAIRO_FORMAT_ARGB32;
 extern const ENUMARRAY<const char *, FONT_ID> FontSpecs;

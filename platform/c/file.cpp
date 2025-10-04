@@ -3,13 +3,16 @@
  *
  */
 
-#include "platform/file.h"
-#include "game/enum_flags.h"
+// GCC 15 throws `error: redefinition of 'struct timespec'` if this appears
+// after a module import.
 #include <assert.h>
 #include <fcntl.h> // For `AT_FDCWD`
 #include <stdio.h> // For fileno() and the `SEEK_*` macros
 #include <sys/stat.h> // The stat types aren't part of the `std` module either
 #include <unistd.h> // For dup() and close()
+
+#include "platform/file.h"
+#include "game/enum_flags.h"
 
 static size_t LoadInplace(std::span<uint8_t> buf, FILE*&& fp)
 {

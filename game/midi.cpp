@@ -3,12 +3,15 @@
 /*                                                                           */
 /*                                                                           */
 
+// GCC 15 throws `error: conflicting declaration 'typedef struct max_align_t
+// max_align_t'` if this appears after a module import.
+#include <malloc.h>
+
 #include "game/midi.h"
 #include "game/endian.h"
 #include "game/enum_flags.h"
 #include "game/volume.h"
 #include "platform/midi_backend.h"
-#include <malloc.h>
 #pragma message(PBGWIN_PBGMIDI_H)
 
 

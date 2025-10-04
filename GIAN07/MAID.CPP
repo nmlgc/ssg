@@ -3,6 +3,10 @@
 /*                                                                           */
 /*                                                                           */
 
+// GCC 15 throws `error: conflicting declaration 'typedef struct imaxdiv_t
+// imaxdiv_t'` if this appears after a module import.
+#include <inttypes.h> // for PRId64
+
 #include "MAID.H"
 #include "CONFIG.H"
 #include "FONTUTY.H"
@@ -11,7 +15,6 @@
 #include "game/snd.h"
 #include "game/input.h"
 #include "game/ut_math.h"
-#include <inttypes.h> // for PRId64
 
 
 MAID			Viv;					// 麗しきメイドさん構造体

@@ -200,14 +200,14 @@ bool DemoplayLoadReplay(int stage)
 
 	// ヘッダの格納先は０番である //
 	temp = in.MemExpand( 0);
-	if(NULL == temp) {
+	if(nullptr == temp) {
 		return false;
 	}
 	memcpy(&DemoInfo, temp.get(), sizeof(DEMOPLAY_INFO));
 
 	// データの格納先は１番ですね //
 	temp = in.MemExpand( 1);
-	if(NULL == temp){
+	if(nullptr == temp) {
 		return false;
 	}
 	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * DemoInfo.FrameCount));

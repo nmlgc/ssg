@@ -94,7 +94,9 @@ void SnakyMove(void)
 		);
 		for(const auto j : std::views::iota(0u, s->Length())) {
 			e = s->EnemyPtr[j];
-			if(e==NULL) continue;
+			if(e == nullptr) {
+				continue;
+			}
 
 			const auto ptr = (
 				(s->Head + points - (j * SNAKEYMOVE_POINTS_PER_ENEMY)) % points
@@ -138,7 +140,7 @@ void SnakyDelete(const BOSS_DATA *b)
 	}
 
 	s->bIsUse = false;
-	s->Parent = NULL;
+	s->Parent = nullptr;
 }
 
 
@@ -164,10 +166,10 @@ void BitInit(void)
 
 	// ここから下の初期化がメインとなる //
 	BitData.State  = BITCMD_DISABLE;
-	BitData.Parent = NULL;
+	BitData.Parent = nullptr;
 
 	for(i=0; i<BIT_MAX; i++){
-		BitData.Bit[i].pEnemy = NULL;		// 敵データへのポインタ
+		BitData.Bit[i].pEnemy = nullptr;	// 敵データへのポインタ
 		BitData.Bit[i].Angle  = 0;			// 現在の角度
 		BitData.Bit[i].Force  = 0;			// その他の？力の加えられている方向
 		BitData.Bit[i].BitID  = i;			// ビットの先頭からの番号
@@ -231,7 +233,7 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 			BitData.Bit[i].BitHP  = 95 * BitHPTable[i];	// ビットの耐久度
 		}
 		else{
-			BitData.Bit[i].pEnemy = NULL;
+			BitData.Bit[i].pEnemy = nullptr;
 		}
 	}
 }
@@ -283,7 +285,9 @@ void BitMove(void)
 	// BitData.NumBits は、削除が行われるとその数が減ることに注意 //
 	for(i=0; i<BitData.NumBits; i++){
 		e = BitData.Bit[i].pEnemy;
-		if(e == NULL) continue;
+		if(e == nullptr) {
+			continue;
+		}
 
 		const uint32_t damage = (BIT_VIRTUAL_HP - e->hp);
 		if(BitData.Bit[i].BitHP <= damage){
@@ -340,7 +344,9 @@ void BitMove(void)
 	// レジスタ更新 //
 	for(i=0; i<BitData.NumBits; i++){
 		e = BitData.Bit[i].pEnemy;
-		if(e == NULL) continue;
+		if(e == nullptr) {
+			continue;
+		}
 		e->GR[1] = BitData.NumBits;
 	}
 }
@@ -402,7 +408,9 @@ static void BitSTDRoll(void)
 	for(i=0; i<n; i++){
 		bit = BitData.Bit + i;
 		e   = bit->pEnemy;
-		if(e == NULL) continue;
+		if(e == nullptr) {
+			continue;
+		}
 
 		// 目標とする角度を求める //
 		const uint8_t d = ((BitData.BaseAngle >> 1) + (delta * bit->BitID));
@@ -481,7 +489,9 @@ void BitDelete(void)
 	// 各ビットを消滅させる //
 	for(i=0; i<BitData.NumBits; i++){
 		e = BitData.Bit[i].pEnemy;
-		if(e == NULL) continue;
+		if(e == nullptr) {
+			continue;
+		}
 
 		if(e->LLaserRef) LLaserForceClose(e);
 		e->hp    = 0;
@@ -509,7 +519,8 @@ void BitLineDraw(void)
 	if(n == 0) return;
 
 	for(i=0, j=-1; i<n; i++){
-		while(BitData.Bit[++j].pEnemy == NULL);
+		while(BitData.Bit[++j].pEnemy == nullptr) {
+		}
 
 		RefTable[i] = RefTable[i + n] = BitData.Bit[j].pEnemy;
 	}
@@ -560,7 +571,9 @@ void BitLaserCommand(uint8_t Command)
 
 	for(i=0; i<BitData.NumBits; i++){
 		e = BitData.Bit[i].pEnemy;
-		if(e == NULL) continue;
+		if(e == nullptr) {
+			continue;
+		}
 
 		LLaserCmd.e    = e;
 		LLaserCmd.d    = e->d;

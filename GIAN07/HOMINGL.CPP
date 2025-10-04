@@ -46,14 +46,14 @@ void HLaserInit(void)
 
 	HLaserNow = 0;
 
-	ActiveHL.Next = NULL;
+	ActiveHL.Next = nullptr;
 	FreeHL.Next   = HLaserBuf;
 
 	for(i=0; i<HLASER_MAX-2; i++){
 		HLaserBuf[i].Next = HLaserBuf + (i+1);
 	}
 
-	HLaserBuf[HLASER_MAX-1].Next = NULL;
+	HLaserBuf[HLASER_MAX - 1].Next = nullptr;
 }
 
 
@@ -67,7 +67,9 @@ void HLaserSet(const HLaserInfo *hinfo)
 	// 1-n としているのは、角度設定のためね... //
 	for(i=1; i<=(hinfo->n); i++){
 		p = FreeHL.Next;
-		if(p == NULL) return;		// データを確保できない
+		if(p == nullptr) {
+			return; // データを確保できない
+		}
 
 		// ポインタ結合を行う //
 		FreeHL.Next   = FreeHL.Next->Next;
@@ -108,7 +110,7 @@ void HLaserMove(void)
 	int			deg,deg2;
 
 	// 次のフレームに移行する //
-	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
+	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
 		// 前回の先頭を一時保存する //
 		x   = hl->p[hl->Current].x;
 		y   = hl->p[hl->Current].y;
@@ -189,7 +191,7 @@ void HLaserMove(void)
 	}
 
 	// 不要なデータを削除する //
-	for(hl=&ActiveHL; (hl->Next)!=NULL; ){
+	for(hl = &ActiveHL; (hl->Next) != nullptr;) {
 		if(hl->Next->State == HLS_DEAD){
 			temp           = hl->Next->Next;
 			hl->Next->Next = FreeHL.Next;
@@ -250,7 +252,7 @@ void HLaserDraw(void)
 
 	GrpGeom->Lock();
 
-	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
+	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
 		w = HOMINGL_WIDTH;
 		current = hl->Current;
 		p = &(hl->p[current]);
@@ -294,7 +296,7 @@ void HLaserDraw(void)
 		gf->SetColor({ 5, 5, 5 });
 	}
 
-	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
+	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
 		w = HOMINGL_WIDTH/2;
 		current = hl->Current;
 		p = &(hl->p[current]);
@@ -344,7 +346,7 @@ void HLaserClear(void)
 
 	HLaserInit();
 	/*
-	for(hl=ActiveHL.Next; hl!=NULL; hl=hl->Next){
+	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
 		hl->State = HLS_CLEAR;
 	}
 	*/

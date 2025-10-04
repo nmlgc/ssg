@@ -78,7 +78,9 @@ void ScrollMove(void)
 	if(ScrollInfo.IsQuake) ScrollInfo.IsQuake+=2;
 
 	// 標準のスクロールスピードだけカウンタを進める //
-	if(ScrollInfo.DataHead==NULL) return;
+	if(ScrollInfo.DataHead == nullptr) {
+		return;
+	}
 	if(ScrollInfo.Count>=ScrollInfo.InfEnd) return;
 
 	// スクロールしない場合は、リターンする //
@@ -554,7 +556,9 @@ void ScrollDraw(void)
 	int		dx = 0;				// 振動用
 	int		RasterDx;			// ラスター用
 
-	if(ScrollInfo.DataHead==NULL) return;
+	if(ScrollInfo.DataHead == nullptr) {
+		return;
+	}
 
 	// 例外処理：ワイドショット用ボム発動中 //
 	//if(Viv.bomb_time && Viv.weapon==0){
@@ -878,9 +882,9 @@ bool ScrollInit(void)
 	}
 
 	// もしすでにロードが行われていた場合、メモリを解放する //
-	if(ScrollInfo.DataHead!=NULL){
+	if(ScrollInfo.DataHead != nullptr) {
 		LocalFree(ScrollInfo.DataHead);
-		ScrollInfo.DataHead = NULL;
+		ScrollInfo.DataHead = nullptr;
 	}
 	// そうでなければ、スクロールに関する初期化を行う //
 	else if(!InitScrollInfo()) {

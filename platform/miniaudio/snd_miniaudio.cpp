@@ -3,12 +3,29 @@
  *
  */
 
+#include <SDL3/SDL_audio.h>
+
 #include "platform/miniaudio/flags.h"
 #include <libs/miniaudio/miniaudio.h>
 
 #include "game/bgm_track.h"
 #include "game/defer.h"
 #include "platform/snd_backend.h"
+
+// Helpers
+// -------
+
+ma_format HelpFormatFrom(SDL_AudioFormat format)
+{
+	switch(format) {
+	case SDL_AUDIO_U8:  return ma_format_u8;
+	case SDL_AUDIO_S16: return ma_format_s16;
+	case SDL_AUDIO_S32: return ma_format_s32;
+	case SDL_AUDIO_F32: return ma_format_f32;
+	default:            return ma_format_unknown;
+	}
+}
+// -------
 
 struct BGM_OBJ {
 	ma_data_source_base data_source{};
@@ -91,7 +108,7 @@ struct RESAMPLED_INSTANCE {
 
 struct SE {
 	// Backing storage for the individual `ma_audio_buffer` instances.
-	void* resampled_buffer = nullptr;
+	std::unique_ptr<std::byte[]> resampled_buffer = nullptr;
 
 	std::unique_ptr<RESAMPLED_INSTANCE[]> instance;
 	unsigned int max = 0;
@@ -101,7 +118,6 @@ struct SE {
 		max = 0;
 		now = 0;
 		instance = nullptr;
-		ma_free(resampled_buffer, nullptr);
 		resampled_buffer = nullptr;
 		return false;
 	}
@@ -240,7 +256,10 @@ void SndBackend_SEUpdateVolume(void)
 }
 
 bool SndBackend_SELoad(
-	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max
+	uint8_t id,
+	SND_INSTANCE_ID max,
+	const SDL_AudioSpec& spec,
+	BYTE_BUFFER_BORROWED pcm
 )
 {
 	if(id >= SND_OBJ_MAX) {
@@ -268,12 +287,44 @@ bool SndBackend_SELoad(
 	// buffer. We still keep the original channel count, though, since mono
 	// expansion is SSE2-optimized.
 	const auto* device = ma_engine_get_device(&Engine);
-	auto config = ma_decoder_config_init(
-		device->playback.format, 0, device->sampleRate
+	const auto config = ma_data_converter_config_init(
+		HelpFormatFrom(spec.format),
+		device->playback.format,
+		spec.channels,
+		spec.channels,
+		spec.freq,
+		device->sampleRate
 	);
-	ma_uint64 frames;
-	result = ma_decode_memory(
-		buffer.get(), buffer.size(), &config, &frames, &se.resampled_buffer
+	ma_data_converter converter;
+	result = ma_data_converter_init(&config, NULL, &converter);
+	if(result != MA_SUCCESS) {
+		return se.Clear();
+	}
+	defer(ma_data_converter_uninit(&converter, nullptr));
+	const size_t input_frame_size = SDL_AUDIO_FRAMESIZE(spec);
+	const size_t output_frame_size = ma_get_bytes_per_frame(
+		config.formatOut, config.channelsOut
+	);
+	ma_uint64 input_frames = (pcm.size() / input_frame_size);
+	ma_uint64 output_frames = 0;
+	result = ma_data_converter_get_expected_output_frame_count(
+		&converter, input_frames, &output_frames
+	);
+	if(result != MA_SUCCESS) {
+		return se.Clear();
+	}
+	se.resampled_buffer = std::unique_ptr<std::byte[]>(
+		new (std::nothrow) std::byte[output_frame_size * output_frames]
+	);
+	if(!se.resampled_buffer) {
+		return false;
+	}
+	result = ma_data_converter_process_pcm_frames(
+		&converter,
+		pcm.data(),
+		&input_frames,
+		se.resampled_buffer.get(),
+		&output_frames
 	);
 	if(result != MA_SUCCESS) {
 		return se.Clear();
@@ -282,10 +333,10 @@ bool SndBackend_SELoad(
 	for(const auto i : std::views::iota(0u, se.max)) {
 		auto& instance = se.instance[i];
 		result = ma_audio_buffer_ref_init(
-			config.format,
-			config.channels,
-			se.resampled_buffer,
-			frames,
+			config.formatOut,
+			config.channelsOut,
+			se.resampled_buffer.get(),
+			output_frames,
 			&instance.data_source
 		);
 		if(result != MA_SUCCESS) {

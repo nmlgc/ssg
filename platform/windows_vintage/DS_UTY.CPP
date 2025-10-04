@@ -3,9 +3,12 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <SDL3/SDL_audio.h>
+
 #define DIRECTSOUND_VERSION 0x0700
 
 #include <dsound.h>
+#include <mmreg.h>
 #include "platform/file.h"
 #include "platform/snd_backend.h"
 #include "game/debug.h" // エラー処理用関数
@@ -26,62 +29,14 @@
 #endif
 
 #ifndef DSBCAPS_CTRLDEFAULT
-#define DSBCAPS_CTRLDEFAULT ( \
-	DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY \\
+#define DSBCAPS_CTRLDEFAULT (\
+	DSBCAPS_CTRLPAN | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY \
 )
 #endif
 
 //#pragma optimize("",off)
 
 // 構造体 //
-
-#pragma pack(push, PBG_WAVEHEAD_PACK)
-#pragma pack(2)
-
-typedef struct tagWAVEHEAD{
-	DWORD	RIFF;
-	DWORD	RiffLen;
-	DWORD	WAVE;
-	DWORD	FMT;
-	DWORD	WaveLen;
-
-	WORD	tag;
-	WORD	ch;
-	DWORD	SamplePerSec;
-	DWORD	AvgBytePerSec;
-	WORD	BlockAlign;
-	WORD	BitPerSample;
-
-	DWORD	DATA;
-	DWORD	DataLen;
-} WAVEHEAD;
-
-typedef struct tagWAVEHEAD_FACT{
-	DWORD	RIFF;
-	DWORD	RiffLen;
-	DWORD	WAVE;
-	DWORD	FMT;
-	DWORD	WaveLen;
-
-	WORD	tag;
-	WORD	ch;
-	DWORD	SamplePerSec;
-	DWORD	AvgBytePerSec;
-	WORD	BlockAlign;
-	WORD	BitPerSample;
-
-	DWORD	FACT;
-	WORD	Dummy_2;
-	WORD	Dummy_3;
-	WORD	Dummy_4;
-	WORD	Dummy_5;
-
-	DWORD	DATA;
-	DWORD	DataLen;
-} WAVEHEAD_FACT;
-
-#pragma pack(pop, PBG_WAVEHEAD_PACK)
-
 
 typedef struct tagSE_STRUCT{
 	BYTE				*data;		//
@@ -210,7 +165,10 @@ void SndBackend_SEUpdateVolume(void)
 
 // ＷＡＶファイルロード(ある制限があるが...) //
 bool SndBackend_SELoad(
-	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max
+	uint8_t id,
+	SND_INSTANCE_ID max,
+	const SDL_AudioSpec& spec,
+	BYTE_BUFFER_BORROWED pcm
 )
 {
 	LPSE_STRUCT		p;
@@ -231,44 +189,33 @@ bool SndBackend_SELoad(
 	*se = p = (LPSE_STRUCT)LocalAlloc(LPTR,sizeof(SE_STRUCT)+(max-1)*sizeof(IDirectSoundBuffer *));
 	if(p == NULL) return FALSE;
 
-	// データを解凍して読み込む //
-	auto cursor = buffer.cursor();
-	const auto maybe_whf = cursor.next<WAVEHEAD_FACT>();
-	if(!maybe_whf) {
-		return false;
-	}
+	WAVEFORMATEX wfx = {
+		.wFormatTag = WORD(SDL_AUDIO_ISFLOAT(spec.format)
+			? WAVE_FORMAT_IEEE_FLOAT
+			: WAVE_FORMAT_PCM
+		),
+		.nChannels = WORD(spec.channels),
+		.nSamplesPerSec = DWORD(spec.freq),
+		.nBlockAlign = WORD(
+			(spec.channels * SDL_AUDIO_BITSIZE(spec.format)) / 8
+		),
+		.wBitsPerSample = SDL_AUDIO_BITSIZE(spec.format),
+		.cbSize = 0,
+	};
+	wfx.nAvgBytesPerSec = (wfx.nSamplesPerSec * wfx.nBlockAlign);
 
-	const auto [datalen, tag] = [&cursor](const WAVEHEAD_FACT& whf) {
-		if(whf.FACT != MAKEFOURCC('f','a','c','t')) {
-			static_assert(sizeof(WAVEHEAD_FACT) >= sizeof(WAVEHEAD));
-			const auto& wh = reinterpret_cast<const WAVEHEAD &>(whf);
-			cursor.cursor = sizeof(wh);
-
-			// C cast because we also need to cast away constness here… grr.
-			return std::pair{ wh.DataLen, (WAVEFORMATEX *)(&wh.tag) };
-		}
-		cursor.cursor = sizeof(whf);
-		return std::pair{ whf.DataLen, (WAVEFORMATEX *)(&whf.tag) };
-	}(maybe_whf.value()[0]);
-
-	const auto maybe_data = cursor.next<uint8_t>(datalen);
-	if(!maybe_data) {
-		return false;
-	}
-	const auto data = maybe_data.value();
-
-	p->data = (BYTE *)LocalAlloc(LPTR,datalen);
-	memcpy(p->data, data.data(), data.size_bytes());
+	p->data = std::bit_cast<BYTE *>(LocalAlloc(LPTR, pcm.size_bytes()));
+	memcpy(p->data, pcm.data(), pcm.size_bytes());
 
 	p->max  = max;
 	p->now  = 0;
-	p->size = datalen;
+	p->size = pcm.size_bytes();
 
-	dsBD.dwBufferBytes = datalen;
+	dsBD.dwBufferBytes = pcm.size_bytes();
 	dsBD.dwFlags       = DSBCAPS_STATIC|DSBCAPS_CTRLDEFAULT|DSBCAPS_GETCURRENTPOSITION2;
 	dsBD.dwReserved    = 0;
 	dsBD.dwSize        = sizeof(DSBUFFERDESC);
-	dsBD.lpwfxFormat   = tag;
+	dsBD.lpwfxFormat   = &wfx;
 
 	dsrval = Snd_DS->CreateSoundBuffer(&dsBD,&p->buf[0],NULL);
 	if(dsrval != DS_OK){

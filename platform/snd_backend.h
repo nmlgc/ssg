@@ -6,6 +6,7 @@
 #pragma once
 
 #include "game/snd.h"
+struct SDL_AudioSpec;
 
 bool SndBackend_Init(void);
 void SndBackend_Cleanup(void);
@@ -41,7 +42,10 @@ void SndBackend_SECleanup(void);
 void SndBackend_SEUpdateVolume(void);
 
 bool SndBackend_SELoad(
-	BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max
+	uint8_t id,
+	SND_INSTANCE_ID max,
+	const SDL_AudioSpec& spec,
+	BYTE_BUFFER_BORROWED pcm
 );
 void SndBackend_SEPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
 void SndBackend_SEStop(uint8_t id);

@@ -3,7 +3,10 @@
  *
  */
 
+#include <SDL3/SDL_audio.h>
+
 #include "game/snd.h"
+#include "game/defer.h"
 #include "game/enum_flags.h"
 #include "platform/snd_backend.h"
 #include <assert.h>
@@ -99,7 +102,19 @@ void Snd_SECleanup(void)
 
 bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 {
-	return SndBackend_SELoad(std::move(buffer), id, max);
+	auto *io = SDL_IOFromConstMem(buffer.get(), buffer.size());
+	if(!io) {
+		return false;
+	}
+
+	SDL_AudioSpec spec{};
+	uint8_t *pcm_buf = nullptr;
+	uint32_t pcm_len = 0;
+	if(!SDL_LoadWAV_IO(io, true, &spec, &pcm_buf, &pcm_len)) {
+		return false;
+	}
+	defer(SDL_free(pcm_buf));
+	return SndBackend_SELoad(id, max, spec, { pcm_buf, pcm_len });
 }
 
 void Snd_SEPlay(uint8_t id, int x, bool loop)

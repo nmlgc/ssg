@@ -7,9 +7,8 @@
 
 #include "game/narrow.h"
 #include "platform/buffer.h"
-#include <blake3.h>
 
-using HASH = std::array<std::byte, BLAKE3_OUT_LEN>;
+using HASH = std::array<std::byte, 32>;
 
 static constexpr std::optional<HASH> HashFrom(Narrow::string_view str)
 {
@@ -36,17 +35,7 @@ static constexpr std::optional<HASH> HashFrom(Narrow::string_view str)
 }
 
 // Hashes the given buffer.
-static HASH Hash(const BYTE_BUFFER_BORROWED& buffer)
-{
-	HASH ret;
-	blake3_hasher h;
-	blake3_hasher_init(&h);
-	blake3_hasher_update(&h, buffer.data(), buffer.size_bytes());
-	blake3_hasher_finalize(
-		&h, reinterpret_cast<uint8_t *>(ret.data()), BLAKE3_OUT_LEN
-	);
-	return ret;
-}
+HASH Hash(const BYTE_BUFFER_BORROWED& buffer);
 
 constexpr HASH operator ""_B3(const char* str, size_t len)
 {

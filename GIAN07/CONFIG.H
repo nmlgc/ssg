@@ -21,7 +21,12 @@ constexpr uint8_t GRPF_ORIG_MASK = 0x07;
 constexpr uint8_t GRPF_PARAM_MASK = (
 	std::to_underlying(GRAPHICS_PARAM_FLAGS::MASK) << GRPF_PARAM_SHIFT
 );
-constexpr uint8_t GRPF_MASK = ~(GRPF_ORIG_MASK | GRPF_PARAM_MASK);
+
+// Integer promotion...
+constexpr uint8_t GRPF_MASK = static_cast<uint8_t>(
+	~(GRPF_ORIG_MASK | GRPF_PARAM_MASK)
+);
+
 constexpr uint8_t GRPF_WINDOW_UPPER	= 0x02;	// メッセージウィンドウを上の方に表示する
 constexpr uint8_t GRPF_MSG_DISABLE	= 0x04;	// 会話シーンを省略
 

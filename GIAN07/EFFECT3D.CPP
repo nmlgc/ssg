@@ -182,12 +182,12 @@ void DrawWarning(void)
 			det = 2;
 		}
 
-		const auto draw = DrawLineList3D;
-		GrpGeom->SetColor({ 1, 1, 5 });	MoveWarningR(st); 	draw(Warning);
-		GrpGeom->SetColor({ 2, 2, 5 });	MoveWarningR(det);	draw(Warning);
-		GrpGeom->SetColor({ 3, 3, 5 });	MoveWarningR(det);	draw(Warning);
-		GrpGeom->SetColor({ 4, 4, 5 });	MoveWarningR(det);	draw(Warning);
-		GrpGeom->SetColor({ 5, 5, 5 });	MoveWarningR(det);	draw(Warning);
+		constexpr auto w = std::span(Warning);
+		GrpGeom->SetColor({ 1, 1, 5 });	MoveWarningR(st); 	DrawLineList3D(w);
+		GrpGeom->SetColor({ 2, 2, 5 });	MoveWarningR(det);	DrawLineList3D(w);
+		GrpGeom->SetColor({ 3, 3, 5 });	MoveWarningR(det);	DrawLineList3D(w);
+		GrpGeom->SetColor({ 4, 4, 5 });	MoveWarningR(det);	DrawLineList3D(w);
+		GrpGeom->SetColor({ 5, 5, 5 });	MoveWarningR(det);	DrawLineList3D(w);
 
 		GrpGeom->Unlock();
 	}

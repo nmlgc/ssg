@@ -26,7 +26,7 @@ static size_t CB_Vorbis_Read(
 int CB_Vorbis_Seek(void* datasource, ogg_int64_t offset, int ov_whence)
 {
 	auto* stream = static_cast<FILE_STREAM_READ *>(datasource);
-	
+
 	#pragma warning(suppress : 26494) // type.5
 	SEEK_WHENCE whence;
 	switch(ov_whence) {

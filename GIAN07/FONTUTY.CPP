@@ -261,7 +261,7 @@ PIXEL_SIZE DrawGrdFont(
 )
 {
 	PIXEL_SIZE extent = { 0, 0 };
-	
+
 	// ここら辺は、一種の常套手段か？ //
 	const auto temp = s.PixelAccess([](TEXTRENDER_SESSION::PIXELACCESS& p) {
 		const PIXEL_POINT coord = { 0, 0 };

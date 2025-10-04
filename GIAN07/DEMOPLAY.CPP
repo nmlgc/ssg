@@ -218,7 +218,7 @@ bool DemoplayLoadReplay(int stage)
 	bool repair = false;
 	const auto file_level = DemoInfo.CfgDat.GameLevel;
 	const auto file_lives = DemoInfo.CfgDat.PlayerStock;
-	
+
 	// ≥P0295 was writing the configured difficulty and starting lives for the
 	// regular 6 stages instead of the fixed values for the Extra Stage.
 	// MODDERS: If this bug doesn't apply to you because you modded an earlier

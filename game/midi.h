@@ -23,7 +23,7 @@ enum class MID_FLAGS : uint8_t {
 	_HAS_BITFLAG_OPERATORS,
 	NONE = 0x00,
 	FIX_SYSEX_BUGS = 0x01,
-	
+
 	MASK = FIX_SYSEX_BUGS,
 };
 
@@ -39,7 +39,7 @@ using MID_PULSE = int64_t;
 
 // Sufficiently precise realtime values for MIDI event timing. Signed 64-bit
 // integers can fit the highest possible tempo × delta time value at nanosecond
-// precision (0xFF'FF'FF × 0xF'FF'FF'FF × 10³) , with one bit to spare.
+// precision (0xFF'FF'FF × 0xF'FF'FF'FF × 10³), with one bit to spare.
 // (Nanoseconds only add a factor of 10³ here because tempo values already use
 // microseconds.)
 using MID_REALTIME = std::chrono::nanoseconds;

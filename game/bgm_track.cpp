@@ -4,6 +4,8 @@
  *   Adapted from thcrap's bgmmod module.
  */
 
+#include <SDL3/SDL_stdinc.h>
+
 // GCC 15 throws `error: redefinition of 'void std::__terminate()'` if this
 // appears after a module import.
 #if(__cpp_lib_to_chars < 201611L)
@@ -146,9 +148,11 @@ static constexpr size_t EXT_CAP = std::ranges::max_element(
 
 static bool TagEquals(const std::u8string_view a, const std::u8string_view b)
 {
-	return std::ranges::equal(a, b, [](char a, char b) {
-		return (toupper(a) == toupper(b));
-	});
+	return ((a.size() == b.size()) && !SDL_strncasecmp(
+		std::bit_cast<const char *>(a.data()),
+		std::bit_cast<const char *>(b.data()),
+		b.size()
+	));
 }
 
 std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)

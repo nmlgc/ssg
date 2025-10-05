@@ -694,7 +694,7 @@ namespace BGMPack {
 		std::ranges::sort(Packs);
 		SelAtOpen = SelNone();
 		for(size_t i = 1; const auto& pack : Packs) {
-			if(pack == ConfigDat.BGMPack.v) {
+			if(pack == ConfigDat.BGMPack) {
 				SelAtOpen = i;
 			}
 			w = (std::max)(w, CWinItemExtent(pack).w);
@@ -746,12 +746,12 @@ namespace BGMPack {
 				URLOpen(BGMPack::SOUNDTRACK_URL);
 			} else {
 				if(selected == SelNone()) {
-					ConfigDat.BGMPack.v.clear();
+					ConfigDat.BGMPack.clear();
 				} else {
-					ConfigDat.BGMPack.v = Packs[selected - 1];
+					ConfigDat.BGMPack = Packs[selected - 1];
 				}
 				Main::Cfg::Snd::SetItem();
-				BGM_PackSet(ConfigDat.BGMPack.v);
+				BGM_PackSet(ConfigDat.BGMPack);
 			}
 			return false;
 		}
@@ -1220,7 +1220,7 @@ static void Main::Cfg::Snd::SetItem(bool)
 	if(!BGM_PacksAvailable()) {
 		sprintf(TitleBGMPack, "BGMPack[ Download ]");
 		ItemBGMPack.Help = BGMPack::HELP_DOWNLOAD;
-	} else if(ConfigDat.BGMPack.v.empty()) {
+	} else if(ConfigDat.BGMPack.empty()) {
 		sprintf(TitleBGMPack, "BGMPack[%s]", CHOICE_USE[1]);
 		ItemBGMPack.Help = BGMPack::HELP_SET;
 	} else {

@@ -14,6 +14,7 @@
 #include "game/bgm.h"
 #include "game/cast.h"
 #include "game/debug.h"
+#include "game/endian.h"
 #include "game/input.h"
 #include "game/snd.h"
 #include "game/ut_math.h"

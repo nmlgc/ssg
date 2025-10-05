@@ -6,14 +6,10 @@
 #pragma once
 
 #include "LEVEL.H"
-#include "game/endian.h"
 #include "game/midi.h"
 #include "game/input.h"
-#include "game/pixelformat.h"
 #include "game/volume.h"
-#include "platform/buffer.h"
 #include "platform/graphics_backend.h"
-#include "platform/unicode.h"
 
 // フラグ //
 constexpr uint8_t GRPF_PARAM_SHIFT = 3;
@@ -54,28 +50,6 @@ constexpr const auto FPS_DIVISOR_MAX = 3;
 constexpr const auto STAGE_MAX = 6; // ステージ数
 
 
-// Option interface. Allows us to arrange values from [ConfigDat] into arrays
-// that define multiple versions of config files, and can be trivially looped
-// over.
-template <typename T> concept CONFIG_OPTION = requires(
-	T t,
-	BYTE_BUFFER_CURSOR<const uint8_t>& cursor_read,
-	BYTE_BUFFER_CURSOR<uint8_t>& cursor_write
-) {
-	// Returns the size of the option value.
-	{ t.Size() } -> std::same_as<size_t>;
-
-	// Reads the configuration value from the given [cursor], advancing it by
-	// the value of Size(). Returns whether there were enough bytes left and
-	// reading should continue.
-	{ t.Read(cursor_read) } -> std::same_as<bool>;
-
-	// Writes the configuration value to the given [cursor], advancing it by
-	// the value of Size(). Returns whether there were enough bytes left and
-	// writing should continue.
-	{ t.Write(cursor_write) } -> std::same_as<bool>;
-};
-
 bool ValidateAlways(auto v) { return true; };
 template <typename T, T Max> constexpr bool ValidateBelow(T v) {
 	return (v <= Max);
@@ -108,49 +82,11 @@ template <typename T> struct CONFIG_OPTION_VALUE {
 	) noexcept : v(def), Validate(validate)
 	{
 	}
-
-	using DISK_T = std::conditional_t<
-		std::is_fundamental_v<T>, ENDIAN_SELECT_BIG<T>, T
-	>;
-
-	const size_t Size() const {
-		return sizeof(T);
-	}
-
-	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor) {
-		const auto maybe_loaded = cursor.next<DISK_T>();
-		if(!maybe_loaded) {
-			return false;
-		}
-		loaded = maybe_loaded.value()[0];
-		if(Validate(maybe_loaded.value()[0])) {
-			v = maybe_loaded.value()[0];
-		}
-		return true;
-	}
-
-	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) {
-		auto maybe_v = cursor.next<DISK_T>();
-		if(!maybe_v) {
-			return false;
-		}
-		maybe_v.value()[0] = v;
-		return true;
-	}
-};
-
-struct CONFIG_OPTION_UTF8 {
-	std::u8string v;
-
-	size_t Size() const;
-	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor);
-	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) const;
 };
 
 // オプション保持用構造体 //
 struct CONFIG_DATA {
 	template <typename T> using OPTION = CONFIG_OPTION_VALUE<T>;
-	using OPTION_UTF8 = CONFIG_OPTION_UTF8;
 
 	template <class T, T V> static constexpr auto Below = &ValidateBelow<T, V>;
 	template <uint8_t V> static constexpr auto U8Below = Below<uint8_t, V>;
@@ -201,7 +137,7 @@ struct CONFIG_DATA {
 	OPTION<MID_FLAGS> MidFlags = { MID_FLAGS::FIX_SYSEX_BUGS, Flag<MID_FLAGS> };
 	OPTION<VOLUME> SEVolume = { ((VOLUME_MAX * 4) / 10), ValidateVolume };
 	OPTION<VOLUME> BGMVolume = { ((VOLUME_MAX * 4) / 10), ValidateVolume };
-	OPTION_UTF8 BGMPack;
+	std::u8string BGMPack;
 
 	// 入力に関するフラグ
 	OPTION<uint8_t> InputFlags = { INPF_Z_MSKIP_ENABLE, Mask<INPF_MASK> };

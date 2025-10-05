@@ -5,91 +5,160 @@
 
 #include "CONFIG.H"
 #include "game/bgm.h"
+#include "game/endian.h"
 #include "platform/file.h"
 #include "platform/window_backend.h"
 
 ///// Constants /////
 constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
 
-size_t CONFIG_OPTION_UTF8::Size() const
+// Option interface. Allows us to arrange values from [ConfigDat] into arrays
+// that define multiple versions of config files, and can be trivially looped
+// over.
+template <typename T>
+concept CONFIG_OPTION = requires(
+	T& t,
+	BYTE_BUFFER_CURSOR<const uint8_t>& cursor_read,
+	BYTE_BUFFER_CURSOR<uint8_t>& cursor_write
+) {
+	// Returns the size of the option value.
+	{ OptionSize(t) } -> std::same_as<size_t>;
+
+	// Reads the configuration value from the given [cursor], advancing it by
+	// the value of Size(). Returns whether there were enough bytes left and
+	// reading should continue.
+	{ OptionRead(t, cursor_read) } -> std::same_as<bool>;
+
+	// Writes the configuration value to the given [cursor], advancing it by
+	// the value of Size(). Returns whether there were enough bytes left and
+	// writing should continue.
+	{ OptionWrite(cursor_write, t) } -> std::same_as<bool>;
+};
+
+// Data types
+// ----------
+
+template <typename T> using DISK = std::conditional_t<
+	std::is_fundamental_v<T>, ENDIAN_SELECT_BIG<T>, T
+>;
+
+template <typename T> constexpr size_t OptionSize(
+	const CONFIG_OPTION_VALUE<T>& opt
+)
 {
-	return (sizeof(U32BE) + (v.size() * sizeof(decltype(v)::value_type)));
+	return sizeof(T);
 }
 
-bool CONFIG_OPTION_UTF8::Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor)
+template <typename T> bool OptionRead(
+	CONFIG_OPTION_VALUE<T>& opt, BYTE_BUFFER_CURSOR<const uint8_t>& cursor
+)
+{
+	const auto maybe_loaded = cursor.next<DISK<T>>();
+	if(!maybe_loaded) {
+		return false;
+	}
+	opt.loaded = maybe_loaded.value()[0];
+	if(opt.Validate(maybe_loaded.value()[0])) {
+		opt.v = maybe_loaded.value()[0];
+	}
+	return true;
+}
+
+template <typename T> bool OptionWrite(
+	BYTE_BUFFER_CURSOR<uint8_t>& cursor, const CONFIG_OPTION_VALUE<T>& opt
+)
+{
+	auto maybe_v = cursor.next<DISK<T>>();
+	if(!maybe_v) {
+		return false;
+	}
+	maybe_v.value()[0] = opt.v;
+	return true;
+}
+
+constexpr size_t OptionSize(const std::u8string& opt)
+{
+	return (sizeof(U32BE) + (opt.size() * sizeof(opt[0])));
+}
+
+bool OptionRead(std::u8string& opt, BYTE_BUFFER_CURSOR<const uint8_t>& cursor)
 {
 	const auto maybe_len = cursor.next<U32BE>();
 	if(!maybe_len) {
 		return false;
 	}
 	const auto len = maybe_len.value()[0];
-	const auto maybe_bytes = cursor.next<decltype(v)::value_type>(len);
+	const auto maybe_bytes = cursor.next<std::u8string::value_type>(len);
 	if(!maybe_bytes) {
 		return false;
 	}
 	const auto bytes = maybe_bytes.value();
-	v.resize_and_overwrite(len, [bytes](auto buf, size_t n) {
+	opt.resize_and_overwrite(len, [bytes](auto buf, size_t n) {
 		std::ranges::copy(bytes, buf);
 		return n;
 	});
 	return true;
 }
 
-bool CONFIG_OPTION_UTF8::Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) const
+bool OptionWrite(BYTE_BUFFER_CURSOR<uint8_t>& cursor, const std::u8string& opt)
 {
-	if(v.size() > (std::numeric_limits<uint32_t>::max)()) {
+	if(opt.size() > (std::numeric_limits<uint32_t>::max)()) {
 		return false;
 	}
 	auto maybe_len = cursor.next<U32BE>();
 	if(!maybe_len) {
 		return false;
 	}
-	maybe_len.value()[0] = static_cast<U32BE>(v.size());
-	const auto maybe_bytes = cursor.next<decltype(v)::value_type>(v.size());
+	maybe_len.value()[0] = static_cast<U32BE>(opt.size());
+	const auto maybe_bytes = cursor.next<std::u8string::value_type>(opt.size());
 	if(!maybe_bytes) {
 		return false;
 	}
 	const auto bytes = maybe_bytes.value();
-	std::ranges::copy(v, bytes.data());
+	std::ranges::copy(opt, bytes.data());
 	return true;
 }
 
 // Arrays of configuration options for simple serialization
-template <CONFIG_OPTION... Options> class CONFIG_OPTION_ARRAY {
-private:
+template <class... Options> struct CONFIG_OPTION_ARRAY {
 	const std::tuple<Options&...> options;
 
-public:
 	constexpr CONFIG_OPTION_ARRAY(Options&... options)
 		: options(options...) {
 	}
-
-	const size_t Size() const {
-		return std::apply([](const auto&... opt) {
-			return (... + opt.Size());
-		}, options);
-	}
-
-	bool Read(BYTE_BUFFER_CURSOR<const uint8_t>& cursor) const {
-		return std::apply([&cursor](auto&... opt) {
-			return (... && opt.Read(cursor));
-		}, options);
-	}
-
-	bool Write(BYTE_BUFFER_CURSOR<uint8_t>& cursor) const {
-		return std::apply([&cursor](auto&... opt) {
-			return (... && opt.Write(cursor));
-		}, options);
-	}
-
-	// Recursively writes the options into a buffer, to be then saved into the
-	// configuration file.
-	BYTE_BUFFER_OWNED Serialize() const {
-		BYTE_BUFFER_OWNED ret = { Size() };
-		auto cursor = ret.cursor_mut();
-		return (!Write(cursor) ? nullptr : std::move(ret));
-	}
 };
+
+template <class... Options> constexpr size_t OptionSize(
+	const CONFIG_OPTION_ARRAY<Options...>& opts
+)
+{
+	return std::apply(
+		[](const auto&...opt) { return (... + OptionSize(opt)); }, opts.options
+	);
+}
+
+template <class... Options> bool OptionRead(
+	const CONFIG_OPTION_ARRAY<Options...>& opts,
+	BYTE_BUFFER_CURSOR<const uint8_t>& cursor
+)
+{
+	return std::apply(
+		[&](auto&...opt) { return (... && OptionRead(opt, cursor)); },
+		opts.options
+	);
+}
+
+template <class... Options> bool OptionWrite(
+	BYTE_BUFFER_CURSOR<uint8_t>& cursor,
+	const CONFIG_OPTION_ARRAY<Options...>& opts
+)
+{
+	return std::apply(
+		[&](const auto&...opt) { return (... && OptionWrite(cursor, opt)); },
+		opts.options
+	);
+}
+// ----------
 
 // On-disk config file versions
 // ----------------------------
@@ -226,12 +295,16 @@ bool VersionLoad(const VERSION auto& version)
 {
 	const auto loaded_buf = FileLoad(version.FN);
 	auto loaded_cursor = loaded_buf.cursor();
-	return version.Options.Read(loaded_cursor);
+	return OptionRead(version.Options, loaded_cursor);
 }
 
 bool VersionSave(const VERSION auto& version)
 {
-	const auto buf = version.Options.Serialize();
+	BYTE_BUFFER_OWNED buf = { OptionSize(version.Options) };
+	auto cursor = buf.cursor_mut();
+	if(!OptionWrite(cursor, version.Options)) {
+		return false;
+	}
 	return (buf && FileWrite(version.FN, buf.cursor()));
 }
 // ----------------------------

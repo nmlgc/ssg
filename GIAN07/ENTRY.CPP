@@ -11,6 +11,7 @@
 #include "platform/input.h"
 #include "platform/path.h"
 #include "platform/text_backend.h"
+#include "platform/unicode.h"
 #include "platform/window_backend.h"
 #include "game/bgm.h"
 #include "game/debug.h"
@@ -152,8 +153,8 @@ bool XInit(void)
 	if(ConfigDat.SoundFlags.v & SNDF_BGM_ENABLE) {
 		BGM_Init();
 	}
-	if(!BGM_PackSet(ConfigDat.BGMPack.v)) {
-		ConfigDat.BGMPack.v.clear();
+	if(!BGM_PackSet(ConfigDat.BGMPack)) {
+		ConfigDat.BGMPack.clear();
 	}
 	BGM_SetGainApply(!(ConfigDat.SoundFlags.v & SNDF_BGM_NOT_VOL_NORM));
 	Grp_ScreenshotSetPrefix(u8"screenshots/");

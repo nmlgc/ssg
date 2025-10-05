@@ -114,7 +114,7 @@ struct CONFIG_DATA {
 
 	// グラフィック関連 //
 	OPTION<uint8_t> DeviceID = { 0 };	// 何番目のデバイスか
-	OPTION<int8_t> GraphicsAPI = { -1 };
+	std::u8string GraphicsAPI;
 	OPTION<uint8_t> WindowScale4x = { 0 };
 	OPTION<int16_t> WindowLeft = { GRAPHICS_TOPLEFT_UNDEFINED };
 	OPTION<int16_t> WindowTop = { GRAPHICS_TOPLEFT_UNDEFINED };

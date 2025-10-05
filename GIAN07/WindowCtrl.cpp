@@ -1175,10 +1175,7 @@ static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 #ifdef SUPPORT_GRP_API
 static void Main::Cfg::Grp::API::SetItem(bool)
 {
-	const bool is_def_api = (ConfigDat.GraphicsAPI.v < 0);
-
-	// Since [ConfigDat.GraphicsAPI.v] can be negative, we must find the
-	// active entry via string comparison.
+	const bool is_def_api = ConfigDat.GraphicsAPI.empty();
 	const Narrow::string_view api_active = GrpBackend_APILabel(
 		GrpBackend_APIString()
 	);

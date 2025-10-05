@@ -260,9 +260,18 @@ const struct VERSION_01 {
 const struct VERSION_02 {
 	static constexpr auto FN = _PATH("SSG_V02.CFG");
 
+	// SDL 2 used a numeric ID for its API parameter, which I reused for the
+	// initial implementation. However, this would couple the user's selection
+	// to the order of SDL's render driver list, and SDL's developers have and
+	// will continue to change its order.
+	// In one of its better improvements, SDL 3 changed SDL_CreateRenderer()'s
+	// driver parameter to a string, nudging developers into this more stable
+	// direction.
+	static inline CONFIG_OPTION_VALUE<int8_t> GraphicsAPIID = { -1 };
+
 	static constexpr auto Options = std::tie(
 		VERSION_01.Options,
-		ConfigDat.GraphicsAPI,
+		GraphicsAPIID,
 		ConfigDat.WindowScale4x,
 		ConfigDat.WindowLeft,
 		ConfigDat.WindowTop,
@@ -271,9 +280,24 @@ const struct VERSION_02 {
 	);
 } VERSION_02;
 
+const struct VERSION_03 {
+	static constexpr auto FN = _PATH("SSG_V03.CFG");
+
+	static constexpr auto Options = std::tie(
+		VERSION_01.Options,
+		ConfigDat.MidFlags,
+		ConfigDat.GraphicsAPI,
+		ConfigDat.WindowScale4x,
+		ConfigDat.WindowLeft,
+		ConfigDat.WindowTop,
+		ConfigDat.ScreenshotEffort
+	);
+} VERSION_03;
+
 
 // Must be sorted from the newest to the oldest version.
 const auto VERSIONS = std::make_tuple(
+	VERSION_03,
 	VERSION_02,
 	VERSION_01,
 	VERSION_00,
@@ -304,7 +328,9 @@ GRAPHICS_PARAMS CONFIG_DATA::GraphicsParams(void) const
 	return {
 		.flags = static_cast<GRAPHICS_PARAM_FLAGS>(flags_shifted),
 		.device_id = DeviceID.v,
-		.api = GraphicsAPI.v,
+#ifdef SUPPORT_GRP_API
+		.api = GrpBackend_APIID(GraphicsAPI),
+#endif
 		.window_scale_4x = WindowScale4x.v,
 		.left = WindowLeft.v,
 		.top = WindowTop.v,
@@ -317,7 +343,9 @@ void CONFIG_DATA::GraphicsParamsApply(const GRAPHICS_PARAMS& params)
 	GraphFlags.v &= ~GRPF_PARAM_MASK;
 	GraphFlags.v |= (std::to_underlying(params.flags) << GRPF_PARAM_SHIFT);
 	DeviceID.v = params.device_id;
-	GraphicsAPI.v = params.api;
+#ifdef SUPPORT_GRP_API
+	GraphicsAPI = GrpBackend_APIString(params.api);
+#endif
 	WindowScale4x.v = params.window_scale_4x;
 	WindowLeft.v = params.left;
 	WindowTop.v = params.top;
@@ -359,6 +387,13 @@ extern void ConfigLoad()
 	if(VERSION_ORIGINAL.BitDepth8Or16.loaded) {
 		ConfigDat.BitDepth = VERSION_ORIGINAL.BitDepth8Or16;
 	}
+#ifdef SUPPORT_GRP_API
+	if(VERSION_02.GraphicsAPIID.loaded) {
+		ConfigDat.GraphicsAPI = GrpBackend_APIString(
+			VERSION_02.GraphicsAPIID.v
+		);
+	}
+#endif
 }
 
 // コンフィグの内容を保存する //

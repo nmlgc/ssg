@@ -119,43 +119,32 @@ bool OptionWrite(BYTE_BUFFER_CURSOR<uint8_t>& cursor, const std::u8string& opt)
 	return true;
 }
 
-// Arrays of configuration options for simple serialization
-template <class... Options> struct CONFIG_OPTION_ARRAY {
-	const std::tuple<Options&...> options;
-
-	constexpr CONFIG_OPTION_ARRAY(Options&... options)
-		: options(options...) {
-	}
-};
-
 template <class... Options> constexpr size_t OptionSize(
-	const CONFIG_OPTION_ARRAY<Options...>& opts
+	const std::tuple<Options&...>& opts
 )
 {
 	return std::apply(
-		[](const auto&...opt) { return (... + OptionSize(opt)); }, opts.options
+		[](const auto&...opt) { return (... + OptionSize(opt)); }, opts
 	);
 }
 
 template <class... Options> bool OptionRead(
-	const CONFIG_OPTION_ARRAY<Options...>& opts,
+	const std::tuple<Options&...>& opts,
 	BYTE_BUFFER_CURSOR<const uint8_t>& cursor
 )
 {
 	return std::apply(
-		[&](auto&...opt) { return (... && OptionRead(opt, cursor)); },
-		opts.options
+		[&](auto&...opt) { return (... && OptionRead(opt, cursor)); }, opts
 	);
 }
 
 template <class... Options> bool OptionWrite(
-	BYTE_BUFFER_CURSOR<uint8_t>& cursor,
-	const CONFIG_OPTION_ARRAY<Options...>& opts
+	BYTE_BUFFER_CURSOR<uint8_t>& cursor, const std::tuple<Options&...>& opts
 )
 {
 	return std::apply(
 		[&](const auto&...opt) { return (... && OptionWrite(cursor, opt)); },
-		opts.options
+		opts
 	);
 }
 // ----------
@@ -187,7 +176,7 @@ const struct VERSION_ORIGINAL {
 	static inline CONFIG_OPTION_VALUE<uint32_t> CheckSum;
 	static inline CONFIG_OPTION_VALUE<uint8_t> PaddingByte;
 
-	static constexpr CONFIG_OPTION_ARRAY Options = {
+	static constexpr auto Options = std::tie(
 		ConfigDat.GameLevel,
 		ConfigDat.PlayerStock,
 		ConfigDat.BombStock,
@@ -211,8 +200,8 @@ const struct VERSION_ORIGINAL {
 
 		PaddingByte,
 		PaddingByte,
-		PaddingByte,
-	};
+		PaddingByte
+	);
 
 	static uint32_t CheckSumCalculate() {
 		uint32_t ret = 0;
@@ -237,7 +226,7 @@ const struct VERSION_ORIGINAL {
 const struct VERSION_00 {
 	static constexpr auto FN = _PATH("SSG_V00.CFG");
 
-	static constexpr CONFIG_OPTION_ARRAY Options = {
+	static constexpr auto Options = std::tie(
 		ConfigDat.GameLevel,
 		ConfigDat.PlayerStock,
 		ConfigDat.BombStock,
@@ -253,33 +242,33 @@ const struct VERSION_00 {
 		ConfigDat.PadShift,
 		ConfigDat.PadCancel,
 		ConfigDat.ExtraStgFlags,
-		ConfigDat.StageSelect,
-	};
+		ConfigDat.StageSelect
+	);
 } VERSION_00;
 
 const struct VERSION_01 {
 	static constexpr auto FN = _PATH("SSG_V01.CFG");
 
-	static constexpr CONFIG_OPTION_ARRAY Options = {
+	static constexpr auto Options = std::tie(
 		VERSION_00.Options,
 		ConfigDat.SEVolume,
 		ConfigDat.BGMVolume,
-		ConfigDat.BGMPack,
-	};
+		ConfigDat.BGMPack
+	);
 } VERSION_01;
 
 const struct VERSION_02 {
 	static constexpr auto FN = _PATH("SSG_V02.CFG");
 
-	static constexpr CONFIG_OPTION_ARRAY Options = {
+	static constexpr auto Options = std::tie(
 		VERSION_01.Options,
 		ConfigDat.GraphicsAPI,
 		ConfigDat.WindowScale4x,
 		ConfigDat.WindowLeft,
 		ConfigDat.WindowTop,
 		ConfigDat.MidFlags,
-		ConfigDat.ScreenshotEffort,
-	};
+		ConfigDat.ScreenshotEffort
+	);
 } VERSION_02;
 
 

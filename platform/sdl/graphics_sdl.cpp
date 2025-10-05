@@ -326,10 +326,9 @@ constinit VERSION Versions[] = {
 #undef TARGET
 #undef TARGET_
 
-void Update(int id)
+void Update(std::u8string_view driver_str)
 {
-	const auto name = WndBackend_SDLRendererName(id);
-	auto *version = std::ranges::find(Versions, name, &VERSION::name_sdl);
+	auto *version = std::ranges::find(Versions, driver_str, &VERSION::name_sdl);
 	if(version == std::end(Versions)) {
 		return;
 	}
@@ -603,6 +602,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		);
 		return PrimaryCleanup();
 	}
+	const auto driver_str = GrpBackend_APIString();
 
 	const auto props = SDL_GetRendererProperties(PrimaryRenderer);
 	const auto *formats_start = static_cast<const SDL_PixelFormat *>(
@@ -651,7 +651,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	}
 
 	SetRenderTargetFor(PrimaryRenderer);
-	APIVersions::Update(params.api);
+	APIVersions::Update(driver_str);
 
 	// Ensure that the software surface uses the preferred format
 	if(!SoftwareSurface || (SoftwareSurface->format != sdl_format)) {

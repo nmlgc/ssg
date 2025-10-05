@@ -288,7 +288,7 @@ uint8_t GrpBackend_DeviceCount(void)
 	return DxEnumNow;
 }
 
-Any::string_view GrpBackend_DeviceName(uint8_t id)
+Any::string_view GrpBackend_DeviceLabel(uint8_t id)
 {
 	if(id >= DxEnumNow) {
 		return {};
@@ -301,7 +301,7 @@ int8_t GrpBackend_APICount(void)
 	return 0;
 }
 
-std::u8string_view GrpBackend_APIName(int8_t id)
+std::u8string_view GrpBackend_APILabel(int8_t id)
 {
 	return (DxObj.PixelFormat.IsChanneled()
 		? u8"DirectDraw blitting + Direct3D 2 geometry"

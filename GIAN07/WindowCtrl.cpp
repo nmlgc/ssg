@@ -451,9 +451,9 @@ void InitMainWindow(void)
 
 		*(menu_p++) = &API::ItemDef;
 		for(const auto i : std::views::iota(0, grp_api_count)) {
-			const Narrow::string_view name = GrpBackend_APIName(i);
-			assert(!name.empty());
-			API::Item[i] = { name.data(), HELP_API_SPECIFIC, API::FnOverride };
+			const Narrow::string_view label = GrpBackend_APILabel(i);
+			assert(!label.empty());
+			API::Item[i] = { label.data(), HELP_API_SPECIFIC, API::FnOverride };
 			*(menu_p++) = &API::Item[i];
 		}
 		*(menu_p++) = &SubmenuExitItem;
@@ -998,7 +998,7 @@ static void Main::Cfg::Grp::SetItem(bool)
 		? 2
 		: ((ConfigDat.GraphFlags.v & GRPF_WINDOW_UPPER) ? 0 : 1)
 	);
-	const auto dev = GrpBackend_DeviceName(ConfigDat.DeviceID.v);
+	const auto dev = GrpBackend_DeviceLabel(ConfigDat.DeviceID.v);
 
 	const auto fs = params.FullscreenFlags();
 	const auto in_borderless_fullscreen = (fs.fullscreen && !fs.exclusive);
@@ -1178,7 +1178,7 @@ static void Main::Cfg::Grp::API::SetItem(bool)
 
 	// Since [ConfigDat.GraphicsAPI.v] can be negative, we must find the
 	// active entry via string comparison.
-	const Narrow::string_view api_active = GrpBackend_APIName(
+	const Narrow::string_view api_active = GrpBackend_APILabel(
 		ConfigDat.GraphicsAPI.v
 	);
 

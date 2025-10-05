@@ -372,6 +372,23 @@ std::u8string_view GrpBackend_APILabel(int8_t id)
 	return ret;
 }
 
+int8_t GrpBackend_APIID(std::u8string_view api)
+{
+	for(const auto i : std::views::iota(0, SDL_GetNumRenderDrivers())) {
+		if(GrpBackend_APIString(i) == api) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+std::u8string_view GrpBackend_APIString(int8_t id)
+{
+	// Guard against `nullptr`s
+	const auto *ret = std::bit_cast<const char8_t *>(SDL_GetRenderDriver(id));
+	return (ret ? ret : std::u8string_view{});
+}
+
 PIXEL_SIZE GrpBackend_DisplaySize(bool fullscreen)
 {
 	SDL_Rect rect{};

@@ -23,6 +23,13 @@ Any::string_view GrpBackend_DeviceLabel(uint8_t id);
 int8_t GrpBackend_APICount(void);
 std::u8string_view GrpBackend_APILabel(int8_t id);
 
+// Maps an API string back to its ID. Returns -1 for an unavailable API.
+int8_t GrpBackend_APIID(std::u8string_view api);
+
+// Maps an API ID to its string representation. Returns the empty string for
+// -1.
+std::u8string_view GrpBackend_APIString(int8_t id);
+
 // Returns the maximum usable display size in windowed or fullscreen mode.
 PIXEL_SIZE GrpBackend_DisplaySize(bool fullscreen);
 /// ------------------------------------------

@@ -126,22 +126,17 @@ std::optional<GRAPHICS_FULLSCREEN_FLAGS> HelpSetFullscreenMode(
 	return fs;
 }
 
-std::u8string_view HelpDriverName(int8_t id)
-{
-	const auto ret = SDL_GetRenderDriver(id);
-	return reinterpret_cast<const char8_t *>(ret);
-}
+#ifndef WIN32_VINTAGE
 
 int8_t WndBackend_ValidateRenderDriver(const std::u8string_view hint)
 {
-	for(const auto i : std::views::iota(0, SDL_GetNumRenderDrivers())) {
-		if(HelpDriverName(i) == hint) {
-			return i;
-		}
+	const auto id = GrpBackend_APIID(hint);
+	if(id >= 0) {
+		return id;
 	}
 	const auto *default_driver = (GRP_SDL_DEFAULT_API
 		? GRP_SDL_DEFAULT_API
-		: HelpDriverName(0).data()
+		: GrpBackend_APIString(0).data()
 	);
 	SDL_LogCritical(
 		LOG_CAT,
@@ -166,7 +161,7 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 {
 	assert(id < SDL_GetNumRenderDrivers());
 	if(id >= 0) {
-		return HelpDriverName(id);
+		return GrpBackend_APIString(id);
 	}
 
 	auto *hint = std::bit_cast<const char8_t *>(
@@ -177,14 +172,19 @@ std::u8string_view WndBackend_SDLRendererName(int8_t id)
 	}
 	if(!hint || (hint[0] == '\0')) {
 		// SDL tries to initialize drivers in order.
-		return HelpDriverName(0);
+		return GrpBackend_APIString(0);
 	}
 	id = WndBackend_ValidateRenderDriver(hint);
 	if(id < 0) {
-		return (GRP_SDL_DEFAULT_API ? GRP_SDL_DEFAULT_API : HelpDriverName(0));
+		if constexpr (GRP_SDL_DEFAULT_API) {
+			return GRP_SDL_DEFAULT_API;
+		}
+		return GrpBackend_APIString(0);
 	}
-	return HelpDriverName(id);
+	return GrpBackend_APIString(id);
 }
+
+#endif
 
 SDL_Window *WndBackend_SDL(void)
 {

@@ -66,6 +66,9 @@ void GrpBackend_Clear(
 // Sets the clipping rectangle.
 void GrpBackend_SetClip(const WINDOW_LTRB& rect);
 
+// Returns the currently active rendering API.
+std::u8string_view GrpBackend_APIString(void);
+
 // Returns the current pixel format of the backbuffer.
 PIXELFORMAT GrpBackend_PixelFormat(void);
 

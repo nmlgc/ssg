@@ -798,6 +798,17 @@ void GrpBackend_SetClip(const WINDOW_LTRB& rect)
 	SDL_SetRenderClipRect(*Renderer, &sdl_rect);
 }
 
+std::u8string_view GrpBackend_APIString(void)
+{
+	// More efficient than the hash table insertion done by
+	// SDL_GetRendererName().
+	assert(PrimaryRenderer);
+	const auto props = SDL_GetRendererProperties(PrimaryRenderer);
+	return { std::bit_cast<const char8_t *>(
+		SDL_GetStringProperty(props, SDL_PROP_RENDERER_NAME_STRING, nullptr)
+	) };
+}
+
 PIXELFORMAT GrpBackend_PixelFormat(void)
 {
 	if(!PreferredPixelFormat) {
@@ -1083,7 +1094,7 @@ bool GrpSurface_GDIText_Create(int32_t w, int32_t h, RGB colorkey)
 		SDL_LogCritical(
 			LOG_CAT,
 			"Renderer \"%s\" does not support the BGRA8888 pixel format required for rendering text via GDI.",
-			SDL_GetRendererName(PrimaryRenderer)
+			GrpBackend_APIString().data()
 		);
 		return false;
 	};

@@ -355,20 +355,19 @@ int8_t GrpBackend_APICount(void)
 	return SDL_GetNumRenderDrivers();
 }
 
-std::u8string_view GrpBackend_APILabel(int8_t id)
+std::u8string_view GrpBackend_APILabel(std::u8string_view api)
 {
-	const auto ret = WndBackend_SDLRendererName(id);
 	for(const auto& nice : API_NICE) {
-		if(nice.first == ret) {
+		if(nice.first == api) {
 			return nice.second;
 		}
 	}
 	for(const auto& nice : APIVersions::Versions) {
-		if(nice.name_sdl == ret) {
+		if(nice.name_sdl == api) {
 			return &nice.buf[0];
 		}
 	}
-	return ret;
+	return api;
 }
 
 int8_t GrpBackend_APIID(std::u8string_view api)
@@ -595,7 +594,8 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 	const auto *driver = SDL_GetRenderDriver(params.api);
 	PrimaryRenderer = SDL_CreateRenderer(WndBackend_SDL(), driver);
 	if(!PrimaryRenderer) {
-		const auto label = GrpBackend_APILabel(params.api);
+		const auto driver_str = WndBackend_SDLRendererName(params.api);
+		const auto label = GrpBackend_APILabel(driver_str);
 		const auto *api = std::bit_cast<const char *>(label.data());
 		SDL_LogCritical(
 			LOG_CAT, "Error creating %s renderer: %s", api, SDL_GetError()
@@ -641,7 +641,7 @@ std::optional<GRAPHICS_INIT_RESULT> PrimaryInitFull(GRAPHICS_PARAMS params)
 		}
 	}
 	if(!PreferredPixelFormat || (sdl_format == SDL_PIXELFORMAT_UNKNOWN)) {
-		const auto label = GrpBackend_APILabel(params.api);
+		const auto label = GrpBackend_APILabel(driver_str);
 		SDL_LogCritical(
 			LOG_CAT,
 			"The \"%s\" renderer does not support any of the game's supported software rendering pixel formats.",

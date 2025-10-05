@@ -21,7 +21,7 @@ Any::string_view GrpBackend_DeviceLabel(uint8_t id);
 
 // Rendering APIs.
 int8_t GrpBackend_APICount(void);
-std::u8string_view GrpBackend_APILabel(int8_t id);
+std::u8string_view GrpBackend_APILabel(std::u8string_view api);
 
 // Maps an API string back to its ID. Returns -1 for an unavailable API.
 int8_t GrpBackend_APIID(std::u8string_view api);

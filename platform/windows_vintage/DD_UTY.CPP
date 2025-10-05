@@ -301,7 +301,7 @@ int8_t GrpBackend_APICount(void)
 	return 0;
 }
 
-std::u8string_view GrpBackend_APILabel(int8_t id)
+std::u8string_view GrpBackend_APILabel(std::u8string_view)
 {
 	return (DxObj.PixelFormat.IsChanneled()
 		? u8"DirectDraw blitting + Direct3D 2 geometry"

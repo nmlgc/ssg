@@ -451,7 +451,8 @@ void InitMainWindow(void)
 
 		*(menu_p++) = &API::ItemDef;
 		for(const auto i : std::views::iota(0, grp_api_count)) {
-			const Narrow::string_view label = GrpBackend_APILabel(i);
+			const auto driver_str = GrpBackend_APIString(i);
+			const Narrow::string_view label = GrpBackend_APILabel(driver_str);
 			assert(!label.empty());
 			API::Item[i] = { label.data(), HELP_API_SPECIFIC, API::FnOverride };
 			*(menu_p++) = &API::Item[i];
@@ -1179,7 +1180,7 @@ static void Main::Cfg::Grp::API::SetItem(bool)
 	// Since [ConfigDat.GraphicsAPI.v] can be negative, we must find the
 	// active entry via string comparison.
 	const Narrow::string_view api_active = GrpBackend_APILabel(
-		ConfigDat.GraphicsAPI.v
+		GrpBackend_APIString()
 	);
 
 	ItemDef.SetActive(!is_def_api);

@@ -124,12 +124,12 @@ std::unique_ptr<PCM_PART> FLAC_Open(
 	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
 )
 {
-	if(on_metadata) {
+	if(const auto& metadata_cb = on_metadata) {
 		const auto maybe_initial_offset = stream.Tell();
 		if(!maybe_initial_offset.has_value()) {
 			return nullptr;
 		}
-		CB_DATA_STREAM_AND_METADATA data = { stream, on_metadata.value() };
+		CB_DATA_STREAM_AND_METADATA data = { stream, *metadata_cb };
 		auto* ff = drflac_open_with_metadata(
 			CB_FLAC_Read<CB_DATA_STREAM_AND_METADATA>,
 			CB_FLAC_Seek<CB_DATA_STREAM_AND_METADATA>,
@@ -140,8 +140,10 @@ std::unique_ptr<PCM_PART> FLAC_Open(
 		if(ff) {
 			drflac_close(ff);
 		}
-		if(!stream.Seek(maybe_initial_offset.value(), SEEK_WHENCE::BEGIN)) {
-			return nullptr;
+		if(const auto& initial_offset = maybe_initial_offset) {
+			if(!stream.Seek(*initial_offset, SEEK_WHENCE::BEGIN)) {
+				return nullptr;
+			}
 		}
 	}
 	auto* ff = drflac_open(

@@ -173,20 +173,19 @@ static bool BGM_Load(unsigned int id)
 
 		// Try loading a waveform track
 		bool waveform_new = false;
+		bool mid_new = false;
 		Waveform = BGM::TrackOpen(PackPath);
 		if(Waveform) {
 			if(SndBackend_BGMLoad(Waveform)) {
 				waveform_new = true;
+				if(const auto& hash = Waveform->metadata.source_midi) {
+					mid_new = BGM_MidLoadByHash(*hash);
+					LoadedOriginalMIDI = mid_new;
+				}
 			}
 		}
 
 		// Try loading a MIDI
-		bool mid_new = false;
-		if(waveform_new && Waveform->metadata.source_midi) {
-			const auto& hash = Waveform->metadata.source_midi.value();
-			mid_new = BGM_MidLoadByHash(hash);
-			LoadedOriginalMIDI = mid_new;
-		}
 		if(!mid_new) {
 			PackPath += EXT_MID;
 			mid_new = BGM_MidLoadBuffer(FileLoad(PackPath.c_str()));

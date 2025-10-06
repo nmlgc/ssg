@@ -95,7 +95,7 @@ std::unique_ptr<BGM::PCM_PART> Vorbis_Open(
 	assert(vf.vi->rate >= 0);
 	assert(vf.vi->channels >= 0);
 
-	if(on_metadata) {
+	if(const auto& metadata_cb = on_metadata) {
 		const auto* vc = ov_comment(&vf, -1);
 		if(vc) {
 			for(decltype(vc->comments) i = 0; i < vc->comments; i++) {
@@ -104,7 +104,7 @@ std::unique_ptr<BGM::PCM_PART> Vorbis_Open(
 				if(vc->comment_lengths[i] < 2) {
 					continue;
 				}
-				BGM::OnVorbisComment(on_metadata.value(), {
+				BGM::OnVorbisComment(*metadata_cb, {
 					reinterpret_cast<const char8_t *>(vc->user_comments[i]),
 					static_cast<size_t>(len),
 				});

@@ -182,9 +182,8 @@ public:
 	}
 
 	~FILE_STREAM_WIN32() {
-		if(maybe_timestamps) {
-			const auto& timestamps = maybe_timestamps.value();
-			SetFileTime(handle, &timestamps.ctime, nullptr, &timestamps.mtime);
+		if(const auto& times = maybe_timestamps) {
+			SetFileTime(handle, &times->ctime, nullptr, &times->mtime);
 		}
 		CloseHandle(handle);
 	}

@@ -83,23 +83,6 @@ bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 	return FileWrite(reinterpret_cast<const PATH_LITERAL>(s), bufs);
 }
 
-bool FileAppend(
-	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
-)
-{
-	auto fp = fopen(s, "ab");
-	return (
-		fp &&
-		!fseek(fp, 0, SEEK_END) &&
-		WriteAndClose(std::move(fp), bufs)
-	);
-}
-
-bool FileAppend(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
-{
-	return FileAppend(reinterpret_cast<const PATH_LITERAL>(s), bufs);
-}
-
 // Streams
 // -------
 

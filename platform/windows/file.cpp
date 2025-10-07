@@ -128,25 +128,6 @@ bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 	}).value_or(false);
 }
 
-bool FileAppend(
-	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
-)
-{
-	auto handle = OpenWrite(s, OPEN_ALWAYS);
-	return (
-		handle &&
-		(SetFilePointer(handle, 0, 0, FILE_END) != INVALID_SET_FILE_POINTER) &&
-		WriteAndClose(std::move(handle), bufs)
-	);
-}
-
-bool FileAppend(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
-{
-	return UTF::WithUTF16<bool>(s, [&](const std::wstring_view str_w) {
-		return FileAppend(str_w.data(), bufs);
-	}).value_or(false);
-}
-
 // Streams
 // -------
 

@@ -41,22 +41,6 @@ static bool FileWrite(const char8_t* s, const BYTE_BUFFER_BORROWED buf) {
 	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
 }
 
-// Appends the given sequence of buffers to the end of the given file. Returns
-// `true` on success.
-bool FileAppend(
-	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
-);
-bool FileAppend(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs);
-
-// Appends the given buffer to the end of the given file. Returns `true` on
-// success.
-static bool FileAppend(const PATH_LITERAL s, const BYTE_BUFFER_BORROWED buf) {
-	return FileAppend(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
-}
-static bool FileAppend(const char8_t* s, const BYTE_BUFFER_BORROWED buf) {
-	return FileAppend(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
-}
-
 // Streams
 // -------
 

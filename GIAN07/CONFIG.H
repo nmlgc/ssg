@@ -80,7 +80,7 @@ bool ValidateAlways(auto v) { return true; };
 template <typename T, T Max> constexpr bool ValidateBelow(T v) {
 	return (v <= Max);
 }
-template <uint8_t Mask> constexpr bool ValidateFlag(uint8_t v) {
+template <uint8_t Mask> constexpr bool ValidateMask(uint8_t v) {
 	return ((v & Mask) == 0);
 }
 template <ENUMFLAGS Flag> constexpr bool ValidateFlag(Flag v) {
@@ -89,9 +89,7 @@ template <ENUMFLAGS Flag> constexpr bool ValidateFlag(Flag v) {
 
 // Option class, with optional validation of the value against a supported
 // static range.
-template <
-	typename T, bool (*Validate)(T) = ValidateAlways
-> struct CONFIG_OPTION_VALUE {
+template <typename T> struct CONFIG_OPTION_VALUE {
 	T v;
 
 	// ([loaded] == std::nullopt): We loaded a config file from an earlier
@@ -102,6 +100,14 @@ template <
 	// ([loaded] != [v]): The config file contained an invalid value, and was
 	// reset to its default.
 	std::optional<T> loaded = std::nullopt;
+
+	bool (*Validate)(T);
+
+	constexpr CONFIG_OPTION_VALUE(
+		T def = T{}, bool (*validate)(T) = ValidateAlways
+	) noexcept : v(def), Validate(validate)
+	{
+	}
 
 	using DISK_T = std::conditional_t<
 		std::is_fundamental_v<T>, ENDIAN_SELECT_BIG<T>, T
@@ -143,37 +149,31 @@ struct CONFIG_OPTION_UTF8 {
 
 // オプション保持用構造体 //
 struct CONFIG_DATA {
-	template <
-		typename T, bool (*Validate)(T) = ValidateAlways
-	> using OPTION = CONFIG_OPTION_VALUE<T, Validate>;
+	template <typename T> using OPTION = CONFIG_OPTION_VALUE<T>;
+	using OPTION_UTF8 = CONFIG_OPTION_UTF8;
 
-	template <typename T, T Max> using OPTION_BELOW = OPTION<
-		T, ValidateBelow<T, Max>
-	>;
-	template <uint8_t Max> using OPTION_U8_BELOW = OPTION_BELOW<uint8_t, Max>;
-	template <uint8_t Mask> using OPTION_FLAGS = OPTION<
-		uint8_t, ValidateFlag<Mask>
-	>;
-	template <ENUMFLAGS Flag> using OPTION_ENUMFLAGS = OPTION<
-		Flag, ValidateFlag<Flag>
-	>;
+	template <class T, T V> static constexpr auto Below = &ValidateBelow<T, V>;
+	template <uint8_t V> static constexpr auto U8Below = Below<uint8_t, V>;
+	template <uint8_t V> static constexpr auto Mask = &ValidateMask<V>;
+	template <ENUMFLAGS V> static constexpr auto Flag = &ValidateFlag<V>;
+	static constexpr auto ValidateVolume = &ValidateBelow<VOLUME, VOLUME_MAX>;
 
 	// 32 is the WinMM joy button limit //
-	using OPTION_WINMM_PAD = OPTION_BELOW<INPUT_PAD_BUTTON, 32>;
-
-	using OPTION_UTF8 = CONFIG_OPTION_UTF8;
+	static constexpr auto ValidateWinMMPad = Below<INPUT_PAD_BUTTON, 32>;
 
 	// 難易度関連 //
 	// ---------- //
 
-	OPTION_U8_BELOW<GAME_LUNATIC> GameLevel = { GAME_NORMAL };	// 難易度
+	// 難易度
+	OPTION<uint8_t> GameLevel = { GAME_NORMAL, U8Below<GAME_LUNATIC> };
 
 	// 初期メイド数？
 	// Quirk: Off by 2?
-	OPTION_U8_BELOW<STOCK_PLAYER_MAX + 2> PlayerStock = { 2 };
+	OPTION<uint8_t> PlayerStock = { 2, U8Below<(STOCK_PLAYER_MAX + 2)> };
 
+	// 初期ボム数
 	// Quirk: Off by 1?
-	OPTION_U8_BELOW<STOCK_BOMB_MAX + 1> BombStock = { 2 }; // 初期ボム数
+	OPTION<uint8_t> BombStock = { 2, U8Below<(STOCK_BOMB_MAX + 1)> };
 	// ---------- //
 
 	// グラフィック関連 //
@@ -186,35 +186,39 @@ struct CONFIG_DATA {
 
 	// Target frame rate = 60 / [FPSDivisor]. 0 disables any frame rate
 	// limitation.
-	OPTION_U8_BELOW<FPS_DIVISOR_MAX> FPSDivisor = { 1 }; // 60Fps Mode
+	OPTION<uint8_t> FPSDivisor = { 1, U8Below<FPS_DIVISOR_MAX> };
 
 	// グラフィックに関するフラグ
-	OPTION_FLAGS<GRPF_MASK> GraphFlags = { 0 };
-	OPTION_U8_BELOW<GRP_SCREENSHOT_EFFORT_MAX> ScreenshotEffort = { 0 };
+	OPTION<uint8_t> GraphFlags = { 0, Mask<GRPF_MASK> };
+	OPTION<uint8_t> ScreenshotEffort = {
+		0, U8Below<GRP_SCREENSHOT_EFFORT_MAX>
+	};
 
 	// サウンド・ＢＧＭ関連 //
-	OPTION_FLAGS<SNDF_MASK> SoundFlags = { (SNDF_SE_ENABLE | SNDF_BGM_ENABLE) };
-	OPTION_ENUMFLAGS<MID_FLAGS> MidFlags = { MID_FLAGS::FIX_SYSEX_BUGS };
-	OPTION_BELOW<VOLUME, VOLUME_MAX> SEVolume  = { (VOLUME_MAX * 4) / 10 };
-	OPTION_BELOW<VOLUME, VOLUME_MAX> BGMVolume = { (VOLUME_MAX * 4) / 10 };
+	OPTION<uint8_t> SoundFlags = {
+		(SNDF_SE_ENABLE | SNDF_BGM_ENABLE), Mask<SNDF_MASK>
+	};
+	OPTION<MID_FLAGS> MidFlags = { MID_FLAGS::FIX_SYSEX_BUGS, Flag<MID_FLAGS> };
+	OPTION<VOLUME> SEVolume = { ((VOLUME_MAX * 4) / 10), ValidateVolume };
+	OPTION<VOLUME> BGMVolume = { ((VOLUME_MAX * 4) / 10), ValidateVolume };
 	OPTION_UTF8 BGMPack;
 
 	// 入力に関するフラグ
-	OPTION_FLAGS<INPF_MASK> InputFlags = { INPF_Z_MSKIP_ENABLE };
+	OPTION<uint8_t> InputFlags = { INPF_Z_MSKIP_ENABLE, Mask<INPF_MASK> };
 
 	// デバッグに関するフラグ
-	OPTION_FLAGS<DBGF_MASK> DebugFlags = { 0 };
+	OPTION<uint8_t> DebugFlags = { 0, Mask<DBGF_MASK> };
 
-	OPTION_WINMM_PAD PadTama = { 1 };
-	OPTION_WINMM_PAD PadBomb = { 2 };
-	OPTION_WINMM_PAD PadShift = { 0 };
-	OPTION_WINMM_PAD PadCancel = { 0 };
+	OPTION<INPUT_PAD_BUTTON> PadTama = { 1, ValidateWinMMPad };
+	OPTION<INPUT_PAD_BUTTON> PadBomb = { 2, ValidateWinMMPad };
+	OPTION<INPUT_PAD_BUTTON> PadShift = { 0, ValidateWinMMPad };
+	OPTION<INPUT_PAD_BUTTON> PadCancel = { 0, ValidateWinMMPad };
 
 	// エキストラステージ判定用フラグ
 	OPTION<uint8_t> ExtraStgFlags = { 0 };
 
 	// ワケ有りでここにいるのです(チェックサムの範囲外)
-	OPTION_U8_BELOW<STAGE_MAX> StageSelect = { 0 };
+	OPTION<uint8_t> StageSelect = { 0, U8Below<STAGE_MAX> };
 
 	GRAPHICS_PARAMS GraphicsParams(void) const;
 	void GraphicsParamsApply(const GRAPHICS_PARAMS& params);

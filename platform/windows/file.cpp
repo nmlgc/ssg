@@ -1,5 +1,5 @@
 /*
- *   File loading (Win32 implementation)
+ *   File I/O (Win32 implementation)
  *
  */
 
@@ -61,13 +61,6 @@ static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
 	return (buf.size_bytes() == bytes_written);
 }
 
-static size_t LoadInplace(std::span<uint8_t> buf, HANDLE&& handle)
-{
-	const auto ret = HandleRead(buf, handle);
-	CloseHandle(handle);
-	return ret;
-}
-
 static bool WriteAndClose(
 	HANDLE&& handle, std::span<const BYTE_BUFFER_BORROWED> bufs
 )
@@ -81,18 +74,6 @@ static bool WriteAndClose(
 		return true;
 	}();
 	return (CloseHandle(handle) && ret);
-}
-
-size_t FileLoadInplace(std::span<uint8_t> buf, const PATH_LITERAL s)
-{
-	return LoadInplace(buf, OpenRead(s));
-}
-
-size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s)
-{
-	return UTF::WithUTF16<size_t>(s, [&](const std::wstring_view str_w) {
-		return FileLoadInplace(buf, str_w.data());
-	}).value_or(0);
 }
 
 static BYTE_BUFFER_OWNED HandleReadAll(

@@ -3,6 +3,8 @@
  *
  */
 
+#include <SDL3/SDL_iostream.h>
+
 #include "CONFIG.H"
 #include "game/bgm.h"
 #include "game/endian.h"
@@ -10,7 +12,7 @@
 #include "platform/window_backend.h"
 
 ///// Constants /////
-constexpr auto DBG_FN = _PATH("秋霜DBG.DAT");
+constexpr auto DBG_FN = u8"秋霜DBG.DAT";
 
 // Option interface. Allows us to arrange values from [ConfigDat] into arrays
 // that define multiple versions of config files, and can be trivially looped
@@ -361,15 +363,17 @@ DEBUG_DATA DebugDat;
 #ifdef PBG_DEBUG
 static void DebugInit(void)
 {
-	const auto loaded_bytes = FileLoadInplace(
-		{ reinterpret_cast<uint8_t *>(&DebugDat), sizeof(DebugDat) }, DBG_FN
-	);
-	if(loaded_bytes != sizeof(DebugDat)) {
+	auto *f = SDL_IOFromFile(DBG_FN, "rb");
+	if(!f) {
+		return;
+	}
+	if(!SDL_MustReadIO(f, &DebugDat, sizeof(DebugDat))) {
 		DebugDat.Hit        = true;
 		DebugDat.MsgDisplay = true;
 		DebugDat.DemoSave   = false;
 		DebugDat.StgSelect  = 1;
 	}
+	SDL_CloseIO(f);
 }
 #endif
 
@@ -423,6 +427,6 @@ extern void ConfigSave(void)
 	}, VERSIONS);
 
 #ifdef PBG_DEBUG
-	FileWrite(DBG_FN, std::span(&DebugDat, 1));
+	SDL_SaveFile(DBG_FN, &DebugDat, sizeof(DebugDat));
 #endif
 }

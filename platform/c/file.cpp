@@ -1,5 +1,5 @@
 /*
- *   File loading (libc implementation)
+ *   File I/O (libc implementation)
  *
  */
 
@@ -13,16 +13,6 @@
 
 #include "platform/file.h"
 #include "game/enum_flags.h"
-
-static size_t LoadInplace(std::span<uint8_t> buf, FILE*&& fp)
-{
-	if(!fp) {
-		return 0;
-	}
-	auto bytes_read = fread(buf.data(), 1, buf.size_bytes(), fp);
-	fclose(fp);
-	return bytes_read;
-}
 
 static bool WriteAndClose(
 	FILE *&&fp, std::span<const BYTE_BUFFER_BORROWED> bufs
@@ -40,16 +30,6 @@ static bool WriteAndClose(
 		return true;
 	}();
 	return (!fclose(fp) && ret);
-}
-
-size_t FileLoadInplace(std::span<uint8_t> buf, const PATH_LITERAL s)
-{
-	return LoadInplace(buf, fopen(s, "rb"));
-}
-
-size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s)
-{
-	return FileLoadInplace(buf, reinterpret_cast<const PATH_LITERAL>(s));
 }
 
 static BYTE_BUFFER_OWNED FPReadAll(

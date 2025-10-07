@@ -1,5 +1,5 @@
 /*
- *   File loading
+ *   File I/O
  *
  */
 
@@ -14,14 +14,6 @@ enum class FILE_FLAGS : uint8_t {
 	FAIL_IF_EXISTS = 0x01,
 	PRESERVE_TIMESTAMPS = 0x02,
 };
-
-// Fills [buf] with the first [buf.size_bytes()] read from the file with the
-// given name, and returns the number of bytes read. Successful if the returned
-// value is equal to [buf.size_bytes()].
-[[nodiscard]] size_t FileLoadInplace(
-	std::span<uint8_t> buf, const PATH_LITERAL s
-);
-[[nodiscard]] size_t FileLoadInplace(std::span<uint8_t> buf, const char8_t* s);
 
 // Loads the file with the given name into a newly allocated buffer, if
 // possible.
@@ -109,3 +101,13 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const char8_t* s, FILE_FLAGS flags = FILE_FLAGS::NONE
 );
 // -------
+
+// SDL wrappers
+// ------------
+
+struct SDL_IOStream;
+
+SDL_IOStream *SDL_IOFromFile(const char8_t *file, const char *mode);
+bool SDL_MustReadIO(SDL_IOStream *context, void *ptr, size_t size);
+bool SDL_SaveFile(const char8_t *file, const void *data, size_t datasize);
+// ------------

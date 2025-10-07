@@ -308,11 +308,9 @@ PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile)
 	return { std::move(packfile), info };
 }
 
-PACKFILE_READ FilStartR(std::unique_ptr<FILE_STREAM_READ> stream)
+PACKFILE_READ FilStartR(SDL_IOStream *&& stream)
 {
-	auto ret = FilStartR(stream->ReadAll());
-	stream.reset();
-	return ret;
+	return FilStartR(SDL_LoadFile_IO(stream, true));
 }
 
 PACKFILE_READ FilStartR(const char8_t *s)

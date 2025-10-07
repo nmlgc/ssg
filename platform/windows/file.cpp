@@ -39,17 +39,6 @@ static HANDLE OpenWrite(const PATH_LITERAL s, DWORD disposition)
 	);
 }
 
-static size_t HandleRead(std::span<uint8_t> buf, HANDLE handle)
-{
-	[[gsl::suppress(type.5)]] DWORD bytes_read;
-	if((handle == INVALID_HANDLE_VALUE) || !ReadFile(
-		handle, buf.data(), buf.size_bytes(), &bytes_read, nullptr
-	)) {
-		return 0;
-	}
-	return bytes_read;
-}
-
 static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
 {
 	[[gsl::suppress(type.5)]] DWORD bytes_written;
@@ -61,30 +50,10 @@ static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
 	return (buf.size_bytes() == bytes_written);
 }
 
-static BYTE_BUFFER_OWNED HandleReadAll(
-	HANDLE handle, size_t size_limit = (std::numeric_limits<size_t>::max)()
-)
-{
-	LARGE_INTEGER size64;
-	if(!GetFileSizeEx(handle, &size64) || (size64.QuadPart > size_limit)) {
-		return {};
-	}
-	const size_t size = size64.QuadPart;
-
-	auto buf = BYTE_BUFFER_OWNED{ size };
-	if(!buf) {
-		return {};
-	}
-	if(HandleRead({ buf.get(), size }, handle) != size) {
-		return {};
-	}
-	return buf;
-}
-
 // Streams
 // -------
 
-struct FILE_STREAM_WIN32 : public FILE_STREAM_READ, FILE_STREAM_WRITE {
+struct FILE_STREAM_WIN32 : public FILE_STREAM_WRITE {
 	HANDLE handle;
 	std::optional<TIMESTAMPS> maybe_timestamps;
 
@@ -122,37 +91,10 @@ public:
 		return ret.QuadPart;
 	};
 
-	BYTE_BUFFER_OWNED ReadAll() override {
-		if(SetFilePointer(handle, 0, nullptr, FILE_BEGIN) != 0) {
-			return {};
-		}
-		return HandleReadAll(handle);
-	}
-
 	bool Write(BYTE_BUFFER_BORROWED buf) override {
 		return HandleWrite(handle, buf);
 	};
 };
-
-std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s)
-{
-	auto handle = OpenRead(s);
-	if(handle == INVALID_HANDLE_VALUE) {
-		return nullptr;
-	}
-	return std::unique_ptr<FILE_STREAM_WIN32>(
-		new (std::nothrow) FILE_STREAM_WIN32(handle)
-	);
-}
-
-std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s)
-{
-	return UTF::WithUTF16<std::unique_ptr<FILE_STREAM_READ>>(
-		s, [](const std::wstring_view str_w) {
-			return FileStreamRead(str_w.data());
-		}
-	).value_or(nullptr);
-}
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, FILE_FLAGS flags

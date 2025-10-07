@@ -32,19 +32,10 @@ struct FILE_STREAM_SEEK : FILE_STREAM {
 	virtual std::optional<int64_t> Tell() = 0;
 };
 
-struct FILE_STREAM_READ : FILE_STREAM_SEEK {
-	// Reads the entire file into a newly allocated buffer, leaving the read
-	// pointer at the end of the file.
-	[[nodiscard]] virtual BYTE_BUFFER_OWNED ReadAll() = 0;
-};
-
 struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {
 	// Retuns `true` if the buffer was written successfully.
 	[[nodiscard]] virtual bool Write(BYTE_BUFFER_BORROWED buf) = 0;
 };
-
-std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s);
-std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s);
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, FILE_FLAGS flags = FILE_FLAGS::NONE

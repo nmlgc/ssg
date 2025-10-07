@@ -347,8 +347,8 @@ namespace DAT {
 				}
 			);
 		}
-		auto stream = FileStreamRead(
-			filename_with_found_prefix.c_str() + NOT_FOUND.size()
+		auto *stream = SDL_IOFromFile(
+			(filename_with_found_prefix.c_str() + NOT_FOUND.size()), "rb"
 		);
 		if(!stream) {
 			return false;

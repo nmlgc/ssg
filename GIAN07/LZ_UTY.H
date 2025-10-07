@@ -10,8 +10,6 @@
 #include "platform/unicode.h"
 #include "game/endian.h"
 
-struct FILE_STREAM_READ;
-
 // Format
 // ------
 
@@ -111,5 +109,5 @@ struct PACKFILE_WRITE {
 
 BIT_FILE_READ BitFilCreateR(const char8_t *s);
 PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile);
-PACKFILE_READ FilStartR(std::unique_ptr<FILE_STREAM_READ> stream);
+PACKFILE_READ FilStartR(SDL_IOStream *&& stream);
 PACKFILE_READ FilStartR(const char8_t *s);

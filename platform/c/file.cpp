@@ -14,35 +14,10 @@
 #include "platform/file.h"
 #include "game/enum_flags.h"
 
-static BYTE_BUFFER_OWNED FPReadAll(
-	FILE* fp, size_t size_limit = (std::numeric_limits<size_t>::max)()
-)
-{
-	assert(fp);
-
-	struct stat st;
-	if(fstat(fileno(fp), &st) != 0) {
-		return {};
-	}
-	const size_t size = st.st_size;
-	if(size > size_limit) {
-		return {};
-	}
-
-	auto buf = BYTE_BUFFER_OWNED{ size };
-	if(!buf) {
-		return {};
-	}
-	if(fread(buf.get(), 1, size, fp) != size) {
-		return {};
-	}
-	return buf;
-}
-
 // Streams
 // -------
 
-struct FILE_STREAM_C : public FILE_STREAM_READ, FILE_STREAM_WRITE {
+struct FILE_STREAM_C : public FILE_STREAM_WRITE {
 	FILE* fp;
 	std::optional<statx_timestamp> maybe_mtime;
 
@@ -92,13 +67,6 @@ public:
 		return ret;
 	};
 
-	BYTE_BUFFER_OWNED ReadAll() override {
-		if(fseek(fp, 0, SEEK_SET)) {
-			return {};
-		}
-		return FPReadAll(fp);
-	}
-
 	bool Write(BYTE_BUFFER_BORROWED buf) override {
 		// fwrite() won't return 1 if we try to write a zero-sized buffer.
 		if(buf.empty()) {
@@ -107,20 +75,6 @@ public:
 		return (fwrite(buf.data(), buf.size(), 1, fp) == 1);
 	};
 };
-
-std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const PATH_LITERAL s)
-{
-	auto* fp = fopen(s, "rb");
-	if(!fp) {
-		return nullptr;
-	}
-	return std::unique_ptr<FILE_STREAM_C>(new (std::nothrow) FILE_STREAM_C(fp));
-}
-
-std::unique_ptr<FILE_STREAM_READ> FileStreamRead(const char8_t* s)
-{
-	return FileStreamRead(reinterpret_cast<const PATH_LITERAL>(s));
-}
 
 std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 	const PATH_LITERAL s, FILE_FLAGS flags

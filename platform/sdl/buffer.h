@@ -50,22 +50,32 @@ template <
 	}
 };
 
+// We can't #include SDL headers here because of GCC 15's import-then-#include
+// limitations, and SDL_malloc() and SDL_free() are declared with tons of
+// attributes we'd rather keep.
+void* SDL_malloc_wrap(size_t);
+
+struct SDL_FREE_DELETER {
+	void operator()(void *);
+};
+
 // Same semantics as the underlying unique_ptr: Can be either allocated or
 // empty.
-struct BYTE_BUFFER_OWNED : public std::unique_ptr<uint8_t[]> {
+struct BYTE_BUFFER_OWNED : public std::unique_ptr<uint8_t[], SDL_FREE_DELETER> {
 private:
 	size_t size_;
 
 public:
 	// Creates an empty buffer, with no allocation.
 	BYTE_BUFFER_OWNED(std::nullptr_t null = nullptr) noexcept :
-		std::unique_ptr<uint8_t[]>(null),
-		size_(0) {
+		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(null), size_(0) {
 	}
 
 	// Tries to allocate [size] bytes, and leaves the buffer empty on failure.
 	BYTE_BUFFER_OWNED(size_t size) :
-		std::unique_ptr<uint8_t[]>(new (std::nothrow) uint8_t[size]),
+		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(
+			static_cast<uint8_t *>(SDL_malloc_wrap(size))
+		),
 		size_(get() ? size : 0) {
 	}
 

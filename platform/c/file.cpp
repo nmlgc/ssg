@@ -57,22 +57,6 @@ static BYTE_BUFFER_OWNED FPReadAll(
 	return buf;
 }
 
-BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
-{
-	auto fp = fopen(s, "rb");
-	if(!fp) {
-		return {};
-	}
-	auto ret = FPReadAll(fp, size_limit);
-	fclose(fp);
-	return ret;
-}
-
-BYTE_BUFFER_OWNED FileLoad(const char8_t* s, size_t size_limit)
-{
-	return FileLoad(reinterpret_cast<const PATH_LITERAL>(s), size_limit);
-}
-
 bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 {
 	return WriteAndClose(fopen(s, "wb"), bufs);

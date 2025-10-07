@@ -71,6 +71,14 @@ public:
 		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(null), size_(0) {
 	}
 
+	// Adopts a SDL-allocated buffer.
+	BYTE_BUFFER_OWNED(void*&& buf, size_t size) :
+		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(
+			static_cast<uint8_t *>(buf)
+		),
+		size_(size) {
+	}
+
 	// Tries to allocate [size] bytes, and leaves the buffer empty on failure.
 	BYTE_BUFFER_OWNED(size_t size) :
 		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(

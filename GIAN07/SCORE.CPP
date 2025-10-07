@@ -21,7 +21,7 @@ constexpr uint64_t PBG_MASK_VALUE = 0xb97eb2c6542d3a41;
 
 
 
-const auto ScoreFileName = _PATH("秋霜SC.DAT");				// スコアデータ格納ファイル名
+const auto ScoreFileName = u8"秋霜SC.DAT";	// スコアデータ格納ファイル名
 NR_SCORE_STRING		ScoreString[NR_RANK_MAX];	// スコアデータ文字列格納先
 
 // スコアデータ格納先(名前空間で保護)

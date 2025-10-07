@@ -104,9 +104,9 @@ void BIT_DEVICE_WRITE::PutBits(uint32_t bits,unsigned int bitcount)
 	}
 }
 
-bool BIT_DEVICE_WRITE::Write(const PATH_LITERAL s) const
+bool BIT_DEVICE_WRITE::Write(const char8_t *s) const
 {
-	return FileWrite(s, buffer);
+	return SDL_SaveFile(s, buffer.data(), buffer.size());
 }
 
 BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
@@ -211,7 +211,7 @@ BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)
 	return device.buffer;
 }
 
-bool PACKFILE_WRITE::Write(const PATH_LITERAL s, FILE_FLAGS flags) const
+bool PACKFILE_WRITE::Write(const char8_t *s, FILE_FLAGS flags) const
 {
 	PBG_FILEHEAD head = { .n = files.size() };
 	std::vector<PBG_FILEINFO> info(files.size());
@@ -258,9 +258,9 @@ bool PACKFILE_WRITE::Write(const PATH_LITERAL s, FILE_FLAGS flags) const
 	return (stream->Seek(0, SEEK_WHENCE::BEGIN) && write_header(*stream));
 }
 
-BIT_FILE_READ BitFilCreateR(const PATH_LITERAL s)
+BIT_FILE_READ BitFilCreateR(const char8_t *s)
 {
-	return { FileLoad(s) };
+	return { SDL_LoadFile(s) };
 }
 
 PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile)
@@ -315,7 +315,7 @@ PACKFILE_READ FilStartR(std::unique_ptr<FILE_STREAM_READ> stream)
 	return ret;
 }
 
-PACKFILE_READ FilStartR(const PATH_LITERAL s)
+PACKFILE_READ FilStartR(const char8_t *s)
 {
-	return FilStartR(FileLoad(s));
+	return FilStartR(SDL_LoadFile(s));
 }

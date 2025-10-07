@@ -188,7 +188,7 @@ static bool BGM_Load(unsigned int id)
 		// Try loading a MIDI
 		if(!mid_new) {
 			PackPath += EXT_MID;
-			mid_new = BGM_MidLoadBuffer(FileLoad(PackPath.c_str()));
+			mid_new = BGM_MidLoadBuffer(SDL_LoadFile(PackPath.c_str()));
 		}
 
 		PackPath.resize(prefix_len);

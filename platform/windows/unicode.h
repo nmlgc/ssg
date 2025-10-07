@@ -8,7 +8,6 @@
 import std;
 
 using UNICODE_STRING = std::wstring;
-using UNICODE_STRING_VIEW = std::wstring_view;
 using UNICODE_LITERAL = const wchar_t *;
 #define _UNICODE_INNER(str) L##str
 #define _UNICODE(str) _UNICODE_INNER(str)

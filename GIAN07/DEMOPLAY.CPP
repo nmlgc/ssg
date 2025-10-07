@@ -26,13 +26,13 @@ struct {
 //DWORD RndBuf[RNDBUF_MAX];
 
 
-PATH_STRING ReplayFN(uint8_t stage)
+std::u8string ReplayFN(uint8_t stage)
 {
 	if(stage == GRAPH_ID_EXSTAGE) {
-		return PATH_STRING{ _PATH("秋霜りぷEx.DAT") };
+		return std::u8string{ u8"秋霜りぷEx.DAT" };
 	}
 
-	auto ret = PATH_STRING{ _PATH("秋霜りぷ_.DAT") };
+	auto ret = std::u8string{ u8"秋霜りぷ_.DAT" };
 	ret[ret.size() - 5] = ('0' + GameStage);
 	return ret;
 }

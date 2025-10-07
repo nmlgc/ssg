@@ -96,26 +96,6 @@ static BYTE_BUFFER_OWNED HandleReadAll(
 	return buf;
 }
 
-BYTE_BUFFER_OWNED FileLoad(const PATH_LITERAL s, size_t size_limit)
-{
-	auto handle = OpenRead(s);
-	if(handle == INVALID_HANDLE_VALUE) {
-		return {};
-	}
-	auto ret = HandleReadAll(handle, size_limit);
-	CloseHandle(handle);
-	return ret;
-}
-
-BYTE_BUFFER_OWNED FileLoad(const char8_t* s, size_t size_limit)
-{
-	return UTF::WithUTF16<BYTE_BUFFER_OWNED>(
-		s, [&](const std::wstring_view str_w) {
-			return FileLoad(str_w.data(), size_limit);
-		}
-	).value_or(nullptr);
-}
-
 bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)
 {
 	return WriteAndClose(OpenWrite(s, CREATE_ALWAYS), bufs);

@@ -15,16 +15,6 @@ enum class FILE_FLAGS : uint8_t {
 	PRESERVE_TIMESTAMPS = 0x02,
 };
 
-// Loads the file with the given name into a newly allocated buffer, if
-// possible.
-BYTE_BUFFER_OWNED FileLoad(
-	const PATH_LITERAL s,
-	size_t size_limit = (std::numeric_limits<size_t>::max)()
-);
-BYTE_BUFFER_OWNED FileLoad(
-	const char8_t* s, size_t size_limit = (std::numeric_limits<size_t>::max)()
-);
-
 // Saves the given sequence of buffers to the file with the given name,
 // overwriting the file if it already exists. Returns `true` on success.
 bool FileWrite(
@@ -92,6 +82,8 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 struct SDL_IOStream;
 
 SDL_IOStream *SDL_IOFromFile(const char8_t *file, const char *mode);
+BYTE_BUFFER_OWNED SDL_LoadFile(const char8_t *file);
+BYTE_BUFFER_OWNED SDL_LoadFile_IO(SDL_IOStream *src, bool closeio);
 bool SDL_MustReadIO(SDL_IOStream *context, void *ptr, size_t size);
 bool SDL_MustWriteIO(SDL_IOStream *context, const void *ptr, size_t size);
 bool SDL_SaveFile(const char8_t *file, const void *data, size_t datasize);

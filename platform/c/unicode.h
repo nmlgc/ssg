@@ -7,6 +7,4 @@
 
 import std;
 
-using UNICODE_STRING = std::string;
 using UNICODE_LITERAL = const char *;
-#define _UNICODE(str) str

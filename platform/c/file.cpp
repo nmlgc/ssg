@@ -14,24 +14,6 @@
 #include "platform/file.h"
 #include "game/enum_flags.h"
 
-static bool WriteAndClose(
-	FILE *&&fp, std::span<const BYTE_BUFFER_BORROWED> bufs
-)
-{
-	if(!fp) {
-		return false;
-	}
-	auto ret = [&]() {
-		for(const auto& buf : bufs) {
-			if(fwrite(buf.data(), buf.size_bytes(), 1, fp) != 1) {
-				return false;
-			}
-		}
-		return true;
-	}();
-	return (!fclose(fp) && ret);
-}
-
 static BYTE_BUFFER_OWNED FPReadAll(
 	FILE* fp, size_t size_limit = (std::numeric_limits<size_t>::max)()
 )
@@ -55,16 +37,6 @@ static BYTE_BUFFER_OWNED FPReadAll(
 		return {};
 	}
 	return buf;
-}
-
-bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)
-{
-	return WriteAndClose(fopen(s, "wb"), bufs);
-}
-
-bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
-{
-	return FileWrite(reinterpret_cast<const PATH_LITERAL>(s), bufs);
 }
 
 // Streams

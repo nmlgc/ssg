@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <SDL3/SDL_iostream.h>
+
 #include "platform/file.h"
 #include "CONFIG.H"
 #include "LZ_UTY.H"
@@ -112,13 +114,17 @@ void DemoplaySaveDemo(void)
 	DemoBuffer[DemoFrameCur] = KEY_ESC;
 	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
-	PATH_CODEUNIT fn[] = _PATH("STG_Demo.DAT");
+	char8_t fn[] = u8"STG_Demo.DAT";
 	fn[3] = ('0' + GameStage);
 
-	const std::array<BYTE_BUFFER_BORROWED, 2> bufs = {
-		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
-	};
-	FileWrite(fn, std::span<const BYTE_BUFFER_BORROWED>{ bufs });
+	auto *f = SDL_IOFromFile(fn, "wb");
+	if(f) {
+		SDL_WriteIO(f, &DemoInfo, sizeof(DemoInfo));
+		SDL_WriteIO(
+			f, DemoBuffer, (sizeof(DemoBuffer[0]) * DemoInfo.FrameCount)
+		);
+		SDL_CloseIO(f);
+	}
 
 	DemoplaySaveEnable = false;
 }

@@ -15,22 +15,6 @@ enum class FILE_FLAGS : uint8_t {
 	PRESERVE_TIMESTAMPS = 0x02,
 };
 
-// Saves the given sequence of buffers to the file with the given name,
-// overwriting the file if it already exists. Returns `true` on success.
-bool FileWrite(
-	const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs
-);
-bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs);
-
-// Saves the given buffer to the file with the given name, overwriting the file
-// if it already exists. Returns `true` on success.
-static bool FileWrite(const PATH_LITERAL s, const BYTE_BUFFER_BORROWED buf) {
-	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
-}
-static bool FileWrite(const char8_t* s, const BYTE_BUFFER_BORROWED buf) {
-	return FileWrite(s, std::span<const BYTE_BUFFER_BORROWED>{ &buf, 1 });
-}
-
 // Streams
 // -------
 

@@ -61,21 +61,6 @@ static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
 	return (buf.size_bytes() == bytes_written);
 }
 
-static bool WriteAndClose(
-	HANDLE&& handle, std::span<const BYTE_BUFFER_BORROWED> bufs
-)
-{
-	const auto ret = [&]() {
-		for(const auto& buf : bufs) {
-			if(!HandleWrite(handle, buf)) {
-				return false;
-			}
-		}
-		return true;
-	}();
-	return (CloseHandle(handle) && ret);
-}
-
 static BYTE_BUFFER_OWNED HandleReadAll(
 	HANDLE handle, size_t size_limit = (std::numeric_limits<size_t>::max)()
 )
@@ -94,18 +79,6 @@ static BYTE_BUFFER_OWNED HandleReadAll(
 		return {};
 	}
 	return buf;
-}
-
-bool FileWrite(const PATH_LITERAL s, std::span<const BYTE_BUFFER_BORROWED> bufs)
-{
-	return WriteAndClose(OpenWrite(s, CREATE_ALWAYS), bufs);
-}
-
-bool FileWrite(const char8_t* s, std::span<const BYTE_BUFFER_BORROWED> bufs)
-{
-	return UTF::WithUTF16<bool>(s, [&](const std::wstring_view str_w) {
-		return FileWrite(str_w.data(), bufs);
-	}).value_or(false);
 }
 
 // Streams

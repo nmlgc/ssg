@@ -93,5 +93,6 @@ struct SDL_IOStream;
 
 SDL_IOStream *SDL_IOFromFile(const char8_t *file, const char *mode);
 bool SDL_MustReadIO(SDL_IOStream *context, void *ptr, size_t size);
+bool SDL_MustWriteIO(SDL_IOStream *context, const void *ptr, size_t size);
 bool SDL_SaveFile(const char8_t *file, const void *data, size_t datasize);
 // ------------

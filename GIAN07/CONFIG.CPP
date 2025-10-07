@@ -7,6 +7,7 @@
 
 #include "CONFIG.H"
 #include "game/bgm.h"
+#include "game/defer.h"
 #include "game/endian.h"
 #include "platform/file.h"
 #include "platform/window_backend.h"
@@ -17,24 +18,14 @@ constexpr auto DBG_FN = u8"秋霜DBG.DAT";
 // Option interface. Allows us to arrange values from [ConfigDat] into arrays
 // that define multiple versions of config files, and can be trivially looped
 // over.
-template <typename T>
-concept CONFIG_OPTION = requires(
-	T& t,
-	BYTE_BUFFER_CURSOR<const uint8_t>& cursor_read,
-	BYTE_BUFFER_CURSOR<uint8_t>& cursor_write
-) {
-	// Returns the size of the option value.
-	{ OptionSize(t) } -> std::same_as<size_t>;
+template <typename T> concept CONFIG_OPTION = requires(T& t, SDL_IOStream& f) {
+	// Reads the configuration value from the given stream. Returns whether the
+	// read was successful.
+	{ OptionRead(t, f) } -> std::same_as<bool>;
 
-	// Reads the configuration value from the given [cursor], advancing it by
-	// the value of Size(). Returns whether there were enough bytes left and
-	// reading should continue.
-	{ OptionRead(t, cursor_read) } -> std::same_as<bool>;
-
-	// Writes the configuration value to the given [cursor], advancing it by
-	// the value of Size(). Returns whether there were enough bytes left and
-	// writing should continue.
-	{ OptionWrite(cursor_write, t) } -> std::same_as<bool>;
+	// Writes the configuration value to the given stream. Returns whether the
+	// write was successful.
+	{ OptionWrite(f, t) } -> std::same_as<bool>;
 };
 
 // Data types
@@ -44,109 +35,71 @@ template <typename T> using DISK = std::conditional_t<
 	std::is_fundamental_v<T>, ENDIAN_SELECT_BIG<T>, T
 >;
 
-template <typename T> constexpr size_t OptionSize(
-	const CONFIG_OPTION_VALUE<T>& opt
-)
-{
-	return sizeof(T);
-}
-
 template <typename T> bool OptionRead(
-	CONFIG_OPTION_VALUE<T>& opt, BYTE_BUFFER_CURSOR<const uint8_t>& cursor
+	CONFIG_OPTION_VALUE<T>& opt, SDL_IOStream& f
 )
 {
-	const auto maybe_loaded = cursor.next<DISK<T>>();
-	if(!maybe_loaded) {
+	DISK<T> d_loaded;
+	if(!SDL_MustReadIO(&f, &d_loaded, sizeof(d_loaded))) {
 		return false;
 	}
-	opt.loaded = maybe_loaded.value()[0];
-	if(opt.Validate(maybe_loaded.value()[0])) {
-		opt.v = maybe_loaded.value()[0];
+	const T loaded = d_loaded;
+	opt.loaded = loaded;
+	if(opt.Validate(loaded)) {
+		opt.v = loaded;
 	}
 	return true;
 }
 
 template <typename T> bool OptionWrite(
-	BYTE_BUFFER_CURSOR<uint8_t>& cursor, const CONFIG_OPTION_VALUE<T>& opt
+	SDL_IOStream& f, const CONFIG_OPTION_VALUE<T>& opt
 )
 {
-	auto maybe_v = cursor.next<DISK<T>>();
-	if(!maybe_v) {
-		return false;
-	}
-	maybe_v.value()[0] = opt.v;
-	return true;
+	const DISK<T> d_v = opt.v;
+	return SDL_MustWriteIO(&f, &d_v, sizeof(T));
 }
 
-constexpr size_t OptionSize(const std::u8string& opt)
+bool OptionRead(std::u8string& opt, SDL_IOStream& f)
 {
-	return (sizeof(U32BE) + (opt.size() * sizeof(opt[0])));
-}
-
-bool OptionRead(std::u8string& opt, BYTE_BUFFER_CURSOR<const uint8_t>& cursor)
-{
-	const auto maybe_len = cursor.next<U32BE>();
-	if(!maybe_len) {
+	U32BE d_len;
+	if(!SDL_MustReadIO(&f, &d_len, sizeof(d_len))) {
 		return false;
 	}
-	const auto len = maybe_len.value()[0];
-	const auto maybe_bytes = cursor.next<std::u8string::value_type>(len);
-	if(!maybe_bytes) {
-		return false;
-	}
-	const auto bytes = maybe_bytes.value();
-	opt.resize_and_overwrite(len, [bytes](auto buf, size_t n) {
-		std::ranges::copy(bytes, buf);
-		return n;
+	const uint32_t len = d_len;
+	opt.resize_and_overwrite(len, [&f](auto buf, size_t n) {
+		return SDL_ReadIO(&f, buf, n);
 	});
-	return true;
+	return ((opt.size() * sizeof(std::u8string::value_type)) == len);
 }
 
-bool OptionWrite(BYTE_BUFFER_CURSOR<uint8_t>& cursor, const std::u8string& opt)
+bool OptionWrite(SDL_IOStream& f, const std::u8string& opt)
 {
 	if(opt.size() > (std::numeric_limits<uint32_t>::max)()) {
 		return false;
 	}
-	auto maybe_len = cursor.next<U32BE>();
-	if(!maybe_len) {
+	const auto d_size = static_cast<U32BE>(opt.size());
+	if(!SDL_MustWriteIO(&f, &d_size, sizeof(d_size))) {
 		return false;
 	}
-	maybe_len.value()[0] = static_cast<U32BE>(opt.size());
-	const auto maybe_bytes = cursor.next<std::u8string::value_type>(opt.size());
-	if(!maybe_bytes) {
-		return false;
-	}
-	const auto bytes = maybe_bytes.value();
-	std::ranges::copy(opt, bytes.data());
-	return true;
-}
-
-template <class... Options> constexpr size_t OptionSize(
-	const std::tuple<Options&...>& opts
-)
-{
-	return std::apply(
-		[](const auto&...opt) { return (... + OptionSize(opt)); }, opts
-	);
+	const auto str_size = (opt.size() * sizeof(std::u8string::value_type));
+	return SDL_MustWriteIO(&f, opt.data(), str_size);
 }
 
 template <class... Options> bool OptionRead(
-	const std::tuple<Options&...>& opts,
-	BYTE_BUFFER_CURSOR<const uint8_t>& cursor
+	const std::tuple<Options&...>& opts, SDL_IOStream& f
 )
 {
 	return std::apply(
-		[&](auto&...opt) { return (... && OptionRead(opt, cursor)); }, opts
+		[&](auto&...opt) { return (... && OptionRead(opt, f)); }, opts
 	);
 }
 
 template <class... Options> bool OptionWrite(
-	BYTE_BUFFER_CURSOR<uint8_t>& cursor, const std::tuple<Options&...>& opts
+	SDL_IOStream& f, const std::tuple<Options&...>& opts
 )
 {
 	return std::apply(
-		[&](const auto&...opt) { return (... && OptionWrite(cursor, opt)); },
-		opts
+		[&](const auto&...opt) { return (... && OptionWrite(f, opt)); }, opts
 	);
 }
 // ----------
@@ -160,7 +113,7 @@ template <typename T> concept VERSION = requires(T t) {
 
 // Original 秋霜CFG.DAT
 const struct VERSION_ORIGINAL {
-	static constexpr auto FN = _PATH("秋霜CFG.DAT");
+	static constexpr auto FN = u8"秋霜CFG.DAT";
 
 	// The original build of the game only supported 8-bit and 16-bit. Anything
 	// else would cause a validation failure, resetting the configuration and
@@ -226,7 +179,7 @@ const struct VERSION_ORIGINAL {
 } VERSION_ORIGINAL;
 
 const struct VERSION_00 {
-	static constexpr auto FN = _PATH("SSG_V00.CFG");
+	static constexpr auto FN = u8"SSG_V00.CFG";
 
 	static constexpr auto Options = std::tie(
 		ConfigDat.GameLevel,
@@ -249,7 +202,7 @@ const struct VERSION_00 {
 } VERSION_00;
 
 const struct VERSION_01 {
-	static constexpr auto FN = _PATH("SSG_V01.CFG");
+	static constexpr auto FN = u8"SSG_V01.CFG";
 
 	static constexpr auto Options = std::tie(
 		VERSION_00.Options,
@@ -260,7 +213,7 @@ const struct VERSION_01 {
 } VERSION_01;
 
 const struct VERSION_02 {
-	static constexpr auto FN = _PATH("SSG_V02.CFG");
+	static constexpr auto FN = u8"SSG_V02.CFG";
 
 	// SDL 2 used a numeric ID for its API parameter, which I reused for the
 	// initial implementation. However, this would couple the user's selection
@@ -283,7 +236,7 @@ const struct VERSION_02 {
 } VERSION_02;
 
 const struct VERSION_03 {
-	static constexpr auto FN = _PATH("SSG_V03.CFG");
+	static constexpr auto FN = u8"SSG_V03.CFG";
 
 	static constexpr auto Options = std::tie(
 		VERSION_01.Options,
@@ -308,19 +261,22 @@ const auto VERSIONS = std::make_tuple(
 
 bool VersionLoad(const VERSION auto& version)
 {
-	const auto loaded_buf = FileLoad(version.FN);
-	auto loaded_cursor = loaded_buf.cursor();
-	return OptionRead(version.Options, loaded_cursor);
+	SDL_IOStream *f = SDL_IOFromFile(version.FN, "rb");
+	if(!f) {
+		return false;
+	}
+	defer(SDL_CloseIO(f));
+	return OptionRead(version.Options, *f);
 }
 
 bool VersionSave(const VERSION auto& version)
 {
-	BYTE_BUFFER_OWNED buf = { OptionSize(version.Options) };
-	auto cursor = buf.cursor_mut();
-	if(!OptionWrite(cursor, version.Options)) {
+	SDL_IOStream *f = SDL_IOFromFile(version.FN, "wb");
+	if(!f) {
 		return false;
 	}
-	return (buf && FileWrite(version.FN, buf.cursor()));
+	defer(SDL_CloseIO(f));
+	return OptionWrite(*f, version.Options);
 }
 // ----------------------------
 

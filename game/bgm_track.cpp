@@ -4,7 +4,7 @@
  *   Adapted from thcrap's bgmmod module.
  */
 
-#include <SDL3/SDL_stdinc.h>
+#include <SDL3/SDL_iostream.h>
 
 // GCC 15 throws `error: redefinition of 'void std::__terminate()'` if this
 // appears after a module import.
@@ -117,6 +117,12 @@ size_t TRACK_PCM::DecodeSingle(std::span<std::byte> buf)
 	return ret;
 }
 
+TRACK_PCM::~TRACK_PCM()
+{
+	SDL_CloseIO(loop_stream);
+	SDL_CloseIO(&intro_stream);
+}
+
 // Codecs
 // ------
 
@@ -126,10 +132,10 @@ struct CODEC_PCM {
 };
 
 std::unique_ptr<PCM_PART> FLAC_Open(
-	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
+	SDL_IOStream& stream, std::optional<METADATA_CALLBACK> on_metadata
 );
 std::unique_ptr<PCM_PART> Vorbis_Open(
-	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
+	SDL_IOStream& stream, std::optional<METADATA_CALLBACK> on_metadata
 );
 
 // Sorted in order of preference.
@@ -167,7 +173,7 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 	for(const auto& codec : CODECS_PCM) {
 		fn.resize(base_len);
 		fn += codec.ext;
-		auto intro_stream = FileStreamRead(fn.c_str());
+		auto intro_stream = SDL_IOFromFile(fn.c_str(), "rb");
 		if(!intro_stream) {
 			continue;
 		}
@@ -176,50 +182,47 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 		std::unique_ptr<PCM_PART> loop_part;
 		TRACK_METADATA meta;
 
-		intro_part = codec.open(
-			*(intro_stream.get()),
-			[&](auto tag, auto value) {
-				if(meta.title.empty() && TagEquals(tag, u8"TITLE")) {
-					meta.title = value;
-					return;
-				}
-				if(!meta.source_midi && TagEquals(tag, u8"SOURCE MIDI")) {
-					meta.source_midi = HashFrom(value);
-					return;
-				}
-				if(!meta.gain_factor && TagEquals(tag, u8"GAIN FACTOR")) {
-					const auto first = Narrow::string_view(value).data();
-					const auto last = (first + value.size());
+		intro_part = codec.open(*intro_stream, [&](auto tag, auto value) {
+			if(meta.title.empty() && TagEquals(tag, u8"TITLE")) {
+				meta.title = value;
+				return;
+			}
+			if(!meta.source_midi && TagEquals(tag, u8"SOURCE MIDI")) {
+				meta.source_midi = HashFrom(value);
+				return;
+			}
+			if(!meta.gain_factor && TagEquals(tag, u8"GAIN FACTOR")) {
+				const auto first = Narrow::string_view(value).data();
+				const auto last = (first + value.size());
 
 #if(__cpp_lib_to_chars >= 201611L)
-					float parsed = 0;
-					const auto r = std::from_chars(first, last, parsed);
-					const auto success = (r.ptr == last);
+				float parsed = 0;
+				const auto r = std::from_chars(first, last, parsed);
+				const auto success = (r.ptr == last);
 #else
-					// Locale braindeath time!
-					// (https://github.com/mpv-player/mpv/commit/1e70e82baa)
-					static locale_t locale_c = nullptr;
-					if(!locale_c) {
-						locale_c = newlocale(LC_NUMERIC_MASK, "C", nullptr);
-						if(locale_c) {
-							atexit([] {
-								freelocale(locale_c);
-								locale_c = nullptr;
-							});
-						}
+				// Locale braindeath time!
+				// (https://github.com/mpv-player/mpv/commit/1e70e82baa)
+				static locale_t locale_c = nullptr;
+				if(!locale_c) {
+					locale_c = newlocale(LC_NUMERIC_MASK, "C", nullptr);
+					if(locale_c) {
+						atexit([] {
+							freelocale(locale_c);
+							locale_c = nullptr;
+						});
 					}
-
-					char *parsed_last = nullptr;
-					float parsed = strtof_l(first, &parsed_last, locale_c);
-					const auto success = (parsed_last == last);
-#endif
-					if(success) {
-						meta.gain_factor = parsed;
-					}
-					return;
 				}
+
+				char *parsed_last = nullptr;
+				float parsed = strtof_l(first, &parsed_last, locale_c);
+				const auto success = (parsed_last == last);
+#endif
+				if(success) {
+					meta.gain_factor = parsed;
+				}
+				return;
 			}
-		);
+		});
 		if(!intro_part) {
 			continue;
 		}
@@ -227,9 +230,9 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 		fn.resize(base_len);
 		fn += LOOP_INFIX;
 		fn += codec.ext;
-		auto loop_stream = FileStreamRead(fn.c_str());
+		auto loop_stream = SDL_IOFromFile(fn.c_str(), "rb");
 		if(loop_stream) {
-			loop_part = codec.open(*(loop_stream.get()), std::nullopt);
+			loop_part = codec.open(*loop_stream, std::nullopt);
 			if(!loop_part) {
 				continue;
 			}
@@ -240,8 +243,8 @@ std::unique_ptr<TRACK> TrackOpen(const std::u8string_view base_fn)
 		}
 		return std::make_unique<TRACK_PCM>(
 			std::move(meta),
-			std::move(intro_stream),
-			std::move(loop_stream),
+			*intro_stream,
+			loop_stream,
 			std::move(intro_part),
 			std::move(loop_part)
 		);

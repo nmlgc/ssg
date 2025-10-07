@@ -9,6 +9,8 @@
 #define OV_EXCLUDE_STATIC_CALLBACKS
 #include <vorbis/vorbisfile.h>
 
+#include <SDL3/SDL_iostream.h>
+
 #include "game/bgm_track.h"
 #include <assert.h>
 
@@ -21,31 +23,31 @@ static size_t CB_Vorbis_Read(
 	void* ptr, size_t size, size_t nmemb, void* datasource
 )
 {
-	auto* stream = static_cast<FILE_STREAM_READ *>(datasource);
-	return stream->Read({ static_cast<uint8_t *>(ptr), (size * nmemb) });
+	auto *stream = static_cast<SDL_IOStream *>(datasource);
+	return SDL_ReadIO(stream, ptr, (size * nmemb));
 }
 
 int CB_Vorbis_Seek(void* datasource, ogg_int64_t offset, int ov_whence)
 {
-	auto* stream = static_cast<FILE_STREAM_READ *>(datasource);
+	auto *stream = static_cast<SDL_IOStream *>(datasource);
 
 	#pragma warning(suppress : 26494) // type.5
-	SEEK_WHENCE whence;
+	SDL_IOWhence whence;
 	switch(ov_whence) {
-	case 0:	whence = SEEK_WHENCE::BEGIN;  	break;
-	case 1:	whence = SEEK_WHENCE::CURRENT;	break;
-	case 2:	whence = SEEK_WHENCE::END;    	break;
+	case 0:	whence = SDL_IO_SEEK_SET;	break;
+	case 1:	whence = SDL_IO_SEEK_CUR;	break;
+	case 2:	whence = SDL_IO_SEEK_END;	break;
 	default:
 		assert(!"Invalid seek origin?");
 		return -1;
 	}
-	return stream->Seek(offset, whence);
+	return SDL_SeekIO(stream, offset, whence);
 }
 
 long CB_Vorbis_Tell(void* datasource)
 {
-	auto* stream = static_cast<FILE_STREAM_READ *>(datasource);
-	return stream->Tell().value_or(-1);
+	auto* stream = static_cast<SDL_IOStream *>(datasource);
+	return SDL_TellIO(stream);
 }
 
 static const ov_callbacks VORBIS_CALLBACKS = {
@@ -84,7 +86,7 @@ PCM_PART_VORBIS::~PCM_PART_VORBIS()
 }
 
 std::unique_ptr<BGM::PCM_PART> Vorbis_Open(
-	FILE_STREAM_READ& stream, std::optional<BGM::METADATA_CALLBACK> on_metadata
+	SDL_IOStream& stream, std::optional<BGM::METADATA_CALLBACK> on_metadata
 )
 {
 	OggVorbis_File vf = { 0 };

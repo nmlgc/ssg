@@ -9,6 +9,7 @@
 
 // GCC 15 throws `error: conflicting declaration 'typedef struct max_align_t
 // max_align_t'` if this appears after a module import.
+#include <SDL3/SDL_iostream.h>
 #include <libs/dr_libs/dr_flac.h>
 
 #include "game/bgm_track.h"
@@ -27,20 +28,20 @@ namespace BGM {
 // a bit of trickery to avoid duplicating the read and seek callbacks for the
 // two cases...
 template <class T> concept CB_DATA = requires(T t) {
-	{ t.stream() } -> std::same_as<FILE_STREAM_READ &>;
+	{ t.stream() } -> std::same_as<SDL_IOStream&>;
 };
 
-struct CB_DATA_STREAM : public FILE_STREAM_READ {
-	FILE_STREAM_READ& stream() {
-		return *this;
+struct CB_DATA_STREAM {
+	SDL_IOStream& stream() {
+		return *std::bit_cast<SDL_IOStream *>(this);
 	}
 };
 
 struct CB_DATA_STREAM_AND_METADATA {
-	FILE_STREAM_READ& _stream;
+	SDL_IOStream& _stream;
 	METADATA_CALLBACK on_metadata;
 
-	FILE_STREAM_READ& stream() {
+	SDL_IOStream& stream() {
 		return _stream;
 	}
 };
@@ -50,7 +51,7 @@ template <CB_DATA CB> static size_t CB_FLAC_Read(
 )
 {
 	auto& stream = static_cast<CB *>(user_data)->stream();
-	return stream.Read({ static_cast<uint8_t *>(buf), size });
+	return SDL_ReadIO(&stream, buf, size);
 }
 
 template <CB_DATA CB> static drflac_bool32 CB_FLAC_Seek(
@@ -60,17 +61,18 @@ template <CB_DATA CB> static drflac_bool32 CB_FLAC_Seek(
 	auto& stream = static_cast<CB *>(user_data)->stream();
 	static_assert(
 		std::to_underlying(DRFLAC_SEEK_SET) ==
-		std::to_underlying(SEEK_WHENCE::BEGIN)
+		std::to_underlying(SDL_IO_SEEK_SET)
 	);
 	static_assert(
 		std::to_underlying(DRFLAC_SEEK_CUR) ==
-		std::to_underlying(SEEK_WHENCE::CURRENT)
+		std::to_underlying(SDL_IO_SEEK_CUR)
 	);
 	static_assert(
 		std::to_underlying(DRFLAC_SEEK_END) ==
-		std::to_underlying(SEEK_WHENCE::END)
+		std::to_underlying(SDL_IO_SEEK_END)
 	);
-	return stream.Seek(offset, static_cast<SEEK_WHENCE>(origin));
+	const auto whence = static_cast<SDL_IOWhence>(origin);
+	return (SDL_SeekIO(&stream, offset, whence) != -1);
 }
 
 template <CB_DATA CB> static drflac_bool32 CB_FLAC_Tell(
@@ -78,11 +80,11 @@ template <CB_DATA CB> static drflac_bool32 CB_FLAC_Tell(
 )
 {
 	auto& stream = static_cast<CB *>(user_data)->stream();
-	const auto ret = stream.Tell();
-	if(!cursor || !ret) {
+	const auto offset = SDL_TellIO(&stream);
+	if(!cursor || (offset == -1)) {
 		return DRFLAC_FALSE;
 	}
-	*cursor = ret.value();
+	*cursor = offset;
 	return DRFLAC_TRUE;
 }
 
@@ -145,12 +147,12 @@ PCM_PART_FLAC::~PCM_PART_FLAC()
 }
 
 std::unique_ptr<PCM_PART> FLAC_Open(
-	FILE_STREAM_READ& stream, std::optional<METADATA_CALLBACK> on_metadata
+	SDL_IOStream& stream, std::optional<METADATA_CALLBACK> on_metadata
 )
 {
 	if(const auto& metadata_cb = on_metadata) {
-		const auto maybe_initial_offset = stream.Tell();
-		if(!maybe_initial_offset.has_value()) {
+		const auto initial_offset = SDL_TellIO(&stream);
+		if(initial_offset == -1) {
 			return nullptr;
 		}
 		CB_DATA_STREAM_AND_METADATA data = { stream, *metadata_cb };
@@ -165,10 +167,11 @@ std::unique_ptr<PCM_PART> FLAC_Open(
 		if(ff) {
 			drflac_close(ff);
 		}
-		if(const auto& initial_offset = maybe_initial_offset) {
-			if(!stream.Seek(*initial_offset, SEEK_WHENCE::BEGIN)) {
-				return nullptr;
-			}
+		const auto new_offset = SDL_SeekIO(
+			&stream, initial_offset, SDL_IO_SEEK_SET
+		);
+		if(new_offset != initial_offset) {
+			return nullptr;
 		}
 	}
 	auto* ff = drflac_open(

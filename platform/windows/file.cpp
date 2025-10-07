@@ -122,10 +122,6 @@ public:
 		return ret.QuadPart;
 	};
 
-	size_t Read(std::span<uint8_t> buf) override {
-		return HandleRead(buf, handle);
-	}
-
 	BYTE_BUFFER_OWNED ReadAll() override {
 		if(SetFilePointer(handle, 0, nullptr, FILE_BEGIN) != 0) {
 			return {};

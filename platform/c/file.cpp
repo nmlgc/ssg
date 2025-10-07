@@ -92,10 +92,6 @@ public:
 		return ret;
 	};
 
-	size_t Read(std::span<uint8_t> buf) override {
-		return fread(buf.data(), 1, buf.size_bytes(), fp);
-	}
-
 	BYTE_BUFFER_OWNED ReadAll() override {
 		if(fseek(fp, 0, SEEK_SET)) {
 			return {};

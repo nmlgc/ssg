@@ -13,6 +13,8 @@
 #define MA_NO_NULL
 #ifdef WIN32_VINTAGE
 #define MA_NO_WASAPI
+#define MA_NO_SSE2
+#define MA_NO_AVX2
 #endif
 
 // Slightly crispier than what you'd get with DirectSound, but 2 would already

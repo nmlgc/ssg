@@ -65,8 +65,12 @@ constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp);
 
 std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer);
 
+#ifndef SDL_pixels_h_
+enum SDL_PixelFormat : uint32_t;
+#endif
+
 // Returns `true` if BMPSave() supports the given [format].
-bool BMPSaveSupports(PIXELFORMAT format);
+bool BMPSaveSupports(SDL_PixelFormat format);
 
 bool BMPSave(
 	FILE_STREAM_WRITE* stream,

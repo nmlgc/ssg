@@ -110,9 +110,6 @@ void Grp_PaletteSetDefault(void);
 // Screenshots
 // -----------
 
-struct BGRA;
-struct FILE_STREAM_WRITE;
-
 // 0 = BMP, 10 = max-effort WebP.
 constexpr uint8_t GRP_SCREENSHOT_EFFORT_COUNT = 11;
 constexpr uint8_t GRP_SCREENSHOT_EFFORT_MAX = (GRP_SCREENSHOT_EFFORT_COUNT - 1);
@@ -127,15 +124,12 @@ extern std::chrono::steady_clock::duration Grp_ScreenshotTimes[
 // Required to enable the screenshot feature as a whole.
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix);
 
-// Saves the given bitmap in the screenshot format to a file with the
-// screenshot prefix. [t_start] represents the very beginning of the backend's
-// capturing process.
+struct SDL_Surface;
+
+// Saves the given surface to a file with the screenshot prefix. [t_start]
+// represents the very beginning of the backend's capturing process.
 bool Grp_ScreenshotSave(
-	PIXEL_SIZE_BASE<unsigned int> size,
-	PIXELFORMAT format,
-	std::span<BGRA> palette,
-	std::span<const std::byte> pixels,
-	const std::chrono::steady_clock::time_point t_start
+	SDL_Surface *src, const std::chrono::steady_clock::time_point t_start
 );
 // -----------
 

@@ -7,6 +7,8 @@
 // max_align_t'` if this appears after a module import.
 #include <webp/encode.h>
 
+#include <SDL3/SDL_surface.h>
+
 #include "game/graphics.h"
 #include "game/defer.h"
 #include "game/format_bmp.h"
@@ -103,40 +105,52 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 	return nullptr;
 }
 
-static bool ScreenshotSaveBMP(
-	PIXEL_SIZE_BASE<unsigned int> size,
-	PIXELFORMAT format,
-	std::span<BGRA> palette,
-	std::span<const std::byte> pixels
-)
+static bool ScreenshotSaveBMP(SDL_Surface *src)
 {
-	if(!BMPSaveSupports(format)) {
+	if(!BMPSaveSupports(src->format)) {
 		assert(!"Unsupported pixel format?");
 		return false;
 	}
-	assert(size.w < std::numeric_limits<PIXEL_COORD>::max());
-	assert(size.h < std::numeric_limits<PIXEL_COORD>::max());
-	const PIXEL_SIZE bmp_size = {
-		.w = Cast::sign<PIXEL_COORD>(size.w),
-		.h = -Cast::sign<PIXEL_COORD>(size.h),
-	};
+	assert(src->w < std::numeric_limits<PIXEL_COORD>::max());
+	assert(src->h < std::numeric_limits<PIXEL_COORD>::max());
 	const auto stream = Grp_NextScreenshotStream(u8".BMP");
 	if(!stream) {
 		return false;
 	}
-	const auto bpp = (format.PixelByteSize() * 8);
+
+	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
+	const auto palette = [src, &bgra_memory]() -> std::span<BGRA> {
+		const auto *palette = SDL_GetSurfacePalette(src);
+		if(!palette) {
+			return {};
+		}
+		assert(palette->ncolors == (sizeof(uint8_t) << 8));
+		for(const int i : std::views::iota(0, palette->ncolors)) {
+			bgra_memory[i] = {
+				.b = palette->colors[i].b,
+				.g = palette->colors[i].g,
+				.r = palette->colors[i].r,
+				.a = palette->colors[i].a,
+			};
+		}
+		return bgra_memory;
+	}();
+
+	const PIXEL_SIZE bmp_size = { .w = src->w, .h = -src->h };
+
+	// SDL_BITSPERPIXEL() for `SDL_PIXELFORMAT_XRGB8888` would return 24, not
+	// 32!
+	const auto bpp = (SDL_BYTESPERPIXEL(src->format) * 8);
+
+	const auto pixels = std::span(
+		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
+	);
 	return BMPSave(stream.get(), bmp_size, 1, bpp, palette, pixels);
 }
 
-static bool ScreenshotSaveWebP(
-	PIXEL_SIZE_BASE<unsigned int> size,
-	PIXELFORMAT format,
-	std::span<BGRA> palette,
-	std::span<const std::byte> pixels,
-	int z
-)
+static bool ScreenshotSaveWebP(SDL_Surface *src, int z)
 {
-	if((size.w > WEBP_MAX_DIMENSION) || (size.h > WEBP_MAX_DIMENSION)) {
+	if((src->w > WEBP_MAX_DIMENSION) || (src->h > WEBP_MAX_DIMENSION)) {
 		return false;
 	}
 
@@ -146,53 +160,56 @@ static bool ScreenshotSaveWebP(
 	}
 	defer(WebPPictureFree(&pic));
 
-	pic.width = size.w;
-	pic.height = size.h;
-	pic.argb_stride = size.w;
+	pic.width = src->w;
+	pic.height = src->h;
+	pic.argb_stride = src->w;
 
 	// Must also be set to opt into lossless import!
 	pic.use_argb = true;
 
 	decltype(WebPPictureImportRGBX) *import_func_32bpp = nullptr;
-	switch(format.format) {
-	case PIXELFORMAT::BGRA8888:
+	switch(src->format) {
+	case SDL_PIXELFORMAT_ARGB8888:
 		// Yup, "argb" is little-endian and this is actually BGRA...
-		pic.argb = std::bit_cast<uint32_t *>(pixels.data());
+		pic.argb = std::bit_cast<uint32_t *>(src->pixels);
 		break;
-	case PIXELFORMAT::BGRX8888:
+	case SDL_PIXELFORMAT_XRGB8888:
 		// … but these are big-endian!
 		import_func_32bpp = WebPPictureImportBGRX;
 		break;
-	case PIXELFORMAT::RGBA8888:
+	case SDL_PIXELFORMAT_ABGR8888:
 		import_func_32bpp = WebPPictureImportRGBA;
 		break;
-	case PIXELFORMAT::PALETTE8:
+	case SDL_PIXELFORMAT_INDEX8: {
 		// The WebP repo has equivalent code in WebPImportColorMappedARGB(),
 		// but Linux distributions typically don't package the `extras` module
 		// this function belongs to.
-		assert(palette.size() == (sizeof(uint8_t) << 8));
+		const auto *palette = SDL_GetSurfacePalette(src);
+		if(!palette) {
+			return false;
+		}
+		assert(palette->ncolors == (sizeof(uint8_t) << 8));
 		if(!WebPPictureAlloc(&pic)) {
 			return false;
 		}
-		{
-			auto *src_p = std::bit_cast<uint8_t *>(pixels.data());
-			auto *dst_p = pic.argb;
-			for(const auto y : std::views::iota(0, pic.height)) {
-				for(const auto x : std::views::iota(0, pic.width)) {
-					const auto c = U32LEAt(&palette[src_p[x]]);
-					dst_p[x] = (c | 0xFF000000u);
-				}
-				src_p += size.w;
-				dst_p += pic.argb_stride;
+		auto *src_p = std::bit_cast<uint8_t *>(src->pixels);
+		auto *dst_p = pic.argb;
+		for(const auto y : std::views::iota(0, pic.height)) {
+			for(const auto x : std::views::iota(0, pic.width)) {
+				const auto c = palette->colors[src_p[x]];
+				dst_p[x] = ((c.b << 0) | (c.g << 8) | (c.r << 16) | 0xFF000000);
 			}
+			src_p += src->w;
+			dst_p += pic.argb_stride;
 		}
 		break;
+	}
 	default:
 		return false;
 	}
 	if(import_func_32bpp) {
-		const auto *bytes = std::bit_cast<uint8_t *>(pixels.data());
-		if(!import_func_32bpp(&pic, bytes, (size.w * sizeof(uint32_t)))) {
+		const auto *bytes = std::bit_cast<uint8_t *>(src->pixels);
+		if(!import_func_32bpp(&pic, bytes, (src->w * sizeof(uint32_t)))) {
 			return false;
 		}
 	}
@@ -224,29 +241,36 @@ static bool ScreenshotSaveWebP(
 }
 
 bool Grp_ScreenshotSave(
-	PIXEL_SIZE_BASE<unsigned int> size,
-	PIXELFORMAT format,
-	std::span<BGRA> palette,
-	std::span<const std::byte> pixels,
-	const std::chrono::steady_clock::time_point t_start
+	SDL_Surface *src, const std::chrono::steady_clock::time_point t_start
 )
 {
 	constexpr auto DURATION_FAILED = std::chrono::steady_clock::duration(-1);
 
+	assert(src->w >= 0);
+	assert(src->h >= 0);
+	if(SDL_MUSTLOCK(src)) {
+		SDL_LockSurface(src);
+	}
+
 	auto ret = false;
 	auto effort = Grp_ScreenshotEffort;
 	if(effort != 0) {
-		ret = ScreenshotSaveWebP(size, format, palette, pixels, (effort - 1));
+		ret = ScreenshotSaveWebP(src, (effort - 1));
 		if(!ret) {
 			Grp_ScreenshotTimes[effort] = DURATION_FAILED;
 		}
 	}
 	if(!ret) {
 		effort = 0;
-		ret = ScreenshotSaveBMP(size, format, palette, pixels);
+		ret = ScreenshotSaveBMP(src);
 	}
 	const auto t_end = std::chrono::steady_clock::now();
 	Grp_ScreenshotTimes[effort] = (ret ? (t_end - t_start) : DURATION_FAILED);
+
+	if(SDL_MUSTLOCK(src)) {
+		SDL_UnlockSurface(src);
+	}
+
 	return ret;
 }
 // -----------

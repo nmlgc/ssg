@@ -3,6 +3,8 @@
  *
  */
 
+#include <SDL3/SDL_pixels.h>
+
 #include "game/format_bmp.h"
 #include "platform/file.h"
 #include <assert.h>
@@ -80,13 +82,13 @@ std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
 	return BMP_OWNED{ std::move(buffer), header_info, palette, pixels };
 }
 
-bool BMPSaveSupports(PIXELFORMAT format)
+bool BMPSaveSupports(SDL_PixelFormat format)
 {
-	switch(format.format) {
-	case PIXELFORMAT::PALETTE8:
-	case PIXELFORMAT::ARGB1555_LE16:
-	case PIXELFORMAT::BGRX8888:
-	case PIXELFORMAT::BGRA8888:
+	switch(format) {
+	case SDL_PIXELFORMAT_INDEX8:
+	case SDL_PIXELFORMAT_XRGB1555:
+	case SDL_PIXELFORMAT_XRGB8888:
+	case SDL_PIXELFORMAT_ARGB8888:
 		return true;
 	default:
 		return false;

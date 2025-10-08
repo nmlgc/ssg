@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <SDL3/SDL_surface.h>
+
 #include "DD_UTY.H"
 #include "game/cast.h"
 #include "game/debug.h"
@@ -169,6 +171,44 @@ std::optional<PIXELFORMAT> HelpPixelFormatFrom(const DDPIXELFORMAT& ddpf)
 	return std::nullopt;
 }
 
+SDL_PixelFormat HelpSDLPixelFormatFrom(const DDPIXELFORMAT& ddpf)
+{
+	if(ddpf.dwFlags & DDPF_PALETTEINDEXED8) {
+		return SDL_PIXELFORMAT_INDEX8;
+	}
+	if(ddpf.dwFlags & DDPF_RGB) {
+		if(ddpf.dwRGBBitCount == 16) {
+			if(
+				(ddpf.dwRBitMask == 0x7C00) &&
+				(ddpf.dwGBitMask == 0x03E0) &&
+				(ddpf.dwBBitMask == 0x001F) &&
+				(ddpf.dwRGBAlphaBitMask == 0x8000)
+			) {
+				return SDL_PIXELFORMAT_ARGB1555;
+			} else if(
+				(ddpf.dwRBitMask == 0xF800) &&
+				(ddpf.dwGBitMask == 0x07E0) &&
+				(ddpf.dwBBitMask == 0x001F)
+			) {
+				return SDL_PIXELFORMAT_RGB565;
+			}
+		} else if(ddpf.dwRGBBitCount == 32) {
+			if(
+				(ddpf.dwRBitMask == 0x00FF0000) &&
+				(ddpf.dwGBitMask == 0x0000FF00) &&
+				(ddpf.dwBBitMask == 0x000000FF)
+			) {
+				if(ddpf.dwRGBAlphaBitMask == 0xFF000000) {
+					return SDL_PIXELFORMAT_ARGB8888;
+				} else if(ddpf.dwRGBAlphaBitMask == 0) {
+					return SDL_PIXELFORMAT_XRGB8888;
+				}
+			}
+		}
+	}
+	return SDL_PIXELFORMAT_UNKNOWN;
+}
+
 // Templating the functor avoids both the need for #including <functional> and
 // any potential runtime exceptions related to the call.
 void DDrawRetryUntilSuccessful(GRAPHICS_DDRAW& dxobj, auto action)
@@ -195,27 +235,6 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		return false;
 	}
 	const auto t_start = std::chrono::steady_clock::now();
-	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
-	const auto palette = [surf, &bgra_memory]() -> std::span<BGRA> {
-		IDirectDrawPalette* pal = nullptr;
-		if((surf->GetPalette(&pal) != DD_OK) || !pal) {
-			return std::span<BGRA>{};
-		}
-		std::array<PALETTEENTRY, BMP_PALETTE_SIZE_MAX> rgba;
-		if(pal->GetEntries(0, 0, rgba.size(), rgba.data()) != DD_OK) {
-			return std::span<BGRA>{};
-		}
-		for(int i = 0; i < rgba.size(); i++) {
-			bgra_memory[i] = {
-				.b = rgba[i].peBlue,
-				.g = rgba[i].peGreen,
-				.r = rgba[i].peRed,
-				.a = rgba[i].peFlags
-			};
-		}
-		pal->Release();
-		return bgra_memory;
-	}();
 
 	DDSURFACEDESC desc = { .dwSize = sizeof(desc) };
 	if(surf->Lock(nullptr, &desc, DDLOCK_WAIT, nullptr) != DD_OK) {
@@ -225,25 +244,14 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 		return false;
 	}
 	defer(surf->Unlock(nullptr));
+	assert(desc.dwWidth <= (std::numeric_limits<int>::max)());
+	assert(desc.dwHeight <= (std::numeric_limits<int>::max)());
 	if(!desc.lpSurface) {
 		return false;
 	}
 
-	const uint16_t bpp = desc.ddpfPixelFormat.dwRGBBitCount;
-	const PIXEL_SIZE_BASE<unsigned int> size = {
-		// The rows of DirectDraw surfaces tend to be aligned to larger
-		// boundaries than the DWORD alignment of .BMP files. Let's just round
-		// up the .BMP width to that stride so that we can directly write the
-		// surface memory in a single block, without trimming the rows.
-		.w = static_cast<unsigned int>(desc.lPitch / (bpp / 8)),
-		.h = desc.dwHeight,
-	};
-	const std::span<const std::byte> pixels = {
-		static_cast<const std::byte *>(desc.lpSurface),
-		static_cast<size_t>(desc.lPitch * desc.dwHeight),
-	};
-	const auto maybe_format = HelpPixelFormatFrom(desc.ddpfPixelFormat);
-	if(!maybe_format) {
+	auto format = HelpSDLPixelFormatFrom(desc.ddpfPixelFormat);
+	if(format == SDL_PIXELFORMAT_UNKNOWN) {
 		DebugOut(u8"Backbuffer format not supported for screenshots");
 		return false;
 	}
@@ -252,13 +260,53 @@ bool DDrawSaveScreenshot(IDirectDrawSurface *surf)
 	// mostly at 0x00 (except for the Direct3D-rendered parts, which receive a
 	// value lower than 0xFF). Checking the alpha value at (0, 0) should be
 	// enough to detect this.
-	auto format = maybe_format.value();
-	const auto *first_pixel = static_cast<const BGRA *>(desc.lpSurface);
-	if((format.format == PIXELFORMAT::BGRA8888) && (first_pixel->a != 0xFF)) {
-		format = { PIXELFORMAT::BGRX8888 };
+	const auto *first_bgra = static_cast<const BGRA *>(desc.lpSurface);
+	if((format == SDL_PIXELFORMAT_ARGB8888) && (first_bgra->a != 0xFF)) {
+		format = SDL_PIXELFORMAT_XRGB8888;
 	}
 
-	return Grp_ScreenshotSave(size, format, palette, pixels, t_start);
+	// This can also happen for 16-pixel formats. .BMP only supports XRGB1555.
+	const auto first_xrgb = *static_cast<const uint16_t *>(desc.lpSurface);
+	if(
+		(format == SDL_PIXELFORMAT_ARGB1555) &&
+		((first_xrgb & desc.ddpfPixelFormat.dwRGBAlphaBitMask) == 0)
+	) {
+		format = SDL_PIXELFORMAT_XRGB1555;
+	}
+
+	auto *src = SDL_CreateSurfaceFrom(
+		desc.dwWidth, desc.dwHeight, format, desc.lpSurface, desc.lPitch
+	);
+	if(!src) {
+		return false;
+	}
+	defer(SDL_DestroySurface(src));
+
+	if(format == SDL_PIXELFORMAT_INDEX8) {
+		IDirectDrawPalette *p_dd = nullptr;
+		if((surf->GetPalette(&p_dd) != DD_OK) || !p_dd) {
+			return false;
+		}
+		auto *p_sdl = SDL_CreateSurfacePalette(src);
+		if(!p_sdl) {
+			return false;
+		}
+		using SDL_C = SDL_Color;
+		static_assert(sizeof(SDL_C) == sizeof(PALETTEENTRY));
+		static_assert(offsetof(SDL_C, r) == offsetof(PALETTEENTRY, peRed));
+		static_assert(offsetof(SDL_C, g) == offsetof(PALETTEENTRY, peGreen));
+		static_assert(offsetof(SDL_C, b) == offsetof(PALETTEENTRY, peBlue));
+		if(p_dd->GetEntries(
+			0, 0, p_sdl->ncolors, std::bit_cast<PALETTEENTRY *>(p_sdl->colors)
+		) != DD_OK) {
+			return false;
+		}
+		for(const auto i : std::views::iota(0, p_sdl->ncolors)) {
+			p_sdl->colors[i].a = 0xFF;
+		}
+		p_dd->Release();
+	}
+	return Grp_ScreenshotSave(src, t_start);
 }
 
 

@@ -821,44 +821,6 @@ PIXELFORMAT GrpBackend_PixelFormat(void)
 void GrpBackend_PaletteGet(PALETTE& pal) {}
 bool GrpBackend_PaletteSet(const PALETTE& pal) { return false; }
 
-void SaveSurfaceAsScreenshot(
-	SDL_Surface *src, const std::chrono::steady_clock::time_point t_start
-)
-{
-	assert(src);
-	assert(src->pitch >= 0);
-	assert(SDL_GetSurfacePalette(src) == nullptr);
-
-	const auto sdl_format = src->format;
-	const auto maybe_format = HelpPixelFormatFrom(sdl_format);
-	if(!maybe_format) {
-		SDL_LogCritical(
-			LOG_CAT,
-			"Screenshot buffer format %s is not supported.",
-			SDL_GetPixelFormatName(sdl_format)
-		);
-		return;
-	}
-
-	assert(src->w >= 0);
-	assert(src->h >= 0);
-	const PIXEL_SIZE_BASE<unsigned int> size = {
-		.w = Cast::sign<unsigned int>(src->w),
-		.h = Cast::sign<unsigned int>(src->h),
-	};
-
-	if(SDL_MUSTLOCK(src)) {
-		SDL_LockSurface(src);
-	}
-	const auto pixels = std::span(
-		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
-	);
-	Grp_ScreenshotSave(size, maybe_format.value(), {}, pixels, t_start);
-	if(SDL_MUSTLOCK(src)) {
-		SDL_UnlockSurface(src);
-	}
-}
-
 void TakeScreenshot(void)
 {
 	// The rendering itself should not impact screenshot timing.
@@ -868,7 +830,7 @@ void TakeScreenshot(void)
 	if(SoftwareRenderer) {
 		// Software rendering is the ideal case for screenshots, because we
 		// already have a system-memory surface we can save.
-		SaveSurfaceAsScreenshot(SoftwareSurface, t_start);
+		Grp_ScreenshotSave(SoftwareSurface, t_start);
 		return;
 	}
 
@@ -878,7 +840,7 @@ void TakeScreenshot(void)
 		return;
 	}
 	defer(SDL_DestroySurface(src));
-	SaveSurfaceAsScreenshot(src, t_start);
+	Grp_ScreenshotSave(src, t_start);
 }
 
 void GrpBackend_Flip(bool take_screenshot)

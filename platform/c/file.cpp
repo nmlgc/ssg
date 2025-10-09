@@ -141,8 +141,7 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 		return std::nullopt;
 	})();
 
-	const auto *mode = (!!(flags & FILE_FLAGS::FAIL_IF_EXISTS) ? "wxb" : "wb");
-	auto* fp = fopen(s, mode);
+	auto* fp = fopen(s, "wb");
 	if(!fp) {
 		return nullptr;
 	}

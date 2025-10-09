@@ -96,7 +96,7 @@ bool BMPSaveSupports(SDL_PixelFormat format)
 }
 
 bool BMPSave(
-	FILE_STREAM_WRITE* stream,
+	SDL_IOStream *stream,
 	PIXEL_SIZE size,
 	uint16_t planes,
 	uint16_t bpp,
@@ -128,9 +128,9 @@ bool BMPSave(
 	};
 	return (
 		stream &&
-		stream->Write(std::span(&header_file, 1)) &&
-		stream->Write(std::span(&header_info, 1)) &&
-		stream->Write(palette) &&
-		stream->Write(pixels)
+		SDL_MustWriteIO(stream, &header_file, sizeof(header_file)) &&
+		SDL_MustWriteIO(stream, &header_info, sizeof(header_info)) &&
+		SDL_MustWriteIO(stream, palette.data(), palette.size_bytes()) &&
+		SDL_MustWriteIO(stream, pixels.data(), pixels.size_bytes())
 	);
 }

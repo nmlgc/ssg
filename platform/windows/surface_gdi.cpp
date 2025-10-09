@@ -29,7 +29,7 @@ static_assert(offsetof(RGBQUAD, rgbGreen) == offsetof(BGRA, g));
 static_assert(offsetof(RGBQUAD, rgbRed) == offsetof(BGRA, r));
 static_assert(offsetof(RGBQUAD, rgbReserved) == offsetof(BGRA, a));
 
-bool SURFACE_GDI::Save(FILE_STREAM_WRITE* stream) const
+bool SURFACE_GDI::Save(SDL_IOStream *stream) const
 {
 	if(!stream) {
 		return false;

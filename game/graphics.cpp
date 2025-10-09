@@ -98,9 +98,7 @@ void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 
 // Increments the screenshot number to the next file with the given extension
 // that doesn't exist yet, then opens a write stream for that file.
-std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
-	std::u8string_view ext
-)
+SDL_IOStream* Grp_NextScreenshotStream(std::u8string_view ext)
 {
 	if(ScreenshotBuf.size() == 0) {
 		return nullptr;
@@ -117,9 +115,7 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 		const auto prefix_len = ScreenshotBuf.size();
 		StringCatNum<4>(ScreenshotNum++, ScreenshotBuf);
 		ScreenshotBuf += ext;
-		auto ret = FileStreamWrite(
-			ScreenshotBuf.c_str(), FILE_FLAGS::FAIL_IF_EXISTS
-		);
+		auto *ret = SDL_IOFromFile(ScreenshotBuf.c_str(), "wxb");
 		ScreenshotBuf.resize(prefix_len);
 		if(ret) {
 			return ret;
@@ -143,6 +139,7 @@ static bool ScreenshotSaveBMP(SDL_Surface *src)
 	if(!stream) {
 		return false;
 	}
+	defer(SDL_CloseIO(stream));
 
 	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
 	const auto palette = [src, &bgra_memory]() -> std::span<BGRA> {
@@ -171,7 +168,7 @@ static bool ScreenshotSaveBMP(SDL_Surface *src)
 	const auto pixels = std::span(
 		static_cast<std::byte *>(src->pixels), (src->h * src->pitch)
 	);
-	return BMPSave(stream.get(), bmp_size, 1, bpp, palette, pixels);
+	return BMPSave(stream, bmp_size, 1, bpp, palette, pixels);
 }
 
 static bool ScreenshotSaveWebP(SDL_Surface *src, int z)
@@ -263,7 +260,8 @@ static bool ScreenshotSaveWebP(SDL_Surface *src, int z)
 	if(!stream) {
 		return false;
 	}
-	return stream->Write({ wrt.mem, wrt.size });
+	defer(SDL_CloseIO(stream));
+	return SDL_MustWriteIO(stream, wrt.mem, wrt.size);
 }
 
 bool Grp_ScreenshotSave(

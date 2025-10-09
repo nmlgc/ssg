@@ -12,7 +12,7 @@
 #include <windows.h>
 
 struct BMP_OWNED;
-struct FILE_STREAM_WRITE;
+struct SDL_IOStream;
 
 class SURFACE_GDI : public SURFACE {
 public:
@@ -35,7 +35,7 @@ public:
 	bool Load(const BMP_OWNED& bmp);
 
 	// Saves [img] as a .BMP file to the given stream.
-	bool Save(FILE_STREAM_WRITE*) const;
+	bool Save(SDL_IOStream *) const;
 
 	void Delete() noexcept;
 };

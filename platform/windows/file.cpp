@@ -174,11 +174,7 @@ std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
 		return ret;
 	})();
 
-	const auto disposition = (!!(flags & FILE_FLAGS::FAIL_IF_EXISTS)
-		? CREATE_NEW
-		: CREATE_ALWAYS
-	);
-	auto handle = OpenWrite(s, disposition);
+	auto handle = OpenWrite(s, CREATE_ALWAYS);
 	if(handle == INVALID_HANDLE_VALUE) {
 		return nullptr;
 	}

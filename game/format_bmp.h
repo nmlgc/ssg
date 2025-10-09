@@ -73,7 +73,7 @@ enum SDL_PixelFormat : uint32_t;
 bool BMPSaveSupports(SDL_PixelFormat format);
 
 bool BMPSave(
-	FILE_STREAM_WRITE* stream,
+	SDL_IOStream *stream,
 	PIXEL_SIZE size,
 	uint16_t planes,
 	uint16_t bpp,

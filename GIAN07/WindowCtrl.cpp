@@ -689,8 +689,8 @@ namespace BGMPack {
 		w = (std::max)(w, CWinTextExtent(TITLE_NONE).w);
 		Packs.clear();
 		Packs.reserve(BGM_PackCount());
-		BGM_PackForeach([](const auto&& str) {
-			Packs.emplace_back(std::move(str));
+		BGM_PackForeach([](const auto pack) {
+			Packs.emplace_back(pack);
 		});
 		std::ranges::sort(Packs);
 		SelAtOpen = SelNone();

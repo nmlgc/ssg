@@ -41,3 +41,10 @@ std::u8string_view PathForData(void)
 
 	return PathDataView;
 }
+
+bool PathIsDirectory(const char8_t *path)
+{
+	SDL_PathInfo pi;
+	const auto ret = SDL_GetPathInfo(std::bit_cast<const char *>(path), &pi);
+	return (ret && (pi.type == SDL_PATHTYPE_DIRECTORY));
+}

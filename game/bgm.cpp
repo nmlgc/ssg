@@ -3,8 +3,11 @@
  *
  */
 
+#include <SDL3/SDL_filesystem.h>
+
 #include "game/bgm.h"
 #include "game/bgm_track.h"
+#include "game/defer.h"
 #include "game/midi.h"
 #include "game/snd.h"
 #include "game/string_format.h"
@@ -338,67 +341,54 @@ void BGM_SetTempo(int8_t tempo)
 	SndBackend_BGMUpdateTempo();
 }
 
-static std::filesystem::directory_iterator DataPathIterator(
-	const std::filesystem::path& subpath
-)
+static bool BGM_PackIterator(std::invocable<std::u8string_view> auto callback)
 {
-	namespace fs = std::filesystem;
-
-	std::error_code ec;
-	fs::directory_iterator it(
-		(fs::path(PathForData()) / subpath),
-		fs::directory_options::skip_permission_denied,
-		ec
+	return SDL_EnumerateDirectory(
+		std::bit_cast<const char *>(BGM_ROOT.data()),
+		[](void *cb, const char *bgm_root, const char *basename) {
+			char *fn = nullptr;
+			if(SDL_asprintf(&fn, "%s%s", bgm_root, basename) < 0) {
+				return SDL_ENUM_FAILURE;
+			}
+			defer(SDL_free(fn));
+			if(!PathIsDirectory(std::bit_cast<const char8_t *>(fn))) {
+				return SDL_ENUM_CONTINUE;
+			}
+			return (std::bit_cast<decltype(callback) *>(cb))->operator()(
+				std::u8string_view{ std::bit_cast<const char8_t *>(basename) }
+			);
+		},
+		&callback
 	);
-	if(ec) {
-		return fs::directory_iterator{};
-	}
-	return it;
 }
-
-#ifdef _MSC_VER
-// Disable the false-positive C26495 warning:
-// https://developercommunity.visualstudio.com/t/10746697
-#pragma warning(disable: 26495)
-#endif
-
-static auto BGM_PackIterator(void)
-{
-	return (std::views::filter(DataPathIterator(BGM_ROOT), [](const auto& d) {
-		std::error_code ec;
-		const auto ret = d.is_directory(ec);
-		return (!ec && ret);
-	}));
-}
-
-#ifdef _MSC_VER
-#pragma warning(default: 26495)
-#endif
 
 bool BGM_PacksAvailable(bool invalidate_cache)
 {
 	if(PacksAvailable.has_value() && !invalidate_cache) {
 		return PacksAvailable.value();
 	}
-	// empty() is not implemented for filtered views?
-	for(const auto& entry : BGM_PackIterator()) {
-		PacksAvailable = true;
-		return true;
-	}
-	PacksAvailable = false;
-	return false;
+	PacksAvailable = BGM_PackIterator([](const std::u8string_view) {
+		return SDL_ENUM_SUCCESS;
+	});
+	return PacksAvailable.value();
 }
 
 size_t BGM_PackCount(void)
 {
-	return std::ranges::distance(BGM_PackIterator());
+	size_t ret = 0;
+	BGM_PackIterator([&](const std::u8string_view) {
+		ret++;
+		return SDL_ENUM_CONTINUE;
+	});
+	return ret;
 }
 
-void BGM_PackForeach(void func(const std::u8string&& str))
+void BGM_PackForeach(void func(const std::u8string_view pack))
 {
-	for(const auto& entry : BGM_PackIterator()) {
-		func(entry.path().filename().u8string());
-	}
+	BGM_PackIterator([&](const std::u8string_view pack) {
+		func(pack);
+		return SDL_ENUM_CONTINUE;
+	});
 }
 
 bool BGM_PackSet(const std::u8string_view pack)
@@ -427,9 +417,7 @@ bool BGM_PackSet(const std::u8string_view pack)
 		});
 
 		// Check if this path exists
-		std::error_code ec;
-		const auto found = std::filesystem::is_directory(PackPath, ec);
-		if(ec || !found) {
+		if(!PathIsDirectory(PackPath.c_str())) {
 			PackPath.clear();
 			return false;
 		}

@@ -1,5 +1,5 @@
 /*
- *   Common paths as determined by SDL's path functions
+ *   Common paths and path manipulation via SDL
  *
  */
 
@@ -47,4 +47,9 @@ bool PathIsDirectory(const char8_t *path)
 	SDL_PathInfo pi;
 	const auto ret = SDL_GetPathInfo(std::bit_cast<const char *>(path), &pi);
 	return (ret && (pi.type == SDL_PATHTYPE_DIRECTORY));
+}
+
+bool SDL_CreateDirectory(const char8_t *path)
+{
+	return SDL_CreateDirectory(std::bit_cast<const char *>(path));
 }

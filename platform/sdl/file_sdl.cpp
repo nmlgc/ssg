@@ -3,6 +3,7 @@
  *
  */
 
+#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_iostream.h>
 
 #include "platform/file.h"

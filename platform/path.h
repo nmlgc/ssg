@@ -1,5 +1,5 @@
 /*
- *   Common paths
+ *   Common paths and path manipulation
  *
  */
 
@@ -13,3 +13,9 @@ import std;
 std::u8string_view PathForData(void);
 
 bool PathIsDirectory(const char8_t *path);
+
+// `char8_t *` wrappers for SDL
+// ----------------------------
+
+bool SDL_CreateDirectory(const char8_t *path);
+// ----------------------------

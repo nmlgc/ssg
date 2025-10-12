@@ -129,10 +129,6 @@ SDL_IOStream* Grp_NextScreenshotStream(std::u8string_view ext)
 
 static bool ScreenshotSaveBMP(SDL_Surface *src)
 {
-	if(!BMPSaveSupports(src->format)) {
-		assert(!"Unsupported pixel format?");
-		return false;
-	}
 	assert(src->w < std::numeric_limits<PIXEL_COORD>::max());
 	assert(src->h < std::numeric_limits<PIXEL_COORD>::max());
 	const auto stream = Grp_NextScreenshotStream(u8".BMP");
@@ -140,6 +136,13 @@ static bool ScreenshotSaveBMP(SDL_Surface *src)
 		return false;
 	}
 	defer(SDL_CloseIO(stream));
+
+	// SDL_SaveBMP_IO() is very slow and unoptimized, especially on Windows
+	// where SDL_IOStream still uses unbuffered writes as of SDL 3.2.24. For
+	// now, we only use it if we absolutely have to.
+	if(!BMPSaveSupports(src->format)) {
+		return SDL_SaveBMP_IO(src, stream, false);
+	}
 
 	std::array<BGRA, BMP_PALETTE_SIZE_MAX> bgra_memory;
 	const auto palette = [src, &bgra_memory]() -> std::span<BGRA> {

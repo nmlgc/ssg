@@ -34,11 +34,9 @@ To build:
 
 ### Linux
 
-Clang ≥18 is the only compiler supported right now.
-Still waiting for GCC to ship [P2465R3 Standard Library Modules](https://wg21.link/P2465R3).
-
 The build is driven by `build_linux.sh`, which sets up the required submodules and environment variables for Tup.
-Some libraries are expected to be installed through the distribution's package manager; check the script for details.
+
+Both GCC ≥15 and Clang ≥18 are supported. The build process honors the `CC` environment variable or otherwise falls back on your system's default C/C++ compiler indicated by the `cc` binary, picking the respective toolchain depending on that compiler's `--version` string.
 
 Use `install_linux.sh` to copy a compiled release build to its standard install locations.
 

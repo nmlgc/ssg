@@ -37,4 +37,5 @@ pkg_config_env_optional libblake3
 	./submodules_check.sh libs/BLAKE3 || exit 1;
 }
 
+toolchain_detect_via_cc
 tup "$@"

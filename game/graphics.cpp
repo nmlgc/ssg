@@ -231,7 +231,21 @@ static bool ScreenshotSaveWebP(SDL_Surface *src, int z)
 		break;
 	}
 	default:
-		return false;
+		// Note how SDL_ConvertPixels() doesn't take a palette parameter and
+		// therefore can't cover the 8-bit case.
+		if(!WebPPictureAlloc(&pic) || !SDL_ConvertPixels(
+			src->w,
+			src->h,
+			src->format,
+			src->pixels,
+			src->pitch,
+			SDL_PIXELFORMAT_ARGB8888,
+			pic.argb,
+			(pic.argb_stride * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_ARGB8888))
+		)) {
+			return false;
+		}
+		break;
 	}
 	if(import_func_32bpp) {
 		const auto *bytes = std::bit_cast<uint8_t *>(src->pixels);

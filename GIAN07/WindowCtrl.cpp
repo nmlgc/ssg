@@ -1077,17 +1077,7 @@ static void Main::Cfg::Grp::SetItem(bool)
 
 static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 {
-#ifdef WIN32_VINTAGE
-	auto effort = ConfigDat.ScreenshotEffort.v;
-	if(ConfigDat.BitDepth.v.value() == 16) {
-		effort = 0;
-		ItemFormat.Flags |= WINDOW_FLAGS::DISABLED;
-	} else {
-		ItemFormat.Flags &= ~WINDOW_FLAGS::DISABLED;
-	};
-#else
 	const auto effort = ConfigDat.ScreenshotEffort.v;
-#endif
 	char format_buf[8];
 	enum class ALIGN { LEFT, CENTER };
 	const auto format_for = [&format_buf](

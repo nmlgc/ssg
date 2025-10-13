@@ -7,6 +7,7 @@
 // max_align_t'` if this appears after a module import.
 #include <webp/encode.h>
 
+#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_surface.h>
 
 #include "game/graphics.h"
@@ -65,6 +66,28 @@ using NUM_TYPE = unsigned int;
 static NUM_TYPE ScreenshotNum = 0;
 static std::u8string ScreenshotBuf;
 
+static void ScreenshotFindLastFor(std::u8string_view ext)
+{
+	SDL_EnumerateDirectory(
+		std::bit_cast<const char *>(ScreenshotBuf.c_str()),
+		[](void *ext_p, const char *, const char *basename_p) {
+			const auto *ext = std::bit_cast<std::u8string_view *>(ext_p);
+			const auto *ext_data = std::bit_cast<const char *>(ext->data());
+			const auto *basename_ext = SDL_strrchr(basename_p, '.');
+			if(!basename_ext) {
+				return SDL_ENUM_CONTINUE;
+			}
+			if(SDL_strncasecmp(basename_ext, ext_data, ext->size())) {
+				return SDL_ENUM_CONTINUE;
+			}
+			const NUM_TYPE num = SDL_strtoul(basename_p, nullptr, 10);
+			ScreenshotNum = (std::max)(ScreenshotNum, (num + 1));
+			return SDL_ENUM_CONTINUE;
+		},
+		&ext
+	);
+}
+
 void Grp_ScreenshotSetPrefix(std::u8string_view prefix)
 {
 	const auto cap = (prefix.length() + STRING_NUM_CAP<NUM_TYPE> + 5);
@@ -100,6 +123,9 @@ std::unique_ptr<FILE_STREAM_WRITE> Grp_NextScreenshotStream(
 		ScreenshotBuf.resize(prefix_len);
 		if(ret) {
 			return ret;
+		}
+		if(ScreenshotNum == 1) {
+			ScreenshotFindLastFor(ext);
 		}
 	}
 	return nullptr;

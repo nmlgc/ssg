@@ -25,7 +25,7 @@ extern constinit const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs = [] {
 		.lfClipPrecision = CLIP_DEFAULT_PRECIS,
 		.lfQuality = PROOF_QUALITY,
 		.lfPitchAndFamily = FIXED_PITCH,
-		.lfFaceName = L"ＭＳ ゴシック"
+		.lfFaceName = L"MS Gothic"
 	};
 
 	// ちっこいフォント //

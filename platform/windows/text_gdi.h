@@ -8,6 +8,11 @@
 #include "game/text_packed.h"
 #include "platform/graphics_backend.h"
 
+// Loads any required fonts from the game directory, and cleans them up at
+// process termination.
+extern void TextBackend_GDIInit(void);
+extern void TextBackend_GDICleanup(void);
+
 class TEXTRENDER_SESSION {
 protected:
 	// HFONT would require a cast of the value returned from SelectObject().

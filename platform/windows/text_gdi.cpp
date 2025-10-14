@@ -18,6 +18,9 @@ public:
 	HFONT ForID(FONT_ID font)
 	{
 		if(!arr[font]) {
+			if(std::ranges::all_of(arr, [](auto h) { return !h; })) {
+				TextBackend_GDIInit();
+			}
 			arr[font] = CreateFontIndirectW(&FontSpecs[font]);
 		}
 		return arr[font];
@@ -217,4 +220,5 @@ PIXEL_SIZE TEXTRENDER::TextExtent(FONT_ID font, Narrow::string_view str)
 void TextBackend_Cleanup(void)
 {
 	Fonts.Cleanup();
+	TextBackend_GDICleanup();
 }

@@ -52,31 +52,43 @@ function BuildSDL(base_cfg, bin_suffix)
 	end
 	src += SDL.glob("src/camera/*.c")
 	src += SDL.glob("src/camera/dummy/*.c")
-	src += SDL.glob("src/camera/mediafoundation/*.c")
+	if modern then
+		src += SDL.glob("src/camera/mediafoundation/*.c")
+	end
 	src += SDL.glob("src/core/*.c")
 	src += SDL.glob("src/core/windows/*.c")
-	src += SDL.glob("src/core/windows/*.cpp")
+	if modern then
+		src += SDL.join("src/core/windows/SDL_gameinput.cpp")
+	end
 	src += SDL.glob("src/cpuinfo/*.c")
 	src += SDL.glob("src/dialog/*.c")
 	src += SDL.glob("src/dialog/windows/*.c")
-	src += SDL.glob("src/dynapi/*.c")
+	if modern then
+		src += SDL.glob("src/dynapi/*.c")
+	end
 	src += (SDL.glob("src/events/*.c") - {
 		"imKStoUCS.c$", "SDL_keysym_to_scancode.c$", "SDL_scancode_tables.c$",
 	})
 	src += SDL.glob("src/filesystem/*.c")
 	src += SDL.glob("src/filesystem/windows/*.c")
 	src += SDL.glob("src/gpu/*.c")
-	src += SDL.glob("src/gpu/d3d12/*.c")
-	src += SDL.glob("src/gpu/vulkan/*.c")
+	if modern then
+		src += SDL.glob("src/gpu/d3d12/*.c")
+		src += SDL.glob("src/gpu/vulkan/*.c")
+	end
 	src += SDL.glob("src/haptic/*.c")
 	src += SDL.glob("src/haptic/hidapi/*.c")
 	src += SDL.glob("src/haptic/windows/*.c")
 	src += SDL.glob("src/hidapi/*.c")
 	src += SDL.glob("src/io/*.c")
 	src += SDL.glob("src/io/generic/*.c")
-	src += SDL.glob("src/io/windows/*.c")
+	if modern then
+		src += SDL.glob("src/io/windows/*.c")
+	end
 	src += SDL.glob("src/joystick/*.c")
-	src += SDL.glob("src/joystick/gdk/*.cpp")
+	if modern then
+		src += SDL.glob("src/joystick/gdk/*.cpp")
+	end
 	src += SDL.glob("src/joystick/hidapi/*.c")
 	src += SDL.glob("src/joystick/virtual/*.c")
 	src += (SDL.glob("src/joystick/windows/*.c") - {
@@ -136,12 +148,18 @@ function BuildSDL(base_cfg, bin_suffix)
 	src += SDL.glob("src/tray/*.c")
 	src += SDL.glob("src/tray/windows/*.c")
 	src += SDL.glob("src/video/*.c")
-	src += (SDL.glob("src/video/*.c") - { "SDL_vulkan_utils.c$" })
+	src += (SDL.glob("src/video/*.c") - { "SDL_egl.c$", "SDL_vulkan_utils.c$" })
 	if modern then
+		src += SDL.join("src/video/SDL_egl.c")
 		src += SDL.join("src/video/SDL_vulkan_utils.c")
 	end
 	src += SDL.glob("src/video/dummy/*.c")
-	src += SDL.glob("src/video/offscreen/*.c")
+	src += (SDL.glob("src/video/offscreen/*.c") - {
+		"opengles.c$", "vulkan.c$",
+	})
+	if modern then
+		src += SDL.glob("src/video/offscreen/*.c")
+	end
 	src += (SDL.glob("src/video/windows/*.c") - { "SDL_windowsvulkan.c$" })
 	if modern then
 		src += SDL.join("src/video/windows/SDL_windowsvulkan.c")

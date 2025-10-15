@@ -6,49 +6,23 @@
 #pragma once
 
 #include "platform/buffer.h"
-#include "platform/unicode.h"
 
-enum class FILE_FLAGS : uint8_t {
-	_HAS_BITFLAG_OPERATORS,
-	NONE = 0x0,
-	PRESERVE_TIMESTAMPS = 0x02,
+struct SDL_IOStream;
+struct FILE_TIMESTAMPS {
 };
 
-// Streams
-// -------
+// Retrieves the system-specific timestamps of the given file if it exists, or
+// a `nullptr` otherwise.
+std::unique_ptr<FILE_TIMESTAMPS> File_TimestampsGet(const char8_t *fn);
 
-enum class SEEK_WHENCE {
-	BEGIN, CURRENT, END
-};
-
-struct FILE_STREAM {
-	virtual ~FILE_STREAM() {};
-};
-
-struct FILE_STREAM_SEEK : FILE_STREAM {
-	// Returns `true` if the seek was successful.
-	[[nodiscard]] virtual bool Seek(int64_t offset, SEEK_WHENCE whence) = 0;
-
-	virtual std::optional<int64_t> Tell() = 0;
-};
-
-struct FILE_STREAM_WRITE : FILE_STREAM_SEEK {
-	// Retuns `true` if the buffer was written successfully.
-	[[nodiscard]] virtual bool Write(BYTE_BUFFER_BORROWED buf) = 0;
-};
-
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const PATH_LITERAL s, FILE_FLAGS flags = FILE_FLAGS::NONE
+// Closes [context] and applies the given timestamps to the on-disk file if
+// they are a valid pointer.
+bool File_CloseWithTimestamps(
+	SDL_IOStream *&& context, std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps
 );
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const char8_t* s, FILE_FLAGS flags = FILE_FLAGS::NONE
-);
-// -------
 
 // SDL wrappers
 // ------------
-
-struct SDL_IOStream;
 
 SDL_IOStream *SDL_IOFromFile(const char8_t *file, const char *mode);
 BYTE_BUFFER_OWNED SDL_LoadFile(const char8_t *file);

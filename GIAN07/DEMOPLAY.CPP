@@ -248,7 +248,7 @@ bool DemoplayLoadReplay(int stage)
 			std::span(&DemoInfo, 1),
 			std::span(DemoBuffer, DemoInfo.FrameCount),
 		} };
-		if(!out.Write(fn.c_str(), FILE_FLAGS::PRESERVE_TIMESTAMPS)) {
+		if(!out.Write(fn.c_str(), File_TimestampsGet(fn.c_str()))) {
 			// Repair denied by file being read-only? OK, bro, you're the boss!
 			DemoInfo.CfgDat.GameLevel = file_level;
 			DemoInfo.CfgDat.PlayerStock = file_lives;

@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include "platform/buffer.h"
 #include "platform/file.h"
-#include "platform/unicode.h"
 #include "game/endian.h"
 
 // Format
@@ -104,7 +102,10 @@ struct PACKFILE_READ {
 struct PACKFILE_WRITE {
 	std::vector<BYTE_BUFFER_BORROWED> files;
 
-	bool Write(const char8_t *s, FILE_FLAGS flags = FILE_FLAGS::NONE) const;
+	bool Write(
+		const char8_t *s,
+		std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps = nullptr
+	) const;
 };
 
 BIT_FILE_READ BitFilCreateR(const char8_t *s);

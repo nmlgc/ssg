@@ -3,8 +3,11 @@
  *
  */
 
-#include "platform/file.h"
+#include <SDL3/SDL_iostream.h>
+
 #include "LZ_UTY.H"
+#include "game/defer.h"
+#include "platform/file.h"
 
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;
@@ -211,26 +214,33 @@ BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)
 	return device.buffer;
 }
 
-bool PACKFILE_WRITE::Write(const char8_t *s, FILE_FLAGS flags) const
+bool PACKFILE_WRITE::Write(
+	const char8_t *s, std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps
+) const
 {
 	PBG_FILEHEAD head = { .n = files.size() };
 	std::vector<PBG_FILEINFO> info(files.size());
 	fil_checksum_t sum = 0; // in native byte order
 
-	auto write_header = [&head, &info](FILE_STREAM_WRITE &stream) {
+	auto write_header = [&head, &info](SDL_IOStream *stream) {
 		return (
-			stream.Write(std::span(&head, 1)) &&
-			stream.Write(std::span(info))
+			SDL_MustWriteIO(stream, &head, sizeof(head)) &&
+			SDL_MustWriteIO(
+				stream, info.data(), (info.size() * sizeof(PBG_FILEINFO))
+			)
 		);
 	};
 
-	auto stream = FileStreamWrite(s, flags);
+	auto *stream = SDL_IOFromFile(s, "wb");
 	if(!stream) {
 		return false;
 	}
+	defer(
+		File_CloseWithTimestamps(std::move(stream), std::move(maybe_timestamps))
+	);
 
 	// Write temporary header
-	if(!write_header(*stream)) {
+	if(!write_header(stream)) {
 		return false;
 	}
 
@@ -238,24 +248,26 @@ bool PACKFILE_WRITE::Write(const char8_t *s, FILE_FLAGS flags) const
 	for(fil_no_t i = 0; i < files.size(); i++) {
 		auto compressed = Compress(files[i]);
 
-		const auto maybe_offset = stream->Tell();
-		if(!maybe_offset) {
+		const auto offset = SDL_TellIO(stream);
+		if(offset == -1) {
 			return false;
 		}
 
-		info[i].offset = maybe_offset.value();
+		info[i].offset = offset;
 		info[i].size_uncompressed = files[i].size();
 		info[i].checksum_compressed = FilChecksumAddFile(
 			sum, info[i].offset, info[i].size_uncompressed, compressed
 		);
-		if(!stream->Write(compressed)) {
+		if(!SDL_MustWriteIO(stream, compressed.data(), compressed.size())) {
 			return false;
 		}
 	}
 
 	// Write real header
 	head.sum = sum;
-	return (stream->Seek(0, SEEK_WHENCE::BEGIN) && write_header(*stream));
+	return (
+		(SDL_SeekIO(stream, 0, SDL_IO_SEEK_SET) != -1) && write_header(stream)
+	);
 }
 
 BIT_FILE_READ BitFilCreateR(const char8_t *s)

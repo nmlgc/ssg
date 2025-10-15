@@ -5,22 +5,24 @@
 
 #define WIN32_LEAN_AND_MEAN
 
+#include <SDL3/SDL_iostream.h>
+
 #include "platform/windows/utf.h"
 #include "platform/file.h"
 #include "game/defer.h"
-#include "game/enum_flags.h"
-#include <assert.h>
 #include <windows.h>
 
-struct TIMESTAMPS {
+struct FILE_TIMESTAMPS_WIN32 : public FILE_TIMESTAMPS {
 	FILETIME ctime;
 	FILETIME mtime;
 };
 
-static HANDLE OpenRead(const PATH_LITERAL s)
+static std::unique_ptr<FILE_TIMESTAMPS> File_TimestampsGetW(
+	const std::wstring_view fn_w
+)
 {
-	return CreateFileW(
-		s,
+	auto handle = CreateFileW(
+		fn_w.data(),
 		GENERIC_READ,
 		FILE_SHARE_READ,
 		nullptr,
@@ -28,111 +30,44 @@ static HANDLE OpenRead(const PATH_LITERAL s)
 		FILE_FLAG_SEQUENTIAL_SCAN,
 		nullptr
 	);
-}
-
-static HANDLE OpenWrite(const PATH_LITERAL s, DWORD disposition)
-{
-	// Use `FILE_GENERIC_WRITE` instead of `GENERIC_WRITE` to ensure that we
-	// can write attributes.
-	return CreateFileW(
-		s, FILE_GENERIC_WRITE, 0, nullptr, disposition, 0, nullptr
-	);
-}
-
-static bool HandleWrite(HANDLE handle, const BYTE_BUFFER_BORROWED buf)
-{
-	[[gsl::suppress(type.5)]] DWORD bytes_written;
-	if((handle == INVALID_HANDLE_VALUE) || !WriteFile(
-		handle, buf.data(), buf.size_bytes(), &bytes_written, nullptr
-	)) {
-		return false;
-	}
-	return (buf.size_bytes() == bytes_written);
-}
-
-// Streams
-// -------
-
-struct FILE_STREAM_WIN32 : public FILE_STREAM_WRITE {
-	HANDLE handle;
-	std::optional<TIMESTAMPS> maybe_timestamps;
-
-public:
-	FILE_STREAM_WIN32(
-		HANDLE handle,
-		std::optional<TIMESTAMPS> maybe_timestamps = std::nullopt
-	) : handle(handle), maybe_timestamps(maybe_timestamps) {
-		assert(handle != INVALID_HANDLE_VALUE);
-	}
-
-	~FILE_STREAM_WIN32() {
-		if(const auto& times = maybe_timestamps) {
-			SetFileTime(handle, &times->ctime, nullptr, &times->mtime);
-		}
-		CloseHandle(handle);
-	}
-
-	bool Seek(int64_t offset, SEEK_WHENCE whence) override {
-		DWORD origin = FILE_BEGIN;
-		const LARGE_INTEGER offset_large = { .QuadPart = offset };
-		switch(whence) {
-		case SEEK_WHENCE::BEGIN:  	origin = FILE_BEGIN;  	break;
-		case SEEK_WHENCE::CURRENT:	origin = FILE_CURRENT;	break;
-		case SEEK_WHENCE::END:    	origin = FILE_END;    	break;
-		}
-		return SetFilePointerEx(handle, offset_large, nullptr, origin);
-	};
-
-	std::optional<int64_t> Tell() override {
-		[[gsl::suppress(type.5)]] LARGE_INTEGER ret;
-		if(!SetFilePointerEx(handle, { 0 }, &ret, FILE_CURRENT)) {
-			return std::nullopt;
-		}
-		return ret.QuadPart;
-	};
-
-	bool Write(BYTE_BUFFER_BORROWED buf) override {
-		return HandleWrite(handle, buf);
-	};
-};
-
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const PATH_LITERAL s, FILE_FLAGS flags
-)
-{
-	const auto maybe_timestamps = ([&] -> std::optional<TIMESTAMPS> {
-		if(!(flags & FILE_FLAGS::PRESERVE_TIMESTAMPS)) {
-			return std::nullopt;
-		}
-		auto handle = OpenRead(s);
-		if(handle == INVALID_HANDLE_VALUE) {
-			return std::nullopt;
-		}
-		defer(CloseHandle(handle));
-		TIMESTAMPS ret;
-		if(!GetFileTime(handle, &ret.ctime, nullptr, &ret.mtime)) {
-			return std::nullopt;
-		}
-		return ret;
-	})();
-
-	auto handle = OpenWrite(s, CREATE_ALWAYS);
 	if(handle == INVALID_HANDLE_VALUE) {
 		return nullptr;
 	}
-	return std::unique_ptr<FILE_STREAM_WIN32>(
-		new (std::nothrow) FILE_STREAM_WIN32(handle, maybe_timestamps)
+	defer(CloseHandle(handle));
+	FILE_TIMESTAMPS_WIN32 ret;
+	if(!GetFileTime(handle, &ret.ctime, nullptr, &ret.mtime)) {
+		return nullptr;
+	}
+	return std::unique_ptr<FILE_TIMESTAMPS_WIN32>(
+		new (std::nothrow) FILE_TIMESTAMPS_WIN32(ret)
 	);
 }
 
-std::unique_ptr<FILE_STREAM_WRITE> FileStreamWrite(
-	const char8_t* s, FILE_FLAGS flags
-)
+std::unique_ptr<FILE_TIMESTAMPS> File_TimestampsGet(const char8_t *fn)
 {
-	return UTF::WithUTF16<std::unique_ptr<FILE_STREAM_WRITE>>(
-		s, [flags](const std::wstring_view str_w) {
-			return FileStreamWrite(str_w.data(), flags);
-		}
+	return UTF::WithUTF16<std::unique_ptr<FILE_TIMESTAMPS>>(
+		fn, File_TimestampsGetW
 	).value_or(nullptr);
 }
-// -------
+
+bool File_CloseWithTimestamps(
+	SDL_IOStream *&& context, std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps
+)
+{
+	const auto *times = std::bit_cast<FILE_TIMESTAMPS_WIN32 *>(
+		maybe_timestamps.get()
+	);
+	if(times) {
+		const SDL_PropertiesID props = SDL_GetIOProperties(context);
+		if(props) {
+			auto handle = std::bit_cast<HANDLE>(SDL_GetPointerProperty(
+				props,
+				SDL_PROP_IOSTREAM_WINDOWS_HANDLE_POINTER,
+				INVALID_HANDLE_VALUE
+			));
+			SetFileTime(handle, &times->ctime, nullptr, &times->mtime);
+		}
+	}
+	maybe_timestamps.reset();
+	return SDL_CloseIO(context);
+}

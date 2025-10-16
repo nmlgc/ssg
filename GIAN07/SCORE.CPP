@@ -131,7 +131,7 @@ uint8_t SetScoreString(NR_NAME_DATA *NData, uint8_t Dif)
 
 		sprintf(Res[i].Score, "%11" PRId64, p[i].Score);
 		sprintf(Res[i].Evade, "%6u", p[i].Evade);
-		sprintf(Res[i].Stage,"%1d" ,p[i].Stage);
+		sprintf(Res[i].Stage, "%1d", p[i].Stage);
 	}
 
 	ReleaseScoreData();

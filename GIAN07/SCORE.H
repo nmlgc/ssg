@@ -44,7 +44,7 @@ typedef struct tagNR_SCORE_STRING{
 	char	Name[NR_NAME_LEN];		// 名前
 	char	Score[STRING_NUM_CAP<decltype(NR_NAME_DATA::Score)> + 1]; // 得点
 	char	Evade[STRING_NUM_CAP<decltype(NR_NAME_DATA::Evade)> + 1]; // かすり
-	char	Stage[1+1];				// ステージ
+	char	Stage[STRING_NUM_CAP<decltype(NR_NAME_DATA::Stage)> + 1]; // ステージ
 	uint8_t	Weapon;	// 装備
 } NR_SCORE_STRING;
 

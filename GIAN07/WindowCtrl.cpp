@@ -1105,8 +1105,8 @@ static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 	};
 
 	const auto split_into_fraction = [](auto v) {
-		const auto ret_int = (v / 1000);
-		const auto ret_frac = ((v % 1000) / 10);
+		const unsigned int ret_int = (v / 1000);
+		const unsigned int ret_frac = ((v % 1000) / 10);
 		return std::pair(ret_int, ret_frac);
 	};
 
@@ -1140,7 +1140,7 @@ static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 				std::chrono::duration_cast<decltype(0us)>(time).count() + 5
 			);
 			sprintf(
-				TitlePerf[i], "%s[%5lld.%02lldms]", format, time_int, time_frac
+				TitlePerf[i], "%s[%5u.%02ums]", format, time_int, time_frac
 			);
 			if(hovered) {
 				constexpr auto target_ms = decltype(0ms)(FRAME_TIME_TARGET);
@@ -1148,7 +1148,7 @@ static void Main::Cfg::Grp::Screenshot::SetItem(bool)
 					const auto fps = split_into_fraction((1000s / time));
 					sprintf(
 						HelpPerf,
-						"Frame rate will drop to ～%lld.%02lld FPS",
+						"Frame rate will drop to ～%u.%02u FPS",
 						fps.first,
 						fps.second
 					);

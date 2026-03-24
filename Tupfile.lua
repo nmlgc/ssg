@@ -3,9 +3,9 @@ tup.include("hatoyama/Tupfile.lua")
 HATOYAMA_CFLAGS = { "-I.", "-IGIAN07/" }
 
 ---@type ConfigShape
-SSG_COMPILE = {}
-SSG_COMPILE.cflags = { debug = "-DPBG_DEBUG" }
-SSG_COMPILE.objdir = "ssg/"
+GIAN07_COMPILE = {}
+GIAN07_COMPILE.cflags = { debug = "-DPBG_DEBUG" }
+GIAN07_COMPILE.objdir = "ssg/"
 
 SSG = sourcepath("./")
 
@@ -14,9 +14,9 @@ PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
 })
 
 -- pbg code
-SSG_SRC += SSG.glob("GIAN07/*.cpp")
-SSG_SRC += SSG.glob("GIAN07/*.CPP")
-SSG_SRC += "MAIN/main_sdl.cpp"
-SSG_SRC.extra_inputs += PLATFORM_CONSTANTS
+GIAN07_OLD_SRC += SSG.glob("GIAN07/*.cpp")
+GIAN07_OLD_SRC += SSG.glob("GIAN07/*.CPP")
+GIAN07_OLD_SRC += "MAIN/main_sdl.cpp"
+GIAN07_OLD_SRC.extra_inputs += PLATFORM_CONSTANTS
 
 tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))

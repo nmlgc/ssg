@@ -101,6 +101,15 @@ struct Stg6Star {
 	int vy;
 };
 
+
+using CUBE3D_CSPAN = std::span<const Cube3D, CUBE_MAX>;
+using STAR2D_CSPAN = std::span<const Star2D, STAR_MAX>;
+using FAKE_ECLSTR_CSPAN = std::span<const FakeECLString, FAKE_ECLSTR_MAX>;
+using ROCK3D_CSPAN = std::span<const Rock3D, ROCK_MAX>;
+using STG6RASTER_CSPAN = std::span<const Stg6Raster, S6RASTER_MAX>;
+using STG6STAR_CSPAN = std::span<const Stg6Star, S3STAR_MAX>;
+
+
 extern Cube3D Cube[CUBE_MAX];
 extern Star2D Star[STAR_MAX];
 extern Rock3D Rock[ROCK_MAX];
@@ -114,24 +123,24 @@ extern Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
 
 void Init3DCube(void);
-void Draw3DCube(void);
+void Draw3DCube(STAR2D_CSPAN, CUBE3D_CSPAN);
 void Move3DCube(void);
 
 void InitEffectFakeECL(void);
 void MoveEffectFakeECL(void);
-void DrawEffectFakeECL(void);
+void DrawEffectFakeECL(const WFLine2D&, FAKE_ECLSTR_CSPAN);
 
 void InitStg4Rock(void);	// ステージ４の背景となる岩の集団
 void MoveStg4Rock(void);	//
-void DrawStg4Rock(void);	//
+void DrawStg4Rock(ROCK3D_CSPAN);	//
 void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);	// コマンド送信
 
 void InitStg6Raster();	// ６面ラスター初期化
 void MoveStg6Raster();	// ６面ラスター動作
-void DrawStg6Raster();	// ６面ラスター描画
+void DrawStg6Raster(STG6STAR_CSPAN, STG6RASTER_CSPAN);	// ６面ラスター描画
 
 void InitStg3Star();	// ３面高速星初期化
 void MoveStg3Star();	// ３面高速星動作
-void DrawStg3Star();	// ３面高速星描画
+void DrawStg3Star(STG6STAR_CSPAN);	// ３面高速星描画
 
 #endif

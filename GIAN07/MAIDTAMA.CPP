@@ -265,7 +265,9 @@ void MaidTamaMove(void)
 }
 
 // ナニな弾描画 //
-void MaidTamaDraw(void)
+void MaidTamaDraw(
+	MAIDTAMA_DATA_CSPAN storage, std::span<const uint16_t> inds, const MAID& Viv
+)
 {
 	// ここでは、さすがにTAMA.cpp 内の関数を使用するわけにはいかないので、 //
 	// 独自に描画ルーチンを展開する。                                      //
@@ -280,8 +282,8 @@ void MaidTamaDraw(void)
 		{600,104,600+40,104+40}
 	};
 
-	for(i=0;i<MaidTamaNow;i++){
-		auto* t = &MaidTama[MaidTamaInd[i]];
+	for(const auto ind : inds) {
+		auto *t = &storage[ind];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です
 		y = (t->y >> 6)-8;	// 上に同じ
@@ -967,7 +969,7 @@ static void SetLaserBomb(void)
 	int			ox,oy;
 	int			i;
 
-	const auto LaserDeg = GetLaserDeg();
+	const auto LaserDeg = GetLaserDeg(Viv);
 
 	ox = Viv.opx + (SBOPT_DX*64);
 	oy = Viv.opy;

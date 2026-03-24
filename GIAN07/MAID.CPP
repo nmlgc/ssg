@@ -27,7 +27,7 @@
 MAID			Viv;					// 麗しきメイドさん構造体
 
 
-extern void WideBombDraw(void)
+extern void WideBombDraw(const MAID& Viv)
 {
 	//PIXEL_LTRB	src = {0, 0, 382, 480};
 	static PIXEL_LTRB data[6] = {
@@ -62,14 +62,14 @@ extern void WideBombDraw(void)
 	GrpSurface_Blit({ x, y }, SURFACE_ID::BOMBER, data[t]);
 }
 
-void LaserBombDraw(void)
+void LaserBombDraw(const MAID& Viv)
 {
 	constexpr RGBA col_channeled = RGB216{ 0, 0, 5 }.ToRGB().WithAlpha(0xFF);
 	VERTEX_XY	p[4];
 	int				i,w;
 	int				lx,ly;
 	int				wx,wy;
-	const auto LaserDeg = GetLaserDeg();
+	const auto LaserDeg = GetLaserDeg(Viv);
 
 	GrpGeom->Lock();
 	if(LaserDeg<58){
@@ -187,7 +187,7 @@ void LaserBombDraw(void)
 	GrpGeom->Unlock();
 }
 
-extern void MaidDraw(void)
+extern void MaidDraw(const MAID& Viv)
 {
 	static PIXEL_LTRB VivBit[4][2] = {
 		{{480,128,480+24,128+24},{504,128,504+24,128+24}},	// ワイド
@@ -225,7 +225,7 @@ extern void MaidDraw(void)
 	}
 
 	if(Viv.bomb_time && Viv.weapon==2)
-		LaserBombDraw();
+		LaserBombDraw(Viv);
 }
 
 extern void MaidMove(INPUT_BITS input, bool in_msg)
@@ -497,7 +497,7 @@ void PowerUp(uint8_t damage)
 	}
 }
 
-uint8_t GetLaserDeg(void)
+uint8_t GetLaserDeg(const MAID& Viv)
 {
 	return (((120 - Viv.bomb_time) * 3) / 2);
 }

@@ -205,7 +205,7 @@ void _CircleA16(GRAPHICS_GEOMETRY_POLY auto& gp, int x, int y, int r, uint8_t d)
 }
 
 // ホーミングレーザーを描画する //
-void HLaserDraw(void)
+void HLaserDraw(const HLaserData& ActiveHL)
 {
 	HLaserData	*hl;
 	int			i,w,current;

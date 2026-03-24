@@ -85,6 +85,8 @@ struct LLASER_DATA {
 	uint8_t	EnemyID;	// 敵から見た番号
 };
 
+using LLASER_DATA_CSPAN = std::span<const LLASER_DATA, LLASER_MAX>;
+
 
 
 //// レーザー関数２ ////
@@ -98,8 +100,10 @@ void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id);	// レーザーを角�
 extern void LLaserForceClose(const ENEMY_DATA *e);	// 敵に関連づけられたレーザーを強制クローズ
 
 extern void LLaserMove(void);				// レーザーを動かす
-extern void LLaserDraw(void);				// レーザーを描画する
 extern void LLaserClear(void);				// 無限遠レーザーを全クローズ
+
+// レーザーを描画する
+void LLaserDraw(LLASER_DATA_CSPAN llaser);
 
 extern void LLaserSetup(void);				// レーザー配列の初期化をする
 

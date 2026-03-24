@@ -160,6 +160,8 @@ struct TAMA_DATA {
 	uint8_t flag;	// 弾消去要請フラグ
 };
 
+using TAMA_DATA_CSPAN = std::span<const TAMA_DATA, TAMA_MAX>;
+
 
 
 ////弾の各種変数たち////
@@ -191,7 +193,6 @@ void tama_setEX(void);					// 弾をセットする(難易度による変更は"
 void tama_setLine(void);				// 弾をセットする(ライン状に発射)
 void tama_setExtra01(void);				// エキストラボス専用弾幕
 void tama_move(void);					// 弾を動かす
-void tama_draw(void);					// 弾を描画する
 void tama_clear(void);					// 弾に消去エフェクトをセットする
 void tamaind_set(uint16_t tama1);	// 弾の個数の割合をセットする(危険！)
 
@@ -211,6 +212,13 @@ void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
 
 void ResetHoming(void);
 void UpdateHoming(const WORLD_POINT& p); // ホーミング座標を更新する
+
+// 弾を描画する
+void tama_draw(
+	TAMA_DATA_CSPAN storage,
+	std::span<const uint16_t> inds1,
+	std::span<const uint16_t> inds2
+);
 
 
 template <size_t N> void Indsort(

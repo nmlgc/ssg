@@ -110,7 +110,7 @@ void BitInit(void);	// ビット配列の初期化
 void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID);	// ビットをセットする
 void BitMove(void);	// ビットを動作させる
 void BitDelete(void);	// ビットを消滅させる
-void BitLineDraw(void);	// ビット間のラインを描画する
+void BitLineDraw(const BIT_DATA&);	// ビット間のラインを描画する
 void BitSelectAttack(uint32_t BitID);	// 攻撃パターンをセットor変更
 void BitLaserCommand(uint8_t Command);	// レーザー系命令を発行
 void BitSendCommand(uint8_t Command, int Param);	// ビット命令を送信

@@ -315,7 +315,11 @@ void tama_move(void)
 	Indsort(Tama2Ind, Tama2Now, Tama);
 }
 
-void tama_draw(void)
+void tama_draw(
+	TAMA_DATA_CSPAN storage,
+	std::span<const uint16_t> inds8,
+	std::span<const uint16_t> inds16
+)
 {
 //	HRESULT		ddrval;
 	PIXEL_LTRB	src;
@@ -332,8 +336,8 @@ void tama_draw(void)
 	static constexpr uint8_t sizeExtraTama[4] = { 16, 12, 8, 4 };
 
 	// 大型弾＆特殊弾(16*16) の描画 //
-	for(const auto i : std::views::iota(0u, Tama2Now)) {
-		auto* t = &Tama[Tama2Ind[i]];
+	for(const auto ind : inds16) {
+		auto *t = &storage[ind];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です
 		y = (t->y >> 6)-8;	// 上に同じ
@@ -436,8 +440,8 @@ void tama_draw(void)
 	}
 
 	// 小型弾(8*8) の描画 //
-	for(const auto i : std::views::iota(0u, Tama1Now)) {
-		auto* t = &Tama[Tama1Ind[i]];
+	for(const auto ind : inds8) {
+		auto *t = &storage[ind];
 
 		x = (t->x >> 6)-4;	// -4 は座標の補正用です
 		y = (t->y >> 6)-4;	// 上に同じ

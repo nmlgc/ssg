@@ -103,6 +103,8 @@ struct ENEMY_DATA {
 	void Draw() const;
 };
 
+using ENEMY_DATA_CSPAN = std::span<const ENEMY_DATA, ENEMY_MAX>;
+
 struct ANIME_DATA {
 	uint8_t	mode;	// アニメーションモード
 	uint8_t	n;	// アニメーションパターン数
@@ -128,9 +130,11 @@ ENEMY_DATA* EnemyFindFree(void);
 bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage);
 
 extern void enemy_move(void);		// 敵を動かす
-extern void enemy_draw(void);		// 敵を描画する
 extern void enemyind_set(void);		// 敵の順序設定用配列の初期化をする
 extern void enemy_clear(void);		// 雑魚を消滅させる
+
+// 敵を描画する
+void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds);
 
 bool enemy_damage(int x, int y, int damage);	// 敵にダメージを与える
 bool enemy_damage2(int x, int y, int damage);	// ｙ上方向無限Ver.敵にダメージを与える

@@ -161,14 +161,12 @@ void laser_move(void)
 	});
 }
 
-void laser_draw(void)
+void laser_draw(LASER_DATA_CSPAN storage, std::span<const uint16_t> inds)
 {
-	int				i;
-
 	GrpGeom->Lock();
 
-	for(i=0;i<LaserNow;i++){
-		auto* lp = &Laser[LaserInd[i]];
+	for(const auto ind : inds) {
+		auto *lp = &storage[ind];
 		switch(lp->type){
 			// ノーマルショートレーザー＆反射レーザー //
 			case(LS_SHORT):case(LS_REF):
@@ -185,8 +183,8 @@ void laser_draw(void)
 	}
 
 	/*
-	for(i=0;i<LaserNow;i++){
-		auto* lp = &Laser[LaserInd[i]];
+	for(const auto ind : inds) {
+		auto *lp = &storage[ind];
 		if(lp->type==LS_REF || lp->type==LS_SHORT)
 			SLdraw(lp);
 	}

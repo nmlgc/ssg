@@ -14,7 +14,6 @@
 #include "GIAN.H"
 #include "ITEM.H"
 #include "LLASER.H"
-#include "MAID.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
 #include "hatoyama/engine/graphics_backend.h"
@@ -120,18 +119,17 @@ uint32_t BossMove(void)
 }
 
 // ボスを描画する
-void BossDraw(void)
+void BossDraw(BOSS_DATA_CSPAN Boss, const MAID& Viv)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 	int x, y;
 	int			w,h,t;
-	ENEMY_DATA	*e;
 	PIXEL_LTRB	wing;
 
 	for(auto& it : Boss) {
 		auto *b = &it;
 		if(b->IsUsed){
-			e = &(b->Edat);
+			const auto *e = &(b->Edat);
 
 			x = (e->x>>6);
 			y = (e->y>>6);

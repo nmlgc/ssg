@@ -17,7 +17,6 @@
 #include "HOMINGL.H"
 #include "ITEM.H"
 #include "LLASER.H"
-#include "MAID.H"
 #include "PRankCtrl.h"
 #include "SCROLL.H"
 #include "GIAN07/entity.h"
@@ -690,13 +689,13 @@ void enemy_move(void)
 	Indsort(EnemyInd, EnemyNow, Enemy);
 }
 
-void enemy_draw(void)
+void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 {
-	int			i,x,y;
+	int x, y;
 	//HRESULT		ddrval;
 
-	for(i=0;i<EnemyNow;i++){
-		auto* e = &Enemy[EnemyInd[i]];
+	for(const auto ind : inds) {
+		auto *e = &storage[ind];
 
 		// 敵を描画する(クリッピング＆幅、高さ処理を追加すること) //
 		x = (e->x>>6);

@@ -11,7 +11,6 @@
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
-#include "EFFECT.H"
 #include "EFFECT3D.H"
 #include "ENEMY.H"
 #include "EnemyExCtrl.h"
@@ -1276,8 +1275,8 @@ void WeaponSelectProc(bool&)
 				GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, rc);
 			}
 		}
-		MaidDraw();
-		MaidTamaDraw();
+		MaidDraw(Viv);
+		MaidTamaDraw(MaidTama, std::span(MaidTamaInd).first(MaidTamaNow), Viv);
 
 		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
 		GrpSurface_Blit({ 468, 400 }, SURFACE_ID::SYSTEM, rc);
@@ -1429,35 +1428,39 @@ void GameDraw(void)
 	ScrollDraw();
 	CEffectDraw();
 
-	BitLineDraw();
-	BossDraw();
+	BitLineDraw(BitData);
+	BossDraw(Boss, Viv);
 
-	WideBombDraw();		// 多分、ここで良いと思うが...
+	WideBombDraw(Viv); // 多分、ここで良いと思うが...
 
-	ExBombEfcDraw();
+	ExBombEfcDraw(BombEfc);
 
-	enemy_draw();
+	enemy_draw(Enemy, std::span(EnemyInd).first(EnemyNow));
 
-	MaidTamaDraw();
+	MaidTamaDraw(MaidTama, std::span(MaidTamaInd).first(MaidTamaNow), Viv);
 
-	MaidDraw();
+	MaidDraw(Viv);
 
 	if(GrpGeom_FB()) {
-		LLaserDraw();
+		LLaserDraw(LLaser);
 	}
 
 	ObjectLockDraw();
 
-	fragment_draw();
-	ItemDraw();
+	fragment_draw(Fragment);
+	ItemDraw(Item, std::span(ItemInd).first(ItemNow));
 
 	if(GrpGeom_Poly()) {
-		LLaserDraw();
+		LLaserDraw(LLaser);
 	}
 
-	HLaserDraw();
-	laser_draw();
-	tama_draw();
+	HLaserDraw(ActiveHL);
+	laser_draw(Laser, std::span(LaserInd).first(LaserNow));
+	tama_draw(
+		Tama,
+		std::span(Tama1Ind).first(Tama1Now),
+		std::span(Tama2Ind).first(Tama2Now)
+	);
 
 	// static uint8_t test = 0;
 
@@ -1467,8 +1470,8 @@ void GameDraw(void)
 	//MoveWarning(test++);
 	//DrawWarning();
 
-	SEffectDraw();
-	StateDraw();
+	SEffectDraw(SEffect);
+	StateDraw(Viv);
 
 	BossHPG_Draw();
 	ScreenEffectDraw();

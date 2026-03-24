@@ -128,7 +128,7 @@ void fragment_move(void)
 	}
 }
 
-void fragment_draw(void)
+void fragment_draw(FRAGMENT_DATA_CSPAN Fragment)
 {
 	for(const auto& it : Fragment) {
 		if(it.count) {

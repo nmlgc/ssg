@@ -97,14 +97,18 @@ struct LASER_DATA {
 	uint8_t evade;	// かすり用フラグ
 };
 
+using LASER_DATA_CSPAN = std::span<const LASER_DATA, LASER_MAX>;
+
 
 ////レーザー関数////
 extern void laser_set(void);		// レーザーをセットする(難易度変更"有り")
 extern void laser_setEX(void);		// レーザーをセットする(難易度変更"無し")
 extern void laser_move(void);		// レーザーを動かす
-extern void laser_draw(void);		// レーザーを描画する
 extern void laser_clear(void);		// レーザー全てに消去エフェクトをかける
 extern void laserind_set(void);		// レーザー順序用配列の初期化
+
+// レーザーを描画する
+void laser_draw(LASER_DATA_CSPAN storage, std::span<const uint16_t> inds);
 
 
 ////レーザーの各種変数たち////

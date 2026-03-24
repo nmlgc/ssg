@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_BOSS_H)
 
 #include "ENEMY.H"
+#include "MAID.H"
 
 
 ///// [ 定数 ] /////
@@ -35,6 +36,8 @@ struct BOSS_DATA {
 	uint8_t	IsUsed;	// このデータは使用されているか(非ゼロなら使用されている)
 };
 
+using BOSS_DATA_CSPAN = std::span<const BOSS_DATA, BOSS_MAX>;
+
 
 
 ///// [ 関数 ] /////
@@ -47,7 +50,8 @@ void BossSet(int x, int y, uint32_t BossID);
 // Returns the HP sum across all bosses.
 uint32_t BossMove(void);
 
-void BossDraw(void);	// ボスを描画する
+// ボスを描画する
+void BossDraw(BOSS_DATA_CSPAN, const MAID&);
 
 void BossClearCmd(void);	// ボス用・敵弾クリアの前処理関数
 int  BossGetBitLeft(void);	// 残りビット数を返す

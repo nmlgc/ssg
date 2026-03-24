@@ -9,7 +9,6 @@
 #include <printf/printf.h>
 
 #include "HUD.H"
-#include "EFFECT.H"
 #include "FONTUTY.H"
 #include "ITEM.H"
 #include "LogicInstance.h"
@@ -67,7 +66,7 @@ void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
 /// ---------
 
 // エフェクトを描画する(仕様変更の可能性があります) //
-void SEffectDraw(void)
+void SEffectDraw(SEFFECT_DATA_CSPAN SEffect)
 {
 	int j, k;
 	int				x,y;
@@ -183,7 +182,7 @@ void SEffectDraw(void)
 }
 
 // 各種ステータスを描画する //
-void StateDraw(void)
+void StateDraw(const MAID& Viv)
 {
 	int		i,temp;
 	//PIXEL_LTRB	src = { 0, 80, 128, (80 + 16) };

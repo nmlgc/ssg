@@ -5,8 +5,10 @@
 
 #pragma once
 
-#include "hatoyama/logic/coords.h"
+#include "EFFECT.H"
 #include "hatoyama/logic/narrow.h"
+
+struct MAID;
 
 /// BGM title
 /// ---------
@@ -19,9 +21,9 @@ void MTitleSet(WINDOW_COORD y, Narrow::string_view s);
 
 // エフェクトを描画する(仕様変更の可能性があります)
 // (Technically game logic!)
-void SEffectDraw(void);
+void SEffectDraw(SEFFECT_DATA_CSPAN);
 
 // 各種ステータスを描画する
-void StateDraw(void);
+void StateDraw(const MAID&);
 
 void StdStatusOutput(void);

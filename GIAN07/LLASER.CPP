@@ -269,7 +269,7 @@ extern void LLaserMove(void)
 	}
 }
 
-extern void LLaserDraw(void)
+void LLaserDraw(LLASER_DATA_CSPAN llaser)
 {
 	int x, y;
 	VERTEX_XY	p[4];
@@ -295,7 +295,7 @@ extern void LLaserDraw(void)
 
 	GrpGeom->Lock();
 
-	for(const auto& it : LLaser) {
+	for(const auto& it : llaser) {
 		const auto *lp = &it;
 		const auto c = lp->c;
 		switch(lp->flag){

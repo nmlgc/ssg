@@ -117,13 +117,13 @@ void ItemMove(void)
 }
 
 // アイテムを描画する //
-void ItemDraw(void)
+void ItemDraw(ITEM_DATA_CSPAN storage, std::span<const uint16_t> inds)
 {
-	int				i,j,x,y;
+	int j, x, y;
 	PIXEL_LTRB	src;
 
-	for(i=0;i<ItemNow;i++){
-		auto* ip = &Item[ItemInd[i]];
+	for(const auto ind : inds) {
+		auto *ip = &storage[ind];
 		const uint8_t ptn = ((ip->count >> 2) & 3);
 		switch(ip->type){
 			case(ITEM_SCORE):

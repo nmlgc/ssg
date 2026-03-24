@@ -10,6 +10,8 @@
 #include "TAMA.H"
 #include "ssg/Input.h"
 
+struct MAID;
+
 
 
 ///// [ 定数 ] /////
@@ -35,6 +37,10 @@
 #define TDM_LASER_SUB		5		// レーザー・サブショットのダメージ
 
 
+#ifdef __cplusplus
+using MAIDTAMA_DATA_CSPAN = std::span<const TAMA_DATA, MAIDTAMA_MAX>;
+#endif
+
 
 //// 弾コマンド用マクロ ////
 void TamaSTDForm(uint8_t c);
@@ -49,8 +55,12 @@ void TamaSetXY(int x, int y);
 ///// [ 関数 ] /////
 void MaidTamaSet(INPUT_BITS, bool in_msg);	// たま発射！！
 void MaidTamaMove(void);	// 弾移動＆ヒットチェック
-void MaidTamaDraw(void);	// ナニな弾描画
 void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化
+
+// ナニな弾描画
+void MaidTamaDraw(
+	MAIDTAMA_DATA_CSPAN storage, std::span<const uint16_t> inds, const MAID&
+);
 
 
 

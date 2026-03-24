@@ -69,7 +69,7 @@ void Init3DCube(void)
 }
 
 
-void Draw3DCube(void)
+void Draw3DCube(STAR2D_CSPAN Star, CUBE3D_CSPAN Cube)
 {
 	for(const auto& it : Star) {
 		static const PIXEL_LTWH rc = { 136, 272, 16, 24 };
@@ -243,7 +243,7 @@ void MoveEffectFakeECL(void)
 	}
 }
 
-void DrawEffectFakeECL(void)
+void DrawEffectFakeECL(const WFLine2D& WFLine, FAKE_ECLSTR_CSPAN FakeECLStr)
 {
 	PIXEL_LTRB	src;
 	int		i,j;
@@ -408,7 +408,7 @@ void MoveStg4Rock(void)
 }
 
 
-void DrawStg4Rock(void)
+void DrawStg4Rock(ROCK3D_CSPAN Rock)
 {
 	constexpr auto sid       = SURFACE_ID::MAPCHIP;
 	static const PIXEL_LTRB src[3] = {
@@ -536,7 +536,7 @@ void MoveStg6Raster()
 
 
 // ６面ラスター描画 //
-void DrawStg6Raster()
+void DrawStg6Raster(STG6STAR_CSPAN S6Star, STG6RASTER_CSPAN S6Ras)
 {
 	constexpr auto sid = SURFACE_ID::MAPCHIP;
 	static const PIXEL_LTRB Target[3] = {
@@ -599,7 +599,7 @@ void MoveStg3Star()
 
 
 // ３面高速星描画 //
-void DrawStg3Star()
+void DrawStg3Star(STG6STAR_CSPAN S6Star)
 {
 	int		i;
 

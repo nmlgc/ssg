@@ -484,7 +484,7 @@ void BitDelete(void)
 
 
 // ビット間のラインを描画する //
-void BitLineDraw(void)
+void BitLineDraw(const BIT_DATA& BitData)
 {
 	int				i, j, n;
 	int				x1, x2, y1, y2;

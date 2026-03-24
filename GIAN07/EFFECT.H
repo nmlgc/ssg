@@ -79,6 +79,12 @@ typedef struct _tagSEFFECT_DATA{
 	char	c;
 } SEFFECT_DATA;
 
+
+#ifdef __cplusplus
+using SEFFECT_DATA_CSPAN = std::span<const SEFFECT_DATA, SEFFECT_MAX>;
+#endif
+
+
 typedef struct tagLOCKON_INFO{
 	int		*x,*y;						// ロック座標へのポインタ
 	int		width,height;				// 幅＆高さ

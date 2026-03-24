@@ -13,7 +13,7 @@ BombEfcCtrl		BombEfc[EXBOMB_MAX];
 
 // 秘密の関数 //
 void _ExBombSTDInit(BombEfcCtrl *p);
-void _ExBombSTDDraw(BombEfcCtrl *p);
+void _ExBombSTDDraw(const BombEfcCtrl *p);
 void _ExBombSTDMove(BombEfcCtrl *p, C_RNG& RNG);
 
 
@@ -58,9 +58,9 @@ void ExBombEfcSet(int x, int y, uint8_t type)
 
 
 // 爆発系エフェクトを描画する
-void ExBombEfcDraw(void)
+void ExBombEfcDraw(BOMBEFC_DATA_CSPAN BombEfc)
 {
-	for(auto& it : BombEfc) {
+	for(const auto& it : BombEfc) {
 		if(!it.bIsUsed) {
 			continue;
 		}
@@ -116,7 +116,7 @@ void _ExBombSTDInit(BombEfcCtrl *p)
 }
 
 
-void _ExBombSTDDraw(BombEfcCtrl *p)
+void _ExBombSTDDraw(const BombEfcCtrl *p)
 {
 	int x, y, dx;
 

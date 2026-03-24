@@ -9,6 +9,7 @@
 
 #include "ENEMY.H"
 
+typedef struct MAID MAID;
 
 ///// [ 定数 ] /////
 
@@ -36,6 +37,10 @@ typedef struct tagBOSS_DATA{
 } BOSS_DATA;
 
 
+#ifdef __cplusplus
+using BOSS_DATA_CSPAN = std::span<const BOSS_DATA, BOSS_MAX>;
+#endif
+
 
 ///// [ 関数 ] /////
 void BossDataInit(void);	// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
@@ -47,7 +52,8 @@ void BossSet(int x, int y, uint32_t BossID);
 // Returns the HP sum across all bosses.
 uint32_t BossMove(void);
 
-void BossDraw(void);	// ボスを描画する
+// ボスを描画する
+void BossDraw(BOSS_DATA_CSPAN, const MAID&);
 
 void BossClearCmd(void);	// ボス用・敵弾クリアの前処理関数
 int  BossGetBitLeft(void);	// 残りビット数を返す

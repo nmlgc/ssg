@@ -418,19 +418,19 @@ void ScrollDraw(void)
 		return;
 	}
 	else if(ScrollInfo.ExCmd == ScrollCmdStg6Cube){
-		Draw3DCube();
+		Draw3DCube(Star, Cube);
 		return;
 	}
 	else if(ScrollInfo.ExCmd == ScrollCmdStg6RndEcl){
-		DrawEffectFakeECL();
+		DrawEffectFakeECL(WFLine, FakeECLStr);
 		return;
 	}
 	else if(ScrollInfo.ExCmd == ScrollCmdStg6Raster){
-		DrawStg6Raster();
+		DrawStg6Raster(S6Star, S6Ras);
 		return;
 	}
 	else if(ScrollInfo.ExCmd == ScrollCmdStg3Star){
-		DrawStg3Star();
+		DrawStg3Star(S6Star);
 		return;
 	}
 
@@ -461,7 +461,7 @@ void ScrollDraw(void)
 	}
 
 	if(ScrollInfo.ExCmd == ScrollCmdStg4Rock){
-		DrawStg4Rock();
+		DrawStg4Rock(Rock);
 	}
 }
 

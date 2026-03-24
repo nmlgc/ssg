@@ -31,7 +31,7 @@ function BuildSDL(base_cfg, bin_suffix)
 	}
 	if not modern then
 		compile.cflags += "/GS-"
-		compile.lflags += "/NODEFAULTLIB"
+		compile.lflags += { "/NODEFAULTLIB", "hid.lib" }
 	end
 
 	---@type ConfigShape
@@ -75,6 +75,7 @@ function BuildSDL(base_cfg, bin_suffix)
 	if modern then
 		src += SDL.glob("src/gpu/d3d12/*.c")
 		src += SDL.glob("src/gpu/vulkan/*.c")
+		src += SDL.glob("src/gpu/xr/*.c")
 	end
 	src += SDL.glob("src/haptic/*.c")
 	src += SDL.glob("src/haptic/hidapi/*.c")
@@ -169,9 +170,7 @@ function BuildSDL(base_cfg, bin_suffix)
 	local version_rc = SDL.join("src/core/windows/version.rc")
 
 	local cfg = base_cfg:branch(compile, link)
-	local mslibc_cfg = cfg:branch(
-		{ cflags = { release = FlagRemove("/GL") } }
-	)
+	local mslibc_cfg = cfg:branch({ cflags = { release = FlagRemove("/GL") } })
 	local mslibc_src
 	mslibc_src += SDL.glob("src/stdlib/SDL_mem*.c")
 	mslibc_src += SDL.join("src/stdlib/SDL_mslibc.c")

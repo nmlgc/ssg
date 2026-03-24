@@ -267,9 +267,7 @@ static void enemy_set(void)
 			case(SCL_MUSIC):
 //				if(!(/*DemoplaySaveEnable||*/DemoplayLoadEnable)){
 				if(!IsDemoplay){
-					BGM_Stop();
 					if(BGM_Switch(cmd[1])){
-						BGM_Play();
 						const auto mtitle = BGM_Title();
 						if(!mtitle.empty()) {
 							SetMusicTitle(460, mtitle);

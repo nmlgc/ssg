@@ -391,8 +391,7 @@ static void enemy_set(void)
 	GameCount++;
 
 	if((GameCount&0x3f)==0){
-		if(GameStage == GRAPH_ID_EXSTAGE) PlayRankAdd(1);
-		else                              PlayRankAdd(1+GameStage/3);
+		PlayRankAdd((GameStage == STAGE_EXTRA) ? 1 : (1 + (GameStage / 3)));
 	}
 }
 

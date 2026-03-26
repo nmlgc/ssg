@@ -574,7 +574,7 @@ bool LoadGraph(int stage)
 
 
 	// エキストラステージシステム用 //
-	if(stage == GRAPH_ID_EXSTAGE){
+	if(stage == STAGE_EXTRA) {
 		if(!GrpBMPLoadP(graph, 0, SURFACE_ID::SYSTEM)) {
 			return false;
 		}
@@ -688,7 +688,7 @@ bool LoadStageData(uint8_t stage)
 	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
 
 	// エキストラステージシステム用 //
-	if(stage == GRAPH_ID_EXSTAGE){
+	if(stage == STAGE_EXTRA) {
 		// ECL Load
 		if((ECL_Head = enemy.MemExpand(24)) == nullptr) {
 			return false;
@@ -737,7 +737,7 @@ bool LoadStageData(uint8_t stage)
 
 	// アニメーションの準備 //
 	switch(stage){
-		case(GRAPH_ID_EXSTAGE):		// エキストラステージのグラフィック矩形
+		case(STAGE_EXTRA): // エキストラステージのグラフィック矩形
 			// Extra Boss I //
 			// 00 : ■Ａ　0 ～ 3   :  翼無し通常　（10fpp)
 			Anime[0].SetSheet<4, 80>({ 0, 0 }, ANM_NORM);

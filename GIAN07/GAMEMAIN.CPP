@@ -120,7 +120,7 @@ void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
-	return ((GameStage == GRAPH_ID_EXSTAGE) ? GAME_EXTRA : LevelSelected);
+	return ((GameStage == STAGE_EXTRA) ? GAME_EXTRA : LevelSelected);
 }
 
 bool InputLocked;
@@ -468,8 +468,7 @@ bool NameRegistInit(bool bNeedChgMusic)
 	CurrentName.Score  = Viv.score;
 	CurrentName.Evade  = Viv.evade_sum;
 	CurrentName.Weapon = Viv.weapon;
-	if(GameStage == GRAPH_ID_EXSTAGE) CurrentName.Stage = 1;
-	else                              CurrentName.Stage = GameStage;
+	CurrentName.Stage = ((GameStage == STAGE_EXTRA) ? 1 : GameStage);
 
 	// デバッグ用... //
 	Snd_SEStop(8);	// ワーニング音を止める
@@ -554,7 +553,7 @@ bool WeaponSelectInit(bool ExStg)
 	Viv.weapon    = 0;
 	GameMain = WeaponSelectProc;
 	if(ExStg) {
-		GameStage = GRAPH_ID_EXSTAGE;
+		GameStage = STAGE_EXTRA;
 	}
 
 	VivTemp = Viv;
@@ -648,7 +647,7 @@ extern bool GameReplayInit(int Stage)
 		return false;
 	}
 
-	if(GameStage == GRAPH_ID_EXSTAGE){
+	if(GameStage == STAGE_EXTRA) {
 		Viv.credit = 0;
 	}
 
@@ -963,7 +962,7 @@ void GameOverProc0(bool&)
 		// ステージセレクトが有効な場合 //
 		if(ConfigDat.StageSelect.v) {
 			DemoplaySaveReplay();
-			if(GameStage == GRAPH_ID_EXSTAGE) {
+			if(GameStage == STAGE_EXTRA) {
 				NameRegistInit(true);
 			} else {
 				GameExit(true);
@@ -1103,7 +1102,7 @@ void WeaponSelectProc(bool&)
 
 		case(KEY_TAMA):case(KEY_RETURN):
 			if(spd) break;
-			if(GameStage == GRAPH_ID_EXSTAGE){
+			if(GameStage == STAGE_EXTRA) {
 				if(!((1 << Viv.weapon) & ConfigDat.ExtraStgFlags.v)) {
 					break;
 				}
@@ -1115,7 +1114,7 @@ void WeaponSelectProc(bool&)
 			count = 0;
 
 			Snd_SEPlay(SOUND_ID_SELECT);
-			if(GameStage != GRAPH_ID_EXSTAGE){
+			if(GameStage != STAGE_EXTRA) {
 #ifdef PBG_DEBUG
 				GameStage = DebugDat.StgSelect;
 				if(GameStage==2) Viv.exp = 160;
@@ -1191,7 +1190,7 @@ void WeaponSelectProc(bool&)
 		GrpGeom->SetAlphaNorm(128);
 		for(i=0;i<3;i++){
 			if(
-				(GameStage != GRAPH_ID_EXSTAGE) ||
+				(GameStage != STAGE_EXTRA) ||
 				((1 << i) & ConfigDat.ExtraStgFlags.v)
 			) {
 				continue;

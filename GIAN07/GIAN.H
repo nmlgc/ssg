@@ -83,6 +83,11 @@ constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
 //#define HITCHK(a,b,h)	( ((uint32_t)(a)-(b)+(h))<h*2 )	// ヒットなら非ゼロ
 #define HITCHK(a,b,h)	(abs((a)-(b))<(h))
 
+enum {
+	// Matches the `GRAPH_ID_EXSTAGE` constant in pbg's original code.
+	STAGE_EXTRA = (128 + 3),
+};
+
 
 ///// [グローバル変数] /////
 extern uint32_t	GameCount;

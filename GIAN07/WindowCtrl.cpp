@@ -10,6 +10,7 @@
 #include "CONFIG.H"
 #include "ENTRY.H"
 #include "GAMEMAIN.H"
+#include "GIAN.H"
 #include "LEVEL.H"
 #include "LOADER.H"
 #include "MUSIC.H"
@@ -374,7 +375,7 @@ WINDOW_MENU Menu = { std::span(Item)};
 namespace Rep {
 template <int Stage> bool FnStg(INPUT_BITS key);
 
-constexpr auto FnStgEx = FnStg<GRAPH_ID_EXSTAGE>;
+constexpr auto FnStgEx = FnStg<STAGE_EXTRA>;
 WINDOW_CHOICE Item[] = {
 	{ " Stage 1 デモ再生", "ステージ１のリプレイ", FnStg<1> },
 	{ " Stage 2 デモ再生", "ステージ２のリプレイ", FnStg<2> },

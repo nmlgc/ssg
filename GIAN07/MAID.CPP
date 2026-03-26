@@ -279,7 +279,7 @@ extern void StateDraw(void)
 	}
 }
 
-extern void MaidMove(void)
+extern void MaidMove(INPUT_BITS input)
 {
 	int		vx,vy,v;
 	constexpr int VivSpeed = (64 * 18);
@@ -312,22 +312,32 @@ extern void MaidMove(void)
 
 	// 押しっぱなし減速を有効にするのか //
 	if(Round.InputFlags & INPF_Z_SPDDOWN_ENABLE) {
-		if(Key_Data & KEY_TAMA){
-			if(Viv.ShiftCounter < 8) Viv.ShiftCounter++;
-			else                     Key_Data = Key_Data | KEY_SHIFT;
-		}
-		else{
+		if(input & KEY_TAMA) {
+			if(Viv.ShiftCounter < 8) {
+				Viv.ShiftCounter++;
+			} else {
+				input |= KEY_SHIFT;
+			}
+		} else {
 			Viv.ShiftCounter = 0;
 		}
 	}
 
 	if(Viv.muteki < MAID_MOVE_DISABLE_TIME){
 		vx = vy = 0;
-		v = (Key_Data & KEY_SHIFT) ? (VivSpeed/3) : VivSpeed;
-		if(Key_Data & KEY_UP)		vy-=v;
-		if(Key_Data & KEY_DOWN)		vy+=v;
-		if(Key_Data & KEY_LEFT)		vx-=v;
-		if(Key_Data & KEY_RIGHT)	vx+=v;
+		v = ((input & KEY_SHIFT) ? (VivSpeed / 3) : VivSpeed);
+		if(input & KEY_UP) {
+			vy -= v;
+		}
+		if(input & KEY_DOWN) {
+			vy += v;
+		}
+		if(input & KEY_LEFT) {
+			vx -= v;
+		}
+		if(input & KEY_RIGHT) {
+			vx += v;
+		}
 
 		if(vx && vy){
 			Viv.x += (vx/6);
@@ -372,7 +382,7 @@ extern void MaidMove(void)
 	Viv.opy = Viv.y + Viv.vy + 64*6;
 
 	// 弾＆ボムのセット //
-	MaidTamaSet();
+	MaidTamaSet(input);
 
 	if(Viv.bomb_time){
 		tama_clear();

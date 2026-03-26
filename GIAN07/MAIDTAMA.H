@@ -7,8 +7,8 @@
 #define PBGWIN_MAIDTAMA_H		"めいどたま : Version 0.01 : Update 2000/02/25"
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
-import std.compat;
 #include "TAMA.H"
+#include "hatoyama/logic/input.h"
 
 
 
@@ -47,7 +47,7 @@ void TamaSetXY(int x, int y);
 
 
 ///// [ 関数 ] /////
-void MaidTamaSet(void);	// たま発射！！
+void MaidTamaSet(INPUT_BITS input);	// たま発射！！
 void MaidTamaMove(void);	// 弾移動＆ヒットチェック
 void MaidTamaDraw(void);	// ナニな弾描画
 void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化

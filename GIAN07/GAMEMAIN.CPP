@@ -1227,13 +1227,12 @@ void WeaponSelectProc(bool&)
 		if(Viv.exp < 31) Viv.lay_time = Viv.lay_grp =  0;
 
 		ResetHoming();
-		Key_Data = KEY_TAMA;
 
 		Viv.muteki = 0;
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
-		MaidMove();
+		MaidMove(KEY_TAMA);
 		MaidTamaMove();
 
 		GrpBackend_SetClip(
@@ -1385,7 +1384,7 @@ void GameMove(void)
 	ScreenEffectMove();
 
 	// この２行の位置を変更しました //
-	MaidMove();
+	MaidMove(Key_Data);
 	MaidTamaMove();
 }
 

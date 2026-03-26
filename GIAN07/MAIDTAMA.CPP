@@ -153,19 +153,23 @@ void TamaSetXY(int x, int y)
 
 
 // たま発射！！ //
-void MaidTamaSet(void)
+void MaidTamaSet(INPUT_BITS input)
 {
 	// この関数では、前回の発射状態 (Viv_St) を参照して、発射可能であるならば //
 	// 発射し、そうでなければ、単にリターンする。                             //
 	// なお、弾のセットには TAMA.cpp 内の関数と互換のものを使用する           //
 
-	if((Key_Data&KEY_TAMA) && Viv.toge_time==0 && Viv.muteki<MAID_MOVE_DISABLE_TIME){
+	if(
+		(input & KEY_TAMA) &&
+		(Viv.toge_time == 0) &&
+		(Viv.muteki < MAID_MOVE_DISABLE_TIME)
+	) {
 		Viv.toge_time = MAID_TAMA_START;
 	}
 
 	// ボムの発動条件を満たしていれば、発動! //
 	if(
-		(Key_Data & KEY_BOMB) &&
+		(input & KEY_BOMB) &&
 		(Viv.bomb_time == 0) &&
 		// (Viv.muteki == 0) &&
 		Viv.bomb &&

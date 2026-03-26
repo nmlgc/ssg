@@ -7,7 +7,7 @@
 #define PBGWIN_MAID_H		"めいど : Version 0.01 : Update 2000/02/17"
 //#pragma message(PBGWIN_MAID_H)
 
-import std.compat;
+#include "hatoyama/logic/input.h"
 
 
 
@@ -73,7 +73,7 @@ struct MAID {
 ///// [ 関数 ] /////
 extern void MaidDraw(void);
 extern void StateDraw(void);		// 各種ステータスを描画する
-extern void MaidMove(void);
+extern void MaidMove(INPUT_BITS);
 extern void MaidSet(void);			// 初期化
 extern void MaidNextStage(void);	// 次のステージの準備
 extern void MaidDead(void);			// 死す

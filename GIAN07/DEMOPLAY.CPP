@@ -29,7 +29,7 @@ struct {
 
 std::u8string ReplayFN(uint8_t stage)
 {
-	if(stage == GRAPH_ID_EXSTAGE) {
+	if(stage == STAGE_EXTRA) {
 		return std::u8string{ u8"秋霜りぷEx.DAT" };
 	}
 
@@ -230,7 +230,7 @@ bool DemoplayLoadReplay(int stage)
 	// MODDERS: If this bug doesn't apply to you because you modded an earlier
 	// build, mark the affected files as read-only to skip this patch.
 	if(
-		(stage == GRAPH_ID_EXSTAGE) &&
+		(stage == STAGE_EXTRA) &&
 		((file_level != EXTRA_LEVEL) || (file_lives != EXTRA_LIVES))
 	) {
 		DemoInfo.CfgDat.LevelSelected = EXTRA_LEVEL;

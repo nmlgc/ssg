@@ -34,7 +34,7 @@ static const RANK_DATA_FOR_DIFFICULTY RANK_DATA[] = {
 void PlayRankAdd(int n)
 {
 	// 難易度を変化させる //
-	if(GameStage == GRAPH_ID_EXSTAGE){
+	if(GameStage == STAGE_EXTRA) {
 		if(n > 0) {
 			PlayRank.Rank += (std::max)(+1, (n /  4));
 		} else if(n < 0) {

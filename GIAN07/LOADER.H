@@ -20,7 +20,6 @@
 #define GRAPH_ID_MUSICROOM		(128)		// 音楽室用ＢＭＰのＩＤ(数値は1-6 で無ければ良い)
 #define GRAPH_ID_TITLE			(128+1)		// タイトル画面のＢＭＰのＩＤ
 #define GRAPH_ID_NAMEREGIST		(128+2)		// お名前登録画面のＢＭＰのＩＤ
-#define GRAPH_ID_EXSTAGE		(128+3)		// エキストラステージ・システム
 #define GRAPH_ID_EXBOSS1		(128+4)		// エキストラステージ・ボス１
 #define GRAPH_ID_EXBOSS2		(128+5)		// エキストラステージ・ボス２
 #define GRAPH_ID_SPROJECT		(128+6)		// 西方Ｐｒｏｊｅｃｔの表示

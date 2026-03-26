@@ -3,9 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DD_UTY.H"
-#include "constants.h"
 #include "DD_GRP3D.H"
+#include "DD_UTY.H"
 #include "game/cast.h"
 #include "game/enum_array.h"
 #include "game/ut_math.h"

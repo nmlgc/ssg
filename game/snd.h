@@ -7,10 +7,10 @@
 
 
 // ヘッダファイル //
+#include "constants.h"
+#include "platform/buffer.h"
 #include "game/enum_flags.h"
 #include "game/volume.h"
-#include "platform/buffer.h"
-#include "constants.h"
 
 // 定数＆マクロ //
 using SND_INSTANCE_ID = uint8_t;

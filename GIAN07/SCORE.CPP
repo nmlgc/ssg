@@ -7,9 +7,9 @@
 // imaxdiv_t'` if this appears after a module import.
 #include <inttypes.h> // for PRId64
 
-#include "LZ_UTY.H"
-#include "LEVEL.H"
 #include "SCORE.H"
+#include "LEVEL.H"
+#include "LZ_UTY.H"
 #include "game/defer.h"
 
 using NR_SCORE_LIST = std::span<NR_NAME_DATA, NR_RANK_MAX>;

@@ -5,11 +5,11 @@
 
 #include <SDL3/SDL_iostream.h>
 
-#include "platform/file.h"
-#include "CONFIG.H"
-#include "LZ_UTY.H"
-#include "GIAN.H"
 #include "DEMOPLAY.H"
+#include "CONFIG.H"
+#include "GIAN.H"
+#include "LZ_UTY.H"
+#include "platform/file.h"
 #include "game/input.h"
 #include "game/ut_math.h"
 

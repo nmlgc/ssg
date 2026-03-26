@@ -21,23 +21,20 @@
 
 
 ///// [Include Files] /////
-#include "constants.h"
-
-#include "BOSS.H"				// ボスの定義＆ボス用エフェクトなど
-#include "PRankCtrl.h"			// プレイランク管理
-#include "GAMEMAIN.H"			// メインのルーチン切り替え処理
-#include "EFFECT.H"				// 主にテキストベースのエフェクト処理
-#include "EFFECT3D.H"			// ３Ｄエフェクト
-#include "FRAGMENT.H"			// 破片系エフェクト処理
-#include "LASER.H"				// 短いレーザー＆リフレクトレーザー処理
-#include "LLASER.H"				// なが～いレーザーの処理
-#include "HOMINGL.H"			// ホーミングレーザーの処理
-#include "MAIDTAMA.H"			// 自機ショットの処理
-#include "MAID.H"				// その名の通り
-#include "SCROLL.H"				// 背景スクロール＆ＳＣＬ管理
-#include "LOADER.H"				// 各種ローダー
-
-#include "ITEM.H"				// アイテム処理
+#include "BOSS.H"      // ボスの定義＆ボス用エフェクトなど
+#include "EFFECT.H"    // 主にテキストベースのエフェクト処理
+#include "EFFECT3D.H"  // ３Ｄエフェクト
+#include "FRAGMENT.H"  // 破片系エフェクト処理
+#include "GAMEMAIN.H"  // メインのルーチン切り替え処理
+#include "HOMINGL.H"   // ホーミングレーザーの処理
+#include "ITEM.H"      // アイテム処理
+#include "LASER.H"     // 短いレーザー＆リフレクトレーザー処理
+#include "LLASER.H"    // なが～いレーザーの処理
+#include "LOADER.H"    // 各種ローダー
+#include "MAID.H"      // その名の通り
+#include "MAIDTAMA.H"  // 自機ショットの処理
+#include "PRankCtrl.h" // プレイランク管理
+#include "SCROLL.H"    // 背景スクロール＆ＳＣＬ管理
 
 
 ///// [ 定数 ] /////

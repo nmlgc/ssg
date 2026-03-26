@@ -5,7 +5,6 @@
 
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
-#include "LOADER.H"
 #include "platform/graphics_backend.h"
 #include "game/ut_math.h"
 

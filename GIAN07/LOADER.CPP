@@ -3,21 +3,20 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "ENEMY.H"
+#include "LOADER.H"
 #include "CONFIG.H"
+#include "ENEMY.H"
 #include "GIAN.H"
-#include "MUSIC.H"
 #include "LZ_UTY.H"
+#include "MUSIC.H"
 #include "WindowSys.h"
-#include "game/enum_array.h"
-#include "game/format_bmp.h"
-#include "game/graphics.h"
-#include "game/hash.h"
-#include "game/midi.h"
-#include "game/snd.h"
 #include "platform/graphics_backend.h"
 #include "platform/path.h"
 #include "platform/thread.h"
+#include "game/enum_array.h"
+#include "game/format_bmp.h"
+#include "game/midi.h"
+#include "game/snd.h"
 #include <assert.h>
 
 // Hardcoded loop points for ZUN's original MIDI files

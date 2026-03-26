@@ -6,10 +6,10 @@
 #pragma once
 
 #include "LEVEL.H"
-#include "game/midi.h"
-#include "game/input.h"
-#include "game/volume.h"
 #include "platform/graphics_backend.h"
+#include "game/input.h"
+#include "game/midi.h"
+#include "game/volume.h"
 
 // フラグ //
 constexpr uint8_t GRPF_PARAM_SHIFT = 3;

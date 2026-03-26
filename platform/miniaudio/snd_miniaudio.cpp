@@ -8,9 +8,9 @@
 #include "platform/miniaudio/flags.h"
 #include <libs/miniaudio/miniaudio.h>
 
+#include "platform/snd_backend.h"
 #include "game/bgm_track.h"
 #include "game/defer.h"
-#include "platform/snd_backend.h"
 
 // Helpers
 // -------

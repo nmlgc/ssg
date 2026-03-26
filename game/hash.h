@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "game/narrow.h"
 #include "platform/buffer.h"
+#include "game/narrow.h"
 
 using HASH = std::array<std::byte, 32>;
 

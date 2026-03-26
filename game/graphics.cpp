@@ -11,13 +11,13 @@
 #include <SDL3/SDL_surface.h>
 
 #include "game/graphics.h"
+#include "platform/file.h"
+#include "platform/graphics_backend.h"
+#include "platform/path.h"
 #include "game/defer.h"
 #include "game/format_bmp.h"
 #include "game/input.h"
 #include "game/string_format.h"
-#include "platform/file.h"
-#include "platform/path.h"
-#include "platform/graphics_backend.h"
 
 uint8_t Grp_FPSDivisor = 0;
 std::chrono::steady_clock::duration Grp_ScreenshotTimes[

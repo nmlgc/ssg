@@ -7,9 +7,9 @@
 #define PBGWIN_ENEMYEXCTRL_H		"ENEMYEXCTRL : Version 0.01 : Update 2000/02/27"
 //#pragma message(PBGWIN_ENEMYEXCTRL_H)
 
-#include "EXDEF.H"
-#include "ENEMY.H"
 #include "BOSS.H"
+#include "ENEMY.H"
+#include "EXDEF.H"
 
 
 ///// [更新履歴] /////

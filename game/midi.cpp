@@ -8,10 +8,10 @@
 #include <malloc.h>
 
 #include "game/midi.h"
+#include "platform/midi_backend.h"
 #include "game/endian.h"
 #include "game/enum_flags.h"
 #include "game/volume.h"
-#include "platform/midi_backend.h"
 #pragma message(PBGWIN_PBGMIDI_H)
 
 

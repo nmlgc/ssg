@@ -7,11 +7,11 @@
 
 #define DIRECTSOUND_VERSION 0x0700
 
-#include <dsound.h>
-#include <mmreg.h>
 #include "platform/file.h"
 #include "platform/snd_backend.h"
 #include "game/debug.h" // エラー処理用関数
+#include <dsound.h>
+#include <mmreg.h>
 #pragma message("DS_UTY : Version 0.03 : Update 2000/02/04")
 
 #pragma comment(lib,"dsound.lib")

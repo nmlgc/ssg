@@ -6,8 +6,8 @@
 // SDL headers must come first to avoid import→#include bugs on Clang 19.
 #include <SDL3/SDL_filesystem.h>
 
-#include "platform/path.h"
 #include "constants.h"
+#include "platform/path.h"
 
 #ifndef WIN32
 	constexpr auto SDL_free_deleter = [](auto* p) { SDL_free(p); };

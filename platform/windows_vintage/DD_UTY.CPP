@@ -6,14 +6,13 @@
 #include <SDL3/SDL_surface.h>
 
 #include "DD_UTY.H"
+#include "platform/window_backend.h"
+#include "platform/windows/surface_gdi.h"
 #include "game/cast.h"
 #include "game/debug.h"
 #include "game/defer.h"
 #include "game/enum_array.h"
 #include "game/format_bmp.h"
-#include "game/input.h"
-#include "platform/windows/surface_gdi.h"
-#include "platform/window_backend.h"
 #include <assert.h>
 #include <d3d.h>
 #pragma message(PBGWIN_DD_UTY_H)

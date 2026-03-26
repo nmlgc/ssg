@@ -6,13 +6,13 @@
 #include <SDL3/SDL_misc.h>
 
 #include "WindowCtrl.h"
-#include "WindowSys.h"
 #include "CONFIG.H"
 #include "ENTRY.H"
 #include "GAMEMAIN.H"
 #include "LEVEL.H"
 #include "LOADER.H"
 #include "MUSIC.H"
+#include "WindowSys.h"
 #include "platform/input.h"
 #include "platform/midi_backend.h"
 #include "game/bgm.h"

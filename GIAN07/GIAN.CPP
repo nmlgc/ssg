@@ -4,9 +4,9 @@
 /*                                                                           */
 
 #include "GIAN.H"
+#include "CONFIG.H"
 #include "FONTUTY.H"
 #include "LEVEL.H"
-#include "CONFIG.H"
 #include "platform/time.h"
 
 

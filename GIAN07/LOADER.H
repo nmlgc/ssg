@@ -12,8 +12,6 @@
 #include "hatoyama/engine/hash.h"
 #include "hatoyama/logic/coords.h"
 
-struct SURFACE_DDRAW;
-
 
 ///// [ 定数 ] /////
 #define FACE_NUMX				6			// 顔グラの横の個数
@@ -96,21 +94,6 @@ extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
 void ReloadGraph(void);
 
 //// [ 変数 ] ////
-extern SURFACE_DDRAW&	GrTama;	// システム用
-extern SURFACE_DDRAW&	GrEnemy;	// 敵(雑魚＆ボス)用
-extern SURFACE_DDRAW&	GrMap;	// 背景用
-extern SURFACE_DDRAW&	GrBomber;	// ボム用グラフィック用
-extern SURFACE_DDRAW&	GrSProject;
-extern SURFACE_DDRAW&	GrTitle;
-extern SURFACE_DDRAW&	GrMusic;
-extern SURFACE_DDRAW&	GrNameReg;
-extern SURFACE_DDRAW&	GrEndingCredits;
-
-// 顔グラ用
-extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX];
-
-extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[ENDING_PIC_MAX];
-
 extern uint32_t	MusicNum;	// 曲数
 
 // パレット

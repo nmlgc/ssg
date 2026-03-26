@@ -12,6 +12,7 @@
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
+#include "HUD.H"
 #include "LENS.H"
 #include "LEVEL.H"
 #include "MUSIC.H"

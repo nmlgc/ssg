@@ -95,8 +95,4 @@ extern uint8_t	GameStage;
 extern uint8_t	LevelSelected;
 
 
-extern void StdStatusOutput(void);
-
-
-
 #endif

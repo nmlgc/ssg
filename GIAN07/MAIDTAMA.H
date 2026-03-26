@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
 #include "TAMA.H"
-#include "hatoyama/logic/input.h"
+#include "ssg/Input.h"
 
 
 

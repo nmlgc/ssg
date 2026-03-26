@@ -12,9 +12,9 @@
 #include "LZ_UTY.H"
 #include "LogicInstance.h"
 #include "MAID.H"
+#include "ssg/Input.h"
 #include "ssg/internal/LZ.hpp"
 #include "hatoyama/engine/file.h"
-#include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"
 
 

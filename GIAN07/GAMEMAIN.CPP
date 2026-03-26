@@ -38,7 +38,6 @@
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/time.h"
-#include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"
 #include "obj/version.h"
 

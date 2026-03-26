@@ -10,10 +10,10 @@
 #include "LOADER.H"
 #include "LZ_UTY.H"
 #include "LogicInstance.h"
+#include "ssg/Input.h"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/file.h"
-#include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"
 
 

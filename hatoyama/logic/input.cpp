@@ -1,5 +1,5 @@
 /*
- *   Cross-platform input declarations
+ *   Cross-platform input declarations and state
  *
  */
 

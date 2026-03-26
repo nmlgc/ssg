@@ -65,8 +65,8 @@ void fragment_set(int x, int y, uint8_t cmd)
 
 		case(FRG_SMOKE):
 			f->count = 24;
-			f->vx    = 0;//cosl((BYTE)rnd(),rnd()&0xff);//cosl((BYTE)rnd()%256,64*6);
-			f->vy    = 0;//sinl((BYTE)rnd(),rnd()&0xff);//sinl((BYTE)rnd()%256,64*6);
+			f->vx    = 0;
+			f->vy    = 0;
 		break;
 
 		case(FRG_STAR1):

@@ -42,13 +42,6 @@ typedef struct tagLineList3D{
 	uint8_t	DegX, DegY, DegZ;	/* 各軸に対する回転角 */
 } LineList3D;
 
-typedef struct tagCircle3D{
-	int		ox,oy;
-	int		r;
-	uint8_t	deg;
-	uint8_t	n;
-} Circle3D;
-
 typedef struct tagDeg3D{
 	int		dx;
 	int		dy;
@@ -65,13 +58,6 @@ typedef struct tagStar2D {
 	int		x,y;
 	int		vy;
 } Star2D;
-
-// 雲管理用構造体 //
-typedef struct tagCloud2D {
-	int		x, y;		// ｘ６４座標
-	int		vy;			// 速度のｙ成分(ｙしかないけど)
-	uint8_t	type;	// 雲の種類
-} Cloud2D;
 
 // 非・汎用２Ｄ正方形ワイヤーフレーム //
 typedef struct tagWFLine2D {
@@ -114,11 +100,7 @@ void MoveWarningR(char count);
 void Init3DCube(void);
 void Draw3DCube(void);
 void Move3DCube(void);
-/*
-void InitStg3Cloud(void);	// ３面の雲の初期化を行う
-void MoveStg3Cloud(void);	// ３面の雲を動作させる
-void DrawStg3Cloud(void);	// ３面の雲を描画する
-*/
+
 void InitEffectFakeECL(void);
 void MoveEffectFakeECL(void);
 void DrawEffectFakeECL(void);

@@ -54,20 +54,9 @@ typedef struct{
 } LASER_CMD;
 
 
-/*
-////反射物(鏡?) 構造体////
-typedef struct{
-	int		x,y;		// 反射物の中心座標
-
-	uint32_t	l;	// リフレクターの長さ(中心から先端まで,つまり全体でl*2)
-	uint8_t	d;	// 反射物の角度(0 <= d < 128)
-} REFLECTOR;
-*/
-
 ////レーザー関数////
 extern void laser_set(void);		// レーザーをセットする(難易度変更"有り")
 extern void laser_setEX(void);		// レーザーをセットする(難易度変更"無し")
-extern int  llaser_set(uint16_t *ind);	// 無限遠レーザーをセットする(セットできた数を返すのだ)
 extern void laser_move(void);		// レーザーを動かす
 extern void laser_draw(void);		// レーザーを描画する
 extern void laser_clear(void);		// レーザー全てに消去エフェクトをかける
@@ -77,7 +66,5 @@ extern void laserind_set(void);		// レーザー順序用配列の初期化
 ////レーザーの各種変数たち////
 extern LASER_CMD	LaserCmd;				// 標準レーザーコマンド構造体
 extern uint16_t	LaserNow;	// レーザーの本数
-//extern REFLECTOR	Reflector[RT_MAX];		// 反射物構造体
-//extern uint16_t	ReflectorNow;	// 反射物の個数
 
 #endif

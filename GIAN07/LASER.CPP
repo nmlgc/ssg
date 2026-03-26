@@ -103,8 +103,6 @@ LASER_CMD		LaserCmd;							// 標準レーザーコマンド構造体
 std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
 std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
 uint16_t LaserNow;                          // レーザーの本数
-//REFLECTOR		Reflector[RT_MAX];					// 反射物_構造体
-// uint16_t	ReflectorNow;		// 反射物の個数
 
 static void easy_cmdL(void);						// 難易度：Ｅａｓｙ
 static void hard_cmdL(void);						// 難易度：Ｈａｒｄ
@@ -572,7 +570,6 @@ static void REFL_move(LASER_DATA *lp)
 
 static int REFL_hit(const LASER_DATA *lp)
 {
-	//REFLECTOR *rp;
 	LLASER_DATA *ll;
 	int i;
 

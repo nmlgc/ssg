@@ -16,20 +16,12 @@ import std.compat;
 
 // サボテン定数 //
 #define VIVDEAD_VAL		(300)		// びびっとの死亡時間．．．
-#define VIVMUTEKI_VAL	(180)			// びびっとの無敵時間
 
 #define MAID_MOVE_DISABLE_TIME		(250-100)		// 行動不能な時間
 
 #define BOMBMUTEKI_VAL	60			// ボムの終端無敵時間
 #define SBOPT_DX		26			// オプションのずれ幅(x64ではない)
-//#define EVADE_X_START	150			// かすりカウンタの初期表示座標
-//#define EVADE_X_SPD		5			// かすりカウンタの移動速度
-//#define EVADE_TIME		60			// かすり許容フレーム数
 #define EVADETIME_MAX	256			// かすりマックス時の待ち時間
-
-#define SSP_WIDE		(64*9)		//
-#define SSP_HOMING		(64*9)		//
-#define SSP_LASER		(64*13)		//
 
 
 
@@ -89,8 +81,6 @@ extern void MaidNextStage(void);	// 次のステージの準備
 extern void MaidDead(void);			// 死す
 
 extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
-//extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
-
 extern void score_add(int sc);		// スコアを上昇させる
 
 extern void WideBombDraw(void);		// ワイドショット用のボム(やや例外処理)

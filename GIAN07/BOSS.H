@@ -12,15 +12,9 @@
 
 ///// [構造体] /////
 
-// 特殊当たり判定 //
-typedef struct tagEXHITCHK{
-	uint8_t	flags[60][60];
-} EXHITCHK;
-
 // ボスデータ //
 typedef struct tagBOSS_DATA{
 	ENEMY_DATA		Edat;					// 標準の敵データ(実体であることに注意)
-	EXHITCHK		*Hit;					// 特殊当たり判定(NULL なら使用しない)
 
 	void(*ExMove)(tagBOSS_DATA *);	// 特殊移動用関数
 

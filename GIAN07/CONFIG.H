@@ -35,7 +35,6 @@ constexpr uint8_t SNDF_SE_ENABLE	= 0x02;
 constexpr uint8_t SNDF_BGM_NOT_VOL_NORM	= 0x04;
 
 constexpr uint8_t INPF_MASK	= (~0x07);
-constexpr uint8_t INPF_JOYPAD_ENABLE	= 0x01;	// パッドが有効
 constexpr uint8_t INPF_Z_MSKIP_ENABLE	= 0x02;	// Ｚキーでメッセージを送れる
 constexpr uint8_t INPF_Z_SPDDOWN_ENABLE	= 0x04;	// 押しっぱなしでシフト移動
 

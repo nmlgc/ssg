@@ -16,7 +16,6 @@
 
 
 uint16_t	HLaserNow;	// ホーミングレーザーの本数
-HLaserInfo		HLaserCmd;				// ホーミングレーザーセット用データ
 HLaserData		HLaserBuf[HLASER_MAX];	// ホーミングレーザー格納バッファ
 
 HLaserData		ActiveHL;		// 確保済みホーミングレーザー

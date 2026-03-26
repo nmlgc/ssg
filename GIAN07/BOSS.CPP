@@ -92,7 +92,6 @@ void BossDataInit(void)
 		it.ExMove   = BossSTDMove;	// 特殊移動関数
 		it.ExCount  = 0;
 		it.ExState  = BEXST_NORM;	// 特殊状態変数
-		it.Hit      = nullptr;	// 特殊当たり判定
 	}
 
 	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
@@ -215,23 +214,7 @@ void BossDraw(void)
 	int			w,h,t;
 	ENEMY_DATA	*e;
 	PIXEL_LTRB	wing;
-/*
-	PIXEL_LTRB	Right[6] = {
-		{240+40, 400, 240+80, 480}, {320, 400, 320+32, 480},
-		{384+24, 400, 384+48, 480}, {432+8, 400, 432+16, 480},
-		{464+8,  400, 464+16, 480}, {480+8, 400, 480+16,  480},
-	};
 
-	PIXEL_LTRB	Left[6] = {
-		{240, 400, 240+40, 480}, {320, 400, 320+32, 480},
-		{384, 400, 384+48, 480}, {432, 400, 432+16, 480},
-		{464, 400, 464+16,  480}, {480, 400, 480+16,  480},
-	};
-
-	WORD	size[6] = {
-		40, 32, 24, 16, 8, 8
-	};
-*/
 	BitLineDraw();
 
 	for(auto& it : Boss) {
@@ -700,13 +683,6 @@ void BossDamage4(int damage)
 
 static int PutBoss(int x, int y, uint32_t id)
 {
-	//if(EnemyNow+1>=ENEMY_MAX) return;
-	//e = Enemy+ (*(EnemyInd+EnemyNow));
-	//EnemyNow++;
-	//n      = 4 + (((BYTE)p[4])<<2);
-	//e->x   = (*(short *)(&p[0]));	//((int)(*(short *)(&p[0])))*64;
-	//e->y   = (*(short *)(&p[2]));	//((int)(*(short *)(&p[2])))*64;
-
 	auto it = std::ranges::find_if(Boss, [](const auto& it) {
 		return !it.IsUsed;
 	});
@@ -722,66 +698,6 @@ static int PutBoss(int x, int y, uint32_t id)
 	InitEnemyDataX64(e,x,y,addr);
 	e->item = 0;
 
-	/*
-	e->x = x;
-	e->y = y;
-
-	// ランダム配置に対応するぞ //
-	//e->x = (e->x==X_RNDV) ? GX_RND : (e->x<<6);
-	//e->y = (e->y==Y_RNDV) ? GY_RND : (e->y<<6);
-	addr   = 4 + (id<<2);		// ちと、やばいね...
-	e->cmd = (*(DWORD *)(&ECL_Head[addr]));
-
-	e->call_addr = e->cmd;
-
-	e->hp       = 0xffffffff;
-	e->amp      = 0;
-	e->anm_ptn  = 0;
-	e->anm_sp   = 0;
-	e->anm_c    = 0;
-	e->count    = 0;
-	e->evscore  = 0;
-	e->d        = 64;
-	e->flag     = EF_DAMAGE|EF_DRAW|EF_HITSB;
-
-	e->tama_c   = rnd()&0xff;
-	e->t_rep    = 0;			// 弾の発射間隔(０：自動発射しない)
-	e->g_width  = 0;
-	e->g_height = 0;
-
-	e->item     = 0;
-
-	e->rep_c    = 0;
-	e->cmd_c    = 0;
-	e->v        = 64;
-	e->vd       = 0;
-	e->vx       = cosl(e->d,e->v);
-	e->vy       = sinl(e->d,e->v);
-
-	e->LLaserRef = 0;
-
-	e->t_cmd.c      = 0;
-	e->t_cmd.cmd    = TC_WAY;
-	e->t_cmd.d      = 64;
-	e->t_cmd.n      = 1;
-	e->t_cmd.option = TE_NONE;
-	e->t_cmd.type   = T_NORM;
-	e->t_cmd.v      = 3;
-	e->t_cmd.x      = 0;
-	e->t_cmd.y      = 0;
-
-	e->t_cmd.dw     = 16;
-	e->t_cmd.ns     = 1;
-	e->t_cmd.rep    = 0;
-	e->t_cmd.vd     = 0;
-
-	// 変数用レジスタの初期化 //
-	e->GR[0] = e->GR[1] = e->GR[2] = e->GR[3] = 0;
-	e->GR[4] = e->GR[5] = e->GR[6] = e->GR[7] = 0;
-
-	// 割り込みベクタの初期化 //
-	InitECLInterrupt(e);
-*/
 	return std::distance(Boss, it);
 }
 

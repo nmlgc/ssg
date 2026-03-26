@@ -74,18 +74,6 @@ struct SURFACE_DDRAW;
 
 
 
-typedef struct tagFACE_DATA{
-	PALETTE	pal;	// 顔グラ用パレット
-} FACE_DATA;
-
-// エンディングのグラフィック管理用 //
-typedef struct tagENDING_GRP{
-	PIXEL_LTRB	rcTarget;	// 矩形の範囲
-	PALETTE	pal;	// パレット
-} ENDING_GRP;
-
-
-
 ///// [ 関数 ] /////
 void LoaderInit(void);
 void LoaderCleanup(void);
@@ -123,13 +111,13 @@ extern const std::reference_wrapper<SURFACE_DDRAW> GrFaces[FACE_MAX];
 
 extern const std::reference_wrapper<SURFACE_DDRAW> GrEndingPic[ENDING_PIC_MAX];
 
-extern FACE_DATA	FaceData[FACE_MAX];	// 顔グラ用
-
 extern uint32_t	MusicNum;	// 曲数
 
+// パレット
 extern PALETTE SProjectPalette;
+extern PALETTE FacePalette[FACE_MAX]; // 顔グラ用パレット
+extern PALETTE EndingPalette[ENDING_PIC_MAX];
 
-extern ENDING_GRP	EndingGrp[ENDING_PIC_MAX];
 
 
 

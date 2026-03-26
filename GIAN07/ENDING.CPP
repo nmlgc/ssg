@@ -16,7 +16,7 @@ typedef struct tagEndingGrpInfo {
 	uint32_t timer;	// 表示用タイマー
 	decltype(timer) fadein;	// フェードイン時刻
 	decltype(timer) fadeout;	// フェードアウト時刻
-	ENDING_GRP	*target;	// 描画対象
+	PALETTE	*target;	// 描画対象
 	short		alpha;		// パレットの状態
 
 	int			x, y;		// 表示する左上
@@ -239,7 +239,9 @@ void DrawGrpInfo()
 	if(!EGrpInfo.bWantDisp) return;
 
 	// 驚異の画像表示 //
-	const auto sid = (SURFACE_ID::ENDING_PIC + (EGrpInfo.target - EndingGrp));
+	const auto sid = (
+		SURFACE_ID::ENDING_PIC + (EGrpInfo.target - EndingPalette)
+	);
 	GrpSurface_BlitOpaque({ EGrpInfo.x, EGrpInfo.y }, sid, { 0, 0, 320, 240 });
 }
 
@@ -310,13 +312,13 @@ void DrawFadeInfo()
 	// フェードアウト関連
 	if(GrpGeom_FB()) {
 		if(FlashState){
-			FlashPaletteGrp(temp_pal, EGrpInfo.target->pal, FlashState);
+			FlashPaletteGrp(temp_pal, *EGrpInfo.target, FlashState);
 			GrpBackend_PaletteSet(temp_pal);
 		}
 		else if(EGrpInfo.target){
 			FadeoutPaletteGrp(
 				temp_pal,
-				EGrpInfo.target->pal,
+				*EGrpInfo.target,
 				Cast::down_sign<uint8_t>(EGrpInfo.alpha)
 			);
 			FadeoutPaletteStf(
@@ -422,7 +424,7 @@ void EndingSCLDecode()
 				break;
 				}
 				EGrpInfo.alpha   = 0;
-				EGrpInfo.target  = EndingGrp + cmd[1];
+				EGrpInfo.target  = (EndingPalette + cmd[1]);
 				EGrpInfo.timer   = 0;
 				EGrpInfo.bWantDisp = true;
 				SCL_Now += 2;

@@ -4,7 +4,8 @@
  */
 
 #include "ENDING.H"
-#include "GIAN.H"
+#include "GAMEMAIN.H"
+#include "LOADER.H"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/text_backend.h"
@@ -60,6 +61,9 @@ typedef struct tagEndingText {
 EndingGrpInfo	EGrpInfo;
 EndingStTask	EStfTask;
 EndingText		EText;
+static BUFFER_OWNED ESCL_Head;
+static uint8_t *ESCL_Now;
+static uint32_t EFrame;
 
 const PIXEL_LTRB StaffLabel[7] = {
 	{ 0,   0, 160,  24 },
@@ -115,9 +119,14 @@ bool EndingInit(void)
 	Grp_Flip();
 	GrpBackend_Clear();
 
-	if(!LoadGraph(GRAPH_ID_ENDING) || !LoadStageData(GRAPH_ID_ENDING)) {
+	if(!LoadGraph(GRAPH_ID_ENDING)) {
 		return false;
 	}
+	ESCL_Head = LoadEndingScript();
+	if(!ESCL_Head) {
+		return false;
+	}
+	ESCL_Now = ESCL_Head.get();
 	BGM_Stop();
 
 
@@ -127,7 +136,7 @@ bool EndingInit(void)
 
 
 	GameMain = EndingProc;
-
+	EFrame = 0;
 	FlashState = 0;
 
 	EGrpInfo.bWantDisp = false;
@@ -371,14 +380,14 @@ void EndingSCLDecode()
 	bool bFlag = true;
 
 	while(bFlag){
-		const uint8_t *cmd = SCL_Now;
+		const uint8_t *cmd = ESCL_Now;
 		switch(cmd[0]){
 			case(SCL_TIME): {
 				const auto temp = I32LEAt(&cmd[1]);
-				if(temp > GameCount) {
+				if(temp > EFrame) {
 					bFlag = false;
 				} else {
-					SCL_Now += 5; // cmd(1)+time(4)
+					ESCL_Now += 5; // cmd(1)+time(4)
 				}
 				break;
 			}
@@ -389,7 +398,7 @@ void EndingSCLDecode()
 				EText.Text[EText.NumText++] = line;
 				EText.TextStr += line_p;
 				EText.TextStr += '\n';
-				SCL_Now += (line.length() + 2);
+				ESCL_Now += (line.length() + 2);
 				break;
 			}
 
@@ -427,7 +436,7 @@ void EndingSCLDecode()
 				EGrpInfo.target  = (EndingPalette + cmd[1]);
 				EGrpInfo.timer   = 0;
 				EGrpInfo.bWantDisp = true;
-				SCL_Now += 2;
+				ESCL_Now += 2;
 			break;
 
 			case(SCL_STAFF):	// わかりにくいが、１２８を加えると、役割名指定ね
@@ -468,23 +477,25 @@ void EndingSCLDecode()
 				else{
 					EStfTask.StfID[EStfTask.NumStf++] = cmd[1];
 				}
-				SCL_Now+=2;
+				ESCL_Now += 2;
 			break;
 
 			case(SCL_NPG):		// 新しいページに変更する
 				EText.Blank();
-				SCL_Now++;
+				ESCL_Now++;
 			break;
 
 			case(SCL_END):		// カウントも変更させずにリターンするのだ
 				EGrpInfo.bWantDisp = false;
 				EStfTask.bWantDisp = false;
+				ESCL_Now = nullptr;
+				ESCL_Head = nullptr;
 				NameRegistInit(false);
 			return;
 
 			case(SCL_MUSIC):
 				BGM_Switch(cmd[1]);
-				SCL_Now += 2;
+				ESCL_Now += 2;
 			break;
 
 			case(SCL_EFC):
@@ -492,7 +503,7 @@ void EndingSCLDecode()
 					case 0:		FlashState = 256*2;		break;
 				}
 
-				SCL_Now += 2;
+				ESCL_Now += 2;
 			break;
 
 			case(SCL_STAGECLEAR):	// ステージクリア
@@ -508,5 +519,5 @@ void EndingSCLDecode()
 		}
 	}
 
-	GameCount++;
+	EFrame++;
 }

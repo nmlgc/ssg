@@ -1184,17 +1184,12 @@ bool LoadStageData(uint8_t stage)
 	return true;
 }
 
-bool LoadEndingScript(void)
+BUFFER_OWNED LoadEndingScript(void)
 {
 	FreeStageData();
 
 	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
-	if((SCL_Head = enemy.MemExpand(47)) == nullptr) {
-		return false;
-	}
-	SCL_Now = SCL_Head.get();
-	GameCount = 0;
-	return true;
+	return enemy.MemExpand(47);
 }
 
 // １パターンのグラフィックをアニメとして定義する //

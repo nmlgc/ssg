@@ -7,8 +7,8 @@
 
 #include <SDL3/SDL_iostream.h>
 
-#include "platform/windows/utf.h"
 #include "platform/file.h"
+#include "platform/windows/utf.h"
 #include "game/defer.h"
 #include <windows.h>
 

@@ -9,8 +9,8 @@
 
 #include "constants.h"
 #include "game/coords.h"
-#include "game/hash.h"
 #include "game/graphics.h"
+#include "game/hash.h"
 
 struct SURFACE_DDRAW;
 

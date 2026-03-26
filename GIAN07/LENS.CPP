@@ -4,7 +4,6 @@
 /*                                                                           */
 
 #include "LENS.H"
-#include "constants.h"
 #include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/ut_math.h"

@@ -15,9 +15,9 @@
 
 
 
+#include "platform/buffer.h"
 #include "game/narrow.h"
 #include "game/volume.h"
-#include "platform/buffer.h"
 
 enum class MID_FLAGS : uint8_t {
 	_HAS_BITFLAG_OPERATORS,

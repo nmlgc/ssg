@@ -18,7 +18,6 @@ using SDL_COLOR = SDL_FColor;
 #include "game/enum_array.h"
 #include "game/format_bmp.h"
 #include "game/string_format.h"
-#include "constants.h"
 
 static constexpr auto LOG_CAT = SDL_LOG_CATEGORY_RENDER;
 

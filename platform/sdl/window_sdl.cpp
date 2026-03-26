@@ -12,13 +12,12 @@
 #include <SDL3/SDL_timer.h>
 #include <SDL3/SDL_video.h>
 
-#include "platform/window_backend.h"
-#include "platform/sdl/log_sdl.h"
 #include "platform/sdl/window_sdl.h"
 #include "platform/graphics_backend.h"
-#include "platform/snd_backend.h"
 #include "platform/input.h"
-#include "constants.h"
+#include "platform/sdl/log_sdl.h"
+#include "platform/snd_backend.h"
+#include "platform/window_backend.h"
 #include "game/bgm.h"
 #include "game/frame.h"
 #include "game/graphics.h"

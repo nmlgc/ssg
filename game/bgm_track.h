@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "game/pcm.h"
-#include "game/hash.h"
 #include "platform/file.h"
+#include "game/hash.h"
+#include "game/pcm.h"
 
 struct SDL_IOStream;
 

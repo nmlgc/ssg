@@ -6,11 +6,11 @@
 #include <SDL3/SDL_iostream.h>
 
 #include "CONFIG.H"
+#include "platform/file.h"
+#include "platform/window_backend.h"
 #include "game/bgm.h"
 #include "game/defer.h"
 #include "game/endian.h"
-#include "platform/file.h"
-#include "platform/window_backend.h"
 
 ///// Constants /////
 constexpr auto DBG_FN = u8"秋霜DBG.DAT";

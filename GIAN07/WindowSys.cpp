@@ -4,8 +4,8 @@
 /*                                                                           */
 
 #include "WindowSys.h"
-#include "LOADER.H"
 #include "FONTUTY.H"
+#include "LOADER.H"
 #include "platform/text_backend.h"
 #include "game/enum_flags.h"
 #include "game/snd.h"

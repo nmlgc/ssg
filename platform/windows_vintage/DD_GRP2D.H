@@ -15,7 +15,6 @@
 
 // ヘッダファイル //
 #include "platform/graphics_backend.h"
-#include "constants.h"
 
 class GRAPHICS_GEOMETRY_DDRAW : public GRAPHICS_GEOMETRY {
 public:

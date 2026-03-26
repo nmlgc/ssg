@@ -5,9 +5,9 @@
 
 #include "BOSS.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
+#include "EnemyExCtrl.h"
 #include "GEOMETRY.H"
 #include "GIAN.H"
-#include "EnemyExCtrl.h"
 #include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/snd.h"

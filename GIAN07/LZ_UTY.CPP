@@ -6,8 +6,8 @@
 #include <SDL3/SDL_iostream.h>
 
 #include "LZ_UTY.H"
-#include "game/defer.h"
 #include "platform/file.h"
+#include "game/defer.h"
 
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;

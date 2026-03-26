@@ -5,11 +5,11 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
+#include "platform/graphics_backend.h"
 #include "game/cast.h"
 #include "game/input.h"
 #include "game/snd.h"
 #include "game/ut_math.h"
-#include "platform/graphics_backend.h"
 
 
 ///// [ひみつの関数] /////

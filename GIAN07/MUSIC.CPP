@@ -8,10 +8,11 @@
 #include <inttypes.h> // for PRId64
 
 #include "MUSIC.H"
-#include "EFFECT.H"
 #include "FONTUTY.H"
 #include "GAMEMAIN.H"
 #include "LOADER.H"
+#include "platform/midi_backend.h"
+#include "platform/text_backend.h"
 #include "game/bgm.h"
 #include "game/debug.h"
 #include "game/input.h"
@@ -19,8 +20,6 @@
 #include "game/string_format.h"
 #include "game/text.h"
 #include "game/ut_math.h"
-#include "platform/midi_backend.h"
-#include "platform/text_backend.h"
 
 extern bool IsDraw();
 

@@ -4,9 +4,8 @@
  */
 
 #include "BOMBEFC.H"
-#include "LOADER.H"
-#include "game/ut_math.h"
 #include "platform/graphics_backend.h"
+#include "game/ut_math.h"
 
 
 BombEfcCtrl		BombEfc[EXBOMB_MAX];

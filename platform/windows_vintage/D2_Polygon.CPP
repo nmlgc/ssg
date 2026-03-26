@@ -4,9 +4,8 @@
 /*                                                                           */
 
 #include "DD_CLIP2D.H"
-#include "game/cast.h"
-#include "constants.h"
 #include "DD_GRP2D.H"
+#include "game/cast.h"
 
 
 //// [更新履歴] ////

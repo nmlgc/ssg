@@ -3,10 +3,9 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "DD_UTY.H"
-#include "constants.h"
 #include "DD_GRP2D.H"
-#include "DD_CLIP2D.H"		// 図形クリッピング用関数群
+#include "DD_CLIP2D.H" // 図形クリッピング用関数群
+#include "DD_UTY.H"
 #include "game/cast.h"
 #include <ddraw.h>
 

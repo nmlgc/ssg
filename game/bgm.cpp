@@ -6,16 +6,16 @@
 #include <SDL3/SDL_filesystem.h>
 
 #include "game/bgm.h"
+#include "platform/file.h"
+#include "platform/midi_backend.h"
+#include "platform/path.h"
+#include "platform/snd_backend.h"
 #include "game/bgm_track.h"
 #include "game/defer.h"
 #include "game/midi.h"
 #include "game/snd.h"
 #include "game/string_format.h"
 #include "game/volume.h"
-#include "platform/file.h"
-#include "platform/midi_backend.h"
-#include "platform/path.h"
-#include "platform/snd_backend.h"
 
 using namespace std::chrono_literals;
 

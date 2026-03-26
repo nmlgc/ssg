@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "game/text_packed.h"
 #include "platform/graphics_backend.h"
+#include "game/text_packed.h"
 
 // Loads any required fonts from the game directory, and cleans them up at
 // process termination.

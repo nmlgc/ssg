@@ -304,7 +304,6 @@ void NameRegistProc(bool&)
 	static int8_t key_time;
 	static uint8_t count;
 	static uint8_t time;
-	//char	buf[100],
 	char	c;
 
 	constexpr int8_t END_WAIT = -1;
@@ -458,16 +457,6 @@ void NameRegistProc(bool&)
 	}
 	GrpSurface_Blit({ (112 + (x << 4)), (420 + (y << 4)) }, sid, src);
 
-	//sprintf(buf,"(%2d,%2d)", x, y);
-	//GrpPut16(0,0,buf);
-
-/*
-	GrpPut16(400,100,temps);
-	for(i=0; i<5; i++){
-		GrpPut16(100, 100+i*32, ScoreString[i].Score);
-		if(CurrentRank == i+1) GrpPut16(85, 100+i*32, "!!");
-	}
-*/
 	Grp_Flip();
 }
 
@@ -636,7 +625,6 @@ extern bool GameReplayInit(int Stage)
 {
 	MaidSet();
 
-//	rnd_seed_set(Time_SteadyTicksMS());
 	GameStage = Stage;
 
 	if(!DemoplayLoadReplay(GameStage)) {
@@ -936,18 +924,7 @@ void GameProc(bool&)
 		GameMain = PauseProc;
 		return;
 	}
-/*
-	static BYTE count;
-	if(count) count--;
-	if((Key_Data & KEY_TAMA) && count==0){
-		CEffectSet(Viv.x,Viv.y,CEFC_CIRCLE2);//STAR);
-		count = 30;
-	}
-	if((Key_Data & KEY_BOMB) && count==0){
-		CEffectSet(Viv.x,Viv.y,CEFC_CIRCLE1);//STAR);
-		count = 30;
-	}
-*/
+
 	GameMove();
 	if(GameMain != GameProc) return;
 
@@ -1277,18 +1254,6 @@ void WeaponSelectProc(bool&)
 		}
 		GrpGeom->Unlock();
 
-/*
-		HDC		hdc;
-		char	buf[100];
-		DxObj.Back->GetDC(&hdc);
-		sprintf(buf,"Viv.weapon = %d",Viv.weapon);
-		TextOut(hdc,0,0,buf,strlen(buf));
-		DxObj.Back->ReleaseDC(hdc);
-
-#ifdef PBG_DEBUG
-		StdStatusOutput();
-#endif
-*/
 		Grp_Flip();
 	}
 }
@@ -1301,15 +1266,6 @@ void TitleProc(bool& quit)
 	//PIXEL_LTRB	src = { 0, 0, 195, 256 };
 	//PIXEL_LTRB	src = { 0, 0, 275, 256 };
 
-/*
-	// 鳩プロテクト? //
-	if(
-		(GetAsyncKeyState(VK_F1) & 0x80000000) &&
-		(GetAsyncKeyState(VK_F10) & 0x8000000)
-	) {
-		quit = true;
-	}
-*/
 	// Running this here to prevent MIDI processing from jumping over a large
 	// number of events once the player enters the Music Room.
 	BGM_UpdateMIDITables();

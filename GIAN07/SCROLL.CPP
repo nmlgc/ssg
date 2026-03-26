@@ -149,7 +149,6 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 static void enemy_set(void)
 {
 	bool	bFlag = true;
-//	BIT_DEVICE	*in;				// やばやば...
 	bool CtrlFlag = false;
 
 	while(bFlag){
@@ -183,17 +182,7 @@ static void enemy_set(void)
 						SclInfo.ReturnFlag = false;
 					}
 				}
-/*
-				if((Key_Data & KEY_SKIP) && SclInfo.MsgFlag)
-					GameCount+=(temp-GameCount)/3;
-				else if((Key_Data & KEY_RETURN) && !SclInfo.ReturnFlag){
-					GameCount  = temp;
-					SclInfo.ReturnFlag = true;
-				}
-				if(!(Key_Data & KEY_RETURN) && SclInfo.ReturnFlag) {
-					SclInfo.ReturnFlag = false;
-				}
-*/
+
 				if(temp > GameCount) {
 					bFlag = false;
 				} else {
@@ -248,7 +237,6 @@ static void enemy_set(void)
 			break;
 
 			case(SCL_MSG):		// メッセージを出力する
-				//MWinCmd(MWCMD_SMALLFONT);
 				MWinMsg(reinterpret_cast<const char *>(cmd + 1));
 				SCL_Now += (strlen(reinterpret_cast<const char *>(cmd + 1)) + 2);
 			break;
@@ -269,13 +257,6 @@ static void enemy_set(void)
 			break;
 
 			case(SCL_END):		// カウントも変更させずにリターンする
-				/*
-				MWinOpen();
-				MWinCmd(MWCMD_NEWPAGE);
-				MWinCmd(MWCMD_LARGEFONT);
-				MWinMsg("ＳＣＬ完了ですの");
-				SCL_DEBUG(u8"--- SCL_END ---");
-				*/
 			return;
 
 			case(SCL_SSP):		// スクロールスピード変更
@@ -306,10 +287,8 @@ static void enemy_set(void)
 			case(SCL_EFC):
 				switch(cmd[1]){
 				case(SEFC_WARN):
-					//effect_set(0,0,EFC_WARNBOSS,GameStage);
 					Snd_SEPlay(8, GX_MID, true);
 					WarningEffectSet();
-					//StringEffect3(GameStage);
 				break;
 
 				case(SEFC_WARNSTOP):	Snd_SEStop(8);	break;	// Warning 停止
@@ -422,11 +401,6 @@ static void enemy_set(void)
 
 static void _PutEnemy(const uint8_t *p)
 {
-/*
- * [メモ]
- *  p[0-1]:EnemyX  p[2-3]:EnemyY  p[4]:EnemyID
- *  ECL_Head[0-3]:Num  ECL_Head[n*4-(n*4+3)] (n>1):StartAddr(ABS)
- */
 	ENEMY_DATA		*e;
 	short			x,y;
 
@@ -439,115 +413,7 @@ static void _PutEnemy(const uint8_t *p)
 	x = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
 	y = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
 	InitEnemyDataSTD(e,x,y,n);
-
-/*
-	e->x   = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
-	e->y   = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
-
-	e->x = (e->x==X_RNDV) ? GX_RND : (e->x<<6);
-	e->y = (e->y==Y_RNDV) ? GY_RND : (e->y<<6);
-	e->cmd = U32LEAt(&ECL_Head[n]);
-
-	e->call_addr = e->cmd;
-
-	e->hp       = 0xffffffff;
-	e->amp      = 0;
-	e->anm_ptn  = 0;
-	e->anm_sp   = 0;
-	e->anm_c    = 0;
-	e->count    = 0;
-	e->evscore  = 0;
-	e->d        = 64;
-	e->flag     = EF_DAMAGE|EF_DRAW|EF_HITSB;
-
-	e->tama_c   = rnd();//&0xff;
-	e->t_rep    = 0;			// 弾の発射間隔(０：自動発射しない)
-	e->g_width  = 0;
-	e->g_height = 0;
-
-	e->item     = 0;
-
-	e->rep_c    = 0;
-	e->cmd_c    = 0;
-	e->v        = 64;
-	e->vd       = 0;
-	e->vx       = cosl(e->d,e->v);
-	e->vy       = sinl(e->d,e->v);
-
-	e->LLaserRef = 0;
-
-	e->t_cmd.c      = 0;
-	e->t_cmd.cmd    = TC_WAY;
-	e->t_cmd.d      = 64;
-	e->t_cmd.n      = 1;
-	e->t_cmd.option = TE_NONE;
-	e->t_cmd.type   = T_NORM;
-	e->t_cmd.v      = 3;
-	e->t_cmd.x      = 0;
-	e->t_cmd.y      = 0;
-
-	e->t_cmd.dw     = 16;
-	e->t_cmd.ns     = 1;
-	e->t_cmd.rep    = 0;
-	e->t_cmd.vd     = 0;
-
-
-	// 変数用レジスタの初期化 //
-	e->GR[0] = e->GR[1] = e->GR[2] = e->GR[3] = 0;
-	e->GR[4] = e->GR[5] = e->GR[6] = e->GR[7] = 0;
-
-	// 割り込みベクタの初期化 //
-	InitECLInterrupt(e);
-*/
 }
-
-/*
-static void ExDraw(void)
-{
-	int			x,y;
-	int			dx,dy;
-	int			infx,infy;
-	int			i,j;
-
-	int			ox,oy;
-
-	static BYTE		deg = 0;
-	static int		len = 0;
-	static BYTE		count = 0;
-	static char		flag = 1;
-
-	ox = cosl(deg,len*flag)+320;
-	oy = sinl(deg,len*flag)+240;
-
-	count++;
-
-	if(count==0)	flag *= -1;
-
-	if(count>60)	len = (len+4)%64;
-	else			deg+=4;
-
-	GrpGeom->Lock();
-	GrpGeom->SetColor({ 0, 3, 0 });
-
-	dx = cosl(deg+64,64);		infx = cosl(deg,800);
-	dy = sinl(deg+64,64);		infy = sinl(deg,800);
-	for(i=-10;i<=10;i++){
-		x = ox + dx*i;
-		y = oy + dy*i;
-		GrpGeom->DrawLine((x - infx), (y - infy), (x + infx), (y + infy));
-	}
-
-	dx = cosl(deg,64);		infx = cosl(deg+64,800);
-	dy = sinl(deg,64);		infy = sinl(deg+64,800);
-	for(i=-10;i<=10;i++){
-		x = ox + dx*i;
-		y = oy + dy*i;
-		GrpGeom->DrawLine((x - infx), (y - infy), (x + infx), (y + infy));
-	}
-
-	GrpGeom->Unlock();
-}
-*/
 
 // 背景を描画する //
 void ScrollDraw(void)
@@ -560,11 +426,6 @@ void ScrollDraw(void)
 	if(ScrollInfo.DataHead == nullptr) {
 		return;
 	}
-
-	// 例外処理：ワイドショット用ボム発動中 //
-	//if(Viv.bomb_time && Viv.weapon==0){
-	//	return;
-	//}
 
 	// 特殊描画モード //
 	if(ScrollInfo.ExCmd == ScrollCmdStg3Boss){
@@ -619,11 +480,6 @@ void ScrollDraw(void)
 	if(ScrollInfo.ExCmd == ScrollCmdStg4Rock){
 		DrawStg4Rock();
 	}
-/*
-	if(ScrollInfo.ExCmd==ScrollCmdStg2Boss){
-		ExDraw();
-	}
-*/
 }
 
 // スクロールスピードを変更する(引数:(1)スクロール速度) //
@@ -650,7 +506,6 @@ void ScrollCommand(uint8_t cmd)
 		case(SCMD_STG3BOSS):	// ３面ボス
 			ScrollInfo.ExCmd   = ScrollCmdStg3Boss;
 			ScrollInfo.ExCount = 0;
-			//InitStg3Cloud();
 		break;
 
 		case(SCMD_STG3RESET):
@@ -803,7 +658,6 @@ static void ScrollCmdRasterClose(void)
 static void ScrollCmdStg3Boss(void)
 {
 	ScrollInfo.ExCount = (ScrollInfo.ExCount+200)%208;
-//	MoveStg3Cloud();
 }
 
 // ゲイツ雲描画 //
@@ -818,8 +672,6 @@ static void Stg3BossMapDraw(void)
 		constexpr PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
 		GrpSurface_Blit({ x, y }, SURFACE_ID::MAPCHIP, src);
 	}
-
-//	DrawStg3Cloud();
 }
 
 
@@ -875,29 +727,6 @@ bool ScrollInit(void)
 		bInitialized = true;
 	}
 
-/*
-	// 読み込みの準備 //
-	auto in = FilStartR("GIAN_MAP.DAT");
-	if(!in) {
-		return false;
-	}
-
-	// もしすでにロードが行われていた場合、メモリを解放する //
-	if(ScrollInfo.DataHead != nullptr) {
-		LocalFree(ScrollInfo.DataHead);
-		ScrollInfo.DataHead = nullptr;
-	}
-	// そうでなければ、スクロールに関する初期化を行う //
-	else if(!InitScrollInfo()) {
-		return false;
-	}
-
-	// 解凍を行う(後で、ステージを考慮したものに変更すること) //
-	ScrollInfo.DataHead = in->MemExpand(0);
-	if(!ScrollInfo.DataHead) {
-		return false;
-	}
-*/
 	// 標準のスクロールスピード(マップエディタと同じ) //
 	auto* head = ScrollInfo.DataHead.get();
 	ScrollInfo.ScrollSpeed = TIME_PER_FRAME;					// 標準のスクロール速度

@@ -502,19 +502,10 @@ void LoaderCleanup(void)
 
 // グローバル変数 //
 uint32_t	MusicNum = 0;	// 曲数
+PALETTE SProjectPalette;
 FACE_DATA	FaceData[FACE_MAX];		// 顔グラ用
 ENDING_GRP	EndingGrp[ENDING_PIC_MAX];	// エンディング用
-
-
-
-
-/*
-static BOOL			bIsBombPalette = FALSE;
-static PALETTEENTRY	tempPalette[256];
-*/
-
 static PALETTE EnemyPalette;
-PALETTE SProjectPalette;
 
 
 
@@ -526,7 +517,6 @@ static int LoadedStage = 0;
 // あるステージのグラフィックをロードする //
 bool LoadGraph(int stage)
 {
-//	bIsBombPalette = FALSE;
 	LoadedStage = stage;
 	const auto& graph = DAT::Packfile(DAT::PACK_ID::GRAPH);
 

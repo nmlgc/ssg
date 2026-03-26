@@ -62,7 +62,6 @@ typedef struct tagHLaserInfo {
 
 ///// [グローバル変数] /////
 extern uint16_t	HLaserNow;	// ホーミングレーザーの本数
-extern HLaserInfo	HLaserCmd;			// ホーミングレーザーセット用データ
 
 
 ///// [関数プロトタイプ] /////

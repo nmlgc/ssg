@@ -13,8 +13,6 @@
 
 
 ///// [グローバル変数] /////
-//HIGH_SCORE		*HighScore;
-//char			ScoreTable[8][80];
 uint32_t	GameCount;
 uint8_t	GameStage;
 uint8_t	GameLevel;

@@ -488,34 +488,6 @@ static void _EnemyDrawBomb(int x, int y, uint32_t count)
 {
 	PIXEL_LTRB	src;
 
-/*
-	switch(count/ENEMY_BOMB_SPD){
-		case(0):case(1):
-			src = PIXEL_LTWH{ 520, 104,  8,  8 };
-			x-=4;y-=4;
-		break;
-
-		case(2):case(3):
-			src = PIXEL_LTWH{ 528, 104, 16, 16 };
-			x-=8;y-=8;
-		break;
-
-		case(4):case(5):
-			src = PIXEL_LTWH{ 544, 104, 24, 24 };
-			x-=12;y-=12;
-		break;
-
-		case(6):
-			src = PIXEL_LTWH{ 568, 104, 32, 32 };
-			x-=16;y-=16;
-		break;
-
-		case(7):
-			src = PIXEL_LTWH{ 600, 104, 48, 48 };
-			x-=24;y-=24;
-		break;
-	}
-*/
 	src.top    = 296;
 	src.left   = (count/ENEMY_BOMB_SPD)*48;
 	src.bottom = 296      +48;

@@ -24,7 +24,7 @@ void ItemSet(int x, int y, uint8_t type)
 
 	auto* ip = &Item[ItemInd[ItemNow++]];
 
-	constexpr uint8_t deg = -64; //rnd()%(128-110)+128+55;
+	constexpr uint8_t deg = -64;
 
 	ip->x     = x;
 	ip->y     = y;

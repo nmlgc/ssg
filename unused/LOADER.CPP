@@ -3,6 +3,42 @@
  *
  */
 
+// グローバル変数 //
+
+
+
+/*
+static BOOL			bIsBombPalette = FALSE;
+static PALETTEENTRY	tempPalette[256];
+*/
+
+
+// あるステージのグラフィックをロードする //
+BOOL LoadGraph(int stage)
+{
+//	bIsBombPalette = FALSE;
+}
+
+// 前後にある４０色をマップパーツのパレットにする //
+void LoadPaletteFromMap(void)
+{
+	LPDIRECTDRAWPALETTE		lpdp;
+
+	if(GrMap->GetPalette(&lpdp) != DD_OK) return;
+
+/*
+	if(bIsBombPalette){
+		lpdp->GetEntries(0, 0, 256, tempPalette);
+	}
+	else{
+*/
+		lpdp->GetEntries(0,0,256,DxObj.pe);
+		GrpSetPalette(DxObj.pe);
+//	}
+
+	lpdp->Release();
+}
+
 extern void LoadPaletteFromEnemy(void)
 {
 /*

@@ -4,8 +4,14 @@
 /*************************************************************************************************/
 
 #include "TAMA.H"
+#include "EFFECT.H"
+#include "ENEMY.H"
+#include "FRAGMENT.H"
 #include "GIAN.H"
+#include "ITEM.H"
 #include "LEVEL.H"
+#include "MAID.H"
+#include "PRankCtrl.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"

@@ -21,20 +21,12 @@
 
 
 ///// [Include Files] /////
-#include "BOSS.H"      // ボスの定義＆ボス用エフェクトなど
-#include "EFFECT.H"    // 主にテキストベースのエフェクト処理
-#include "EFFECT3D.H"  // ３Ｄエフェクト
-#include "FRAGMENT.H"  // 破片系エフェクト処理
-#include "GAMEMAIN.H"  // メインのルーチン切り替え処理
-#include "HOMINGL.H"   // ホーミングレーザーの処理
-#include "ITEM.H"      // アイテム処理
-#include "LASER.H"     // 短いレーザー＆リフレクトレーザー処理
-#include "LLASER.H"    // なが～いレーザーの処理
-#include "LOADER.H"    // 各種ローダー
-#include "MAID.H"      // その名の通り
-#include "MAIDTAMA.H"  // 自機ショットの処理
-#include "PRankCtrl.h" // プレイランク管理
-#include "SCROLL.H"    // 背景スクロール＆ＳＣＬ管理
+#include "hatoyama/logic/coords.h"
+#include "hatoyama/logic/ffi.h"
+
+// We obviously can't use `constexpr` in FFI headers.
+#pragma warning(push)
+#pragma warning(disable: 26814)
 
 
 ///// [ 定数 ] /////
@@ -44,14 +36,14 @@
 #define X_MAX		(511)						// 表示Ｘ座標最大値
 #define X_MID		((X_MAX+X_MIN)/2)
 #define Y_MIN		(0)							// 表示Ｙ座標最小値
-constexpr WINDOW_COORD Y_MAX = (GRP_RES.h - 1);
+#define Y_MAX		(479)
 #define Y_MID		((Y_MAX+Y_MIN)/2)
 enum {
 	X_SIZ = ((X_MAX + 1) - X_MIN),
 	Y_SIZ = ((Y_MAX + 1) - Y_MIN),
 };
 
-constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
+static const WINDOW_LTRB PLAYFIELD_CLIP = {
 	X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1)
 };
 
@@ -94,5 +86,6 @@ extern uint32_t	GameCount;
 extern uint8_t	GameStage;
 extern uint8_t	LevelSelected;
 
+#pragma warning(pop)
 
 #endif

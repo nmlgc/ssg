@@ -8,6 +8,7 @@
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "LLASER.H"
+#include "MAID.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "hatoyama/engine/graphics_backend.h"

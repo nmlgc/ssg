@@ -4,7 +4,12 @@
 /*                                                                           */
 
 #include "ITEM.H"
+#include "EFFECT.H"
+#include "FRAGMENT.H"
 #include "GIAN.H"
+#include "LOADER.H"
+#include "MAID.H"
+#include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"

@@ -4,10 +4,19 @@
 /*                                                                           */
 
 #include "SCROLL.H"
+#include "BOSS.H"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "EFFECT.H"
+#include "EFFECT3D.H"
+#include "ENDING.H"
+#include "ENEMY.H"
+#include "GAMEMAIN.H"
 #include "GIAN.H"
 #include "LEVEL.H"
+#include "LOADER.H"
+#include "MAID.H"
+#include "PRankCtrl.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
 #include "hatoyama/engine/bgm.h"

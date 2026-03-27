@@ -6,9 +6,11 @@
 #include <printf/printf.h>
 
 #include "EFFECT.H"
+#include "EFFECT3D.H"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
+#include "LOADER.H"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/logic/cast.h"

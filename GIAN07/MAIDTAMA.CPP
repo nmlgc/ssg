@@ -4,7 +4,13 @@
 /*                                                                           */
 
 #include "MAIDTAMA.H"
+#include "ENEMY.H"
+#include "FRAGMENT.H"
 #include "GIAN.H"
+#include "LOADER.H"
+#include "MAID.H"
+#include "PRankCtrl.h"
+#include "SCROLL.H"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"

@@ -7,9 +7,16 @@
 
 #include "BOSS.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
+#include "EFFECT.H"
 #include "EnemyExCtrl.h"
+#include "FRAGMENT.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
+#include "ITEM.H"
+#include "LLASER.H"
+#include "LOADER.H"
+#include "MAID.H"
+#include "SCROLL.H"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"

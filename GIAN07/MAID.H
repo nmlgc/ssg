@@ -8,7 +8,6 @@
 //#pragma message(PBGWIN_MAID_H)
 
 import std.compat;
-#include "hatoyama/logic/cast.h"
 
 
 
@@ -81,6 +80,7 @@ extern void MaidDead(void);			// 死す
 
 extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
 extern void score_add(int sc);		// スコアを上昇させる
+void PowerUp(uint8_t damage);
 
 extern void WideBombDraw(void);		// ワイドショット用のボム(やや例外処理)
 
@@ -91,32 +91,9 @@ extern MAID			Viv;					// 麗しきメイドさん構造体
 
 
 
-inline void PowerUp(uint8_t damage)
-{
-	// ダメージの分だけ加算する //
-	Viv.exp2 += damage;
-
-	// Viv.exp(8bit+1bit) ooo oooooo //
-	switch((Cast::up<uint16_t>(Viv.exp) + 1) >> 5) {
-		case(0):	if(Viv.exp2>5-3)		Viv.exp++,	Viv.exp2=0;	return;
-		case(1):	if(Viv.exp2>25-15)		Viv.exp++,	Viv.exp2=0;	return;
-		case(2):	if(Viv.exp2>50-20)		Viv.exp++,	Viv.exp2=0;	return;
-		case(3):	if(Viv.exp2>80)		Viv.exp++,	Viv.exp2=0;	return;
-		case(4):	if(Viv.exp2>120)	Viv.exp++,	Viv.exp2=0;	return;
-		case(5):	if(Viv.exp2>140)	Viv.exp++,	Viv.exp2=0;	return;
-		case(6):	if(Viv.exp2>160)	Viv.exp++,	Viv.exp2=0;	return;
-		case(7):	if(Viv.exp2>180)	Viv.exp++,	Viv.exp2=0;	return;
-		case(8):	return;		// フルパワーアップ時
-	}
-}
-
+uint8_t GetLaserDeg(void);
 uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i);
 uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i);
-
-inline uint8_t GetLaserDeg(void)
-{
-	return ((120-Viv.bomb_time)*3)/2;
-}
 
 
 #endif

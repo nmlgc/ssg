@@ -42,6 +42,17 @@ int TamaSpeedEx(uint8_t d);
 void _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
 
 
+//// かすり用マクロ ////
+static void TamaEvadeAdd(TAMA_DATA *t)
+{
+	if(t->flag & TF_EVADE) {
+		evade_addEx(t->x, t->y, 0);
+	} else {
+		t->flag |= TF_EVADE;
+		evade_addEx(t->x, t->y, TAMA_EVADE);
+	}
+}
+
 void tama_set(void)
 {
 	int		v;

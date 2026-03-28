@@ -533,6 +533,30 @@ extern void score_add(int sc)
 	Viv.dscore += sc;
 }
 
+void PowerUp(uint8_t damage)
+{
+	// ダメージの分だけ加算する //
+	Viv.exp2 += damage;
+
+	// Viv.exp(8bit+1bit) ooo oooooo //
+	switch((Cast::up<uint16_t>(Viv.exp) + 1) >> 5) {
+	case 0:	if(Viv.exp2 >   2) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 1:	if(Viv.exp2 >  10) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 2:	if(Viv.exp2 >  30) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 3:	if(Viv.exp2 >  80) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 4:	if(Viv.exp2 > 120) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 5:	if(Viv.exp2 > 140) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 6:	if(Viv.exp2 > 160) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 7:	if(Viv.exp2 > 180) { Viv.exp++, Viv.exp2 = 0; } return;
+	case 8:	return; // フルパワーアップ時
+	}
+}
+
+uint8_t GetLaserDeg(void)
+{
+	return (((120 - Viv.bomb_time) * 3) / 2);
+}
+
 // MSVC's static analyzer suggests to make the functions below `constexpr`,
 // which won't work because they are used in other translation units and this
 // is not a header.

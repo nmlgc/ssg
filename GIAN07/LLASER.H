@@ -15,7 +15,6 @@
 
 
 #include "ENEMY.H"
-#include "hatoyama/engine/graphics_backend.h"
 
 
 
@@ -72,7 +71,7 @@ typedef struct{
 
 	uint32_t	count;	// フレームカウンタ
 
-	VERTEX_XY	p[4];	// 座標保持用のポインタ(Grp)
+	WINDOW_POINT	p[4];	// 座標保持用のポインタ(Grp)
 
 	uint8_t	d;	// レーザーの発射角
 	uint8_t	c;	// レーザーの色

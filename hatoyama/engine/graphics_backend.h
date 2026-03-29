@@ -150,11 +150,22 @@ bool GrpSurface_GDIText_Update(const PIXEL_LTWH& r) noexcept;
 
 #ifdef WIN32_VINTAGE
 using VERTEX_COORD = WINDOW_COORD;
+using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
 #else
 using VERTEX_COORD = float;
-#endif
+struct VERTEX_XY : public WINDOW_POINT_BASE<VERTEX_COORD> {
+	VERTEX_XY() = default;
 
-using VERTEX_XY = WINDOW_POINT_BASE<VERTEX_COORD>;
+	VERTEX_XY(VERTEX_COORD x, VERTEX_COORD y) {
+		this->x = x;
+		this->y = y;
+	}
+	VERTEX_XY(const PIXEL_POINT_BASE<VERTEX_COORD>& p) : VERTEX_XY(p.x, p.y) {
+	}
+	VERTEX_XY(const WINDOW_POINT& p) : VERTEX_XY(p.x, p.y) {
+	}
+};
+#endif
 
 #ifndef WIN32_VINTAGE
 struct VERTEX_RGBA {

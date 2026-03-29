@@ -14,7 +14,8 @@
 //            : 発射しているレーザーの何番目か、に変更された
 
 
-#include "hatoyama/engine/graphics_backend.h"
+import std.compat;
+#include "hatoyama/logic/coords.h"
 
 struct ENEMY_DATA;
 
@@ -73,7 +74,7 @@ struct LLASER_DATA {
 
 	uint32_t	count;	// フレームカウンタ
 
-	VERTEX_XY	p[4];	// 座標保持用のポインタ(Grp)
+	WINDOW_POINT	p[4];	// 座標保持用のポインタ(Grp)
 
 	uint8_t	d;	// レーザーの発射角
 	uint8_t	c;	// レーザーの色

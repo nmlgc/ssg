@@ -319,11 +319,14 @@ extern void LLaserDraw(void)
 					p[2].x += lp->infx;
 					p[2].y += lp->infy;
 					*/
+					const VERTEX_XY rect[4] = {
+						lp->p[0], lp->p[1], lp->p[2], lp->p[3]
+					};
 					if(auto *gp = GrpGeom_Poly()) {
 						// gp->SetColor({ 3, 0, 3 });
 						const RGBA col = Table16Bit[c].ToRGB().WithAlpha(0xFF);
 						gp->SetAlphaOne();
-						GeomGrdRectA(*gp, lp->p, col);
+						GeomGrdRectA(*gp, rect, col);
 
 						std::array<VERTEX_RGBA, VERTEX_COUNT> vcs;
 						vcs[0] = { 255, 255, 255, 0xFF };
@@ -346,7 +349,7 @@ extern void LLaserDraw(void)
 					} else if(auto *gf = GrpGeom_FB()) {
 						// gf->SetColor({ 2, 0, 2 });
 						gf->SetColor(Table8BitA[c]);
-						gf->DrawTriangleFan(lp->p);
+						gf->DrawTriangleFan(rect);
 					}
 				} else if(GrpGeom_Poly()) {
 					break;

@@ -81,7 +81,7 @@ struct LASER_DATA {
 	int wx,wy;	// 表示座標の加算値(太さ)
 	int v;	// 速度
 
-	VERTEX_XY p[4];	// 表示する座標
+	WINDOW_POINT p[4]; // 表示する座標
 
 	char a;	// 加速度(つかうのか??)
 	uint8_t d;	// 進行方向
@@ -385,11 +385,12 @@ static void SLdraw(const LASER_DATA *lp)
 	// GrpGeom->SetColor({ 4, 1, 0 });
 	// GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);	// 2000/09/06 に削除
 
+	const VERTEX_XY rect[4] = { lp->p[0], lp->p[1], lp->p[2], lp->p[3] };
 	if(auto *gp = GrpGeom_Poly()) {
-		GeomGrdRect(*gp, lp->p, col.ToRGB());
+		GeomGrdRect(*gp, rect, col.ToRGB());
 	} else if(auto *gf = GrpGeom_FB()) {
 		gf->SetColor({ 1, 0, 5 });
-		gf->DrawTriangleFan(lp->p);
+		gf->DrawTriangleFan(rect);
 
 		gf->SetColor({ 5, 5, 5 });
 

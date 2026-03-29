@@ -117,6 +117,9 @@ extern std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 extern uint16_t	EnemyNow;
 extern ANIME_DATA	Anime[ANIME_MAX];
 
+extern uint8_t	EnemyEXDEG;	// 特殊角度の現在値
+extern uint8_t	EnemyEXDEG_D;	// 特殊角度の増分
+
 
 //// 敵制御関数 ////
 ENEMY_DATA* EnemyFindFree(void);

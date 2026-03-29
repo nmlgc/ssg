@@ -171,6 +171,7 @@ extern uint16_t	Tama1Now;	// 小型弾の弾数
 extern uint16_t	Tama2Now;	// 特殊弾の弾数
 extern uint16_t	Tama1Max;	// 小型弾の最大数
 extern uint16_t	Tama2Max;	// 特殊弾の最大数
+extern int	TamaSpeed;
 
 extern WORLD_COORD HomingX; // ホーミング対象のＸ座標
 extern WORLD_COORD HomingY; // ホーミング対象のＹ座標

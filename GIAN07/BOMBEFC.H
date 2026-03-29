@@ -34,6 +34,8 @@ typedef struct tagBombEfcCtrl {
 	uint8_t	type;	// エフェクトの種類
 } BombEfcCtrl;
 
+extern BombEfcCtrl BombEfc[EXBOMB_MAX];
+
 
 
 /***** [関数プロトタイプ] *****/

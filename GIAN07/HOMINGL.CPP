@@ -11,30 +11,12 @@
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
-#define HOMINGL_WIDTH	(8*64)
-
-
 
 uint16_t	HLaserNow;	// ホーミングレーザーの本数
 HLaserData		HLaserBuf[HLASER_MAX];	// ホーミングレーザー格納バッファ
 
 HLaserData		ActiveHL;		// 確保済みホーミングレーザー
 HLaserData		FreeHL;			// 解放済みホーミングレーザー
-
-
-
-///// [マクロ] /////
-constexpr int HLASER_GETNEXT(int current)
-{
-	// 後で mod -> and に変更すること //
-	return (current + HLASER_LEN*HLASER_SECTION - 1)%(HLASER_LEN*HLASER_SECTION);
-}
-
-constexpr int HLASER_GETPREV(int current, int n)
-{
-	// 後で mod -> and に変更すること //
-	return (current + n)%(HLASER_LEN*HLASER_SECTION);
-}
 
 
 

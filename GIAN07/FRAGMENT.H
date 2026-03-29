@@ -35,6 +35,7 @@ struct FRAGMENT_DATA {
 
 //// 破片用変数 ////
 extern FRAGMENT_DATA	Fragment[FRAGMENT_MAX];
+extern int	FragmentPtr;	// 次に破片データを挿入する位置
 
 
 //// 破片関数 ////

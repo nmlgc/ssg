@@ -10,6 +10,20 @@
 #include "ENEMY.H"
 
 
+///// [ 定数 ] /////
+
+// 最大数 //
+constexpr auto BOSS_MAX = 4; // ボスの最大出現数(二匹以上出るのか？？)
+
+// ボスの状態 //
+#define BEXST_NORM   0x00 // 通常のＥＣＬで動作中
+#define BEXST_DEAD   0x01 // 死亡中<-こいつは多分使っていないぞ(2000/10/31)
+#define BEXST_WING01 0x02 // 蝶の羽
+#define BEXST_WING02 0x03 // 天使の羽
+#define BEXST_SHILD1 0x04 // シールド１
+#define BEXST_SHILD2 0x05 // シールド２
+
+
 ///// [構造体] /////
 
 // ボスデータ //
@@ -53,6 +67,7 @@ void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param);	// ビット命令�
 
 
 ///// [ 変数 ] /////
+extern BOSS_DATA	Boss[BOSS_MAX];	// ボスデータ格納用構造体
 extern uint16_t	BossNow;	// 現在のボスの数
 
 #endif

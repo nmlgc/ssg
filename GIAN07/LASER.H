@@ -32,6 +32,24 @@ import std.compat;
 #define LASER_MAX			1000			// レーザーの最大発生本数
 
 
+////レーザーの種類定数////
+#define LS_SHORT 0x00 // ショートレーザー
+#define LS_REF   0x01 // 反射レーザー
+#define LS_LONG  0x02 // 無限遠レーザー
+#define LS_LONGY 0x03 // 縦無限遠レーザー(角度指定は無効 64固定)
+
+
+////レーザーフラグ定数(一部レーザーの種類に依存します)////
+#define LF_NONE  0x00 // フラグ無し状態
+#define LF_CLEAR 0x01 // レーザーが消滅中である
+
+#define LF_SHOT  0x02 // レーザー発射中
+#define LF_HIT   0x04 // レーザーヒット中(REF_OBJECTに対して)
+#define LF_NMOVE 0x06 // レーザーの長さ変わらず(LF_SHOT|LF_HIT)
+
+#define LF_DELETE 0x80 // レーザーを消去する(処理対象から外す)
+
+
 ////レーザー発動コマンド構造体////
 struct LASER_CMD {
 	int  x,y;		// 始点の座標
@@ -54,6 +72,32 @@ struct LASER_CMD {
 };
 
 
+////レーザー用構造体////
+struct LASER_DATA {
+	int x,y;	// 現在の始点
+	int vx,vy;	// 速度の(X,Y)成分
+	int lx,ly;	// 表示座標の加算値(長さ)
+	int wx,wy;	// 表示座標の加算値(太さ)
+	int v;	// 速度
+
+	WINDOW_POINT p[4]; // 表示する座標
+
+	char a;	// 加速度(つかうのか??)
+	uint8_t d;	// 進行方向
+
+	int w,wmax;	// 太さ
+	int l,lmax;	// 現在の長さ、長さの最終値
+	int ltemp;	// 反射レーザー専用変数(発射＆ヒットの場合にのみ使用)
+
+	uint16_t count;	// フレームカウンタ
+	uint8_t c;	// 色
+	uint8_t type;	// 種類
+	uint8_t flag;	// 消去要請フラグ等(エフェクト含む)
+	uint8_t notr;	// 反射しないリフレクターの番号
+	uint8_t evade;	// かすり用フラグ
+};
+
+
 ////レーザー関数////
 extern void laser_set(void);		// レーザーをセットする(難易度変更"有り")
 extern void laser_setEX(void);		// レーザーをセットする(難易度変更"無し")
@@ -65,6 +109,8 @@ extern void laserind_set(void);		// レーザー順序用配列の初期化
 
 ////レーザーの各種変数たち////
 extern LASER_CMD	LaserCmd;				// 標準レーザーコマンド構造体
+extern std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
+extern std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
 extern uint16_t	LaserNow;	// レーザーの本数
 
 #endif

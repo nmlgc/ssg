@@ -34,6 +34,8 @@ struct BombEfcCtrl {
 	uint8_t	type;	// エフェクトの種類
 };
 
+extern BombEfcCtrl BombEfc[EXBOMB_MAX];
+
 
 
 /***** [関数プロトタイプ] *****/

@@ -9,6 +9,7 @@
 //#pragma message(PBGWIN_HOMINGL_H)
 
 #include "EXDEF.H"
+#include "hatoyama/logic/coords.h"
 
 
 
@@ -16,6 +17,9 @@
 #define HLASER_MAX			162
 #define HLASER_LEN			7		// 描画枚数..
 #define HLASER_SECTION		4		// 読み込み幅
+constexpr auto HLASER_SEGMENTS = (HLASER_LEN * HLASER_SECTION);
+
+constexpr WORLD_COORD HOMINGL_WIDTH = PixelToWorld(8);
 
 
 #define HL_NONE		0			// ただ進むだけ
@@ -24,6 +28,21 @@
 #define HLS_NORM	0x00		// ホーミングレーザー通常
 #define HLS_CLEAR	0x01		// ホーミングレーザー消去中
 #define HLS_DEAD	0xff		// ホーミングレーザー削除要請
+
+
+
+///// [マクロ] /////
+constexpr int HLASER_GETNEXT(int current)
+{
+	// 後で mod -> and に変更すること //
+	return ((current + (HLASER_SEGMENTS - 1)) % HLASER_SEGMENTS);
+}
+
+constexpr int HLASER_GETPREV(int current, int n)
+{
+	// 後で mod -> and に変更すること //
+	return ((current + n) % HLASER_SEGMENTS);
+}
 
 
 
@@ -62,6 +81,8 @@ struct HLaserInfo {
 
 ///// [グローバル変数] /////
 extern uint16_t	HLaserNow;	// ホーミングレーザーの本数
+extern HLaserData	ActiveHL;	// 確保済みホーミングレーザー
+extern HLaserData	FreeHL;	// 解放済みホーミングレーザー
 
 
 ///// [関数プロトタイプ] /////

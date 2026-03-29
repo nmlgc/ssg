@@ -21,6 +21,14 @@ import std.compat;
 
 
 ///// [ 定数 ] /////
+#define CUBE_MAX        8
+#define STAR_MAX        40
+#define FAKE_ECLSTR_MAX 80
+#define ROCK_MAX        28
+#define S6RASTER_MAX    28
+#define S6STAR_MAX      60
+#define S3STAR_MAX      180
+
 #define STG4ROCK_STDMOVE	0		// 普通のスクロールね
 #define STG4ROCK_ACCMOVE1	1		// 加速有りスクロール(1)
 #define STG4ROCK_ACCMOVE2	2		// 加速有りスクロール(2)
@@ -87,8 +95,30 @@ struct Rock3D {
 	uint8_t	State;	// 現在の状態
 };
 
+struct Stg6Raster {
+	int x, y;     // 表示座標
+	char vy;      //
+	uint8_t type; // 種類(0-2)
+	uint8_t deg;  // 基準角度
+	uint8_t amp;  // 振幅
+};
+
+struct Stg6Star {
+	int x, y;
+	int vy;
+};
+
+extern Cube3D Cube[CUBE_MAX];
+extern Star2D Star[STAR_MAX];
+extern Rock3D Rock[ROCK_MAX];
+extern WFLine2D WFLine;
+extern FakeECLString FakeECLStr[FAKE_ECLSTR_MAX];
+extern Stg6Raster S6Ras[S6RASTER_MAX];
+extern Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
+
 
 ///// [ 関数 ] /////
+void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
 void InitLineList3D(std::span<LineList3D> w);
 void DrawLineList3D(std::span<const LineList3D> w);
 

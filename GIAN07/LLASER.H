@@ -61,16 +61,17 @@ struct LLASER_CMD {
 
 //// レーザー用構造体２ ////
 struct LLASER_DATA {
-	ENEMY_DATA	*e;			// 敵データへのポインタ(ここら辺でボスでも雑魚でも発射できるように)
+	// 敵データへのポインタ(ここら辺でボスでも雑魚でも発射できるように)
+	ENEMY_DATA *e;
 
-	int		x,y;			// 現在の表示座標
-	int		dx,dy;	 		// 敵データからのずらし値(x64)
-	int		lx,ly;			// レーザー円の中心座標までのベクトル(Grp)
-	int		infx,infy;		// 仮の無限遠へのベクトル(Grp)
-	int		wx,wy;			// レーザー幅(Grp)
+	WORLD_COORD x, y;	// 現在の表示座標
+	WORLD_COORD dx, dy;	// 敵データからのずらし値(x64)
+	int lx, ly;	// レーザー円の中心座標までのベクトル(Grp)
+	int infx, infy;	// 仮の無限遠へのベクトル(Grp)
+	int wx, wy;	// レーザー幅(Grp)
 
-	int		w,wmax;			// 幅、最大幅(x64)
-	int		v;
+	WORLD_COORD w, wmax; // 幅、最大幅(x64)
+	WORLD_COORD v;
 
 	uint32_t	count;	// フレームカウンタ
 

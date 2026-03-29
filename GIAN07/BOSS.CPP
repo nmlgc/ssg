@@ -23,21 +23,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-///// [ 定数 ] /////
-
-// 最大数 //
-#define BOSS_MAX	4	// ボスの最大出現数(二匹以上出るのか？？)
-
-// ボスの状態 //
-#define BEXST_NORM	0x00	// 通常のＥＣＬで動作中
-#define BEXST_DEAD	0x01	// 死亡中<-こいつは多分使っていないぞ(2000/10/31)
-#define BEXST_WING01	0x02	// 蝶の羽
-#define BEXST_WING02	0x03	// 天使の羽
-#define BEXST_SHILD1	0x04	// シールド１
-#define BEXST_SHILD2	0x05	// シールド２
-
-
-
 ///// [ 変数 ] /////
 
 // 公開グローバル //

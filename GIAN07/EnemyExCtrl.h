@@ -118,4 +118,10 @@ int  BitGetNum(void);	// 現在のビット数を取得する
 
 
 
+///// [ 変数 ] /////
+extern SNAKYMOVE_DATA<30> SnakeData[SNAKE_MAX];
+extern BIT_DATA BitData;
+
+
+
 #endif

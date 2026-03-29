@@ -32,6 +32,7 @@
 #include "PRankCtrl.h"
 #include "SCORE.H"
 #include "SCROLL.H"
+#include "TAMA.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"

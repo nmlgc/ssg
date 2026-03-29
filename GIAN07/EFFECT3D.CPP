@@ -9,11 +9,6 @@
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
 
-#define CUBE_MAX			8
-#define STAR_MAX			40
-#define FAKE_ECLSTR_MAX		80
-#define ROCK_MAX			28
-
 
 Cube3D		Cube[CUBE_MAX];
 Star2D		Star[STAR_MAX];
@@ -679,23 +674,6 @@ void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 }
 
 
-
-#define S6RASTER_MAX	28
-#define S6STAR_MAX		60
-#define S3STAR_MAX		180
-
-struct Stg6Raster {
-	int		x, y;		// 表示座標
-	char	vy;			//
-	uint8_t	type;	// 種類(0-2)
-	uint8_t	deg;	// 基準角度
-	uint8_t	amp;	// 振幅
-};
-
-struct Stg6Star {
-	int		x, y;
-	int		vy;
-};
 
 Stg6Raster	S6Ras[S6RASTER_MAX];
 Stg6Star	S6Star[S3STAR_MAX];		// 兼用モノなのだ

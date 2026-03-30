@@ -32,6 +32,7 @@
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -1364,6 +1365,7 @@ void GameMove(void)
 {
 	MWinMove();
 
+	StageMove();
 	ScrollMove();
 
 	BossMove();

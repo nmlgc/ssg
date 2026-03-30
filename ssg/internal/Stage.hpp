@@ -21,3 +21,5 @@ extern SCL_INFO SclInfo;
 
 extern BUFFER_OWNED SCL_Head;
 extern uint8_t *SCL_Now;
+
+void StageMove(void);

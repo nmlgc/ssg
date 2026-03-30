@@ -41,7 +41,6 @@ typedef struct tagScrollSaveHeader{
 SCROLL_INFO		ScrollInfo;			// スクロールに関する情報
 PIXEL_LTRB	rcMapChip[1200];	// マップパーツＩＤに対する矩形
 
-static void enemy_set(void);			// 敵をセットする
 static void _PutEnemy(const uint8_t *p);	// p:SCL_ENEMY以降の敵配置データ
 static void InitMapChipRect(void);		// スクロールに関する情報の初期化を行う
 
@@ -81,7 +80,6 @@ void ScrollMove(void)
 {
 	int			i;
 
-	enemy_set();			// 敵をセット
 	ScrollInfo.ExCmd();		// 特殊スクロール発動!!
 
 	// 振動エフェクトを動作させる(これは、特殊スクロールとは別物) //
@@ -155,7 +153,7 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 }
 
 // p:SCL_ENEMY以降の敵配置データ //
-static void enemy_set(void)
+void StageMove(void)
 {
 	bool	bFlag = true;
 	bool CtrlFlag = false;

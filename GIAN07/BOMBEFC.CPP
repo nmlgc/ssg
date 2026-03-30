@@ -5,7 +5,6 @@
 
 #include "BOMBEFC.H"
 #include "ssg/internal/RNG.hpp"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -13,7 +12,6 @@ BombEfcCtrl		BombEfc[EXBOMB_MAX];
 
 // 秘密の関数 //
 void _ExBombSTDInit(BombEfcCtrl *p);
-void _ExBombSTDDraw(const BombEfcCtrl *p);
 void _ExBombSTDMove(BombEfcCtrl *p, C_RNG& RNG);
 
 
@@ -57,25 +55,6 @@ void ExBombEfcSet(int x, int y, uint8_t type)
 }
 
 
-// 爆発系エフェクトを描画する
-void ExBombEfcDraw(BOMBEFC_DATA_CSPAN BombEfc)
-{
-	for(const auto& it : BombEfc) {
-		if(!it.bIsUsed) {
-			continue;
-		}
-		switch(it.type) {
-		case EXBOMB_STD:
-			_ExBombSTDDraw(&it);
-			break;
-
-		default:
-			return;
-		}
-	}
-}
-
-
 // 爆発系エフェクトを動作させる
 void ExBombEfcMove(void)
 {
@@ -112,24 +91,6 @@ void _ExBombSTDInit(BombEfcCtrl *p)
 		target->x = x;
 		target->y = y;
 		target->d = i % (7*2);
-	}
-}
-
-
-void _ExBombSTDDraw(const BombEfcCtrl *p)
-{
-	int x, y, dx;
-
-	// Graphic 48 * 48 //
-	for(const auto& it : p->Obj) {
-		const auto *target = &it;
-		if(target->d <= 7*2){
-			x = (target->x >> 6) - 24;
-			y = (target->y >> 6) - 24;
-			dx = (target->d>>1) * 48;
-			const PIXEL_LTRB src = PIXEL_LTWH{ dx, 296, 48, 48 };
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		}
 	}
 }
 

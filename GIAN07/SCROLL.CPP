@@ -4,15 +4,14 @@
 /*                                                                           */
 
 #include "SCROLL.H"
-#include "BOSS.H"
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT.H"
-#include "EFFECT3D.H"
 #include "ENDING.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
+#include "GameDraw.h"
 #include "HUD.H"
 #include "LOADER.H"
 #include "LogicInstance.h"

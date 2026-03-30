@@ -4,10 +4,8 @@
 /*                                                                           */
 
 #include "HOMINGL.H"
-#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "MAID.H"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -187,138 +185,6 @@ void HLaserMove(void)
 		}
 	}
 }
-
-void _CircleA16(GRAPHICS_GEOMETRY_POLY auto& gp, int x, int y, int r, uint8_t d)
-{
-	VERTEX_XY	src[9 + 1];
-	int			i,j;
-
-	for(j=0,i=-64; j<=8; j++){
-		src[j].x = (x + cosl(d+i, r))>>6;
-		src[j].y = (y + sinl(d+i, r))>>6;
-		i+=16;
-	}
-
-	src[9] = src[0];
-
-	gp.DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, src);
-}
-
-// ホーミングレーザーを描画する //
-void HLaserDraw(const HLaserData& ActiveHL)
-{
-	HLaserData	*hl;
-	int			i,w,current;
-	DegPoint	*p;
-	VERTEX_XY	src[4];
-	auto *gp = GrpGeom_Poly();
-	auto *gf = GrpGeom_FB();
-	const auto AlphaPolygon = [gp, gf](VERTEX_XY_SPAN<> p) {
-		if(gp) {
-			gp->DrawTrianglesA(TRIANGLE_PRIMITIVE::FAN, p);
-		} else if(gf) {
-			gf->DrawTriangleFan(p);
-		}
-	};
-	// void (*AlphaCircle)(WINDOW_POINT center, WINDOW_POINT radius);
-
-	if(gp) {
-		//AlphaCircle  = GeomCircleFA;
-		gp->SetColor({ 1, 2, 5 });
-		gp->SetAlphaOne();
-	} else if(gf) {
-		// AlphaCircle  = GeomCircle;
-		gf->SetColor({ 2, 2, 5 });
-	}
-
-	GrpGeom->Lock();
-
-	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
-		w = HOMINGL_WIDTH;
-		current = hl->Current;
-		p = &(hl->p[current]);
-
-		// 後で最適化するのぢゃ //
-		src[0].x = (p->x + cosl(p->d-64, w))>>6;
-		src[0].y = (p->y + sinl(p->d-64, w))>>6;
-		src[1].x = (p->x - cosl(p->d-64, w))>>6;
-		src[1].y = (p->y - sinl(p->d-64, w))>>6;
-
-		if(gp) {
-			_CircleA16(*gp, p->x, p->y, w, p->d);
-		} else {
-			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, (w >> 6));
-		}
-
-		for(i=0; i< HLASER_LEN-1; i++){
-			//temp    = p;
-			current = HLASER_GETPREV(current, HLASER_SECTION);
-			p       = &(hl->p[current]);
-			// GrpGeom->DrawLine(
-			// 	(p->x >> 6), (p->y >> 6), (temp->x >> 6), (temp->y >> 6)
-			// );
-
-			src[2].x = (p->x - cosl(p->d-64, w))>>6;
-			src[2].y = (p->y - sinl(p->d-64, w))>>6;
-			src[3].x = (p->x + cosl(p->d-64, w))>>6;
-			src[3].y = (p->y + sinl(p->d-64, w))>>6;
-			AlphaPolygon(src);
-
-			src[0] = src[3];
-			src[1] = src[2];
-
-			if(w>64*2)	w -= 64;
-		}
-	}
-
-	if(gp) {
-		gp->SetColor({ 3, 4, 5 });
-	} else if(gf) {
-		gf->SetColor({ 5, 5, 5 });
-	}
-
-	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
-		w = HOMINGL_WIDTH/2;
-		current = hl->Current;
-		p = &(hl->p[current]);
-
-		src[0].x = (p->x + cosl(p->d-64, w))>>6;
-		src[0].y = (p->y + sinl(p->d-64, w))>>6;
-		src[1].x = (p->x - cosl(p->d-64, w))>>6;
-		src[1].y = (p->y - sinl(p->d-64, w))>>6;
-
-		//AlphaCircle(p->x>>6, p->y>>6, w>>6);
-		if(gp) {
-			_CircleA16(*gp, p->x, p->y, w, p->d);
-		} else {
-			GeomCircleF({ (p->x >> 6), (p->y >> 6) }, (w >> 6));
-		}
-
-		for(i=0; i< HLASER_LEN-1; i++){
-			//temp    = p;
-			current = HLASER_GETPREV(current, HLASER_SECTION);
-			p       = &(hl->p[current]);
-			// GrpGeom->DrawLine(
-			// 	(p->x >> 6), (p->y >> 6), (temp->x >> 6), (temp->y >> 6)
-			// );
-
-			src[2].x = (p->x - cosl(p->d-64, w))>>6;
-			src[2].y = (p->y - sinl(p->d-64, w))>>6;
-			src[3].x = (p->x + cosl(p->d-64, w))>>6;
-			src[3].y = (p->y + sinl(p->d-64, w))>>6;
-			AlphaPolygon(src);
-
-			src[0] = src[3];
-			src[1] = src[2];
-
-			if(w>64)	w-=64;
-			else        break;
-		}
-	}
-
-	GrpGeom->Unlock();
-}
-
 
 // ホーミングレーザーに消去エフェクトをセット //
 void HLaserClear(void)

@@ -10,8 +10,6 @@
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "ssg/Sound.h"
-#include "ssg/internal/Stage.hpp"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/input.h"
@@ -261,74 +259,6 @@ void MaidTamaMove(void)
 		//y = (Viv.opy>>6)-20;
 		enemy_damage2(Viv.opx+(SBOPT_DX<<6),Viv.opy,Viv.lay_grp/3+1);
 		enemy_damage2(Viv.opx-(SBOPT_DX<<6),Viv.opy,Viv.lay_grp/3+1);
-	}
-}
-
-// ナニな弾描画 //
-void MaidTamaDraw(
-	MAIDTAMA_DATA_CSPAN storage, std::span<const uint16_t> inds, const MAID& Viv
-)
-{
-	// ここでは、さすがにTAMA.cpp 内の関数を使用するわけにはいかないので、 //
-	// 独自に描画ルーチンを展開する。                                      //
-
-	int				i,x,y;
-	PIXEL_LTRB	src, ltemp;
-	static PIXEL_LTRB	HomingBomb[5] = {
-		{520,104,520+8 ,104+8},
-		{528,104,528+16,104+16},
-		{544,104,544+24,104+24},
-		{568,104,568+32,104+32},
-		{600,104,600+40,104+40}
-	};
-
-	for(const auto ind : inds) {
-		auto *t = &storage[ind];
-
-		x = (t->x >> 6)-8;	// -8 は座標の補正用です
-		y = (t->y >> 6)-8;	// 上に同じ
-
-		// 弾の種類により、描画指定用矩形をセットする //
-		switch(t->c){
-			case(TID_WIDE_MAIN):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 176, 16, 16 };	break;
-			case(TID_WIDE_SUB):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 192, 16, 16 };	break;
-			case(TID_HOMING_MAIN):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 208, 16, 16 };	break;
-			case(TID_HOMING_SUB):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 224, 16, 16 };	break;
-			case(TID_HOMING_BOMB_A):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 288, 16, 16 };	break;
-			case(TID_LASER_SUB):	src = PIXEL_LTWH{ (384 + ((t->d + 8) & 0xf0)), 256, 16, 16 };	break;
-
-			case(TID_HOMING_BOMB_B):
-				src = HomingBomb[(t->count/4)%5];
-			break;
-		}
-
-		// 完全判定付きクリッピング //
-		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-	}
-
-	// レーザーの描画 //
-	if(Viv.weapon == 2  &&  Viv.lay_grp){
-		ltemp = PIXEL_LTWH{ (384 + ((Viv.lay_grp - 1) << 4)), 240, 8, 16 };
-
-		x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
-		y = (Viv.opy>>6)-20;
-		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
-
-		x = (Viv.opx>>6)+4 -8 - SBOPT_DX;
-		y = (Viv.opy>>6)-20;
-		GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
-
-		ltemp = PIXEL_LTWH{ (384 + 8 + ((Viv.lay_grp - 1) << 4)), 240, 8, 16 };
-		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
-			x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
-			y = i;
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
-		}
-		for(i=(Viv.opy>>6)-36;i>-16;i-=16){
-			x = (Viv.opx>>6)+4 -8 - SBOPT_DX;
-			y = i;
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, ltemp);
-		}
 	}
 }
 

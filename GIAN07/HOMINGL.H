@@ -89,7 +89,6 @@ extern HLaserData	FreeHL;	// 解放済みホーミングレーザー
 void HLaserInit(void);	// ホーミングレーザーの初期化を行う
 void HLaserSet(const HLaserInfo *hinfo);	// ホーミングレーザーをセットする
 void HLaserMove(void);	// ホーミングレーザーを動作させる
-void HLaserDraw(const HLaserData& ActiveHL);	// ホーミングレーザーを描画する
 void HLaserClear(void);	// ホーミングレーザーに消去エフェクトをセット
 
 

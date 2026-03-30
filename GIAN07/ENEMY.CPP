@@ -9,6 +9,7 @@
 
 #include "ENEMY.H"
 #include "BOSS.H"
+#include "BossHPG.h"
 #include "ECL_LEN.H"
 #include "EFFECT.H"
 #include "EFFECT3D.H"
@@ -1531,10 +1532,11 @@ void parse_ECL(ENEMY_DATA *e)
 		}
 		break;
 
-		case(ECL_BOSSSET):		// ボスを発生させる
-			BossSetEx((e->x)>>6, (e->y)>>6, cmd[1]);
+		case(ECL_BOSSSET): { // ボスを発生させる
+			BossSet(((e->x) >> 6), ((e->y) >> 6), cmd[1]);
+			BossHPG_Update(GetBossHPSum());
 			bRetFlag = false;
-		break;
+		} break;
 
 		case(ECL_MOVR): { // レジスタ<->構造体変数の代入
 			const auto dwTemp = ID2Value(e, cmd[2]);

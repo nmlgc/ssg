@@ -7,7 +7,6 @@
 
 #include "BOSS.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
-#include "BossHPG.h"
 #include "EFFECT.H"
 #include "EnemyExCtrl.h"
 #include "FRAGMENT.H"
@@ -47,7 +46,6 @@ uint16_t	BossNow;	// 現在のボスの数
 
 
 // 秘密の関数 //
-static int PutBoss(int x, int y, uint32_t id);	// ボスをセットする
 static void BossSTDMove(BOSS_DATA *b);	// ノーマルECL互換の移動
 
 
@@ -77,59 +75,32 @@ void BossDataInit(void)
 // ボスをセットする //
 void BossSet(int x, int y, uint32_t BossID)
 {
-	int n;
-	uint32_t HP_Sum = 0;
+	auto it = std::ranges::find_if(Boss, [](const auto& it) {
+		return !it.IsUsed;
+	});
 
-	// ｘ６４座標に変換してボスをセットする //
-	n = PutBoss(x<<6,y<<6,BossID);
-
-	if(n==BOSS_MAX) return;		// ここに来たらバグ
-
-	Boss[n].ExCount = 0;
-	Boss[n].ExMove  = BossSTDMove;
-	Boss[n].ExState = BEXST_NORM;
-	Boss[n].IsUsed  = 0xff;
-
-	parse_ECL(&(Boss[n].Edat));
-	//ObjectLockOn(&(Boss[n].Edat.x),&(Boss[n].Edat.y),Boss[n].Edat.g_width,Boss[n].Edat.g_height);
-
-	for(const auto& it : Boss) {
-		if(it.IsUsed) {
-			HP_Sum += it.Edat.hp;
-		}
+	// まず、あり得ないのだが... //
+	if(it == std::end(Boss)) {
+		// ここに来たらバグ
+		assert(!"Script code spawns more bosses than supported by the engine");
+		return;
 	}
 
-	BossHPG_Open(HP_Sum);
-	BossNow++;
-}
-
-
-// ボスをセットする(ＥＣＬ用) //
-void BossSetEx(int x, int y, uint32_t BossID)
-{
-	int n;
-	uint32_t HP_Sum = 0;
+	auto *e = &it->Edat;
+	const uint32_t addr = (4 + (BossID << 2)); // ちと、やばいね...
 
 	// ｘ６４座標に変換してボスをセットする //
-	n = PutBoss(x<<6,y<<6,BossID);
+	InitEnemyDataX64(e, PixelToWorld(x), PixelToWorld(y), addr);
+	e->item = 0;
 
-	if(n==BOSS_MAX) return;		// ここに来たらバグ
+	it->ExCount = 0;
+	it->ExMove  = BossSTDMove;
+	it->ExState = BEXST_NORM;
+	it->IsUsed  = 0xff;
 
-	Boss[n].ExCount = 0;
-	Boss[n].ExMove  = BossSTDMove;
-	Boss[n].ExState = BEXST_NORM;
-	Boss[n].IsUsed  = 0xff;
+	parse_ECL(e);
+	//ObjectLockOn(&(it->Edat.x),&(it->Edat.y),it->Edat.g_width,it->Edat.g_height);
 
-	parse_ECL(&(Boss[n].Edat));
-	//ObjectLockOn(&(Boss[n].Edat.x),&(Boss[n].Edat.y),Boss[n].Edat.g_width,Boss[n].Edat.g_height);
-
-	for(const auto& it : Boss) {
-		if(it.IsUsed) {
-			HP_Sum += it.Edat.hp;
-		}
-	}
-
-	BossHPG_Update(HP_Sum);
 	BossNow++;
 }
 
@@ -452,26 +423,6 @@ void BossDamage4(int damage)
 //	return FALSE;
 }
 
-
-static int PutBoss(int x, int y, uint32_t id)
-{
-	auto it = std::ranges::find_if(Boss, [](const auto& it) {
-		return !it.IsUsed;
-	});
-
-	// まず、あり得ないのだが... //
-	if(it == std::end(Boss)) {
-		return BOSS_MAX;
-	}
-
-	auto *e = &it->Edat;
-
-	const uint32_t addr = (4 + (id << 2)); // ちと、やばいね...
-	InitEnemyDataX64(e,x,y,addr);
-	e->item = 0;
-
-	return std::distance(Boss, it);
-}
 
 // ノーマルECL互換の移動 //
 static void BossSTDMove(BOSS_DATA *b)

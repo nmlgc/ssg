@@ -5,6 +5,7 @@
 
 #include "SCROLL.H"
 #include "BOSS.H"
+#include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT.H"
@@ -209,7 +210,8 @@ void StageMove(void)
 				const auto x  = I16LEAt(&cmd[1 + 0]);	// ボス初期Ｘ
 				const auto y  = I16LEAt(&cmd[1 + 2]);	// ボス初期Ｙ
 				const auto id = cmd[1 + 2 + 2];	// ボスＩＤ
-				BossSet(x,y,id);
+				BossSet(x, y, id);
+				BossHPG_Open(GetBossHPSum());
 				SCL_Now += (1+2+2+1);	// cmd+x+y+id
 			}
 			break;

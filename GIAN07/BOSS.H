@@ -27,8 +27,9 @@ struct BOSS_DATA {
 
 ///// [ 関数 ] /////
 void BossDataInit(void);	// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
-void BossSet(int x, int y, uint32_t BossID);	// ボスをセットする(For SCL)
-void BossSetEx(int x, int y, uint32_t BossID);	// ボスをセットする(For ECL)
+
+// ボスをセットする
+void BossSet(int x, int y, uint32_t BossID);
 
 // ボスを動かす
 // Returns the HP sum across all bosses.

@@ -8,6 +8,7 @@
 #include "GAMEMAIN.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
 #include "BOSS.H"
+#include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT.H"
@@ -520,6 +521,9 @@ void GameSTD_Init(void)
 	// Grp_Flip();
 
 	BossDataInit();
+
+	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
+	BossHPG_Init();
 
 	//MaidSet();
 	MaidTamaIndSet();
@@ -1366,7 +1370,8 @@ void GameMove(void)
 	StageMove();
 	ScrollMove();
 
-	BossMove();
+	const auto HP_Sum = BossMove();
+	BossHPG_Move(HP_Sum);
 	enemy_move();
 	ItemMove();
 	tama_move();

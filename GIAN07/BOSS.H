@@ -29,7 +29,11 @@ struct BOSS_DATA {
 void BossDataInit(void);	// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
 void BossSet(int x, int y, uint32_t BossID);	// ボスをセットする(For SCL)
 void BossSetEx(int x, int y, uint32_t BossID);	// ボスをセットする(For ECL)
-void BossMove(void);	// ボスを動かす
+
+// ボスを動かす
+// Returns the HP sum across all bosses.
+uint32_t BossMove(void);
+
 void BossDraw(void);	// ボスを描画する
 
 void BossClearCmd(void);	// ボス用・敵弾クリアの前処理関数
@@ -40,8 +44,6 @@ bool BossDamage(int x, int y, int damage);	// ボスにダメージを与える
 bool BossDamage2(int x, int y, int damage);	// ボスにダメージを与える(ｙ上方向無限Ver)
 void BossDamage3(int x, int y, uint8_t d);	// ボスにダメージを与える(ナナメレーザー)
 void BossDamage4(int damage);	// ボスにダメージを与える(すべての敵)
-
-void BossHPG_Draw(void);	// ボスの体力ゲージを描画する
 
 uint32_t GetBossHPSum(void);	// ボスの体力の総和を求める
 

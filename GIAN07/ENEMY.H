@@ -144,8 +144,6 @@ struct ANIME_DATA {
 //// 敵変数 ////
 extern std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
 extern BUFFER_OWNED	ECL_Head;
-extern BUFFER_OWNED	SCL_Head;
-extern uint8_t			*SCL_Now;
 extern std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 extern uint16_t	EnemyNow;
 extern ANIME_DATA	Anime[ANIME_MAX];

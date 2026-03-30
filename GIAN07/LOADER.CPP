@@ -12,6 +12,7 @@
 #include "WindowSys.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/LZ.hpp"
+#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/format_bmp.h"
 #include "hatoyama/engine/path.h"
 #include "hatoyama/engine/snd.h"

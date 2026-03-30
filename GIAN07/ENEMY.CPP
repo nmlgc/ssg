@@ -56,8 +56,6 @@ static void ECL_DEBUG(const char *s, auto param)
 
 // 変数の実体 //
 BUFFER_OWNED	ECL_Head = nullptr;
-BUFFER_OWNED	SCL_Head = nullptr;
-uint8_t	*SCL_Now  = nullptr;
 std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
 std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 uint16_t	EnemyNow = 0;

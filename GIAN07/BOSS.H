@@ -50,9 +50,6 @@ void BossSet(int x, int y, uint32_t BossID);
 // Returns the HP sum across all bosses.
 uint32_t BossMove(void);
 
-// ボスを描画する
-void BossDraw(BOSS_DATA_CSPAN, const MAID&);
-
 void BossClearCmd(void);	// ボス用・敵弾クリアの前処理関数
 int  BossGetBitLeft(void);	// 残りビット数を返す
 

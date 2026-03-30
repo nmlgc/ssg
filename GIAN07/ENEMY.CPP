@@ -24,7 +24,6 @@
 #include "ssg/Sound.h"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/endian.h"
@@ -66,9 +65,6 @@ uint8_t	EnemyEXDEG;	// 特殊角度の現在値
 uint8_t	EnemyEXDEG_D;	// 特殊角度の増分
 
 
-// 関数 //
-static void _EnemyDrawBomb(int x, int y, uint32_t count);
-
 template <size_t N> void Indsort(
 	std::array<uint16_t, N>& indices,
 	uint16_t& count,
@@ -98,30 +94,6 @@ bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 	const int w = abs(-sinl(d, tx) + cosl(d, ty));
 
 	return ((l > 0) && (w < chkw));
-}
-
-void ENEMY_DATA::Draw() const
-{
-	constexpr auto sid = SURFACE_ID::ENEMY;
-
-	// TODO: Remove once the structure itself uses WORLD_POINT.
-	const WORLD_POINT center = { &x, &y };
-
-	const auto& a = Anime[anm_ptn];
-	const auto topleft = center.ToPixel(a.size); // 座標セット //
-
-	// 描画モード選択 //
-	const auto& src = ((a.mode == ANM_DEG)
-		? a.ptn[uint8_t(d - 64 + 8) >> 4]
-		: a.ptn[anm_c]
-	);
-	if(GrpSurface_Blit({ topleft.x, topleft.y }, sid, src)) {
-		if((anm_ptn != anm_ptnEx) && IsDamaged) {
-			const auto& a = Anime[anm_ptnEx];
-			const auto topleft = center.ToPixel(a.size); // 座標セット //
-			GrpSurface_Blit({ topleft.x, topleft.y }, sid, a.ptn[0]);
-		}
-	}
 }
 
 ENEMY_DATA* EnemyFindFree(void)
@@ -689,28 +661,6 @@ void enemy_move(void)
 	Indsort(EnemyInd, EnemyNow, Enemy);
 }
 
-void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
-{
-	int x, y;
-	//HRESULT		ddrval;
-
-	for(const auto ind : inds) {
-		auto *e = &storage[ind];
-
-		// 敵を描画する(クリッピング＆幅、高さ処理を追加すること) //
-		x = (e->x>>6);
-		y = (e->y>>6);
-		if(e->flag==EF_BOMB){
-			_EnemyDrawBomb(x,y,e->count);
-			continue;
-		}
-
-		if(e->flag&EF_DRAW){
-			e->Draw();
-		}
-	}
-}
-
 // 雑魚を消滅させる //
 extern void enemy_clear(void)
 {
@@ -988,21 +938,6 @@ void EnemyExplode(ENEMY_DATA& e)
 	e.hp = 0;
 	e.count = 0; // 爆発のアニメセット用
 	e.flag = EF_BOMB;
-}
-
-static void _EnemyDrawBomb(int x, int y, uint32_t count)
-{
-	PIXEL_LTRB	src;
-
-	src.top    = 296;
-	src.left   = (count/ENEMY_BOMB_SPD)*48;
-	src.bottom = 296      +48;
-	src.right  = src.left +48;
-
-	x-=24;
-	y-=24;
-
-	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 }
 
 void parse_ECL(ENEMY_DATA *e)

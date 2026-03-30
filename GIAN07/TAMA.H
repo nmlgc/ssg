@@ -213,13 +213,6 @@ void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
 void ResetHoming(void);
 void UpdateHoming(const WORLD_POINT& p); // ホーミング座標を更新する
 
-// 弾を描画する
-void tama_draw(
-	TAMA_DATA_CSPAN storage,
-	std::span<const uint16_t> inds1,
-	std::span<const uint16_t> inds2
-);
-
 
 template <size_t N> void Indsort(
 	std::array<uint16_t, N>& indices,

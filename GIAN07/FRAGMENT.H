@@ -43,7 +43,6 @@ extern int	FragmentPtr;	// 次に破片データを挿入する位置
 //// 破片関数 ////
 void fragment_set(int x, int y, uint8_t cmd);
 void fragment_move(void);
-void fragment_draw(FRAGMENT_DATA_CSPAN);
 void fragment_setup(void);
 
 

@@ -71,7 +71,6 @@ struct MAID {
 
 
 ///// [ 関数 ] /////
-extern void MaidDraw(const MAID&);
 extern void MaidMove(INPUT_BITS, bool in_msg);
 extern void MaidSet(uint8_t stage_first);	// 初期化
 extern void MaidNextStage(void);	// 次のステージの準備
@@ -81,8 +80,6 @@ extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
 extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
 extern void score_add(int sc);		// スコアを上昇させる
 void PowerUp(uint8_t damage);
-
-extern void WideBombDraw(const MAID&); // ワイドショット用のボム(やや例外処理)
 
 
 

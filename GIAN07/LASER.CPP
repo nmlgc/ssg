@@ -4,15 +4,13 @@
 /*************************************************************************************************/
 
 #include "LASER.H"
-#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "LLASER.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
+#include "GIAN07/entity.h"
 #include "ssg/Round.h"
 #include "ssg/internal/RNG.hpp"
-#include "GIAN07/entity.h"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -161,38 +159,6 @@ void laser_move(void)
 	});
 }
 
-void laser_draw(LASER_DATA_CSPAN storage, std::span<const uint16_t> inds)
-{
-	GrpGeom->Lock();
-
-	for(const auto ind : inds) {
-		auto *lp = &storage[ind];
-		switch(lp->type){
-			// ノーマルショートレーザー＆反射レーザー //
-			case(LS_SHORT):case(LS_REF):
-				SLdraw(lp);
-			break;
-
-			/*
-			// 無限遠レーザー＆Ｙ_正方向_無限遠レーザー //
-			case(LS_LONG):case(LS_LONGY):
-				Ldraw(lp);
-			break;
-			*/
-		}
-	}
-
-	/*
-	for(const auto ind : inds) {
-		auto *lp = &storage[ind];
-		if(lp->type==LS_REF || lp->type==LS_SHORT)
-			SLdraw(lp);
-	}
-	*/
-
-	GrpGeom->Unlock();
-}
-
 void laser_clear(void)
 {
 	for(decltype(LaserNow) i = 0; i < LaserNow; i++) {
@@ -310,63 +276,6 @@ static void slaser_pset(LASER_DATA *lp)
 	lp->p[1].y += lp->ly;
 	lp->p[2].x += lp->lx;
 	lp->p[2].y += lp->ly;
-}
-
-static void SLdraw(const LASER_DATA *lp)
-{
-	constexpr RGB216 col = { 1, 0, 5 };
-	int x,y;
-
-	int tx,ty;
-
-
-	if(lp->flag==LF_CLEAR){
-		// GrpGeom->SetColor(laser_color[lp->c]);
-		GrpGeom->SetColor(col);
-		GrpGeom->DrawLine(lp->p[0].x, lp->p[0].y, lp->p[1].x, lp->p[1].y);
-		GrpGeom->DrawLine(lp->p[3].x, lp->p[3].y, lp->p[2].x, lp->p[2].y);
-		return;
-	}
-
-	x = lp->x>>6;	tx = 0;//(lp->p[0].x - x)>>2;
-	y = lp->y>>6;	ty = 0;//(lp->p[0].y - y)>>2;
-
-/* 参考
- *  レンダリングステートから考えるに、どうやらαの設定を変えてしまうと、
- *  その時点で、αが有効になってしまうドライバが存在するようである。
- *  んなもんで、ここでは GrpSetAlpha を無効にしている
- */
-
-	// GrpGeom->SetAlpha(0, GRAPHICS_ALPHA::ONE);
-	// GrpGeom->SetColor({ 4, 1, 0 });
-	// GrpGeom->SetAlpha(128, GRAPHICS_ALPHA::ONE);	// 2000/09/06 に削除
-
-	const VERTEX_XY rect[4] = { lp->p[0], lp->p[1], lp->p[2], lp->p[3] };
-	if(auto *gp = GrpGeom_Poly()) {
-		GeomGrdRect(*gp, rect, col.ToRGB());
-	} else if(auto *gf = GrpGeom_FB()) {
-		gf->SetColor({ 1, 0, 5 });
-		gf->DrawTriangleFan(rect);
-
-		gf->SetColor({ 5, 5, 5 });
-
-		VERTEX_XY p[4];
-		p[0].x = p[1].x = lp->p[0].x - lp->wx*3/4;//- wx*4/len;
-		p[0].y = p[1].y = lp->p[0].y - lp->wy*3/4;//- wy*4/len;
-		p[3].x = p[2].x = lp->p[3].x + lp->wx*3/4;//+ wx*4/len;
-		p[3].y = p[2].y = lp->p[3].y + lp->wy*3/4;//+ wy*4/len;
-		p[1].x += lp->lx;
-		p[1].y += lp->ly;
-		p[2].x += lp->lx;
-		p[2].y += lp->ly;
-		gf->DrawTriangleFan(p);
-		// gf->DrawLine(lp->p[0].x, lp->p[0].y, lp->p[1].x, lp->p[1].y);
-		// gf->DrawLine(lp->p[2].x, lp->p[2].y, lp->p[3].x, lp->p[3].y);
-		// gf->DrawTriangleFan(lp->p, 4);
-		// gf->SetColor({ 5, 5, 5 });
-		// gf->DrawLine(x, y, (x + lp->lx), (y + lp->ly));
-	}
-	//Grp_Polygon(temp,4,RGB256(5,5,5));
 }
 
 static void Lmove(LASER_DATA *lp)

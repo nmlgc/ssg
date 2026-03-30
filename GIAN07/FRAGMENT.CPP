@@ -4,17 +4,13 @@
 /*************************************************************************************************/
 
 #include "FRAGMENT.H"
-#include "GEOMETRY.H"
 #include "ssg/internal/RNG.hpp"
-#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/logic/coords.h"
 #include "hatoyama/logic/ut_math.h"
 
 
 FRAGMENT_DATA	Fragment[FRAGMENT_MAX];		// 破片データ管理用構造体
 int				FragmentPtr = 0;			// 次に破片データを挿入する位置
-
-
-static void _FDraw(const FRAGMENT_DATA *f);
 
 
 void fragment_set(int x, int y, uint8_t cmd)
@@ -128,15 +124,6 @@ void fragment_move(void)
 	}
 }
 
-void fragment_draw(FRAGMENT_DATA_CSPAN Fragment)
-{
-	for(const auto& it : Fragment) {
-		if(it.count) {
-			_FDraw(&it);
-		}
-	}
-}
-
 void fragment_setup(void)
 {
 	for(auto& it : Fragment) {
@@ -145,83 +132,4 @@ void fragment_setup(void)
 	}
 
 	FragmentPtr = 0;
-}
-
-static void _FDraw(const FRAGMENT_DATA *f)
-{
-	int		x,y;
-	PIXEL_LTRB	src;
-
-	switch(f->cmd){
-		case(FRG_EVADE):
-			x = (f->x>>6) - 4;
-			y = (f->y>>6) - 4;
-			src = PIXEL_LTWH{
-				(592 + (((24 - f->count) >> 2) << 3)), 8, 8, 8
-			};
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_HIT):
-			x = (f->x>>6) - 4;
-			y = (f->y>>6) - 4;
-			src = PIXEL_LTWH{
-				(592 + (((24 - f->count) >> 2) << 3)), (8 + 8), 8, 8
-			};
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_SMOKE):
-			x = (f->x>>6) - 4;
-			y = (f->y>>6) - 4;
-			src = PIXEL_LTWH{
-				(592 + (((24 - f->count) >> 2) << 3)), 0, 8, 8
-			};
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_STAR1):
-			x = (f->x>>6) - 8;
-			y = (f->y>>6) - 8;
-			src = PIXEL_LTWH{ 624, 432, 16, 16 };
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_STAR2):
-			x = (f->x>>6) - 16;
-			y = (f->y>>6) - 16;
-			src = PIXEL_LTWH{ 608, 448, 32, 32 };
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_STAR3):
-			x = (f->x>>6) - 16;
-			y = (f->y>>6) - 16;
-			src = PIXEL_LTWH{ 608, 448, 32, 32 };
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_HEART):
-			x = (f->x>>6) - 16;
-			y = (f->y>>6) - 16;
-			src = PIXEL_LTWH{ 576, 448, 32, 32 };
-			GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-		break;
-
-		case(FRG_FATCIRCLE):
-			if(auto *gp = GrpGeom_Poly()) {
-				gp->Lock();
-				gp->SetColor({ 4, 0, 0 });
-				gp->SetAlphaOne();
-				GeomFatCircleA(
-					*gp, { (f->x >> 6), (f->y >> 6) }, ((60 - f->count) * 6), 5
-				);
-				gp->Unlock();
-			}
-		break;
-
-		default:
-			// ここには来ないはずだが ... //
-		break;
-	}
 }

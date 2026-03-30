@@ -9,9 +9,8 @@
 #include "GIAN.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
-#include "ssg/Sound.h"
 #include "GIAN07/entity.h"
-#include "hatoyama/engine/graphics_backend.h"
+#include "ssg/Sound.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -114,67 +113,6 @@ void ItemMove(void)
 	Indsort(ItemInd, ItemNow, Item, [](const ITEM_DATA& i) {
 		return (i.type == ITEM_DELETE);
 	});
-}
-
-// アイテムを描画する //
-void ItemDraw(ITEM_DATA_CSPAN storage, std::span<const uint16_t> inds)
-{
-	int j, x, y;
-	PIXEL_LTRB	src;
-
-	for(const auto ind : inds) {
-		auto *ip = &storage[ind];
-		const uint8_t ptn = ((ip->count >> 2) & 3);
-		switch(ip->type){
-			case(ITEM_SCORE):
-				src = PIXEL_LTWH{
-					(384 + (ptn << 4)), (256 + 16), 16, 16
-				};
-				x = (ip->x>>6) - 8;
-				y = (ip->y>>6) - 8;
-				GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-			break;
-
-			case(ITEM_EXTEND):
-				for(j=0; j<8; j++){
-					src = PIXEL_LTWH{
-						(384 + (16 * 4) + (ptn << 4)), (256 + 16), 16, 16
-					};
-					x = (ip->x>>6) - 8 + cosl(ip->count+j*256/8, 12);
-					y = (ip->y>>6) - 8 + sinl(ip->count+j*256/8, 12);
-					GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-				}
-
-			//	src = PIXEL_LTWH{
-			//		(384 + (16 * 4) + (ptn << 4)), (256 + 16), 16, 16
-			//	};
-			//	x = (ip->x>>6) - 8;
-			//	y = (ip->y>>6) - 8;
-			//	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-			break;
-
-			case(ITEM_BOMB):
-				for(j=0; j<8; j++){
-					src = PIXEL_LTWH{
-						(384 + (16 * 8) + (ptn << 4)), (256 + 16), 16, 16
-					};
-					x = (ip->x>>6) - 8 + cosl(-2*ip->count+j*256/8, 12);
-					y = (ip->y>>6) - 8 + sinl(-2*ip->count+j*256/8, 12);
-					GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-				}
-
-			//	src = PIXEL_LTWH{
-			//		(384 + (16 * 8) + (ptn << 4)), (256 + 16), 16, 16
-			//	};
-			//	x = (ip->x>>6) - 8;
-			//	y = (ip->y>>6) - 8;
-			//	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
-			break;
-
-			default:
-			break;
-		}
-	}
 }
 
 // アイテム配列の初期化 //

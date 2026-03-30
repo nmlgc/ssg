@@ -6,8 +6,6 @@
 #include <printf/printf.h>
 
 #include "GAMEMAIN.H"
-#include "BOMBEFC.H" // 爆発エフェクト処理
-#include "BOSS.H"
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
@@ -15,23 +13,18 @@
 #include "ENEMY.H"
 #include "EnemyExCtrl.h"
 #include "FONTUTY.H"
-#include "FRAGMENT.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
+#include "GameDraw.h"
 #include "HOMINGL.H"
 #include "HUD.H"
 #include "ITEM.H"
 #include "LENS.H"
-#include "LLASER.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
-#include "MAID.H"
-#include "MAIDTAMA.H"
 #include "MUSIC.H"
-#include "PRankCtrl.h"
 #include "SCORE.H"
 #include "SCROLL.H"
-#include "TAMA.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"

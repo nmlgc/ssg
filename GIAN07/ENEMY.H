@@ -99,8 +99,6 @@ struct ENEMY_DATA {
 
 	TAMA_CMD	t_cmd;		// 弾発射用コマンド
 	LASER_CMD	l_cmd;		// レーザー発射用コマンド
-
-	void Draw() const;
 };
 
 using ENEMY_DATA_CSPAN = std::span<const ENEMY_DATA, ENEMY_MAX>;
@@ -132,9 +130,6 @@ bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage);
 extern void enemy_move(void);		// 敵を動かす
 extern void enemyind_set(void);		// 敵の順序設定用配列の初期化をする
 extern void enemy_clear(void);		// 雑魚を消滅させる
-
-// 敵を描画する
-void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds);
 
 bool enemy_damage(int x, int y, int damage);	// 敵にダメージを与える
 bool enemy_damage2(int x, int y, int damage);	// ｙ上方向無限Ver.敵にダメージを与える

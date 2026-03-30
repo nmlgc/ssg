@@ -10,17 +10,12 @@
 #include "EFFECT.H"
 #include "EnemyExCtrl.h"
 #include "FRAGMENT.H"
-#include "GEOMETRY.H"
 #include "GIAN.H"
 #include "ITEM.H"
 #include "LLASER.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
-#include "hatoyama/logic/cast.h"
-#include "hatoyama/logic/ut_math.h"
-
 
 ///// [ 変数 ] /////
 
@@ -116,83 +111,6 @@ uint32_t BossMove(void)
 		}
 	}
 	return HP_Sum;
-}
-
-// ボスを描画する
-void BossDraw(BOSS_DATA_CSPAN Boss, const MAID& Viv)
-{
-	constexpr auto sid = SURFACE_ID::ENEMY;
-	int x, y;
-	int			w,h,t;
-	PIXEL_LTRB	wing;
-
-	for(auto& it : Boss) {
-		auto *b = &it;
-		if(b->IsUsed){
-			const auto *e = &(b->Edat);
-
-			x = (e->x>>6);
-			y = (e->y>>6);
-
-			// 霊魂状態 //
-			if(b->ExState == BEXST_SHILD2 && Viv.bomb_time && (e->flag&EF_DRAW)){
-				wing = PIXEL_LTWH{
-					(160 + (Cast::sign<int32_t>(e->count / 2) % 4) * 40),
-					80,
-					40,
-					40
-				};
-
-				// pbg quirk: Blitted without clipping?! I'd consider this a
-				// bug if it wasn't explicitly commented as such. Fine then...
-				GrpBackend_SetClip(GRP_RES_RECT);
-
-				// クリッピングなし
-				GrpSurface_Blit({ (x - 20), (y - 20) }, sid, wing);
-
-				GrpBackend_SetClip({ X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1) });
-				continue;
-			}
-
-			// バリア状態 //
-			if(b->ExState == BEXST_SHILD1 && Viv.bomb_time && (e->flag&EF_DRAW)){
-				GrpGeom->Lock();
-				for(uint8_t j = 0; j <= 5; j++) {
-					GrpGeom->SetColor({ (5u - j), (5u - j), 5u });
-					GeomCircle(
-						{ x, y }, (sinl((e->count * 4), (30 + (j * 4))) + 80)
-					);
-				}
-				GrpGeom->Unlock();
-			}
-
-			switch(b->ExState){
-				case(BEXST_WING01):
-					t = (b->ExCount-64-8)<<2;
-					if(t<0) t=0;
-					w = 64;
-					h = 92;
-					wing = {   0, 176, 128, 360 };
-					GrpSurface_Blit({ (x - w - t), (y - h) }, sid, wing);
-					wing = { 128, 176, 256, 360 };
-					GrpSurface_Blit({ (x - w + t), (y - h) }, sid, wing);
-				break;
-
-				case(BEXST_WING02):
-					w = 44;
-					h = 52;
-					wing = { 552,   0, 640, 104 };
-					GrpSurface_Blit({ (x - w - 50), (y - h) }, sid, wing);
-					wing = { 552, 104, 640, 208 };
-					GrpSurface_Blit({ (x - w + 50), (y - h) }, sid, wing);
-				break;
-			}
-
-			if(e->flag&EF_DRAW){
-				e->Draw();
-			}
-		}
-	}
 }
 
 

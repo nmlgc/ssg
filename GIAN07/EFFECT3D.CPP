@@ -6,7 +6,6 @@
 #include "EFFECT3D.H"
 #include "GIAN.H"
 #include "ssg/internal/RNG.hpp"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -16,8 +15,6 @@ Rock3D		Rock[ROCK_MAX];
 
 WFLine2D		WFLine;
 FakeECLString	FakeECLStr[FAKE_ECLSTR_MAX];
-
-static void __Draw3DCube(const Cube3D *c); // 汎用３Ｄキューブ描画
 
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 {
@@ -37,12 +34,6 @@ void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 	temp.y = p->y;
 	p->x   = (cosl(dz, temp.x) - sinl(dz, temp.y));
 	p->y   = (sinl(dz, temp.x) + cosl(dz, temp.y));
-}
-
-void ShiftRight6Bit(const Point3D *o, Point3D *p)
-{
-	p->x = (((p->x + o->x) >> 6) + 320);
-	p->y = (((p->y + o->y) >> 6) + 240);
 }
 
 
@@ -66,21 +57,6 @@ void Init3DCube(void)
 		it.y = -(RNG.next() % Y_SIZ);
 		it.vy = ((RNG.next() % 10) + 10);
 	}
-}
-
-
-void Draw3DCube(STAR2D_CSPAN Star, CUBE3D_CSPAN Cube)
-{
-	for(const auto& it : Star) {
-		static const PIXEL_LTWH rc = { 136, 272, 16, 24 };
-		GrpSurface_Blit({ it.x, it.y }, SURFACE_ID::SYSTEM, rc);
-	}
-
-	GrpGeom->Lock();
-	for(const auto& it : Cube) {
-		__Draw3DCube(&it);
-	}
-	GrpGeom->Unlock();
 }
 
 
@@ -118,86 +94,6 @@ void Move3DCube(void)
 			it.x = ((RNG.next() % X_SIZ) + X_MIN);
 			it.y = 0;
 			it.vy = ((RNG.next() % 10) + 10);
-		}
-	}
-}
-
-
-// 汎用３Ｄキューブ描画 //
-static void __Draw3DCube(const Cube3D *c)
-{
-	// ３Ｄで透過色付きorアルファ比較ポリゴンを使えばもっともっと早いのだが... //
-	// ８ビット対応のため、まぁ仕方が無いか... //
-
-	int			x,y,z;
-	int			l,l2;
-	Point3D		p1,p2;
-	Point3D		o;
-
-	o  = c->p;
-	l  = c->l;
-	const uint8_t dx = c->d.dx;
-	const uint8_t dy = c->d.dy;
-	const uint8_t dz = c->d.dz;
-
-	l2  = l;
-
-	// GrpGeom->SetColor({ 1, 1, 2 });
-	GrpGeom->SetColor({ 1, 1, 3 });
-	for(x=-1; x<=1; x++){
-		for(y=-1; y<=1; y++){
-			p1.x = x * l;
-			p1.y = y * l;
-			p1.z =    -l2;
-			Transform3D(&p1, dx, dy, dz);
-			ShiftRight6Bit(&o,&p1);
-
-			p2.x = x * l;
-			p2.y = y * l;
-			p2.z =     l2;
-			Transform3D(&p2, dx, dy, dz);
-			ShiftRight6Bit(&o,&p2);
-
-			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
-		}
-	}
-
-	GrpGeom->SetColor({ 0, 0, 3 });
-	for(y=-1; y<=1; y++){
-		for(z=-1; z<=1; z++){
-			p1.x =    -l2;
-			p1.y = y * l;
-			p1.z = z * l;
-			Transform3D(&p1, dx, dy, dz);
-			ShiftRight6Bit(&o,&p1);
-
-			p2.x =     l2;
-			p2.y = y * l;
-			p2.z = z * l;
-			Transform3D(&p2, dx, dy, dz);
-			ShiftRight6Bit(&o,&p2);
-
-			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
-		}
-	}
-
-	// GrpGeom->SetColor({ 1, 1, 3 });
-	GrpGeom->SetColor({ 1, 1, 4 });
-	for(x=-1; x<=1; x++){
-		for(z=-1; z<=1; z++){
-			p1.x = x * l;
-			p1.y =    -l2;
-			p1.z = z * l;
-			Transform3D(&p1, dx, dy, dz);
-			ShiftRight6Bit(&o,&p1);
-
-			p2.x = x * l;
-			p2.y =     l2;
-			p2.z = z * l;
-			Transform3D(&p2, dx, dy, dz);
-			ShiftRight6Bit(&o,&p2);
-
-			GrpGeom->DrawLine(p1.x, p1.y, p2.x, p2.y);
 		}
 	}
 }
@@ -241,45 +137,6 @@ void MoveEffectFakeECL(void)
 			ResetFakeECLStr(it, RNG);
 		}
 	}
-}
-
-void DrawEffectFakeECL(const WFLine2D& WFLine, FAKE_ECLSTR_CSPAN FakeECLStr)
-{
-	PIXEL_LTRB	src;
-	int		i,j;
-
-	GrpGeom->Lock();
-
-	// GrpGeom->SetColor({ 3, 2, 0 });	// 後半戦用
-	GrpGeom->SetColor({ 0, 2, 0 });
-	// GrpGeom->SetColor({ 0, 0, 3 });
-
-	for(i=128-WFLine.ox/2; i<640-128; i+=32)
-		GrpGeom->DrawLine(i, 0, i, 480);
-
-	for(j=WFLine.oy/2; j<480; j+=32)
-		GrpGeom->DrawLine(128, j, (640 - 128), j);
-
-
-	// GrpGeom->SetColor({ 5, 3, 0 });	// 後半戦用
-	GrpGeom->SetColor({ 0, 3, 0 });
-	// GrpGeom->SetColor({ 0, 0, 4 });
-
-	for(i=128-WFLine.ox; i<640-128; i+=64)
-		GrpGeom->DrawLine(i, 0, i, 480);
-
-	for(j=-WFLine.oy; j<480; j+=64)
-		GrpGeom->DrawLine(128, j, (640 - 128), j);
-
-	GrpGeom->Unlock();
-
-	for(const auto& it : FakeECLStr) {
-		src = PIXEL_LTWH{it.SrcX, it.SrcY, 72, 16};
-		GrpSurface_Blit({ (it.x >> 6), (it.y >> 6) }, SURFACE_ID::MAPCHIP, src);
-	}
-
-	src = { 0, 272, 416, 352 };
-	GrpSurface_Blit({ 128, 400 }, SURFACE_ID::MAPCHIP, src);
 }
 
 static WORLD_COORD Stg4RockRandomX(C_RNG& RNG)
@@ -408,30 +265,6 @@ void MoveStg4Rock(void)
 }
 
 
-void DrawStg4Rock(ROCK3D_CSPAN Rock)
-{
-	constexpr auto sid       = SURFACE_ID::MAPCHIP;
-	static const PIXEL_LTRB src[3] = {
-		{  0, 224, 80, 288 },
-		{  0, 288, 48, 336 },
-		{ 48, 288, 80, 320 },
-	};
-	static const int dx[3] = { (80 / 2), (48 / 2), (32 / 2) };
-	static const int dy[3] = { (64 / 2), (48 / 2), (32 / 2) };
-
-	int x, y;
-
-	for(const auto& it : Rock) {
-		const auto *p = &it;
-		x = (p->x + GX_MID)>>6;
-		y = (p->y + GY_MID)>>6;
-		GrpSurface_Blit(
-			{ (x - dx[p->GrpID]), (y - dy[p->GrpID]) }, sid, src[p->GrpID]
-		);
-	}
-}
-
-
 void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 {
 	switch(Cmd){
@@ -535,39 +368,6 @@ void MoveStg6Raster()
 }
 
 
-// ６面ラスター描画 //
-void DrawStg6Raster(STG6STAR_CSPAN S6Star, STG6RASTER_CSPAN S6Ras)
-{
-	constexpr auto sid = SURFACE_ID::MAPCHIP;
-	static const PIXEL_LTRB Target[3] = {
-		{ 608, 272, 640, 352 },
-		{ 592, 160, 640, 272 },
-		{ 576,   0, 640, 160 },
-	};
-
-	int		i, j, h, w;
-	int		x1, x2, dx, oy;
-
-	for(i=0; i<S6STAR_MAX; i++){
-		static const PIXEL_LTRB src = { 624, 352, (624 + 16), (352 + 16) };
-		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, sid, src);
-	}
-
-	for(const auto& it : S6Ras) {
-		x1 = Target[it.type].left;
-		x2 = Target[it.type].right;
-		oy = Target[it.type].top;
-		h = (Target[it.type].bottom - Target[it.type].top);
-		w  = (x2 - x1)/2;
-		for(j=0; j<h; j+=2){
-			dx = sinl((it.deg + j), it.amp);
-			const PIXEL_LTRB src = { x1, (j + oy), x2, (j + 2) };
-			GrpSurface_Blit({ (it.x + dx - w), (it.y + j) }, sid, src);
-		}
-	}
-}
-
-
 // ３面高速星初期化 //
 void InitStg3Star()
 {
@@ -594,17 +394,5 @@ void MoveStg3Star()
 			S6Star[i].y -= 480;
 			S6Star[i].vy = ((RNG.next() % 20) + 8);
 		}
-	}
-}
-
-
-// ３面高速星描画 //
-void DrawStg3Star(STG6STAR_CSPAN S6Star)
-{
-	int		i;
-
-	for(i=0; i<S3STAR_MAX; i++){
-		static const PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
-		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, SURFACE_ID::MAPCHIP, src);
 	}
 }

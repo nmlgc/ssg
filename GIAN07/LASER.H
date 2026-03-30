@@ -107,9 +107,6 @@ extern void laser_move(void);		// レーザーを動かす
 extern void laser_clear(void);		// レーザー全てに消去エフェクトをかける
 extern void laserind_set(void);		// レーザー順序用配列の初期化
 
-// レーザーを描画する
-void laser_draw(LASER_DATA_CSPAN storage, std::span<const uint16_t> inds);
-
 
 ////レーザーの各種変数たち////
 extern LASER_CMD	LaserCmd;				// 標準レーザーコマンド構造体

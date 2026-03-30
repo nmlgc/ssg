@@ -9,7 +9,6 @@
 #include "MAID.H"
 #include "ssg/Sound.h"
 #include "ssg/internal/RNG.hpp"
-#include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
@@ -481,43 +480,6 @@ void BitDelete(void)
 
 	// 後は、この関数に任せる //
 	BitInit();
-}
-
-
-// ビット間のラインを描画する //
-void BitLineDraw(const BIT_DATA& BitData)
-{
-	int				i, j, n;
-	int				x1, x2, y1, y2;
-	ENEMY_DATA		*RefTable[BIT_MAX*2];
-
-	if(BitData.State == BITCMD_DISABLE) return;
-
-	n = BitData.NumBits;
-	if(n == 0) return;
-
-	for(i=0, j=-1; i<n; i++){
-		while(BitData.Bit[++j].pEnemy == nullptr) {
-		}
-
-		RefTable[i] = RefTable[i + n] = BitData.Bit[j].pEnemy;
-	}
-
-	GrpGeom->Lock();
-	GrpGeom->SetColor({ 4, 4, 5 });
-
-	for(i=0; i<n; i++){
-		if(n >= 5) j = i + 2;
-		else       j = i + 1;
-
-		x1 = RefTable[i]->x >> 6;
-		y1 = RefTable[i]->y >> 6;
-		x2 = RefTable[j]->x >> 6;
-		y2 = RefTable[j]->y >> 6;
-		GrpGeom->DrawLine(x1, y1, x2, y2);
-	}
-
-	GrpGeom->Unlock();
 }
 
 

@@ -55,11 +55,6 @@ void MaidTamaSet(INPUT_BITS, bool in_msg);	// たま発射！！
 void MaidTamaMove(void);	// 弾移動＆ヒットチェック
 void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化
 
-// ナニな弾描画
-void MaidTamaDraw(
-	MAIDTAMA_DATA_CSPAN storage, std::span<const uint16_t> inds, const MAID&
-);
-
 
 
 ///// [ 変数 ] /////

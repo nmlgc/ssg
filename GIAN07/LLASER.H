@@ -101,10 +101,6 @@ extern void LLaserForceClose(const ENEMY_DATA *e);	// 敵に関連づけられ�
 
 extern void LLaserMove(void);				// レーザーを動かす
 extern void LLaserClear(void);				// 無限遠レーザーを全クローズ
-
-// レーザーを描画する
-void LLaserDraw(LLASER_DATA_CSPAN llaser);
-
 extern void LLaserSetup(void);				// レーザー配列の初期化をする
 
 

@@ -123,24 +123,19 @@ extern Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
 
 void Init3DCube(void);
-void Draw3DCube(STAR2D_CSPAN, CUBE3D_CSPAN);
 void Move3DCube(void);
 
 void InitEffectFakeECL(void);
 void MoveEffectFakeECL(void);
-void DrawEffectFakeECL(const WFLine2D&, FAKE_ECLSTR_CSPAN);
 
 void InitStg4Rock(void);	// ステージ４の背景となる岩の集団
 void MoveStg4Rock(void);	//
-void DrawStg4Rock(ROCK3D_CSPAN);	//
 void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);	// コマンド送信
 
 void InitStg6Raster();	// ６面ラスター初期化
 void MoveStg6Raster();	// ６面ラスター動作
-void DrawStg6Raster(STG6STAR_CSPAN, STG6RASTER_CSPAN);	// ６面ラスター描画
 
 void InitStg3Star();	// ３面高速星初期化
 void MoveStg3Star();	// ３面高速星動作
-void DrawStg3Star(STG6STAR_CSPAN);	// ３面高速星描画
 
 #endif

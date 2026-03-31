@@ -29,7 +29,6 @@
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/endian.h"
-#include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -155,7 +154,7 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 }
 
 // p:SCL_ENEMY以降の敵配置データ //
-void StageMove(void)
+void StageMove(INPUT_BITS input)
 {
 	bool	bFlag = true;
 	bool CtrlFlag = false;
@@ -170,15 +169,12 @@ void StageMove(void)
 				const auto temp = U32LEAt(&cmd[1]);
 				// メッセージウィンドウがオープンしている場合 //
 				if(SclInfo.MsgFlag){
-					if(!Round.MsgEnabled || (SystemKey_Data & SYSKEY_SKIP)) {
+					if(!Round.MsgEnabled || (input & KEY_SKIP)) {
 						CtrlFlag = true;
 					}
 
 					if(CtrlFlag) GameCount += (temp-GameCount)/3;
-					else if(
-						(Key_Data & KEY_RETURN) ||
-						((Key_Data & KEY_TAMA) && (ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE))
-					){
+					else if(input & KEY_RETURN) {
 						if(!SclInfo.ReturnFlag){
 							GameCount = temp;
 							SclInfo.ReturnFlag = true;

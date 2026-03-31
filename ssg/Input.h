@@ -28,5 +28,6 @@ static const INPUT_BITS KEY_BOMB   = { 0x0020 };
 static const INPUT_BITS KEY_SHIFT  = { 0x0040 };
 static const INPUT_BITS KEY_RETURN = { 0x0080 };
 static const INPUT_BITS KEY_ESC    = { 0x0100 };
+static const INPUT_BITS KEY_SKIP   = { 0x0200 };
 
 #pragma warning(pop)

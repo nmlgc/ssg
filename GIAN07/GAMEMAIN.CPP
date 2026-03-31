@@ -129,7 +129,7 @@ void GameSTD_Init(void);	// ゲームを立ち上げる際に必ず行う初期�
 bool DemoInit(void);	// デモプレイの初期化を行う
 
 void GameDraw(void);
-void GameMove(void);
+void GameMove(INPUT_BITS);
 bool IsDraw(void);
 
 void ScoreDraw(void);	// スコアの描画
@@ -694,7 +694,7 @@ void ReplayProc(bool&)
 		return;
 	}
 
-	GameMove();
+	GameMove(Key_Data);
 
 	if(GameMain != ReplayProc){
 		DemoplayCleanup();	// 後始末
@@ -919,18 +919,44 @@ extern void GameContinue(void)
 
 void GameProc(bool&)
 {
+	// Rewrite input for the logic layer and recorded replays:
+	//
+	// • [KEY_SKIP] influences SCL timing, but must be a system key on the
+	//   frontend to preserve the original game's behavior for comparisons of
+	//   [Key_Data] with 0.
+	//
+	// • Text box skipping with the Shot key is an optional feature governed by
+	//   [INPF_Z_MSKIP_ENABLE], so we translate it to the common [KEY_RETURN]
+	//   here.
+	//
+	// Both of these can happen here rather than inside the logic layer because
+	// the original one-stage replay format always skipped past dialog. Hence,
+	// there are no pre-existing replays that require these rewrites to sync
+	// properly.
+	INPUT_BITS input = Key_Data;
+	if(SclInfo.MsgFlag) {
+		if(SystemKey_Data & SYSKEY_SKIP) {
+			input |= KEY_SKIP;
+		}
+		if(
+			(input & KEY_TAMA) && (ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE)
+		) {
+			input |= KEY_RETURN;
+		}
+	}
+
 #ifdef PBG_DEBUG
-	if(DebugDat.DemoSave && DemoplayRecord(Key_Data)) {
+	if(DebugDat.DemoSave && DemoplayRecord(input)) {
 		DemoplaySaveDemo();
 	}
 #endif
 
 	// リプレイ時の保存処理 //
-	if(ConfigDat.StageSelect.v && DemoplayRecord(Key_Data)) {
+	if(ConfigDat.StageSelect.v && DemoplayRecord(input)) {
 		DemoplaySaveReplay();
 	}
 
-	if(Key_Data & KEY_ESC){
+	if(input & KEY_ESC) {
 		if(ConfigDat.StageSelect.v) {
 			DemoplaySaveReplay();
 			GameExit(true);
@@ -942,7 +968,7 @@ void GameProc(bool&)
 		return;
 	}
 
-	GameMove();
+	GameMove(input);
 	if(GameMain != GameProc) return;
 
 	if(IsDraw()){
@@ -1047,7 +1073,7 @@ void DemoProc(bool&)
 		return;
 	}
 
-	GameMove();
+	GameMove(Key_Data);
 
 	if(GameMain != DemoProc){
 		DemoplayCleanup();	// 後始末
@@ -1364,11 +1390,11 @@ void PauseProc(bool&)
 }
 
 
-void GameMove(void)
+void GameMove(INPUT_BITS input)
 {
 	MWinMove();
 
-	StageMove();
+	StageMove(input);
 	ScrollMove();
 
 	const auto HP_Sum = BossMove();
@@ -1391,7 +1417,7 @@ void GameMove(void)
 	ScreenEffectMove();
 
 	// この２行の位置を変更しました //
-	MaidMove(Key_Data, SclInfo.MsgFlag);
+	MaidMove(input, SclInfo.MsgFlag);
 	MaidTamaMove();
 }
 

@@ -25,12 +25,12 @@ import std.compat;
 
 
 //// 破片構造体 ////
-typedef struct{
+struct FRAGMENT_DATA {
 	int		x,y;		// 現在の座標
 	int		vx,vy;		// 速度成分 (x64)
 	uint8_t	count;	// フレームカウンタ(０の時は使用していないとする)
 	uint8_t	cmd;	// どんな破片？
-} FRAGMENT_DATA;
+};
 
 
 //// 破片用変数 ////

@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "LLASER.H"
+#include "ENEMY.H"
 #include "GEOMETRY.H"
 #include "MAID.H"
 #include "hatoyama/engine/graphics_backend.h"

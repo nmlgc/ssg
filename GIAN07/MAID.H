@@ -32,8 +32,7 @@ import std.compat;
 
 ///// [構造体] /////
 
-typedef struct
-{
+struct MAID {
 	int x,y;			// 現在の<表示>座標
 
 	int vx,vy;			// オプションのズレ具合
@@ -68,7 +67,7 @@ typedef struct
 
 	bool bGameOver;	// ゲームオーバー判定用フラグ
 	bool BuzzSound;	// かすった音を連続再生させないためのフラグ
-} MAID;
+};
 
 
 

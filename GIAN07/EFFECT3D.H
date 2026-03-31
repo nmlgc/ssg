@@ -31,9 +31,9 @@ import std.compat;
 
 
 ///// [ 構造体 ] /////
-typedef struct tagPoint3D{
+struct Point3D {
 	WORLD_COORD x, y, z;
-} Point3D;
+};
 
 typedef struct tagLineList3D{
 	PIXEL_POINT	center;	/* 頂点の座標の補正用 */
@@ -42,39 +42,39 @@ typedef struct tagLineList3D{
 	uint8_t	DegX, DegY, DegZ;	/* 各軸に対する回転角 */
 } LineList3D;
 
-typedef struct tagDeg3D{
+struct Deg3D {
 	int		dx;
 	int		dy;
 	int		dz;
-} Deg3D;
+};
 
-typedef struct tagCube3D{
+struct Cube3D {
 	Point3D		p;
 	Deg3D		d;
 	int			l;
-} Cube3D;
+};
 
-typedef struct tagStar2D {
+struct Star2D {
 	int		x,y;
 	int		vy;
-} Star2D;
+};
 
 // 非・汎用２Ｄ正方形ワイヤーフレーム //
-typedef struct tagWFLine2D {
+struct WFLine2D {
 	int		ox,oy;		// 中心座標
 	int		w;			// 正方形の一辺の長さ
 	uint8_t	d;	// 正方形の傾き角度
-} WFLine2D;
+};
 
 // 偽ＥＣＬ羅列管理用構造体 //
-typedef struct tagFakeECLString {
+struct FakeECLString {
 	int		SrcX, SrcY;		// 元画像の基準となるＸ＆Ｙ座標
 	int		x,y;			// 現在の座標x64
 	int		vx,vy;			// 現在の速度成分x64
-} FakeECLString;
+};
 
 // 岩管理用構造体 //
-typedef struct tagRock3D {
+struct Rock3D {
 	int		x, y, z;		// 現在の座標
 	int		vx, vy;			// 速度XY成分(2D-平面上)
 
@@ -85,7 +85,7 @@ typedef struct tagRock3D {
 	uint8_t	d;	// 角度(2D-平面上)
 	uint8_t	GrpID;	// グラフィックＩＤ
 	uint8_t	State;	// 現在の状態
-} Rock3D;
+};
 
 
 ///// [ 関数 ] /////

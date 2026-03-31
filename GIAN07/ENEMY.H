@@ -52,10 +52,10 @@
 
 
 //// 割り込みベクタ構造体 ////
-typedef struct{
+struct INT_VECTOR {
 	uint32_t	vect;	// 割り込みベクタ(0 なら無効)
 	int		value;		// 比較値
-} INT_VECTOR;
+};
 
 //// 敵データ構造体 ////
 struct ENEMY_DATA {

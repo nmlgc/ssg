@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "EnemyExCtrl.h"
+#include "BOSS.H"
 #include "LLASER.H"
 #include "LOADER.H"
 #include "MAID.H"

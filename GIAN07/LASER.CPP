@@ -74,7 +74,7 @@
 
 
 ////レーザー用構造体////
-typedef struct{
+struct LASER_DATA {
 	int x,y;	// 現在の始点
 	int vx,vy;	// 速度の(X,Y)成分
 	int lx,ly;	// 表示座標の加算値(長さ)
@@ -96,7 +96,7 @@ typedef struct{
 	uint8_t flag;	// 消去要請フラグ等(エフェクト含む)
 	uint8_t notr;	// 反射しないリフレクターの番号
 	uint8_t evade;	// かすり用フラグ
-} LASER_DATA;
+};
 
 ////グローバル変数////
 LASER_CMD		LaserCmd;							// 標準レーザーコマンド構造体

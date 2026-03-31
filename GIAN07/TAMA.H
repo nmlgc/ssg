@@ -113,7 +113,7 @@
 
 
 ////弾コマンド構造体(安全性アップ)////
-typedef struct{
+struct TAMA_CMD {
 	int  x,y;		// 弾の発射位置
 
 	uint8_t d;	// 発射角
@@ -130,12 +130,12 @@ typedef struct{
 	uint8_t cmd;	// 弾コマンド＆エフェクト
 	uint8_t type;	// 弾の種類
 	uint8_t option;	// 弾の属性(バイブレーション,反射,炸裂,ボム)
-} TAMA_CMD;
+};
 
 
 
 ////弾データ構造体////
-typedef struct{
+struct TAMA_DATA {
 	int x,y;		// 現在の<表示>座標
 	int tx,ty;		// 振動系エフェクト使用時の演算用座標
 	int vx,vy;		// 速度の(X,Y)成分
@@ -157,7 +157,7 @@ typedef struct{
 
 	uint16_t count;	// フレームカウンタ
 	uint8_t flag;	// 弾消去要請フラグ
-} TAMA_DATA;
+};
 
 
 

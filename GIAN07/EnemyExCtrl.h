@@ -7,9 +7,10 @@
 #define PBGWIN_ENEMYEXCTRL_H		"ENEMYEXCTRL : Version 0.01 : Update 2000/02/27"
 //#pragma message(PBGWIN_ENEMYEXCTRL_H)
 
-#include "BOSS.H"
-#include "ENEMY.H"
 #include "EXDEF.H"
+
+struct BOSS_DATA;
+struct ENEMY_DATA;
 
 
 ///// [更新履歴] /////
@@ -62,16 +63,16 @@ template <size_t Len> struct SNAKYMOVE_DATA {
 };
 
 
-typedef struct tagBIT_PARAM {
+struct BIT_PARAM {
 	ENEMY_DATA	*pEnemy;	// 対象となる敵へのポインタ
 
 	uint32_t	BitHP;	// ビットの耐久力
 	uint8_t	BitID;	// 基準角から何番目(0～)に相当するビットか
 	uint8_t	Angle;	// 現在の角度
 	char		Force;		// 現在力の加えられている方向
-} BIT_PARAM;
+};
 
-typedef struct tagBIT_DATA {
+struct BIT_DATA {
 	BIT_PARAM		Bit[BIT_MAX];		// ビットデータへのポインタ
 	BOSS_DATA		*Parent;			// 親データへのポインタ
 
@@ -95,7 +96,7 @@ typedef struct tagBIT_DATA {
 	uint16_t	BaseAngle;	// ビットの回転基本角
 
 	bool	bIsLaserEnable;	// レーザーが動作中かどうか
-} BIT_DATA;
+};
 
 
 

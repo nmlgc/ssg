@@ -18,13 +18,13 @@ import std.compat;
 
 
 /***** [構造体] *****/
-typedef struct tagSpObj {
+struct SpObj {
 	int			x,y;
 	int			vx,vy;
 	uint8_t	d;
-} SpObj;
+};
 
-typedef struct tagBombEfcCtrl {
+struct BombEfcCtrl {
 	int			x,y;					// エフェクトの中心座標
 	bool	bIsUsed;	// この構造体は使用中か
 	uint32_t	count;	// フレームカウンタ
@@ -32,7 +32,7 @@ typedef struct tagBombEfcCtrl {
 	SpObj		Obj[EXBOMB_OBJMAX];		// エフェクト補助用オブジェクト
 
 	uint8_t	type;	// エフェクトの種類
-} BombEfcCtrl;
+};
 
 
 

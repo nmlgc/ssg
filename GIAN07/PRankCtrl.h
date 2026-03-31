@@ -11,10 +11,10 @@ import std.compat;
 
 
 ///// [構造体] /////
-typedef struct tagPlayRankInfo{
+struct PlayRankInfo {
 	uint8_t	GameLevel;	// 方向数も関係する難易度変化
 	int		Rank;			// 弾の速度変化に関する値
-} PlayRankInfo;
+};
 
 
 

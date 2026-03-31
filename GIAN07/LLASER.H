@@ -14,8 +14,9 @@
 //            : 発射しているレーザーの何番目か、に変更された
 
 
-#include "ENEMY.H"
 #include "hatoyama/engine/graphics_backend.h"
+
+struct ENEMY_DATA;
 
 
 
@@ -42,7 +43,7 @@
 
 
 //// レーザー発動コマンド構造体２ ////
-typedef struct{
+struct LLASER_CMD {
 	ENEMY_DATA	*e;		// 敵データへのポインタ
 
 	int		dx,dy;		// レーザーの発射座標ずらし値
@@ -54,11 +55,11 @@ typedef struct{
 
 	uint8_t	c;	// レーザーの色
 	uint8_t	type;	// レーザーの種類
-} LLASER_CMD;
+};
 
 
 //// レーザー用構造体２ ////
-typedef struct{
+struct LLASER_DATA {
 	ENEMY_DATA	*e;			// 敵データへのポインタ(ここら辺でボスでも雑魚でも発射できるように)
 
 	int		x,y;			// 現在の表示座標
@@ -80,7 +81,7 @@ typedef struct{
 	uint8_t	flag;	// レーザーの状態
 	uint8_t	type;	// レーザーの種類
 	uint8_t	EnemyID;	// 敵から見た番号
-} LLASER_DATA;
+};
 
 
 

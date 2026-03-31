@@ -28,12 +28,12 @@ import std.compat;
 
 
 ///// [構造体] /////
-typedef struct tagITEM_DATA{
+struct ITEM_DATA {
 	int		x,y;
 	int		vx,vy;
 	uint32_t	count;
 	uint8_t	type;
-} ITEM_DATA;
+};
 
 
 

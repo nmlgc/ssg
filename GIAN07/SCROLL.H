@@ -89,10 +89,10 @@ typedef struct tagScrollInfo{
 } SCROLL_INFO;
 
 // ＳＣＬ管理用構造体 //
-typedef struct tagSCL_INFO{
+struct SCL_INFO {
 	bool	MsgFlag;	// メッセージスキップ用フラグ
 	bool	ReturnFlag;	// リターンキー用フラグ
-} SCL_INFO;
+};
 
 
 ///// [ 関数 ] /////

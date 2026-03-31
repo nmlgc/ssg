@@ -681,18 +681,18 @@ void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 #define S6STAR_MAX		60
 #define S3STAR_MAX		180
 
-typedef struct tagStg6Raster {
+struct Stg6Raster {
 	int		x, y;		// 表示座標
 	char	vy;			//
 	uint8_t	type;	// 種類(0-2)
 	uint8_t	deg;	// 基準角度
 	uint8_t	amp;	// 振幅
-} Stg6Raster;
+};
 
-typedef struct tagStg6Star {
+struct Stg6Star {
 	int		x, y;
 	int		vy;
-} Stg6Star;
+};
 
 Stg6Raster	S6Ras[S6RASTER_MAX];
 Stg6Star	S6Star[S3STAR_MAX];		// 兼用モノなのだ

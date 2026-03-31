@@ -30,7 +30,7 @@
 ///// [構造体] /////
 
 // ホーミングレーザー //
-typedef struct tagHLaserData {
+struct HLaserData {
 	int		Current;	// 現在の先頭
 	int		v;			// 速度
 	int		a;			// 加速度
@@ -42,12 +42,12 @@ typedef struct tagHLaserData {
 	uint8_t	c;	// 色
 	uint8_t	Left;	// 残りホーミング回数
 
-	struct tagHLaserData	*Next;				// 次のレーザーへのポインタ
+	HLaserData	*Next;	// 次のレーザーへのポインタ
 	DegPoint	p[HLASER_LEN*HLASER_SECTION];	// 頂点キュー(ExDef.h)
-} HLaserData;
+};
 
 // ホーミングレーザーセット情報 //
-typedef struct tagHLaserInfo {
+struct HLaserInfo {
 	int		x,y;		// 中心座標
 
 	uint8_t	d;	// 角度
@@ -56,7 +56,7 @@ typedef struct tagHLaserInfo {
 
 	uint8_t	c;	// 色
 	uint8_t	type;	// 種類
-} HLaserInfo;
+};
 
 
 

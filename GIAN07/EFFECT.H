@@ -66,7 +66,7 @@ typedef struct _tagCIRCLE_EFC_DATA{
 	uint8_t	d;	// 円エフェクトの角度(謎)
 } CIRCLE_EFC_DATA;
 
-typedef struct _tagSEFFECT_DATA{
+struct SEFFECT_DATA {
 	int		x,y;
 	int		vx,vy;
 
@@ -75,7 +75,7 @@ typedef struct _tagSEFFECT_DATA{
 
 	uint8_t	cmd;
 	char	c;
-} SEFFECT_DATA;
+};
 
 typedef struct tagLOCKON_INFO{
 	int		*x,*y;						// ロック座標へのポインタ

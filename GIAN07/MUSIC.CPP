@@ -199,7 +199,7 @@ void GrpDrawSpect(int x, int y)
 	static uint16_t ftable3[128 + 8 + 8];
 	static uint8_t ftable3flag;
 
-	constexpr PIXEL_LTRB src = {
+	static const PIXEL_LTRB src = {
 		(16 * 16), 0, ((16 * 16) + (8 * 21)), 8
 	}; // ,,,8*4
 
@@ -283,7 +283,7 @@ void GrpDrawNote(void)
 	// o#o#oo#o#o#o
 	// o o oo o o o
 
-	constexpr const PIXEL_LTRB src[12] = {
+	static const PIXEL_LTRB src[12] = {
 		{  0, 464,  3, 474 },	// しろ
 		{  0, 456,  3, 461 },	// 黒
 
@@ -303,7 +303,7 @@ void GrpDrawNote(void)
 		{ 24, 464, 27, 474 },	// しろ
 	};
 
-	constexpr const PIXEL_LTRB src2[12] = {
+	static const PIXEL_LTRB src2[12] = {
 		{  0, (464 - 24),  3, (474 - 24) },	// しろ
 		{  0, (456 - 24),  3, (461 - 24) },	// 黒
 
@@ -323,7 +323,7 @@ void GrpDrawNote(void)
 		{ 24, (464 - 24), 27, (474 - 24) },	// しろ
 	};
 
-	constexpr const PIXEL_COORD destX[12] = {
+	static const PIXEL_COORD destX[12] = {
 		0,	// しろ
 		2,	// 黒
 

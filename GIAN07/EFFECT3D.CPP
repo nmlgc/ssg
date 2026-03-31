@@ -133,7 +133,7 @@ void InitWarning(void)
 
 void DrawWarning(void)
 {
-	constexpr PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
+	static const PIXEL_LTRB src = { 0, (152 + 16), 384, (232 + 16) };
 	int	st,det;
 	static int count;
 
@@ -274,7 +274,7 @@ void Init3DCube(void)
 void Draw3DCube(void)
 {
 	for(const auto& it : Star) {
-		constexpr PIXEL_LTWH rc = { 136, 272, 16, 24 };
+		static const PIXEL_LTWH rc = { 136, 272, 16, 24 };
 		GrpSurface_Blit({ it.x, it.y }, SURFACE_ID::SYSTEM, rc);
 	}
 
@@ -610,9 +610,13 @@ void MoveStg4Rock(void)
 void DrawStg4Rock(void)
 {
 	constexpr auto sid       = SURFACE_ID::MAPCHIP;
-	static PIXEL_LTRB src[3] ={{0, 224, 80, 288},{0, 288, 48, 336},{48, 288, 80, 320}};
-	static int dx[3] = {80/2, 48/2, 32/2};
-	static int dy[3] = {64/2, 48/2, 32/2};
+	static const PIXEL_LTRB src[3] = {
+		{  0, 224, 80, 288 },
+		{  0, 288, 48, 336 },
+		{ 48, 288, 80, 320 },
+	};
+	static const int dx[3] = { (80 / 2), (48 / 2), (32 / 2) };
+	static const int dy[3] = { (64 / 2), (48 / 2), (32 / 2) };
 
 	int x, y;
 
@@ -751,16 +755,17 @@ void MoveStg6Raster()
 void DrawStg6Raster()
 {
 	constexpr auto sid = SURFACE_ID::MAPCHIP;
-	static PIXEL_LTRB Target[3] = {
-		{608, 272, 640, 352}, {592, 160, 640, 272}, {576, 0, 640, 160},
+	static const PIXEL_LTRB Target[3] = {
+		{ 608, 272, 640, 352 },
+		{ 592, 160, 640, 272 },
+		{ 576,   0, 640, 160 },
 	};
 
-	PIXEL_LTRB	src;
 	int		i, j, h, w;
 	int		x1, x2, dx, oy;
 
 	for(i=0; i<S6STAR_MAX; i++){
-		src = { 624, 352, (624 + 16), (352 + 16) };
+		static const PIXEL_LTRB src = { 624, 352, (624 + 16), (352 + 16) };
 		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, sid, src);
 	}
 
@@ -772,7 +777,7 @@ void DrawStg6Raster()
 		w  = (x2 - x1)/2;
 		for(j=0; j<h; j+=2){
 			dx = sinl((it.deg + j), it.amp);
-			src = { x1, (j + oy), x2, (j + 2) };
+			const PIXEL_LTRB src = { x1, (j + oy), x2, (j + 2) };
 			GrpSurface_Blit({ (it.x + dx - w), (it.y + j) }, sid, src);
 		}
 	}
@@ -815,7 +820,7 @@ void DrawStg3Star()
 	int		i;
 
 	for(i=0; i<S3STAR_MAX; i++){
-		constexpr PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
+		static const PIXEL_LTRB src = { (640 - 16), 0, 640, 16 };
 		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, SURFACE_ID::MAPCHIP, src);
 	}
 }

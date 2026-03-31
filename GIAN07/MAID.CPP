@@ -227,7 +227,7 @@ extern void StateDraw(void)
 {
 	int		i,temp;
 	//PIXEL_LTRB	src = { 0, 80, 128, (80 + 16) };
-	constexpr PIXEL_LTRB src = { 0, 80, 128, (80 + 24) };
+	static const PIXEL_LTRB src = { 0, 80, 128, (80 + 24) };
 	char	buf[100];
 
 	// 残りかすり時間ゲージの表示 //

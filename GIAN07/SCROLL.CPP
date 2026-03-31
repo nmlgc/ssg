@@ -668,7 +668,7 @@ static void Stg3BossMapDraw(void)
 	y = Y_MIN - ScrollInfo.ExCount;
 
 	for(; y<Y_MAX; y+=208){
-		constexpr PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
+		static const PIXEL_LTRB src = { 0, 272, (640 - 256), (272 + 208) };
 		GrpSurface_Blit({ x, y }, SURFACE_ID::MAPCHIP, src);
 	}
 }

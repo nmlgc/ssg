@@ -298,7 +298,7 @@ char GetAddr2Char(int x, int y)
 void NameRegistProc(bool&)
 {
 	// <- DemoInit() を修正するのだぞ
-	PIXEL_LTRB	src = {0, 0, 400, 64};
+	PIXEL_LTRB 	src;
 	int		gx,gy,len;
 	static int	x,y;
 	static int8_t key_time;
@@ -441,13 +441,12 @@ void NameRegistProc(bool&)
 	GrpGeom->Unlock();
 
 	constexpr auto sid = SURFACE_ID::NAMEREG;
-	GrpSurface_Blit({ 120, 0 }, sid, src);
+	GrpSurface_Blit({ 120, 0 }, sid, PIXEL_LTRB{ 0, 0, 400, 64 });
 
 	ScoreDraw();
 
 	// 名前入力用文字列群 //
-	src = { 0, 432, 416, 480 };
-	GrpSurface_Blit({ 112, 420 }, sid, src);
+	GrpSurface_Blit({ 112, 420 }, sid, PIXEL_LTRB{ 0, 432, 416, 480 });
 
 	// カーソル //
 	if((x >= 20) && (y == 2)) {
@@ -684,7 +683,7 @@ void ReplayProc(bool&)
 	if(IsDraw()){
 		GameDraw();
 
-		constexpr PIXEL_LTWH rc = { 312, 80, 32, 8 };
+		static const PIXEL_LTWH rc = { 312, 80, 32, 8 };
 		GrpSurface_Blit({ 128, 470 }, SURFACE_ID::SYSTEM, rc);
 		if(ExTimer<64+32){
 			GrpGeom->Lock();
@@ -694,7 +693,7 @@ void ReplayProc(bool&)
 				(128 + 45 - 3), (470 + 4 - 1), (128 + 45 + 72), (470 + 4 + 5)
 			);
 			GrpGeom->Unlock();
-			constexpr PIXEL_LTWH rc = { 312, 88, 72, 8 };
+			static const PIXEL_LTWH rc = { 312, 88, 72, 8 };
 			GrpSurface_Blit({ (128 + 45), (470 + 4) }, SURFACE_ID::SYSTEM, rc);
 		}
 		Grp_Flip();
@@ -746,12 +745,12 @@ void SProjectProc(bool&)
 {
 	static uint16_t timer = 0;
 
-	constexpr PIXEL_SIZE logo_size = { 320, 42 };
-	constexpr WINDOW_LTRB logo = WINDOW_LTWH{
+	static const PIXEL_SIZE logo_size = { 320, 42 };
+	static const WINDOW_LTRB logo = WINDOW_LTWH{
 		(320 - (logo_size.w / 2)), (240 + 40), logo_size.w, logo_size.h
 	};
 
-	const auto fade = [logo](uint8_t black_alpha, uint8_t palette_tone) {
+	const auto fade = [](uint8_t black_alpha, uint8_t palette_tone) {
 		if(auto *gp = GrpGeom_Poly()) {
 			gp->Lock();
 			gp->SetAlphaNorm(black_alpha);
@@ -763,7 +762,7 @@ void SProjectProc(bool&)
 		}
 	};
 
-	constexpr PIXEL_LTRB rc = { 0, 0, logo_size.w, logo_size.h };
+	static const PIXEL_LTRB rc = { 0, 0, logo_size.w, logo_size.h };
 	int		x, y;
 
 	timer = timer + 1;
@@ -931,7 +930,7 @@ void GameProc(bool&)
 	if(IsDraw()){
 		GameDraw();
 		if(DemoplaySaveEnable){
-			constexpr PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
+			static const PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
 			GrpSurface_Blit({ 128, 470 }, SURFACE_ID::SYSTEM, rc);
 		}
 		Grp_Flip();
@@ -1003,7 +1002,7 @@ void GameOverProc(bool&)
 		CWinDraw(&ContinueWindow);
 		/*
 		if(DemoplaySaveEnable){
-			constexpr PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
+			static const PIXEL_LTRB rc = PIXEL_LTWH{ 288, 80, 24, 8 };
 			GrpSurface_Blit({ 128, 470 }, SURFACE_ID::SYSTEM, rc);
 		}*/
 		Grp_Flip();
@@ -1057,7 +1056,7 @@ void WeaponSelectProc(bool&)
 	static char spd  = 0;
 	static uint16_t count = 0;
 
-	constexpr PIXEL_LTRB src[4] = {
+	static const PIXEL_LTRB src[4] = {
 		PIXEL_LTWH{  0, 344, 56, 48 },
 		PIXEL_LTWH{  0, 392, 56, 48 },
 		PIXEL_LTWH{ 56, 344, 56, 48 },
@@ -1261,7 +1260,7 @@ void WeaponSelectProc(bool&)
 
 void TitleProc(bool& quit)
 {
-	constexpr PIXEL_LTRB src = { 0, 0, 640, 396 };
+	static const PIXEL_LTRB src = { 0, 0, 640, 396 };
 	//PIXEL_LTRB	src = { 0, 0, 350, 403 };
 	//PIXEL_LTRB	src = { 0, 0, 195, 256 };
 	//PIXEL_LTRB	src = { 0, 0, 275, 256 };

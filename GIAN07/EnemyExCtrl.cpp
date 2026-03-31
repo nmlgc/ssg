@@ -131,11 +131,8 @@ void SnakyDelete(const BOSS_DATA *b)
 		}
 
 		// Snd_SEPlay(SOUND_ID_BOMB, e->x);
-		if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 		//PowerUp(e->hp);			// パワーアップ
-		e->hp    = 0;
-		e->count = 0;
-		e->flag  = EF_BOMB;
+		EnemyExplode(*e);
 		///score_add(e->score);
 		//ItemSet(e->x,e->y,0);
 	}
@@ -295,10 +292,7 @@ void BitMove(void)
 			bIsDestroyed = true;
 
 			// ビット配列に関連づけられた敵に削除要求を送出 //
-			if(e->LLaserRef) LLaserForceClose(e);
-			e->hp    = 0;
-			e->count = 0;			// 爆発のアニメセット用
-			e->flag  = EF_BOMB;
+			EnemyExplode(*e);
 
 			Snd_SEPlay(SOUND_ID_BOMB, e->x);
 
@@ -493,12 +487,7 @@ void BitDelete(void)
 		if(e == nullptr) {
 			continue;
 		}
-
-		if(e->LLaserRef) LLaserForceClose(e);
-		e->hp    = 0;
-		e->count = 0;
-		e->flag  = EF_BOMB;
-
+		EnemyExplode(*e);
 		Snd_SEPlay(SOUND_ID_BOMB, e->x);
 	}
 

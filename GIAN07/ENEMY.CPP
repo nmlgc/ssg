@@ -174,8 +174,7 @@ void enemy_move(void)
 			if((e->y<GY_MIN-(e->g_height))||(e->y>GY_MAX+(e->g_height))||
 				(e->x<GX_MIN-(e->g_width))||(e->x>GX_MAX+(e->g_width))){
 				if((e->flag&EF_CLIP)==0){
-					if(e->LLaserRef) LLaserForceClose(e);
-					e->flag = EF_DELETE;
+					EnemyDelete(*e);
 				}
 			}
 		}
@@ -227,19 +226,15 @@ extern void enemy_clear(void)
 		if(e->flag == EF_BOMB) continue;
 
 		if(e->flag & EF_DRAW){
-			e->flag = EF_BOMB;
-			e->hp    = 0;
-			e->count = 0;
-			if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
+			EnemyExplode(*e);
 			Snd_SEPlay(SOUND_ID_BOMB, e->x);
 		}
 		else{
 			// 描画しないタイプの敵の消去の仕方は他の場合と異なり、 //
 			// 爆発アニメ・爆発音を再生しない                       //
-			e->flag = EF_DELETE;
+			EnemyDelete(*e);
 			e->hp    = 0;
 			e->count = 0;
-			if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
 			// 爆発音の再生は行わない //
 		}
 	}
@@ -264,13 +259,8 @@ bool EnemyDamageApply(ENEMY_DATA& e, int damage)
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) {
 		Snd_SEPlay(SOUND_ID_BOMB, e.x);
-		if(e.LLaserRef) {
-			LLaserForceClose(&e); // レーザーの強制クローズ
-		}
 		PowerUp(static_cast<uint8_t>(e.hp)); // パワーアップ
-		e.hp    = 0;
-		e.count = 0;
-		e.flag  = EF_BOMB;
+		EnemyExplode(e);
 		score_add(e.score);
 		if(e.item) {
 			ItemSet(e.x, e.y, e.item);
@@ -487,6 +477,24 @@ void EnemyAnimeMove(ENEMY_DATA *e)
 	}
 }
 
+void EnemyDelete(ENEMY_DATA& e)
+{
+	if(e.LLaserRef) {
+		LLaserForceClose(&e); // レーザーの強制クローズ
+	}
+	e.flag = EF_DELETE;
+}
+
+void EnemyExplode(ENEMY_DATA& e)
+{
+	if(e.LLaserRef) {
+		LLaserForceClose(&e); // レーザーの強制クローズ
+	}
+	e.hp = 0;
+	e.count = 0; // 爆発のアニメセット用
+	e.flag = EF_BOMB;
+}
+
 static void _EnemyDrawBomb(int x, int y, uint32_t count)
 {
 	PIXEL_LTRB	src;
@@ -636,8 +644,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_END):			// 敵の強制消滅
 			ECL_DEBUG("ECL_END",0);
-			if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-			e->flag = EF_DELETE;	// 後で変更するように
+			EnemyDelete(*e); // 後で変更するように
 		return;						// バグ防止(かも)
 
 		case(ECL_JMP):			// ◎ＥＣＬ無条件ジャンプ(少々特殊な動作をします)

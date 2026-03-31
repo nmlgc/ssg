@@ -507,10 +507,7 @@ void BossKillAll(void)
 			fragment_set(e->x,e->y,FRG_FATCIRCLE);
 			ExBombEfcSet(e->x, e->y, EXBOMB_STD);
 			Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
-			if(e->LLaserRef) LLaserForceClose(e);	// レーザーの強制クローズ
-			e->hp = 0;
-			e->count = 0;
-			e->flag = EF_BOMB;
+			EnemyExplode(*e);
 			b->IsUsed = 0;
 		}
 	}
@@ -529,13 +526,8 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		ExBombEfcSet(e.x, e.y, EXBOMB_STD);
 		ScrollCommand(SCMD_QUAKE);
 		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);
-		if(e.LLaserRef) {
-			LLaserForceClose(&e); // レーザーの強制クローズ
-		}
 		PowerUp(Cast::down<uint8_t>(e.hp));
-		e.hp    = 0;
-		e.count = 0;
-		e.flag  = EF_BOMB;
+		EnemyExplode(e);
 
 		// 最後の一匹だった場合 //
 		if(BossNow == 1) {

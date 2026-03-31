@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "ssg/Input.h"
 #include "hatoyama/logic/buffer.h"
 
 // ＳＣＬ管理用構造体 //
@@ -26,4 +27,4 @@ extern uint32_t GameCount;
 // Returns `true` if [data] is a valid pointer.
 bool StageSet(BUFFER_OWNED&& data);
 
-void StageMove(void);
+void StageMove(INPUT_BITS);

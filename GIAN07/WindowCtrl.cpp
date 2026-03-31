@@ -776,20 +776,12 @@ static void Main::Cfg::Snd::Mid::FnFixes(int_fast8_t)
 
 static void Main::Cfg::Inp::FnMsgSkip(int_fast8_t)
 {
-	if(ConfigDat.InputFlags.v & INPF_Z_MSKIP_ENABLE) {
-		ConfigDat.InputFlags.v &= (~INPF_Z_MSKIP_ENABLE);
-	} else {
-		ConfigDat.InputFlags.v |= INPF_Z_MSKIP_ENABLE;
-	}
+	ConfigDat.InputFlags.v ^= INPF_Z_MSKIP_ENABLE;
 }
 
 static void Main::Cfg::Inp::FnZSpeedDown(int_fast8_t)
 {
-	if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
-		ConfigDat.InputFlags.v &= (~INPF_Z_SPDDOWN_ENABLE);
-	} else {
-		ConfigDat.InputFlags.v |= INPF_Z_SPDDOWN_ENABLE;
-	}
+	ConfigDat.InputFlags.v ^= INPF_Z_SPDDOWN_ENABLE;
 }
 
 

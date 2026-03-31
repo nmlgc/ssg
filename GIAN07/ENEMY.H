@@ -167,6 +167,8 @@ void enemy_damage3(int x, int y, uint8_t d);	// ナナメレーザーの当た�
 extern void enemy_damage4(int damage);				// すべての敵にダメージを与える
 
 extern void EnemyAnimeMove(ENEMY_DATA *e);
+void EnemyDelete(ENEMY_DATA& e);
+void EnemyExplode(ENEMY_DATA& e);
 
 
 // 敵データを初期化する(x,y は x64 で指定のこと) //

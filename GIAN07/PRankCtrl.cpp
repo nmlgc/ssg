@@ -9,16 +9,30 @@
 
 PlayRankInfo	PlayRank;
 
+struct RANK_DATA_FOR_DIFFICULTY {
+	int clamp_min;
+	int threshold;
+	int initial;
+	int clamp_max;
+};
+
+// イージー 　　　0 ～ 24
+// ノーマル　　　16 ～ 40
+// ハード　　 　　32 ～ 48
+// ルナティック  40 ～ 64
+static const RANK_DATA_FOR_DIFFICULTY RANK_DATA[] = {
+	// clamp_min   threshold,    initial   clamp_max
+	{ ( 0 * 256), ( 0 * 256), (12 * 256), (24 * 256) }, // Easy
+	{ (16 * 256), (20 * 256), (28 * 256), (40 * 256) }, // Normal
+	{ (32 * 256), (36 * 256), (40 * 256), (48 * 256) }, // Hard
+	{ (40 * 256), (44 * 256), (52 * 256), (64 * 256) }, // Lunatic
+};
+
 
 
 // 難易度の許容範囲内でプレイランクを増減する
 void PlayRankAdd(int n)
 {
-	// イージー 　　　0 ～ 24
-	// ノーマル　　　16 ～ 40
-	// ハード　　 　　32 ～ 48
-	// ルナティック  40 ～ 64
-
 	// 難易度を変化させる //
 	if(GameStage == GRAPH_ID_EXSTAGE){
 		if(n > 0) {
@@ -33,40 +47,21 @@ void PlayRankAdd(int n)
 
 	// この分岐に関しては、基本的にコンフィグの値に基づく //
 	assert((GameLevel <= GAME_LUNATIC) && "Extra is not a valid difficulty");
-	switch(GameLevel) {
-		case(GAME_EASY):
-			if     (PlayRank.Rank < 0)      PlayRank.Rank = 0;
-			else if(PlayRank.Rank > 24*256) PlayRank.Rank = 24*256;
+	const auto& rd_selected = RANK_DATA[GameLevel];
+	PlayRank.Rank = std::clamp(
+		PlayRank.Rank, rd_selected.clamp_min, rd_selected.clamp_max
+	);
 
-			if(PlayRank.Rank < 20*256) PlayRank.GameLevel = GAME_EASY;
-			else                       PlayRank.GameLevel = GAME_NORMAL;
-		break;
-
-		case(GAME_NORMAL):
-			if     (PlayRank.Rank < 16*256) PlayRank.Rank = 16*256;
-			else if(PlayRank.Rank > 40*256) PlayRank.Rank = 40*256;
-
-			if     (PlayRank.Rank < 20*256) PlayRank.GameLevel = GAME_EASY;
-			else if(PlayRank.Rank < 36*256) PlayRank.GameLevel = GAME_NORMAL;
-			else                            PlayRank.GameLevel = GAME_HARD;
-		break;
-
-		case(GAME_HARD):
-			if     (PlayRank.Rank < 32*256) PlayRank.Rank = 32*256;
-			else if(PlayRank.Rank > 48*256) PlayRank.Rank = 48*256;
-
-			if     (PlayRank.Rank < 36*256) PlayRank.GameLevel = GAME_NORMAL;
-			else if(PlayRank.Rank < 44*256) PlayRank.GameLevel = GAME_HARD;
-			else                            PlayRank.GameLevel = GAME_LUNATIC;
-		break;
-
-		case(GAME_LUNATIC):
-			if     (PlayRank.Rank < 40*256) PlayRank.Rank = 40*256;
-			else if(PlayRank.Rank > 64*256) PlayRank.Rank = 64*256;
-
-			if(PlayRank.Rank < 44*256) PlayRank.GameLevel = GAME_HARD;
-			else                       PlayRank.GameLevel = GAME_LUNATIC;
-		break;
+	// We can only jump up or down by a single difficulty.
+	if(
+		(GameLevel < GAME_LUNATIC) &&
+		(PlayRank.Rank >= RANK_DATA[GameLevel + 1].threshold)
+	) {
+		PlayRank.GameLevel = (GameLevel + 1);
+	} else if(PlayRank.Rank >= rd_selected.threshold) {
+		PlayRank.GameLevel = GameLevel;
+	} else if(GameLevel > GAME_EASY) {
+		PlayRank.GameLevel = (GameLevel - 1);
 	}
 }
 
@@ -76,11 +71,5 @@ void PlayRankReset(void)
 {
 	assert((GameLevel <= GAME_LUNATIC) && "Extra is not a valid difficulty");
 	PlayRank.GameLevel = GameLevel;
-
-	switch(GameLevel) {
-		case(GAME_EASY):		PlayRank.Rank = 12*256;		break;
-		case(GAME_NORMAL):		PlayRank.Rank = 28*256;		break;
-		case(GAME_HARD):		PlayRank.Rank = 40*256;		break;
-		case(GAME_LUNATIC):		PlayRank.Rank = 52*256;		break;
-	}
+	PlayRank.Rank = RANK_DATA[GameLevel].initial;
 }

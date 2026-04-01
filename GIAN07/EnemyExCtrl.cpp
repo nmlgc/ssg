@@ -63,12 +63,11 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 		point.d = b->Edat.d;
 	}
 
-	const auto n = (4 + (TailID << 2));
 	for(auto& enemy_ptr : s->EnemyPtr) {
 		if(EnemyNow+1<ENEMY_MAX){
 			e = &Enemy[EnemyInd[EnemyNow++]];
 
-			InitEnemyDataX64(e,b->Edat.x,b->Edat.y,n);
+			InitEnemyDataX64(e, b->Edat.x, b->Edat.y, TailID);
 			enemy_ptr = e;
 		}
 		else{
@@ -207,15 +206,13 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 	BitData.bIsLaserEnable = false;
 //	BitData.ForceCount  = 0;
 
-	const auto n = (4 + (BitID << 2));
-
 	for(i=0; i<NumBits; i++){
 		if(EnemyNow+1 < ENEMY_MAX){
 			// 敵資源の要求 //
 			auto* e = &Enemy[EnemyInd[EnemyNow++]];
 
 			// データを初期化 //
-			InitEnemyDataX64(e, BitData.x, BitData.y, n);
+			InitEnemyDataX64(e, BitData.x, BitData.y, BitID);
 			e->hp    = BIT_VIRTUAL_HP;
 			e->d     = i * (256 / NumBits);
 			e->GR[0] = i;

@@ -7,6 +7,7 @@
 
 #include "GAMEMAIN.H"
 #include "BossHPG.h"
+#include "BOSS.H"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT3D.H"
@@ -516,7 +517,7 @@ void GameSTD_Init(void)
 	// GrpBackend_Clear();
 	// Grp_Flip();
 
-	BossDataInit();
+	Boss.Init();
 	Snaky.Init();	// 蛇管理を初期化(やや謎) //
 	Bit.Init();	// ビット管理も初期化 //
 
@@ -1389,7 +1390,7 @@ void GameMove(INPUT_BITS input)
 	StageMove(input);
 	ScrollMove();
 
-	const auto HP_Sum = BossMove();
+	const auto HP_Sum = Boss.Move();
 	Snaky.Move();
 	Bit.Move();
 	BossHPG_Move(HP_Sum);

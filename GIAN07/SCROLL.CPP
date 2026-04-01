@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include "SCROLL.H"
+#include "BOSS.H"
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
@@ -192,7 +193,7 @@ void StageMove(INPUT_BITS input)
 
 			case(SCL_ENEMY):
 				// ボス出現中は出て来ちゃダメ
-				if(BossNow == 0) {
+				if(Boss.NumAlive() == 0) {
 					if(auto *e = EnemyFindFree()) {
 						const int16_t x = I16LEAt(&cmd[1 + 0]);
 						const int16_t y = I16LEAt(&cmd[1 + 2]);
@@ -208,14 +209,14 @@ void StageMove(INPUT_BITS input)
 				const auto x  = I16LEAt(&cmd[1 + 0]);	// ボス初期Ｘ
 				const auto y  = I16LEAt(&cmd[1 + 2]);	// ボス初期Ｙ
 				const auto id = cmd[1 + 2 + 2];	// ボスＩＤ
-				BossSet(x, y, id);
-				BossHPG_Open(GetBossHPSum());
+				Boss.Set(x, y, id);
+				BossHPG_Open(Boss.GetHPSum());
 				SCL_Now += (1+2+2+1);	// cmd+x+y+id
 			}
 			break;
 
 			case(SCL_BOSSDEAD):		// ボスを強制的に破壊する(Level2 命令Only)
-				BossKillAll();
+				Boss.KillAll();
 				SCL_Now++;
 			break;
 
@@ -313,12 +314,12 @@ void StageMove(INPUT_BITS input)
 			case(SCL_WAITEX):	// 特殊待ち <cmd1>,<opt4>
 				switch(cmd[1]){
 					case(SWAIT_BOSSHP):		// 残りＨＰ
-						if(GetBossHPSum() <= U32LEAt(&cmd[2])) {
+						if(Boss.GetHPSum() <= U32LEAt(&cmd[2])) {
 							break;
 						}
 					return;
 					case(SWAIT_BOSSLEFT):	// 残りボス数
-						if(BossNow <= U32LEAt(&cmd[2])) {
+						if(Boss.NumAlive() <= U32LEAt(&cmd[2])) {
 							break;
 						}
 					return;

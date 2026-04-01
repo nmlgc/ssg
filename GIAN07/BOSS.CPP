@@ -20,17 +20,11 @@
 ///// [ 変数 ] /////
 
 // 公開グローバル //
-BOSS_DATA		Boss[BOSS_MAX];		// ボスデータ格納用構造体
-uint16_t	BossNow;	// 現在のボスの数
-
-
-// 秘密の関数 //
-static void BossSTDMove(BOSS_DATA *b);	// ノーマルECL互換の移動
-
+C_BOSS Boss;
 
 
 // ボスデータ配列を初期化する(中断、ステージクリア時に使用) //
-void BossDataInit(void)
+void C_BOSS::Init(void)
 {
 	for(auto& it : Boss) {
 		it.IsUsed   = 0;	// 要はこれをゼロにすれば良い
@@ -45,7 +39,7 @@ void BossDataInit(void)
 }
 
 // ボスをセットする //
-void BossSet(int x, int y, uint32_t BossID)
+void C_BOSS::Set(int x, int y, uint32_t BossID)
 {
 	auto it = std::ranges::find_if(Boss, [](const auto& it) {
 		return !it.IsUsed;
@@ -76,7 +70,7 @@ void BossSet(int x, int y, uint32_t BossID)
 
 
 // ボスを動かす //
-uint32_t BossMove(void)
+uint32_t C_BOSS::Move(void)
 {
 	uint32_t HP_Sum = 0;
 	ENEMY_DATA		*e;
@@ -88,7 +82,7 @@ uint32_t BossMove(void)
 		if(b->IsUsed){
 			e = &(b->Edat);
 			e->IsDamaged = 0;
-			BossSTDMove(b);
+			this->STDMove(b);
 
 			// サボテンヒットチェック //
 			if(HITCHK(e->x,Viv.x,e->g_width) && HITCHK(e->y,Viv.y,e->g_height) && Viv.muteki==0){
@@ -115,14 +109,14 @@ uint32_t BossMove(void)
 
 
 // ボス用・敵弾クリアの前処理関数 //
-void BossClearCmd(void)
+void C_BOSS::ClearCmd(void)
 {
 	Bit.Delete();
 }
 
 
 // 現在出現しているボス全てのＨＰを０にする //
-void BossKillAll(void)
+void C_BOSS::KillAll(void)
 {
 	// 破壊後の破片放出などの処理は、ダメージを与えて破壊するのと同等の関数を //
 	// 使用するが、当然のごとく、得点＆経験値？は入手できない                 //
@@ -146,7 +140,7 @@ void BossKillAll(void)
 	BossNow = 0;
 }
 
-bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
+bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 {
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) { // ボスの死亡処理(後で変更すること!!)
@@ -186,7 +180,7 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 }
 
 // ボスにダメージを与える //
-bool BossDamage(int x, int y, int damage)
+bool C_BOSS::Damage(int x, int y, int damage)
 {
 	ENEMY_DATA		*e;
 
@@ -206,7 +200,7 @@ bool BossDamage(int x, int y, int damage)
 			if(HITCHK(x,e->x,e->g_width) && HITCHK(y,e->y,e->g_height) && (e->flag&EF_DAMAGE)){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					return BossDamageApply(*b, *e, damage);
+					return DamageApply(*b, *e, damage);
 				}
 			}
 		}
@@ -215,7 +209,7 @@ bool BossDamage(int x, int y, int damage)
 }
 
 // ボスにダメージを与える(ｙ上方向無限Ver) //
-bool BossDamage2(int x, int y, int damage)
+bool C_BOSS::Damage2(int x, int y, int damage)
 {
 	ENEMY_DATA		*e;
 	bool	ret_val = false;
@@ -236,7 +230,7 @@ bool BossDamage2(int x, int y, int damage)
 			if(HITCHK(x,e->x,e->g_width) && (y > e->y) && (e->flag&EF_DAMAGE)){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					ret_val = BossDamageApply(*b, *e, damage);
+					ret_val = DamageApply(*b, *e, damage);
 				}
 			}
 		}
@@ -245,7 +239,7 @@ bool BossDamage2(int x, int y, int damage)
 }
 
 // ボスにダメージを与える(ナナメレーザー) //
-void BossDamage3(int x, int y, uint8_t d)
+void C_BOSS::Damage3(int x, int y, uint8_t d)
 {
 	ENEMY_DATA		*e;
 	//BOOL			ret_val = FALSE;
@@ -265,7 +259,7 @@ void BossDamage3(int x, int y, uint8_t d)
 			if(LaserHITCHK(e, x, y, d) && (e->flag&EF_DAMAGE)){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					BossDamageApply(*b, *e, damage);
+					DamageApply(*b, *e, damage);
 				}
 			}
 		}
@@ -274,7 +268,7 @@ void BossDamage3(int x, int y, uint8_t d)
 
 
 // ボスにダメージを与える(すべての敵)
-void BossDamage4(int damage)
+void C_BOSS::Damage4(int damage)
 {
 	ENEMY_DATA		*e;
 
@@ -292,7 +286,7 @@ void BossDamage4(int damage)
 			if(e->flag&EF_DAMAGE){
 				if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 				else{
-					BossDamageApply(*b, *e, damage);
+					DamageApply(*b, *e, damage);
 
 					//return TRUE;
 				}
@@ -304,7 +298,7 @@ void BossDamage4(int damage)
 
 
 // ノーマルECL互換の移動 //
-static void BossSTDMove(BOSS_DATA *b)
+void C_BOSS::STDMove(BOSS_DATA *b)
 {
 	ENEMY_DATA	*e = &(b->Edat);
 
@@ -330,15 +324,14 @@ static void BossSTDMove(BOSS_DATA *b)
 }
 
 // ボスの体力の総和を求める //
-uint32_t GetBossHPSum(void)
+uint32_t C_BOSS::GetHPSum(void) const
 {
 	uint32_t	HP_Sum = 0;
-	ENEMY_DATA		*e;
 
 	for(auto& it : Boss) {
 		auto *b = &it;
 		if(b->IsUsed){
-			e = &(b->Edat);
+			const auto *e = &(b->Edat);
 			HP_Sum += e->hp;
 		}
 	}
@@ -347,7 +340,7 @@ uint32_t GetBossHPSum(void)
 }
 
 // ボス用割り込み処理 //
-void BossINT(ENEMY_DATA *e, uint8_t IntID)
+void C_BOSS::INT(ENEMY_DATA *e, uint8_t IntID)
 {
 	auto b = std::ranges::find_if(Boss, [e](const auto& b) {
 		return ((&b.Edat) == e);
@@ -392,7 +385,7 @@ void BossINT(ENEMY_DATA *e, uint8_t IntID)
 
 
 // ビット攻撃アドレス指定 //
-void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
+void C_BOSS::BitAttack(ENEMY_DATA *e, uint32_t AtkID)
 {
 	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
 		return ((&b.Edat) == e);
@@ -405,7 +398,7 @@ void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
 }
 
 // ビットにレーザーコマンドセット //
-void BossBitLaser(ENEMY_DATA *e, uint8_t cmd)
+void C_BOSS::BitLaser(ENEMY_DATA *e, uint8_t cmd)
 {
 	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
 		return ((&b.Edat) == e);
@@ -418,7 +411,7 @@ void BossBitLaser(ENEMY_DATA *e, uint8_t cmd)
 }
 
 // ビット命令送信 //
-void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param)
+void C_BOSS::BitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param)
 {
 	const auto* b = std::ranges::find_if(Boss, [e](const auto& b) {
 		return ((&b.Edat) == e);
@@ -432,7 +425,7 @@ void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param)
 
 
 // 残りビット数を返す //
-int BossGetBitLeft(void)
+int C_BOSS::GetBitLeft(void) const
 {
 	return Bit.GetNum();
 }

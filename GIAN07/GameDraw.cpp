@@ -4,6 +4,7 @@
  */
 
 #include "GameDraw.h"
+#include "BOSS.H"
 #include "EnemyExCtrl.h"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
@@ -119,14 +120,14 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 /// ------
 
 // ボスを描画する
-void BossDraw(BOSS_DATA_CSPAN Boss, const MAID& Viv)
+void BossDraw(const C_BOSS& Boss, const MAID& Viv)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 	int x, y;
 	int			w,h,t;
 	PIXEL_LTRB	wing;
 
-	for(auto& it : Boss) {
+	for(auto& it : Boss.Data()) {
 		auto *b = &it;
 		if(b->IsUsed){
 			const auto *e = &(b->Edat);

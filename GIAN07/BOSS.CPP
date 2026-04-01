@@ -63,12 +63,6 @@ void BossDataInit(void)
 
 	// ボスの数を０にする //
 	BossNow = 0;
-
-	// 蛇管理を初期化(やや謎) //
-	SnakyInit();
-
-	// ビット管理も初期化 //
-	BitInit();
 }
 
 // ボスをセットする //
@@ -139,9 +133,6 @@ uint32_t BossMove(void)
 			e->count++;
 		}
 	}
-
-	SnakyMove();
-	BitMove();
 	return HP_Sum;
 }
 
@@ -153,8 +144,6 @@ void BossDraw(void)
 	int			w,h,t;
 	ENEMY_DATA	*e;
 	PIXEL_LTRB	wing;
-
-	BitLineDraw();
 
 	for(auto& it : Boss) {
 		auto *b = &it;

@@ -13,6 +13,8 @@
 #include "DEMOPLAY.H"
 #include "EFFECT.H"
 #include "EFFECT3D.H"
+#include "ENEMY.H"
+#include "EnemyExCtrl.h"
 #include "FONTUTY.H"
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
@@ -522,6 +524,8 @@ void GameSTD_Init(void)
 	// Grp_Flip();
 
 	BossDataInit();
+	SnakyInit();	// 蛇管理を初期化(やや謎) //
+	BitInit();	// ビット管理も初期化 //
 
 	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
 	BossHPG_Init();
@@ -1365,6 +1369,8 @@ void GameMove(void)
 	ScrollMove();
 
 	const auto HP_Sum = BossMove();
+	SnakyMove();
+	BitMove();
 	BossHPG_Move(HP_Sum);
 	enemy_move();
 	ItemMove();
@@ -1394,6 +1400,7 @@ void GameDraw(void)
 	ScrollDraw();
 	CEffectDraw();
 
+	BitLineDraw();
 	BossDraw();
 
 	WideBombDraw();		// 多分、ここで良いと思うが...

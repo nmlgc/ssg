@@ -413,11 +413,9 @@ static void _PutEnemy(const uint8_t *p)
 
 	e = &Enemy[EnemyInd[EnemyNow++]];
 
-	const uint32_t n = (4 + (p[4] << 2));
-
 	x = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
 	y = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
-	InitEnemyDataSTD(e,x,y,n);
+	InitEnemyDataSTD(e, x, y, p[4]);
 }
 
 // 背景を描画する //

@@ -163,10 +163,10 @@ void EnemyExplode(ENEMY_DATA& e);
 
 
 // 敵データを初期化する(x,y は x64 で指定のこと) //
-void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID);
+void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id);
 
 // 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
-void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID);
+void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id);
 
 // 強制的に ECL ブロック間を移動する //
 void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID);

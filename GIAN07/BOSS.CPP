@@ -80,10 +80,9 @@ void BossSet(int x, int y, uint32_t BossID)
 	}
 
 	auto *e = &it->Edat;
-	const uint32_t addr = (4 + (BossID << 2)); // ちと、やばいね...
 
 	// ｘ６４座標に変換してボスをセットする //
-	InitEnemyDataX64(e, PixelToWorld(x), PixelToWorld(y), addr);
+	InitEnemyDataX64(e, PixelToWorld(x), PixelToWorld(y), BossID);
 	e->item = 0;
 
 	it->ExCount = 0;

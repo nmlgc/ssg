@@ -342,14 +342,13 @@ extern void enemy_damage4(int damage)
 
 
 // 敵データを初期化する(x,y は x64 で指定のこと) //
-void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID)
+void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id)
 {
 	e->x = x;
 	e->y = y;
 
-	e->cmd = U32LEAt(&ECL_Head[EclID]);
-
-	e->call_addr = e->cmd;
+	const uint32_t addr = (4 + (id << 2)); // ちと、やばいね...
+	EnemyECL_LongJump(e, addr);
 
 	e->hp       = 0xffffffff;
 	e->amp      = 0;
@@ -365,14 +364,11 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t EclID)
 	e->IsDamaged = 0;
 
 	e->tama_c   = Cast::down<uint8_t>(rnd()); // & 0xff;
-	e->t_rep    = 0;			// 弾の発射間隔(０：自動発射しない)
 	e->g_width  = 0;
 	e->g_height = 0;
 
 	e->item     = ITEM_SCORE;
 
-	e->rep_c    = 0;
-	e->cmd_c    = 0;
 	e->v        = 64;
 	e->vd       = 0;
 	e->vx       = cosl(e->d,e->v);
@@ -423,7 +419,7 @@ void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID)
 
 
 // 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
-void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID)
+void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id)
 {
 	int		EnemyX = x;
 	int		EnemyY = y;
@@ -436,7 +432,7 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID)
 	EnemyX = (EnemyX==X_RNDV) ? GX_RND : (EnemyX<<6);
 	EnemyY = (EnemyY==Y_RNDV) ? GY_RND : (EnemyY<<6);
 
-	InitEnemyDataX64(e,EnemyX,EnemyY,EclID);
+	InitEnemyDataX64(e, EnemyX, EnemyY, id);
 }
 
 void EnemyAnimeMove(ENEMY_DATA *e)
@@ -1521,13 +1517,11 @@ void parse_ECL(ENEMY_DATA *e)
 
 			// バグに注意注意！！ //
 			if(cmd[0] == ECL_ENEMYSETD){
-				const uint32_t n = (4 + (cmd[6] << 2));
-				InitEnemyDataSTD(new_enemy,x,y,n);
+				InitEnemyDataSTD(new_enemy, x, y, cmd[6]);
 				new_enemy->d = ID2Value(e, cmd[5]);
 			}
 			else{
-				const uint32_t n = (4 + (cmd[5] << 2));
-				InitEnemyDataSTD(new_enemy,x,y,n);
+				InitEnemyDataSTD(new_enemy, x, y, cmd[5]);
 			}
 		}
 		break;

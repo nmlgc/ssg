@@ -103,12 +103,6 @@ typedef struct tagBIT_DATA {
 
 
 
-///// [ 関数 ] /////
-void SnakyInit(void);	// 蛇型の敵配列の初期化
-void SnakySet(BOSS_DATA *b, int len, uint32_t TailID);	// 蛇型の敵をセットする
-void SnakyMove(void);	// 蛇型の敵の移動処理
-void SnakyDelete(const BOSS_DATA *b);	// 蛇型の敵を殺す
-
 void BitInit(void);	// ビット配列の初期化
 void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID);	// ビットをセットする
 void BitMove(void);	// ビットを動作させる
@@ -121,7 +115,6 @@ int  BitGetNum(void);	// 現在のビット数を取得する
 
 
 ///// [ 変数 ] /////
-extern SNAKYMOVE_DATA SnakeData[SNAKE_MAX];
 extern BIT_DATA BitData;
 
 

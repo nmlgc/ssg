@@ -23,6 +23,7 @@
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
@@ -512,7 +513,7 @@ void GameSTD_Init(void)
 	// Grp_Flip();
 
 	BossDataInit();
-	SnakyInit();	// 蛇管理を初期化(やや謎) //
+	Snaky.Init();	// 蛇管理を初期化(やや謎) //
 	BitInit();	// ビット管理も初期化 //
 
 	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
@@ -1385,7 +1386,7 @@ void GameMove(INPUT_BITS input)
 	ScrollMove();
 
 	const auto HP_Sum = BossMove();
-	SnakyMove();
+	Snaky.Move();
 	BitMove();
 	BossHPG_Move(HP_Sum);
 	enemy_move();

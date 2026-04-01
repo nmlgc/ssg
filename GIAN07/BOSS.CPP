@@ -134,7 +134,7 @@ void BossKillAll(void)
 		auto *b = &it;
 		if(b->IsUsed){
 			e = &(b->Edat);
-			SnakyDelete(b);
+			Snaky.Delete(b);
 			fragment_set(e->x,e->y,FRG_FATCIRCLE);
 			ExBombEfcSet(e->x, e->y, EXBOMB_STD);
 			Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
@@ -150,7 +150,7 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 {
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) { // ボスの死亡処理(後で変更すること!!)
-		SnakyDelete(&b);
+		Snaky.Delete(&b);
 		BitDelete();
 		enemy_clear();
 		fragment_set(e.x, e.y, FRG_FATCIRCLE);
@@ -367,7 +367,7 @@ void BossINT(ENEMY_DATA *e, uint8_t IntID)
 	// 割り込み番号による分岐 //
 	switch(IntID){
 		case(ECLINT_SNAKEON):
-			SnakySet(b,30,11);
+			Snaky.Set(b, 30, 11);
 		break;
 
 		case(ECLINT_LBWING01):	// 蝶の羽も描画する

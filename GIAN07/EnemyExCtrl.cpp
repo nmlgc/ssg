@@ -16,7 +16,7 @@
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 
 
-SNAKYMOVE_DATA<30> SnakeData[SNAKE_MAX];
+C_SNAKY Snaky;
 BIT_DATA		BitData;
 
 
@@ -26,7 +26,7 @@ static void BitSTDRad(void);	// 基本的な半径処理
 
 
 // 蛇型の敵配列の初期化 //
-void SnakyInit(void)
+void C_SNAKY::Init(void)
 {
 	// 全ての蛇さんをダメダメにするの //
 	for(auto& it : SnakeData) {
@@ -36,7 +36,7 @@ void SnakyInit(void)
 }
 
 // 蛇型の敵をセットする //
-void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
+void C_SNAKY::Set(BOSS_DATA *b, int len, uint32_t TailID)
 {
 	auto s = std::ranges::find_if(SnakeData, [](const auto& s) {
 		return !s.bIsUse;
@@ -69,7 +69,7 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 }
 
 // 蛇型の敵の移動処理 //
-void SnakyMove(void)
+void C_SNAKY::Move(void)
 {
 	ENEMY_DATA		*e;
 
@@ -107,7 +107,7 @@ void SnakyMove(void)
 }
 
 // 蛇型の敵を殺す
-void SnakyDelete(const BOSS_DATA *b)
+void C_SNAKY::Delete(const BOSS_DATA *b)
 {
 	auto s = std::ranges::find_if(SnakeData, [b](const auto& s) {
 		return (s.Parent == b);

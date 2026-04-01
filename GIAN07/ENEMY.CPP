@@ -682,7 +682,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_JDIF):			// 難易度によるジャンプ
 			ECL_DEBUG("ECL_JDIF",0);
-			switch(PlayRank.GameLevel){
+			switch(PlayRank.LevelRanked) {
 				case(GAME_EASY):	e->cmd = U32LEAt(&cmd[1 +  0]);	break;
 				default:
 				case(GAME_NORMAL):	e->cmd = U32LEAt(&cmd[1 +  4]);	break;

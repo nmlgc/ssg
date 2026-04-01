@@ -120,7 +120,7 @@ void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
-	return ((GameStage == GRAPH_ID_EXSTAGE) ? GAME_EXTRA : GameLevel);
+	return ((GameStage == GRAPH_ID_EXSTAGE) ? GAME_EXTRA : LevelSelected);
 }
 
 bool InputLocked;
@@ -541,7 +541,7 @@ bool WeaponSelectInit(bool ExStg)
 	GrpBackend_Clear();
 	Grp_Flip();
 
-	GameLevel = (ExStg ? EXTRA_LEVEL : ConfigDat.GameLevel.v);
+	LevelSelected = (ExStg ? EXTRA_LEVEL : ConfigDat.LevelSelected.v);
 
 	GameSTD_Init();
 	PlayRankReset();

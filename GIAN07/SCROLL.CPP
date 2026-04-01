@@ -348,7 +348,7 @@ static void enemy_set(void)
 				}
 				if(DemoplayLoadEnable) return;
 
-				if(GameLevel != GAME_EASY) {
+				if(LevelSelected != GAME_EASY) {
 					switch(Viv.weapon){
 						case(0):	ConfigDat.ExtraStgFlags.v |= 1;	break;
 						case(1):	ConfigDat.ExtraStgFlags.v |= 2;	break;

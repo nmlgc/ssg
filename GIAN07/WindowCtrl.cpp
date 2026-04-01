@@ -502,7 +502,7 @@ static void Main::Cfg::Dif::FnBombStock(int_fast8_t delta)
 
 static void Main::Cfg::Dif::FnDifficulty(int_fast8_t delta)
 {
-	RingStep(ConfigDat.GameLevel.v, delta, GAME_EASY, GAME_LUNATIC);
+	RingStep(ConfigDat.LevelSelected.v, delta, GAME_EASY, GAME_LUNATIC);
 }
 
 #ifdef PBG_DEBUG
@@ -950,7 +950,7 @@ static void Main::Cfg::Dif::SetItem(bool)
 	// +1 に注意
 	sprintf(Title[0], "PlayerStock [ %d ]", (ConfigDat.PlayerStock.v + 1));
 	sprintf(Title[1], "BombStock   [ %d ]", ConfigDat.BombStock.v);
-	sprintf(Title[2], "Difficulty[%s]", dif[ConfigDat.GameLevel.v]);
+	sprintf(Title[2], "Difficulty[%s]", dif[ConfigDat.LevelSelected.v]);
 
 #ifdef PBG_DEBUG
 	sprintf(Title[3], "DebugOut  %s", CHOICE_OFF_ON[DebugDat.MsgDisplay]);

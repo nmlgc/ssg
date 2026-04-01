@@ -12,7 +12,7 @@ import std.compat;
 
 ///// [構造体] /////
 struct PlayRankInfo {
-	uint8_t	GameLevel;	// 方向数も関係する難易度変化
+	uint8_t	LevelRanked;	// 方向数も関係する難易度変化
 	int		Rank;			// 弾の速度変化に関する値
 };
 

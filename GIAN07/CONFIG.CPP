@@ -137,7 +137,7 @@ const struct VERSION_ORIGINAL {
 	static inline CONFIG_OPTION_VALUE<uint8_t> PaddingByte;
 
 	static constexpr auto Options = std::tie(
-		ConfigDat.GameLevel,
+		ConfigDat.LevelSelected,
 		ConfigDat.PlayerStock,
 		ConfigDat.BombStock,
 		ConfigDat.DeviceID,
@@ -170,7 +170,7 @@ const struct VERSION_ORIGINAL {
 		ret += (ConfigDat.DeviceID.v << 2);
 		ret += (ConfigDat.FPSDivisor.v << 6);
 		ret += (ConfigDat.ExtraStgFlags.v << 5);
-		ret += (ConfigDat.GameLevel.v << 2);
+		ret += (ConfigDat.LevelSelected.v << 2);
 		ret += (ConfigDat.GraphFlags.v << 1);
 		ret += (ConfigDat.InputFlags.v << 3);
 		ret += (ConfigDat.PadBomb.v << 6);
@@ -187,7 +187,7 @@ const struct VERSION_00 {
 	static constexpr auto FN = u8"SSG_V00.CFG";
 
 	static constexpr auto Options = std::tie(
-		ConfigDat.GameLevel,
+		ConfigDat.LevelSelected,
 		ConfigDat.PlayerStock,
 		ConfigDat.BombStock,
 		ConfigDat.DeviceID,

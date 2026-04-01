@@ -46,22 +46,22 @@ void PlayRankAdd(int n)
 	}
 
 	// この分岐に関しては、基本的にコンフィグの値に基づく //
-	assert((GameLevel <= GAME_LUNATIC) && "Extra is not a valid difficulty");
-	const auto& rd_selected = RANK_DATA[GameLevel];
+	assert(
+		(LevelSelected <= GAME_LUNATIC) && "Extra is not a valid difficulty"
+	);
+	const auto& rd_selected = RANK_DATA[LevelSelected];
 	PlayRank.Rank = std::clamp(
 		PlayRank.Rank, rd_selected.clamp_min, rd_selected.clamp_max
 	);
 
 	// We can only jump up or down by a single difficulty.
-	if(
-		(GameLevel < GAME_LUNATIC) &&
-		(PlayRank.Rank >= RANK_DATA[GameLevel + 1].threshold)
-	) {
-		PlayRank.GameLevel = (GameLevel + 1);
+	if((LevelSelected < GAME_LUNATIC) &&
+	   (PlayRank.Rank >= RANK_DATA[LevelSelected + 1].threshold)) {
+		PlayRank.LevelRanked = (LevelSelected + 1);
 	} else if(PlayRank.Rank >= rd_selected.threshold) {
-		PlayRank.GameLevel = GameLevel;
-	} else if(GameLevel > GAME_EASY) {
-		PlayRank.GameLevel = (GameLevel - 1);
+		PlayRank.LevelRanked = LevelSelected;
+	} else if(LevelSelected > GAME_EASY) {
+		PlayRank.LevelRanked = (LevelSelected - 1);
 	}
 }
 
@@ -69,7 +69,9 @@ void PlayRankAdd(int n)
 // 現在の難易度に応じてプレイランクを初期化
 void PlayRankReset(void)
 {
-	assert((GameLevel <= GAME_LUNATIC) && "Extra is not a valid difficulty");
-	PlayRank.GameLevel = GameLevel;
-	PlayRank.Rank = RANK_DATA[GameLevel].initial;
+	assert(
+		(LevelSelected <= GAME_LUNATIC) && "Extra is not a valid difficulty"
+	);
+	PlayRank.LevelRanked = LevelSelected;
+	PlayRank.Rank = RANK_DATA[LevelSelected].initial;
 }

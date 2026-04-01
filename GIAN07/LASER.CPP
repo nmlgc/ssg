@@ -121,7 +121,7 @@ static int  REFL_hit(const LASER_DATA *lp);	// ﾘﾌﾚｸﾀｰとの当たり
 
 void laser_set(void)
 {
-	switch(PlayRank.GameLevel){
+	switch(PlayRank.LevelRanked) {
 		case(GAME_EASY):
 			easy_cmdL();
 		break;

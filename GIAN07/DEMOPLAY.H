@@ -21,7 +21,7 @@ struct CONFIG_DATA;
 // The original code simply reused CONFIG_DATA, which we can't do in this fork
 // due to the additional fields we add to the structure.
 struct DEMOPLAY_CONFIG_DATA {
-	uint8_t GameLevel;
+	uint8_t LevelSelected;
 	uint8_t PlayerStock;
 	uint8_t BombStock;
 	uint8_t Padding1[5] = { 0 };

@@ -401,7 +401,9 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id)
 	e->GR[4] = e->GR[5] = e->GR[6] = e->GR[7] = 0;
 
 	// 割り込みベクタの初期化 //
-	InitECLInterrupt(e);
+	for(auto& it : e->Vect) {
+		it.vect = 0;
+	}
 }
 
 
@@ -1807,14 +1809,6 @@ extern void CheckECLInterrupt(ENEMY_DATA *e)
 			default:
 			break;
 		}
-	}
-}
-
-// 割り込みベクタの初期化 //
-extern void InitECLInterrupt(ENEMY_DATA *e)
-{
-	for(auto& it : e->Vect) {
-		it.vect = 0;
 	}
 }
 

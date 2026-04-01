@@ -16,12 +16,7 @@
 
 
 C_SNAKY Snaky;
-BIT_DATA		BitData;
-
-
-static void BitSTDRoll(void);	// 基本的なビット回転処理
-static void BitSTDRad(void);	// 基本的な半径処理
-
+C_BIT Bit;
 
 
 // 蛇型の敵配列の初期化 //
@@ -130,7 +125,7 @@ void C_SNAKY::Delete(const BOSS_DATA *b)
 
 
 // ビット配列の初期化 //
-void BitInit(void)
+void C_BIT::Init(void)
 {
 	int			i;
 
@@ -164,7 +159,7 @@ void BitInit(void)
 
 
 // ビットをセットする //
-void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
+void C_BIT::Set(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 {
 	static const uint8_t BitHPTable[BIT_MAX] = { 1, 4, 2, 5, 3, 6 };
 
@@ -221,7 +216,7 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 
 
 // ビットを動作させる //
-void BitMove(void)
+void C_BIT::Move(void)
 {
 	int				i, j;
 	ENEMY_DATA		*e;
@@ -331,7 +326,7 @@ void BitMove(void)
 
 
 // 基本的な半径処理
-static void BitSTDRad(void)
+void C_BIT::BitSTDRad(void)
 {
 	if(BitData.Length > BitData.FinalLength){
 		BitData.Length -= 64*2;
@@ -349,7 +344,7 @@ static void BitSTDRad(void)
 
 
 // 基本的なビット回転処理 //
-static void BitSTDRoll(void)
+void C_BIT::BitSTDRoll(void)
 {
 	int			i, ox, oy;
 	int			n, l;
@@ -457,7 +452,7 @@ static void BitSTDRoll(void)
 }
 
 // ビットを消滅させる //
-void BitDelete(void)
+void C_BIT::Delete(void)
 {
 	int				i;
 	ENEMY_DATA		*e;
@@ -475,12 +470,12 @@ void BitDelete(void)
 	}
 
 	// 後は、この関数に任せる //
-	BitInit();
+	this->Init();
 }
 
 
 // 攻撃パターンをセットor変更 //
-void BitSelectAttack(uint32_t BitID)
+void C_BIT::SelectAttack(uint32_t BitID)
 {
 	int			i;
 
@@ -492,7 +487,7 @@ void BitSelectAttack(uint32_t BitID)
 }
 
 // レーザー系命令を発行 //
-void BitLaserCommand(uint8_t Command)
+void C_BIT::LaserCommand(uint8_t Command)
 {
 	int				i;
 	ENEMY_DATA		*e;
@@ -564,7 +559,7 @@ void BitLaserCommand(uint8_t Command)
 
 
 // ビット命令を送信 //
-void BitSendCommand(uint8_t Command, int Param)
+void C_BIT::SendCommand(uint8_t Command, int Param)
 {
 	switch(Command){
 		case(BITCMD_CHGSPD):		// 回転速度を変更する
@@ -598,7 +593,7 @@ void BitSendCommand(uint8_t Command, int Param)
 
 
 // 現在のビット数を取得する //
-int BitGetNum(void)
+int C_BIT::GetNum(void) const
 {
 	if(BitData.State == BITCMD_DISABLE) return 0;
 	return BitData.NumBits;

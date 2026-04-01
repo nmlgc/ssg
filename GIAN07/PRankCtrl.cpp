@@ -32,6 +32,7 @@ void PlayRankAdd(int n)
 	}
 
 	// この分岐に関しては、基本的にコンフィグの値に基づく //
+	assert((GameLevel <= GAME_LUNATIC) && "Extra is not a valid difficulty");
 	switch(GameLevel) {
 		case(GAME_EASY):
 			if     (PlayRank.Rank < 0)      PlayRank.Rank = 0;
@@ -66,9 +67,6 @@ void PlayRankAdd(int n)
 			if(PlayRank.Rank < 44*256) PlayRank.GameLevel = GAME_HARD;
 			else                       PlayRank.GameLevel = GAME_LUNATIC;
 		break;
-
-		//case(GAME_EXTRA):
-		//break;
 	}
 }
 
@@ -76,6 +74,7 @@ void PlayRankAdd(int n)
 // 現在の難易度に応じてプレイランクを初期化
 void PlayRankReset(void)
 {
+	assert((GameLevel <= GAME_LUNATIC) && "Extra is not a valid difficulty");
 	PlayRank.GameLevel = GameLevel;
 
 	switch(GameLevel) {
@@ -83,6 +82,5 @@ void PlayRankReset(void)
 		case(GAME_NORMAL):		PlayRank.Rank = 28*256;		break;
 		case(GAME_HARD):		PlayRank.Rank = 40*256;		break;
 		case(GAME_LUNATIC):		PlayRank.Rank = 52*256;		break;
-		//case(GAME_EXTRA):		break;
 	}
 }

@@ -42,7 +42,7 @@ void tama_set(void)
 
 	// NORMAL の場合は変更しない(ゲーム中に増減する難易度は考案中) //
 	// おそらく switch 中に記述する事になるかと... //
-	switch(PlayRank.GameLevel){
+	switch(PlayRank.LevelRanked) {
 		case(GAME_EASY):
 			easy_cmd();
 		break;

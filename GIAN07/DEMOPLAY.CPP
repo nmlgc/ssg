@@ -47,7 +47,7 @@ void DemoplayInit(void)
 
 	DemoInfo.Exp    = Viv.exp;
 	DemoInfo.Weapon = Viv.weapon;
-	DemoInfo.CfgDat.GameLevel = GameLevel;
+	DemoInfo.CfgDat.LevelSelected = LevelSelected;
 	DemoInfo.CfgDat.PlayerStock = Viv.left;
 	DemoInfo.CfgDat.BombStock = ConfigDat.BombStock.v;
 	DemoInfo.CfgDat.InputFlags = ConfigDat.InputFlags.v;
@@ -72,7 +72,7 @@ bool DemoplayLoadSetup()
 	ConfigDat.BombStock.v   = DemoInfo.CfgDat.BombStock;
 	ConfigDat.PlayerStock.v = DemoInfo.CfgDat.PlayerStock;
 	ConfigDat.InputFlags.v  = DemoInfo.CfgDat.InputFlags;
-	GameLevel = DemoInfo.CfgDat.GameLevel;
+	LevelSelected = DemoInfo.CfgDat.LevelSelected;
 
 	// 本体の性能記述 //
 	Viv.exp    = DemoInfo.Exp;
@@ -220,7 +220,7 @@ bool DemoplayLoadReplay(int stage)
 	// --------------------------------------------------
 
 	bool repair = false;
-	const auto file_level = DemoInfo.CfgDat.GameLevel;
+	const auto file_level = DemoInfo.CfgDat.LevelSelected;
 	const auto file_lives = DemoInfo.CfgDat.PlayerStock;
 
 	// ≥P0295 was writing the configured difficulty and starting lives for the
@@ -231,7 +231,7 @@ bool DemoplayLoadReplay(int stage)
 		(stage == GRAPH_ID_EXSTAGE) &&
 		((file_level != EXTRA_LEVEL) || (file_lives != EXTRA_LIVES))
 	) {
-		DemoInfo.CfgDat.GameLevel = EXTRA_LEVEL;
+		DemoInfo.CfgDat.LevelSelected = EXTRA_LEVEL;
 		DemoInfo.CfgDat.PlayerStock = EXTRA_LIVES;
 		repair = true;
 	}
@@ -248,7 +248,7 @@ bool DemoplayLoadReplay(int stage)
 		} };
 		if(!out.Write(fn.c_str(), File_TimestampsGet(fn.c_str()))) {
 			// Repair denied by file being read-only? OK, bro, you're the boss!
-			DemoInfo.CfgDat.GameLevel = file_level;
+			DemoInfo.CfgDat.LevelSelected = file_level;
 			DemoInfo.CfgDat.PlayerStock = file_lives;
 		}
 	}

@@ -15,7 +15,7 @@
 ///// [グローバル変数] /////
 uint32_t	GameCount;
 uint8_t	GameStage;
-uint8_t	GameLevel;
+uint8_t	LevelSelected;
 
 
 
@@ -51,12 +51,12 @@ extern void StdStatusOutput(void)
 	sprintf(buf, "%2dBppMode", ConfigDat.BitDepth.v.value());
 	GrpPut16(0, 32, buf);
 #endif
-	//sprintf(buf,"%s",DItem[ConfigDat.GameLevel.v]);
+	//sprintf(buf,"%s",DItem[ConfigDat.LevelSelected.v]);
 	//GrpPut16(0,50,buf);
 
-	sprintf(buf,"%s",DItem[PlayRank.GameLevel]);
+	sprintf(buf,"%s",DItem[PlayRank.LevelRanked]);
 	GrpPut16(0,50,buf);
-	sprintf(buf,"%s<Lvl>",DItem[GameLevel]);
+	sprintf(buf, "%s<Lvl>", DItem[LevelSelected]);
 	GrpPut16(0,68,buf);
 	sprintf(buf,"Pr %d",PlayRank.Rank);
 	GrpPut16(0,86,buf);

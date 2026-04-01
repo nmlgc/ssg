@@ -87,7 +87,7 @@ constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
 ///// [グローバル変数] /////
 extern uint32_t	GameCount;
 extern uint8_t	GameStage;
-extern uint8_t	GameLevel;
+extern uint8_t	LevelSelected;
 
 
 extern void StdStatusOutput(void);

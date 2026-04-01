@@ -96,7 +96,7 @@ struct CONFIG_DATA {
 	// ---------- //
 
 	// 難易度
-	OPTION<uint8_t> GameLevel = { GAME_NORMAL, U8Below<GAME_LUNATIC> };
+	OPTION<uint8_t> LevelSelected = { GAME_NORMAL, U8Below<GAME_LUNATIC> };
 
 	// 初期メイド数？
 	// Quirk: Off by 2?

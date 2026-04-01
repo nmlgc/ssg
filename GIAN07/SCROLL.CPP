@@ -42,7 +42,6 @@ typedef struct tagScrollSaveHeader{
 SCROLL_INFO		ScrollInfo;			// スクロールに関する情報
 PIXEL_LTRB	rcMapChip[1200];	// マップパーツＩＤに対する矩形
 
-static void _PutEnemy(const uint8_t *p);	// p:SCL_ENEMY以降の敵配置データ
 static void InitMapChipRect(void);		// スクロールに関する情報の初期化を行う
 
 static PBGMAP *ScNextLine(PBGMAP *p);		// 次の行にＧＯ！！
@@ -201,7 +200,15 @@ void StageMove(void)
 			break;
 
 			case(SCL_ENEMY):
-				if(BossNow==0) _PutEnemy(cmd+1);		// ボス出現中は出て来ちゃダメ
+				// ボス出現中は出て来ちゃダメ
+				if(BossNow == 0) {
+					if(auto *e = EnemyFindFree()) {
+						const int16_t x = I16LEAt(&cmd[1 + 0]);
+						const int16_t y = I16LEAt(&cmd[1 + 2]);
+						const uint8_t id = cmd[1 + 4];
+						InitEnemyDataSTD(e, x, y, id);
+					}
+				}
 				SCL_Now += 6;	// cmd(1)+x(2)+y(2)+id(1)
 				SCL_DEBUG(u8"--- SCL_ENEMY ---");
 			break;
@@ -402,20 +409,6 @@ void StageMove(void)
 	if((GameCount&0x3f)==0){
 		PlayRankAdd((GameStage == STAGE_EXTRA) ? 1 : (1 + (GameStage / 3)));
 	}
-}
-
-static void _PutEnemy(const uint8_t *p)
-{
-	ENEMY_DATA		*e;
-	short			x,y;
-
-	if(EnemyNow+1>=ENEMY_MAX) return;
-
-	e = &Enemy[EnemyInd[EnemyNow++]];
-
-	x = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
-	y = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
-	InitEnemyDataSTD(e, x, y, p[4]);
 }
 
 // 背景を描画する //

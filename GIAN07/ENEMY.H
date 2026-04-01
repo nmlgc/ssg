@@ -147,6 +147,7 @@ extern ANIME_DATA	Anime[ANIME_MAX];
 
 
 //// 敵制御関数 ////
+ENEMY_DATA* EnemyFindFree(void);
 extern void enemy_move(void);		// 敵を動かす
 extern void enemy_draw(void);		// 敵を描画する
 extern void enemyind_set(void);		// 敵の順序設定用配列の初期化をする

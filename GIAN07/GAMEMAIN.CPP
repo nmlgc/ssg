@@ -518,7 +518,7 @@ void GameSTD_Init(void)
 
 	BossDataInit();
 	Snaky.Init();	// 蛇管理を初期化(やや謎) //
-	BitInit();	// ビット管理も初期化 //
+	Bit.Init();	// ビット管理も初期化 //
 
 	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
 	BossHPG_Init();
@@ -1391,7 +1391,7 @@ void GameMove(INPUT_BITS input)
 
 	const auto HP_Sum = BossMove();
 	Snaky.Move();
-	BitMove();
+	Bit.Move();
 	BossHPG_Move(HP_Sum);
 	enemy_move();
 	ItemMove();
@@ -1421,7 +1421,7 @@ void GameDraw(void)
 	ScrollDraw();
 	CEffectDraw();
 
-	BitLineDraw(BitData);
+	BitLineDraw(Bit);
 	BossDraw(Boss, Viv);
 
 	WideBombDraw(Viv); // 多分、ここで良いと思うが...

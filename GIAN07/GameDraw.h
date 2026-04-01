@@ -9,7 +9,6 @@
 #include "BOSS.H"
 #include "EFFECT3D.H"
 #include "ENEMY.H"
-#include "EnemyExCtrl.h"
 #include "FRAGMENT.H"
 #include "HOMINGL.H"
 #include "ITEM.H"
@@ -17,8 +16,10 @@
 #include "LLASER.H"
 #include "MAIDTAMA.H"
 
+class C_BIT;
+
 // ビット間のラインを描画する
-void BitLineDraw(const BIT_DATA&);
+void BitLineDraw(const C_BIT&);
 
 // 敵を描画する
 void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds);

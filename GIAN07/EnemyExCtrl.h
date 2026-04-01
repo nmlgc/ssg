@@ -118,20 +118,48 @@ public:
 	void Delete(const BOSS_DATA *b);
 };
 
-void BitInit(void);	// ビット配列の初期化
-void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID);	// ビットをセットする
-void BitMove(void);	// ビットを動作させる
-void BitDelete(void);	// ビットを消滅させる
-void BitSelectAttack(uint32_t BitID);	// 攻撃パターンをセットor変更
-void BitLaserCommand(uint8_t Command);	// レーザー系命令を発行
-void BitSendCommand(uint8_t Command, int Param);	// ビット命令を送信
-int  BitGetNum(void);	// 現在のビット数を取得する
+class C_BIT {
+private:
+	BIT_DATA BitData;
+
+	// 基本的なビット回転処理
+	void BitSTDRoll(BIT_DATA& BitData);
+
+public:
+	// ビット配列の初期化
+	void Init(void);
+
+	// ビットをセットする
+	void Set(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID);
+
+	// ビットを動作させる
+	void Move(void);
+
+	// ビットを消滅させる
+	void Delete(void);
+
+	// 攻撃パターンをセットor変更
+	void SelectAttack(uint32_t BitID);
+
+	// レーザー系命令を発行
+	void LaserCommand(uint8_t Command);
+
+	// ビット命令を送信
+	void SendCommand(uint8_t Command, int Param);
+
+	// 現在のビット数を取得する
+	int GetNum(void) const;
+
+	const BIT_DATA& Data(void) const {
+		return BitData;
+	}
+};
 
 
 
 ///// [ 変数 ] /////
 extern C_SNAKY Snaky;
-extern BIT_DATA BitData;
+extern C_BIT Bit;
 
 
 

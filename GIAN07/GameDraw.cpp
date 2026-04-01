@@ -4,6 +4,7 @@
  */
 
 #include "GameDraw.h"
+#include "EnemyExCtrl.h"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
@@ -15,8 +16,9 @@
 /// ---------
 
 // ビット間のラインを描画する //
-void BitLineDraw(const BIT_DATA& BitData)
+void BitLineDraw(const C_BIT& Bit)
 {
+	const auto BitData = Bit.Data();
 	int				i, j, n;
 	int				x1, x2, y1, y2;
 	ENEMY_DATA		*RefTable[BIT_MAX*2];

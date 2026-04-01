@@ -117,7 +117,7 @@ uint32_t BossMove(void)
 // ボス用・敵弾クリアの前処理関数 //
 void BossClearCmd(void)
 {
-	BitDelete();
+	Bit.Delete();
 }
 
 
@@ -151,7 +151,7 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) { // ボスの死亡処理(後で変更すること!!)
 		Snaky.Delete(&b);
-		BitDelete();
+		Bit.Delete();
 		enemy_clear();
 		fragment_set(e.x, e.y, FRG_FATCIRCLE);
 		ExBombEfcSet(e.x, e.y, EXBOMB_STD);
@@ -188,11 +188,9 @@ bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 // ボスにダメージを与える //
 bool BossDamage(int x, int y, int damage)
 {
-	int				i;
 	ENEMY_DATA		*e;
 
-	i = (BitGetNum()>>1);
-	damage -= i;
+	damage -= (Bit.GetNum() >> 1);
 	if(damage <= 0) {
 		return false;
 	}
@@ -219,12 +217,10 @@ bool BossDamage(int x, int y, int damage)
 // ボスにダメージを与える(ｙ上方向無限Ver) //
 bool BossDamage2(int x, int y, int damage)
 {
-	int				i;
 	ENEMY_DATA		*e;
 	bool	ret_val = false;
 
-	i = (BitGetNum()>>1);
-	damage -= i;
+	damage -= (Bit.GetNum() >> 1);
 	if(damage <= 0) {
 		return false;
 	}
@@ -251,13 +247,11 @@ bool BossDamage2(int x, int y, int damage)
 // ボスにダメージを与える(ナナメレーザー) //
 void BossDamage3(int x, int y, uint8_t d)
 {
-	int				i;
 	ENEMY_DATA		*e;
 	//BOOL			ret_val = FALSE;
 	int				damage  = 2;
 
-	i = (BitGetNum()>>1);
-	damage -= i;
+	damage -= (Bit.GetNum() >> 1);
 	if(damage <= 0) return;
 
 	for(auto& it : Boss) {
@@ -282,11 +276,9 @@ void BossDamage3(int x, int y, uint8_t d)
 // ボスにダメージを与える(すべての敵)
 void BossDamage4(int damage)
 {
-	int				i;
 	ENEMY_DATA		*e;
 
-	i = (BitGetNum()>>1);
-	damage -= i;
+	damage -= (Bit.GetNum() >> 1);
 	if(damage <= 0) return;
 
 	for(auto& it : Boss) {
@@ -381,11 +373,11 @@ void BossINT(ENEMY_DATA *e, uint8_t IntID)
 		break;
 
 		case(ECLINT_BITON5):
-			BitSet(b, 5, 3);
+			Bit.Set(b, 5, 3);
 		break;
 
 		case(ECLINT_BITON6):
-			BitSet(b, 6, 3);
+			Bit.Set(b, 6, 3);
 		break;
 
 		case(ECLINT_SHILD1):
@@ -409,7 +401,7 @@ void BossBitAttack(ENEMY_DATA *e, uint32_t AtkID)
 		return;
 	}
 
-	BitSelectAttack(AtkID);
+	Bit.SelectAttack(AtkID);
 }
 
 // ビットにレーザーコマンドセット //
@@ -422,7 +414,7 @@ void BossBitLaser(ENEMY_DATA *e, uint8_t cmd)
 		return;
 	}
 
-	BitLaserCommand(cmd);
+	Bit.LaserCommand(cmd);
 }
 
 // ビット命令送信 //
@@ -435,12 +427,12 @@ void BossBitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param)
 		return;
 	}
 
-	BitSendCommand(Cmd, Param);
+	Bit.SendCommand(Cmd, Param);
 }
 
 
 // 残りビット数を返す //
 int BossGetBitLeft(void)
 {
-	return BitGetNum();
+	return Bit.GetNum();
 }

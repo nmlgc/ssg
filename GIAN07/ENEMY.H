@@ -119,6 +119,7 @@ extern ANIME_DATA	Anime[ANIME_MAX];
 
 
 //// 敵制御関数 ////
+ENEMY_DATA* EnemyFindFree(void);
 
 // Returns `true` if [ecl] is a valid pointer.
 bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage);

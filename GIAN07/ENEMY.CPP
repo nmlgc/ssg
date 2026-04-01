@@ -122,6 +122,14 @@ void ENEMY_DATA::Draw() const
 	}
 }
 
+ENEMY_DATA* EnemyFindFree(void)
+{
+	if((EnemyNow + 1) >= ENEMY_MAX) {
+		return nullptr;
+	}
+	return &Enemy[EnemyInd[EnemyNow++]];
+}
+
 template <uint8_t Count> static void SetSheet(
 	ANIME_DATA& a, PIXEL_POINT topleft, PIXEL_SIZE size, uint8_t mode
 )
@@ -2018,8 +2026,10 @@ void parse_ECL(ENEMY_DATA *e)
 
 			bRetFlag = false;
 
-			if(EnemyNow+1>=ENEMY_MAX) break;
-			auto* new_enemy = &Enemy[EnemyInd[EnemyNow++]];
+			auto* new_enemy = EnemyFindFree();
+			if(!new_enemy) {
+				break;
+			}
 
 			x = ((e->x >> 6) + I16LEAt(&cmd[1])); // PixelToWorld(I16LEAt(&p[0]));
 			y = ((e->y >> 6) + I16LEAt(&cmd[3])); // PixelToWorld(I16LEAt(&p[2]));

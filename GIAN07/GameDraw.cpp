@@ -117,14 +117,14 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 /// ------
 
 // ボスを描画する
-void BossDraw(BOSS_DATA_CSPAN Boss, const MAID& Viv)
+void BossDraw(BOSS_DATA_CSPAN BossData, const MAID& Viv)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 	int x, y;
 	int			w,h,t;
 	PIXEL_LTRB	wing;
 
-	for(auto& it : Boss) {
+	for(auto& it : BossData) {
 		auto *b = &it;
 		if(b->IsUsed){
 			const auto *e = &(b->Edat);

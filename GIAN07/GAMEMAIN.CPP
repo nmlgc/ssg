@@ -23,6 +23,7 @@
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Boss.hpp"
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
@@ -512,7 +513,7 @@ void GameSTD_Init(void)
 	// GrpBackend_Clear();
 	// Grp_Flip();
 
-	BossDataInit();
+	Boss.Init();
 	Snaky.Init();	// 蛇管理を初期化(やや謎) //
 	Bit.Init();	// ビット管理も初期化 //
 
@@ -1385,7 +1386,7 @@ void GameMove(INPUT_BITS input)
 	StageMove(input);
 	ScrollMove();
 
-	const auto HP_Sum = BossMove();
+	const auto HP_Sum = Boss.Move();
 	Snaky.Move();
 	Bit.Move();
 	BossHPG_Move(HP_Sum);
@@ -1418,7 +1419,7 @@ void GameDraw(void)
 	CEffectDraw();
 
 	BitLineDraw(Bit.Data());
-	BossDraw(Boss, Viv);
+	BossDraw(Boss.Data(), Viv);
 
 	WideBombDraw(Viv); // 多分、ここで良いと思うが...
 

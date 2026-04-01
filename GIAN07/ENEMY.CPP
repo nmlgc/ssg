@@ -8,7 +8,6 @@
 #endif
 
 #include "ENEMY.H"
-#include "BOSS.H"
 #include "BossHPG.h"
 #include "ECL_LEN.H"
 #include "EFFECT.H"
@@ -23,6 +22,7 @@
 #include "GIAN07/entity.h"
 #include "ssg/Round.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Boss.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -77,7 +77,7 @@ template <size_t N> void Indsort(
 }
 
 // 割り込みジャンプを調べる
-void CheckECLInterrupt(ENEMY_DATA *e);
+void CheckECLInterrupt(const C_BOSS& Boss, ENEMY_DATA *e);
 
 // ECLCST_?? からその値に変換する
 static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
@@ -608,7 +608,7 @@ void enemy_move(void)
 {
 	int				i;//,chkx,chky;
 
-	if(BossNow == 0) {
+	if(Boss.NumAlive() == 0) {
 		ResetHoming();
 	}
 
@@ -649,7 +649,7 @@ void enemy_move(void)
 		}
 
 		// ホーミングの準備 //
-		if((BossNow == 0) && (e->flag & EF_DAMAGE)) {
+		if((Boss.NumAlive() == 0) && (e->flag & EF_DAMAGE)) {
 			UpdateHoming({ &e->x, &e->y });
 		}
 
@@ -723,7 +723,7 @@ bool enemy_damage(int x,int y,int damage)
 {
 	int				i;
 
-	if(BossDamage(x, y, damage)) {
+	if(Boss.Damage(x, y, damage)) {
 		return true;
 	}
 
@@ -743,7 +743,7 @@ bool enemy_damage(int x,int y,int damage)
 bool enemy_damage2(int x,int y,int damage)
 {
 	int				i;
-	auto ret_val = BossDamage2(x, y, damage);
+	auto ret_val = Boss.Damage2(x, y, damage);
 
 	for(i=0;i<EnemyNow;i++){
 		auto* e = &Enemy[EnemyInd[i]];
@@ -765,7 +765,7 @@ extern void enemy_damage3(int x, int y, uint8_t d)
 	// bool	ret_val = false;
 	constexpr int damage = 8;
 
-	BossDamage3(x,y,d);
+	Boss.Damage3(x, y, d);
 
 	for(i=0;i<EnemyNow;i++){
 		auto* e = &Enemy[EnemyInd[i]];
@@ -784,7 +784,7 @@ extern void enemy_damage4(int damage)
 {
 	int				i;
 
-	BossDamage4(damage);
+	Boss.Damage4(damage);
 
 	for(i=0;i<EnemyNow;i++){
 		auto* e = &Enemy[EnemyInd[i]];
@@ -953,7 +953,7 @@ void parse_ECL(ENEMY_DATA *e)
 	uint16_t	BaseAngle;
 	uint16_t	DeltaAngle;
 
-	CheckECLInterrupt(e);
+	CheckECLInterrupt(Boss, e);
 
 	// こんなところにＧＯＴＯ用ラベルが！！ //
 	ECL_HEAD:
@@ -1075,7 +1075,9 @@ void parse_ECL(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_SETUP",0);
 			e->hp    = U32LEAt(&cmd[1 + 0]);
 			e->score = U32LEAt(&cmd[1 + 4]);
-			if(e->hp==0) BossKillAll();
+			if(e->hp == 0) {
+				Boss.KillAll();
+			}
 			bRetFlag = false;
 		break;
 
@@ -1738,7 +1740,7 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_TCLR):			// 敵弾を全消去(レーザー含む)
-			BossClearCmd();	// この処理を何よりも優先させる(ビット消去等を含む)
+			Boss.ClearCmd(); // この処理を何よりも優先させる(ビット消去等を含む)
 			tama_clear();
 			laser_clear();
 			HLaserClear();
@@ -1933,22 +1935,22 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_INT):			// ボス用割り込み発生
-			BossINT(e,cmd[1]);
+			Boss.INT(e, cmd[1]);
 			bRetFlag = false;
 		break;					// cmd を動かさない
 
 		case(ECL_BITATTACK):	// (ボス特権命令)ビットに攻撃パターンをセットする
-			BossBitAttack(e, U32LEAt(&cmd[1]));
+			Boss.BitAttack(e, U32LEAt(&cmd[1]));
 			bRetFlag = false;
 		break;
 
 		case(ECL_BITLASER):		// (ボス特権命令)ビットにレーザー系コマンドをセットする
-			BossBitLaser(e, cmd[1]);
+			Boss.BitLaser(e, cmd[1]);
 			bRetFlag = false;
 		break;
 
 		case(ECL_BITCMD):
-			BossBitCommand(e, cmd[1], I32LEAt(&cmd[2]));
+			Boss.BitCommand(e, cmd[1], I32LEAt(&cmd[2]));
 			bRetFlag = false;
 		break;
 
@@ -1984,8 +1986,8 @@ void parse_ECL(ENEMY_DATA *e)
 		break;
 
 		case(ECL_BOSSSET): { // ボスを発生させる
-			BossSet(((e->x) >> 6), ((e->y) >> 6), cmd[1]);
-			BossHPG_Update(GetBossHPSum());
+			Boss.Set(((e->x) >> 6), ((e->y) >> 6), cmd[1]);
+			BossHPG_Update(Boss.GetHPSum());
 			bRetFlag = false;
 		} break;
 
@@ -2208,7 +2210,7 @@ void parse_ECL(ENEMY_DATA *e)
 }
 
 // 割り込みジャンプを調べる //
-extern void CheckECLInterrupt(ENEMY_DATA *e)
+extern void CheckECLInterrupt(const C_BOSS& Boss, ENEMY_DATA *e)
 {
 	int		i;
 
@@ -2216,7 +2218,7 @@ extern void CheckECLInterrupt(ENEMY_DATA *e)
 		if(e->Vect[i].vect==0) continue;	// 割り込みがかかっていない
 		switch(i){
 			case(ECLVECT_BITLEFT):	// ビット残り割り込み
-				if(BossGetBitLeft() <= e->Vect[ECLVECT_BITLEFT].value){
+				if(Boss.GetBitLeft() <= e->Vect[ECLVECT_BITLEFT].value) {
 					e->cmd = e->Vect[ECLVECT_BITLEFT].vect;
 					e->cmd_c = 0;		// コマンド繰り返しカウンタ
 					e->rep_c = 0;		// LOOP(旧REP)命令カウンタ
@@ -2226,7 +2228,7 @@ extern void CheckECLInterrupt(ENEMY_DATA *e)
 			break;
 
 			case(ECLVECT_BOSSLEFT):	// ボス残り割り込み
-				if(BossNow <= e->Vect[ECLVECT_BOSSLEFT].value){
+				if(Boss.NumAlive() <= e->Vect[ECLVECT_BOSSLEFT].value) {
 					e->cmd = e->Vect[ECLVECT_BOSSLEFT].vect;
 					e->cmd_c = 0;		// コマンド繰り返しカウンタ
 					e->rep_c = 0;		// LOOP(旧REP)命令カウンタ

@@ -21,7 +21,7 @@ typedef struct {
 extern SCL_INFO SclInfo;
 
 extern BUFFER_OWNED SCL_Head;
-extern uint8_t *SCL_Now;
+extern const uint8_t *SCL_Now;
 extern uint32_t GameCount;
 
 // Returns `true` if [data] is a valid pointer.

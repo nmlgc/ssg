@@ -10,7 +10,6 @@
 #include "CONFIG.H"
 #include "ENTRY.H"
 #include "GAMEMAIN.H"
-#include "GIAN.H"
 #include "LOADER.H"
 #include "MUSIC.H"
 #include "WindowSys.h"

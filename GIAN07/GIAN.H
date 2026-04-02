@@ -77,6 +77,9 @@ enum {
 	// (Also different from [GX_MID], which is 319.5, not 320.)
 	SND_X_MID = PixelToWorld(320),
 
+	// ステージ数
+	STAGE_MAX = 6,
+
 	// Matches the `GRAPH_ID_EXSTAGE` constant in pbg's original code.
 	STAGE_EXTRA = (128 + 3),
 };

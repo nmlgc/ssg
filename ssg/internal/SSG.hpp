@@ -7,6 +7,7 @@
 
 #include "hatoyama/logic/ffi.h"
 
+struct PACKFILE_READ;
 struct ROUND_PARAMS;
 
 struct C_SSG {
@@ -16,4 +17,12 @@ struct C_SSG {
 	// Sets the number of credits based on [stage_first].
 	// Does *not* call `StageInit()`.
 	void RoundInit(const ROUND_PARAMS& round, uint8_t stage_first);
+
+	// Calls `StageFree()`, then initializes the enemy and SCL subsystems with
+	// the data for the given [stage], decompressed from a previously
+	// initialized packfile instance of `ENEMY.DAT`. Returns `true` on success.
+	bool StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage);
+
+	// Deallocates enemy and SCL data.
+	void StageFree(void);
 };

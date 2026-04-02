@@ -18,7 +18,6 @@
 #include "FONTUTY.H"
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
-#include "GIAN.H"
 #include "HOMINGL.H"
 #include "HUD.H"
 #include "ITEM.H"

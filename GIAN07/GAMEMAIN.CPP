@@ -1226,7 +1226,7 @@ void WeaponSelectProc(bool&)
 		Viv.exp = min(count,255);
 		if(Viv.exp < 31) Viv.lay_time = Viv.lay_grp =  0;
 
-		HomingFlag=HOMING_DUMMY;
+		ResetHoming();
 		Key_Data = KEY_TAMA;
 
 		Viv.muteki = 0;

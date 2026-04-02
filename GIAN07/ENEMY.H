@@ -39,9 +39,6 @@
 
 #define ENEMY_BOMB_SPD	4
 
-//// ホーミング定数 ////
-#define HOMING_DUMMY	(500*64)	// 敵をホーミングしない場合のダミー値
-
 
 ////アニメーション定数////
 #define ANIME_MAX		50			// アニメーションの種類
@@ -148,10 +145,6 @@ extern std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 extern uint16_t	EnemyNow;
 extern ANIME_DATA	Anime[ANIME_MAX];
 
-extern int HomingX;			// ホーミング対象のＸ座標
-extern int HomingY;			// ホーミング対象のＹ座標
-extern int HomingFlag;		// 真ならホーミング実行
-
 
 //// 敵制御関数 ////
 extern void enemy_move(void);		// 敵を動かす
@@ -178,7 +171,6 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t EclID);
 // 強制的に ECL ブロック間を移動する //
 void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID);
 
-extern void UpdateHoming(const ENEMY_DATA *e);	// ホーミング座標を更新する
 extern void parse_ECL(ENEMY_DATA *e);			// 敵をＥＣＬに従って動かす
 extern void CheckECLInterrupt(ENEMY_DATA *e);	// 割り込みジャンプを調べる
 extern void InitECLInterrupt(ENEMY_DATA *e);	// 割り込みベクタの初期化

@@ -17,6 +17,10 @@
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
 
+//// ホーミング定数 ////
+// 敵をホーミングしない場合のダミー値
+static constexpr WORLD_COORD HOMING_DUMMY = PixelToWorld(500);
+
 
 ////グローバル変数////
 TAMA_CMD		TamaCmd;				// 標準・弾コマンド構造体
@@ -28,6 +32,10 @@ uint16_t	Tama2Now;	// 特殊弾の弾数
 uint16_t	Tama1Max;	// 小型弾の最大数
 uint16_t	Tama2Max;	// 特殊弾の最大数
 int				TamaSpeed;
+
+WORLD_COORD HomingX; // ホーミング対象のＸ座標
+WORLD_COORD HomingY; // ホーミング対象のＹ座標
+int HomingFlag;      // 真ならホーミング実行
 
 
 ////ローカルな関数////
@@ -1194,5 +1202,23 @@ void tamaEmove(TAMA_DATA *t)
 				t->flag = TF_DELETE;
 			}
 		return;
+	}
+}
+
+void ResetHoming(void)
+{
+	HomingFlag = HOMING_DUMMY;
+}
+
+void UpdateHoming(const WORLD_POINT& p)
+{
+	const int temp = (Viv.y - p.y);
+	if(temp < 0) {
+		return;
+	}
+	if(temp < HomingFlag) {
+		HomingFlag = temp;
+		HomingX = p.x;
+		HomingY = p.y;
 	}
 }

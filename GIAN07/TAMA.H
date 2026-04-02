@@ -8,6 +8,7 @@
 //#pragma message(PBGWIN_TAMA_H)
 
 #include "GIAN07/entity.h"
+#include "hatoyama/logic/coords.h"
 
 
 ///// [更新履歴] /////
@@ -171,6 +172,10 @@ extern uint16_t	Tama2Now;	// 特殊弾の弾数
 extern uint16_t	Tama1Max;	// 小型弾の最大数
 extern uint16_t	Tama2Max;	// 特殊弾の最大数
 
+extern WORLD_COORD HomingX; // ホーミング対象のＸ座標
+extern WORLD_COORD HomingY; // ホーミング対象のＹ座標
+extern int HomingFlag;      // 真ならホーミング実行
+
 
 
 ////弾関数////
@@ -202,6 +207,9 @@ uint8_t tama_flag(void);	// 弾のフラグを初期化する
 void tamaTmove(TAMA_DATA *t);	// 弾の " Type " による移動を行う
 void tamaOmove(TAMA_DATA *t);	// 弾の "Option" による移動を行う
 void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
+
+void ResetHoming(void);
+void UpdateHoming(const WORLD_POINT& p); // ホーミング座標を更新する
 
 
 //// 弾コマンド用マクロ ////

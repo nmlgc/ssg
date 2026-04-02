@@ -61,10 +61,6 @@ std::array<uint16_t, ENEMY_MAX>	EnemyInd;
 uint16_t	EnemyNow = 0;
 ANIME_DATA	Anime[ANIME_MAX];
 
-int			HomingX;		// ホーミング対象のＸ座標
-int			HomingY;		// ホーミング対象のＹ座標
-int			HomingFlag;		// 真ならホーミング実行
-
 uint8_t	EnemyEXDEG;	// 特殊角度の現在値
 uint8_t	EnemyEXDEG_D;	// 特殊角度の増分
 
@@ -86,19 +82,6 @@ template <size_t N> void Indsort(
 static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
 
 
-
-void UpdateHoming(const ENEMY_DATA *e)
-{
-	const int temp = (Viv.y - e->y);
-
-	if(temp<0) return;
-
-	if(temp<HomingFlag){
-		HomingFlag = temp;
-		HomingX    = e->x;
-		HomingY    = e->y;
-	}
-}
 
 bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 {
@@ -141,7 +124,9 @@ void enemy_move(void)
 {
 	int				i;//,chkx,chky;
 
-	if(BossNow==0) HomingFlag = HOMING_DUMMY;
+	if(BossNow == 0) {
+		ResetHoming();
+	}
 
 	for(i=0;i<EnemyNow;i++){
 		auto* e = &Enemy[EnemyInd[i]];
@@ -181,7 +166,9 @@ void enemy_move(void)
 		}
 
 		// ホーミングの準備 //
-		if((BossNow==0) && (e->flag&EF_DAMAGE)) UpdateHoming(e);
+		if((BossNow == 0) && (e->flag & EF_DAMAGE)) {
+			UpdateHoming({ &e->x, &e->y });
+		}
 
 		// アニメーションの動作 //
 		EnemyAnimeMove(e);

@@ -180,7 +180,7 @@ void BossMove(void)
 	uint32_t HP_Sum = 0;
 	ENEMY_DATA		*e;
 
-	HomingFlag = HOMING_DUMMY;
+	ResetHoming();
 
 	for(auto& it : Boss) {
 		auto *b = &it;
@@ -196,7 +196,9 @@ void BossMove(void)
 			}
 
 			// ホーミングの準備 //
-			if(e->flag&EF_DAMAGE) UpdateHoming(e);
+			if(e->flag & EF_DAMAGE) {
+				UpdateHoming({ &e->x, &e->y });
+			}
 
 			// 体力の総和を表示する //
 			HP_Sum += b->Edat.hp;

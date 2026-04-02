@@ -22,10 +22,12 @@ typedef struct MAID MAID;
 void BitLineDraw(const BIT_DATA&);
 
 // 敵を描画する
-void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds);
+void enemy_draw(
+	ENEMY_DATA_CSPAN, std::span<const uint16_t> inds, ANIME_DATA_CSPAN
+);
 
 // ボスを描画する
-void BossDraw(BOSS_DATA_CSPAN, const MAID&);
+void BossDraw(BOSS_DATA_CSPAN, ENEMY_DATA_CSPAN, ANIME_DATA_CSPAN, const MAID&);
 
 // 爆発系エフェクトを描画する
 void ExBombEfcDraw(BOMBEFC_DATA_CSPAN);

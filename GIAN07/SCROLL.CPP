@@ -21,6 +21,7 @@
 #include "WindowSys.h"
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/Effect3D.hpp"
+#include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
@@ -196,11 +197,11 @@ void StageMove(INPUT_BITS input)
 			case(SCL_ENEMY):
 				// ボス出現中は出て来ちゃダメ
 				if(Boss.NumAlive() == 0) {
-					if(auto *e = EnemyFindFree()) {
+					if(auto *e = Enemy.FindFree()) {
 						const int16_t x = I16LEAt(&cmd[1 + 0]);
 						const int16_t y = I16LEAt(&cmd[1 + 2]);
 						const uint8_t id = cmd[1 + 4];
-						InitEnemyDataSTD(e, x, y, id);
+						Enemy.InitEnemyDataSTD(e, x, y, id);
 					}
 				}
 				SCL_Now += 6;	// cmd(1)+x(2)+y(2)+id(1)
@@ -280,7 +281,7 @@ void StageMove(INPUT_BITS input)
 			break;
 
 			case(SCL_DELENEMY):
-				enemyind_set();
+				Enemy.IndSet();
 				SCL_Now++;
 			break;
 

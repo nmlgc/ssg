@@ -4,11 +4,11 @@
  */
 
 #include "SSG.hpp"
-#include "ENEMY.H"
 #include "GIAN.H"
 #include "LogicInstance.h"
 #include "MAID.H"
 #include "PRankCtrl.h"
+#include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
@@ -35,7 +35,7 @@ bool StageLoad(
 	if(!((stage == STAGE_EXTRA) || ((stage >= 1) && (stage <= STAGE_MAX)))) {
 		return false;
 	}
-	if(!(enemy_set(ecl_buf_func(), stage) && StageSet(scl_buf_func()))) {
+	if(!(Enemy.Set(ecl_buf_func(), stage) && StageSet(scl_buf_func()))) {
 		return false;
 	}
 	return true;
@@ -58,6 +58,6 @@ bool C_SSG::StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage)
 void C_SSG::StageFree(void)
 {
 	// メモリを解放だ！ //
-	enemy_set(nullptr, 0);
+	Enemy.Set(nullptr, 0);
 	StageSet(nullptr);
 }

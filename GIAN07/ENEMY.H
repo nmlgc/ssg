@@ -23,7 +23,6 @@
 #include "ECL.H"
 #include "LASER.H"
 #include "TAMA.H"
-#include "hatoyama/logic/buffer.h"
 
 
 //// 敵定数 ////
@@ -113,49 +112,6 @@ struct ANIME_DATA {
 using ENEMY_DATA_CSPAN = std::span<const ENEMY_DATA, ENEMY_MAX>;
 using ANIME_DATA_CSPAN = std::span<const ANIME_DATA, ANIME_MAX>;
 #endif
-
-
-//// 敵変数 ////
-extern std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
-extern BUFFER_OWNED	ECL_Head;
-extern std::array<uint16_t, ENEMY_MAX>	EnemyInd;
-extern uint16_t	EnemyNow;
-extern ANIME_DATA	Anime[ANIME_MAX];
-
-extern uint8_t	EnemyEXDEG;	// 特殊角度の現在値
-extern uint8_t	EnemyEXDEG_D;	// 特殊角度の増分
-
-
-//// 敵制御関数 ////
-ENEMY_DATA* EnemyFindFree(void);
-
-// Returns `true` if [ecl] is a valid pointer.
-bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage);
-
-extern void enemy_move(void);		// 敵を動かす
-extern void enemyind_set(void);		// 敵の順序設定用配列の初期化をする
-extern void enemy_clear(void);		// 雑魚を消滅させる
-
-bool enemy_damage(int x, int y, int damage);	// 敵にダメージを与える
-bool enemy_damage2(int x, int y, int damage);	// ｙ上方向無限Ver.敵にダメージを与える
-void enemy_damage3(int x, int y, uint8_t d);	// ナナメレーザーの当たり判定
-extern void enemy_damage4(int damage);				// すべての敵にダメージを与える
-
-extern void EnemyAnimeMove(ENEMY_DATA *e);
-void EnemyDelete(ENEMY_DATA& e);
-void EnemyExplode(ENEMY_DATA& e);
-
-
-// 敵データを初期化する(x,y は x64 で指定のこと) //
-void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id);
-
-// 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
-void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id);
-
-// 強制的に ECL ブロック間を移動する //
-void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID);
-
-extern void parse_ECL(ENEMY_DATA *e);			// 敵をＥＣＬに従って動かす
 
 
 // Vivit ナナメレーザーの当たり判定 //

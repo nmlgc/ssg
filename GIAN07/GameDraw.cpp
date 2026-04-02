@@ -54,7 +54,7 @@ void BitLineDraw(const BIT_DATA& BitData)
 /// Enemies
 /// -------
 
-static void _EnemyDraw(const ENEMY_DATA& e)
+static void _EnemyDraw(const ENEMY_DATA& e, ANIME_DATA_CSPAN Anime)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 
@@ -93,7 +93,11 @@ static void _EnemyDrawBomb(int x, int y, uint32_t count)
 	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 }
 
-void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
+void enemy_draw(
+	ENEMY_DATA_CSPAN storage,
+	std::span<const uint16_t> inds,
+	ANIME_DATA_CSPAN Anime
+)
 {
 	for(const auto ind : inds) {
 		const auto *e = &storage[ind];
@@ -107,7 +111,7 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 		}
 
 		if(e->flag&EF_DRAW){
-			_EnemyDraw(*e);
+			_EnemyDraw(*e, Anime);
 		}
 	}
 }
@@ -117,7 +121,12 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 /// ------
 
 // ボスを描画する
-void BossDraw(BOSS_DATA_CSPAN BossData, const MAID& Viv)
+void BossDraw(
+	BOSS_DATA_CSPAN BossData,
+	ENEMY_DATA_CSPAN EnemyData,
+	ANIME_DATA_CSPAN Anime,
+	const MAID& Viv
+)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 	int x, y;
@@ -187,7 +196,7 @@ void BossDraw(BOSS_DATA_CSPAN BossData, const MAID& Viv)
 			}
 
 			if(e->flag&EF_DRAW){
-				_EnemyDraw(*e);
+				_EnemyDraw(*e, Anime);
 			}
 		}
 	}

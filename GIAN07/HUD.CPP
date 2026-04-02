@@ -16,10 +16,10 @@
 #include "MAIDTAMA.H"
 #ifdef PBG_DEBUG
 #include "CONFIG.H"
-#include "ENEMY.H"
 #include "HOMINGL.H"
 #include "PRankCtrl.h"
 #include "SCROLL.H"
+#include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/Stage.hpp"
 #endif
 #include "hatoyama/engine/text_backend.h"
@@ -272,7 +272,7 @@ void StdStatusOutput(void)
 	GrpPut16(0, 86, buf);
 
 
-	sprintf(buf, "Enemy %3d", EnemyNow);
+	sprintf(buf, "Enemy %3d", Enemy.NumAlive());
 	GrpPut16(0, (96 + 40), buf);
 
 	sprintf(buf, "Tama1 %3d", Tama1Now);

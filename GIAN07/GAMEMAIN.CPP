@@ -25,6 +25,7 @@
 #include "ssg/Sound.h"
 #include "ssg/internal/BombEfc.hpp"
 #include "ssg/internal/Boss.hpp"
+#include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
@@ -523,7 +524,7 @@ void GameSTD_Init(void)
 
 	//MaidSet();
 	MaidTamaIndSet();
-	enemyind_set();
+	Enemy.IndSet();
 	tamaind_set(400+200);		// 小型弾に４００
 	laserind_set();
 	LLaserSetup();
@@ -1391,7 +1392,7 @@ void GameMove(INPUT_BITS input)
 	Snaky.Move();
 	Bit.Move();
 	BossHPG_Move(HP_Sum);
-	enemy_move();
+	Enemy.Move();
 	ItemMove();
 	tama_move();
 	laser_move();
@@ -1420,13 +1421,13 @@ void GameDraw(void)
 	CEffectDraw();
 
 	BitLineDraw(Bit.Data());
-	BossDraw(Boss.Data(), Viv);
+	BossDraw(Boss.Data(), Enemy.Data(), Enemy.AnimeData(), Viv);
 
 	WideBombDraw(Viv); // 多分、ここで良いと思うが...
 
 	ExBombEfcDraw(BombEfc.Data());
 
-	enemy_draw(Enemy, std::span(EnemyInd).first(EnemyNow));
+	enemy_draw(Enemy.Data(), Enemy.Inds(), Enemy.AnimeData());
 
 	MaidTamaDraw(MaidTama, std::span(MaidTamaInd).first(MaidTamaNow), Viv);
 

@@ -79,6 +79,9 @@ template <size_t N> void Indsort(
 	});
 }
 
+// 割り込みジャンプを調べる
+void CheckECLInterrupt(ENEMY_DATA *e);
+
 // ECLCST_?? からその値に変換する
 static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
 
@@ -142,7 +145,6 @@ void enemy_move(void)
 		e->IsDamaged = 0;
 		if(!(e->flag & EF_BOMB)){
 			// 通常の敵の処理 //
-			CheckECLInterrupt(e);
 			parse_ECL(e);
 
 			// 弾発射モードによる分岐 //
@@ -514,6 +516,7 @@ void parse_ECL(ENEMY_DATA *e)
 	uint16_t	BaseAngle;
 	uint16_t	DeltaAngle;
 
+	CheckECLInterrupt(e);
 
 	// こんなところにＧＯＴＯ用ラベルが！！ //
 	ECL_HEAD:

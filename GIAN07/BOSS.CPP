@@ -416,7 +416,6 @@ static void BossSTDMove(BOSS_DATA *b)
 	ENEMY_DATA	*e = &(b->Edat);
 
 	// 通常の敵の処理 //
-	CheckECLInterrupt(e);
 	parse_ECL(e);
 
 	// 弾発射モードによる分岐 //

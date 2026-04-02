@@ -173,7 +173,6 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id);
 void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID);
 
 extern void parse_ECL(ENEMY_DATA *e);			// 敵をＥＣＬに従って動かす
-extern void CheckECLInterrupt(ENEMY_DATA *e);	// 割り込みジャンプを調べる
 
 
 // Vivit ナナメレーザーの当たり判定 //

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "ENEMY.H"
 #include "FRAGMENT.H"
 #include "HOMINGL.H"
 #include "ITEM.H"
@@ -17,15 +16,16 @@ class C_BIT;
 class C_BOSS;
 class C_BOMBEFC;
 class C_EFFECT3D;
+class C_ENEMY;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
 
 // 敵を描画する
-void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds);
+void enemy_draw(const C_ENEMY&);
 
 // ボスを描画する
-void BossDraw(const C_BOSS&, const MAID&);
+void BossDraw(const C_BOSS&, const C_ENEMY&, const MAID&);
 
 // 爆発系エフェクトを描画する
 void ExBombEfcDraw(const C_BOMBEFC&);

@@ -55,14 +55,7 @@ static void ECL_DEBUG(const char *s, auto param)
 
 
 // 変数の実体 //
-BUFFER_OWNED	ECL_Head = nullptr;
-std::array<ENEMY_DATA, ENEMY_MAX>	Enemy;
-std::array<uint16_t, ENEMY_MAX>	EnemyInd;
-uint16_t	EnemyNow = 0;
-ANIME_DATA	Anime[ANIME_MAX];
-
-uint8_t	EnemyEXDEG;	// 特殊角度の現在値
-uint8_t	EnemyEXDEG_D;	// 特殊角度の増分
+C_ENEMY Enemy;
 
 
 template <size_t N> void Indsort(
@@ -96,7 +89,7 @@ bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 	return ((l > 0) && (w < chkw));
 }
 
-ENEMY_DATA* EnemyFindFree(void)
+ENEMY_DATA* C_ENEMY::FindFree(void)
 {
 	if((EnemyNow + 1) >= ENEMY_MAX) {
 		return nullptr;
@@ -146,7 +139,7 @@ static void SetAnimeRect2(ANIME_DATA& anm, int x1, int y1, int x2, int y2)
 	anm.ptn[0] = { x1, y1, x2, y2 };
 }
 
-bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage)
+bool C_ENEMY::Set(BUFFER_OWNED&& ecl, uint8_t stage)
 {
 	ECL_Head = std::move(ecl);
 	if(!ECL_Head.get()) {
@@ -603,7 +596,7 @@ bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage)
 	return true;
 }
 
-void enemy_move(void)
+void C_ENEMY::Move(void)
 {
 	int				i;//,chkx,chky;
 
@@ -616,7 +609,7 @@ void enemy_move(void)
 		e->IsDamaged = 0;
 		if(!(e->flag & EF_BOMB)){
 			// 通常の敵の処理 //
-			parse_ECL(e);
+			ECL_Parse(e);
 
 			// 弾発射モードによる分岐 //
 			if(e->t_rep && e->hp){
@@ -639,7 +632,7 @@ void enemy_move(void)
 			if((e->y<GY_MIN-(e->g_height))||(e->y>GY_MAX+(e->g_height))||
 				(e->x<GX_MIN-(e->g_width))||(e->x>GX_MAX+(e->g_width))){
 				if((e->flag&EF_CLIP)==0){
-					EnemyDelete(*e);
+					Delete(*e);
 				}
 			}
 		}
@@ -653,7 +646,7 @@ void enemy_move(void)
 		}
 
 		// アニメーションの動作 //
-		EnemyAnimeMove(e);
+		AnimeMove(e);
 
 		e->count++;
 	}
@@ -662,7 +655,7 @@ void enemy_move(void)
 }
 
 // 雑魚を消滅させる //
-extern void enemy_clear(void)
+void C_ENEMY::Clear(void)
 {
 	int			i;
 
@@ -671,13 +664,13 @@ extern void enemy_clear(void)
 		if(e->flag == EF_BOMB) continue;
 
 		if(e->flag & EF_DRAW){
-			EnemyExplode(*e);
+			this->Explode(*e);
 			Snd_SEPlay(SOUND_ID_BOMB, e->x);
 		}
 		else{
 			// 描画しないタイプの敵の消去の仕方は他の場合と異なり、 //
 			// 爆発アニメ・爆発音を再生しない                       //
-			EnemyDelete(*e);
+			this->Delete(*e);
 			e->hp    = 0;
 			e->count = 0;
 			// 爆発音の再生は行わない //
@@ -687,7 +680,7 @@ extern void enemy_clear(void)
 	Indsort(EnemyInd, EnemyNow, Enemy);
 }
 
-void enemyind_set(void)
+void C_ENEMY::IndSet(void)
 {
 	int i;
 
@@ -699,13 +692,13 @@ void enemyind_set(void)
 	EnemyNow = 0;
 }
 
-bool EnemyDamageApply(ENEMY_DATA& e, int damage)
+bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 {
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) {
 		Snd_SEPlay(SOUND_ID_BOMB, e.x);
 		PowerUp(static_cast<uint8_t>(e.hp)); // パワーアップ
-		EnemyExplode(e);
+		this->Explode(e);
 		score_add(e.score);
 		if(e.item) {
 			ItemSet(e.x, e.y, e.item);
@@ -718,7 +711,7 @@ bool EnemyDamageApply(ENEMY_DATA& e, int damage)
 	return true;
 }
 
-bool enemy_damage(int x,int y,int damage)
+bool C_ENEMY::Damage(int x, int y, int damage)
 {
 	int				i;
 
@@ -731,7 +724,7 @@ bool enemy_damage(int x,int y,int damage)
 		if(HITCHK(x,e->x,e->g_width) && HITCHK(y,e->y,e->g_height) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				return EnemyDamageApply(*e, damage);
+				return this->DamageApply(*e, damage);
 			}
 		}
 	}
@@ -739,7 +732,7 @@ bool enemy_damage(int x,int y,int damage)
 	return false;
 }
 
-bool enemy_damage2(int x,int y,int damage)
+bool C_ENEMY::Damage2(int x, int y, int damage)
 {
 	int				i;
 	auto ret_val = Boss.Damage2(x, y, damage);
@@ -749,7 +742,7 @@ bool enemy_damage2(int x,int y,int damage)
 		if(HITCHK(x,e->x,e->g_width) && (y > e->y) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				ret_val = EnemyDamageApply(*e, damage);
+				ret_val = this->DamageApply(*e, damage);
 			}
 		}
 	}
@@ -758,7 +751,7 @@ bool enemy_damage2(int x,int y,int damage)
 }
 
 // ナナメレーザーの当たり判定 //
-extern void enemy_damage3(int x, int y, uint8_t d)
+void C_ENEMY::Damage3(int x, int y, uint8_t d)
 {
 	int				i;
 	// bool	ret_val = false;
@@ -771,7 +764,7 @@ extern void enemy_damage3(int x, int y, uint8_t d)
 		if(LaserHITCHK(e, x, y, d) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				EnemyDamageApply(*e, damage);
+				this->DamageApply(*e, damage);
 			}
 		}
 	}
@@ -779,7 +772,7 @@ extern void enemy_damage3(int x, int y, uint8_t d)
 
 
 // すべての敵にダメージを与える /
-extern void enemy_damage4(int damage)
+void C_ENEMY::Damage4(int damage)
 {
 	int				i;
 
@@ -790,7 +783,7 @@ extern void enemy_damage4(int damage)
 		if(e->flag&EF_DAMAGE){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
 			else{
-				EnemyDamageApply(*e, damage);
+				this->DamageApply(*e, damage);
 				//return true;
 			}
 		}
@@ -801,13 +794,13 @@ extern void enemy_damage4(int damage)
 
 
 // 敵データを初期化する(x,y は x64 で指定のこと) //
-void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id)
+void C_ENEMY::InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id)
 {
 	e->x = x;
 	e->y = y;
 
 	const uint32_t addr = (4 + (id << 2)); // ちと、やばいね...
-	EnemyECL_LongJump(e, addr);
+	this->ECL_LongJump(e, addr);
 
 	e->hp       = 0xffffffff;
 	e->amp      = 0;
@@ -867,7 +860,7 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id)
 
 
 // 強制的に ECL ブロック間を移動する //
-void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID)
+void C_ENEMY::ECL_LongJump(ENEMY_DATA *e, uint32_t EclID) const
 {
 	e->cmd = U32LEAt(&ECL_Head[EclID]);
 
@@ -880,7 +873,7 @@ void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID)
 
 
 // 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
-void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id)
+void C_ENEMY::InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id)
 {
 /*
 	e->x   = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
@@ -898,7 +891,7 @@ void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id)
 	InitEnemyDataX64(e, EnemyX, EnemyY, id);
 }
 
-void EnemyAnimeMove(ENEMY_DATA *e)
+void C_ENEMY::AnimeMove(ENEMY_DATA *e) const
 {
 	const auto *a = &Anime[e->anm_ptn];
 
@@ -922,7 +915,7 @@ void EnemyAnimeMove(ENEMY_DATA *e)
 	}
 }
 
-void EnemyDelete(ENEMY_DATA& e)
+void C_ENEMY::Delete(ENEMY_DATA& e)
 {
 	if(e.LLaserRef) {
 		LLaserForceClose(&e); // レーザーの強制クローズ
@@ -930,7 +923,7 @@ void EnemyDelete(ENEMY_DATA& e)
 	e.flag = EF_DELETE;
 }
 
-void EnemyExplode(ENEMY_DATA& e)
+void C_ENEMY::Explode(ENEMY_DATA& e)
 {
 	if(e.LLaserRef) {
 		LLaserForceClose(&e); // レーザーの強制クローズ
@@ -940,7 +933,7 @@ void EnemyExplode(ENEMY_DATA& e)
 	e.flag = EF_BOMB;
 }
 
-void parse_ECL(ENEMY_DATA *e)
+void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 {
 	bool bRetFlag;	// 実行クロック０命令の場合はfalseにすること
 	int		RegCmp;
@@ -1086,7 +1079,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_END):			// 敵の強制消滅
 			ECL_DEBUG("ECL_END",0);
-			EnemyDelete(*e); // 後で変更するように
+			this->Delete(*e); // 後で変更するように
 		return;						// バグ防止(かも)
 
 		case(ECL_JMP):			// ◎ＥＣＬ無条件ジャンプ(少々特殊な動作をします)
@@ -1747,7 +1740,7 @@ void parse_ECL(ENEMY_DATA *e)
 			tama_clear();
 			laser_clear();
 			HLaserClear();
-			enemy_clear();
+			this->Clear();
 			bRetFlag = false;
 		break;
 
@@ -1969,7 +1962,7 @@ void parse_ECL(ENEMY_DATA *e)
 
 			bRetFlag = false;
 
-			auto* new_enemy = EnemyFindFree();
+			auto *new_enemy = FindFree();
 			if(!new_enemy) {
 				break;
 			}

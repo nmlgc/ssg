@@ -61,8 +61,8 @@ void C_SNAKY::Set(BOSS_DATA *b, int len, uint32_t TailID)
 	}
 
 	for(auto *& enemy_ptr : s->EnemyPtr) {
-		if(enemy_ptr = EnemyFindFree()) {
-			InitEnemyDataX64(enemy_ptr, b->Edat.x, b->Edat.y, TailID);
+		if((enemy_ptr = Enemy.FindFree())) {
+			Enemy.InitEnemyDataX64(enemy_ptr, b->Edat.x, b->Edat.y, TailID);
 		}
 	}
 }
@@ -122,7 +122,7 @@ void C_SNAKY::Delete(const BOSS_DATA *b)
 
 		// Snd_SEPlay(SOUND_ID_BOMB, e->x);
 		//PowerUp(e->hp);			// パワーアップ
-		EnemyExplode(*e);
+		Enemy.Explode(*e);
 		///score_add(e->score);
 		//ItemSet(e->x,e->y,0);
 	}
@@ -199,14 +199,14 @@ void C_BIT::Set(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 
 	for(i=0; i<NumBits; i++){
 		// 敵資源の要求 //
-		if(auto *e = EnemyFindFree()) {
+		if(auto *e = Enemy.FindFree()) {
 			// データを初期化 //
-			InitEnemyDataX64(e, BitData.x, BitData.y, BitID);
+			Enemy.InitEnemyDataX64(e, BitData.x, BitData.y, BitID);
 			e->hp    = BIT_VIRTUAL_HP;
 			e->d     = i * (256 / NumBits);
 			e->GR[0] = i;
 			e->GR[1] = NumBits;
-			parse_ECL(e);
+			Enemy.ECL_Parse(e);
 
 			// この構造体と作成した敵を関連づける //
 			BitData.Bit[i].pEnemy = e;		// 敵データへのポインタ
@@ -278,7 +278,7 @@ void C_BIT::Move(void)
 			bIsDestroyed = true;
 
 			// ビット配列に関連づけられた敵に削除要求を送出 //
-			EnemyExplode(*e);
+			Enemy.Explode(*e);
 
 			Snd_SEPlay(SOUND_ID_BOMB, e->x);
 
@@ -473,7 +473,7 @@ void C_BIT::Delete(void)
 		if(e == nullptr) {
 			continue;
 		}
-		EnemyExplode(*e);
+		Enemy.Explode(*e);
 		Snd_SEPlay(SOUND_ID_BOMB, e->x);
 	}
 
@@ -490,7 +490,7 @@ void C_BIT::SelectAttack(uint32_t BitID)
 	const auto n = (4 + (BitID << 2));
 
 	for(i=0; i<BitData.NumBits; i++){
-		EnemyECL_LongJump(BitData.Bit[i].pEnemy, n);
+		Enemy.ECL_LongJump(BitData.Bit[i].pEnemy, n);
 	}
 }
 

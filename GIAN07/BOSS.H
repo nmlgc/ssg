@@ -100,7 +100,7 @@ public:
 	// ビット命令送信
 	void BitCommand(ENEMY_DATA *e, uint8_t Cmd, int Param);
 
-	uint16_t NumAlive(void) const {
+	decltype(BossNow) NumAlive(void) const {
 		return BossNow;
 	}
 

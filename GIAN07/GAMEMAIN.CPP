@@ -527,7 +527,7 @@ void GameSTD_Init(void)
 
 	//MaidSet();
 	MaidTamaIndSet();
-	enemyind_set();
+	Enemy.IndSet();
 	tamaind_set(400+200);		// 小型弾に４００
 	laserind_set();
 	LLaserSetup();
@@ -1395,7 +1395,7 @@ void GameMove(INPUT_BITS input)
 	Snaky.Move();
 	Bit.Move();
 	BossHPG_Move(HP_Sum);
-	enemy_move();
+	Enemy.Move();
 	ItemMove();
 	tama_move();
 	laser_move();
@@ -1424,13 +1424,13 @@ void GameDraw(void)
 	CEffectDraw();
 
 	BitLineDraw(Bit);
-	BossDraw(Boss, Viv);
+	BossDraw(Boss, Enemy, Viv);
 
 	WideBombDraw(Viv); // 多分、ここで良いと思うが...
 
 	ExBombEfcDraw(BombEfc);
 
-	enemy_draw(Enemy, std::span(EnemyInd).first(EnemyNow));
+	enemy_draw(Enemy);
 
 	MaidTamaDraw(MaidTama, std::span(MaidTamaInd).first(MaidTamaNow), Viv);
 

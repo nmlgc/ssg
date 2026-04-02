@@ -59,14 +59,14 @@ void BitLineDraw(const C_BIT& Bit)
 /// Enemies
 /// -------
 
-static void _EnemyDraw(const ENEMY_DATA& e)
+static void _EnemyDraw(const C_ENEMY& Enemy, const ENEMY_DATA& e)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 
 	// TODO: Remove once the structure itself uses WORLD_POINT.
 	const WORLD_POINT center = { &e.x, &e.y };
 
-	const auto& a = Anime[e.anm_ptn];
+	const auto& a = Enemy.AnimeSheet(e.anm_ptn);
 	const auto topleft = center.ToPixel(a.size); // 座標セット //
 
 	// 描画モード選択 //
@@ -76,7 +76,7 @@ static void _EnemyDraw(const ENEMY_DATA& e)
 	);
 	if(GrpSurface_Blit({ topleft.x, topleft.y }, sid, src)) {
 		if((e.anm_ptn != e.anm_ptnEx) && e.IsDamaged) {
-			const auto& a = Anime[e.anm_ptnEx];
+			const auto& a = Enemy.AnimeSheet(e.anm_ptnEx);
 			const auto topleft = center.ToPixel(a.size); // 座標セット //
 			GrpSurface_Blit({ topleft.x, topleft.y }, sid, a.ptn[0]);
 		}
@@ -98,9 +98,10 @@ static void _EnemyDrawBomb(int x, int y, uint32_t count)
 	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, src);
 }
 
-void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
+void enemy_draw(const C_ENEMY& Enemy)
 {
-	for(const auto ind : inds) {
+	const auto storage = Enemy.Data();
+	for(const auto ind : Enemy.Inds()) {
 		const auto *e = &storage[ind];
 
 		// 敵を描画する(クリッピング＆幅、高さ処理を追加すること) //
@@ -112,7 +113,7 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 		}
 
 		if(e->flag&EF_DRAW){
-			_EnemyDraw(*e);
+			_EnemyDraw(Enemy, *e);
 		}
 	}
 }
@@ -122,7 +123,7 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds)
 /// ------
 
 // ボスを描画する
-void BossDraw(const C_BOSS& Boss, const MAID& Viv)
+void BossDraw(const C_BOSS& Boss, const C_ENEMY& Enemy, const MAID& Viv)
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;
 	int x, y;
@@ -192,7 +193,7 @@ void BossDraw(const C_BOSS& Boss, const MAID& Viv)
 			}
 
 			if(e->flag&EF_DRAW){
-				_EnemyDraw(*e);
+				_EnemyDraw(Enemy, *e);
 			}
 		}
 	}

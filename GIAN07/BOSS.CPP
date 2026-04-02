@@ -55,14 +55,14 @@ void C_BOSS::Set(int x, int y, uint32_t BossID)
 	auto *e = &it->Edat;
 
 	// ｘ６４座標に変換してボスをセットする //
-	InitEnemyDataX64(e, PixelToWorld(x), PixelToWorld(y), BossID);
+	Enemy.InitEnemyDataX64(e, PixelToWorld(x), PixelToWorld(y), BossID);
 	e->item = 0;
 
 	it->ExCount = 0;
 	it->ExState = BEXST_NORM;
 	it->IsUsed  = 0xff;
 
-	parse_ECL(e);
+	Enemy.ECL_Parse(e);
 	//ObjectLockOn(&(it->Edat.x),&(it->Edat.y),it->Edat.g_width,it->Edat.g_height);
 
 	BossNow++;
@@ -99,7 +99,7 @@ uint32_t C_BOSS::Move(void)
 			HP_Sum += b->Edat.hp;
 
 			// アニメーションの動作 //
-			EnemyAnimeMove(e);
+			Enemy.AnimeMove(e);
 
 			e->count++;
 		}
@@ -132,7 +132,7 @@ void C_BOSS::KillAll(void)
 			fragment_set(e->x,e->y,FRG_FATCIRCLE);
 			BombEfc.Set(e->x, e->y, EXBOMB_STD);
 			Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
-			EnemyExplode(*e);
+			Enemy.Explode(*e);
 			b->IsUsed = 0;
 		}
 	}
@@ -146,13 +146,13 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 	if(e.hp <= damage) { // ボスの死亡処理(後で変更すること!!)
 		Snaky.Delete(&b);
 		Bit.Delete();
-		enemy_clear();
+		Enemy.Clear();
 		fragment_set(e.x, e.y, FRG_FATCIRCLE);
 		BombEfc.Set(e.x, e.y, EXBOMB_STD);
 		ScrollCommand(SCMD_QUAKE);
 		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);
 		PowerUp(Cast::down<uint8_t>(e.hp));
-		EnemyExplode(e);
+		Enemy.Explode(e);
 
 		// 最後の一匹だった場合 //
 		if(BossNow == 1) {
@@ -303,7 +303,7 @@ void C_BOSS::STDMove(BOSS_DATA *b)
 	ENEMY_DATA	*e = &(b->Edat);
 
 	// 通常の敵の処理 //
-	parse_ECL(e);
+	Enemy.ECL_Parse(e);
 
 	// 弾発射モードによる分岐 //
 	if(e->t_rep){

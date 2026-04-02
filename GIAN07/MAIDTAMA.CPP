@@ -219,7 +219,7 @@ void MaidTamaMove(void)
 	for(i=0;i<MaidTamaNow;i++){
 		auto* t = &MaidTama[MaidTamaInd[i]];
 		if(t->c == TID_HOMING_BOMB_B){
-			enemy_damage(t->x,t->y,TogeDamage[t->c]);
+			Enemy.Damage(t->x, t->y, TogeDamage[t->c]);
 			t->count++;
 			if(t->count>=19) t->flag = TF_DELETE;
 			continue;
@@ -231,7 +231,7 @@ void MaidTamaMove(void)
 			if(((t->flag&TF_CLIP)==0)&&((t->x)<GX_MIN||(t->x)>GX_MAX||(t->y)<GY_MIN||(t->y)>GY_MAX))
 				t->flag = TF_DELETE;
 
-			if(enemy_damage(t->x,t->y,TogeDamage[t->c])){
+			if(Enemy.Damage(t->x, t->y, TogeDamage[t->c])) {
 				if(t->c == TID_HOMING_BOMB_A){
 					TamaSTDForm(TID_HOMING_BOMB_B);
 					TamaCmd.type = T_SBHBOMB;
@@ -257,8 +257,12 @@ void MaidTamaMove(void)
 	if(Viv.weapon == 2  &&  Viv.lay_grp){
 		//x = (Viv.opx>>6)+4 -8 + SBOPT_DX;
 		//y = (Viv.opy>>6)-20;
-		enemy_damage2(Viv.opx+(SBOPT_DX<<6),Viv.opy,Viv.lay_grp/3+1);
-		enemy_damage2(Viv.opx-(SBOPT_DX<<6),Viv.opy,Viv.lay_grp/3+1);
+		Enemy.Damage2(
+			(Viv.opx + (SBOPT_DX << 6)), Viv.opy, ((Viv.lay_grp / 3) + 1)
+		);
+		Enemy.Damage2(
+			(Viv.opx - (SBOPT_DX << 6)), Viv.opy, ((Viv.lay_grp / 3) + 1)
+		);
 	}
 }
 
@@ -875,7 +879,7 @@ static void SetWideBomb(void)
 	fragment_set(dx, dy, FRG_STAR1);
 	fragment_set(dx, dy, FRG_STAR2);
 
-	enemy_damage4(1);
+	Enemy.Damage4(1);
 }
 
 static void SetHomingBomb(void)
@@ -905,14 +909,14 @@ static void SetLaserBomb(void)
 	oy = Viv.opy;
 	for(i=-3;i<=3;i++){
 		const auto d = GetRightLaserDeg(LaserDeg, i);
-		enemy_damage3(ox, oy, d);
+		Enemy.Damage3(ox, oy, d);
 	}
 
 	ox = Viv.opx - (SBOPT_DX*64);
 	oy = Viv.opy;
 	for(i=-3;i<=3;i++){
 		const auto d = GetLeftLaserDeg(LaserDeg, i);
-		enemy_damage3(ox, oy, d);
+		Enemy.Damage3(ox, oy, d);
 	}
 }
 

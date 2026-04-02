@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "GIAN.H"
 #include "ssg/Round.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/midi.h"
@@ -38,7 +39,6 @@ constexpr uint8_t SNDF_BGM_NOT_VOL_NORM	= 0x04;
 constexpr const auto STOCK_PLAYER_MAX = 4;
 constexpr const auto STOCK_BOMB_MAX = 2;
 constexpr const auto FPS_DIVISOR_MAX = 3;
-constexpr const auto STAGE_MAX = 6; // ステージ数
 
 
 bool ValidateAlways(auto v) { return true; };

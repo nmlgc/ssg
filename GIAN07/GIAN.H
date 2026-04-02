@@ -73,6 +73,9 @@ constexpr int SND_X_MID = PixelToWorld(320);
 #define HITCHK(a,b,h)	(abs((a)-(b))<(h))
 
 enum {
+	// ステージ数
+	STAGE_MAX = 6,
+
 	// Matches the `GRAPH_ID_EXSTAGE` constant in pbg's original code.
 	STAGE_EXTRA = (128 + 3),
 };

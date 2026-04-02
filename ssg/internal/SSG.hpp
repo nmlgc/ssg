@@ -10,6 +10,8 @@
 #include "ssg/Round.h"
 #include "ssg/internal/RNG.hpp"
 
+struct PACKFILE_READ;
+
 struct C_SSG {
 	// Starts a new round of gameplay (i.e., a playthrough of either the main 6
 	// stages starting at Stage 1, the Extra Stage, or a single stage for
@@ -17,4 +19,12 @@ struct C_SSG {
 	// Sets the number of credits based on [stage_first].
 	// Does *not* call `StageInit()`.
 	void RoundInit(const ROUND_PARAMS& round, uint8_t stage_first);
+
+	// Calls `StageFree()`, then initializes the enemy and SCL subsystems with
+	// the data for the given [stage], decompressed from a previously
+	// initialized packfile instance of `ENEMY.DAT`. Returns `true` on success.
+	bool StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage);
+
+	// Deallocates enemy and SCL data.
+	void StageFree(void);
 };

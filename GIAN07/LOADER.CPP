@@ -8,11 +8,11 @@
 #include "ENEMY.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
+#include "LogicInstance.h"
 #include "SCROLL.H"
 #include "WindowSys.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/LZ.hpp"
-#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/format_bmp.h"
 #include "hatoyama/engine/path.h"
 #include "hatoyama/engine/snd.h"
@@ -511,7 +511,6 @@ static PALETTE EnemyPalette;
 
 
 
-// 秘密の関数 //
 static int LoadedStage = 0;
 
 // あるステージのグラフィックをロードする //
@@ -668,8 +667,7 @@ extern void LoadPaletteFromEnemy(void)
 void FreeStageData(void)
 {
 	// メモリを解放だ！ //
-	StageSet(nullptr);
-	ECL_Head = nullptr;
+	SSG.StageFree();
 	ScrollInfo.DataHead = nullptr;
 }
 
@@ -681,44 +679,14 @@ bool LoadStageData(uint8_t stage)
 	FreeStageData();
 
 	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
-
-	// エキストラステージシステム用 //
-	if(stage == STAGE_EXTRA) {
-		// ECL Load
-		if(!enemy_set(enemy.MemExpand(24), stage)) {
-			return false;
-		}
-
-		// SCL Load
-		if(!StageSet(enemy.MemExpand(25))) {
-			return false;
-		}
-
-		// MapData Load
-		if((ScrollInfo.DataHead = enemy.MemExpand(26)) == nullptr) {
-			return false;
-		}
+	if(!SSG.StageLoadFromDAT(enemy, stage)) {
+		return false;
 	}
-	else{
-		// 各データをロードする //
-		if((stage < 1) || (stage > STAGE_MAX)) {
-			return false;
-		}
 
-		// ECL Load
-		if(!enemy_set(enemy.MemExpand(stage + 0 - 1), stage)) {
-			return false;
-		}
-
-		// SCL Load
-		if(!StageSet(enemy.MemExpand(stage + 6 - 1))) {
-			return false;
-		}
-
-		// MapData Load
-		if((ScrollInfo.DataHead = enemy.MemExpand(stage + 12 - 1)) == nullptr) {
-			return false;
-		}
+	// MapData Load
+	const fil_no_t map = ((stage == STAGE_EXTRA) ? 26 : (stage + 12 - 1));
+	if((ScrollInfo.DataHead = enemy.MemExpand(map)) == nullptr) {
+		return false;
 	}
 
 	// スクロール用変数の初期化 //

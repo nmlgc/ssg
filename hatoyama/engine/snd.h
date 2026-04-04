@@ -38,7 +38,7 @@ void Snd_BGMCleanup(void);
 bool Snd_SEInit(void);
 void Snd_SECleanup(void);
 
-bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
+bool Snd_SELoad(BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max);
 
 // 再生＆停止 //
 void Snd_SEPlay(uint8_t id, int x = SND_X_MID, bool loop = false);

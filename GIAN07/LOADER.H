@@ -94,13 +94,13 @@ bool LoadGraph(int stage);	// あるステージのグラフィックをロー�
 bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする
 bool LoadMusic(unsigned int id);	// ｎ番目の曲をロードする
 bool LoadMusicByHash(const HASH& hash);
-bool LoadMIDIBuffer(BYTE_BUFFER_OWNED);
+bool LoadMIDIBuffer(BUFFER_OWNED);
 bool LoadSound(void);	// 全ての Sound データをロードする
 
 // MusicRoom のコメントをロードする
-BYTE_BUFFER_OWNED LoadMusicRoomComment(int no);
+BUFFER_OWNED LoadMusicRoomComment(int no);
 
-BYTE_BUFFER_OWNED LoadDemo(int stage);
+BUFFER_OWNED LoadDemo(int stage);
 
 extern void LoadPaletteFromEnemy(void);		// 敵のパレットにする
 

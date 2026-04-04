@@ -135,7 +135,7 @@ struct MID_EVENT {
 };
 
 class MID_TRACK_ITERATOR {
-	BYTE_BUFFER_CURSOR<const uint8_t> cursor;
+	BUFFER_CURSOR<const uint8_t> cursor;
 	uint8_t status = 0x00;
 
 public:
@@ -186,7 +186,7 @@ struct MID_TRACK {
 };
 
 struct MID_SEQUENCE {
-	BYTE_BUFFER_OWNED smf = nullptr;
+	BUFFER_OWNED smf = nullptr;
 	std::unique_ptr<MID_TRACK[]> track_buf = nullptr;
 	std::span<MID_TRACK> tracks;
 	MID_TEMPO tempo = { .qn_duration = 1s /* 60 BPM */ };
@@ -355,7 +355,7 @@ void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration)
 	Mid_Dev.FadeDuration = duration;
 }
 
-bool Mid_Load(BYTE_BUFFER_OWNED buffer)
+bool Mid_Load(BUFFER_OWNED buffer)
 {
 	Mid_Seq = {};
 	Mid_Seq.smf = std::move(buffer);

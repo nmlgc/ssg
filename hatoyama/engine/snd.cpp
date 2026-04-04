@@ -100,7 +100,7 @@ void Snd_SECleanup(void)
 	Snd_Cleanup(SND_SYS::SE);
 }
 
-bool Snd_SELoad(BYTE_BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
+bool Snd_SELoad(BUFFER_OWNED buffer, uint8_t id, SND_INSTANCE_ID max)
 {
 	auto *io = SDL_IOFromConstMem(buffer.get(), buffer.size());
 	if(!io) {

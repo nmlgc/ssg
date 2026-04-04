@@ -15,7 +15,7 @@ import std.compat;
 extern bool (*const BGM_MidLoadOriginal)(unsigned int id);
 
 // Loads MIDI BGM from the given byte buffer.
-extern bool (*const BGM_MidLoadBuffer)(BYTE_BUFFER_OWNED);
+extern bool (*const BGM_MidLoadBuffer)(BUFFER_OWNED);
 
 // Loads the source MIDI via its hash from the game's original BGM data source.
 extern bool (*const BGM_MidLoadByHash)(const HASH& hash);

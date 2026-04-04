@@ -197,7 +197,7 @@ void DemoplaySaveReplay(void)
 
 bool DemoplayLoadReplay(int stage)
 {
-	BYTE_BUFFER_OWNED	temp;
+	BUFFER_OWNED temp;
 
 	const auto fn = ReplayFN(stage);
 	const auto in = FilStartR(fn.c_str());

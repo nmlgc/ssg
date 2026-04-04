@@ -45,7 +45,7 @@ bool SndBackend_SELoad(
 	uint8_t id,
 	SND_INSTANCE_ID max,
 	const SDL_AudioSpec& spec,
-	BYTE_BUFFER_BORROWED pcm
+	BUFFER_BORROWED pcm
 );
 void SndBackend_SEPlay(uint8_t id, int x = SND_X_MID, bool loop = false);
 void SndBackend_SEStop(uint8_t id);

@@ -23,7 +23,7 @@ constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp)
 	return ret;
 }
 
-std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer)
+std::optional<BMP_OWNED> BMPLoad(BUFFER_OWNED buffer)
 {
 	if(!buffer) {
 		return std::nullopt;

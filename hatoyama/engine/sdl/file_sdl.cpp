@@ -13,7 +13,7 @@ SDL_IOStream* SDL_IOFromFile(const char8_t *file, const char *mode)
 	return SDL_IOFromFile(std::bit_cast<const char *>(file), mode);
 }
 
-BYTE_BUFFER_OWNED SDL_LoadFile(const char8_t *file)
+BUFFER_OWNED SDL_LoadFile(const char8_t *file)
 {
 	auto *f = SDL_IOFromFile(std::bit_cast<const char *>(file), "rb");
 	if(!f) {
@@ -22,7 +22,7 @@ BYTE_BUFFER_OWNED SDL_LoadFile(const char8_t *file)
 	return SDL_LoadFile_IO(f, true);
 }
 
-BYTE_BUFFER_OWNED SDL_LoadFile_IO(SDL_IOStream *src, bool closeio)
+BUFFER_OWNED SDL_LoadFile_IO(SDL_IOStream *src, bool closeio)
 {
 	size_t size;
 	auto *buf = SDL_LoadFile_IO(src, &size, true);

@@ -7,17 +7,17 @@
 
 import std.compat;
 
-struct BYTE_BUFFER_BORROWED : public std::span<const uint8_t> {
+struct BUFFER_BORROWED : public std::span<const uint8_t> {
 	using span::span;
 
-	template <typename T, size_t N> BYTE_BUFFER_BORROWED(std::span<T, N> val) :
+	template <typename T, size_t N> BUFFER_BORROWED(std::span<T, N> val) :
 		span(reinterpret_cast<const uint8_t *>(val.data()), val.size_bytes()) {
 	}
 };
 
 template <
 	typename ConstOrNonConstByte
-> struct BYTE_BUFFER_CURSOR : public std::span<ConstOrNonConstByte> {
+> struct BUFFER_CURSOR : public std::span<ConstOrNonConstByte> {
 	using std::span<ConstOrNonConstByte>::span;
 
 	template <typename T> using transfer_const = std::conditional_t<
@@ -27,7 +27,7 @@ template <
 	size_t cursor = 0;
 
 	// Required to work around a C26495 false positive, for some reason?
-	BYTE_BUFFER_CURSOR(const std::span<ConstOrNonConstByte> other) :
+	BUFFER_CURSOR(const std::span<ConstOrNonConstByte> other) :
 		std::span<ConstOrNonConstByte>(other) {
 	}
 
@@ -61,18 +61,18 @@ struct SDL_FREE_DELETER {
 
 // Same semantics as the underlying unique_ptr: Can be either allocated or
 // empty.
-struct BYTE_BUFFER_OWNED : public std::unique_ptr<uint8_t[], SDL_FREE_DELETER> {
+struct BUFFER_OWNED : public std::unique_ptr<uint8_t[], SDL_FREE_DELETER> {
 private:
 	size_t size_;
 
 public:
 	// Creates an empty buffer, with no allocation.
-	BYTE_BUFFER_OWNED(std::nullptr_t null = nullptr) noexcept :
+	BUFFER_OWNED(std::nullptr_t null = nullptr) noexcept :
 		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(null), size_(0) {
 	}
 
 	// Adopts a SDL-allocated buffer.
-	BYTE_BUFFER_OWNED(void*&& buf, size_t size) :
+	BUFFER_OWNED(void*&& buf, size_t size) :
 		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(
 			static_cast<uint8_t *>(buf)
 		),
@@ -80,7 +80,7 @@ public:
 	}
 
 	// Tries to allocate [size] bytes, and leaves the buffer empty on failure.
-	BYTE_BUFFER_OWNED(size_t size) :
+	BUFFER_OWNED(size_t size) :
 		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(
 			static_cast<uint8_t *>(SDL_malloc_wrap(size))
 		),
@@ -92,14 +92,14 @@ public:
 	}
 
 	// Borrows a buffer with an immutable cursor.
-	BYTE_BUFFER_CURSOR<const uint8_t> cursor() const {
+	BUFFER_CURSOR<const uint8_t> cursor() const {
 		return { get(), size() };
 	}
 
 	// Borrows a buffer with a mutable cursor.
-	BYTE_BUFFER_CURSOR<uint8_t> cursor_mut() {
+	BUFFER_CURSOR<uint8_t> cursor_mut() {
 		return { get(), size() };
 	}
 };
 
-using BYTE_BUFFER_GROWABLE = std::vector<uint8_t>;
+using BUFFER_GROWABLE = std::vector<uint8_t>;

@@ -35,7 +35,7 @@ static constexpr std::optional<HASH> HashFrom(Narrow::string_view str)
 }
 
 // Hashes the given buffer.
-HASH Hash(const BYTE_BUFFER_BORROWED& buffer);
+HASH Hash(const BUFFER_BORROWED& buffer);
 
 constexpr HASH operator ""_B3(const char* str, size_t len)
 {

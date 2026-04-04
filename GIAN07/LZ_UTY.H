@@ -42,9 +42,9 @@ class BIT_DEVICE_READ {
 	} cursor;
 
 public:
-	const BYTE_BUFFER_BORROWED buffer;
+	const BUFFER_BORROWED buffer;
 
-	BIT_DEVICE_READ(const BYTE_BUFFER_BORROWED buffer) :
+	BIT_DEVICE_READ(const BUFFER_BORROWED buffer) :
 		buffer(buffer) {
 	}
 
@@ -61,7 +61,7 @@ public:
 };
 
 struct BIT_DEVICE_WRITE {
-	BYTE_BUFFER_GROWABLE buffer;
+	BUFFER_GROWABLE buffer;
 	uint8_t bit_cursor:3 = 0;
 
 	void PutBit(uint8_t bit);
@@ -70,29 +70,28 @@ struct BIT_DEVICE_WRITE {
 };
 
 struct BIT_FILE_READ : public BIT_DEVICE_READ {
-	const BYTE_BUFFER_OWNED file;
+	const BUFFER_OWNED file;
 
-	BIT_FILE_READ(BYTE_BUFFER_OWNED &&file) :
-		BIT_DEVICE_READ(file.get(),file.size()),
-		file(std::move(file)) {
+	BIT_FILE_READ(BUFFER_OWNED&& file) :
+		BIT_DEVICE_READ(file.get(), file.size()), file(std::move(file)) {
 	}
 };
 
 struct PACKFILE_READ {
-	BYTE_BUFFER_OWNED packfile;
+	BUFFER_OWNED packfile;
 	std::span<const PBG_FILEINFO> info;
 
 	PACKFILE_READ(std::nullptr_t null = nullptr) noexcept {
 	}
 
 	PACKFILE_READ(
-		BYTE_BUFFER_OWNED &&packfile, const std::span<const PBG_FILEINFO> info
+		BUFFER_OWNED&& packfile, const std::span<const PBG_FILEINFO> info
 	) :
 		packfile(std::move(packfile)),
 		info(info) {
 	}
 
-	BYTE_BUFFER_OWNED MemExpand(fil_no_t filno) const;
+	BUFFER_OWNED MemExpand(fil_no_t filno) const;
 
 	explicit operator bool() const {
 		return packfile.get();
@@ -100,7 +99,7 @@ struct PACKFILE_READ {
 };
 
 struct PACKFILE_WRITE {
-	std::vector<BYTE_BUFFER_BORROWED> files;
+	std::vector<BUFFER_BORROWED> files;
 
 	bool Write(
 		const char8_t *s,
@@ -109,6 +108,6 @@ struct PACKFILE_WRITE {
 };
 
 BIT_FILE_READ BitFilCreateR(const char8_t *s);
-PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile);
+PACKFILE_READ FilStartR(BUFFER_OWNED packfile);
 PACKFILE_READ FilStartR(SDL_IOStream *&& stream);
 PACKFILE_READ FilStartR(const char8_t *s);

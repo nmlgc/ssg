@@ -51,7 +51,7 @@ struct BMP_INFOHEADER {
 // A valid .BMP buffer, with convenient references to the header, optional
 // palette, and pixel data inside the buffer.
 struct BMP_OWNED {
-	BYTE_BUFFER_OWNED buffer;
+	BUFFER_OWNED buffer;
 	const BMP_INFOHEADER& info;
 	std::span<BGRA> palette; // Empty if not palettized.
 	std::span<std::byte> pixels; // Exactly as large as the image.
@@ -63,7 +63,7 @@ constexpr uint16_t BMP_PALETTE_SIZE_MAX = 256;
 // Returns a value between 0 and [BMP_PALETTE_SIZE_MAX].
 constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp);
 
-std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer);
+std::optional<BMP_OWNED> BMPLoad(BUFFER_OWNED buffer);
 
 #ifndef SDL_pixels_h_
 enum SDL_PixelFormat : uint32_t;

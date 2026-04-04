@@ -259,7 +259,7 @@ bool SndBackend_SELoad(
 	uint8_t id,
 	SND_INSTANCE_ID max,
 	const SDL_AudioSpec& spec,
-	BYTE_BUFFER_BORROWED pcm
+	BUFFER_BORROWED pcm
 )
 {
 	if(id >= SND_OBJ_MAX) {

@@ -40,7 +40,7 @@ struct MUSICROOM_TEXT {
 	TEXTRENDER_RECT_ID title;
 	TEXTRENDER_RECT_ID comment;
 	TEXTRENDER_RECT_ID version;
-	BYTE_BUFFER_OWNED comment_buf = nullptr;
+	BUFFER_OWNED comment_buf = nullptr;
 
 	void RenderVersion(WINDOW_POINT topleft) const;
 	void RenderMidDev(WINDOW_POINT topleft) const;
@@ -117,7 +117,7 @@ void MUSICROOM_TEXT::RenderComment(WINDOW_POINT topleft) const
 	};
 
 	Narrow::string_view comment_str = {};
-	BYTE_BUFFER_CURSOR<const uint8_t> cursor = { std::span<const uint8_t>() };
+	BUFFER_CURSOR<const uint8_t> cursor = { std::span<const uint8_t>() };
 	if(BGM_LoadedOriginalMIDI()) {
 		// Skip the title in the comment
 		cursor = comment_buf.cursor();

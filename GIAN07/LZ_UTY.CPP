@@ -31,8 +31,8 @@ template <typename Container> fil_checksum_t FilChecksumAddFile(
 	return ret;
 }
 
-std::optional<BYTE_BUFFER_BORROWED> FilFileGetCompressed(
-	const BYTE_BUFFER_OWNED& packfile,
+std::optional<BUFFER_BORROWED> FilFileGetCompressed(
+	const BUFFER_OWNED& packfile,
 	const std::span<const PBG_FILEINFO> info,
 	fil_no_t filno
 )
@@ -48,7 +48,7 @@ std::optional<BYTE_BUFFER_BORROWED> FilFileGetCompressed(
 	if((start >= packfile.size()) || (end > packfile.size())) {
 		return std::nullopt;
 	}
-	return BYTE_BUFFER_BORROWED{ (packfile.get() + start), (end - start) };
+	return BUFFER_BORROWED{ (packfile.get() + start), (end - start) };
 }
 
 uint8_t BIT_DEVICE_READ::GetBit()
@@ -112,7 +112,7 @@ bool BIT_DEVICE_WRITE::Write(const char8_t *s) const
 	return SDL_SaveFile(s, buffer.data(), buffer.size());
 }
 
-BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
+BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 {
 	const auto maybe_compressed = FilFileGetCompressed(packfile, info, filno);
 	if(!maybe_compressed) {
@@ -120,7 +120,7 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 	}
 
 	const uint32_t size_uncompressed = info[filno].size_uncompressed;
-	BYTE_BUFFER_OWNED uncompressed = { size_uncompressed };
+	BUFFER_OWNED uncompressed = { size_uncompressed };
 	if(!uncompressed) {
 		return nullptr;
 	}
@@ -159,7 +159,7 @@ BYTE_BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 	return uncompressed;
 }
 
-BYTE_BUFFER_GROWABLE Compress(BYTE_BUFFER_BORROWED buffer)
+BUFFER_GROWABLE Compress(BUFFER_BORROWED buffer)
 {
 	constexpr auto DICT_WINDOW = ((1 << LZSS_DICT_BITS) - LZSS_SEQ_MAX);
 
@@ -279,7 +279,7 @@ BIT_FILE_READ BitFilCreateR(const char8_t *s)
 	return { SDL_LoadFile(s) };
 }
 
-PACKFILE_READ FilStartR(BYTE_BUFFER_OWNED packfile)
+PACKFILE_READ FilStartR(BUFFER_OWNED packfile)
 {
 	auto packfile_cursor = packfile.cursor();
 

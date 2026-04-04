@@ -89,7 +89,7 @@ VOLUME Mid_GetFadeVolume(void);
 void Mid_UpdateVolume(void);
 void Mid_FadeOut(VOLUME volume_start, std::chrono::milliseconds duration);
 
-bool Mid_Load(BYTE_BUFFER_OWNED buffer);	// Load a MIDI file from a buffer
+bool Mid_Load(BUFFER_OWNED buffer); // Load a MIDI file from a buffer
 
 // Sets a loop point for the currently loaded sequence.
 void Mid_SetLoop(const MID_LOOP& loop);

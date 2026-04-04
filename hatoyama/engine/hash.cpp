@@ -14,7 +14,7 @@ static_assert(
 	"hardcoded hash size in header must match algorithm's output size"
 );
 
-HASH Hash(const BYTE_BUFFER_BORROWED& buffer)
+HASH Hash(const BUFFER_BORROWED& buffer)
 {
 	HASH ret;
 	blake3_hasher h;

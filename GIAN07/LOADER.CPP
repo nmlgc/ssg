@@ -178,7 +178,7 @@ static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 66>({{
 	// ----------------------------------------------------------------------
 }});
 
-bool LoadMIDIWithPotentialLoop(BYTE_BUFFER_OWNED buf, const HASH& hash)
+bool LoadMIDIWithPotentialLoop(BUFFER_OWNED buf, const HASH& hash)
 {
 	const auto ret = Mid_Load(std::move(buf));
 	if(!ret) {
@@ -1202,7 +1202,7 @@ bool LoadMusicByHash(const HASH& hash)
 	return DAT::LoadMusicByHash(hash);
 }
 
-bool LoadMIDIBuffer(BYTE_BUFFER_OWNED buf)
+bool LoadMIDIBuffer(BUFFER_OWNED buf)
 {
 	const auto hash = Hash(buf.cursor());
 	return LoadMIDIWithPotentialLoop(std::move(buf), hash);
@@ -1256,7 +1256,7 @@ bool LoadSound(void)
 }
 
 
-BYTE_BUFFER_OWNED LoadMusicRoomComment(int no)
+BUFFER_OWNED LoadMusicRoomComment(int no)
 {
 	if((no < 0) || (no > 19)) {
 		return false;
@@ -1264,7 +1264,7 @@ BYTE_BUFFER_OWNED LoadMusicRoomComment(int no)
 	return DAT::Packfile(DAT::PACK_ID::ENEMY).MemExpand(27 + no);
 }
 
-BYTE_BUFFER_OWNED LoadDemo(int stage)
+BUFFER_OWNED LoadDemo(int stage)
 {
 	return DAT::Packfile(DAT::PACK_ID::ENEMY).MemExpand(stage - 1 + 18);
 }

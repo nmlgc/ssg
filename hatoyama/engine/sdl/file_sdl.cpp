@@ -8,6 +8,15 @@
 
 #include "engine/file.h"
 
+const BUFFER_HEAP BUFFER_HEAP_SDL = {
+	.allocate = [](size_t size) noexcept {
+		return SDL_malloc(size);
+	},
+	.free = [](void *buf) noexcept {
+		return SDL_free(buf);
+	},
+};
+
 SDL_IOStream* SDL_IOFromFile(const char8_t *file, const char *mode)
 {
 	return SDL_IOFromFile(std::bit_cast<const char *>(file), mode);
@@ -29,7 +38,7 @@ BUFFER_OWNED SDL_LoadFile_IO(SDL_IOStream *src, bool closeio)
 	if(!buf) {
 		return {};
 	}
-	return { std::move(buf), size };
+	return { std::move(buf), size, BUFFER_HEAP_SDL };
 }
 
 bool SDL_MustReadIO(SDL_IOStream *context, void *ptr, size_t size)

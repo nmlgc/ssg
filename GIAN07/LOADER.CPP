@@ -667,16 +667,23 @@ extern void LoadPaletteFromEnemy(void)
 	}
 }
 
-// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする //
-bool LoadStageData(uint8_t stage)
+void FreeStageData(void)
 {
-	int				i;
-
 	// メモリを解放だ！ //
 	SCL_Now = nullptr;
 	ECL_Head = nullptr;
 	SCL_Head = nullptr;
 	ScrollInfo.DataHead = nullptr;
+}
+
+// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする //
+bool LoadStageData(uint8_t stage)
+{
+	int				i;
+
+	// Re-assigning the `std::unique_ptr`s only frees them one by one, and we
+	// want them all freed in any case.
+	FreeStageData();
 
 	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
 
@@ -696,15 +703,6 @@ bool LoadStageData(uint8_t stage)
 		if((ScrollInfo.DataHead = enemy.MemExpand(26)) == nullptr) {
 			return false;
 		}
-	}
-	else if(stage == GRAPH_ID_ENDING){
-		// SCL Load
-		if((SCL_Head = enemy.MemExpand(47)) == nullptr) {
-			return false;
-		}
-		SCL_Now   = SCL_Head.get();
-		GameCount = 0;
-		return true;
 	}
 	else{
 		// 各データをロードする //
@@ -1183,6 +1181,19 @@ bool LoadStageData(uint8_t stage)
 		break;
 	}
 
+	return true;
+}
+
+bool LoadEndingScript(void)
+{
+	FreeStageData();
+
+	const auto& enemy = DAT::Packfile(DAT::PACK_ID::ENEMY);
+	if((SCL_Head = enemy.MemExpand(47)) == nullptr) {
+		return false;
+	}
+	SCL_Now = SCL_Head.get();
+	GameCount = 0;
 	return true;
 }
 

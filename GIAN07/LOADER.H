@@ -76,6 +76,7 @@
 void LoaderInit(void);
 void LoaderCleanup(void);
 bool LoadStageData(uint8_t stage);	// ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする
+bool LoadEndingScript(void);
 bool LoadGraph(int stage);	// あるステージのグラフィックをロードする
 bool LoadFace(uint8_t FaceID, uint8_t FileNo);	// 顔グラフィックをロードする
 bool LoadMusic(unsigned int id);	// ｎ番目の曲をロードする

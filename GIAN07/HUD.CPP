@@ -282,7 +282,7 @@ void StdStatusOutput(void)
 	GrpPut16(0, (148 + 40), buf);
 	sprintf(buf, "Laser %3d", LaserNow);
 	GrpPut16(0, (176 + 40), buf);
-	sprintf(buf, "HLaser %2d", HLaserNow);
+	sprintf(buf, "HLaser %2d", HLaser.NumAlive());
 	GrpPut16(0, (196 + 40), buf);
 
 	sprintf(buf, "MTama %3d", MaidTamaNow);

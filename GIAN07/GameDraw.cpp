@@ -12,6 +12,7 @@
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
+#include "HOMINGL.H"
 #include "MAID.H"
 #include "TAMA.H"
 #include "hatoyama/logic/ut_math.h"
@@ -552,7 +553,7 @@ void _CircleA16(GRAPHICS_GEOMETRY_POLY auto& gp, int x, int y, int r, uint8_t d)
 }
 
 // ホーミングレーザーを描画する //
-void HLaserDraw(const HLaserData& ActiveHL)
+void HLaserDraw(const C_HLASER& HLaser)
 {
 	HLaserData	*hl;
 	int			i,w,current;
@@ -580,7 +581,7 @@ void HLaserDraw(const HLaserData& ActiveHL)
 
 	GrpGeom->Lock();
 
-	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
+	for(hl = HLaser.Data().Next; hl != nullptr; hl = hl->Next) {
 		w = HOMINGL_WIDTH;
 		current = hl->Current;
 		p = &(hl->p[current]);
@@ -624,7 +625,7 @@ void HLaserDraw(const HLaserData& ActiveHL)
 		gf->SetColor({ 5, 5, 5 });
 	}
 
-	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
+	for(hl = HLaser.Data().Next; hl != nullptr; hl = hl->Next) {
 		w = HOMINGL_WIDTH/2;
 		current = hl->Current;
 		p = &(hl->p[current]);

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "HOMINGL.H"
 #include "ITEM.H"
 #include "LASER.H"
 #include "LLASER.H"
@@ -17,6 +16,7 @@ class C_BOMBEFC;
 class C_EFFECT3D;
 class C_ENEMY;
 class C_FRAGMENT;
+class C_HLASER;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -44,7 +44,7 @@ void DrawEffectFakeECL(const C_EFFECT3D&);
 void fragment_draw(const C_FRAGMENT&);
 
 // ホーミングレーザーを描画する
-void HLaserDraw(const HLaserData& ActiveHL);
+void HLaserDraw(const C_HLASER&);
 
 // アイテムを描画する
 void ItemDraw(ITEM_DATA_CSPAN storage, std::span<const uint16_t> inds);

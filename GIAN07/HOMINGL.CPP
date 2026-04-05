@@ -10,16 +10,12 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-uint16_t	HLaserNow;	// ホーミングレーザーの本数
-HLaserData		HLaserBuf[HLASER_MAX];	// ホーミングレーザー格納バッファ
-
-HLaserData		ActiveHL;		// 確保済みホーミングレーザー
-HLaserData		FreeHL;			// 解放済みホーミングレーザー
+C_HLASER HLaser;
 
 
 
 // ホーミングレーザーの初期化を行う //
-void HLaserInit(void)
+void C_HLASER::Init(void)
 {
 	int		i;
 
@@ -37,7 +33,7 @@ void HLaserInit(void)
 
 
 // ホーミングレーザーをセットする //
-void HLaserSet(const HLaserInfo *hinfo)
+void C_HLASER::Set(const HLaserInfo *hinfo)
 {
 	int			i,j;
 	uint8_t	deg;
@@ -80,7 +76,7 @@ void HLaserSet(const HLaserInfo *hinfo)
 
 
 // ホーミングレーザーを動作させる //
-void HLaserMove(void)
+void C_HLASER::Move(void)
 {
 	HLaserData	*hl;
 	HLaserData	*temp;
@@ -187,11 +183,11 @@ void HLaserMove(void)
 }
 
 // ホーミングレーザーに消去エフェクトをセット //
-void HLaserClear(void)
+void C_HLASER::Clear(void)
 {
 //	HLaserData	*hl;
 
-	HLaserInit();
+	this->Init();
 	/*
 	for(hl = ActiveHL.Next; hl != nullptr; hl = hl->Next) {
 		hl->State = HLS_CLEAR;

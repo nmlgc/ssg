@@ -532,7 +532,7 @@ void GameSTD_Init(void)
 	tamaind_set(400+200);		// 小型弾に４００
 	laserind_set();
 	LLaserSetup();
-	HLaserInit();
+	HLaser.Init();
 	SEffectInit();
 	CEffectInit();
 	ObjectLockOnInit();
@@ -1401,7 +1401,7 @@ void GameMove(INPUT_BITS input)
 	tama_move();
 	laser_move();
 	LLaserMove();
-	HLaserMove();
+	HLaser.Move();
 	Fragment.Move();
 	SEffectMove();
 	CEffectMove();
@@ -1450,7 +1450,7 @@ void GameDraw(void)
 		LLaserDraw(LLaser);
 	}
 
-	HLaserDraw(ActiveHL);
+	HLaserDraw(HLaser);
 	laser_draw(Laser, std::span(LaserInd).first(LaserNow));
 	tama_draw(
 		Tama,

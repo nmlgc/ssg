@@ -115,7 +115,7 @@ bool EndingInit(void)
 	Grp_Flip();
 	GrpBackend_Clear();
 
-	if(!LoadGraph(GRAPH_ID_ENDING) || !LoadStageData(GRAPH_ID_ENDING)) {
+	if(!LoadGraph(GRAPH_ID_ENDING) || !LoadEndingScript()) {
 		return false;
 	}
 	BGM_Stop();

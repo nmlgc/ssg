@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "ITEM.H"
 #include "LASER.H"
 #include "LLASER.H"
 #include "MAIDTAMA.H"
@@ -17,6 +16,7 @@ class C_EFFECT3D;
 class C_ENEMY;
 class C_FRAGMENT;
 class C_HLASER;
+class C_ITEM;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -47,7 +47,7 @@ void fragment_draw(const C_FRAGMENT&);
 void HLaserDraw(const C_HLASER&);
 
 // アイテムを描画する
-void ItemDraw(ITEM_DATA_CSPAN storage, std::span<const uint16_t> inds);
+void ItemDraw(const C_ITEM&);
 
 // レーザーを描画する
 void laser_draw(LASER_DATA_CSPAN storage, std::span<const uint16_t> inds);

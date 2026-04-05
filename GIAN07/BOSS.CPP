@@ -165,7 +165,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		}
 
 		if(e.item) {
-			ItemSet(e.x, e.y, e.item);
+			Item.Set(e.x, e.y, e.item);
 		}
 		score_add(e.score);
 		laser_clear();

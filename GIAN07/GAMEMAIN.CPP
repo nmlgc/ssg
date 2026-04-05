@@ -536,7 +536,7 @@ void GameSTD_Init(void)
 	SEffectInit();
 	CEffectInit();
 	ObjectLockOnInit();
-	ItemIndSet();
+	Item.IndSet();
 	Fragment.Setup();
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
@@ -1397,7 +1397,7 @@ void GameMove(INPUT_BITS input)
 	Bit.Move();
 	BossHPG_Move(HP_Sum);
 	Enemy.Move();
-	ItemMove();
+	Item.Move();
 	tama_move();
 	laser_move();
 	LLaserMove();
@@ -1444,7 +1444,7 @@ void GameDraw(void)
 	ObjectLockDraw();
 
 	fragment_draw(Fragment);
-	ItemDraw(Item, std::span(ItemInd).first(ItemNow));
+	ItemDraw(Item);
 
 	if(GrpGeom_Poly()) {
 		LLaserDraw(LLaser);

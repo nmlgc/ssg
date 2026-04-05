@@ -701,7 +701,7 @@ bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 		this->Explode(e);
 		score_add(e.score);
 		if(e.item) {
-			ItemSet(e.x, e.y, e.item);
+			Item.Set(e.x, e.y, e.item);
 		}
 	} else {
 		Snd_SEPlay(SOUND_ID_HIT, e.x);

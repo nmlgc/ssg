@@ -288,7 +288,7 @@ void StdStatusOutput(void)
 	sprintf(buf, "MTama %3d", MaidTamaNow);
 	GrpPut16(0, (224 + 40), buf);
 
-	sprintf(buf, "Item  %3d", ItemNow);
+	sprintf(buf, "Item  %3zu", Item.Inds().size());
 	GrpPut16(0, (252 + 40), buf);
 
 	sprintf(buf, "Pow   %3d", Viv.exp);

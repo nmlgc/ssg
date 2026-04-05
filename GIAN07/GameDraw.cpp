@@ -13,6 +13,7 @@
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "HOMINGL.H"
+#include "ITEM.H"
 #include "MAID.H"
 #include "TAMA.H"
 #include "hatoyama/logic/ut_math.h"
@@ -672,12 +673,13 @@ void HLaserDraw(const C_HLASER& HLaser)
 /// -----
 
 // アイテムを描画する //
-void ItemDraw(ITEM_DATA_CSPAN storage, std::span<const uint16_t> inds)
+void ItemDraw(const C_ITEM& Item)
 {
+	const auto storage = Item.Data();
 	int j, x, y;
 	PIXEL_LTRB	src;
 
-	for(const auto ind : inds) {
+	for(const auto ind : Item.Inds()) {
 		auto *ip = &storage[ind];
 		const uint8_t ptn = ((ip->count >> 2) & 3);
 		switch(ip->type){

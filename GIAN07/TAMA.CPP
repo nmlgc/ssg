@@ -394,7 +394,7 @@ void tama2item(uint8_t n)
 			t->d      = 0;
 
 			if((RNG.next() % n) == 0) {
-				ItemSet(t->x, t->y, ITEM_SCORE);
+				Item.Set(t->x, t->y, ITEM_SCORE);
 				t->flag   = TF_DELETE;
 				t->c      = 0x25;
 			}
@@ -415,7 +415,7 @@ void tama2item(uint8_t n)
 			t->d      = 0;
 
 			if((RNG.next() % n) == 0) {
-				ItemSet(t->x, t->y, ITEM_SCORE);
+				Item.Set(t->x, t->y, ITEM_SCORE);
 				t->flag   = TF_DELETE;
 				t->c      = 0x25;
 			}

@@ -16,13 +16,11 @@
 
 
 
-std::array<ITEM_DATA, ITEM_MAX>	Item;
-std::array<uint16_t, ITEM_MAX>	ItemInd;
-uint16_t ItemNow;
+C_ITEM Item;
 
 
 // アイテムを発生させる //
-void ItemSet(int x, int y, uint8_t type)
+void C_ITEM::Set(int x, int y, uint8_t type)
 {
 	if(ItemNow+1>=ITEM_MAX) return;
 
@@ -54,7 +52,7 @@ void ItemSet(int x, int y, uint8_t type)
 }
 
 // アイテムを動かす //
-void ItemMove(void)
+void C_ITEM::Move(void)
 {
 	int i, tx, ty, l;
 
@@ -116,7 +114,7 @@ void ItemMove(void)
 }
 
 // アイテム配列の初期化 //
-void ItemIndSet(void)
+void C_ITEM::IndSet(void)
 {
 	int i;
 

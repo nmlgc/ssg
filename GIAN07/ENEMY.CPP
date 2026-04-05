@@ -23,6 +23,7 @@
 #include "ssg/internal/Effect3D.hpp"
 #include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/Item.hpp"
+#include "ssg/internal/Laser.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -1739,25 +1740,25 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		case(ECL_TCLR):			// 敵弾を全消去(レーザー含む)
 			Boss.ClearCmd(); // この処理を何よりも優先させる(ビット消去等を含む)
 			tama_clear();
-			laser_clear();
+			Laser.Clear();
 			HLaser.Clear();
 			this->Clear();
 			bRetFlag = false;
 		break;
 
 		case(ECL_LASER):		// レーザー発射
-			LaserCmd = e->l_cmd;
-			LaserCmd.x += e->x;
-			LaserCmd.y += e->y;
-			laser_set();
+			Laser.LaserCmd = e->l_cmd;
+			Laser.LaserCmd.x += e->x;
+			Laser.LaserCmd.y += e->y;
+			Laser.Set();
 			bRetFlag = false;
 		break;
 
 		case(ECL_LASER2):		// レーザー発射
-			LaserCmd = e->l_cmd;
-			LaserCmd.x += e->x;
-			LaserCmd.y += e->y;
-			laser_setEX();
+			Laser.LaserCmd = e->l_cmd;
+			Laser.LaserCmd.x += e->x;
+			Laser.LaserCmd.y += e->y;
+			Laser.SetEX();
 			bRetFlag = false;
 		break;
 

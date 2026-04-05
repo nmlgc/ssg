@@ -103,18 +103,4 @@ using LASER_DATA_CSPAN = std::span<const LASER_DATA, LASER_MAX>;
 #endif
 
 
-////レーザー関数////
-extern void laser_set(void);		// レーザーをセットする(難易度変更"有り")
-extern void laser_setEX(void);		// レーザーをセットする(難易度変更"無し")
-extern void laser_move(void);		// レーザーを動かす
-extern void laser_clear(void);		// レーザー全てに消去エフェクトをかける
-extern void laserind_set(void);		// レーザー順序用配列の初期化
-
-
-////レーザーの各種変数たち////
-extern LASER_CMD	LaserCmd;				// 標準レーザーコマンド構造体
-extern std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
-extern std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
-extern uint16_t	LaserNow;	// レーザーの本数
-
 #endif

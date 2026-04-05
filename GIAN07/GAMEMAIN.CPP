@@ -30,6 +30,7 @@
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/Item.hpp"
+#include "ssg/internal/Laser.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
@@ -529,7 +530,7 @@ void GameSTD_Init(void)
 	MaidTamaIndSet();
 	Enemy.IndSet();
 	tamaind_set(400+200);		// 小型弾に４００
-	laserind_set();
+	Laser.IndSet();
 	LLaserSetup();
 	HLaser.Init();
 	SEffectInit();
@@ -1398,7 +1399,7 @@ void GameMove(INPUT_BITS input)
 	Enemy.Move();
 	Item.Move();
 	tama_move();
-	laser_move();
+	Laser.Move();
 	LLaserMove();
 	HLaser.Move();
 	Fragment.Move();
@@ -1450,7 +1451,7 @@ void GameDraw(void)
 	}
 
 	HLaserDraw(HLaser.Data());
-	laser_draw(Laser, std::span(LaserInd).first(LaserNow));
+	laser_draw(Laser.Data(), Laser.Inds());
 	tama_draw(
 		Tama,
 		std::span(Tama1Ind).first(Tama1Now),

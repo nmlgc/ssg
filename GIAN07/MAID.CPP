@@ -9,12 +9,12 @@
 #include "EFFECT.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
-#include "LASER.H"
 #include "LogicInstance.h"
 #include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Laser.hpp"
 #include "hatoyama/engine/snd.h"
 
 
@@ -128,7 +128,7 @@ extern void MaidMove(INPUT_BITS input, bool in_msg)
 
 	if(Viv.bomb_time){
 		tama_clear();
-		laser_clear();
+		Laser.Clear();
 		// if((Viv.bomb_time % 60) == 0) {
 		// 	Fragment.Set(Viv.x, Viv.y, FRG_FATCIRCLE);
 		// }
@@ -227,7 +227,7 @@ extern void MaidDead(void)
 	}
 
 	tama_clear();
-	laser_clear();
+	Laser.Clear();
 }
 
 // かすりゲージを上昇させる(エフェクトはメイド中心) //

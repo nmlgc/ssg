@@ -16,6 +16,7 @@
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Item.hpp"
+#include "ssg/internal/Laser.hpp"
 #include "hatoyama/engine/snd.h"
 
 ///// [ 変数 ] /////
@@ -169,7 +170,7 @@ bool C_BOSS::BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 			Item.Set(e.x, e.y, e.item);
 		}
 		score_add(e.score);
-		laser_clear();
+		Laser.Clear();
 		b.IsUsed = 0;
 		BossNow--; // ボスの参照カウント？を使用する
 	} else {

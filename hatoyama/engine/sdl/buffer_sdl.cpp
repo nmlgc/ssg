@@ -4,8 +4,7 @@
  */
 
 #include <SDL3/SDL_stdinc.h>
-
-#include "engine/buffer.h"
+#include "logic/buffer.h"
 
 void* SDL_malloc_wrap(size_t size)
 {

@@ -23,7 +23,7 @@
 #include "ECL.H"
 #include "LASER.H"
 #include "TAMA.H"
-#include "hatoyama/engine/buffer.h"
+#include "hatoyama/logic/buffer.h"
 
 
 //// 敵定数 ////

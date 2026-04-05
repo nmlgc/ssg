@@ -8,8 +8,8 @@
 
 // ヘッダファイル //
 #include "constants.h"
-#include "engine/buffer.h"
 #include "engine/volume.h"
+#include "logic/buffer.h"
 #include "logic/enum_flags.h"
 
 // 定数＆マクロ //

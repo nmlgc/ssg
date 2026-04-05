@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "engine/buffer.h"
+#include "logic/buffer.h"
 
 struct SDL_IOStream;
 struct FILE_TIMESTAMPS {

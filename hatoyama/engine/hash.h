@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "engine/buffer.h"
+#include "logic/buffer.h"
 #include "logic/narrow.h"
 
 using HASH = std::array<std::byte, 32>;

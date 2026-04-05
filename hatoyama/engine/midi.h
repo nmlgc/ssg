@@ -15,8 +15,8 @@
 
 
 
-#include "engine/buffer.h"
 #include "engine/volume.h"
+#include "logic/buffer.h"
 #include "logic/narrow.h"
 
 enum class MID_FLAGS : uint8_t {

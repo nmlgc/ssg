@@ -6,8 +6,8 @@
 #pragma once
 
 import std.compat;
-#include "engine/buffer.h"
 #include "engine/hash.h"
+#include "logic/buffer.h"
 #include "logic/narrow.h"
 
 // Loads the BGM with the given 0-based [id] from the game's original BGM data

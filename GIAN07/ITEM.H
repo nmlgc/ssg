@@ -41,18 +41,4 @@ using ITEM_DATA_CSPAN = std::span<const ITEM_DATA, ITEM_MAX>;
 #endif
 
 
-///// [ 関数 ] /////
-void ItemSet(int x, int y, uint8_t type);	// アイテムを発生させる
-void ItemMove(void);	// アイテムを動かす
-void ItemIndSet(void);	// アイテム配列の初期化
-
-
-
-///// [ 変数 ] /////
-extern std::array<ITEM_DATA, ITEM_MAX>	Item;
-extern std::array<uint16_t, ITEM_MAX>	ItemInd;
-extern uint16_t	ItemNow;
-
-
-
 #endif

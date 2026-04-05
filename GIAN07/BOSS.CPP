@@ -8,7 +8,6 @@
 #include "ssg/internal/Boss.hpp"
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "ITEM.H"
 #include "MAID.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
@@ -16,6 +15,7 @@
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Item.hpp"
 #include "hatoyama/engine/snd.h"
 
 ///// [ 変数 ] /////
@@ -166,7 +166,7 @@ bool C_BOSS::BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		}
 
 		if(e.item) {
-			ItemSet(e.x, e.y, e.item);
+			Item.Set(e.x, e.y, e.item);
 		}
 		score_add(e.score);
 		laser_clear();

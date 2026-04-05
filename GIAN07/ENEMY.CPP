@@ -12,7 +12,6 @@
 #include "ECL_LEN.H"
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "ITEM.H"
 #include "LLASER.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
@@ -23,6 +22,7 @@
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/Effect3D.hpp"
 #include "ssg/internal/HLaser.hpp"
+#include "ssg/internal/Item.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -702,7 +702,7 @@ bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 		this->Explode(e);
 		score_add(e.score);
 		if(e.item) {
-			ItemSet(e.x, e.y, e.item);
+			Item.Set(e.x, e.y, e.item);
 		}
 	} else {
 		Snd_SEPlay(SOUND_ID_HIT, e.x);

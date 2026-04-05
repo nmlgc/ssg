@@ -10,7 +10,6 @@
 
 #include "HUD.H"
 #include "FONTUTY.H"
-#include "ITEM.H"
 #include "LogicInstance.h"
 #include "MAID.H"
 #include "MAIDTAMA.H"
@@ -20,6 +19,7 @@
 #include "SCROLL.H"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/HLaser.hpp"
+#include "ssg/internal/Item.hpp"
 #include "ssg/internal/Stage.hpp"
 #endif
 #include "hatoyama/engine/text_backend.h"
@@ -287,7 +287,7 @@ void StdStatusOutput(void)
 	sprintf(buf, "MTama %3d", MaidTamaNow);
 	GrpPut16(0, (224 + 40), buf);
 
-	sprintf(buf, "Item  %3d", ItemNow);
+	sprintf(buf, "Item  %3zu", Item.Inds().size());
 	GrpPut16(0, (252 + 40), buf);
 
 	sprintf(buf, "Pow   %3d", Viv.exp);

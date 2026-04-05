@@ -7,11 +7,11 @@
 #include "EFFECT.H"
 #include "ENEMY.H"
 #include "GIAN.H"
-#include "ITEM.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "ssg/Round.h"
 #include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Item.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
@@ -394,7 +394,7 @@ void tama2item(uint8_t n)
 			t->d      = 0;
 
 			if((RNG.next() % n) == 0) {
-				ItemSet(t->x, t->y, ITEM_SCORE);
+				Item.Set(t->x, t->y, ITEM_SCORE);
 				t->flag   = TF_DELETE;
 				t->c      = 0x25;
 			}
@@ -415,7 +415,7 @@ void tama2item(uint8_t n)
 			t->d      = 0;
 
 			if((RNG.next() % n) == 0) {
-				ItemSet(t->x, t->y, ITEM_SCORE);
+				Item.Set(t->x, t->y, ITEM_SCORE);
 				t->flag   = TF_DELETE;
 				t->c      = 0x25;
 			}

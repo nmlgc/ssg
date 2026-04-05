@@ -29,6 +29,7 @@
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/HLaser.hpp"
+#include "ssg/internal/Item.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
@@ -534,7 +535,7 @@ void GameSTD_Init(void)
 	SEffectInit();
 	CEffectInit();
 	ObjectLockOnInit();
-	ItemIndSet();
+	Item.IndSet();
 	Fragment.Setup();
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
@@ -1395,7 +1396,7 @@ void GameMove(INPUT_BITS input)
 	Bit.Move();
 	BossHPG_Move(HP_Sum);
 	Enemy.Move();
-	ItemMove();
+	Item.Move();
 	tama_move();
 	laser_move();
 	LLaserMove();
@@ -1442,7 +1443,7 @@ void GameDraw(void)
 	ObjectLockDraw();
 
 	fragment_draw(Fragment.Data());
-	ItemDraw(Item, std::span(ItemInd).first(ItemNow));
+	ItemDraw(Item.Data(), Item.Inds());
 
 	if(GrpGeom_Poly()) {
 		LLaserDraw(LLaser);

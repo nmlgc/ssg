@@ -14,6 +14,7 @@
 #include "GIAN.H"
 #include "HOMINGL.H"
 #include "ITEM.H"
+#include "LASER.H"
 #include "MAID.H"
 #include "TAMA.H"
 #include "hatoyama/logic/ut_math.h"
@@ -795,11 +796,12 @@ static void SLdraw(const LASER_DATA *lp)
 	//Grp_Polygon(temp,4,RGB256(5,5,5));
 }
 
-void laser_draw(LASER_DATA_CSPAN storage, std::span<const uint16_t> inds)
+void laser_draw(const C_LASER& Laser)
 {
+	const auto storage = Laser.Data();
 	GrpGeom->Lock();
 
-	for(const auto ind : inds) {
+	for(const auto ind : Laser.Inds()) {
 		auto *lp = &storage[ind];
 		switch(lp->type){
 			// ノーマルショートレーザー＆反射レーザー //

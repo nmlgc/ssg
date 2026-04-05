@@ -168,7 +168,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 			Item.Set(e.x, e.y, e.item);
 		}
 		score_add(e.score);
-		laser_clear();
+		Laser.Clear();
 		b.IsUsed = 0;
 		BossNow--; // ボスの参照カウント？を使用する
 	} else {

@@ -55,27 +55,17 @@
 #define LC_RNDZ	0x0a	// 基本角サボテンセットランダム
 
 ////グローバル変数////
-LASER_CMD		LaserCmd;							// 標準レーザーコマンド構造体
-std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
-std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
-uint16_t LaserNow;                          // レーザーの本数
+C_LASER Laser;
 
 static void easy_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｅａｓｙ
 static void hard_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｈａｒｄ
 static void luna_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｌｕｎａｔｉｃ
 
-static uint8_t laser_dir(uint16_t i);	// レーザーの進行方向をセットする
 static void slaser_pset(LASER_DATA *lp);	// ４点の座標をセットする(ショート用)
 static void SLdraw(const LASER_DATA *lp);	// ショートレーザー描画
 
-static void Lmove(LASER_DATA *lp);	// 種類により分岐し座標を更新する
-static void laser_hitchk(LASER_DATA *lp);	// レーザーの当たり判定
 
-static void REFL_move(LASER_DATA *lp);	// 反射レーザーの移動
-static int  REFL_hit(const LASER_DATA *lp);	// ﾘﾌﾚｸﾀｰとの当たり判定(ﾋｯﾄ->非０)
-
-
-void laser_set(void)
+void C_LASER::Set(void)
 {
 	switch(PlayRank.LevelRanked) {
 		case(GAME_EASY):
@@ -93,10 +83,10 @@ void laser_set(void)
 
 	LaserCmd.v = (((LaserCmd.v>>1)*(PlayRank.Rank))>>(5+8)) + (LaserCmd.v>>1);
 
-	laser_setEX();
+	this->SetEX();
 }
 
-void laser_setEX(void)
+void C_LASER::SetEX(void)
 {
 	for(decltype(LaserCmd.n) i = 0; i < LaserCmd.n; i++) {
 		if(LaserNow+1 == LASER_MAX) return;		// 最大数を越えた場合
@@ -142,7 +132,7 @@ void laser_setEX(void)
 	}
 }
 
-void laser_move(void)
+void C_LASER::Move(void)
 {
 	// [LaserNow] will get mutated for reflecting lasers!
 	for(decltype(LaserNow) i = 0; i < LaserNow; i++) {
@@ -159,7 +149,7 @@ void laser_move(void)
 	});
 }
 
-void laser_clear(void)
+void C_LASER::Clear(void)
 {
 	for(decltype(LaserNow) i = 0; i < LaserNow; i++) {
 		auto& l = Laser[LaserInd[i]];
@@ -170,7 +160,7 @@ void laser_clear(void)
 	}
 }
 
-void laserind_set(void)
+void C_LASER::IndSet(void)
 {
 	for(auto i = 0; i < LASER_MAX; i++) {
 		LaserInd[i]=i;
@@ -236,7 +226,7 @@ static void luna_cmdL(LASER_CMD& LaserCmd)
 	LaserCmd.l += (LaserCmd.l>>1);
 }
 
-static uint8_t laser_dir(uint16_t i)
+uint8_t C_LASER::laser_dir(uint16_t i)
 {
 	uint8_t deg = 0;
 
@@ -278,7 +268,7 @@ static void slaser_pset(LASER_DATA *lp)
 	lp->p[2].y += lp->ly;
 }
 
-static void Lmove(LASER_DATA *lp)
+void C_LASER::Lmove(LASER_DATA *lp)
 {
 	//int i;
 	//int ltempx,ltempy;
@@ -335,7 +325,7 @@ static void Lmove(LASER_DATA *lp)
 	}
 }
 
-static void laser_hitchk(LASER_DATA *lp)
+void C_LASER::laser_hitchk(LASER_DATA *lp)
 {
 	long tx,ty,w1,length;
 
@@ -383,7 +373,7 @@ static void laser_hitchk(LASER_DATA *lp)
 	}
 }
 
-static void REFL_move(LASER_DATA *lp)
+void C_LASER::REFL_move(LASER_DATA *lp)
 {
 	switch(lp->flag){
 		case(LF_NONE):	// E  -->  R	普通に移動
@@ -434,7 +424,7 @@ static void REFL_move(LASER_DATA *lp)
 	}
 }
 
-static int REFL_hit(const LASER_DATA *lp)
+int C_LASER::REFL_hit(const LASER_DATA *lp)
 {
 	LLASER_DATA *ll;
 	int i;
@@ -473,7 +463,7 @@ static int REFL_hit(const LASER_DATA *lp)
 			LaserCmd.cmd = LC_WAY;	//
 			LaserCmd.type = LS_REF;	// ２回以上の反射を許可
 			LaserCmd.notr = i;		// 自分には反射しない
-			laser_setEX();			// 難易度変更無し
+			this->SetEX();	// 難易度変更無し
 			return 1;				// 当たった
 		}
 

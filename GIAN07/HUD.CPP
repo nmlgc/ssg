@@ -16,10 +16,10 @@
 #include "MAIDTAMA.H"
 #ifdef PBG_DEBUG
 #include "CONFIG.H"
-#include "HOMINGL.H"
 #include "PRankCtrl.h"
 #include "SCROLL.H"
 #include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/Stage.hpp"
 #endif
 #include "hatoyama/engine/text_backend.h"
@@ -281,7 +281,7 @@ void StdStatusOutput(void)
 	GrpPut16(0, (148 + 40), buf);
 	sprintf(buf, "Laser %3d", LaserNow);
 	GrpPut16(0, (176 + 40), buf);
-	sprintf(buf, "HLaser %2d", HLaserNow);
+	sprintf(buf, "HLaser %2d", HLaser.NumAlive());
 	GrpPut16(0, (196 + 40), buf);
 
 	sprintf(buf, "MTama %3d", MaidTamaNow);

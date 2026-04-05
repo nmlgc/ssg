@@ -12,7 +12,6 @@
 #include "ECL_LEN.H"
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "HOMINGL.H"
 #include "ITEM.H"
 #include "LLASER.H"
 #include "MAID.H"
@@ -23,6 +22,7 @@
 #include "ssg/Sound.h"
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/Effect3D.hpp"
+#include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -1026,7 +1026,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			HInfo.type = e->l_cmd.type;
 			HInfo.x    = e->x + e->l_cmd.x;
 			HInfo.y    = e->y + e->l_cmd.y;
-			HLaserSet(&HInfo);
+			HLaser.Set(&HInfo);
 		break;
 
 		case(ECL_LLSET):		// 太レーザーセット
@@ -1740,7 +1740,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			Boss.ClearCmd(); // この処理を何よりも優先させる(ビット消去等を含む)
 			tama_clear();
 			laser_clear();
-			HLaserClear();
+			HLaser.Clear();
 			this->Clear();
 			bRetFlag = false;
 		break;

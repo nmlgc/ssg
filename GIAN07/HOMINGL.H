@@ -79,18 +79,4 @@ typedef struct tagHLaserInfo {
 
 
 
-///// [グローバル変数] /////
-extern uint16_t	HLaserNow;	// ホーミングレーザーの本数
-extern HLaserData	ActiveHL;	// 確保済みホーミングレーザー
-extern HLaserData	FreeHL;	// 解放済みホーミングレーザー
-
-
-///// [関数プロトタイプ] /////
-void HLaserInit(void);	// ホーミングレーザーの初期化を行う
-void HLaserSet(const HLaserInfo *hinfo);	// ホーミングレーザーをセットする
-void HLaserMove(void);	// ホーミングレーザーを動作させる
-void HLaserClear(void);	// ホーミングレーザーに消去エフェクトをセット
-
-
-
 #endif

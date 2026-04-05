@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <assert.h>
 import std.compat;
 
 struct BUFFER_BORROWED : public std::span<const uint8_t> {
@@ -50,39 +51,54 @@ template <
 	}
 };
 
-// We can't #include SDL headers here because of GCC 15's import-then-#include
-// limitations, and SDL_malloc() and SDL_free() are declared with tons of
-// attributes we'd rather keep.
-void* SDL_malloc_wrap(size_t);
-
-struct SDL_FREE_DELETER {
-	void operator()(void *);
+// Defines a heap for use with `BUFFER_OWNED`.
+struct BUFFER_HEAP {
+	void* (*allocate)(size_t size) noexcept;
+	void (*free)(void *buf) noexcept;
 };
+
+// And since pointers to structs can't be callable… This indeed creates smaller
+// code than just using the [free] pointer itself as the template parameter of
+// `BUFFER_OWNED`.
+struct BUFFER_DELETER {
+	void (*free)(void *buf) noexcept;
+
+	void operator()(void *buf) const {
+		// std::unique_ptr will only ever call this for non-`nullptr` pointers.
+		// If [free] is a `nullptr`, that's on us.
+		assert(free != nullptr);
+		free(buf);
+	}
+};
+
+extern const BUFFER_HEAP BUFFER_HEAP_SDL;
 
 // Same semantics as the underlying unique_ptr: Can be either allocated or
 // empty.
-struct BUFFER_OWNED : public std::unique_ptr<uint8_t[], SDL_FREE_DELETER> {
+struct BUFFER_OWNED : public std::unique_ptr<uint8_t[], BUFFER_DELETER> {
 private:
 	size_t size_;
 
 public:
 	// Creates an empty buffer, with no allocation.
 	BUFFER_OWNED(std::nullptr_t null = nullptr) noexcept :
-		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(null), size_(0) {
+		std::unique_ptr<uint8_t[], BUFFER_DELETER>(nullptr, { nullptr }),
+		size_(0) {
 	}
 
-	// Adopts a SDL-allocated buffer.
-	BUFFER_OWNED(void*&& buf, size_t size) :
-		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(
-			static_cast<uint8_t *>(buf)
+	// Adopts a pre-allocated buffer from the given heap.
+	BUFFER_OWNED(void *&& buf, size_t size, const BUFFER_HEAP& heap) :
+		std::unique_ptr<uint8_t[], BUFFER_DELETER>(
+			static_cast<uint8_t *>(buf), { heap.free }
 		),
-		size_(size) {
+		size_(size)
+	{
 	}
 
 	// Tries to allocate [size] bytes, and leaves the buffer empty on failure.
-	BUFFER_OWNED(size_t size) :
-		std::unique_ptr<uint8_t[], SDL_FREE_DELETER>(
-			static_cast<uint8_t *>(SDL_malloc_wrap(size))
+	BUFFER_OWNED(size_t size, const BUFFER_HEAP& heap) :
+		std::unique_ptr<uint8_t[], BUFFER_DELETER>(
+			static_cast<uint8_t *>(heap.allocate(size)), { heap.free }
 		),
 		size_(get() ? size : 0) {
 	}

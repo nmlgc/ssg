@@ -1263,7 +1263,7 @@ bool LoadSound(void)
 BUFFER_OWNED LoadMusicRoomComment(int no)
 {
 	if((no < 0) || (no > 19)) {
-		return false;
+		return nullptr;
 	}
 	return DAT::Packfile(DAT::PACK_ID::ENEMY).MemExpand(27 + no);
 }

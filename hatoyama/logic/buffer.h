@@ -71,7 +71,8 @@ struct BUFFER_DELETER {
 	}
 };
 
-extern const BUFFER_HEAP BUFFER_HEAP_SDL;
+// Low-dependency heap for game logic allocations
+extern const BUFFER_HEAP BUFFER_HEAP_LOGIC;
 
 // Same semantics as the underlying unique_ptr: Can be either allocated or
 // empty.

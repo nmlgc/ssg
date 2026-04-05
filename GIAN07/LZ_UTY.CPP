@@ -120,7 +120,7 @@ BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 	}
 
 	const uint32_t size_uncompressed = info[filno].size_uncompressed;
-	BUFFER_OWNED uncompressed = { size_uncompressed, BUFFER_HEAP_SDL };
+	BUFFER_OWNED uncompressed = { size_uncompressed, BUFFER_HEAP_LOGIC };
 	if(!uncompressed) {
 		return nullptr;
 	}

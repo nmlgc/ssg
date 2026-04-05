@@ -127,11 +127,13 @@ function BuildHatoyamaLogic(variant)
 
 	local src
 	src += HATOYAMA_LOGIC.src
+	src += HATOYAMA.glob("logic/windows/*.cpp")
 
 	local link_cfg = modules_cfg:branch(PRINTF_LINK, link)
 	local compile_cfg = link_cfg:branch(HATOYAMA_LOGIC.compile)
 	local obj = compile_cfg:cxx(src)
 	return dep_cfg, link_cfg:branch({
+		lflags = { "kernel32.lib" },
 		linputs = compile_cfg:lib(obj, "logic"),
 	})
 end

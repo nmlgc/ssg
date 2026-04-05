@@ -21,6 +21,7 @@ function BuildHatoyamaLogic(constants_cflags)
 
 	local src
 	src += HATOYAMA_LOGIC.src
+	src += HATOYAMA.glob("logic/c/*.cpp")
 
 	local obj = link_cfg:branch(HATOYAMA_LOGIC.compile):cxx(src)
 	return dep_cfg, link_cfg:branch({ linputs = obj })

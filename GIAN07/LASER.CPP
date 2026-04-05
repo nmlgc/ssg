@@ -426,7 +426,6 @@ void C_LASER::REFL_move(LASER_DATA *lp)
 
 int C_LASER::REFL_hit(const LASER_DATA *lp)
 {
-	LLASER_DATA *ll;
 	int i;
 
 	// レーザーの進行方向に対して先端??? //
@@ -442,7 +441,7 @@ int C_LASER::REFL_hit(const LASER_DATA *lp)
 	// 太レーザーに対して反射する //
 	for(i=0;i<LLASER_MAX;i++){
 		if(i == lp->notr)        continue;		// 前回反射したなら無視する
-		ll = LLaser + i;
+		const auto *ll = (LLaser.Data().data() + i);
 		if(ll->flag != LLF_NORM) continue;		// 完全オープンでなければ次へ
 
 		tx = lx - ll->x;

@@ -11,17 +11,14 @@
 
 
 //// レーザー変数２ ////
-LLASER_DATA	LLaser[LLASER_MAX];
-LLASER_CMD	LLaserCmd;
+C_LLASER LLaser;
 
 
 //// ローカル関数 ////
 static void _LLaserPointSet(LLASER_DATA *lp);
-static void _LLaserHitCheck(const LLASER_DATA *lp);
-static void _LLaserXYSet(int id);			// レーザーの座標をセットする
 
 
-bool LLaserSet(uint8_t id)
+bool C_LLASER::Set(uint8_t id)
 {
 	// この部分で空いているレーザーのサーチを行う             //
 	// もし、レーザーが見つからなければ、FALSE をリターンする //
@@ -77,7 +74,7 @@ bool LLaserSet(uint8_t id)
 	return true;
 }
 
-extern void LLaserOpen(const ENEMY_DATA *e, uint8_t id)
+void C_LLASER::Open(const ENEMY_DATA *e, uint8_t id)
 {
 	for(auto& it : LLaser) {
 		auto *lp = &it;
@@ -88,10 +85,10 @@ extern void LLaserOpen(const ENEMY_DATA *e, uint8_t id)
 	}
 }
 
-extern void LLaserClose(const ENEMY_DATA *e, uint8_t id)
+void C_LLASER::Close(const ENEMY_DATA *e, uint8_t id)
 {
 	if(id==ECLCST_LLASERALL){
-		LLaserForceClose(e);
+		this->ForceClose(e);
 		return;
 	}
 
@@ -104,7 +101,7 @@ extern void LLaserClose(const ENEMY_DATA *e, uint8_t id)
 	}
 }
 
-extern void LLaserLine(const ENEMY_DATA *e, uint8_t id)
+void C_LLASER::Line(const ENEMY_DATA *e, uint8_t id)
 {
 	for(auto& it : LLaser) {
 		auto *lp = &it;
@@ -115,7 +112,7 @@ extern void LLaserLine(const ENEMY_DATA *e, uint8_t id)
 	}
 }
 
-static void _LLaserXYSet(int id)
+void C_LLASER::_LLaserXYSet(int id)
 {
 	// 注意！！この関数のid は旧式のid の意味を持つことに注意 //
 
@@ -125,7 +122,7 @@ static void _LLaserXYSet(int id)
 	_LLaserPointSet(LLaser+id);			// p[4] をセット
 }
 
-extern void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id)
+void C_LLASER::DegA(const ENEMY_DATA *e, uint8_t d, uint8_t id)
 {
 	for(auto& it : LLaser) {
 		auto *lp = &it;
@@ -146,7 +143,7 @@ extern void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id)
 	}
 }
 
-extern void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id)
+void C_LLASER::DegR(const ENEMY_DATA *e, char d, uint8_t id)
 {
 	for(auto& it : LLaser) {
 		auto *lp = &it;
@@ -168,7 +165,7 @@ extern void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id)
 }
 
 // 敵に関連づけられたレーザーを強制クローズ(Level2...) //
-extern void LLaserForceClose(const ENEMY_DATA *e)
+void C_LLASER::ForceClose(const ENEMY_DATA *e)
 {
 	for(auto& it : LLaser) {
 		auto *lp = &it;
@@ -182,7 +179,7 @@ extern void LLaserForceClose(const ENEMY_DATA *e)
 	}
 }
 
-extern void LLaserMove(void)
+void C_LLASER::Move(void)
 {
 	int				i;
 	LLASER_DATA		*lp;
@@ -267,7 +264,7 @@ extern void LLaserMove(void)
 	}
 }
 
-extern void LLaserClear(void)
+void C_LLASER::Clear(void)
 {
 	// 存在するレーザー全てを閉じる //
 	for(auto& it : LLaser) {
@@ -279,7 +276,7 @@ extern void LLaserClear(void)
 	Snd_SEStop(2);
 }
 
-extern void LLaserSetup(void)
+void C_LLASER::Setup(void)
 {
 	for(auto& it : LLaser) {
 		//memset(LLaser+i,0,sizeof(LLASER_DATA));
@@ -307,7 +304,7 @@ static void _LLaserPointSet(LLASER_DATA *lp)
 	pp[2].y += lp->infy;
 }
 
-static void _LLaserHitCheck(const LLASER_DATA *lp)
+void C_LLASER::_LLaserHitCheck(const LLASER_DATA *lp)
 {
 //	long tx,ty,w1,w2,length;
 

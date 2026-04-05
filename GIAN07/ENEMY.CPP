@@ -918,7 +918,7 @@ void C_ENEMY::AnimeMove(ENEMY_DATA *e) const
 void C_ENEMY::Delete(ENEMY_DATA& e)
 {
 	if(e.LLaserRef) {
-		LLaserForceClose(&e); // レーザーの強制クローズ
+		LLaser.ForceClose(&e); // レーザーの強制クローズ
 	}
 	e.flag = EF_DELETE;
 }
@@ -926,7 +926,7 @@ void C_ENEMY::Delete(ENEMY_DATA& e)
 void C_ENEMY::Explode(ENEMY_DATA& e)
 {
 	if(e.LLaserRef) {
-		LLaserForceClose(&e); // レーザーの強制クローズ
+		LLaser.ForceClose(&e); // レーザーの強制クローズ
 	}
 	e.hp = 0;
 	e.count = 0; // 爆発のアニメセット用
@@ -1028,7 +1028,8 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			HLaser.Set(&HInfo);
 		break;
 
-		case(ECL_LLSET):		// 太レーザーセット
+		case(ECL_LLSET): { // 太レーザーセット
+			auto& LLaserCmd = LLaser.LLaserCmd;
 			LLaserCmd.c  = e->l_cmd.c;
 			LLaserCmd.d  = e->l_cmd.d;
 			LLaserCmd.dx = e->l_cmd.x;
@@ -1040,30 +1041,33 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			LLaserCmd.w = e->l_cmd.w;
 
 			// 失敗した場合は、参照カウントを増やさない //
-			if(LLaserSet(e->LLaserRef)) e->LLaserRef++;
+			if(LLaser.Set(e->LLaserRef)) {
+				e->LLaserRef++;
+			}
 			bRetFlag = false;
+		}
 		break;
 
 		case(ECL_LLOPEN):		// 太レーザーオープン cmd,id
-			LLaserOpen(e,cmd[1]);
+			LLaser.Open(e,cmd[1]);
 			bRetFlag = false;
 		break;
 
 		case(ECL_LLCLOSE):		// 太レーザークローズ(消去＆参照カウント減少) cmd,id
-			LLaserClose(e,cmd[1]);
+			LLaser.Close(e,cmd[1]);
 			if(cmd[1]==ECLCST_LLASERALL) e->LLaserRef =  0;
 			else                         e->LLaserRef -= 1;		// ちょっとバグ有りなので注意
 			bRetFlag = false;
 		break;
 
 		case(ECL_LLCLOSEL):		// 太レーザーライン状態へ cmd,id
-			LLaserLine(e,cmd[1]);
+			LLaser.Line(e,cmd[1]);
 			bRetFlag = false;
 		break;
 
 		case(ECL_LLDEGR):		// 太レーザー角度相対変更 cmd,id,deg
 			// 順番が逆だから注意ね
-			LLaserDegR(e, Cast::sign<int8_t>(cmd[2]), cmd[1]);
+			LLaser.DegR(e, Cast::sign<int8_t>(cmd[2]), cmd[1]);
 			bRetFlag = false;
 		break;
 

@@ -23,6 +23,7 @@
 #include "HUD.H"
 #include "ITEM.H"
 #include "LENS.H"
+#include "LLASER.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
 #include "MUSIC.H"
@@ -531,7 +532,7 @@ void GameSTD_Init(void)
 	Enemy.IndSet();
 	tamaind_set(400+200);		// 小型弾に４００
 	Laser.IndSet();
-	LLaserSetup();
+	LLaser.Setup();
 	HLaser.Init();
 	SEffectInit();
 	CEffectInit();
@@ -853,7 +854,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	}
 	GrpBackend_SetClip(GRP_RES_RECT);
 
-	LLaserSetup();		// 音を止める
+	LLaser.Setup();	// 音を止める
 	Snd_SEStop(8);	// ワーニング音を止めるのだ
 
 	const auto flags = MSG_WINDOW_FLAGS::CENTER;
@@ -1400,7 +1401,7 @@ void GameMove(INPUT_BITS input)
 	Item.Move();
 	tama_move();
 	Laser.Move();
-	LLaserMove();
+	LLaser.Move();
 	HLaser.Move();
 	Fragment.Move();
 	SEffectMove();

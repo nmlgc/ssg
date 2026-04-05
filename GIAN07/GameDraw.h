@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "LLASER.H"
 #include "MAIDTAMA.H"
 
 class C_BIT;
@@ -17,6 +16,7 @@ class C_FRAGMENT;
 class C_HLASER;
 class C_ITEM;
 class C_LASER;
+class C_LLASER;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -53,7 +53,7 @@ void ItemDraw(const C_ITEM&);
 void laser_draw(const C_LASER&);
 
 // レーザーを描画する
-void LLaserDraw(LLASER_DATA_CSPAN llaser);
+void LLaserDraw(const C_LLASER&);
 
 void MaidDraw(const MAID&);
 void StateDraw(const MAID&);    // 各種ステータスを描画する

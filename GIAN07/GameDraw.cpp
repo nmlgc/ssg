@@ -15,6 +15,7 @@
 #include "HOMINGL.H"
 #include "ITEM.H"
 #include "LASER.H"
+#include "LLASER.H"
 #include "MAID.H"
 #include "TAMA.H"
 #include "hatoyama/logic/ut_math.h"
@@ -833,7 +834,7 @@ void laser_draw(const C_LASER& Laser)
 /// Long lasers
 /// -----------
 
-void LLaserDraw(LLASER_DATA_CSPAN llaser)
+void LLaserDraw(const C_LLASER& LLaser)
 {
 	int x, y;
 	VERTEX_XY	p[4];
@@ -859,7 +860,7 @@ void LLaserDraw(LLASER_DATA_CSPAN llaser)
 
 	GrpGeom->Lock();
 
-	for(const auto& it : llaser) {
+	for(const auto& it : LLaser.Data()) {
 		const auto *lp = &it;
 		const auto c = lp->c;
 		switch(lp->flag){

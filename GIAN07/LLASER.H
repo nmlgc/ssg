@@ -88,26 +88,4 @@ using LLASER_DATA_CSPAN = std::span<const LLASER_DATA, LLASER_MAX>;
 #endif
 
 
-//// レーザー関数２ ////
-bool LLaserSet(uint8_t id);	// レーザーをセットする
-void LLaserOpen(const ENEMY_DATA *e, uint8_t id);	// レーザーを開く
-void LLaserClose(const ENEMY_DATA *e, uint8_t id);	// レーザーを閉じる
-void LLaserLine(const ENEMY_DATA *e, uint8_t id);	// レーザーをライン状態にする
-void LLaserDegA(const ENEMY_DATA *e, uint8_t d, uint8_t id);	// レーザーを角度絶対で回転
-void LLaserDegR(const ENEMY_DATA *e, char d, uint8_t id);	// レーザーを角度相対で回転
-
-extern void LLaserForceClose(const ENEMY_DATA *e);	// 敵に関連づけられたレーザーを強制クローズ
-
-extern void LLaserMove(void);				// レーザーを動かす
-extern void LLaserClear(void);				// 無限遠レーザーを全クローズ
-extern void LLaserSetup(void);				// レーザー配列の初期化をする
-
-
-
-//// レーザー変数２ ////
-extern LLASER_DATA	LLaser[LLASER_MAX];
-extern LLASER_CMD	LLaserCmd;
-
-
-
 #endif

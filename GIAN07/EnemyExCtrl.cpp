@@ -4,10 +4,10 @@
 /*                                                                           */
 
 #include "ssg/internal/EnemyExCtrl.hpp"
-#include "LLASER.H"
 #include "MAID.H"
 #include "ssg/Sound.h"
 #include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/LLaser.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
@@ -445,8 +445,8 @@ void C_BIT::BitSTDRoll(void)
 			case(BLASERCMD_TYPE_C):		// 角度同期ｎ芒星レーザー
 				if(BitData.NumBits == 0) break;
 				LaserDeg = 64 + 256 / BitData.NumBits;
-				LLaserDegA(e, e->d + LaserDeg, 0);
-				LLaserDegA(e, e->d - LaserDeg, 1);
+				LLaser.DegA(e, (e->d + LaserDeg), 0);
+				LLaser.DegA(e, (e->d - LaserDeg), 1);
 			break;
 		}
 	}
@@ -493,6 +493,7 @@ void C_BIT::LaserCommand(uint8_t Command)
 	int				i;
 	ENEMY_DATA		*e;
 	uint8_t delta;
+	auto& LLaserCmd = LLaser.LLaserCmd;
 
 	LLaserCmd.dx = 0;
 	LLaserCmd.dy = 0;
@@ -514,17 +515,23 @@ void C_BIT::LaserCommand(uint8_t Command)
 			case(BLASERCMD_TYPE_A):		// 一方向・角度固定レーザーを放射
 				LLaserCmd.type = LLS_LONG;
 				LLaserCmd.c    = 2;
-				if(LLaserSet(e->LLaserRef)) e->LLaserRef++;
+				if(LLaser.Set(e->LLaserRef)) {
+					e->LLaserRef++;
+				}
 			break;
 
 			case(BLASERCMD_TYPE_B):		// 両方向角度固定レーザーを放射
 				LLaserCmd.d += 64;
 				LLaserCmd.type = LLS_LONG;
 				LLaserCmd.c = 1;
-				if(LLaserSet(e->LLaserRef)) e->LLaserRef++;
+				if(LLaser.Set(e->LLaserRef)) {
+					e->LLaserRef++;
+				}
 
 				LLaserCmd.d += 128;
-				if(LLaserSet(e->LLaserRef)) e->LLaserRef++;
+				if(LLaser.Set(e->LLaserRef)) {
+					e->LLaserRef++;
+				}
 			break;
 
 			case(BLASERCMD_TYPE_C):		// 角度同期ｎ芒星レーザー
@@ -534,23 +541,27 @@ void C_BIT::LaserCommand(uint8_t Command)
 				delta = 64 + 256 / BitData.NumBits;
 
 				LLaserCmd.d = e->d + delta;
-				if(LLaserSet(e->LLaserRef)) e->LLaserRef++;
+				if(LLaser.Set(e->LLaserRef)) {
+					e->LLaserRef++;
+				}
 				LLaserCmd.d = e->d - delta;
-				if(LLaserSet(e->LLaserRef)) e->LLaserRef++;
+				if(LLaser.Set(e->LLaserRef)) {
+					e->LLaserRef++;
+				}
 			break;
 
 			case(BLASERCMD_OPEN):
-				LLaserOpen(e, ECLCST_LLASERALL);
+				LLaser.Open(e, ECLCST_LLASERALL);
 			continue;
 
 			case(BLASERCMD_CLOSE):
-				LLaserClose(e, ECLCST_LLASERALL);
+				LLaser.Close(e, ECLCST_LLASERALL);
 				e->LLaserRef = 0;
 				BitData.bIsLaserEnable = false;
 			continue;
 
 			case(BLASERCMD_CLOSEL):
-				LLaserLine(e, ECLCST_LLASERALL);
+				LLaser.Line(e, ECLCST_LLASERALL);
 			continue;
 		}
 

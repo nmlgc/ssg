@@ -30,6 +30,7 @@
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/Item.hpp"
+#include "ssg/internal/LLaser.hpp"
 #include "ssg/internal/Laser.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
@@ -531,7 +532,7 @@ void GameSTD_Init(void)
 	Enemy.IndSet();
 	tamaind_set(400+200);		// 小型弾に４００
 	Laser.IndSet();
-	LLaserSetup();
+	LLaser.Setup();
 	HLaser.Init();
 	SEffectInit();
 	CEffectInit();
@@ -853,7 +854,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	}
 	GrpBackend_SetClip(GRP_RES_RECT);
 
-	LLaserSetup();		// 音を止める
+	LLaser.Setup();	// 音を止める
 	Snd_SEStop(8);	// ワーニング音を止めるのだ
 
 	const auto flags = MSG_WINDOW_FLAGS::CENTER;
@@ -1400,7 +1401,7 @@ void GameMove(INPUT_BITS input)
 	Item.Move();
 	tama_move();
 	Laser.Move();
-	LLaserMove();
+	LLaser.Move();
 	HLaser.Move();
 	Fragment.Move();
 	SEffectMove();
@@ -1438,7 +1439,7 @@ void GameDraw(void)
 	MaidDraw(Viv);
 
 	if(GrpGeom_FB()) {
-		LLaserDraw(LLaser);
+		LLaserDraw(LLaser.Data());
 	}
 
 	ObjectLockDraw();
@@ -1447,7 +1448,7 @@ void GameDraw(void)
 	ItemDraw(Item.Data(), Item.Inds());
 
 	if(GrpGeom_Poly()) {
-		LLaserDraw(LLaser);
+		LLaserDraw(LLaser.Data());
 	}
 
 	HLaserDraw(HLaser.Data());

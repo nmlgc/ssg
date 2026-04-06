@@ -187,7 +187,10 @@ uint32_t tama2score(void);	// 弾を得点化する(Ret : 得点)
 void  tama2item(uint8_t n);	// 弾の 1/n をアイテム化する
 
 uint8_t tama_dir(uint16_t i);	// 弾の進行方向をセットする
-int tama_speed(uint16_t i);	// 弾の初速度をセットする
+
+// 弾の初速度をセットする
+int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd);
+
 uint8_t tama_flag(void);	// 弾のフラグを初期化する
 
 void tamaTmove(TAMA_DATA *t);	// 弾の " Type " による移動を行う

@@ -306,7 +306,10 @@ static void MTamaSet(void)
 		t->x = t->tx = TamaCmd.x;					// X座標のセット
 		t->y = t->ty = TamaCmd.y;					// Y座標のセット
 
-		t->v = t->v0 = tama_speed(i);			// 初速度のセット
+		// 初速度のセット
+		// 速度の基本値をセットする(GIAN.H)
+		t->v = t->v0 = tama_speed(i, SPEEDM(TamaCmd.v), TamaCmd);
+
 		t->a = TamaCmd.a;						// 注意：サイズは char
 
 		t->d   = tama_dir(i);					// 弾の発射角度

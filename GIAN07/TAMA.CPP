@@ -36,7 +36,6 @@ static void easy_cmd(void);				// 難易度：Ｅａｓｙ
 static void hard_cmd(void);				// 難易度：Ｈａｒｄ
 static void luna_cmd(void);				// 難易度：Ｌｕｎａｔｉｃ
 
-int NewTamaSpeed(uint16_t i);
 int LineCmdNewTamaSpeed(uint16_t i);
 int TamaSpeedEx(uint8_t d);
 void _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
@@ -250,7 +249,7 @@ static void __TamaSet(void)
 
 
 		//temp = random_ref;
-		t->v = t->v0 = NewTamaSpeed(i);			// 初速度のセット
+		t->v = t->v0 = tama_speed(i, TamaSpeed, TamaCmd); // 初速度のセット
 		//Debug(temp,30);
 
 		t->a = TamaCmd.a;						// 注意：サイズは char
@@ -779,24 +778,6 @@ uint8_t tama_dir(uint16_t i)
 	}
 }
 
-int NewTamaSpeed(uint16_t i)
-{
-	int temp = 0;						// ランダム要素の設定用
-	const int vret = TamaSpeed; // SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
-
-	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
-	switch(TamaCmd.v & 0xc0){
-		case(TAMASP_RND1): temp = rnd()%16-8 ; /* DebugOut(u8"2"); */	break;
-		case(TAMASP_RND2): temp = rnd()%32-16; /* DebugOut(u8"3"); */	break;
-		case(TAMASP_RND3): temp = rnd()%64-32; /* DebugOut(u8"4"); */	break;
-	}
-
-	if(TamaCmd.cmd & TAMA_REN)
-		return vret + (vret>>3)*(i/TamaCmd.n) + temp;
-	else
-		return vret + temp;
-}
-
 int LineCmdNewTamaSpeed(uint16_t i)
 {
 	int		vret = TamaSpeed;		// 速度の基本値をセットする(GIAN.H)
@@ -818,10 +799,9 @@ int LineCmdNewTamaSpeed(uint16_t i)
 		return vret;
 }
 
-int tama_speed(uint16_t i)
+int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd)
 {
 	int temp = 0;						// ランダム要素の設定用
-	const int vret = SPEEDM(TamaCmd.v);	// 速度の基本値をセットする(GIAN.H)
 
 	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
 	switch(TamaCmd.v & 0xc0){

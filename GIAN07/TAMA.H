@@ -226,6 +226,16 @@ inline void TamaSTDForm(uint8_t c)
 	TamaSetForm(TC_WAY,TOP_NONE,T_NORM,c);
 }
 
+inline void TamaSetHoming(uint8_t c)
+{
+	TamaCmd.cmd    = TC_WAY;
+	TamaCmd.option = TOP_NONE;
+	TamaCmd.type   = T_SBHOMING;
+	TamaCmd.c      = c;
+	TamaCmd.rep    = 64;
+	TamaCmd.vd     = 5;
+}
+
 inline void TamaSetDeg(uint8_t d, uint8_t dw)
 {
 	TamaCmd.d  = d;

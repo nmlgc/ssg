@@ -582,10 +582,7 @@ static void SetT_B1(void)
 	if(IsSubShot(Viv.toge_time)){
 		// ホーミング弾 //
 		// オプションのショット(右) //
-		TamaSTDForm(TID_HOMING_SUB);
-		TamaCmd.type = T_SBHOMING;
-		TamaCmd.rep  = 64;
-		TamaCmd.vd   = 5;
+		TamaSetHoming(TID_HOMING_SUB);
 		TamaSetXY(Viv.opx+SBOPT_DX*64,Viv.opy);
 		TamaSetSpd(28,4);
 		TamaSetDeg(64-5,0);
@@ -617,10 +614,7 @@ static void SetT_B2(void)
 	if(IsSubShot(Viv.toge_time)){
 		// ホーミング弾 //
 		// オプションのショット(右) //
-		TamaSTDForm(TID_HOMING_SUB);
-		TamaCmd.type = T_SBHOMING;
-		TamaCmd.rep  = 64;
-		TamaCmd.vd   = 5;
+		TamaSetHoming(TID_HOMING_SUB);
 		TamaSetXY(Viv.opx+SBOPT_DX*64,Viv.opy);
 		TamaSetSpd(28,4);
 		TamaSetDeg(64-5,0);
@@ -657,10 +651,7 @@ static void SetT_B4(void)
 	if(IsSubShot(Viv.toge_time)){
 		// ホーミング弾 //
 		// オプションのショット(右) //
-		TamaSTDForm(TID_HOMING_SUB);
-		TamaCmd.type = T_SBHOMING;
-		TamaCmd.rep  = 64;
-		TamaCmd.vd   = 5;
+		TamaSetHoming(TID_HOMING_SUB);
 		TamaSetXY(Viv.opx+SBOPT_DX*64,Viv.opy);
 		TamaSetSpd(28,4);
 		TamaSetDeg(64-5,0);
@@ -697,10 +688,7 @@ static void SetT_B6(void)
 	if(IsSubShot(Viv.toge_time)){
 		// ホーミング弾 //
 		// オプションのショット(右) //
-		TamaSTDForm(TID_HOMING_SUB);
-		TamaCmd.type = T_SBHOMING;
-		TamaCmd.rep  = 64;
-		TamaCmd.vd   = 5;
+		TamaSetHoming(TID_HOMING_SUB);
 		TamaSetXY(Viv.opx+SBOPT_DX*64,Viv.opy);
 		TamaSetSpd(28,4);
 		TamaSetDeg(64-5,0);
@@ -737,10 +725,7 @@ static void SetT_B8(void)
 	if(IsSubShot(Viv.toge_time)){
 		// ホーミング弾 //
 		// オプションのショット(右) //
-		TamaSTDForm(TID_HOMING_SUB);
-		TamaCmd.type = T_SBHOMING;
-		TamaCmd.rep  = 64;
-		TamaCmd.vd   = 5;
+		TamaSetHoming(TID_HOMING_SUB);
 		TamaSetXY(Viv.opx+SBOPT_DX*64,Viv.opy);
 		TamaSetSpd(28,4);
 		TamaSetDeg(64-22,30);
@@ -915,10 +900,7 @@ static void SetWideBomb(void)
 static void SetHomingBomb(void)
 {
 	if(Viv.bomb_time%30 == 1){
-		TamaSTDForm(TID_HOMING_BOMB_A);
-		TamaCmd.type = T_SBHOMING;
-		TamaCmd.rep  = 64;
-		TamaCmd.vd   = 5;
+		TamaSetHoming(TID_HOMING_BOMB_A);
 		TamaSetXY(Viv.x,Viv.y);
 		TamaSetSpd(28,4);
 		TamaSetDeg(64,16);

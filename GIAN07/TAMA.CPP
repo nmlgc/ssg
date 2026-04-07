@@ -12,6 +12,7 @@
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "ssg/Round.h"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
@@ -216,9 +217,9 @@ int TamaSpeedEx(uint8_t d)
 	int		delta;
 
 	switch(TamaCmd.v & 0xc0){
-		case(TAMASP_RND1): temp = rnd()%16-8 ; /* DebugOut(u8"2"); */	break;
-		case(TAMASP_RND2): temp = rnd()%32-16; /* DebugOut(u8"3"); */	break;
-		case(TAMASP_RND3): temp = rnd()%64-32; /* DebugOut(u8"4"); */	break;
+	case(TAMASP_RND1): temp = ((RNG.next() % 16) -  8); break;
+	case(TAMASP_RND2): temp = ((RNG.next() % 32) - 16); break;
+	case(TAMASP_RND3): temp = ((RNG.next() % 64) - 32); break;
 	}
 
 	// d と TamaCmd.d の値の離れ具合により、速度を変化させる //
@@ -617,7 +618,7 @@ void tama2item(uint8_t n)
 			t->count  = 0;
 			t->d      = 0;
 
-			if(rnd()%n == 0){
+			if((RNG.next() % n) == 0) {
 				ItemSet(t->x, t->y, ITEM_SCORE);
 				t->flag   = TF_DELETE;
 				t->c      = 0x25;
@@ -638,7 +639,7 @@ void tama2item(uint8_t n)
 			t->count  = 0;
 			t->d      = 0;
 
-			if(rnd()%n == 0){
+			if((RNG.next() % n) == 0) {
 				ItemSet(t->x, t->y, ITEM_SCORE);
 				t->flag   = TF_DELETE;
 				t->c      = 0x25;
@@ -753,7 +754,7 @@ uint8_t tama_dir(uint16_t i)
 
 		case(TC_RND):
 			// DebugOut(u8"1");
-			return deg + rnd()%TamaCmd.dw - (TamaCmd.dw>>1);
+			return (deg + (RNG.next() % TamaCmd.dw) - (TamaCmd.dw >> 1));
 
 		default:
 			return 0;	// 絶対無いけれど、warning がうるさいので...
@@ -787,9 +788,9 @@ int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd)
 
 	// 速度ランダムは基本値のｎ％変化とするべきかもしれないが... //
 	switch(TamaCmd.v & 0xc0){
-		case(TAMASP_RND1): temp = rnd()%16-8 ; /* DebugOut(u8"2"); */	break;
-		case(TAMASP_RND2): temp = rnd()%32-16; /* DebugOut(u8"3"); */	break;
-		case(TAMASP_RND3): temp = rnd()%64-32; /* DebugOut(u8"4"); */	break;
+	case(TAMASP_RND1): temp = ((RNG.next() % 16) -  8); break;
+	case(TAMASP_RND2): temp = ((RNG.next() % 32) - 16); break;
+	case(TAMASP_RND3): temp = ((RNG.next() % 64) - 32); break;
 	}
 
 	if(TamaCmd.cmd & TAMA_REN)
@@ -1143,7 +1144,7 @@ void tamaOmove(TAMA_DATA *t)
 					case(TC_ALL):
 						TamaCmd.n  = 10;
 						TamaCmd.v  = 13;
-						TamaCmd.d  = Cast::down<uint8_t>(rnd());
+						TamaCmd.d  = Cast::down<uint8_t>(RNG.next());
 						if(TamaCmd.cmd&TAMA_REN) TamaCmd.v -= 2;
 					break;
 					case(TC_RND):

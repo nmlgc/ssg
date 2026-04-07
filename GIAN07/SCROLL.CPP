@@ -20,6 +20,7 @@
 #include "PRankCtrl.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
+#include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"

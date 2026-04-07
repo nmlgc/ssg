@@ -14,6 +14,7 @@
 #include "MAID.H"
 #include "ssg/Input.h"
 #include "ssg/internal/LZ.hpp"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/file.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -40,9 +41,10 @@ void DemoplayInit(void)
 {
 	// 乱数の準備 //
 	DemoInfo.RndSeed = (
-		(Cast::up<uint32_t>(rnd()) + 1u) * (Cast::up<uint32_t>(rnd()) + 1u)
+		(Cast::up<uint32_t>(RNG.next()) + 1u) *
+		(Cast::up<uint32_t>(RNG.next()) + 1u)
 	);
-	rnd_seed_set(DemoInfo.RndSeed);
+	RNG.seed = DemoInfo.RndSeed;
 
 	DemoInfo.Exp    = Viv.exp;
 	DemoInfo.Weapon = Viv.weapon;
@@ -75,7 +77,7 @@ bool DemoplayLoadSetup()
 
 	// 乱数の初期化 //
 	// 最後に乱数もそろえる //
-	rnd_seed_set(DemoInfo.RndSeed);
+	RNG.seed = DemoInfo.RndSeed;
 
 	return true;
 }

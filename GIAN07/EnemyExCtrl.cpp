@@ -8,6 +8,7 @@
 #include "LLASER.H"
 #include "MAID.H"
 #include "ssg/Sound.h"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
@@ -191,7 +192,7 @@ void BitSet(BOSS_DATA *b, uint8_t NumBits, uint32_t BitID)
 	BitData.Length      = 0;
 	BitData.FinalLength = 64*80;
 	BitData.NumBits     = NumBits;
-	BitData.BitSpeed    = ((rnd()>>1)&1) ? 2: -2;
+	BitData.BitSpeed    = (((RNG.next() >> 1) & 1) ? 2: -2);
 //	BitData.DeltaAngle  = (256*256)/NumBits;
 	BitData.BaseAngle   = 0;//(256*256)/NumBits;//0;
 	BitData.LaserState  = BLASERCMD_DISABLE;

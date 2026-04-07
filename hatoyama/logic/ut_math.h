@@ -53,11 +53,6 @@ uint8_t atan8(int x, int y);	// ３２ビット版です
 int32_t isqrt(int32_t s);
 
 
-// 乱数 //
-void rnd_seed_set(uint32_t val);
-uint16_t rnd(void);
-
-
 // 使用禁止かな //
 #endif
 

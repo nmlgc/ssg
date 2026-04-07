@@ -5,6 +5,7 @@
 
 #include "EFFECT3D.H"
 #include "GIAN.H"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
@@ -250,18 +251,18 @@ void Init3DCube(void)
 
 	for(i=0; i<CUBE_MAX; i++){
 		Cube[i].l = 30*64;
-		Cube[i].d.dx = rnd();
-		Cube[i].d.dy = rnd();
-		Cube[i].d.dz = rnd();
+		Cube[i].d.dx = RNG.next();
+		Cube[i].d.dy = RNG.next();
+		Cube[i].d.dz = RNG.next();
 		Cube[i].p.x = cosl(i*256/CUBE_MAX, 200*64);
 		Cube[i].p.y = sinl(i*256/CUBE_MAX, 200*64);
 		Cube[i].p.z = 0;
 	}
 
 	for(auto& it : Star) {
-		it.x = ((rnd() % X_SIZ) + X_MIN);
-		it.y = -(rnd() % Y_SIZ);
-		it.vy = ((rnd() % 10) + 10);
+		it.x = ((RNG.next() % X_SIZ) + X_MIN);
+		it.y = -(RNG.next() % Y_SIZ);
+		it.vy = ((RNG.next() % 10) + 10);
 	}
 }
 
@@ -312,9 +313,9 @@ void Move3DCube(void)
 	for(auto& it : Star) {
 		it.y += it.vy;
 		if(it.y > 480) {
-			it.x = ((rnd() % X_SIZ) + X_MIN);
+			it.x = ((RNG.next() % X_SIZ) + X_MIN);
 			it.y = 0;
-			it.vy = ((rnd() % 10) + 10);
+			it.vy = ((RNG.next() % 10) + 10);
 		}
 	}
 }
@@ -400,15 +401,15 @@ static void __Draw3DCube(const Cube3D *c)
 }
 
 
-static void ResetFakeECLStr(FakeECLString& it)
+static void ResetFakeECLStr(FakeECLString& it, C_RNG& RNG)
 {
-	const uint8_t d = (rnd() % 128);
-	const int v = ((rnd() % PixelToWorld(5)) + PixelToWorld(5));
+	const uint8_t d = (RNG.next() % 128);
+	const int v = ((RNG.next() % PixelToWorld(5)) + PixelToWorld(5));
 
-	it.SrcX = (((rnd() % 7) * 9) * 8);
-	it.SrcY = ((rnd() % 16) * 16);
-	it.x    = PixelToWorld(28 + (rnd() % 484));
-	it.y    = -PixelToWorld(rnd() % 640);
+	it.SrcX = (((RNG.next() % 7) * 9) * 8);
+	it.SrcY = ((RNG.next() % 16) * 16);
+	it.x    = PixelToWorld(28 + (RNG.next() % 484));
+	it.y    = -PixelToWorld(RNG.next() % 640);
 	it.vx   = 0; //cosl(d, v);
 	it.vy   = v; //sinl(d, v);
 }
@@ -421,7 +422,7 @@ void InitEffectFakeECL(void)
 	WFLine.w = 30;
 
 	for(auto& it : FakeECLStr) {
-		ResetFakeECLStr(it);
+		ResetFakeECLStr(it, RNG);
 	}
 }
 
@@ -435,7 +436,7 @@ void MoveEffectFakeECL(void)
 		it.y += it.vy;
 
 		if(it.y >= (480 * 64)) {
-			ResetFakeECLStr(it);
+			ResetFakeECLStr(it, RNG);
 		}
 	}
 }
@@ -479,14 +480,14 @@ void DrawEffectFakeECL(void)
 	GrpSurface_Blit({ 128, 400 }, SURFACE_ID::MAPCHIP, src);
 }
 
-static WORLD_COORD Stg4RockRandomX(void)
+static WORLD_COORD Stg4RockRandomX(C_RNG& RNG)
 {
-	return ((rnd() % PixelToWorld(500)) - PixelToWorld(250));
+	return ((RNG.next() % PixelToWorld(500)) - PixelToWorld(250));
 }
 
-static WORLD_COORD Stg4RockRandomY(void)
+static WORLD_COORD Stg4RockRandomY(C_RNG& RNG)
 {
-	return PixelToWorld(-250 - 40 - (rnd() % 250));
+	return PixelToWorld(-250 - 40 - (RNG.next() % 250));
 }
 
 void InitStg4Rock(void)
@@ -498,12 +499,12 @@ void InitStg4Rock(void)
 	constexpr int dy2 = (dy / 2);
 
 	for(i=0; i<ROCK_MAX; i++){
-		y = (i%4)*dy + (rnd()%dy2);
+		y = (((i % 4) * dy) + (RNG.next() % dy2));
 			//((380*64/16) * (i%(ROCK_MAX/16+1))) + rnd()%(380*64/16);
 
-		Rock[i].x = Stg4RockRandomX();	//
+		Rock[i].x = Stg4RockRandomX(RNG);	//
 		Rock[i].y = -250*64-y;						// 上の方なのだ
-		Rock[i].z = Stg4RockRandomX();	//
+		Rock[i].z = Stg4RockRandomX(RNG);	//
 
 		if(i == ROCK_MAX*5/8) id--;
 		if(i == ROCK_MAX*7/8) id--;
@@ -535,8 +536,8 @@ void MoveStg4Rock(void)
 		case(STG4ROCK_STDMOVE):
 			p->y += p->vy;
 			if(p->y > (250+40)*64){
-				p->x     = Stg4RockRandomX();
-				p->y     = Stg4RockRandomY();
+				p->x     = Stg4RockRandomX(RNG);
+				p->y     = Stg4RockRandomY(RNG);
 				p->vy    = ((4 - p->GrpID) * 16);
 				p->v     = p->vy;
 			}
@@ -548,8 +549,8 @@ void MoveStg4Rock(void)
 			p->y += p->vy;
 
 			if(p->y > (250+40)*64){
-				p->x     = Stg4RockRandomX();
-				p->y     = Stg4RockRandomY();
+				p->x     = Stg4RockRandomX(RNG);
+				p->y     = Stg4RockRandomY(RNG);
 				p->vy    = ((4 - p->GrpID) * 32 * 3);
 				p->v     = p->vy;
 				p->a     = 0;
@@ -563,8 +564,8 @@ void MoveStg4Rock(void)
 
 			if(p->count > 60*2){
 				if(p->y > (250+40)*64 || p->y < (-250-40)*64){
-					p->x     = Stg4RockRandomX();
-					p->y     = Stg4RockRandomY();
+					p->x     = Stg4RockRandomX(RNG);
+					p->y     = Stg4RockRandomY(RNG);
 					p->vy    = ((4 - p->GrpID) * 32);
 					p->v     = p->vy;
 				}
@@ -578,8 +579,8 @@ void MoveStg4Rock(void)
 			}
 
 			if(p->y > (250+40)*64 || p->y < (-250-40)*64){
-				p->x     = Stg4RockRandomX();
-				p->y     = (250+40)*64+rnd()%250;
+				p->x     = Stg4RockRandomX(RNG);
+				p->y     = (PixelToWorld(250 + 40) + (RNG.next() % 250));
 				p->vy    = (-(4 - p->GrpID) * 32 * 3);
 				p->v     = p->vy;
 				p->a     = 0;
@@ -685,18 +686,18 @@ void InitStg6Raster()
 	int		i;
 
 	for(i=0; i<S6RASTER_MAX; i++){
-		S6Ras[i].x = ((rnd() % X_SIZ) + X_MIN);
-		S6Ras[i].y = -rnd()%(480+160);//(480+240)-240;
-		S6Ras[i].deg = rnd();
+		S6Ras[i].x = ((RNG.next() % X_SIZ) + X_MIN);
+		S6Ras[i].y = (-RNG.next() % (480 + 160)); //(480+240)-240;
+		S6Ras[i].deg = RNG.next();
 		S6Ras[i].type = i%3;
-		S6Ras[i].amp = rnd()%80 + 70;
-		S6Ras[i].vy = 2 + rnd()%3;
+		S6Ras[i].amp = ((RNG.next() % 80) + 70);
+		S6Ras[i].vy = (2 + (RNG.next() % 3));
 	}
 
 	for(i=0; i<S6STAR_MAX; i++){
-		S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
-		S6Star[i].y = ((rnd() % Y_SIZ) + Y_MIN);
-		S6Star[i].vy = rnd()%20 + 8;
+		S6Star[i].x = ((RNG.next() % X_SIZ) + X_MIN);
+		S6Star[i].y = ((RNG.next() % Y_SIZ) + Y_MIN);
+		S6Star[i].vy = ((RNG.next() % 20) + 8);
 	}
 }
 
@@ -713,10 +714,10 @@ void MoveStg6Raster()
 		S6Ras[i].y += S6Ras[i].vy;
 
 		if(S6Ras[i].y > 480){
-			S6Ras[i].x = ((rnd() % X_SIZ) + X_MIN);
+			S6Ras[i].x = ((RNG.next() % X_SIZ) + X_MIN);
 			S6Ras[i].y = -160;
-			S6Ras[i].deg = rnd();
-			S6Ras[i].amp = rnd()%80 + 70;
+			S6Ras[i].deg = RNG.next();
+			S6Ras[i].amp = ((RNG.next() % 80) + 70);
 		}
 	}
 
@@ -724,9 +725,9 @@ void MoveStg6Raster()
 		S6Star[i].y += S6Star[i].vy;
 
 		if(S6Star[i].y > 480){
-			S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
+			S6Star[i].x = ((RNG.next() % X_SIZ) + X_MIN);
 			S6Star[i].y -= 480;
-			S6Star[i].vy = rnd()%20 + 8;
+			S6Star[i].vy = ((RNG.next() % 20) + 8);
 		}
 	}
 }
@@ -771,9 +772,9 @@ void InitStg3Star()
 	int		i;
 
 	for(i=0; i<S3STAR_MAX; i++){
-		S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
-		S6Star[i].y = ((rnd() % Y_SIZ) + Y_MIN);
-		S6Star[i].vy = rnd()%20 + 8;
+		S6Star[i].x = ((RNG.next() % X_SIZ) + X_MIN);
+		S6Star[i].y = ((RNG.next() % Y_SIZ) + Y_MIN);
+		S6Star[i].vy = ((RNG.next() % 20) + 8);
 	}
 }
 
@@ -787,9 +788,9 @@ void MoveStg3Star()
 		S6Star[i].y += S6Star[i].vy;
 
 		if(S6Star[i].y > 480){
-			S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
+			S6Star[i].x = ((RNG.next() % X_SIZ) + X_MIN);
 			S6Star[i].y -= 480;
-			S6Star[i].vy = rnd()%20 + 8;
+			S6Star[i].vy = ((RNG.next() % 20) + 8);
 		}
 	}
 }

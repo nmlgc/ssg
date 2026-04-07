@@ -19,10 +19,11 @@
 #include "LLASER.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
-#include "ssg/Round.h"
 #include "SCROLL.H"
-#include "ssg/Sound.h"
 #include "GIAN07/entity.h"
+#include "ssg/Round.h"
+#include "ssg/Sound.h"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
@@ -872,7 +873,7 @@ void InitEnemyDataX64(ENEMY_DATA *e, int x, int y, uint32_t id)
 
 	e->IsDamaged = 0;
 
-	e->tama_c   = Cast::down<uint8_t>(rnd()); // & 0xff;
+	e->tama_c   = Cast::down<uint8_t>(RNG.next()); // & 0xff;
 	e->g_width  = 0;
 	e->g_height = 0;
 
@@ -932,16 +933,18 @@ void EnemyECL_LongJump(ENEMY_DATA *e, uint32_t EclID)
 // 敵データを初期化する(x,y は非x64(ランダム可能) で指定のこと) //
 void InitEnemyDataSTD(ENEMY_DATA *e, short x, short y, uint32_t id)
 {
-	int		EnemyX = x;
-	int		EnemyY = y;
 /*
 	e->x   = I16LEAt(&p[0]);	// PixelToWorld(I16LEAt(&p[0]));
 	e->y   = I16LEAt(&p[2]);	// PixelToWorld(I16LEAt(&p[2]));
 */
 
 	// ランダム配置に対応するぞ //
-	EnemyX = (EnemyX==X_RNDV) ? GX_RND : (EnemyX<<6);
-	EnemyY = (EnemyY==Y_RNDV) ? GY_RND : (EnemyY<<6);
+	const int EnemyX = PixelToWorld(
+		(x == X_RNDV) ? (X_MIN + (RNG.next() % (X_MAX - X_MIN))) : x
+	);
+	const int EnemyY = PixelToWorld(
+		(y == Y_RNDV) ? (Y_MIN + (RNG.next() % (Y_MAX - Y_MIN))) : y
+	);
 
 	InitEnemyDataX64(e, EnemyX, EnemyY, id);
 }
@@ -1033,16 +1036,21 @@ void parse_ECL(ENEMY_DATA *e)
 		}
 		break;
 
-		case(ECL_XYRND):
+		case(ECL_XYRND): {
+			const auto rnd_x = ((RNG.next() % (X_MAX - X_MIN - 100)) * 32);
 			if(e->x > GX_MID){
-				e->x =  X_MID * 64 - ( rnd()%(X_MAX - X_MIN - 100) ) * 32;
+				e->x = (PixelToWorld(X_MID) - rnd_x);
 			}
 			else{
-				e->x =  X_MID * 64 + ( rnd()%(X_MAX - X_MIN - 100) ) * 32;
+				e->x = (PixelToWorld(X_MID) + rnd_x);
 			}
 
-			e->y = ( rnd()%(Y_MID - Y_MIN - 160) ) * 64 + (Y_MIN + 40) * 64;
+			e->y = (
+				PixelToWorld(RNG.next() % (Y_MID - Y_MIN - 160)) +
+				PixelToWorld(Y_MIN + 40)
+			);
 			bRetFlag = false;
+		}
 		break;
 
 		case(ECL_XYL):	// 1+2 Bytes Param
@@ -1347,8 +1355,8 @@ void parse_ECL(ENEMY_DATA *e)
 				}
 				else{
 					// 上端 //
-					//BaseAngle  = 24+(rnd()>>1)%(64-16)-16;//0;
-					BaseAngle  = 32 + ((rnd()>>1)&1)*64 - 16;
+					// BaseAngle  = (24 + ((RNG.next() >> 1) % (64 - 16)) - 16); //0;
+					BaseAngle  = (32 + (((RNG.next() >> 1) & 1) * 64) - 16);
 					DeltaAngle = 32;//128;
 				}
 			}
@@ -1382,13 +1390,13 @@ void parse_ECL(ENEMY_DATA *e)
 				}
 				else{
 					// 真ん中 //
-					BaseAngle  = ((rnd()>>1)&1) ? (-16) : (128-16);
+					BaseAngle = (((RNG.next() >> 1) & 1) ? (-16) : (128 - 16));
 					DeltaAngle = 32;
 				}
 			}
 
 			// 実際に角度を確定する //
-			e->d = BaseAngle + (rnd()>>1)%DeltaAngle;
+			e->d = (BaseAngle + ((RNG.next() >> 1) % DeltaAngle));
 
 			bRetFlag = false;
 		break;
@@ -1610,17 +1618,17 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_DEGX):			// ＠角度ランダムセット
 			ECL_DEBUG("ECL_DEGX",0);
-			e->d = rnd() & 0xff;
+			e->d = (RNG.next() & 0xff);
 			bRetFlag = false;
 		break;
 
 		case(ECL_DEGXU):		// ＠角度ランダムセット(上)
-			e->d = 128 + (rnd()&0x7f);
+			e->d = (128 + (RNG.next() & 0x7f));
 			bRetFlag = false;
 		break;
 
 		case(ECL_DEGXD):		// ＠角度ランダムセット(下)
-			e->d = rnd()&0x7f;
+			e->d = (RNG.next() & 0x7f);
 			bRetFlag = false;
 		break;
 
@@ -2200,11 +2208,13 @@ void parse_ECL(ENEMY_DATA *e)
 			bRetFlag = false;
 		break;
 
-		case(ECL_RND):		// Gr0 = rnd()
+		case(ECL_RND): // Gr0 = RNG.next()
 			switch(cmd[1]){
 				case(ECLCST_GR0):case(ECLCST_GR1):case(ECLCST_GR2):case(ECLCST_GR3):
 				case(ECLCST_GR4):case(ECLCST_GR5):case(ECLCST_GR6):case(ECLCST_GR7):
-					e->GR[cmd[1]] = (Cast::up<uint32_t>(rnd()) * rnd());
+					e->GR[cmd[1]] = (
+						Cast::up<uint32_t>(RNG.next()) * RNG.next()
+					);
 				break;
 
 				default:	// レジスタ指定がおかしい

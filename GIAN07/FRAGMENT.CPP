@@ -5,6 +5,7 @@
 
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -48,16 +49,16 @@ void fragment_set(int x, int y, uint8_t cmd)
 
 	switch(cmd){
 		case(FRG_HIT):
-			d = rnd()&0xff;
-			l = 64 + rnd()%(64*3);
+			d = (RNG.next() & 0xff);
+			l = (PixelToWorld(1) + (RNG.next() % PixelToWorld(3)));
 			f->count = 24;
 			f->vx    = cosl(d,l);
 			f->vy    = sinl(d,l);
 		break;
 
 		case(FRG_EVADE):
-			d = rnd()&0xff;
-			l = 64*4 + rnd()%(64*3);
+			d = (RNG.next() & 0xff);
+			l = (PixelToWorld(4) + (RNG.next() % PixelToWorld(3)));
 			f->count = 24;
 			f->vx    = cosl(d,l);
 			f->vy    = sinl(d,l);
@@ -71,32 +72,32 @@ void fragment_set(int x, int y, uint8_t cmd)
 
 		case(FRG_STAR1):
 			f->count = 64;
-			d = rnd()&0xff;
-			l = 64*5 + rnd()%(64*3);
+			d = (RNG.next() & 0xff);
+			l = (PixelToWorld(5) + (RNG.next() % PixelToWorld(3)));
 			f->vx    = cosl(d,l);
 			f->vy    = sinl(d,l);
 		break;
 
 		case(FRG_STAR2):
 			f->count = 64;
-			d = rnd()&0xff;
-			l = 64*4 + rnd()%(64*3);
+			d = (RNG.next() & 0xff);
+			l = (PixelToWorld(4) + (RNG.next() % PixelToWorld(3)));
 			f->vx    = cosl(d,l);
 			f->vy    = sinl(d,l);
 		break;
 
 		case(FRG_STAR3):
 			f->count = 64;
-			d = -64 - 48 + rnd()%96;
-			l = 64*6 + rnd()%(64*4);
+			d = (-64 - 48 + (RNG.next() % 96));
+			l = (PixelToWorld(6) + (RNG.next() % PixelToWorld(4)));
 			f->vx    = cosl(d,l);
 			f->vy    = sinl(d,l);
 		break;
 
 		case(FRG_HEART):
 			f->count = 105;
-			d = rnd()&0xff;
-			l = 64*2 + rnd()%(64*5);
+			d = (RNG.next() & 0xff);
+			l = (PixelToWorld(2) + (RNG.next() % PixelToWorld(5)));
 			f->vx    = cosl(d,l);
 			f->vy    = sinl(d,l);
 		break;

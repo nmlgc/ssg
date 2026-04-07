@@ -69,9 +69,6 @@ constexpr int SND_X_MID = PixelToWorld(320);
 ///// [マクロ] /////
 #define SPEEDM(v)	((short)(((v)&0x3f)<<4))	// 速度セット用まくろ(BYTE->int?)
 
-#define GX_RND	((X_MIN+rnd()%(X_MAX-X_MIN))<<6)			// Ｘ座標ランダム
-#define GY_RND	((Y_MIN+rnd()%(Y_MAX-Y_MIN))<<6)			// Ｙ座標ランダム
-
 //#define HITCHK(a,b,h)	( ((uint32_t)(a)-(b)+(h))<h*2 )	// ヒットなら非ゼロ
 #define HITCHK(a,b,h)	(abs((a)-(b))<(h))
 

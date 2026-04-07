@@ -11,6 +11,7 @@
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "ssg/Sound.h"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/logic/cast.h"
@@ -295,7 +296,7 @@ void SEffectMove(void)
 
 			case(SEFC_STR1_2):
 				if(e->time==0){
-					const uint8_t deg = (128 + (rnd() % 128));
+					const uint8_t deg = (128 + (RNG.next() % 128));
 					e->cmd  = SEFC_STR1_3;
 					e->time = 64;
 					e->vx   = cosl(deg,10*64);

@@ -676,8 +676,6 @@ void FreeStageData(void)
 // ＥＣＬ&ＳＣＬデータ列をメモリ上にロードする //
 bool LoadStageData(uint8_t stage)
 {
-	int				i;
-
 	// Re-assigning the `std::unique_ptr`s only frees them one by one, and we
 	// want them all freed in any case.
 	FreeStageData();

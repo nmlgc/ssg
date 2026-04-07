@@ -4,6 +4,7 @@
  */
 
 #include "BOMBEFC.H"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -13,7 +14,7 @@ BombEfcCtrl		BombEfc[EXBOMB_MAX];
 // 秘密の関数 //
 void _ExBombSTDInit(BombEfcCtrl *p);
 void _ExBombSTDDraw(BombEfcCtrl *p);
-void _ExBombSTDMove(BombEfcCtrl *p);
+void _ExBombSTDMove(BombEfcCtrl *p, C_RNG& RNG);
 
 
 
@@ -85,7 +86,7 @@ void ExBombEfcMove(void)
 		it.count++;
 		switch(it.type) {
 		case EXBOMB_STD:
-			_ExBombSTDMove(&it);
+			_ExBombSTDMove(&it, RNG);
 			if(it.count > ((64 * 3) + 32)) {
 				it.bIsUsed = false;
 			}
@@ -133,7 +134,7 @@ void _ExBombSTDDraw(BombEfcCtrl *p)
 }
 
 
-void _ExBombSTDMove(BombEfcCtrl *p)
+void _ExBombSTDMove(BombEfcCtrl *p, C_RNG& RNG)
 {
 	int j = 0;
 	int x, y, v, rv;
@@ -147,15 +148,15 @@ void _ExBombSTDMove(BombEfcCtrl *p)
 		auto *target = &it;
 		if(target->d > 7*2){
 			if(t > 64*3) continue;
-			const uint8_t rd = rnd();
-			rv = rnd()%256+128;
+			const uint8_t rd = RNG.next();
+			rv = ((RNG.next() % 256) + 128);
 			target->vx = cosl(rd, rv);
 			target->vy = sinl(rd, rv);
 
 			const uint8_t d = ((t * 2) + ((j % 8) << 5)); // + (rnd() % 8) - 4;
 			//v = sinl(degx,64*90)+64*90;
 
-			rv = v - rnd()%(v>>2);
+			rv = (v - (RNG.next() % (v >> 2)));
 			target->x = cosl(d,rv) + x;
 			target->y = sinl(d,rv) + y;
 			target->d = 0;

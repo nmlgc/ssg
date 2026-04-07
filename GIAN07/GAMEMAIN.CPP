@@ -36,6 +36,7 @@
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
@@ -741,10 +742,10 @@ bool DemoInit(void)
 
 	MaidSet();
 
-	rnd_seed_set(Time_SteadyTicksMS());
-	GameStage = (rnd()%STAGE_MAX)+1;
+	RNG.seed = Time_SteadyTicksMS();
+	GameStage = ((RNG.next() % STAGE_MAX) + 1);
 
-//	GameStage = (rnd()%3)+1;		// この部分は体験版(コミケ)だけ //
+//	GameStage = ((RNG.next() % 3) + 1);	// この部分は体験版(コミケ)だけ //
 //	GameStage = 1;					// こっちはＨＰ体験版用         //
 
 	if(!DemoplayLoadDemo(GameStage)) {

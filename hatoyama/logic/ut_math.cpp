@@ -7,11 +7,6 @@
 #pragma message(PBGWIN_UT_MATH_H)
 
 
-constexpr uint32_t RAND_A = 22695477; // 0x015a4e35
-
-static uint32_t random_seed; // 乱数のたね //
-
-
 ////ｓｉｎテーブル(ｃｏｓを含む)////
 extern const signed int SIN256[256+64] = {
 	0,6,12,18,25,31,37,43,49,56,62,68,74,80,86,92,97,103,109,115,120,126,131,136,
@@ -129,11 +124,6 @@ uint8_t atan8(int x, int y)
 	return ret;
 }
 
-void rnd_seed_set(uint32_t val)
-{
-	random_seed = val;
-}
-
 int32_t isqrt(int32_t s)
 {
 	// Near-constant-time integer square root algorithm, adapted from
@@ -188,10 +178,4 @@ int32_t isqrt(int32_t s)
 		return (root + 1);
 	}
 	return root;
-}
-
-uint16_t rnd(void)
-{
-	random_seed = ((random_seed * RAND_A) + 1);
-	return ((random_seed >> 16) & 0x7FFF);
 }

@@ -11,6 +11,7 @@
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "ssg/Round.h"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -336,7 +337,7 @@ static uint8_t laser_dir(uint16_t i)
 			return deg + (i<<8)/LaserCmd.n;
 
 		case(LC_RND):
-			return deg + rnd()%LaserCmd.dw - (LaserCmd.dw>>1);
+			return (deg + (RNG.next() % LaserCmd.dw) - (LaserCmd.dw >> 1));
 
 		default:	// ここには絶対にこないと思うのだが...
 			return 0;

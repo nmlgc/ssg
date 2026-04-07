@@ -159,7 +159,7 @@ void CEffectSet(int x, int y, uint8_t type)
 
 void MTitleInit(void)
 {
-	MTitleRect = TextObj.Register({ ((X_MAX + 1) - X_MIN), 20 });
+	MTitleRect = TextObj.Register({ X_SIZ, 20 });
 }
 
 // エフェクトの初期化を行う //

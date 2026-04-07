@@ -1342,13 +1342,6 @@ void PauseProc(bool&)
 	}
 }
 
-/*
-inline XAdd(DWORD old,int id)
-{
-	RndBuf[id] += (random_ref-old);
-}
-*/
-
 
 void GameMove(void)
 {

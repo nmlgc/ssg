@@ -5,6 +5,13 @@
 
 #include "ENEMY.H"
 
+/*
+_inline Debug(DWORD old,int id)
+{
+	RndBuf[id] += (random_ref-old);
+}
+*/
+
 // The original game defined this function for rotational 48×48 and 80×80 cels
 // whose 16 sprites were stored on two lines instead of one, but the original
 // game didn't use any.

@@ -1,5 +1,5 @@
 /*
- *   Unused MIDI debugging code
+ *   Unused code from `GAMEMAIN.CPP`
  *
  */
 
@@ -93,3 +93,10 @@ FVOID TitleProc(void)
 		PostMessage(hWndMain,WM_SYSCOMMAND,SC_CLOSE,0);
 */
 }
+
+/*
+_inline XAdd(DWORD old,int id)
+{
+	RndBuf[id] += (random_ref-old);
+}
+*/

@@ -25,8 +25,6 @@ struct {
 	uint8_t InputFlags;
 } ConfigTemp; // コンフィグのデータ一時保存用
 
-//DWORD RndBuf[RNDBUF_MAX];
-
 
 std::u8string ReplayFN(uint8_t stage)
 {

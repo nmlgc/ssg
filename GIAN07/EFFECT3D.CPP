@@ -264,8 +264,8 @@ void Init3DCube(void)
 	}
 
 	for(auto& it : Star) {
-		it.x = ((rnd() % (640 - 256)) + 128);
-		it.y = -(rnd() % 480);
+		it.x = ((rnd() % X_SIZ) + X_MIN);
+		it.y = -(rnd() % Y_SIZ);
 		it.vy = ((rnd() % 10) + 10);
 	}
 }
@@ -317,7 +317,7 @@ void Move3DCube(void)
 	for(auto& it : Star) {
 		it.y += it.vy;
 		if(it.y > 480) {
-			it.x = ((rnd() % (640 - 256)) + 128);
+			it.x = ((rnd() % X_SIZ) + X_MIN);
 			it.y = 0;
 			it.vy = ((rnd() % 10) + 10);
 		}
@@ -704,7 +704,7 @@ void InitStg6Raster()
 	int		i;
 
 	for(i=0; i<S6RASTER_MAX; i++){
-		S6Ras[i].x = rnd()%(640-256) + 128;
+		S6Ras[i].x = ((rnd() % X_SIZ) + X_MIN);
 		S6Ras[i].y = -rnd()%(480+160);//(480+240)-240;
 		S6Ras[i].deg = rnd();
 		S6Ras[i].type = i%3;
@@ -713,8 +713,8 @@ void InitStg6Raster()
 	}
 
 	for(i=0; i<S6STAR_MAX; i++){
-		S6Star[i].x = rnd()%(640-256) + 128;
-		S6Star[i].y = rnd()%480;
+		S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
+		S6Star[i].y = ((rnd() % Y_SIZ) + Y_MIN);
 		S6Star[i].vy = rnd()%20 + 8;
 	}
 }
@@ -732,7 +732,7 @@ void MoveStg6Raster()
 		S6Ras[i].y += S6Ras[i].vy;
 
 		if(S6Ras[i].y > 480){
-			S6Ras[i].x = rnd()%(640-256) + 128;
+			S6Ras[i].x = ((rnd() % X_SIZ) + X_MIN);
 			S6Ras[i].y = -160;
 			S6Ras[i].deg = rnd();
 			S6Ras[i].amp = rnd()%80 + 70;
@@ -743,7 +743,7 @@ void MoveStg6Raster()
 		S6Star[i].y += S6Star[i].vy;
 
 		if(S6Star[i].y > 480){
-			S6Star[i].x  = rnd()%(640-256) + 128;
+			S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
 			S6Star[i].y -= 480;
 			S6Star[i].vy = rnd()%20 + 8;
 		}
@@ -790,8 +790,8 @@ void InitStg3Star()
 	int		i;
 
 	for(i=0; i<S3STAR_MAX; i++){
-		S6Star[i].x = rnd()%(640-256) + 128;
-		S6Star[i].y = rnd()%480;
+		S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
+		S6Star[i].y = ((rnd() % Y_SIZ) + Y_MIN);
 		S6Star[i].vy = rnd()%20 + 8;
 	}
 }
@@ -806,7 +806,7 @@ void MoveStg3Star()
 		S6Star[i].y += S6Star[i].vy;
 
 		if(S6Star[i].y > 480){
-			S6Star[i].x  = rnd()%(640-256) + 128;
+			S6Star[i].x = ((rnd() % X_SIZ) + X_MIN);
 			S6Star[i].y -= 480;
 			S6Star[i].vy = rnd()%20 + 8;
 		}

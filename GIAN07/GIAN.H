@@ -46,6 +46,10 @@
 #define Y_MIN		(0)							// 表示Ｙ座標最小値
 constexpr WINDOW_COORD Y_MAX = (GRP_RES.h - 1);
 #define Y_MID		((Y_MAX+Y_MIN)/2)
+enum {
+	X_SIZ = ((X_MAX + 1) - X_MIN),
+	Y_SIZ = ((Y_MAX + 1) - Y_MIN),
+};
 
 constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
 	X_MIN, Y_MIN, (X_MAX + 1), (Y_MAX + 1)

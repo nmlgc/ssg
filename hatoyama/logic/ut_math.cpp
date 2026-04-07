@@ -10,7 +10,6 @@
 constexpr uint32_t RAND_A = 22695477; // 0x015a4e35
 
 static uint32_t random_seed; // 乱数のたね //
-//uint32_t random_ref;
 
 
 ////ｓｉｎテーブル(ｃｏｓを含む)////

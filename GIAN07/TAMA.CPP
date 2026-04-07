@@ -36,13 +36,6 @@ int TamaSpeedEx(uint8_t d);
 void _TamaEffectDraw(const TAMA_DATA *t);	// 弾をエフェクトとして描画？
 
 
-/*
-inline Debug(uint32_t old, int id)
-{
-	RndBuf[id] += (random_ref-old);
-}
-*/
-
 void tama_set(void)
 {
 	int		v;

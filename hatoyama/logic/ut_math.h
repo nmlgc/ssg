@@ -58,10 +58,6 @@ void rnd_seed_set(uint32_t val);
 uint16_t rnd(void);
 
 
-// デバッグ用(後で消すこと) //
-//extern uint32_t random_ref;
-
-
 // 使用禁止かな //
 #endif
 

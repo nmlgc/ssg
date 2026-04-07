@@ -105,13 +105,6 @@ bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 	return ((l > 0) && (w < chkw));
 }
 
-/*
-inline Debug(DWORD old,int id)
-{
-	RndBuf[id] += (random_ref-old);
-}
-*/
-
 void ENEMY_DATA::Draw() const
 {
 	constexpr auto sid = SURFACE_ID::ENEMY;

@@ -491,6 +491,16 @@ void DrawEffectFakeECL(void)
 	GrpSurface_Blit({ 128, 400 }, SURFACE_ID::MAPCHIP, src);
 }
 
+static WORLD_COORD Stg4RockRandomX(void)
+{
+	return ((rnd() % PixelToWorld(500)) - PixelToWorld(250));
+}
+
+static WORLD_COORD Stg4RockRandomY(void)
+{
+	return PixelToWorld(-250 - 40 - (rnd() % 250));
+}
+
 void InitStg4Rock(void)
 {
 	int		i;
@@ -503,9 +513,9 @@ void InitStg4Rock(void)
 		y = (i%4)*dy + (rnd()%dy2);
 			//((380*64/16) * (i%(ROCK_MAX/16+1))) + rnd()%(380*64/16);
 
-		Rock[i].x = (rnd()%(500*64)-250*64);		//
+		Rock[i].x = Stg4RockRandomX();	//
 		Rock[i].y = -250*64-y;						// 上の方なのだ
-		Rock[i].z = (rnd()%(500*64)-250*64);		//
+		Rock[i].z = Stg4RockRandomX();	//
 
 		if(i == ROCK_MAX*5/8) id--;
 		if(i == ROCK_MAX*7/8) id--;
@@ -537,8 +547,8 @@ void MoveStg4Rock(void)
 		case(STG4ROCK_STDMOVE):
 			p->y += p->vy;
 			if(p->y > (250+40)*64){
-				p->x     = (rnd()%(500*64)-250*64);
-				p->y     = (-250-40-rnd()%250)*64;
+				p->x     = Stg4RockRandomX();
+				p->y     = Stg4RockRandomY();
 				p->vy    = ((4 - p->GrpID) * 16);
 				p->v     = p->vy;
 			}
@@ -550,8 +560,8 @@ void MoveStg4Rock(void)
 			p->y += p->vy;
 
 			if(p->y > (250+40)*64){
-				p->x     = (rnd()%(500*64)-250*64);
-				p->y     = (-250-40-rnd()%250)*64;
+				p->x     = Stg4RockRandomX();
+				p->y     = Stg4RockRandomY();
 				p->vy    = ((4 - p->GrpID) * 32 * 3);
 				p->v     = p->vy;
 				p->a     = 0;
@@ -565,8 +575,8 @@ void MoveStg4Rock(void)
 
 			if(p->count > 60*2){
 				if(p->y > (250+40)*64 || p->y < (-250-40)*64){
-					p->x     = (rnd()%(500*64)-250*64);
-					p->y     = (-250-40-rnd()%250)*64;
+					p->x     = Stg4RockRandomX();
+					p->y     = Stg4RockRandomY();
 					p->vy    = ((4 - p->GrpID) * 32);
 					p->v     = p->vy;
 				}
@@ -580,7 +590,7 @@ void MoveStg4Rock(void)
 			}
 
 			if(p->y > (250+40)*64 || p->y < (-250-40)*64){
-				p->x     = (rnd()%(500*64)-250*64);
+				p->x     = Stg4RockRandomX();
 				p->y     = (250+40)*64+rnd()%250;
 				p->vy    = (-(4 - p->GrpID) * 32 * 3);
 				p->v     = p->vy;

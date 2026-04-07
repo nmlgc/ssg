@@ -405,32 +405,33 @@ static void __Draw3DCube(const Cube3D *c)
 }
 
 
+static void ResetFakeECLStr(FakeECLString& it)
+{
+	const uint8_t d = (rnd() % 128);
+	const int v = ((rnd() % PixelToWorld(5)) + PixelToWorld(5));
+
+	it.SrcX = (((rnd() % 7) * 9) * 8);
+	it.SrcY = ((rnd() % 16) * 16);
+	it.x    = PixelToWorld(28 + (rnd() % 484));
+	it.y    = -PixelToWorld(rnd() % 640);
+	it.vx   = 0; //cosl(d, v);
+	it.vy   = v; //sinl(d, v);
+}
+
 void InitEffectFakeECL(void)
 {
-	int v;
-
-	WFLine.d  = 0;
-	WFLine.ox = 640*64/2;
-	WFLine.oy = 480*64/2;
-	WFLine.w  = 30;
+	WFLine.d = 0;
+	WFLine.ox = 640 * 64 / 2;
+	WFLine.oy = 480 * 64 / 2;
+	WFLine.w = 30;
 
 	for(auto& it : FakeECLStr) {
-		const uint8_t d = (rnd() % 128);
-		v = rnd()%(64*5) + 64*5;
-
-		it.SrcX = (((rnd() % 7) *  9) * 8);
-		it.SrcY = ((rnd() % 16) * 16);
-		it.x    = ((28 + (rnd() % 484)) * 64);
-		it.y    = -((rnd() % 640) * 64);
-		it.vx   = 0; //cosl(d, v);
-		it.vy   = v; //sinl(d, v);
+		ResetFakeECLStr(it);
 	}
 }
 
 void MoveEffectFakeECL(void)
 {
-	int v;
-
 	WFLine.ox = (WFLine.ox+1)%64;
 	WFLine.oy = (WFLine.oy+62)%64;
 
@@ -439,15 +440,7 @@ void MoveEffectFakeECL(void)
 		it.y += it.vy;
 
 		if(it.y >= (480 * 64)) {
-			const uint8_t d = (rnd() % 128);
-			v = rnd()%(64*5) + 64*5;
-
-			it.SrcX = (((rnd() % 7) *  9) * 8);
-			it.SrcY = ((rnd() % 16) * 16);
-			it.x    = ((28 + (rnd() % 484)) * 64);
-			it.y    = -((rnd() % 640) * 64);
-			it.vx   = 0; //cosl(d, v);
-			it.vy   = v; //sinl(d, v);
+			ResetFakeECLStr(it);
 		}
 	}
 }

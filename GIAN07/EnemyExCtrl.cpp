@@ -38,8 +38,6 @@ void SnakyInit(void)
 // 蛇型の敵をセットする //
 void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 {
-	ENEMY_DATA		*e;
-
 	auto s = std::ranges::find_if(SnakeData, [](const auto& s) {
 		return !s.bIsUse;
 	});

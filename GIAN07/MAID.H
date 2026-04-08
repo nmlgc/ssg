@@ -7,7 +7,7 @@
 #define PBGWIN_MAID_H		"めいど : Version 0.01 : Update 2000/02/17"
 //#pragma message(PBGWIN_MAID_H)
 
-#include "ssg/Input.h"
+#include "hatoyama/logic/ffi.h"
 
 
 
@@ -67,24 +67,6 @@ typedef struct MAID {
 	bool bGameOver;	// ゲームオーバー判定用フラグ
 	bool BuzzSound;	// かすった音を連続再生させないためのフラグ
 } MAID;
-
-
-
-///// [ 関数 ] /////
-extern void MaidMove(INPUT_BITS, bool in_msg);
-extern void MaidSet(uint8_t stage_first);	// 初期化
-extern void MaidNextStage(void);	// 次のステージの準備
-extern void MaidDead(void);			// 死す
-
-extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
-extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
-extern void score_add(int sc);		// スコアを上昇させる
-void PowerUp(uint8_t damage);
-
-
-
-///// [ 変数 ] /////
-extern MAID			Viv;					// 麗しきメイドさん構造体
 
 
 

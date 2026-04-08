@@ -5,11 +5,11 @@
 
 #include "ssg/internal/Laser.hpp"
 #include "GIAN.H"
-#include "MAID.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "ssg/Round.h"
 #include "ssg/internal/LLaser.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/ut_math.h"
 
@@ -351,13 +351,14 @@ void C_LASER::laser_hitchk(LASER_DATA *lp)
 			}
 */
 			if(length>0 && length<=(lp->l) && w1<=(lp->w)){
-				MaidDead();
+				Viv.Dead();
 			}
 			else if(length>0 && length<=(lp->l) && w1<=(lp->w+LASER_EVADE_WIDTH)){
-				if(lp->evade) evade_add(0);
-				else{
+				if(lp->evade) {
+					Viv.evade_add(0);
+				} else {
 					lp->evade = 0xff;
-					evade_add(SLASER_EVADE);
+					Viv.evade_add(SLASER_EVADE);
 				}
 			}
 		break;

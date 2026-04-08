@@ -4,10 +4,10 @@
 /*                                                                           */
 
 #include "ssg/internal/EnemyExCtrl.hpp"
-#include "MAID.H"
 #include "ssg/Sound.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/LLaser.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"

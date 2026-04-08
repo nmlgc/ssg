@@ -11,8 +11,8 @@
 #include "HUD.H"
 #include "FONTUTY.H"
 #include "LogicInstance.h"
-#include "MAID.H"
 #include "MAIDTAMA.H"
+#include "ssg/internal/Maid.hpp"
 #ifdef PBG_DEBUG
 #include "CONFIG.H"
 #include "PRankCtrl.h"

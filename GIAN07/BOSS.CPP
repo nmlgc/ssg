@@ -8,7 +8,6 @@
 #include "ssg/internal/Boss.hpp"
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "MAID.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
 #include "ssg/internal/BombEfc.hpp" // 爆発エフェクト処理
@@ -17,6 +16,7 @@
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Laser.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/engine/snd.h"
 
 ///// [ 変数 ] /////
@@ -89,7 +89,9 @@ uint32_t C_BOSS::Move(void)
 			// サボテンヒットチェック //
 			if(HITCHK(e->x,Viv.x,e->g_width) && HITCHK(e->y,Viv.y,e->g_height) && Viv.muteki==0){
 				// ここら辺で敵にダメージを与えるとおもしろいかも？ //
-				if(e->flag&EF_HITSB) MaidDead();
+				if(e->flag & EF_HITSB) {
+					Viv.Dead();
+				}
 			}
 
 			// ホーミングの準備 //
@@ -153,7 +155,7 @@ bool C_BOSS::BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		BombEfc.Set(e.x, e.y, EXBOMB_STD);
 		ScrollCommand(SCMD_QUAKE);
 		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);
-		PowerUp(Cast::down<uint8_t>(e.hp));
+		Viv.PowerUp(Cast::down<uint8_t>(e.hp));
 		Enemy.Explode(e);
 
 		// 最後の一匹だった場合 //
@@ -163,19 +165,19 @@ bool C_BOSS::BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 			// sprintf(buf, "%3d Evade  %5dPts", Viv.evade, Viv.evadesc);
 			sprintf(buf, "  Bonus    %7uPts", temp);
 			StringEffect(180, 60, buf);
-			score_add(temp);
+			Viv.score_add(temp);
 		}
 
 		if(e.item) {
 			Item.Set(e.x, e.y, e.item);
 		}
-		score_add(e.score);
+		Viv.score_add(e.score);
 		Laser.Clear();
 		b.IsUsed = 0;
 		BossNow--; // ボスの参照カウント？を使用する
 	} else {
 		Snd_SEPlay(SOUND_ID_HIT, e.x);
-		PowerUp(damage);
+		Viv.PowerUp(damage);
 		e.hp -= damage;
 	}
 	return true;

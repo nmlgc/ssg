@@ -16,7 +16,6 @@
 #include "LENS.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
-#include "MAID.H"
 #include "MUSIC.H"
 #include "SCORE.H"
 #include "SCROLL.H"
@@ -32,6 +31,7 @@
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/LLaser.hpp"
 #include "ssg/internal/Laser.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
@@ -630,7 +630,7 @@ extern bool GameNextStage(void)
 	}
 
 	GameSTD_Init();
-	MaidNextStage();
+	Viv.NextStage();
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -1258,7 +1258,7 @@ void WeaponSelectProc(bool&)
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
-		MaidMove(KEY_TAMA, SclInfo.MsgFlag);
+		Viv.Move(KEY_TAMA, SclInfo.MsgFlag);
 		MaidTamaMove();
 
 		GrpBackend_SetClip(
@@ -1413,7 +1413,7 @@ void GameMove(INPUT_BITS input)
 	ScreenEffectMove();
 
 	// この２行の位置を変更しました //
-	MaidMove(input, SclInfo.MsgFlag);
+	Viv.Move(input, SclInfo.MsgFlag);
 	MaidTamaMove();
 }
 

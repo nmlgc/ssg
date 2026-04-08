@@ -5,7 +5,7 @@
 
 #include <printf/printf.h>
 
-#include "MAID.H"
+#include "ssg/internal/Maid.hpp"
 #include "EFFECT.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
@@ -18,10 +18,18 @@
 #include "hatoyama/engine/snd.h"
 
 
-MAID			Viv;					// 麗しきメイドさん構造体
+C_VIV Viv;
+
+// Avoids changes to the original code that accessed the single old `Viv`
+// instance. Very ugly, I know, but having a
+//
+// 	MAID& Viv = *this;
+//
+// member in `C_VIV` would reload the pointer on every access.
+#define Viv (*this)
 
 
-extern void MaidMove(INPUT_BITS input, bool in_msg)
+void C_VIV::Move(INPUT_BITS input, bool in_msg)
 {
 	int		vx,vy,v;
 	constexpr int VivSpeed = (64 * 18);
@@ -138,9 +146,9 @@ extern void MaidMove(INPUT_BITS input, bool in_msg)
 }
 
 // 初期化 //
-void MaidSet(uint8_t stage_first)
+void C_VIV::Set(uint8_t stage_first)
 {
-	MaidNextStage();
+	this->NextStage();
 
 	Viv.score     = 0;
 	Viv.dscore    = 0;
@@ -160,7 +168,7 @@ void MaidSet(uint8_t stage_first)
 }
 
 // 次のステージの準備 //
-extern void MaidNextStage(void)
+void C_VIV::NextStage(void)
 {
 	Viv.x         = Viv.opx = SX_START;
 	Viv.y         = Viv.opx = SY_START;
@@ -179,7 +187,7 @@ extern void MaidNextStage(void)
 	Viv.BuzzSound = false;
 }
 
-extern void MaidDead(void)
+void C_VIV::Dead(void)
 {
 	int		i;
 
@@ -231,13 +239,13 @@ extern void MaidDead(void)
 }
 
 // かすりゲージを上昇させる(エフェクトはメイド中心) //
-extern void evade_add(uint8_t n)
+void C_VIV::evade_add(uint8_t n)
 {
 	evade_addEx(Viv.x,Viv.y,n);
 }
 
 // 指定座標からエフェクト発生＆ゲージ上昇 //
-extern void evade_addEx(int x, int y, uint8_t n)
+void C_VIV::evade_addEx(int x, int y, uint8_t n)
 {
 	int		i;
 
@@ -268,12 +276,12 @@ extern void evade_addEx(int x, int y, uint8_t n)
 }
 
 // スコアを上昇させる //
-extern void score_add(int sc)
+void C_VIV::score_add(int sc)
 {
 	Viv.dscore += sc;
 }
 
-void PowerUp(uint8_t damage)
+void C_VIV::PowerUp(uint8_t damage)
 {
 	// ダメージの分だけ加算する //
 	Viv.exp2 += damage;
@@ -291,6 +299,8 @@ void PowerUp(uint8_t damage)
 	case 8:	return; // フルパワーアップ時
 	}
 }
+
+#undef Viv
 
 uint8_t GetLaserDeg(const MAID& Viv)
 {

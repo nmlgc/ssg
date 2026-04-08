@@ -5,11 +5,11 @@
 
 #include "MAIDTAMA.H"
 #include "GIAN.H"
-#include "MAID.H"
 #include "PRankCtrl.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/input.h"

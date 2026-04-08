@@ -12,7 +12,6 @@
 #include "ECL_LEN.H"
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "MAID.H"
 #include "PRankCtrl.h"
 #include "SCROLL.H"
 #include "GIAN07/entity.h"
@@ -24,6 +23,7 @@
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Laser.hpp"
 #include "ssg/internal/LLaser.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -627,7 +627,9 @@ void C_ENEMY::Move(void)
 			// サボテンヒットチェック //
 			if(HITCHK(e->x,Viv.x,e->g_width) && HITCHK(e->y,Viv.y,e->g_height) && Viv.muteki==0){
 				// ここら辺で敵にダメージを与えるとおもしろいかも？ //
-				if(e->flag&EF_HITSB) MaidDead();
+				if(e->flag & EF_HITSB) {
+					Viv.Dead();
+				}
 			}
 
 			// 範囲外チェック //
@@ -699,15 +701,15 @@ bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) {
 		Snd_SEPlay(SOUND_ID_BOMB, e.x);
-		PowerUp(static_cast<uint8_t>(e.hp)); // パワーアップ
+		Viv.PowerUp(static_cast<uint8_t>(e.hp)); // パワーアップ
 		this->Explode(e);
-		score_add(e.score);
+		Viv.score_add(e.score);
 		if(e.item) {
 			Item.Set(e.x, e.y, e.item);
 		}
 	} else {
 		Snd_SEPlay(SOUND_ID_HIT, e.x);
-		PowerUp(damage); // ここでもパワーアップ
+		Viv.PowerUp(damage); // ここでもパワーアップ
 		e.hp -= damage;
 	}
 	return true;

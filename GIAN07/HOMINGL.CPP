@@ -5,7 +5,7 @@
 
 #include "ssg/internal/HLaser.hpp"
 #include "GIAN.H"
-#include "MAID.H"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -159,10 +159,12 @@ void C_HLASER::Move(void)
 			// 当たり判定 //
 			if(HITCHK(x,Viv.x,HOMINGL_WIDTH*2/3) && HITCHK(y,Viv.y,HOMINGL_WIDTH*2/3)){
 			//	hl->State = HLS_DEAD;	// こいつは消去
-				MaidDead();				// 殺っておしまい
+				Viv.Dead(); // 殺っておしまい
 			}
 		}
-		if(ev_flag) evade_add(1);
+		if(ev_flag) {
+			Viv.evade_add(1);
+		}
 	}
 
 	// 不要なデータを削除する //

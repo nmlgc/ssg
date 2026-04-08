@@ -4,7 +4,7 @@
 /*                                                                           */
 
 #include "ssg/internal/LLaser.hpp"
-#include "MAID.H"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -336,9 +336,9 @@ void C_LLASER::_LLaserHitCheck(const LLASER_DATA *lp)
 	}
 */
 	if(length>0 && width<=(lp->w+64*15)){
-		evade_add(LLASER_EVADE);
+		Viv.evade_add(LLASER_EVADE);
 	}
 	if(length>0 && width<=(lp->w)){
-		MaidDead();
+		Viv.Dead();
 	}
 }

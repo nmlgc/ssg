@@ -6,17 +6,17 @@
 #include "SSG.hpp"
 #include "GIAN.H"
 #include "LogicInstance.h"
-#include "MAID.H"
 #include "PRankCtrl.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/LZ.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 
 void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 {
 	Round = round;
-	MaidSet(stage_first);
+	Viv.Set(stage_first);
 	PlayRankReset();
 
 	// 乱数の初期化 //

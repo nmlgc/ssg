@@ -6,11 +6,11 @@
 #include "ssg/internal/Item.hpp"
 #include "EFFECT.H"
 #include "GIAN.H"
-#include "MAID.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -80,7 +80,7 @@ void C_ITEM::Move(void)
 				case(ITEM_SCORE):
 					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
 					PlayRankAdd((SY_MAX-Viv.y)>>10);
-					score_add(point);
+					Viv.score_add(point);
 					StringEffect2(ip->x,ip->y,point);
 					if(Viv.evade){
 						Fragment.Set(ip->x, ip->y, FRG_STAR3);

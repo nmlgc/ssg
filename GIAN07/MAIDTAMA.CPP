@@ -242,7 +242,7 @@ void MaidTamaMove(void)
 					MTamaSet();
 				}
 				t->flag = TF_DELETE;
-				fragment_set(t->x,t->y,FRG_HIT);
+				Fragment.Set(t->x, t->y, FRG_HIT);
 			}
 		}
 		else
@@ -875,9 +875,9 @@ static void SetWideBomb(void)
 	dx = GX_MID + 64*70/2 + cosl(d, l<<1);
 	dy = GY_MID - 64*90/2 + sinl(d<<1, l);
 
-	fragment_set(dx, dy, FRG_STAR1);
-	fragment_set(dx, dy, FRG_STAR1);
-	fragment_set(dx, dy, FRG_STAR2);
+	Fragment.Set(dx, dy, FRG_STAR1);
+	Fragment.Set(dx, dy, FRG_STAR1);
+	Fragment.Set(dx, dy, FRG_STAR2);
 
 	Enemy.Damage4(1);
 }

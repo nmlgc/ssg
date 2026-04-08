@@ -132,7 +132,9 @@ extern void MaidMove(INPUT_BITS input, bool in_msg)
 	if(Viv.bomb_time){
 		tama_clear();
 		laser_clear();
-		//if(Viv.bomb_time%60==0) fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
+		// if((Viv.bomb_time % 60) == 0) {
+		// 	Fragment.Set(Viv.x, Viv.y, FRG_FATCIRCLE);
+		// }
 	}
 
 	Viv.BuzzSound = false;
@@ -184,10 +186,10 @@ extern void MaidDead(void)
 {
 	int		i;
 
-	fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
+	Fragment.Set(Viv.x, Viv.y, FRG_FATCIRCLE);
 
 	for(i=0; i<50; i++)
-		fragment_set(Viv.x,Viv.y,FRG_HEART);
+		Fragment.Set(Viv.x, Viv.y, FRG_HEART);
 
 	Snd_SEPlay(SOUND_ID_DEAD);
 
@@ -249,9 +251,9 @@ extern void evade_addEx(int x, int y, uint8_t n)
 			Snd_SEPlay(SOUND_ID_BUZZ, x);
 			Viv.BuzzSound = true;
 		}
-		fragment_set(x,y,FRG_EVADE);
-		fragment_set(x,y,FRG_EVADE);
-		fragment_set(x,y,FRG_EVADE);
+		Fragment.Set(x, y, FRG_EVADE);
+		Fragment.Set(x, y, FRG_EVADE);
+		Fragment.Set(x, y, FRG_EVADE);
 	}
 
 	for(i=0;i<n;i++){

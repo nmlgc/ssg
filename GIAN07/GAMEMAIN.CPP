@@ -7,14 +7,15 @@
 
 #include "GAMEMAIN.H"
 #include "BOMBEFC.H"
-#include "BossHPG.h"
 #include "BOSS.H"
+#include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT3D.H"
 #include "ENEMY.H"
 #include "EnemyExCtrl.h"
 #include "FONTUTY.H"
+#include "FRAGMENT.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "GameDraw.h"
@@ -536,7 +537,7 @@ void GameSTD_Init(void)
 	CEffectInit();
 	ObjectLockOnInit();
 	ItemIndSet();
-	fragment_setup();
+	Fragment.Setup();
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
 
@@ -981,7 +982,7 @@ void GameOverProc0(bool&)
 	switch(GameOverTimer) {
 	default:
 		GameOverTimer--;
-		fragment_move();
+		Fragment.Move();
 		SEffectMove();
 		break;
 
@@ -1401,7 +1402,7 @@ void GameMove(INPUT_BITS input)
 	laser_move();
 	LLaserMove();
 	HLaserMove();
-	fragment_move();
+	Fragment.Move();
 	SEffectMove();
 	CEffectMove();
 	BombEfc.Move();

@@ -751,7 +751,9 @@ void tamaTmove(TAMA_DATA *t)
 		return;
 
 		case(T_SBHOMING):	// サボテン用ホーミング(煙を吐き出すぞ！)
-			if(t->count&1) fragment_set(t->x,t->y,FRG_SMOKE);
+			if(t->count & 1) {
+				Fragment.Set(t->x, t->y, FRG_SMOKE);
+			}
 			t->tx += t->vx;
 			t->ty += t->vy;
 			if((t->count<130-60) && HomingFlag!=HOMING_DUMMY){

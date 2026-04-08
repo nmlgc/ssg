@@ -4,11 +4,12 @@
  */
 
 #include "GameDraw.h"
-#include "BOSS.H"
-#include "EnemyExCtrl.h"
 #include "BOMBEFC.H"
+#include "BOSS.H"
 #include "EFFECT3D.H"
+#include "EnemyExCtrl.h"
 #include "FONTUTY.H"
+#include "FRAGMENT.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "MAID.H"
@@ -450,9 +451,9 @@ void DrawEffectFakeECL(const C_EFFECT3D& Effect3D)
 /// Particles
 /// ---------
 
-void fragment_draw(FRAGMENT_DATA_CSPAN Fragment)
+void fragment_draw(const C_FRAGMENT& Fragment)
 {
-	for(const auto& f : Fragment) {
+	for(const auto& f : Fragment.Data()) {
 		if(f.count == 0) {
 			continue;
 		}

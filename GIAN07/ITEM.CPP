@@ -85,8 +85,8 @@ void ItemMove(void)
 					score_add(point);
 					StringEffect2(ip->x,ip->y,point);
 					if(Viv.evade){
-						fragment_set(ip->x, ip->y, FRG_STAR3);
-						fragment_set(ip->x, ip->y, FRG_STAR3);
+						Fragment.Set(ip->x, ip->y, FRG_STAR3);
+						Fragment.Set(ip->x, ip->y, FRG_STAR3);
 					}
 				break;
 

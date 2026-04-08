@@ -129,7 +129,7 @@ void C_BOSS::KillAll(void)
 		if(b->IsUsed){
 			e = &(b->Edat);
 			Snaky.Delete(b);
-			fragment_set(e->x,e->y,FRG_FATCIRCLE);
+			Fragment.Set(e->x,e->y,FRG_FATCIRCLE);
 			BombEfc.Set(e->x, e->y, EXBOMB_STD);
 			Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
 			Enemy.Explode(*e);
@@ -147,7 +147,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		Snaky.Delete(&b);
 		Bit.Delete();
 		Enemy.Clear();
-		fragment_set(e.x, e.y, FRG_FATCIRCLE);
+		Fragment.Set(e.x, e.y, FRG_FATCIRCLE);
 		BombEfc.Set(e.x, e.y, EXBOMB_STD);
 		ScrollCommand(SCMD_QUAKE);
 		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);

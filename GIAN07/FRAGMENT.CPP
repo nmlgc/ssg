@@ -9,11 +9,10 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-FRAGMENT_DATA	Fragment[FRAGMENT_MAX];		// 破片データ管理用構造体
-int				FragmentPtr = 0;			// 次に破片データを挿入する位置
+C_FRAGMENT Fragment;
 
 
-void fragment_set(int x, int y, uint8_t cmd)
+void C_FRAGMENT::Set(int x, int y, uint8_t cmd)
 {
 	int				i;
 	int				l;
@@ -112,7 +111,7 @@ void fragment_set(int x, int y, uint8_t cmd)
 	FragmentPtr = (FragmentPtr+1)%FRAGMENT_MAX;
 }
 
-void fragment_move(void)
+void C_FRAGMENT::Move(void)
 {
 	for(auto& it : Fragment) {
 		auto *f = &it;
@@ -124,7 +123,7 @@ void fragment_move(void)
 	}
 }
 
-void fragment_setup(void)
+void C_FRAGMENT::Setup(void)
 {
 	for(auto& it : Fragment) {
 		//memset(Fragment+i,0,sizeof(FRAGMENT_DATA));

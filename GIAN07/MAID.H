@@ -70,21 +70,41 @@ struct MAID {
 
 
 
-///// [ 関数 ] /////
-extern void MaidMove(INPUT_BITS, bool in_msg);
-extern void MaidSet(uint8_t stage_first);	// 初期化
-extern void MaidNextStage(void);	// 次のステージの準備
-extern void MaidDead(void);			// 死す
+// 麗しきメイドさん構造体
+class C_VIV : public MAID {
+private:
+	/// Internal interface
+	/// ------------------
+	friend class C_SSG;
 
-extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
-extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
-extern void score_add(int sc);		// スコアを上昇させる
-void PowerUp(uint8_t damage);
+	// 初期化
+	void Set(uint8_t stage_first);
+	/// ------------------
+
+public:
+	///// [ 関数 ] /////
+	void Move(INPUT_BITS, bool in_msg);
+
+	// 次のステージの準備
+	void NextStage(void);
+
+	// 死す
+	void Dead(void);
+
+	// かすりゲージを上昇させる
+	void evade_add(uint8_t n);
+	void evade_addEx(int x, int y, uint8_t n);
+
+	// スコアを上昇させる
+	void score_add(int sc);
+
+	void PowerUp(uint8_t damage);
+};
 
 
 
 ///// [ 変数 ] /////
-extern MAID			Viv;					// 麗しきメイドさん構造体
+extern C_VIV Viv;
 
 
 

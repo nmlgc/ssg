@@ -352,13 +352,14 @@ void C_LASER::laser_hitchk(LASER_DATA *lp)
 			}
 */
 			if(length>0 && length<=(lp->l) && w1<=(lp->w)){
-				MaidDead();
+				Viv.Dead();
 			}
 			else if(length>0 && length<=(lp->l) && w1<=(lp->w+LASER_EVADE_WIDTH)){
-				if(lp->evade) evade_add(0);
-				else{
+				if(lp->evade) {
+					Viv.evade_add(0);
+				} else {
 					lp->evade = 0xff;
-					evade_add(SLASER_EVADE);
+					Viv.evade_add(SLASER_EVADE);
 				}
 			}
 		break;

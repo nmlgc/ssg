@@ -49,13 +49,13 @@ int TamaSpeedEx(uint8_t d);
 
 
 //// かすり用マクロ ////
-static void TamaEvadeAdd(TAMA_DATA *t)
+static void TamaEvadeAdd(TAMA_DATA *t, C_VIV& Viv)
 {
 	if(t->flag & TF_EVADE) {
-		evade_addEx(t->x, t->y, 0);
+		Viv.evade_addEx(t->x, t->y, 0);
 	} else {
 		t->flag |= TF_EVADE;
-		evade_addEx(t->x, t->y, TAMA_EVADE);
+		Viv.evade_addEx(t->x, t->y, TAMA_EVADE);
 	}
 }
 
@@ -272,11 +272,11 @@ void tama_move(void)
 			t->count++;
 			if(Viv.muteki) continue;
 			if(HITCHK(t->x,Viv.x,TAMA_EVX_SMALL) && HITCHK(t->y,Viv.y,TAMA_EVY_SMALL)){
-				TamaEvadeAdd(t);
+				TamaEvadeAdd(t, Viv);
 			}
 			if(HITCHK(t->x,Viv.x,TAMA_HITX) && HITCHK(t->y,Viv.y,TAMA_HITY)){
 				t->flag = TF_DELETE;
-				MaidDead();
+				Viv.Dead();
 			}
 		}
 		else{
@@ -298,11 +298,11 @@ void tama_move(void)
 			t->count++;
 			if(Viv.muteki) continue;
 			if(HITCHK(t->x,Viv.x,TAMA_EVX_LARGE) && HITCHK(t->y,Viv.y,TAMA_EVY_LARGE)){
-				TamaEvadeAdd(t);
+				TamaEvadeAdd(t, Viv);
 			}
 			if(HITCHK(t->x,Viv.x,TAMA_HITX) && HITCHK(t->y,Viv.y,TAMA_HITY)){
 				t->flag = TF_DELETE;
-				MaidDead();
+				Viv.Dead();
 			}
 		}
 		else{

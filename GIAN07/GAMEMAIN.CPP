@@ -630,7 +630,7 @@ extern bool GameNextStage(void)
 	}
 
 	GameSTD_Init();
-	MaidNextStage();
+	Viv.NextStage();
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -1258,7 +1258,7 @@ void WeaponSelectProc(bool&)
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
-		MaidMove(KEY_TAMA, SclInfo.MsgFlag);
+		Viv.Move(KEY_TAMA, SclInfo.MsgFlag);
 		MaidTamaMove();
 
 		GrpBackend_SetClip(
@@ -1413,7 +1413,7 @@ void GameMove(INPUT_BITS input)
 	ScreenEffectMove();
 
 	// この２行の位置を変更しました //
-	MaidMove(input, SclInfo.MsgFlag);
+	Viv.Move(input, SclInfo.MsgFlag);
 	MaidTamaMove();
 }
 

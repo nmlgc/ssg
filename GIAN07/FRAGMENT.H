@@ -3,7 +3,7 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#ifndef PBGWIN_FRAGMETN_H
+#ifndef PBGWIN_FRAGMENT_H
 #define PBGWIN_FRAGMENT_H		"FRAGMENT : Ver 0.10 : Update 99/10/31"
 //#pragma message(PBGWIN_FRAGMENT_H)
 

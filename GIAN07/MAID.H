@@ -79,6 +79,7 @@ extern void MaidNextStage(void);	// 次のステージの準備
 extern void MaidDead(void);			// 死す
 
 extern void evade_add(uint8_t n);	// かすりゲージを上昇させる
+extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
 extern void score_add(int sc);		// スコアを上昇させる
 void PowerUp(uint8_t damage);
 

@@ -195,8 +195,6 @@ void tamaOmove(TAMA_DATA *t);	// 弾の "Option" による移動を行う
 void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
 
 
-extern void evade_addEx(int x, int y, uint8_t n);	// かすりゲージを上昇させる
-
 //// 弾コマンド用マクロ ////
 inline void TamaSetForm(uint8_t cmd, uint8_t option, uint8_t type, uint8_t c)
 {

@@ -251,7 +251,7 @@ extern void LLaserMove(void)
 			case(LLF_LINE):
 				_LLaserXYSet(i);
 				// この部分にレーザー溜めエフェクトを仕掛ける //
-				//fragment_set(lp->x,lp->y,FRG_LASER);
+				//Fragment.Set(lp->x, lp->y, FRG_LASER);
 			break;
 
 			// ノーマル //

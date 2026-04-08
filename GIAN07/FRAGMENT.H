@@ -38,15 +38,4 @@ using FRAGMENT_DATA_CSPAN = std::span<const FRAGMENT_DATA, FRAGMENT_MAX>;
 #endif
 
 
-//// 破片用変数 ////
-extern FRAGMENT_DATA	Fragment[FRAGMENT_MAX];
-extern int	FragmentPtr;	// 次に破片データを挿入する位置
-
-
-//// 破片関数 ////
-void fragment_set(int x, int y, uint8_t cmd);
-void fragment_move(void);
-void fragment_setup(void);
-
-
 #endif

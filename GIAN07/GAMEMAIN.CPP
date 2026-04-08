@@ -27,6 +27,7 @@
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/EnemyExCtrl.hpp"
+#include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
@@ -533,7 +534,7 @@ void GameSTD_Init(void)
 	CEffectInit();
 	ObjectLockOnInit();
 	ItemIndSet();
-	fragment_setup();
+	Fragment.Setup();
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
 
@@ -978,7 +979,7 @@ void GameOverProc0(bool&)
 	switch(GameOverTimer) {
 	default:
 		GameOverTimer--;
-		fragment_move();
+		Fragment.Move();
 		SEffectMove();
 		break;
 
@@ -1398,7 +1399,7 @@ void GameMove(INPUT_BITS input)
 	laser_move();
 	LLaserMove();
 	HLaserMove();
-	fragment_move();
+	Fragment.Move();
 	SEffectMove();
 	CEffectMove();
 	BombEfc.Move();
@@ -1439,7 +1440,7 @@ void GameDraw(void)
 
 	ObjectLockDraw();
 
-	fragment_draw(Fragment);
+	fragment_draw(Fragment.Data());
 	ItemDraw(Item, std::span(ItemInd).first(ItemNow));
 
 	if(GrpGeom_Poly()) {

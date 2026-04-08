@@ -5,12 +5,12 @@
 
 #include "ITEM.H"
 #include "EFFECT.H"
-#include "FRAGMENT.H"
 #include "GIAN.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Fragment.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -85,8 +85,8 @@ void ItemMove(void)
 					score_add(point);
 					StringEffect2(ip->x,ip->y,point);
 					if(Viv.evade){
-						fragment_set(ip->x, ip->y, FRG_STAR3);
-						fragment_set(ip->x, ip->y, FRG_STAR3);
+						Fragment.Set(ip->x, ip->y, FRG_STAR3);
+						Fragment.Set(ip->x, ip->y, FRG_STAR3);
 					}
 				break;
 

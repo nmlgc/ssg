@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <printf/printf.h>
+
 #include "GAMEMAIN.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
 #include "CONFIG.H"

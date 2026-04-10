@@ -4,6 +4,7 @@
  */
 
 #include <SDL3/SDL_filesystem.h>
+#include <printf/printf.h>
 
 #include "engine/bgm.h"
 #include "engine/bgm_track.h"

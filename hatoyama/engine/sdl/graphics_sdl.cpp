@@ -7,6 +7,7 @@
 #include <SDL3/SDL_gpu.h>
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_render.h>
+#include <printf/printf.h>
 
 using SDL_COLOR = SDL_FColor;
 

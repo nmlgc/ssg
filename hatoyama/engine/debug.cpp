@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include <SDL3/SDL_iostream.h>
+#include <printf/printf.h>
 
 #include "engine/debug.h"
 #include "engine/file.h"

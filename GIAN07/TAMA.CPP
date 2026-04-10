@@ -4,7 +4,6 @@
 /*************************************************************************************************/
 
 #include "TAMA.H"
-#include "EFFECT.H"
 #include "ENEMY.H"
 #include "GIAN.H"
 #include "PRankCtrl.h"
@@ -13,6 +12,7 @@
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
@@ -347,7 +347,9 @@ uint32_t tama2score(void)
 	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect!=TE_DELETE){
-			StringEffect2(t->x-64*4,t->y-64*4,Score);
+			SEffect.SetPoint(
+				(t->x - PixelToWorld(4)), (t->y - PixelToWorld(4)), Score
+			);
 			sum += Score;
 			t->flag   = TF_DELETE;
 			t->count  = 0;
@@ -361,7 +363,9 @@ uint32_t tama2score(void)
 	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect!=TE_DELETE){
-			StringEffect2(t->x-64*8,t->y-64*8,Score);
+			SEffect.SetPoint(
+				(t->x - PixelToWorld(8)), (t->y - PixelToWorld(8)), Score
+			);
 			sum += Score;
 			t->flag   = TF_DELETE;
 			t->count  = 0;

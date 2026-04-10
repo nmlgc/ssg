@@ -100,21 +100,6 @@ typedef struct tagSCREENEFC_INFO{
 
 
 
-///// [ 関数 ] /////
-void SEffectInit(void);	// エフェクトの初期化を行う
-void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
-
-// 得点表示エフェクト
-// (Negative points are very much possible!)
-void StringEffect2(int x, int y, int32_t point);
-
-void StringEffect3(void);	// ゲームオーバーの表示
-
-// 曲名の表示
-void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
-
-void SEffectMove(void);	// エフェクトを動かす(仕様変更の可能性があります)
-
 void CEffectInit(void);	// 円エフェクトの初期化
 void CEffectMove(void);	// 円エフェクトを動かす
 void CEffectDraw(void);	// 円エフェクトを描画する
@@ -141,7 +126,6 @@ void GrpDrawNote(void);	// 押されているところを表示
 
 
 ///// [ 変数 ] /////
-extern SEFFECT_DATA		SEffect[SEFFECT_MAX];
 extern CIRCLE_EFC_DATA	CEffect[CIRCLE_EFC_MAX];
 extern LOCKON_INFO		LockInfo[LOCKON_MAX];
 extern SCREENEFC_INFO	ScreenInfo;

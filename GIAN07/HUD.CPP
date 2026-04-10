@@ -12,6 +12,7 @@
 #include "FONTUTY.H"
 #include "LogicInstance.h"
 #include "MAIDTAMA.H"
+#include "ssg/internal/SEffect.hpp"
 #include "ssg/internal/Maid.hpp"
 #ifdef PBG_DEBUG
 #include "CONFIG.H"
@@ -50,7 +51,7 @@ void MTitleSet(WINDOW_COORD y, Narrow::string_view s)
 		extent.w += s_extent.w;
 		extent.h = s_extent.h;
 	};
-	SEffectSetMTitle(y, extent);
+	SEffect.SetMTitle(y, extent);
 }
 
 void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)

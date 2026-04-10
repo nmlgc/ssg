@@ -6,7 +6,6 @@
 #include <printf/printf.h>
 
 #include "ssg/internal/Boss.hpp"
-#include "EFFECT.H"
 #include "GIAN.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
@@ -17,6 +16,7 @@
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Laser.hpp"
 #include "ssg/internal/Maid.hpp"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 
 ///// [ 変数 ] /////
@@ -164,7 +164,7 @@ bool C_BOSS::BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 			const auto temp = tama2score(); // 弾→スコアエフェクト
 			// sprintf(buf, "%3d Evade  %5dPts", Viv.evade, Viv.evadesc);
 			sprintf(buf, "  Bonus    %7uPts", temp);
-			StringEffect(180, 60, buf);
+			SEffect.SetString(180, 60, buf);
 			Viv.score_add(temp);
 		}
 

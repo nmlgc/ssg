@@ -6,7 +6,6 @@
 #include <printf/printf.h>
 
 #include "ssg/internal/Maid.hpp"
-#include "EFFECT.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
 #include "LogicInstance.h"
@@ -15,6 +14,7 @@
 #include "ssg/Sound.h"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Laser.hpp"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 
 
@@ -42,7 +42,7 @@ void C_VIV::Move(INPUT_BITS input, bool in_msg)
 
 		if(Viv.evade_c==0){
 			sprintf(buf,"%3d Evade  %7dPts",Viv.evade,Viv.evadesc);
-			StringEffect(180,40,buf);
+			SEffect.SetString(180, 40, buf);
 			score_add(Viv.evadesc);
 			Viv.evade   = 0;
 			Viv.evadesc = 0;

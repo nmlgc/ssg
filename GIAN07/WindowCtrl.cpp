@@ -4,6 +4,7 @@
 /*                                                                           */
 
 #include <SDL3/SDL_misc.h>
+#include <printf/printf.h>
 
 #include "WindowCtrl.h"
 #include "CONFIG.H"

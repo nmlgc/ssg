@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <printf/printf.h>
+
 #include "EFFECT.H"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"

@@ -9,6 +9,7 @@
 
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_surface.h>
+#include <printf/printf.h>
 
 #include "engine/graphics.h"
 #include "engine/file.h"

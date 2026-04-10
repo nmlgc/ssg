@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <printf/printf.h>
+
 #include "BOSS.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
 #include "EnemyExCtrl.h"

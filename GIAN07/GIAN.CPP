@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <printf/printf.h>
+
 #include "GIAN.H"
 #include "CONFIG.H"
 #include "FONTUTY.H"

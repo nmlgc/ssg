@@ -3,6 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
+#include <printf/printf.h>
+
 #include "FONTUTY.H"
 #include "LOADER.H"
 #include "hatoyama/engine/graphics_backend.h"

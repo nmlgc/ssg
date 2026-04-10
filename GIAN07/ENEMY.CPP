@@ -3,6 +3,10 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
+#ifdef SCRIPT_TRACE
+#include <printf/printf.h>
+#endif
+
 #include "ENEMY.H"
 #include "ECL_LEN.H"
 #include "GIAN.H"

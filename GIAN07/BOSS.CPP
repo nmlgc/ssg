@@ -162,7 +162,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 			const auto temp = tama2score(); // 弾→スコアエフェクト
 			// sprintf(buf, "%3d Evade  %5dPts", Viv.evade, Viv.evadesc);
 			sprintf(buf, "  Bonus    %7uPts", temp);
-			StringEffect(180, 60, buf);
+			SEffect.SetString(180, 60, buf);
 			Viv.score_add(temp);
 		}
 

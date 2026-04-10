@@ -9,6 +9,7 @@
 #include <printf/printf.h>
 
 #include "HUD.H"
+#include "EFFECT.H"
 #include "FONTUTY.H"
 #include "ITEM.H"
 #include "LogicInstance.h"
@@ -50,7 +51,7 @@ void MTitleSet(WINDOW_COORD y, Narrow::string_view s)
 		extent.w += s_extent.w;
 		extent.h = s_extent.h;
 	};
-	SEffectSetMTitle(y, extent);
+	SEffect.SetMTitle(y, extent);
 }
 
 void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
@@ -66,7 +67,7 @@ void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
 /// ---------
 
 // エフェクトを描画する(仕様変更の可能性があります) //
-void SEffectDraw(SEFFECT_DATA_CSPAN SEffect)
+void SEffectDraw(const C_SEFFECT& SEffect)
 {
 	int j, k;
 	int				x,y;
@@ -74,7 +75,7 @@ void SEffectDraw(SEFFECT_DATA_CSPAN SEffect)
 	PIXEL_LTWH src;
 	char			buf[20];
 
-	for(const auto& it : SEffect) {
+	for(const auto& it : SEffect.Data()) {
 		const auto *e = &it;
 		switch(e->cmd){
 			case(SEFC_STR1):case(SEFC_STR1_2):case(SEFC_STR1_3):

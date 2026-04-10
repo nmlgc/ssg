@@ -17,7 +17,7 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-SEFFECT_DATA		SEffect[SEFFECT_MAX];
+C_SEFFECT SEffect;
 CIRCLE_EFC_DATA		CEffect[CIRCLE_EFC_MAX];
 LOCKON_INFO			LockInfo[LOCKON_MAX];
 SCREENEFC_INFO ScreenInfo;
@@ -155,7 +155,7 @@ void CEffectSet(int x, int y, uint8_t type)
 }
 
 // エフェクトの初期化を行う //
-void SEffectInit(void)
+void C_SEFFECT::Init(void)
 {
 	for(auto& it : SEffect) {
 		//memset(SEffect+i,0,sizeof(SEFFECT_DATA));
@@ -164,7 +164,7 @@ void SEffectInit(void)
 }
 
 // 文字列系エフェクト //
-void StringEffect(int x, int y, const char *s)
+void C_SEFFECT::SetString(int x, int y, const char *s)
 {
 	int		i,j,len;
 
@@ -185,7 +185,7 @@ void StringEffect(int x, int y, const char *s)
 }
 
 // 得点表示エフェクト //
-void StringEffect2(int x, int y, uint32_t point)
+void C_SEFFECT::SetPoint(WORLD_COORD x, WORLD_COORD y, uint32_t point)
 {
 	for(auto& it : SEffect) {
 		if(it.cmd != SEFC_NONE) {
@@ -204,7 +204,7 @@ void StringEffect2(int x, int y, uint32_t point)
 }
 
 // ゲームオーバーの表示 //
-void StringEffect3(void)
+void C_SEFFECT::SetGameOver(void)
 {
 	for(auto& it : SEffect) {
 		if(it.cmd != SEFC_NONE) {
@@ -222,7 +222,7 @@ void StringEffect3(void)
 }
 
 // 曲名の表示 //
-void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent)
+void C_SEFFECT::SetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent)
 {
 	// 空きバッファ検索 //
 	auto e = std::ranges::find_if(SEffect, [](const auto& e) {
@@ -244,7 +244,7 @@ void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent)
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //
-void SEffectMove(void)
+void C_SEFFECT::Move(void)
 {
 	for(auto& it : SEffect) {
 		auto *e = &it;

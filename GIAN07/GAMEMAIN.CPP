@@ -11,6 +11,7 @@
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "EFFECT.H"
 #include "EFFECT3D.H"
 #include "ENEMY.H"
 #include "EnemyExCtrl.h"
@@ -534,7 +535,7 @@ void GameSTD_Init(void)
 	Laser.IndSet();
 	LLaser.Setup();
 	HLaser.Init();
-	SEffectInit();
+	SEffect.Init();
 	CEffectInit();
 	ObjectLockOnInit();
 	Item.IndSet();
@@ -890,7 +891,7 @@ extern bool GameExit(bool bNeedChgMusic)
 // ゲームオーバーの前処理
 extern void GameOverInit(void)
 {
-	StringEffect3();
+	SEffect.SetGameOver();
 
 	GameOverTimer = 120;
 
@@ -984,7 +985,7 @@ void GameOverProc0(bool&)
 	default:
 		GameOverTimer--;
 		Fragment.Move();
-		SEffectMove();
+		SEffect.Move();
 		break;
 
 	case 0:
@@ -1033,7 +1034,7 @@ void GameOverProc(bool&)
 {
 	CWinMove(&ContinueWindow);
 	if(GameMain != GameOverProc){
-		SEffectInit();
+		SEffect.Init();
 		return;
 	}
 
@@ -1404,7 +1405,7 @@ void GameMove(INPUT_BITS input)
 	LLaser.Move();
 	HLaser.Move();
 	Fragment.Move();
-	SEffectMove();
+	SEffect.Move();
 	CEffectMove();
 	BombEfc.Move();
 	ObjectLockMove();

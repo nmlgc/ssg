@@ -45,7 +45,7 @@ void C_VIV::Move(INPUT_BITS input, bool in_msg)
 
 		if(Viv.evade_c==0){
 			sprintf(buf,"%3d Evade  %7dPts",Viv.evade,Viv.evadesc);
-			StringEffect(180,40,buf);
+			SEffect.SetString(180, 40, buf);
 			score_add(Viv.evadesc);
 			Viv.evade   = 0;
 			Viv.evadesc = 0;

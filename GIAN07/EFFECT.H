@@ -94,16 +94,35 @@ typedef struct tagSCREENEFC_INFO{
 
 
 
-///// [ 関数 ] /////
-void SEffectInit(void);	// エフェクトの初期化を行う
-void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
-void StringEffect2(int x, int y, uint32_t point);	// 得点表示エフェクト
-void StringEffect3(void);	// ゲームオーバーの表示
+class C_SEFFECT {
+private:
+	SEFFECT_DATA SEffect[SEFFECT_MAX];
 
-// 曲名の表示
-void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
+public:
+	// エフェクトの初期化を行う
+	void Init(void);
 
-void SEffectMove(void);	// エフェクトを動かす(仕様変更の可能性があります)
+	// 文字列系エフェクト(上に表示する奴)
+	void SetString(int x, int y, const char *s);
+
+	// 得点表示エフェクト
+	void SetPoint(WORLD_COORD x, WORLD_COORD y, uint32_t point);
+
+	// ゲームオーバーの表示
+	void SetGameOver(void);
+
+	// 曲名の表示
+	void SetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
+
+	// エフェクトを動かす(仕様変更の可能性があります)
+	void Move(void);
+
+	SEFFECT_DATA_CSPAN Data(void) const {
+		return SEffect;
+	}
+};
+
+extern C_SEFFECT SEffect;
 
 void CEffectInit(void);	// 円エフェクトの初期化
 void CEffectMove(void);	// 円エフェクトを動かす
@@ -131,7 +150,6 @@ void GrpDrawNote(void);	// 押されているところを表示
 
 
 ///// [ 変数 ] /////
-extern SEFFECT_DATA		SEffect[SEFFECT_MAX];
 extern CIRCLE_EFC_DATA	CEffect[CIRCLE_EFC_MAX];
 extern LOCKON_INFO		LockInfo[LOCKON_MAX];
 extern SCREENEFC_INFO	ScreenInfo;

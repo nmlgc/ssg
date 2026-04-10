@@ -347,7 +347,9 @@ uint32_t tama2score(void)
 	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect!=TE_DELETE){
-			StringEffect2(t->x-64*4,t->y-64*4,Score);
+			SEffect.SetPoint(
+				(t->x - PixelToWorld(4)), (t->y - PixelToWorld(4)), Score
+			);
 			sum += Score;
 			t->flag   = TF_DELETE;
 			t->count  = 0;
@@ -361,7 +363,9 @@ uint32_t tama2score(void)
 	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect!=TE_DELETE){
-			StringEffect2(t->x-64*8,t->y-64*8,Score);
+			SEffect.SetPoint(
+				(t->x - PixelToWorld(8)), (t->y - PixelToWorld(8)), Score
+			);
 			sum += Score;
 			t->flag   = TF_DELETE;
 			t->count  = 0;

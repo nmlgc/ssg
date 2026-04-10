@@ -81,7 +81,7 @@ void C_ITEM::Move(void)
 					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
 					PlayRank.Add((SY_MAX - Viv.y) >> 10);
 					Viv.score_add(point);
-					StringEffect2(ip->x,ip->y,point);
+					SEffect.SetPoint(ip->x, ip->y, point);
 					if(Viv.evade){
 						Fragment.Set(ip->x, ip->y, FRG_STAR3);
 						Fragment.Set(ip->x, ip->y, FRG_STAR3);
@@ -90,13 +90,15 @@ void C_ITEM::Move(void)
 
 				case(ITEM_EXTEND):
 					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
-					StringEffect(180+64,80,"E x t e n d  !");
+					SEffect.SetString((180 + 64), 80, "E x t e n d  !");
 					Viv.left++;
 				break;
 
 				case(ITEM_BOMB):
 					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
-					StringEffect(120+64,80,"B o m b   E x t e n d  !");
+					SEffect.SetString(
+						(120 + 64), 80, "B o m b   E x t e n d  !"
+					);
 					Viv.bomb++;
 				break;
 			}

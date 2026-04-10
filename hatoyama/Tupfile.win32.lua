@@ -2,6 +2,7 @@ tup.include("libs/tupblocks/toolchain.msvc.lua")
 tup.include("libs/9xcompat.lua")
 tup.include("libs/BLAKE3.lua")
 tup.include("libs/libwebp_lossless.lua")
+tup.include("libs/printf.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
@@ -84,6 +85,8 @@ function BuildHatoyamaLogic(variant, constants_cflags)
 		})
 	end
 
+	local PRINTF_LINK = BuildPrintf(dep_cfg)
+
 	-- Opt out of exception unwinding for the C++ standard library to avoid
 	-- references to modern system APIs for the vintage build.
 	-- This makes sense in general though, because it's always safe: Even
@@ -120,7 +123,7 @@ function BuildHatoyamaLogic(variant, constants_cflags)
 	local src
 	src += HATOYAMA_LOGIC.src
 
-	local link_cfg = modules_cfg:branch(link)
+	local link_cfg = modules_cfg:branch(PRINTF_LINK, link)
 	local compile_cfg = link_cfg:branch(HATOYAMA_LOGIC.compile)
 	local obj = compile_cfg:cxx(src)
 	return dep_cfg, link_cfg:branch({

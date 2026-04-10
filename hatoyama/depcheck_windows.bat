@@ -13,6 +13,7 @@ sh %~dp0submodules_check.sh ^
 	%~dp0libs\libvorbis ^
 	%~dp0libs\libwebp_lossless ^
 	%~dp0libs\miniaudio ^
+	%~dp0libs\printf ^
 	%~dp0libs\SDL3 ^
 	%~dp0libs\tupblocks
 exit /b

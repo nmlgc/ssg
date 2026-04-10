@@ -6,7 +6,6 @@
 #include <printf/printf.h>
 
 #include "ssg/internal/Boss.hpp"
-#include "BOMBEFC.H" // 爆発エフェクト処理
 #include "EFFECT.H"
 #include "FRAGMENT.H"
 #include "GIAN.H"
@@ -14,6 +13,7 @@
 #include "MAID.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
+#include "ssg/internal/BombEfc.hpp" // 爆発エフェクト処理
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "hatoyama/engine/snd.h"
 
@@ -130,7 +130,7 @@ void C_BOSS::KillAll(void)
 			e = &(b->Edat);
 			Snaky.Delete(b);
 			fragment_set(e->x,e->y,FRG_FATCIRCLE);
-			ExBombEfcSet(e->x, e->y, EXBOMB_STD);
+			BombEfc.Set(e->x, e->y, EXBOMB_STD);
 			Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
 			EnemyExplode(*e);
 			b->IsUsed = 0;
@@ -148,7 +148,7 @@ bool C_BOSS::BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		Bit.Delete();
 		enemy_clear();
 		fragment_set(e.x, e.y, FRG_FATCIRCLE);
-		ExBombEfcSet(e.x, e.y, EXBOMB_STD);
+		BombEfc.Set(e.x, e.y, EXBOMB_STD);
 		ScrollCommand(SCMD_QUAKE);
 		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);
 		PowerUp(Cast::down<uint8_t>(e.hp));

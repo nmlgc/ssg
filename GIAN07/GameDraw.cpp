@@ -198,9 +198,9 @@ void BossDraw(BOSS_DATA_CSPAN BossData, const MAID& Viv)
 /// ---------------
 
 // 爆発系エフェクトを描画する
-void ExBombEfcDraw(BOMBEFC_DATA_CSPAN BombEfc)
+void ExBombEfcDraw(BOMBEFC_DATA_CSPAN BombEfcData)
 {
-	for(const auto& it : BombEfc) {
+	for(const auto& it : BombEfcData) {
 		if(!it.bIsUsed) {
 			continue;
 		}

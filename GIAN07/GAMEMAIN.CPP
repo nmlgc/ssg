@@ -23,6 +23,7 @@
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/BombEfc.hpp"
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
@@ -535,7 +536,7 @@ void GameSTD_Init(void)
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
 
-	ExBombEfcInit();
+	BombEfc.Init();
 
 	WarningEffectInit();
 	//WarningEffectSet();
@@ -1399,7 +1400,7 @@ void GameMove(INPUT_BITS input)
 	fragment_move();
 	SEffectMove();
 	CEffectMove();
-	ExBombEfcMove();
+	BombEfc.Move();
 	ObjectLockMove();
 
 	WarningEffectMove();
@@ -1423,7 +1424,7 @@ void GameDraw(void)
 
 	WideBombDraw(Viv); // 多分、ここで良いと思うが...
 
-	ExBombEfcDraw(BombEfc);
+	ExBombEfcDraw(BombEfc.Data());
 
 	enemy_draw(Enemy, std::span(EnemyInd).first(EnemyNow));
 

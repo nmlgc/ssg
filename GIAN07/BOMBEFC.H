@@ -40,15 +40,4 @@ using BOMBEFC_DATA_CSPAN = std::span<const BombEfcCtrl, EXBOMB_MAX>;
 #endif
 
 
-extern BombEfcCtrl BombEfc[EXBOMB_MAX];
-
-
-
-/***** [関数プロトタイプ] *****/
-void ExBombEfcInit(void);	// 爆発系エフェクトの初期化
-void ExBombEfcSet(int x, int y, uint8_t type);	// 爆発系エフェクトをセットする
-void ExBombEfcMove(void);	// 爆発系エフェクトを動作させる
-
-
-
 #endif

@@ -3,6 +3,9 @@
  *
  */
 
+// GCC 15 throws `error: conflicting declaration 'typedef struct imaxdiv_t
+// imaxdiv_t'` if this appears after a module import.
+#include <inttypes.h> // for PRId64
 #include <printf/printf.h>
 
 #include "HUD.H"
@@ -61,6 +64,54 @@ void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
 	}, subrect);
 }
 /// ---------
+
+// 各種ステータスを描画する //
+void StateDraw(void)
+{
+	int		i,temp;
+	//PIXEL_LTRB	src = { 0, 80, 128, (80 + 16) };
+	static const PIXEL_LTRB src = { 0, 80, 128, (80 + 24) };
+	char	buf[100];
+
+	// 残りかすり時間ゲージの表示 //
+	if(Viv.evade_c){
+		GrpGeom->Lock();
+		GrpGeom->SetColor({ 5, 1, 0 });
+		GrpGeom->SetAlphaOne();
+		for(i=0;i<=10;i++){
+			temp = 128+9+(Viv.evade_c>>2) + (5-i);
+			if(temp > (128 + 8)) {
+				GrpGeom->DrawBoxA(
+					(128 + 8), (16 + 3 + i), temp, (16 + 3 + i + 1)
+				);
+				// GrpGeom->DrawBoxA(
+				// 	(128 + 8),
+				// 	(16 + 3),
+				// 	(128 + 9 + (Viv.evade_c >> 2)),
+				// 	(16 + 3 + 10)
+				// );
+			}
+		}
+		GrpGeom->Unlock();
+	}
+	GrpSurface_Blit({ 128, 16 }, SURFACE_ID::SYSTEM, src);
+	sprintf(buf,"%3d",Viv.evade);
+	GrpPut57(128 + 95,16 + 91-80,buf);
+
+	// 得点表示 //
+	sprintf(buf, ("%9" PRId64), Viv.score);
+	GrpPut16(128, 0, buf);
+
+	// 仮の残機＆残りボム表示 //
+	sprintf(buf,"       Bomb %1d", Viv.bomb);
+	GrpPut16(280, 0, buf);
+
+	// 残りメイド数表示 //
+	for(i=0; i<Viv.left; i++){
+		constexpr PIXEL_LTWH src = { 608, 432, 16, 16 };
+		GrpSurface_Blit({ (280 + (i * 14)), 0 }, SURFACE_ID::SYSTEM, src);
+	}
+}
 
 void StdStatusOutput(void)
 {

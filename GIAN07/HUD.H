@@ -20,4 +20,7 @@ void MTitleSet(WINDOW_COORD y, Narrow::string_view s);
 void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect);
 /// ---------
 
+// 各種ステータスを描画する
+void StateDraw(void);
+
 void StdStatusOutput(void);

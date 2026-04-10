@@ -9,6 +9,7 @@
 #include "EFFECT3D.H"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
+#include "HUD.H" // (temporary, SEffectDraw() will be moved into the same TU later)
 #include "GIAN.H"
 #include "ssg/Sound.h"
 #include "ssg/internal/RNG.hpp"
@@ -21,12 +22,7 @@
 SEFFECT_DATA		SEffect[SEFFECT_MAX];
 CIRCLE_EFC_DATA		CEffect[CIRCLE_EFC_MAX];
 LOCKON_INFO			LockInfo[LOCKON_MAX];
-SCREENEFC_INFO		ScreenInfo;
-TEXTRENDER_RECT_ID	MTitleRect;
-
-// Print the ♪ separately, since it can be combined with a music title in
-// any encoding.
-Narrow::string_view MTitleStrs[2] = { "♪ " };
+SCREENEFC_INFO ScreenInfo;
 
 
 extern void CircleFadeOut(int x, int y, int r);
@@ -160,11 +156,6 @@ void CEffectSet(int x, int y, uint8_t type)
 	}
 }
 
-void MTitleInit(void)
-{
-	MTitleRect = TextObj.Register({ X_SIZ, 20 });
-}
-
 // エフェクトの初期化を行う //
 void SEffectInit(void)
 {
@@ -233,7 +224,7 @@ void StringEffect3(void)
 }
 
 // 曲名の表示 //
-void SetMusicTitle(int y, Narrow::string_view s)
+void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent)
 {
 	// 空きバッファ検索 //
 	auto e = std::ranges::find_if(SEffect, [](const auto& e) {
@@ -242,14 +233,6 @@ void SetMusicTitle(int y, Narrow::string_view s)
 	if(e == std::end(SEffect)) {
 		return;
 	}
-
-	MTitleStrs[1] = s;
-	PIXEL_SIZE extent = { 0, 0 };
-	for(const auto s : MTitleStrs) {
-		const auto s_extent = TextObj.TextExtent(FONT_ID::NORMAL, s);
-		extent.w += s_extent.w;
-		extent.h = s_extent.h;
-	};
 
 	// 曲のタイトルが長すぎる場合、どうしましょう？ //
 	auto x = (std::max)((640 - 128 - 32 - extent.w), 128);
@@ -260,17 +243,6 @@ void SetMusicTitle(int y, Narrow::string_view s)
 	e->time = (64 * 2);
 	e->vx   = extent.w;
 	e->vy   = extent.h;
-}
-
-void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
-{
-	const auto mtitle = MTitleStrs[1];
-	TextObj.Render(topleft, MTitleRect, mtitle, [](TEXTRENDER_SESSION& s) {
-		const auto gradient_func = [](PIXEL_COORD y) -> uint8_t {
-			return (255 + 8 - (y * 8));
-		};
-		DrawGrdFont(s, MTitleStrs, FONT_ID::NORMAL, true, gradient_func);
-	}, subrect);
 }
 
 // エフェクトを動かす(仕様変更の可能性があります) //

@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_EFFECT_H)
 
 import std.compat;
-#include "hatoyama/logic/narrow.h"
+#include "hatoyama/logic/coords.h"
 
 
 
@@ -93,12 +93,13 @@ typedef struct tagSCREENEFC_INFO{
 
 
 ///// [ 関数 ] /////
-void MTitleInit(void);	// Registers the music title rectangle
 void SEffectInit(void);	// エフェクトの初期化を行う
 void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
 void StringEffect2(int x, int y, uint32_t point);	// 得点表示エフェクト
 void StringEffect3(void);	// ゲームオーバーの表示
-void SetMusicTitle(int y, Narrow::string_view s);	// 曲名の表示
+
+// 曲名の表示
+void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
 
 void SEffectMove(void);	// エフェクトを動かす(仕様変更の可能性があります)
 void SEffectDraw(void);	// エフェクトを描画する(仕様変更の可能性があります)

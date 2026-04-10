@@ -6,6 +6,7 @@
 #include <printf/printf.h>
 
 #include "HUD.H"
+#include "EFFECT.H"
 #include "FONTUTY.H"
 #include "ITEM.H"
 #include "LogicInstance.h"
@@ -22,6 +23,44 @@
 #endif
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/time.h"
+
+/// BGM title
+/// ---------
+
+TEXTRENDER_RECT_ID MTitleRect;
+
+// Print the ♪ separately, since it can be combined with a music title in
+// any encoding.
+Narrow::string_view MTitleStrs[2] = { "♪ " };
+
+void MTitleInit(void)
+{
+	MTitleRect = TextObj.Register({ X_SIZ, 20 });
+}
+
+void MTitleSet(WINDOW_COORD y, Narrow::string_view s)
+{
+	MTitleStrs[1] = s;
+	PIXEL_SIZE extent = { 0, 0 };
+	for(const auto s : MTitleStrs) {
+		const auto s_extent = TextObj.TextExtent(FONT_ID::NORMAL, s);
+		extent.w += s_extent.w;
+		extent.h = s_extent.h;
+	};
+	SEffectSetMTitle(y, extent);
+}
+
+void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
+{
+	const auto mtitle = MTitleStrs[1];
+	TextObj.Render(topleft, MTitleRect, mtitle, [](TEXTRENDER_SESSION& s) {
+		const auto gradient_func = [](PIXEL_COORD y) -> uint8_t {
+			return (255 + 8 - (y * 8));
+		};
+		DrawGrdFont(s, MTitleStrs, FONT_ID::NORMAL, true, gradient_func);
+	}, subrect);
+}
+/// ---------
 
 void StdStatusOutput(void)
 {

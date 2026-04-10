@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "BOMBEFC.H"
 #include "EFFECT3D.H"
 #include "ENEMY.H"
 #include "FRAGMENT.H"
@@ -17,6 +16,7 @@
 
 class C_BIT;
 class C_BOSS;
+class C_BOMBEFC;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -28,7 +28,7 @@ void enemy_draw(ENEMY_DATA_CSPAN storage, std::span<const uint16_t> inds);
 void BossDraw(const C_BOSS&, const MAID&);
 
 // 爆発系エフェクトを描画する
-void ExBombEfcDraw(BOMBEFC_DATA_CSPAN);
+void ExBombEfcDraw(const C_BOMBEFC&);
 
 // ３面高速星描画
 void DrawStg3Star(STG6STAR_CSPAN);

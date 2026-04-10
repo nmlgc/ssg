@@ -8,7 +8,7 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-BombEfcCtrl		BombEfc[EXBOMB_MAX];
+C_BOMBEFC BombEfc;
 
 // 秘密の関数 //
 void _ExBombSTDInit(BombEfcCtrl *p);
@@ -17,7 +17,7 @@ void _ExBombSTDMove(BombEfcCtrl *p, C_RNG& RNG);
 
 
 // 爆発系エフェクトの初期化 //
-void ExBombEfcInit(void)
+void C_BOMBEFC::Init(void)
 {
 	for(auto& it : BombEfc) {
 		it.bIsUsed = false;
@@ -26,7 +26,7 @@ void ExBombEfcInit(void)
 
 
 // 爆発系エフェクトをセットする //
-void ExBombEfcSet(int x, int y, uint8_t type)
+void C_BOMBEFC::Set(int x, int y, uint8_t type)
 {
 	auto p = std::ranges::find_if(BombEfc, [](const auto& p) {
 		return !p.bIsUsed;
@@ -56,7 +56,7 @@ void ExBombEfcSet(int x, int y, uint8_t type)
 
 
 // 爆発系エフェクトを動作させる
-void ExBombEfcMove(void)
+void C_BOMBEFC::Move(void)
 {
 	for(auto& it : BombEfc) {
 		if(!it.bIsUsed) {

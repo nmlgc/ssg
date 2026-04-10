@@ -6,6 +6,7 @@
 #include <printf/printf.h>
 
 #include "GAMEMAIN.H"
+#include "BOMBEFC.H"
 #include "BossHPG.h"
 #include "BOSS.H"
 #include "CONFIG.H"
@@ -539,7 +540,7 @@ void GameSTD_Init(void)
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
 
-	ExBombEfcInit();
+	BombEfc.Init();
 
 	WarningEffectInit();
 	//WarningEffectSet();
@@ -1403,7 +1404,7 @@ void GameMove(INPUT_BITS input)
 	fragment_move();
 	SEffectMove();
 	CEffectMove();
-	ExBombEfcMove();
+	BombEfc.Move();
 	ObjectLockMove();
 
 	WarningEffectMove();

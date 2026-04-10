@@ -6,6 +6,7 @@
 #include "GameDraw.h"
 #include "BOSS.H"
 #include "EnemyExCtrl.h"
+#include "BOMBEFC.H"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
@@ -201,9 +202,9 @@ void BossDraw(const C_BOSS& Boss, const MAID& Viv)
 /// ---------------
 
 // 爆発系エフェクトを描画する
-void ExBombEfcDraw(BOMBEFC_DATA_CSPAN BombEfc)
+void ExBombEfcDraw(const C_BOMBEFC& BombEfc)
 {
-	for(const auto& it : BombEfc) {
+	for(const auto& it : BombEfc.Data()) {
 		if(!it.bIsUsed) {
 			continue;
 		}

@@ -36,14 +36,27 @@ struct BombEfcCtrl {
 
 using BOMBEFC_DATA_CSPAN = std::span<const BombEfcCtrl, EXBOMB_MAX>;
 
-extern BombEfcCtrl BombEfc[EXBOMB_MAX];
+class C_BOMBEFC {
+private:
+	BombEfcCtrl BombEfc[EXBOMB_MAX];
 
+public:
+	// 爆発系エフェクトの初期化
+	void Init(void);
 
+	// 爆発系エフェクトをセットする
+	void Set(int x, int y, uint8_t type);
 
-/***** [関数プロトタイプ] *****/
-void ExBombEfcInit(void);	// 爆発系エフェクトの初期化
-void ExBombEfcSet(int x, int y, uint8_t type);	// 爆発系エフェクトをセットする
-void ExBombEfcMove(void);	// 爆発系エフェクトを動作させる
+	// 爆発系エフェクトを動作させる
+	void Move(void);
+
+	BOMBEFC_DATA_CSPAN Data(void) const {
+		return BombEfc;
+	}
+};
+
+extern C_BOMBEFC BombEfc;
+
 
 
 

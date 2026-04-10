@@ -1,6 +1,10 @@
 tup.import("TOOLCHAIN=gcc")
 tup.include("libs/tupblocks/toolchain." .. TOOLCHAIN .. ".lua")
 tup.include("libs/BLAKE3.lua")
+tup.include("libs/printf.lua")
+
+-- We need this library in a non-C++ build step later.
+local PRINTF_LINK = BuildPrintf(CONFIG)
 
 HATOYAMA_LINK.cflags += { "-DLINUX" }
 
@@ -10,7 +14,7 @@ function BuildHatoyamaLogic()
 	local modules_cfg = CONFIG:branch({ cflags = "-pthread" })
 
 	local dep_cfg = modules_cfg:branch(HATOYAMA_LINK)
-	local link_cfg = dep_cfg:branch(modules_cfg:cxx_std_modules())
+	local link_cfg = dep_cfg:branch(modules_cfg:cxx_std_modules(), PRINTF_LINK)
 
 	local src
 	src += HATOYAMA_LOGIC.src
@@ -48,7 +52,7 @@ function BuildHatoyamaEngine(dep_cfg, logic_cfg)
 
 	local obj = (
 		link_cfg:branch(HATOYAMA_ENGINE.compile):cxx(src) +
-		dep_cfg:branch(HATOYAMA_ENGINE.compile):cc(c_src)
+		dep_cfg:branch(HATOYAMA_ENGINE.compile, PRINTF_LINK):cc(c_src)
 	)
 	return link_cfg:branch({ linputs = obj })
 end

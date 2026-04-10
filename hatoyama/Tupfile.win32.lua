@@ -2,6 +2,7 @@ tup.include("libs/tupblocks/toolchain.msvc.lua")
 tup.include("libs/9xcompat.lua")
 tup.include("libs/BLAKE3.lua")
 tup.include("libs/libwebp_lossless.lua")
+tup.include("libs/printf.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
@@ -83,6 +84,8 @@ function BuildHatoyamaLogic(variant)
 		})
 	end
 
+	local PRINTF_LINK = BuildPrintf(dep_cfg)
+
 	local modules_cfg = dep_cfg:branch(ANALYSIS)
 	local modules_link = modules_cfg:cxx_std_modules()
 
@@ -107,7 +110,7 @@ function BuildHatoyamaLogic(variant)
 	local src
 	src += HATOYAMA_LOGIC.src
 
-	local link_cfg = modules_cfg:branch(link)
+	local link_cfg = modules_cfg:branch(PRINTF_LINK, link)
 	local compile_cfg = link_cfg:branch(HATOYAMA_LOGIC.compile)
 	local obj = compile_cfg:cxx(src)
 	return dep_cfg, link_cfg:branch({

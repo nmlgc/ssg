@@ -36,3 +36,8 @@
 	path = hatoyama/libs/9xcompat
 	url = https://github.com/nmlgc/9xcompat
 	shallow = true
+[submodule "libs/printf"]
+	path = hatoyama/libs/printf
+	url = https://github.com/eyalroz/printf
+	branch = cmake-option-for-bug-203
+	shallow = true

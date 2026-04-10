@@ -18,6 +18,7 @@ echo "[updater]
 	"$hatoyama/libs/tupblocks" \
 	"$hatoyama/libs/dr_libs" \
 	"$hatoyama/libs/miniaudio" \
+	"$hatoyama/libs/printf" \
 	|| exit
 
 . "$hatoyama/libs/tupblocks/tupblocks.sh"

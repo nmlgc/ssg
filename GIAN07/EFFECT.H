@@ -102,7 +102,6 @@ void StringEffect3(void);	// ゲームオーバーの表示
 void SEffectSetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
 
 void SEffectMove(void);	// エフェクトを動かす(仕様変更の可能性があります)
-void SEffectDraw(void);	// エフェクトを描画する(仕様変更の可能性があります)
 
 void CEffectInit(void);	// 円エフェクトの初期化
 void CEffectMove(void);	// 円エフェクトを動かす

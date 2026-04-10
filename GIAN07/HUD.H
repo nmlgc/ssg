@@ -15,10 +15,11 @@
 void MTitleInit(void);
 
 void MTitleSet(WINDOW_COORD y, Narrow::string_view s);
-
-// (temporary, SEffectDraw() will be moved into the same TU later)
-void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect);
 /// ---------
+
+// エフェクトを描画する(仕様変更の可能性があります)
+// (Technically game logic!)
+void SEffectDraw(void);
 
 // 各種ステータスを描画する
 void StateDraw(void);

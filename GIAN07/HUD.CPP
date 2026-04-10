@@ -26,6 +26,7 @@
 #endif
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/time.h"
+#include "hatoyama/logic/ut_math.h"
 
 /// BGM title
 /// ---------
@@ -64,6 +65,122 @@ void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
 	}, subrect);
 }
 /// ---------
+
+// エフェクトを描画する(仕様変更の可能性があります) //
+void SEffectDraw(void)
+{
+	int j, k;
+	int				x,y;
+	int				temp;
+	PIXEL_LTWH src;
+	char			buf[20];
+
+	for(const auto& it : SEffect) {
+		const auto *e = &it;
+		switch(e->cmd){
+			case(SEFC_STR1):case(SEFC_STR1_2):case(SEFC_STR1_3):
+				GrpPutc(e->x>>6,e->y>>6,e->c);
+			break;
+
+			case(SEFC_STR2):
+				sprintf(buf, "%u", e->point);
+				GrpPutScore(e->x>>6,e->y>>6,buf);
+			break;
+
+			case(SEFC_GAMEOVER):
+				strcpy(buf,"GAME OVER");
+				for(j=0;j<9;j++){
+					// *37 //
+					const auto angle = Cast::down<uint8_t>(
+						(e->time * 3) + (j * 26)
+					);
+					x = (e->x >> 6) + cosl(angle, e->time * 4);
+					y = (e->y >> 6) + sinl(angle, e->time * 4);
+					GrpPutc(x,y,buf[j]);
+				}
+			break;
+
+			case(SEFC_GAMEOVER2):
+				x = (e->x >> 6) + 8;
+				y = (e->y >> 6) + 8;
+				j = (35 - e->time) / 2;
+				GrpGeom->Lock();
+				GrpGeom->SetColor({ 0, 0, 0 });
+				GrpGeom->SetAlphaNorm(Cast::down<uint8_t>((35 - e->time) * 3));
+				GrpGeom->DrawBoxA((x - 170), (y - j), (x + 170), (y + j));
+				GrpGeom->Unlock();
+
+				strcpy(buf,"GAME OVER");
+				for(j=0;j<9;j++){
+					// *37 //
+					x = (e->x>>6) + (j-4)*(35-e->time);
+					y = (e->y>>6);
+					GrpPutc(x,y,buf[j]);
+				}
+			break;
+
+			case(SEFC_MTITLE3): {
+				const auto degx = Cast::down<uint8_t>((64 * 2) - e->time);
+				for(j=0;j<e->vx;j++){
+					src = { j, 0, 1, e->vy };
+					temp = sinl(degx,100);
+					const auto y = (
+						(e->y >> 6) - sinl((degx + j), degx /*40*/)
+					);
+					for(k=0;k<2;k++){
+						const auto x = (
+							(e->x >> 6) + sinl((degx + (j / 2)), temp) + j + k
+						);
+						MTitleRender({ x, y }, src);
+					}
+				}
+			}
+			break;
+
+			case(SEFC_MTITLE1): {
+				const auto degx = Cast::down<uint8_t>(e->time);
+				for(j=0;j<e->vx;j++){
+					src = { j, 0, 1, e->vy };
+					temp = sinl(degx,160);
+					const auto y = (
+						(e->y >> 6) - sinl((degx + j), degx /*40*/)
+					);
+					for(k=0;k<2;k++){
+						const auto x = (
+							(e->x >> 6) + sinl((degx + (j / 2)), temp) + j + k
+						);
+						MTitleRender({ x, y }, src);
+					}
+				}
+			}
+			break;
+
+			case(SEFC_MTITLE2): {
+				GrpGeom->Lock();
+				GrpGeom->SetColor({ 0, 0, 0 });
+				GrpGeom->SetAlphaNorm(
+					(sinl(Cast::down<uint8_t>(e->time - 32), 80) + 80)
+				);
+				for(j=0;j<16;j++){
+					temp = sinl(128+j*16,16);
+					GrpGeom->DrawBoxA(
+						((e->x >> 6) + temp - 16),
+						((e->y >> 6) + j),
+						((X_MAX - 16) - temp),
+						((e->y >> 6) + j + 1)
+					);
+				}
+				GrpGeom->Unlock();
+				src = { 0, 0, e->vx, e->vy };
+				MTitleRender({ (e->x >> 6), (e->y >> 6) }, src);
+			}
+			break;
+
+			case(SEFC_NONE):default:
+			break;
+		}
+	}
+}
 
 // 各種ステータスを描画する //
 void StateDraw(void)

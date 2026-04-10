@@ -5,4 +5,19 @@
 
 #pragma once
 
+#include "hatoyama/logic/coords.h"
+#include "hatoyama/logic/narrow.h"
+
+/// BGM title
+/// ---------
+
+// Registers the music title rectangle
+void MTitleInit(void);
+
+void MTitleSet(WINDOW_COORD y, Narrow::string_view s);
+
+// (temporary, SEffectDraw() will be moved into the same TU later)
+void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect);
+/// ---------
+
 void StdStatusOutput(void);

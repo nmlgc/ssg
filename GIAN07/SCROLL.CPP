@@ -12,6 +12,7 @@
 #include "ENDING.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
+#include "HUD.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
 #include "MAID.H"
@@ -277,7 +278,7 @@ void StageMove(void)
 					if(BGM_Switch(cmd[1])){
 						const auto mtitle = BGM_Title();
 						if(!mtitle.empty()) {
-							SetMusicTitle(460, mtitle);
+							MTitleSet(460, mtitle);
 						}
 					}
 				}

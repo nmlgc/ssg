@@ -35,12 +35,6 @@ typedef struct tagPoint3D{
 	WORLD_COORD x, y, z;
 } Point3D;
 
-struct LineList3D {
-	std::span<const WORLD_POINT>	p;	/* 頂点の座標         */
-
-	uint8_t	DegX, DegY, DegZ;	/* 各軸に対する回転角 */
-};
-
 typedef struct tagDeg3D{
 	int		dx;
 	int		dy;
@@ -88,12 +82,6 @@ typedef struct tagRock3D {
 
 
 ///// [ 関数 ] /////
-void DrawLineList3D(std::span<const LineList3D> w);
-
-void DrawWarning(void);
-void MoveWarning(uint8_t count);
-void MoveWarningR(char count);
-
 void Init3DCube(void);
 void Draw3DCube(void);
 void Move3DCube(void);

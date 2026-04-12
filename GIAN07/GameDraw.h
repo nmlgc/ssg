@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "EFFECT3D.H"
 #include "ENEMY.H"
 #include "FRAGMENT.H"
 #include "HOMINGL.H"
@@ -17,6 +16,7 @@
 class C_BIT;
 class C_BOSS;
 class C_BOMBEFC;
+class C_EFFECT3D;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -31,15 +31,15 @@ void BossDraw(const C_BOSS&, const MAID&);
 void ExBombEfcDraw(const C_BOMBEFC&);
 
 // ３面高速星描画
-void DrawStg3Star(STG6STAR_CSPAN);
+void DrawStg3Star(const C_EFFECT3D&);
 
-void DrawStg4Rock(ROCK3D_CSPAN);
+void DrawStg4Rock(const C_EFFECT3D&);
 
 // ６面ラスター描画
-void DrawStg6Raster(STG6STAR_CSPAN, STG6RASTER_CSPAN);
+void DrawStg6Raster(const C_EFFECT3D&);
 
-void Draw3DCube(STAR2D_CSPAN, CUBE3D_CSPAN);
-void DrawEffectFakeECL(const WFLine2D&, FAKE_ECLSTR_CSPAN);
+void Draw3DCube(const C_EFFECT3D&);
+void DrawEffectFakeECL(const C_EFFECT3D&);
 
 void fragment_draw(FRAGMENT_DATA_CSPAN);
 

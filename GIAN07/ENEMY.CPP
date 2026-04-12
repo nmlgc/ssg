@@ -995,12 +995,16 @@ void parse_ECL(ENEMY_DATA *e)
 
 		case(ECL_STG4EFC):
 			switch(cmd[1]){
-				case(STG4ROCK_STDMOVE):	SendCmdStg4Rock(cmd[1], 0);		break;
-				case(STG4ROCK_ACCMOVE1):SendCmdStg4Rock(cmd[1], 0);		break;
-				case(STG4ROCK_ACCMOVE2):SendCmdStg4Rock(cmd[1], e->d);	break;
-				case(STG4ROCK_3DMOVE):	SendCmdStg4Rock(cmd[1], 0);		break;
-				case(STG4ROCK_LEAVE):	SendCmdStg4Rock(cmd[1], 0);		break;
-				case(STG4ROCK_END):		SendCmdStg4Rock(cmd[1], 0);		break;
+			case(STG4ROCK_STDMOVE):
+			case(STG4ROCK_ACCMOVE1):
+			case(STG4ROCK_3DMOVE):
+			case(STG4ROCK_LEAVE):
+			case(STG4ROCK_END):
+				Effect3D.SendCmdStg4Rock(cmd[1], 0);
+				break;
+			case(STG4ROCK_ACCMOVE2):
+				Effect3D.SendCmdStg4Rock(cmd[1], e->d);
+				break;
 			}
 
 			bRetFlag = false;

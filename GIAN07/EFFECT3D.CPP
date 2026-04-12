@@ -9,16 +9,11 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-Cube3D		Cube[CUBE_MAX];
-Star2D		Star[STAR_MAX];
-Rock3D		Rock[ROCK_MAX];
-
-WFLine2D		WFLine;
-FakeECLString	FakeECLStr[FAKE_ECLSTR_MAX];
+C_EFFECT3D Effect3D;
 
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 {
-	static Point3D	temp;
+	Point3D temp;
 
 	temp.y = p->y;
 	temp.z = p->z;
@@ -38,7 +33,7 @@ void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 
 
 
-void Init3DCube(void)
+void C_EFFECT3D::Init3DCube(void)
 {
 	int		i;
 
@@ -60,12 +55,14 @@ void Init3DCube(void)
 }
 
 
-void Move3DCube(void)
+void C_EFFECT3D::Move3DCube(void)
 {
 	int				i;
 	int				l,d2;
-	static uint16_t d;
-	static uint16_t dx, dy, dz;
+	auto& d = this->cube_d;
+	auto& dx = this->cube_dx;
+	auto& dy = this->cube_dy;
+	constexpr uint16_t dz = 0;
 
 	d+=64*4;
 
@@ -112,7 +109,7 @@ static void ResetFakeECLStr(FakeECLString& it, C_RNG& RNG)
 	it.vy   = v; //sinl(d, v);
 }
 
-void InitEffectFakeECL(void)
+void C_EFFECT3D::InitFakeECL(void)
 {
 	WFLine.d = 0;
 	WFLine.ox = 640 * 64 / 2;
@@ -124,7 +121,7 @@ void InitEffectFakeECL(void)
 	}
 }
 
-void MoveEffectFakeECL(void)
+void C_EFFECT3D::MoveFakeECL(void)
 {
 	WFLine.ox = (WFLine.ox+1)%64;
 	WFLine.oy = (WFLine.oy+62)%64;
@@ -149,7 +146,7 @@ static WORLD_COORD Stg4RockRandomY(C_RNG& RNG)
 	return PixelToWorld(-250 - 40 - (RNG.next() % 250));
 }
 
-void InitStg4Rock(void)
+void C_EFFECT3D::InitStg4Rock(void)
 {
 	int		i;
 	int		id = 2;
@@ -182,7 +179,7 @@ void InitStg4Rock(void)
 }
 
 
-void MoveStg4Rock(void)
+void C_EFFECT3D::MoveStg4Rock(void)
 {
 	constexpr int dy = (500 * (64 / 4));
 	constexpr int dy2 = (dy / 2);
@@ -265,7 +262,7 @@ void MoveStg4Rock(void)
 }
 
 
-void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
+void C_EFFECT3D::SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 {
 	switch(Cmd){
 	case(STG4ROCK_LEAVE): {
@@ -311,12 +308,8 @@ void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param)
 
 
 
-Stg6Raster	S6Ras[S6RASTER_MAX];
-Stg6Star	S6Star[S3STAR_MAX];		// 兼用モノなのだ
-
-
 // ６面ラスター初期化 //
-void InitStg6Raster()
+void C_EFFECT3D::InitStg6Raster()
 {
 	int		i;
 
@@ -338,7 +331,7 @@ void InitStg6Raster()
 
 
 // ６面ラスター動作 //
-void MoveStg6Raster()
+void C_EFFECT3D::MoveStg6Raster()
 {
 	int		i;
 
@@ -369,7 +362,7 @@ void MoveStg6Raster()
 
 
 // ３面高速星初期化 //
-void InitStg3Star()
+void C_EFFECT3D::InitStg3Star()
 {
 	int		i;
 
@@ -382,7 +375,7 @@ void InitStg3Star()
 
 
 // ３面高速星動作 //
-void MoveStg3Star()
+void C_EFFECT3D::MoveStg3Star()
 {
 	int		i;
 

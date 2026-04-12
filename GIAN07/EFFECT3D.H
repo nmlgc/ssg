@@ -110,32 +110,74 @@ using STG6RASTER_CSPAN = std::span<const Stg6Raster, S6RASTER_MAX>;
 using STG6STAR_CSPAN = std::span<const Stg6Star, S3STAR_MAX>;
 
 
-extern Cube3D Cube[CUBE_MAX];
-extern Star2D Star[STAR_MAX];
-extern Rock3D Rock[ROCK_MAX];
-extern WFLine2D WFLine;
-extern FakeECLString FakeECLStr[FAKE_ECLSTR_MAX];
-extern Stg6Raster S6Ras[S6RASTER_MAX];
-extern Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
+class C_EFFECT3D {
+private:
+	uint16_t cube_d;
+	uint16_t cube_dx;
+	uint16_t cube_dy;
+
+	Cube3D Cube[CUBE_MAX];
+	Star2D Star[STAR_MAX];
+	Rock3D Rock[ROCK_MAX];
+	WFLine2D WFLine;
+	FakeECLString FakeECLStr[FAKE_ECLSTR_MAX];
+	Stg6Raster S6Ras[S6RASTER_MAX];
+	Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
+
+public:
+	void Init3DCube(void);
+	void Move3DCube(void);
+
+	void InitFakeECL(void);
+	void MoveFakeECL(void);
+
+	// ステージ４の背景となる岩の集団
+	void InitStg4Rock(void);
+
+	void MoveStg4Rock(void);
+
+	// コマンド送信
+	void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);
+
+	// ６面ラスター初期化
+	void InitStg6Raster();
+
+	// ６面ラスター動作
+	void MoveStg6Raster();
+
+	// ３面高速星初期化
+	void InitStg3Star();
+
+	// ３面高速星動作
+	void MoveStg3Star();
+
+	CUBE3D_CSPAN DataCube(void) const {
+		return Cube;
+	}
+	STAR2D_CSPAN DataStar(void) const {
+		return Star;
+	}
+	ROCK3D_CSPAN DataRock(void) const {
+		return Rock;
+	}
+	const WFLine2D& DataWFLine(void) const {
+		return WFLine;
+	}
+	FAKE_ECLSTR_CSPAN DataFakeECL(void) const {
+		return FakeECLStr;
+	}
+	STG6RASTER_CSPAN DataS6Ras(void) const {
+		return S6Ras;
+	}
+	STG6STAR_CSPAN DataS6Star(void) const {
+		return S6Star;
+	}
+};
+
+extern C_EFFECT3D Effect3D;
 
 
 ///// [ 関数 ] /////
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
-
-void Init3DCube(void);
-void Move3DCube(void);
-
-void InitEffectFakeECL(void);
-void MoveEffectFakeECL(void);
-
-void InitStg4Rock(void);	// ステージ４の背景となる岩の集団
-void MoveStg4Rock(void);	//
-void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);	// コマンド送信
-
-void InitStg6Raster();	// ６面ラスター初期化
-void MoveStg6Raster();	// ６面ラスター動作
-
-void InitStg3Star();	// ３面高速星初期化
-void MoveStg3Star();	// ３面高速星動作
 
 #endif

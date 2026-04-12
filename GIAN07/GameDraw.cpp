@@ -7,6 +7,7 @@
 #include "BOSS.H"
 #include "EnemyExCtrl.h"
 #include "BOMBEFC.H"
+#include "EFFECT3D.H"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
@@ -233,8 +234,9 @@ void ExBombEfcDraw(const C_BOMBEFC& BombEfc)
 /// ----------
 
 // ３面高速星描画 //
-void DrawStg3Star(STG6STAR_CSPAN S6Star)
+void DrawStg3Star(const C_EFFECT3D& Effect3D)
 {
+	const auto S6Star = Effect3D.DataS6Star();
 	int		i;
 
 	for(i=0; i<S3STAR_MAX; i++){
@@ -244,7 +246,7 @@ void DrawStg3Star(STG6STAR_CSPAN S6Star)
 }
 
 
-void DrawStg4Rock(ROCK3D_CSPAN Rock)
+void DrawStg4Rock(const C_EFFECT3D& Effect3D)
 {
 	constexpr auto sid = SURFACE_ID::MAPCHIP;
 	static const PIXEL_LTRB src[3] = {
@@ -257,7 +259,7 @@ void DrawStg4Rock(ROCK3D_CSPAN Rock)
 
 	int x, y;
 
-	for(const auto& it : Rock) {
+	for(const auto& it : Effect3D.DataRock()) {
 		const auto *p = &it;
 		x = (p->x + GX_MID)>>6;
 		y = (p->y + GY_MID)>>6;
@@ -269,7 +271,7 @@ void DrawStg4Rock(ROCK3D_CSPAN Rock)
 
 
 // ６面ラスター描画 //
-void DrawStg6Raster(STG6STAR_CSPAN S6Star, STG6RASTER_CSPAN S6Ras)
+void DrawStg6Raster(const C_EFFECT3D& Effect3D)
 {
 	constexpr auto sid = SURFACE_ID::MAPCHIP;
 	static const PIXEL_LTRB Target[3] = {
@@ -281,12 +283,13 @@ void DrawStg6Raster(STG6STAR_CSPAN S6Star, STG6RASTER_CSPAN S6Ras)
 	int		i, j, h, w;
 	int		x1, x2, dx, oy;
 
-	for(i=0; i<S6STAR_MAX; i++){
+	const auto S6Star = Effect3D.DataS6Star();
+	for(i = 0; i < S6STAR_MAX; i++) {
 		static const PIXEL_LTRB src = { 624, 352, (624 + 16), (352 + 16) };
 		GrpSurface_Blit({ S6Star[i].x, S6Star[i].y }, sid, src);
 	}
 
-	for(const auto& it : S6Ras) {
+	for(const auto& it : Effect3D.DataS6Ras()) {
 		x1 = Target[it.type].left;
 		x2 = Target[it.type].right;
 		oy = Target[it.type].top;
@@ -386,23 +389,24 @@ static void __Draw3DCube(const Cube3D *c)
 	}
 }
 
-void Draw3DCube(STAR2D_CSPAN Star, CUBE3D_CSPAN Cube)
+void Draw3DCube(const C_EFFECT3D& Effect3D)
 {
-	for(const auto& it : Star) {
+	for(const auto& it : Effect3D.DataStar()) {
 		static const PIXEL_LTWH rc = { 136, 272, 16, 24 };
 		GrpSurface_Blit({ it.x, it.y }, SURFACE_ID::SYSTEM, rc);
 	}
 
 	GrpGeom->Lock();
-	for(const auto& it : Cube) {
+	for(const auto& it : Effect3D.DataCube()) {
 		__Draw3DCube(&it);
 	}
 	GrpGeom->Unlock();
 }
 
 
-void DrawEffectFakeECL(const WFLine2D& WFLine, FAKE_ECLSTR_CSPAN FakeECLStr)
+void DrawEffectFakeECL(const C_EFFECT3D& Effect3D)
 {
+	const auto& WFLine = Effect3D.DataWFLine();
 	PIXEL_LTRB	src;
 	int		i,j;
 
@@ -431,7 +435,7 @@ void DrawEffectFakeECL(const WFLine2D& WFLine, FAKE_ECLSTR_CSPAN FakeECLStr)
 
 	GrpGeom->Unlock();
 
-	for(const auto& it : FakeECLStr) {
+	for(const auto& it : Effect3D.DataFakeECL()) {
 		src = PIXEL_LTWH{it.SrcX, it.SrcY, 72, 16};
 		GrpSurface_Blit({ (it.x >> 6), (it.y >> 6) }, SURFACE_ID::MAPCHIP, src);
 	}

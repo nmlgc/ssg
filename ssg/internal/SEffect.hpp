@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "EFFECT.H"
+#include "ssg/SEffect.h"
+#include "hatoyama/logic/coords.h"
 
 class C_SEFFECT {
 private:

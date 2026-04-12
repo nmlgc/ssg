@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "EFFECT.H"
+#include "ssg/SEffect.h"
+#include "hatoyama/logic/coords.h"
 #include "hatoyama/logic/narrow.h"
 
 typedef struct MAID MAID;

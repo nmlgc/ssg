@@ -9,6 +9,7 @@
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
+#include "EFFECT.H"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GameDraw.h"

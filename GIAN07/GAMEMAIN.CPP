@@ -539,7 +539,6 @@ void GameSTD_Init(void)
 
 	ExBombEfcInit();
 
-	InitWarning();
 	WarningEffectInit();
 	//WarningEffectSet();
 

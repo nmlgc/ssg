@@ -723,7 +723,6 @@ void WarningEffectSet(void)
 {
 	bEnableWarnEfc = true;
 	WarnEfcTime    = 0;
-	InitWarning();
 }
 
 // ワーニングの動作 //

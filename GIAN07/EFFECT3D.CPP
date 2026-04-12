@@ -18,71 +18,78 @@ Rock3D		Rock[ROCK_MAX];
 WFLine2D		WFLine;
 FakeECLString	FakeECLStr[FAKE_ECLSTR_MAX];
 
-#define _ PIXEL_POINT
+template <size_t N> consteval auto TransformLineList(
+	PIXEL_POINT center, std::array<PIXEL_POINT, N>&& in
+)
+{
+	std::array<WORLD_POINT, N> ret;
+	for(size_t i = 0; auto& p : ret) {
+		p = (in[i++] - center);
+	}
+	return ret;
+}
 
-WORLD_POINT PList_W[11] = {
-	_{  0, 15 }, _{ 15, 66 }, _{ 32, 47 }, _{ 48, 66 },
-	_{ 63, 14 }, _{ 52, 11 }, _{ 42, 38 }, _{ 32, 26 },
-	_{ 21, 38 }, _{ 11, 10 }, _{  0, 15 },
-};
+constinit auto PList_W = TransformLineList<11>({ 192, 39 }, {{
+	{  0, 15 }, { 15, 66 }, { 32, 47 }, { 48, 66 },
+	{ 63, 14 }, { 52, 11 }, { 42, 38 }, { 32, 26 },
+	{ 21, 38 }, { 11, 10 }, {  0, 15 },
+}});
 
-WORLD_POINT PList_A1[8] = {
-	_{  96, 12 }, _{  66, 61 }, _{  75, 67 }, _{ 83, 56 },
-	_{ 107, 56 }, _{ 115, 67 }, _{ 125, 61 }, _{ 96, 12 },
-};
+constinit auto PList_A1 = TransformLineList<8>({ 192, 39 }, {{
+	{  96, 12 }, {  66, 61 }, {  75, 67 }, { 83, 56 },
+	{ 107, 56 }, { 115, 67 }, { 125, 61 }, { 96, 12 },
+}});
 
-WORLD_POINT PList_A2[4] = {
-	_{ 96, 34 }, _{ 90, 44 }, _{ 101, 44 }, _{ 96, 34 },
-};
+constinit auto PList_A2 = TransformLineList<4>({ 192, 39 }, {{
+	{ 96, 34 }, { 90, 44 }, { 101, 44 }, { 96, 34 },
+}});
 
-WORLD_POINT PList_R[15-1] = {
-	_{ 132, 14 }, _{ 132, 64 }, _{ 145, 64 }, _{ 145, 27 },
-	_{ 164, 27 },
+constinit auto PList_R = TransformLineList<15-1>({ 192, 39 }, {{
+	{ 132, 14 }, { 132, 64 }, { 145, 64 }, { 145, 27 },
+	{ 164, 27 },
 
-	//_{ 150, 41 }, _{ 150, 43 },
-	_{ 150, 42 },
+	//{ 150, 41 }, { 150, 43 },
+	{ 150, 42 },
 
-	_{ 171, 66 },
-	_{ 173, 66 }, _{ 181, 57 }, _{ 167, 43 }, _{ 180, 29 },
-	_{ 180, 27 }, _{ 170, 14 }, _{ 132, 14 },
-};
+	{ 171, 66 },
+	{ 173, 66 }, { 181, 57 }, { 167, 43 }, { 180, 29 },
+	{ 180, 27 }, { 170, 14 }, { 132, 14 },
+}});
 
-WORLD_POINT PList_N1[9] = {
-	_{ 189, 12 }, _{ 189, 64 }, _{ 201, 64 }, _{ 201, 40 },
-	_{ 239, 66 }, _{ 239, 14 }, _{ 227, 14 }, _{ 227, 38 },
-	_{ 189, 12 },
-};
+constinit auto PList_N1 = TransformLineList<9>({ 192, 39 }, {{
+	{ 189, 12 }, { 189, 64 }, { 201, 64 }, { 201, 40 },
+	{ 239, 66 }, { 239, 14 }, { 227, 14 }, { 227, 38 },
+	{ 189, 12 },
+}});
 
-WORLD_POINT PList_N2[9] = {
-	_{ 189, 12 }, _{ 189, 64 }, _{ 201, 64 }, _{ 201, 40 },
-	_{ 239, 66 }, _{ 239, 14 }, _{ 227, 14 }, _{ 227, 38 },
-	_{ 189, 12 },
-};
+constinit auto PList_N2 = TransformLineList<9>({ (192 - (296 - 215)), 39 }, {{
+	{ 189, 12 }, { 189, 64 }, { 201, 64 }, { 201, 40 },
+	{ 239, 66 }, { 239, 14 }, { 227, 14 }, { 227, 38 },
+	{ 189, 12 },
+}});
 
-WORLD_POINT PList_I[5] = {
-	_{ 248, 14 }, _{ 248, 64 }, _{ 262, 64 }, _{ 262, 14 },
-	_{ 248, 14 },
-};
+constinit auto PList_I = TransformLineList<5>({ 192, 39 }, {{
+	{ 248, 14 }, { 248, 64 }, { 262, 64 }, { 262, 14 },
+	{ 248, 14 },
+}});
 
-WORLD_POINT PList_G[17] = {
-	_{ 354, 11 }, _{ 328, 22 }, _{ 328, 57 }, _{ 354, 68 },
-	_{ 380, 59 }, _{ 380, 34 }, _{ 355, 34 }, _{ 354, 45 },
-	_{ 367, 46 }, _{ 367, 51 }, _{ 355, 55 }, _{ 342, 50 },
-	_{ 342, 29 }, _{ 354, 24 }, _{ 372, 30 }, _{ 377, 19 },
-	_{ 354, 11 },
-};
-
-#undef _
+constinit auto PList_G = TransformLineList<17>({ 192, 39 }, {{
+	{ 354, 11 }, { 328, 22 }, { 328, 57 }, { 354, 68 },
+	{ 380, 59 }, { 380, 34 }, { 355, 34 }, { 354, 45 },
+	{ 367, 46 }, { 367, 51 }, { 355, 55 }, { 342, 50 },
+	{ 342, 29 }, { 354, 24 }, { 372, 30 }, { 377, 19 },
+	{ 354, 11 },
+}});
 
 LineList3D Warning[8] = {
-	{ { 192, 39 }, PList_W },
-	{ { 192, 39 }, PList_A1 },
-	{ { 192, 39 }, PList_A2 },
-	{ { 192, 39 }, PList_R },
-	{ { 192, 39 }, PList_N1 },
-	{ { 192, 39 }, PList_I },
-	{ { (192 - (296 - 215)), 39 }, PList_N2 },
-	{ { 192, 39 }, PList_G }
+	{ PList_W },
+	{ PList_A1 },
+	{ PList_A2 },
+	{ PList_R },
+	{ PList_N1 },
+	{ PList_I },
+	{ PList_N2 },
+	{ PList_G },
 };
 
 
@@ -116,16 +123,6 @@ void ShiftRight6Bit(const Point3D *o, Point3D *p)
 }
 
 
-
-void InitWarning(void)
-{
-	static bool bInitialized = false;
-
-	if(bInitialized) return;
-
-	InitLineList3D(Warning);
-	bInitialized = true;
-}
 
 void DrawWarning(void)
 {
@@ -192,15 +189,6 @@ void MoveWarning(uint8_t count)
 		llist.DegX = ((count < 64) ? ((64 - count) * 2) : 0);
 		llist.DegY = ((count < 64) ? ((64 - count) * 1) : 0);
 		llist.DegZ = ((count < 64) ? ((64 - count) * 4) : 0);
-	}
-}
-
-void InitLineList3D(std::span<LineList3D> w)
-{
-	for(auto& llist : w) {
-		for(auto& point : llist.p) {
-			point -= llist.center;
-		}
 	}
 }
 

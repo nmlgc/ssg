@@ -43,12 +43,11 @@ struct Point3D {
 	WORLD_COORD x, y, z;
 };
 
-typedef struct tagLineList3D{
-	PIXEL_POINT	center;	/* 頂点の座標の補正用 */
-	std::span<WORLD_POINT>	p;	/* 頂点の座標         */
+struct LineList3D {
+	std::span<const WORLD_POINT>	p;	/* 頂点の座標         */
 
 	uint8_t	DegX, DegY, DegZ;	/* 各軸に対する回転角 */
-} LineList3D;
+};
 
 struct Deg3D {
 	int		dx;
@@ -119,10 +118,8 @@ extern Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
 
 ///// [ 関数 ] /////
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
-void InitLineList3D(std::span<LineList3D> w);
 void DrawLineList3D(std::span<const LineList3D> w);
 
-void InitWarning(void);
 void DrawWarning(void);
 void MoveWarning(uint8_t count);
 void MoveWarningR(char count);

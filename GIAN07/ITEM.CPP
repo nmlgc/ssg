@@ -4,13 +4,13 @@
 /*                                                                           */
 
 #include "ITEM.H"
-#include "EFFECT.H"
 #include "FRAGMENT.H"
 #include "GIAN.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 

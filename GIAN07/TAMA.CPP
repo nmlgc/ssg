@@ -4,7 +4,6 @@
 /*************************************************************************************************/
 
 #include "TAMA.H"
-#include "EFFECT.H"
 #include "ENEMY.H"
 #include "FRAGMENT.H"
 #include "GIAN.H"
@@ -13,6 +12,7 @@
 #include "PRankCtrl.h"
 #include "ssg/Round.h"
 #include "ssg/internal/RNG.hpp"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"

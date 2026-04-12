@@ -6,8 +6,6 @@
 #include <printf/printf.h>
 
 #include "MAID.H"
-#include "CONFIG.H"
-#include "EFFECT.H"
 #include "FRAGMENT.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
@@ -17,8 +15,8 @@
 #include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
-#include "hatoyama/logic/input.h"
 
 
 C_VIV Viv;

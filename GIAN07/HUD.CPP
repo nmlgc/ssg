@@ -9,12 +9,12 @@
 #include <printf/printf.h>
 
 #include "HUD.H"
-#include "EFFECT.H"
 #include "FONTUTY.H"
 #include "ITEM.H"
 #include "LogicInstance.h"
 #include "MAID.H"
 #include "MAIDTAMA.H"
+#include "ssg/internal/SEffect.hpp"
 #ifdef PBG_DEBUG
 #include "CONFIG.H"
 #include "ENEMY.H"

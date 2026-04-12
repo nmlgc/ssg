@@ -35,6 +35,7 @@
 #include "WindowSys.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/RNG.hpp"
+#include "ssg/internal/SEffect.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"

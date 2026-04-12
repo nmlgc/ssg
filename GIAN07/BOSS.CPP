@@ -7,7 +7,6 @@
 
 #include "BOSS.H"
 #include "BOMBEFC.H" // 爆発エフェクト処理
-#include "EFFECT.H"
 #include "EnemyExCtrl.h"
 #include "FRAGMENT.H"
 #include "GIAN.H"
@@ -15,6 +14,7 @@
 #include "LLASER.H"
 #include "SCROLL.H"
 #include "ssg/Sound.h"
+#include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 
 ///// [ 変数 ] /////

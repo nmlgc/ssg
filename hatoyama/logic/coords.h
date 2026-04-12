@@ -20,7 +20,7 @@ template <class Coord> struct PIXEL_POINT_BASE {
 	Coord y;
 
 	// Explicit integer division.
-	PIXEL_POINT_BASE DivInt(int scalar) const {
+	constexpr PIXEL_POINT_BASE DivInt(int scalar) const {
 		return {
 			.x = static_cast<Coord>(static_cast<int>(x) / scalar),
 			.y = static_cast<Coord>(static_cast<int>(y) / scalar),
@@ -31,7 +31,11 @@ template <class Coord> struct PIXEL_POINT_BASE {
 		return { (x + other.x), (y + other.y) };
 	}
 
-	PIXEL_POINT_BASE& operator-=(const PIXEL_POINT_BASE& other) {
+	constexpr PIXEL_POINT_BASE operator-(const PIXEL_POINT_BASE& other) const {
+		return { (x - other.x), (y - other.y) };
+	}
+
+	constexpr PIXEL_POINT_BASE& operator-=(const PIXEL_POINT_BASE& other) {
 		this->x -= other.x;
 		this->y -= other.y;
 		return *this;
@@ -140,11 +144,11 @@ template <class Coord> struct PIXEL_LTRB_BASE {
 	Coord right;
 	Coord bottom;
 
-	PIXEL_LTRB_BASE() = default;
-	PIXEL_LTRB_BASE(const PIXEL_LTRB_BASE&) = default;
-	PIXEL_LTRB_BASE(PIXEL_LTRB_BASE&&) = default;
-	PIXEL_LTRB_BASE& operator=(const PIXEL_LTRB_BASE&) = default;
-	PIXEL_LTRB_BASE& operator=(PIXEL_LTRB_BASE&&) = default;
+	constexpr PIXEL_LTRB_BASE() = default;
+	constexpr PIXEL_LTRB_BASE(const PIXEL_LTRB_BASE&) = default;
+	constexpr PIXEL_LTRB_BASE(PIXEL_LTRB_BASE&&) = default;
+	constexpr PIXEL_LTRB_BASE& operator=(const PIXEL_LTRB_BASE&) = default;
+	constexpr PIXEL_LTRB_BASE& operator=(PIXEL_LTRB_BASE&&) = default;
 	constexpr PIXEL_LTRB_BASE(
 		decltype(left) left,
 		decltype(top) top,
@@ -185,7 +189,7 @@ template <
 		return { (this->x + other.x), (this->y + other.y) };
 	}
 
-	WINDOW_POINT_BASE operator/(Coord scalar) const {
+	constexpr WINDOW_POINT_BASE operator/(Coord scalar) const {
 		return { (this->x / scalar), (this->y / scalar) };
 	}
 };
@@ -236,7 +240,7 @@ struct WORLD_POINT {
 	WORLD_COORD y;
 
 	#pragma warning(suppress : 26495) // type.6
-	WORLD_POINT() noexcept {
+	constexpr WORLD_POINT() noexcept {
 	}
 
 	// World-space points should never be constructed from integer literals.
@@ -248,16 +252,16 @@ struct WORLD_POINT {
 	// TODO: Keeping this one around so that we can at least pass structure
 	// fields while we gradually migrate the game to this structure, but it
 	// should be `delete`d once we're done.
-	WORLD_POINT(const WORLD_COORD* x, const WORLD_COORD* y) :
+	constexpr WORLD_POINT(const WORLD_COORD* x, const WORLD_COORD* y) :
 		x(*x), y(*y) {
 	}
 
-	WORLD_POINT(const PIXEL_POINT& pixel) :
+	constexpr WORLD_POINT(const PIXEL_POINT& pixel) :
 		x(pixel.x << WORLD_COORD_BITS),
 		y(pixel.y << WORLD_COORD_BITS) {
 	}
 
-	WORLD_POINT& operator -=(const WORLD_POINT& other) {
+	constexpr WORLD_POINT& operator -=(const WORLD_POINT& other) {
 		x -= other.x;
 		y -= other.y;
 		return *this;

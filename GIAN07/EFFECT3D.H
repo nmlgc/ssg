@@ -112,32 +112,7 @@ using STG6STAR_CSPAN = std::span<const Stg6Star, S3STAR_MAX>;
 #endif
 
 
-extern Cube3D Cube[CUBE_MAX];
-extern Star2D Star[STAR_MAX];
-extern Rock3D Rock[ROCK_MAX];
-extern WFLine2D WFLine;
-extern FakeECLString FakeECLStr[FAKE_ECLSTR_MAX];
-extern Stg6Raster S6Ras[S6RASTER_MAX];
-extern Stg6Star S6Star[S3STAR_MAX]; // 兼用モノなのだ
-
-
 ///// [ 関数 ] /////
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
-
-void Init3DCube(void);
-void Move3DCube(void);
-
-void InitEffectFakeECL(void);
-void MoveEffectFakeECL(void);
-
-void InitStg4Rock(void);	// ステージ４の背景となる岩の集団
-void MoveStg4Rock(void);	//
-void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);	// コマンド送信
-
-void InitStg6Raster();	// ６面ラスター初期化
-void MoveStg6Raster();	// ６面ラスター動作
-
-void InitStg3Star();	// ３面高速星初期化
-void MoveStg3Star();	// ３面高速星動作
 
 #endif

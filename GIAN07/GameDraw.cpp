@@ -17,7 +17,7 @@
 #include "LASER.H"
 #include "LLASER.H"
 #include "MAID.H"
-#include "TAMA.H"
+#include "MAIDTAMA.H"
 #include "hatoyama/logic/ut_math.h"
 
 /// Bit lines
@@ -1180,12 +1180,11 @@ void MaidDraw(const MAID& Viv)
 /// -------------------------
 
 // ナニな弾描画 //
-void MaidTamaDraw(
-	MAIDTAMA_DATA_CSPAN storage, std::span<const uint16_t> inds, const MAID& Viv
-)
+void MaidTamaDraw(const C_MAIDTAMA& MaidTama, const MAID& Viv)
 {
 	// ここでは、さすがにTAMA.cpp 内の関数を使用するわけにはいかないので、 //
 	// 独自に描画ルーチンを展開する。                                      //
+	const auto storage = MaidTama.Data();
 
 	int				i,x,y;
 	PIXEL_LTRB	src, ltemp;
@@ -1197,7 +1196,7 @@ void MaidTamaDraw(
 		{600,104,600+40,104+40}
 	};
 
-	for(const auto ind : inds) {
+	for(const auto ind : MaidTama.Inds()) {
 		auto *t = &storage[ind];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です

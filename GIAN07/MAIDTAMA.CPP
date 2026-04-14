@@ -16,60 +16,8 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-///// [ひみつの関数] /////
-static void MTamaSet(void);
-
-static void SetT_A0(void);		// めいどたまＴＹＰＥ－Ａ
-static void SetT_A1(void);
-static void SetT_A2(void);
-static void SetT_A3(void);
-static void SetT_A4(void);
-static void SetT_A5(void);
-static void SetT_A6(void);
-static void SetT_A7(void);
-static void SetT_A8(void);
-
-static void SetT_B0(void);		// めいどたまＴＹＰＥ－Ｂ
-static void SetT_B1(void);
-static void SetT_B2(void);
-static void SetT_B3(void);
-static void SetT_B4(void);
-static void SetT_B5(void);
-static void SetT_B6(void);
-static void SetT_B7(void);
-static void SetT_B8(void);
-
-static void SetT_C0(void);		// めいどたまＴＹＰＥ－Ｃ
-static void SetT_C1(void);
-static void SetT_C2(void);
-static void SetT_C3(void);
-static void SetT_C4(void);
-static void SetT_C5(void);
-static void SetT_C6(void);
-static void SetT_C7(void);
-static void SetT_C8(void);
-
-static void SetT_D0(void);		// めいどたまＴＹＰＥ－Ｄ
-static void SetT_D1(void);
-static void SetT_D2(void);
-static void SetT_D3(void);
-static void SetT_D4(void);
-static void SetT_D5(void);
-static void SetT_D6(void);
-static void SetT_D7(void);
-static void SetT_D8(void);
-
-static void SetWideBomb(void);
-static void SetHomingBomb(void);
-static void SetLaserBomb(void);
-static void SetCactusBomb(void);
-
-
-
 TAMA_CMD& TamaCmd = Tama.TamaCmd;
-std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
-std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
-uint16_t	MaidTamaNow;	// 現在の数
+C_MAIDTAMA MaidTama;
 
 constexpr uint8_t TogeDamage[(4 * 2) + 2] = {
 	// MainWeapon		// SubWeapon
@@ -78,17 +26,6 @@ constexpr uint8_t TogeDamage[(4 * 2) + 2] = {
 	TDM_LASER_MAIN,		TDM_LASER_SUB,		// TYPE_C
 	1,					1					// ホーミングボム用
 };
-
-static void (*MaidTamaFunc[4][9])(void) =
-{
-	{SetT_A0,SetT_A1,SetT_A2,SetT_A3,SetT_A4,SetT_A5,SetT_A6,SetT_A7,SetT_A8},
-	{SetT_B0,SetT_B1,SetT_B2,SetT_B3,SetT_B4,SetT_B5,SetT_B6,SetT_B7,SetT_B8},
-	{SetT_C0,SetT_C1,SetT_C2,SetT_C3,SetT_C4,SetT_C5,SetT_C6,SetT_C7,SetT_C8},
-	{SetT_D0,SetT_D1,SetT_D2,SetT_D3,SetT_D4,SetT_D5,SetT_D6,SetT_D7,SetT_D8}
-};
-
-static void (*MaidBombFunc[4])(void) =
-{SetWideBomb, SetHomingBomb, SetLaserBomb, SetCactusBomb};
 
 #define WIDE_BOMB_TIME			(60*4)
 #define HOMING_BOMB_TIME		(60*3)
@@ -107,7 +44,7 @@ static constexpr uint8_t MaidBombTime[4] = {
 
 
 //// 弾コマンド用マクロ ////
-void TamaSTDForm(uint8_t c)
+void C_MAIDTAMA::TamaSTDForm(uint8_t c)
 {
 	TamaCmd.cmd    = TC_WAY;
 	TamaCmd.option = TOP_NONE;
@@ -115,7 +52,7 @@ void TamaSTDForm(uint8_t c)
 	TamaCmd.c      = c;
 }
 
-void TamaSetHoming(uint8_t c)
+void C_MAIDTAMA::TamaSetHoming(uint8_t c)
 {
 	TamaCmd.cmd    = TC_WAY;
 	TamaCmd.option = TOP_NONE;
@@ -125,25 +62,25 @@ void TamaSetHoming(uint8_t c)
 	TamaCmd.vd     = 5;
 }
 
-void TamaSetDeg(uint8_t d, uint8_t dw)
+void C_MAIDTAMA::TamaSetDeg(uint8_t d, uint8_t dw)
 {
 	TamaCmd.d  = d;
 	TamaCmd.dw = dw;
 }
 
-void TamaSetNum(uint8_t n, uint8_t ns)
+void C_MAIDTAMA::TamaSetNum(uint8_t n, uint8_t ns)
 {
 	TamaCmd.n  = n;
 	TamaCmd.ns = ns;
 }
 
-void TamaSetSpd(uint8_t v, char a)
+void C_MAIDTAMA::TamaSetSpd(uint8_t v, char a)
 {
 	TamaCmd.v = v;
 	TamaCmd.a = a;
 }
 
-void TamaSetXY(int x, int y)
+void C_MAIDTAMA::TamaSetXY(int x, int y)
 {
 	TamaCmd.x = x;
 	TamaCmd.y = y;
@@ -152,7 +89,7 @@ void TamaSetXY(int x, int y)
 
 
 // たま発射！！ //
-void MaidTamaSet(INPUT_BITS input, bool in_msg)
+void C_MAIDTAMA::Set(INPUT_BITS input, bool in_msg)
 {
 	// この関数では、前回の発射状態 (Viv_St) を参照して、発射可能であるならば //
 	// 発射し、そうでなければ、単にリターンする。                             //
@@ -184,14 +121,14 @@ void MaidTamaSet(INPUT_BITS input, bool in_msg)
 
 	if(Viv.bomb_time){
 		Viv.bomb_time--;
-		MaidBombFunc[Viv.weapon]();
+		std::invoke(MaidBombFunc[Viv.weapon], *this);
 
 		//if(Viv.bomb_time == 0 && Viv.weapon == 0)
 		//	LeaveBombPalette();
 	}
 
 	if(Viv.toge_time){
-		MaidTamaFunc[Viv.weapon&3][(Viv.exp+1)>>5]();
+		std::invoke(MaidTamaFunc[Viv.weapon&3][(Viv.exp+1)>>5], *this);
 		Viv.toge_time--;
 	}
 
@@ -208,7 +145,7 @@ void MaidTamaSet(INPUT_BITS input, bool in_msg)
 }
 
 // 弾移動＆ヒットチェック //
-void MaidTamaMove(void)
+void C_MAIDTAMA::Move(void)
 {
 	// この関数では、TAMA.cpp の敵弾の移動処理を使用する。もちろん、         //
 	// 当たり判定については、敵に対してのものとする事！！                    //
@@ -268,7 +205,7 @@ void MaidTamaMove(void)
 }
 
 // 弾ハッシュテーブル初期化 //
-void MaidTamaIndSet(void)
+void C_MAIDTAMA::IndSet(void)
 {
 	int		i;
 
@@ -282,7 +219,7 @@ void MaidTamaIndSet(void)
 	MaidTamaNow = 0;
 }
 
-static void MTamaSet(void)
+void C_MAIDTAMA::MTamaSet(void)
 {
 	for(decltype(TamaCmd.n) i = 0; i < TamaCmd.n; i++) {
 		if(MaidTamaNow+1 >= MAIDTAMA_MAX) return;			// セットできない場合
@@ -296,7 +233,7 @@ static void MTamaSet(void)
 #define IsMainShot(t)	((t)==MAID_MAIN_SHOT||(t)==MAID_MAIN_SHOT*2||(t)==MAID_MAIN_SHOT*3)
 #define IsSubShot(t)	( ((t)==0 || (t)==MAID_SUB_SHOT) && Viv.bomb_time==0)
 
-void MLaserSet(uint16_t time)
+void C_MAIDTAMA::MLaserSet(uint16_t time)
 {
 	if(Viv.bomb_time || Viv.muteki>MAID_MOVE_DISABLE_TIME){
 		Viv.lay_time = 0;
@@ -311,7 +248,7 @@ void MLaserSet(uint16_t time)
 }
 
 // ショットＴＹＰＥ－Ａ //
-static void SetT_A0(void)
+void C_MAIDTAMA::SetT_A0(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット単発のみ //
@@ -324,7 +261,7 @@ static void SetT_A0(void)
 	}
 }
 
-static void SetT_A1(void)
+void C_MAIDTAMA::SetT_A1(void)
 {
 	char dd;
 
@@ -356,7 +293,7 @@ static void SetT_A1(void)
 	}
 }
 
-static void SetT_A2(void)
+void C_MAIDTAMA::SetT_A2(void)
 {
 	char dd;
 
@@ -392,7 +329,7 @@ static void SetT_A2(void)
 	}
 }
 
-static void SetT_A3(void)
+void C_MAIDTAMA::SetT_A3(void)
 {
 	char dd;
 
@@ -424,7 +361,7 @@ static void SetT_A3(void)
 	}
 }
 
-static void SetT_A4(void)
+void C_MAIDTAMA::SetT_A4(void)
 {
 	char dd;
 
@@ -456,12 +393,12 @@ static void SetT_A4(void)
 	}
 }
 
-static void SetT_A5(void)
+void C_MAIDTAMA::SetT_A5(void)
 {
 	SetT_A4();
 }
 
-static void SetT_A6(void)
+void C_MAIDTAMA::SetT_A6(void)
 {
 	char dd;
 
@@ -493,12 +430,12 @@ static void SetT_A6(void)
 	}
 }
 
-static void SetT_A7(void)
+void C_MAIDTAMA::SetT_A7(void)
 {
 	SetT_A6();
 }
 
-static void SetT_A8(void)
+void C_MAIDTAMA::SetT_A8(void)
 {
 	char dd;
 
@@ -531,7 +468,7 @@ static void SetT_A8(void)
 }
 
 // ショットＴＹＰＥ－Ｂ //
-static void SetT_B0(void)
+void C_MAIDTAMA::SetT_B0(void)
 {
 	char dd;
 
@@ -549,7 +486,7 @@ static void SetT_B0(void)
 	//Viv.toge_time = 3;
 }
 
-static void SetT_B1(void)
+void C_MAIDTAMA::SetT_B1(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット２連 //
@@ -582,7 +519,7 @@ static void SetT_B1(void)
 	}
 }
 
-static void SetT_B2(void)
+void C_MAIDTAMA::SetT_B2(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット３ＷＡＹ //
@@ -614,12 +551,12 @@ static void SetT_B2(void)
 	}
 }
 
-static void SetT_B3(void)
+void C_MAIDTAMA::SetT_B3(void)
 {
 	SetT_B2();
 }
 
-static void SetT_B4(void)
+void C_MAIDTAMA::SetT_B4(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット５ＷＡＹ //
@@ -651,12 +588,12 @@ static void SetT_B4(void)
 	}
 }
 
-static void SetT_B5(void)
+void C_MAIDTAMA::SetT_B5(void)
 {
 	SetT_B4();
 }
 
-static void SetT_B6(void)
+void C_MAIDTAMA::SetT_B6(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット５ＷＡＹ //
@@ -688,12 +625,12 @@ static void SetT_B6(void)
 	}
 }
 
-static void SetT_B7(void)
+void C_MAIDTAMA::SetT_B7(void)
 {
 	SetT_B6();
 }
 
-static void SetT_B8(void)
+void C_MAIDTAMA::SetT_B8(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット５ＷＡＹ //
@@ -726,7 +663,7 @@ static void SetT_B8(void)
 }
 
 // ショットＴＹＰＥ－Ｃ //
-static void SetT_C0(void)
+void C_MAIDTAMA::SetT_C0(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット単発のみ //
@@ -739,7 +676,7 @@ static void SetT_C0(void)
 	}
 }
 
-static void SetT_C1(void)
+void C_MAIDTAMA::SetT_C1(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央に２列ショット //
@@ -756,12 +693,12 @@ static void SetT_C1(void)
 	MLaserSet(64+50);
 }
 
-static void SetT_C2(void)
+void C_MAIDTAMA::SetT_C2(void)
 {
 	SetT_C1();
 }
 
-static void SetT_C3(void)
+void C_MAIDTAMA::SetT_C3(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット３ＷＡＹ //
@@ -776,12 +713,12 @@ static void SetT_C3(void)
 	MLaserSet(64+100);
 }
 
-static void SetT_C4(void)
+void C_MAIDTAMA::SetT_C4(void)
 {
 	SetT_C3();
 }
 
-static void SetT_C5(void)
+void C_MAIDTAMA::SetT_C5(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット４ＷＡＹ(中央は２列で) //
@@ -801,17 +738,17 @@ static void SetT_C5(void)
 	MLaserSet(64+150);
 }
 
-static void SetT_C6(void)
+void C_MAIDTAMA::SetT_C6(void)
 {
 	SetT_C5();
 }
 
-static void SetT_C7(void)
+void C_MAIDTAMA::SetT_C7(void)
 {
 	SetT_C5();
 }
 
-static void SetT_C8(void)
+void C_MAIDTAMA::SetT_C8(void)
 {
 	if(IsMainShot(Viv.toge_time)){
 		// 中央にショット５ＷＡＹ //
@@ -827,45 +764,45 @@ static void SetT_C8(void)
 }
 
 // ショットＴＹＰＥ－Ｄ //
-static void SetT_D0(void)
+void C_MAIDTAMA::SetT_D0(void)
 {
 }
 
-static void SetT_D1(void)
+void C_MAIDTAMA::SetT_D1(void)
 {
 }
 
-static void SetT_D2(void)
+void C_MAIDTAMA::SetT_D2(void)
 {
 }
 
-static void SetT_D3(void)
+void C_MAIDTAMA::SetT_D3(void)
 {
 }
 
-static void SetT_D4(void)
+void C_MAIDTAMA::SetT_D4(void)
 {
 }
 
-static void SetT_D5(void)
+void C_MAIDTAMA::SetT_D5(void)
 {
 }
 
-static void SetT_D6(void)
+void C_MAIDTAMA::SetT_D6(void)
 {
 }
 
-static void SetT_D7(void)
+void C_MAIDTAMA::SetT_D7(void)
 {
 }
 
-static void SetT_D8(void)
+void C_MAIDTAMA::SetT_D8(void)
 {
 }
 
 
 
-static void SetWideBomb(void)
+void C_MAIDTAMA::SetWideBomb(void)
 {
 	int		dx,dy,l;
 
@@ -883,7 +820,7 @@ static void SetWideBomb(void)
 	Enemy.Damage4(1);
 }
 
-static void SetHomingBomb(void)
+void C_MAIDTAMA::SetHomingBomb(void)
 {
 	if(Viv.bomb_time%30 == 1){
 		TamaSetHoming(TID_HOMING_BOMB_A);
@@ -899,7 +836,7 @@ static void SetHomingBomb(void)
 }
 
 // こいつは、Set というよりも、 HitCheck 的な役割を果たす //
-static void SetLaserBomb(void)
+void C_MAIDTAMA::SetLaserBomb(void)
 {
 	int			ox,oy;
 	int			i;
@@ -921,6 +858,6 @@ static void SetLaserBomb(void)
 	}
 }
 
-static void SetCactusBomb(void)
+void C_MAIDTAMA::SetCactusBomb(void)
 {
 }

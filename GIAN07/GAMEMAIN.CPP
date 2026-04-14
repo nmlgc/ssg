@@ -27,6 +27,7 @@
 #include "LLASER.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
+#include "MAIDTAMA.H"
 #include "MUSIC.H"
 #include "SCORE.H"
 #include "SCROLL.H"
@@ -529,7 +530,7 @@ void GameSTD_Init(void)
 	BossHPG_Init();
 
 	//MaidSet();
-	MaidTamaIndSet();
+	MaidTama.IndSet();
 	Enemy.IndSet();
 	Tama.IndSet(400 + 200); // 小型弾に４００
 	Laser.IndSet();
@@ -1151,7 +1152,7 @@ void WeaponSelectProc(bool&)
 			}
 
 			Round.Weapon = Viv.weapon;
-			MaidTamaIndSet();
+			MaidTama.IndSet();
 			count = 0;
 
 			Snd_SEPlay(SOUND_ID_SELECT);
@@ -1260,7 +1261,7 @@ void WeaponSelectProc(bool&)
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
 		Viv.Move(KEY_TAMA, Stage.InMsg());
-		MaidTamaMove();
+		MaidTama.Move();
 
 		GrpBackend_SetClip(
 			{ (400 - 110), (400 - 300 + 2), (400 + 110), (400 + 10) }
@@ -1274,7 +1275,7 @@ void WeaponSelectProc(bool&)
 			}
 		}
 		MaidDraw(Viv);
-		MaidTamaDraw(MaidTama, std::span(MaidTamaInd).first(MaidTamaNow), Viv);
+		MaidTamaDraw(MaidTama, Viv);
 
 		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
 		GrpSurface_Blit({ 468, 400 }, SURFACE_ID::SYSTEM, rc);
@@ -1415,7 +1416,7 @@ void GameMove(INPUT_BITS input)
 
 	// この２行の位置を変更しました //
 	Viv.Move(input, Stage.InMsg());
-	MaidTamaMove();
+	MaidTama.Move();
 }
 
 
@@ -1435,7 +1436,7 @@ void GameDraw(void)
 
 	enemy_draw(Enemy);
 
-	MaidTamaDraw(MaidTama, std::span(MaidTamaInd).first(MaidTamaNow), Viv);
+	MaidTamaDraw(MaidTama, Viv);
 
 	MaidDraw(Viv);
 

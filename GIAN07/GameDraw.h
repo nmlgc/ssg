@@ -5,11 +5,9 @@
 
 #pragma once
 
-#include "MAIDTAMA.H"
-
 class C_BIT;
-class C_BOSS;
 class C_BOMBEFC;
+class C_BOSS;
 class C_EFFECT3D;
 class C_ENEMY;
 class C_FRAGMENT;
@@ -17,7 +15,9 @@ class C_HLASER;
 class C_ITEM;
 class C_LASER;
 class C_LLASER;
+class C_MAIDTAMA;
 class C_TAMA;
+struct MAID;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -61,9 +61,7 @@ void StateDraw(const MAID&);    // 各種ステータスを描画する
 void WideBombDraw(const MAID&); // ワイドショット用のボム(やや例外処理)
 
 // ナニな弾描画
-void MaidTamaDraw(
-	MAIDTAMA_DATA_CSPAN storage, std::span<const uint16_t> inds, const MAID&
-);
+void MaidTamaDraw(const C_MAIDTAMA&, const MAID&);
 
 // 弾を描画する
 void tama_draw(const C_TAMA&);

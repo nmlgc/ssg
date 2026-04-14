@@ -285,7 +285,7 @@ void StdStatusOutput(void)
 	sprintf(buf, "HLaser %2d", HLaser.NumAlive());
 	GrpPut16(0, (196 + 40), buf);
 
-	sprintf(buf, "MTama %3d", MaidTamaNow);
+	sprintf(buf, "MTama %3zu", MaidTama.Inds().size());
 	GrpPut16(0, (224 + 40), buf);
 
 	sprintf(buf, "Item  %3zu", Item.Inds().size());

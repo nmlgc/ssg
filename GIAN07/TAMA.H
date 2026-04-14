@@ -218,9 +218,9 @@ private:
 
 	void __Set(void);
 
-public:
 	/// Internal interface, shared between TAMA and MAIDTAMA
 	/// ----------------------------------------------------
+	friend class C_MAIDTAMA;
 
 	// Initializes an individual (regular) bullet or player shot from `TamaCmd`.
 	void SetSingle(

@@ -135,7 +135,7 @@ void C_VIV::Move(INPUT_BITS input, bool in_msg)
 	Viv.opy = Viv.y + Viv.vy + 64*6;
 
 	// 弾＆ボムのセット //
-	MaidTamaSet(input, in_msg);
+	MaidTama.Set(input, in_msg);
 
 	if(Viv.bomb_time){
 		Tama.Clear();

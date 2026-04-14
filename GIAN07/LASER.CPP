@@ -62,9 +62,9 @@ std::array<LASER_DATA, LASER_MAX>	Laser;	// レーザー格納用構造体
 std::array<uint16_t, LASER_MAX>	LaserInd;	// レーザー順番維持用配列
 uint16_t LaserNow;                          // レーザーの本数
 
-static void easy_cmdL(void);						// 難易度：Ｅａｓｙ
-static void hard_cmdL(void);						// 難易度：Ｈａｒｄ
-static void luna_cmdL(void);						// 難易度：Ｌｕｎａｔｉｃ
+static void easy_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｅａｓｙ
+static void hard_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｈａｒｄ
+static void luna_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｌｕｎａｔｉｃ
 
 static uint8_t laser_dir(uint16_t i);	// レーザーの進行方向をセットする
 static void slaser_pset(LASER_DATA *lp);	// ４点の座標をセットする(ショート用)
@@ -81,15 +81,15 @@ void laser_set(void)
 {
 	switch(PlayRank.LevelRanked) {
 		case(GAME_EASY):
-			easy_cmdL();
+			easy_cmdL(LaserCmd);
 		break;
 
 		case(GAME_HARD):
-			hard_cmdL();
+			hard_cmdL(LaserCmd);
 		break;
 
 		case(GAME_LUNATIC):
-			luna_cmdL();
+			luna_cmdL(LaserCmd);
 		break;
 	}
 
@@ -216,7 +216,7 @@ void laserind_set(void)
 	LaserNow = 0;
 }
 
-static void easy_cmdL(void)
+static void easy_cmdL(LASER_CMD& LaserCmd)
 {
 	switch(LaserCmd.cmd&0x03){
 		case(LC_WAY):
@@ -232,7 +232,7 @@ static void easy_cmdL(void)
 	LaserCmd.l -= (LaserCmd.l>>2);
 }
 
-static void hard_cmdL(void)
+static void hard_cmdL(LASER_CMD& LaserCmd)
 {
 	switch(LaserCmd.cmd&0x03){
 		case(LC_WAY):
@@ -252,7 +252,7 @@ static void hard_cmdL(void)
 	LaserCmd.l += (LaserCmd.l>>2);
 }
 
-static void luna_cmdL(void)
+static void luna_cmdL(LASER_CMD& LaserCmd)
 {
 	switch(LaserCmd.cmd&0x03){
 		case(LC_WAY):

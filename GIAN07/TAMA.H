@@ -7,8 +7,7 @@
 #define PBGWIN_TAMA_H		"TAMA : Ver 0.62 : Update 2000/02/17"
 //#pragma message(PBGWIN_TAMA_H)
 
-#include "GIAN07/entity.h"
-#include "hatoyama/logic/coords.h"
+#include "hatoyama/logic/ffi.h"
 
 
 ///// [更新履歴] /////
@@ -164,67 +163,6 @@ typedef struct{
 #ifdef __cplusplus
 using TAMA_DATA_CSPAN = std::span<const TAMA_DATA, TAMA_MAX>;
 #endif
-
-
-////弾の各種変数たち////
-extern TAMA_CMD		TamaCmd;			// 標準・弾コマンド構造体
-extern std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
-extern std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
-extern std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
-extern uint16_t	Tama1Now;	// 小型弾の弾数
-extern uint16_t	Tama2Now;	// 特殊弾の弾数
-extern uint16_t	Tama1Max;	// 小型弾の最大数
-extern uint16_t	Tama2Max;	// 特殊弾の最大数
-extern int	TamaSpeed;
-
-extern WORLD_COORD HomingX; // ホーミング対象のＸ座標
-extern WORLD_COORD HomingY; // ホーミング対象のＹ座標
-extern int HomingFlag;      // 真ならホーミング実行
-
-
-
-////弾関数////
-
-// Initializes an individual (regular) bullet or player shot from `TamaCmd`.
-void TamaSetSingle(
-	TAMA_DATA& t, unsigned int i, int speed, decltype(TAMA_DATA::effect) effect
-);
-
-void tama_set(void);					// 弾をセットする(難易度による変更は"有り")
-void tama_setEX(void);					// 弾をセットする(難易度による変更は"無し")
-void tama_setLine(void);				// 弾をセットする(ライン状に発射)
-void tama_setExtra01(void);				// エキストラボス専用弾幕
-void tama_move(void);					// 弾を動かす
-void tama_clear(void);					// 弾に消去エフェクトをセットする
-void tamaind_set(uint16_t tama1);	// 弾の個数の割合をセットする(危険！)
-
-uint32_t tama2score(void);	// 弾を得点化する(Ret : 得点)
-void  tama2item(uint8_t n);	// 弾の 1/n をアイテム化する
-
-uint8_t tama_dir(uint16_t i);	// 弾の進行方向をセットする
-
-// 弾の初速度をセットする
-int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd);
-
-uint8_t tama_flag(void);	// 弾のフラグを初期化する
-
-void tamaTmove(TAMA_DATA *t);	// 弾の " Type " による移動を行う
-void tamaOmove(TAMA_DATA *t);	// 弾の "Option" による移動を行う
-void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
-
-void ResetHoming(void);
-void UpdateHoming(const WORLD_POINT& p); // ホーミング座標を更新する
-
-
-template <size_t N> void Indsort(
-	std::array<uint16_t, N>& indices,
-	uint16_t& count,
-	const std::array<TAMA_DATA, N>& entities
-) {
-	Indsort(indices, count, entities, [](const TAMA_DATA& t) {
-		return (t.flag & TF_DELETE);
-	});
-}
 
 
 #endif

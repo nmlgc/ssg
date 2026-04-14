@@ -23,6 +23,7 @@
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Laser.hpp"
 #include "ssg/internal/Stage.hpp"
+#include "ssg/internal/Tama.hpp"
 #endif
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/time.h"
@@ -277,9 +278,9 @@ void StdStatusOutput(void)
 	sprintf(buf, "Enemy %3d", Enemy.NumAlive());
 	GrpPut16(0, (96 + 40), buf);
 
-	sprintf(buf, "Tama1 %3d", Tama1Now);
+	sprintf(buf, "Tama1 %3zu", Tama.Inds1().size());
 	GrpPut16(0, (128 + 40), buf);
-	sprintf(buf, "Tama2 %3d", Tama2Now);
+	sprintf(buf, "Tama2 %3zu", Tama.Inds2().size());
 	GrpPut16(0, (148 + 40), buf);
 	sprintf(buf, "Laser %3zu", Laser.Inds().size());
 	GrpPut16(0, (176 + 40), buf);

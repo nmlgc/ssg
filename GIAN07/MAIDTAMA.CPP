@@ -10,6 +10,7 @@
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Maid.hpp"
+#include "ssg/internal/Tama.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/input.h"
@@ -66,6 +67,7 @@ static void SetCactusBomb(void);
 
 
 
+TAMA_CMD& TamaCmd = Tama.TamaCmd;
 std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
 std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
 uint16_t	MaidTamaNow;	// 現在の数
@@ -225,8 +227,8 @@ void MaidTamaMove(void)
 			continue;
 		}
 		if(t->effect==TE_NONE){
-			tamaTmove(t);
-			tamaOmove(t);
+			Tama.Tmove(t);
+			Tama.Omove(t);
 			t->count++;
 			if(((t->flag&TF_CLIP)==0)&&((t->x)<GX_MIN||(t->x)>GX_MAX||(t->y)<GY_MIN||(t->y)>GY_MAX))
 				t->flag = TF_DELETE;
@@ -246,7 +248,7 @@ void MaidTamaMove(void)
 			}
 		}
 		else
-			tamaEmove(t);
+			Tama.Emove(t);
 	}
 	Indsort(MaidTamaInd, MaidTamaNow, MaidTama, [](const TAMA_DATA& t) {
 		return (t.flag & TF_DELETE);
@@ -288,7 +290,7 @@ static void MTamaSet(void)
 
 		auto* t = &MaidTama[MaidTamaInd[MaidTamaNow++]];	// 弾ポインタをセット
 
-		TamaSetSingle(*t, i, SPEEDM(TamaCmd.v), 0);
+		Tama.SetSingle(*t, i, SPEEDM(TamaCmd.v), 0);
 	}
 }
 

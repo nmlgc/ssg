@@ -22,7 +22,6 @@
 #include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "ssg/Sound.h"
-#include "TAMA.H"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"

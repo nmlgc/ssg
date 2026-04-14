@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
 import std.compat;
-struct TAMA_DATA;
+#include "TAMA.H"
 
 
 
@@ -33,6 +33,16 @@ struct TAMA_DATA;
 #define TDM_HOMING_SUB		7		// ホーミング・サブショットのダメージ
 #define TDM_LASER_MAIN		2		// レーザー・メインショットのダメージ
 #define TDM_LASER_SUB		5		// レーザー・サブショットのダメージ
+
+
+
+//// 弾コマンド用マクロ ////
+void TamaSTDForm(uint8_t c);
+void TamaSetHoming(uint8_t c);
+void TamaSetDeg(uint8_t d, uint8_t dw);
+void TamaSetNum(uint8_t n, uint8_t ns);
+void TamaSetSpd(uint8_t v, char a);
+void TamaSetXY(int x, int y);
 
 
 

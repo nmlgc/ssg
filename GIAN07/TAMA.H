@@ -212,54 +212,6 @@ void ResetHoming(void);
 void UpdateHoming(const WORLD_POINT& p); // ホーミング座標を更新する
 
 
-//// 弾コマンド用マクロ ////
-inline void TamaSetForm(uint8_t cmd, uint8_t option, uint8_t type, uint8_t c)
-{
-	TamaCmd.cmd    = cmd;
-	TamaCmd.option = option;
-	TamaCmd.type   = type;
-	TamaCmd.c      = c;
-}
-
-inline void TamaSTDForm(uint8_t c)
-{
-	TamaSetForm(TC_WAY,TOP_NONE,T_NORM,c);
-}
-
-inline void TamaSetHoming(uint8_t c)
-{
-	TamaCmd.cmd    = TC_WAY;
-	TamaCmd.option = TOP_NONE;
-	TamaCmd.type   = T_SBHOMING;
-	TamaCmd.c      = c;
-	TamaCmd.rep    = 64;
-	TamaCmd.vd     = 5;
-}
-
-inline void TamaSetDeg(uint8_t d, uint8_t dw)
-{
-	TamaCmd.d  = d;
-	TamaCmd.dw = dw;
-}
-
-inline void TamaSetNum(uint8_t n, uint8_t ns)
-{
-	TamaCmd.n  = n;
-	TamaCmd.ns = ns;
-}
-
-inline void TamaSetSpd(uint8_t v, char a)
-{
-	TamaCmd.v = v;
-	TamaCmd.a = a;
-}
-
-inline void TamaSetXY(int x,int y)
-{
-	TamaCmd.x = x;
-	TamaCmd.y = y;
-}
-
 template <size_t N> void Indsort(
 	std::array<uint16_t, N>& indices,
 	uint16_t& count,

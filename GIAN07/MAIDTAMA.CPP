@@ -107,6 +107,51 @@ static constexpr uint8_t MaidBombTime[4] = {
 
 
 
+//// 弾コマンド用マクロ ////
+void TamaSTDForm(uint8_t c)
+{
+	TamaCmd.cmd    = TC_WAY;
+	TamaCmd.option = TOP_NONE;
+	TamaCmd.type   = T_NORM;
+	TamaCmd.c      = c;
+}
+
+void TamaSetHoming(uint8_t c)
+{
+	TamaCmd.cmd    = TC_WAY;
+	TamaCmd.option = TOP_NONE;
+	TamaCmd.type   = T_SBHOMING;
+	TamaCmd.c      = c;
+	TamaCmd.rep    = 64;
+	TamaCmd.vd     = 5;
+}
+
+void TamaSetDeg(uint8_t d, uint8_t dw)
+{
+	TamaCmd.d  = d;
+	TamaCmd.dw = dw;
+}
+
+void TamaSetNum(uint8_t n, uint8_t ns)
+{
+	TamaCmd.n  = n;
+	TamaCmd.ns = ns;
+}
+
+void TamaSetSpd(uint8_t v, char a)
+{
+	TamaCmd.v = v;
+	TamaCmd.a = a;
+}
+
+void TamaSetXY(int x, int y)
+{
+	TamaCmd.x = x;
+	TamaCmd.y = y;
+}
+
+
+
 // たま発射！！ //
 void MaidTamaSet(void)
 {

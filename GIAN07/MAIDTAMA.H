@@ -35,6 +35,16 @@
 
 
 
+//// 弾コマンド用マクロ ////
+void TamaSTDForm(uint8_t c);
+void TamaSetHoming(uint8_t c);
+void TamaSetDeg(uint8_t d, uint8_t dw);
+void TamaSetNum(uint8_t n, uint8_t ns);
+void TamaSetSpd(uint8_t v, char a);
+void TamaSetXY(int x, int y);
+
+
+
 ///// [ 関数 ] /////
 void MaidTamaSet(void);	// たま発射！！
 void MaidTamaMove(void);	// 弾移動＆ヒットチェック

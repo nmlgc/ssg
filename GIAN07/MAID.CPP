@@ -9,11 +9,11 @@
 #include "GAMEMAIN.H"
 #include "GIAN.H"
 #include "LogicInstance.h"
-#include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Laser.hpp"
+#include "ssg/internal/MaidTama.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "ssg/internal/Tama.hpp"
 #include "hatoyama/engine/snd.h"
@@ -133,7 +133,7 @@ void C_VIV::Move(INPUT_BITS input, bool in_msg)
 	Viv.opy = Viv.y + Viv.vy + 64*6;
 
 	// 弾＆ボムのセット //
-	MaidTamaSet(input, in_msg);
+	MaidTama.Set(input, in_msg);
 
 	if(Viv.bomb_time){
 		Tama.Clear();

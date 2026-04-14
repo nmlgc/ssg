@@ -7,8 +7,11 @@
 #define PBGWIN_MAIDTAMA_H		"めいどたま : Version 0.01 : Update 2000/02/25"
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
-#include "TAMA.H"
-#include "ssg/Input.h"
+#ifdef __cplusplus
+import std.compat;
+#endif
+
+typedef struct TAMA_DATA TAMA_DATA;
 
 
 
@@ -38,30 +41,6 @@
 #ifdef __cplusplus
 using MAIDTAMA_DATA_CSPAN = std::span<const TAMA_DATA, MAIDTAMA_MAX>;
 #endif
-
-
-//// 弾コマンド用マクロ ////
-void TamaSTDForm(uint8_t c);
-void TamaSetHoming(uint8_t c);
-void TamaSetDeg(uint8_t d, uint8_t dw);
-void TamaSetNum(uint8_t n, uint8_t ns);
-void TamaSetSpd(uint8_t v, char a);
-void TamaSetXY(int x, int y);
-
-
-
-///// [ 関数 ] /////
-void MaidTamaSet(INPUT_BITS, bool in_msg);	// たま発射！！
-void MaidTamaMove(void);	// 弾移動＆ヒットチェック
-void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化
-
-
-
-///// [ 変数 ] /////
-extern std::array<TAMA_DATA, MAIDTAMA_MAX>	MaidTama;	// 自機ショットの格納用構造体
-extern std::array<uint16_t, MAIDTAMA_MAX>	MaidTamaInd;	// 弾の順番を維持するための配列(TAMA.CPP互換)
-extern uint16_t	MaidTamaNow;	// 現在の数
-
 
 
 #endif

@@ -11,7 +11,6 @@
 #include "HUD.H"
 #include "FONTUTY.H"
 #include "LogicInstance.h"
-#include "MAIDTAMA.H"
 #include "ssg/internal/SEffect.hpp"
 #include "ssg/internal/Maid.hpp"
 #ifdef PBG_DEBUG
@@ -22,6 +21,7 @@
 #include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Laser.hpp"
+#include "ssg/internal/MaidTama.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "ssg/internal/Tama.hpp"
 #endif
@@ -287,7 +287,7 @@ void StdStatusOutput(void)
 	sprintf(buf, "HLaser %2d", HLaser.NumAlive());
 	GrpPut16(0, (196 + 40), buf);
 
-	sprintf(buf, "MTama %3d", MaidTamaNow);
+	sprintf(buf, "MTama %3zu", MaidTama.Inds().size());
 	GrpPut16(0, (224 + 40), buf);
 
 	sprintf(buf, "Item  %3zu", Item.Inds().size());

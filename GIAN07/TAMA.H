@@ -135,7 +135,7 @@ typedef struct{
 
 
 ////弾データ構造体////
-typedef struct{
+typedef struct TAMA_DATA {
 	int x,y;		// 現在の<表示>座標
 	int tx,ty;		// 振動系エフェクト使用時の演算用座標
 	int vx,vy;		// 速度の(X,Y)成分

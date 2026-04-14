@@ -40,9 +40,9 @@ int HomingFlag;      // 真ならホーミング実行
 
 ////ローカルな関数////
 static void __TamaSet(void);
-static void easy_cmd(void);				// 難易度：Ｅａｓｙ
-static void hard_cmd(void);				// 難易度：Ｈａｒｄ
-static void luna_cmd(void);				// 難易度：Ｌｕｎａｔｉｃ
+static void easy_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｅａｓｙ
+static void hard_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｈａｒｄ
+static void luna_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｌｕｎａｔｉｃ
 
 int LineCmdNewTamaSpeed(uint16_t i);
 int TamaSpeedEx(uint8_t d);
@@ -68,15 +68,15 @@ void tama_set(void)
 	// おそらく switch 中に記述する事になるかと... //
 	switch(PlayRank.LevelRanked) {
 		case(GAME_EASY):
-			easy_cmd();
+			easy_cmd(TamaCmd);
 		break;
 
 		case(GAME_HARD):
-			hard_cmd();
+			hard_cmd(TamaCmd);
 		break;
 
 		case(GAME_LUNATIC):
-			luna_cmd();
+			luna_cmd(TamaCmd);
 		break;
 	}
 
@@ -674,7 +674,7 @@ void tamaind_set(uint16_t tama1)
 	Tama1Now = Tama2Now = 0;
 }
 
-static void easy_cmd(void)
+static void easy_cmd(TAMA_CMD& TamaCmd)
 {
 	switch(TamaCmd.cmd&0x03){
 		case(TC_WAY):
@@ -690,7 +690,7 @@ static void easy_cmd(void)
 	if(TamaCmd.ns>=2) TamaCmd.ns--;			// 連射数_減少
 }
 
-static void hard_cmd(void)
+static void hard_cmd(TAMA_CMD& TamaCmd)
 {
 	switch(TamaCmd.cmd&0x03){
 		case(TC_WAY):
@@ -710,7 +710,7 @@ static void hard_cmd(void)
 	TamaCmd.ns++;		// 連射数_増加
 }
 
-static void luna_cmd(void)
+static void luna_cmd(TAMA_CMD& TamaCmd)
 {
 	switch(TamaCmd.cmd&0x03){
 		case(TC_WAY):

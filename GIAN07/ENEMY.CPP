@@ -601,7 +601,7 @@ void C_ENEMY::Move(void)
 	int				i;//,chkx,chky;
 
 	if(Boss.NumAlive() == 0) {
-		ResetHoming();
+		Tama.ResetHoming();
 	}
 
 	for(i=0;i<EnemyNow;i++){
@@ -615,10 +615,11 @@ void C_ENEMY::Move(void)
 			if(e->t_rep && e->hp){
 				e->tama_c = (e->tama_c+1)%(e->t_rep);
 				if(e->tama_c==0){
+					auto& TamaCmd = Tama.TamaCmd;
 					TamaCmd = e->t_cmd;
 					TamaCmd.x += e->x;
 					TamaCmd.y += e->y;
-					tama_set();
+					Tama.Set();
 				}
 			}
 
@@ -644,7 +645,7 @@ void C_ENEMY::Move(void)
 
 		// ホーミングの準備 //
 		if((Boss.NumAlive() == 0) && (e->flag & EF_DAMAGE)) {
-			UpdateHoming({ &e->x, &e->y });
+			Tama.UpdateHoming({ &e->x, &e->y });
 		}
 
 		// アニメーションの動作 //
@@ -941,6 +942,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 	int		RegCmp;
 	HLaserInfo		HInfo;
 
+	auto& TamaCmd = Tama.TamaCmd;
 	const PIXEL_LTRB rcDegX2 =
 		{GX_MIN+150*64, GY_MIN+(GY_MID-GY_MIN-40*64)/3,
 			GX_MAX-150*64, GY_MID-(GY_MID-GY_MIN-40*64)/3 - 40*64};
@@ -1253,7 +1255,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_T2ITEM):		// 弾の何％かをアイテム化する
-			tama2item(cmd[1]);
+			Tama.ToItem(cmd[1]);
 			bRetFlag = false;
 		break;
 
@@ -1619,7 +1621,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			TamaCmd = e->t_cmd;
 			TamaCmd.x += e->x;
 			TamaCmd.y += e->y;
-			tama_set();
+			Tama.Set();
 			bRetFlag = false;
 		break;
 
@@ -1627,7 +1629,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			TamaCmd = e->t_cmd;
 			TamaCmd.x += e->x;
 			TamaCmd.y += e->y;
-			tama_setEX();
+			Tama.SetEX();
 			bRetFlag = false;
 		break;
 
@@ -1635,7 +1637,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			TamaCmd = e->t_cmd;
 			TamaCmd.x += e->x;
 			TamaCmd.y += e->y;
-			tama_setLine();
+			Tama.SetLine();
 			bRetFlag = false;
 		break;
 
@@ -1643,7 +1645,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			TamaCmd = e->t_cmd;
 			TamaCmd.x += e->x;
 			TamaCmd.y += e->y;
-			tama_setExtra01();
+			Tama.SetExtra01();
 			bRetFlag = false;
 		break;
 
@@ -1743,7 +1745,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 		case(ECL_TCLR):			// 敵弾を全消去(レーザー含む)
 			Boss.ClearCmd(); // この処理を何よりも優先させる(ビット消去等を含む)
-			tama_clear();
+			Tama.Clear();
 			Laser.Clear();
 			HLaser.Clear();
 			this->Clear();

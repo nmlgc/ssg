@@ -75,7 +75,7 @@ uint32_t C_BOSS::Move(void)
 	uint32_t HP_Sum = 0;
 	ENEMY_DATA		*e;
 
-	ResetHoming();
+	Tama.ResetHoming();
 
 	for(auto& it : Boss) {
 		auto *b = &it;
@@ -94,7 +94,7 @@ uint32_t C_BOSS::Move(void)
 
 			// ホーミングの準備 //
 			if(e->flag & EF_DAMAGE) {
-				UpdateHoming({ &e->x, &e->y });
+				Tama.UpdateHoming({ &e->x, &e->y });
 			}
 
 			// 体力の総和を表示する //
@@ -159,7 +159,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		// 最後の一匹だった場合 //
 		if(BossNow == 1) {
 			char buf[100];
-			const auto temp = tama2score(); // 弾→スコアエフェクト
+			const auto temp = Tama.ToScore(); // 弾→スコアエフェクト
 			// sprintf(buf, "%3d Evade  %5dPts", Viv.evade, Viv.evadesc);
 			sprintf(buf, "  Bonus    %7uPts", temp);
 			SEffect.SetString(180, 60, buf);
@@ -311,10 +311,11 @@ void C_BOSS::STDMove(BOSS_DATA *b)
 	if(e->t_rep){
 		e->tama_c = (e->tama_c+1)%(e->t_rep);
 		if(e->tama_c==0){
+			auto& TamaCmd = Tama.TamaCmd;
 			TamaCmd = e->t_cmd;
 			TamaCmd.x += e->x;
 			TamaCmd.y += e->y;
-			tama_set();
+			Tama.Set();
 		}
 	}
 

@@ -23,29 +23,13 @@ static constexpr WORLD_COORD HOMING_DUMMY = PixelToWorld(500);
 
 
 ////グローバル変数////
-TAMA_CMD		TamaCmd;				// 標準・弾コマンド構造体
-std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
-std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
-std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
-uint16_t	Tama1Now;	// 小型弾の弾数
-uint16_t	Tama2Now;	// 特殊弾の弾数
-uint16_t	Tama1Max;	// 小型弾の最大数
-uint16_t	Tama2Max;	// 特殊弾の最大数
-int				TamaSpeed;
-
-WORLD_COORD HomingX; // ホーミング対象のＸ座標
-WORLD_COORD HomingY; // ホーミング対象のＹ座標
-int HomingFlag;      // 真ならホーミング実行
+C_TAMA Tama;
 
 
 ////ローカルな関数////
-static void __TamaSet(void);
 static void easy_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｅａｓｙ
 static void hard_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｈａｒｄ
 static void luna_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｌｕｎａｔｉｃ
-
-int LineCmdNewTamaSpeed(uint16_t i);
-int TamaSpeedEx(uint8_t d);
 
 
 //// かすり用マクロ ////
@@ -59,7 +43,7 @@ static void TamaEvadeAdd(TAMA_DATA *t, C_VIV& Viv)
 	}
 }
 
-void tama_set(void)
+void C_TAMA::Set(void)
 {
 	int		v;
 
@@ -86,18 +70,18 @@ void tama_set(void)
 	else
 		TamaSpeed = v;
 
-	__TamaSet();
+	this->__Set();
 }
 
-void tama_setEX(void)
+void C_TAMA::SetEX(void)
 {
 	TamaSpeed = SPEEDM(TamaCmd.v);
 
-	__TamaSet();
+	this->__Set();
 }
 
 // 弾をセットする(ライン状に発射)
-void tama_setLine(void)
+void C_TAMA::SetLine(void)
 {
 	// uint32_t temp;
 	uint16_t *indnow, *indmax, *indp; // 上に同じ
@@ -156,7 +140,7 @@ void tama_setLine(void)
 }
 
 // エキストラボス専用弾幕(角度が広くなると、遅くなる) //
-void tama_setExtra01(void)
+void C_TAMA::SetExtra01(void)
 {
 	// uint32_t temp;
 	uint16_t *indnow, *indmax, *indp; // 上に同じ
@@ -209,7 +193,7 @@ void tama_setExtra01(void)
 	}
 }
 
-int TamaSpeedEx(uint8_t d)
+int C_TAMA::TamaSpeedEx(uint8_t d)
 {
 	int		temp = 0;
 	int		delta;
@@ -228,7 +212,7 @@ int TamaSpeedEx(uint8_t d)
 	return TamaSpeed - (TamaSpeed * abs(delta)) / 23 + temp;
 }
 
-static void __TamaSet(void)
+void C_TAMA::__Set(void)
 {
 	// uint32_t temp;
 	uint16_t *indnow, *indmax, *indp; // 上に同じ
@@ -251,11 +235,11 @@ static void __TamaSet(void)
 		*indnow = *indnow + 1;					// 弾数をインクリメント
 		auto* t = &Tama[indp[i]];
 
-		TamaSetSingle(*t, i, TamaSpeed, (TamaCmd.cmd & 0xf0));
+		this->SetSingle(*t, i, TamaSpeed, (TamaCmd.cmd & 0xf0));
 	}
 }
 
-void tama_move(void)
+void C_TAMA::Move(void)
 {
 	// ヒットチェック後にサボテンの生死判定をしているのは、死んでいる時間 //
 	// よりも生きている時間のほうが長いからなのですが...                  //
@@ -264,8 +248,8 @@ void tama_move(void)
 	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto* t = &Tama[Tama1Ind[i]];
 		if(t->effect==TE_NONE){
-			tamaTmove(t);
-			tamaOmove(t);
+			this->Tmove(t);
+			this->Omove(t);
 			if(((t->flag&TF_CLIP)==0)&&
 				((t->x)<GX_MIN-4*64||(t->x)>GX_MAX+4*64||(t->y)<GY_MIN-4*64||(t->y)>GY_MAX+4*64))
 				t->flag = TF_DELETE;
@@ -280,7 +264,7 @@ void tama_move(void)
 			}
 		}
 		else{
-			tamaEmove(t);
+			this->Emove(t);
 			t->count++;
 		}
 	}
@@ -290,8 +274,8 @@ void tama_move(void)
 	for(const auto i : std::views::iota(0u, Tama2Now)) {
 		auto* t = &Tama[Tama2Ind[i]];
 		if(t->effect==TE_NONE){
-			tamaTmove(t);
-			tamaOmove(t);
+			this->Tmove(t);
+			this->Omove(t);
 			if(((t->flag&TF_CLIP)==0)&&
 				((t->x)<GX_MIN-8*64||(t->x)>GX_MAX+8*64||(t->y)<GY_MIN-8*64||(t->y)>GY_MAX+8*64))
 				t->flag = TF_DELETE;
@@ -306,7 +290,7 @@ void tama_move(void)
 			}
 		}
 		else{
-			tamaEmove(t);
+			this->Emove(t);
 			t->count++;
 		}
 	}
@@ -314,7 +298,7 @@ void tama_move(void)
 }
 
 
-void tama_clear(void)
+void C_TAMA::Clear(void)
 {
 	for(const auto i : std::views::iota(0u, Tama1Now)) {
 		auto& t = Tama[Tama1Ind[i]];
@@ -338,7 +322,7 @@ void tama_clear(void)
 }
 
 // 弾を得点化する(Ret : 得点)
-uint32_t tama2score(void)
+uint32_t C_TAMA::ToScore(void)
 {
 	uint32_t sum = 0;
 	uint32_t Score;
@@ -379,7 +363,7 @@ uint32_t tama2score(void)
 }
 
 // 弾をアイテム化する //
-void tama2item(uint8_t n)
+void C_TAMA::ToItem(uint8_t n)
 {
 	// uint32_t sum = 0;
 	// uint32_t Score;
@@ -387,7 +371,7 @@ void tama2item(uint8_t n)
 //	Score = TAMA1_POINT + Viv.evade * 100;
 
 	if(n == 0){
-		tama_clear();
+		this->Clear();
 		return;
 	}
 
@@ -435,7 +419,7 @@ void tama2item(uint8_t n)
 //	return sum;
 }
 
-void tamaind_set(uint16_t tama1)
+void C_TAMA::IndSet(uint16_t tama1)
 {
 	int i;
 
@@ -510,7 +494,7 @@ static void luna_cmd(TAMA_CMD& TamaCmd)
 	TamaCmd.ns+=2;		// 連射数_増加
 }
 
-uint8_t tama_dir(uint16_t i)
+uint8_t C_TAMA::tama_dir(uint16_t i)
 {
 	uint8_t deg = ((TamaCmd.cmd & TAMA_ZSET)
 		? atan8((Viv.x - TamaCmd.x), (Viv.y - TamaCmd.y))
@@ -540,7 +524,7 @@ uint8_t tama_dir(uint16_t i)
 	}
 }
 
-int LineCmdNewTamaSpeed(uint16_t i)
+int C_TAMA::LineCmdNewTamaSpeed(uint16_t i)
 {
 	int		vret = TamaSpeed;		// 速度の基本値をセットする(GIAN.H)
 
@@ -561,7 +545,7 @@ int LineCmdNewTamaSpeed(uint16_t i)
 		return vret;
 }
 
-int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd)
+int C_TAMA::tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd)
 {
 	int temp = 0;						// ランダム要素の設定用
 
@@ -578,7 +562,7 @@ int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd)
 		return vret + temp;
 }
 
-uint8_t tama_flag(void)
+uint8_t C_TAMA::tama_flag(void)
 {
 	switch(TamaCmd.type){
 		case(T_HOMING):case(T_HOMING_M):
@@ -590,7 +574,7 @@ uint8_t tama_flag(void)
 	}
 }
 
-void TamaSetSingle(
+void C_TAMA::SetSingle(
 	TAMA_DATA& t, unsigned int i, int speed, decltype(TAMA_DATA::effect) effect
 )
 {
@@ -622,7 +606,7 @@ void TamaSetSingle(
 	t.flag   = tama_flag();	// フラグの初期化
 }
 
-void tamaTmove(TAMA_DATA *t)
+void C_TAMA::Tmove(TAMA_DATA *t)
 {
 	short		deg_t;
 	//ENEMY_DATA	*e;
@@ -800,7 +784,7 @@ void tamaTmove(TAMA_DATA *t)
 	}
 }
 
-void tamaOmove(TAMA_DATA *t)
+void C_TAMA::Omove(TAMA_DATA *t)
 {
 	int op_temp = 0;
 
@@ -938,7 +922,7 @@ void tamaOmove(TAMA_DATA *t)
 				TamaCmd.type = T_NORM;
 				TamaCmd.option = TOP_NONE;
 				Snd_SEPlay(12, TamaCmd.x);
-				tama_set();		// 難易度で変化させるところがポイント
+				this->Set();	// 難易度で変化させるところがポイント
 			}
 		return;
 
@@ -947,7 +931,7 @@ void tamaOmove(TAMA_DATA *t)
 	}
 }
 
-void tamaEmove(TAMA_DATA *t)
+void C_TAMA::Emove(TAMA_DATA *t)
 {
 	// TE_NONE:エフェクト無しはこの関数にこないので記述しても意味無し //
 	// TE_DELETE:消去要請フラグを立てる事を忘れないように！ //
@@ -987,12 +971,12 @@ void tamaEmove(TAMA_DATA *t)
 	}
 }
 
-void ResetHoming(void)
+void C_TAMA::ResetHoming(void)
 {
 	HomingFlag = HOMING_DUMMY;
 }
 
-void UpdateHoming(const WORLD_POINT& p)
+void C_TAMA::UpdateHoming(const WORLD_POINT& p)
 {
 	const int temp = (Viv.y - p.y);
 	if(temp < 0) {

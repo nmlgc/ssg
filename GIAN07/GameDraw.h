@@ -17,6 +17,7 @@ class C_HLASER;
 class C_ITEM;
 class C_LASER;
 class C_LLASER;
+class C_TAMA;
 
 // ビット間のラインを描画する
 void BitLineDraw(const C_BIT&);
@@ -65,8 +66,4 @@ void MaidTamaDraw(
 );
 
 // 弾を描画する
-void tama_draw(
-	TAMA_DATA_CSPAN storage,
-	std::span<const uint16_t> inds1,
-	std::span<const uint16_t> inds2
-);
+void tama_draw(const C_TAMA&);

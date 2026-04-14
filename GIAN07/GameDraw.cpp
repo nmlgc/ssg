@@ -1316,12 +1316,9 @@ void _TamaEffectDraw(const TAMA_DATA *t)
 	GrpSurface_Blit({ x, y }, SURFACE_ID::SYSTEM, temp);
 }
 
-void tama_draw(
-	TAMA_DATA_CSPAN storage,
-	std::span<const uint16_t> inds8,
-	std::span<const uint16_t> inds16
-)
+void tama_draw(const C_TAMA& Tama)
 {
+	const auto storage = Tama.Data();
 //	HRESULT		ddrval;
 	PIXEL_LTRB	src;
 	int			x,y;
@@ -1337,7 +1334,7 @@ void tama_draw(
 	static constexpr uint8_t sizeExtraTama[4] = { 16, 12, 8, 4 };
 
 	// 大型弾＆特殊弾(16*16) の描画 //
-	for(const auto ind : inds16) {
+	for(const auto ind : Tama.Inds2()) {
 		auto *t = &storage[ind];
 
 		x = (t->x >> 6)-8;	// -8 は座標の補正用です
@@ -1441,7 +1438,7 @@ void tama_draw(
 	}
 
 	// 小型弾(8*8) の描画 //
-	for(const auto ind : inds8) {
+	for(const auto ind : Tama.Inds1()) {
 		auto *t = &storage[ind];
 
 		x = (t->x >> 6)-4;	// -4 は座標の補正用です

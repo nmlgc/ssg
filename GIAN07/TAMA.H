@@ -164,54 +164,131 @@ using TAMA_DATA_CSPAN = std::span<const TAMA_DATA, TAMA_MAX>;
 
 
 
-////弾の各種変数たち////
-extern TAMA_CMD		TamaCmd;			// 標準・弾コマンド構造体
-extern std::array<TAMA_DATA, TAMA_MAX>	Tama;	// 弾の格納用構造体
-extern std::array<uint16_t, TAMA_MAX>	Tama1Ind;	// 小型弾の順番を維持するための配列
-extern std::array<uint16_t, TAMA_MAX>	Tama2Ind;	// 特殊弾の順番を維持するための配列
-extern uint16_t	Tama1Now;	// 小型弾の弾数
-extern uint16_t	Tama2Now;	// 特殊弾の弾数
-extern uint16_t	Tama1Max;	// 小型弾の最大数
-extern uint16_t	Tama2Max;	// 特殊弾の最大数
-extern int	TamaSpeed;
+class C_TAMA {
+public:
+	// 標準・弾コマンド構造体
+	TAMA_CMD TamaCmd;
 
-extern WORLD_COORD HomingX; // ホーミング対象のＸ座標
-extern WORLD_COORD HomingY; // ホーミング対象のＹ座標
-extern int HomingFlag;      // 真ならホーミング実行
+private:
+	////弾の各種変数たち////
 
+	// 小型弾の弾数
+	uint16_t Tama1Now;
 
+	// 特殊弾の弾数
+	uint16_t Tama2Now;
 
-////弾関数////
+	// 小型弾の最大数
+	uint16_t Tama1Max;
 
-// Initializes an individual (regular) bullet or player shot from `TamaCmd`.
-void TamaSetSingle(
-	TAMA_DATA& t, unsigned int i, int speed, decltype(TAMA_DATA::effect) effect
-);
+	// 特殊弾の最大数
+	uint16_t Tama2Max;
 
-void tama_set(void);					// 弾をセットする(難易度による変更は"有り")
-void tama_setEX(void);					// 弾をセットする(難易度による変更は"無し")
-void tama_setLine(void);				// 弾をセットする(ライン状に発射)
-void tama_setExtra01(void);				// エキストラボス専用弾幕
-void tama_move(void);					// 弾を動かす
-void tama_clear(void);					// 弾に消去エフェクトをセットする
-void tamaind_set(uint16_t tama1);	// 弾の個数の割合をセットする(危険！)
+	int TamaSpeed;
 
-uint32_t tama2score(void);	// 弾を得点化する(Ret : 得点)
-void  tama2item(uint8_t n);	// 弾の 1/n をアイテム化する
+	// ホーミング対象のＸ座標
+	WORLD_COORD HomingX;
 
-uint8_t tama_dir(uint16_t i);	// 弾の進行方向をセットする
+	// ホーミング対象のＹ座標
+	WORLD_COORD HomingY;
 
-// 弾の初速度をセットする
-int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd);
+	// 真ならホーミング実行
+	int HomingFlag;
 
-uint8_t tama_flag(void);	// 弾のフラグを初期化する
+	// 弾の格納用構造体
+	std::array<TAMA_DATA, TAMA_MAX> Tama;
 
-void tamaTmove(TAMA_DATA *t);	// 弾の " Type " による移動を行う
-void tamaOmove(TAMA_DATA *t);	// 弾の "Option" による移動を行う
-void tamaEmove(TAMA_DATA *t);	// 弾の "Effect" による移動を行う
+	// 小型弾の順番を維持するための配列
+	std::array<uint16_t, TAMA_MAX> Tama1Ind;
 
-void ResetHoming(void);
-void UpdateHoming(const WORLD_POINT& p); // ホーミング座標を更新する
+	// 特殊弾の順番を維持するための配列
+	std::array<uint16_t, TAMA_MAX> Tama2Ind;
+
+	// 弾の進行方向をセットする
+	uint8_t tama_dir(uint16_t i);
+
+	// 弾の初速度をセットする
+	int tama_speed(uint16_t i, int vret, const TAMA_CMD& TamaCmd);
+
+	// 弾のフラグを初期化する
+	uint8_t tama_flag(void);
+
+	int LineCmdNewTamaSpeed(uint16_t i);
+	int TamaSpeedEx(uint8_t d);
+
+	void __Set(void);
+
+public:
+	/// Internal interface, shared between TAMA and MAIDTAMA
+	/// ----------------------------------------------------
+
+	// Initializes an individual (regular) bullet or player shot from `TamaCmd`.
+	void SetSingle(
+		TAMA_DATA& t,
+		unsigned int i,
+		int speed,
+		decltype(TAMA_DATA::effect) effect
+	);
+
+	// 弾の " Type " による移動を行う
+	void Tmove(TAMA_DATA *t);
+
+	// 弾の "Option" による移動を行う
+	void Omove(TAMA_DATA *t);
+
+	// 弾の "Effect" による移動を行う
+	void Emove(TAMA_DATA *t);
+	/// ----------------------------------------------------
+
+public:
+	////弾関数////
+
+	// 弾をセットする(難易度による変更は"有り")
+	void Set(void);
+
+	// 弾をセットする(難易度による変更は"無し")
+	void SetEX(void);
+
+	// 弾をセットする(ライン状に発射)
+	void SetLine(void);
+
+	// エキストラボス専用弾幕
+	void SetExtra01(void);
+
+	// 弾を動かす
+	void Move(void);
+
+	// 弾に消去エフェクトをセットする
+	void Clear(void);
+
+	// 弾の個数の割合をセットする(危険！)
+	void IndSet(uint16_t tama1);
+
+	// 弾を得点化する(Ret : 得点)
+	uint32_t ToScore(void);
+
+	// 弾の 1/n をアイテム化する
+	void ToItem(uint8_t n);
+
+	void ResetHoming(void);
+
+	// ホーミング座標を更新する
+	void UpdateHoming(const WORLD_POINT& p);
+
+	TAMA_DATA_CSPAN Data(void) const {
+		return Tama;
+	}
+
+	const std::span<const uint16_t> Inds1(void) const {
+		return std::span(Tama1Ind).first(Tama1Now);
+	}
+
+	const std::span<const uint16_t> Inds2(void) const {
+		return std::span(Tama2Ind).first(Tama2Now);
+	}
+};
+
+extern C_TAMA Tama;
 
 
 template <size_t N> void Indsort(

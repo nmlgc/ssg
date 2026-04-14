@@ -531,7 +531,7 @@ void GameSTD_Init(void)
 	//MaidSet();
 	MaidTamaIndSet();
 	Enemy.IndSet();
-	tamaind_set(400+200);		// 小型弾に４００
+	Tama.IndSet(400 + 200); // 小型弾に４００
 	Laser.IndSet();
 	LLaser.Setup();
 	HLaser.Init();
@@ -1253,7 +1253,7 @@ void WeaponSelectProc(bool&)
 		Viv.exp = min(count,255);
 		if(Viv.exp < 31) Viv.lay_time = Viv.lay_grp =  0;
 
-		ResetHoming();
+		Tama.ResetHoming();
 
 		Viv.muteki = 0;
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
@@ -1400,7 +1400,7 @@ void GameMove(INPUT_BITS input)
 	BossHPG_Move(HP_Sum);
 	Enemy.Move();
 	Item.Move();
-	tama_move();
+	Tama.Move();
 	Laser.Move();
 	LLaser.Move();
 	HLaser.Move();
@@ -1454,11 +1454,7 @@ void GameDraw(void)
 
 	HLaserDraw(HLaser);
 	laser_draw(Laser);
-	tama_draw(
-		Tama,
-		std::span(Tama1Ind).first(Tama1Now),
-		std::span(Tama2Ind).first(Tama2Now)
-	);
+	tama_draw(Tama);
 
 	// static uint8_t test = 0;
 

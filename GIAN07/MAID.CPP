@@ -138,7 +138,7 @@ void C_VIV::Move(INPUT_BITS input, bool in_msg)
 	MaidTamaSet(input, in_msg);
 
 	if(Viv.bomb_time){
-		tama_clear();
+		Tama.Clear();
 		Laser.Clear();
 		// if((Viv.bomb_time % 60) == 0) {
 		// 	Fragment.Set(Viv.x, Viv.y, FRG_FATCIRCLE);
@@ -237,7 +237,7 @@ void C_VIV::Dead(void)
 		GameOverInit();						// ゲームオーバーへと
 	}
 
-	tama_clear();
+	Tama.Clear();
 	Laser.Clear();
 }
 

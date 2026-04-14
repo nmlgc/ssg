@@ -174,6 +174,12 @@ extern uint16_t	Tama2Max;	// 特殊弾の最大数
 
 
 ////弾関数////
+
+// Initializes an individual (regular) bullet or player shot from `TamaCmd`.
+void TamaSetSingle(
+	TAMA_DATA& t, unsigned int i, int speed, decltype(TAMA_DATA::effect) effect
+);
+
 void tama_set(void);					// 弾をセットする(難易度による変更は"有り")
 void tama_setEX(void);					// 弾をセットする(難易度による変更は"無し")
 void tama_setLine(void);				// 弾をセットする(ライン状に発射)

@@ -303,29 +303,7 @@ static void MTamaSet(void)
 
 		auto* t = &MaidTama[MaidTamaInd[MaidTamaNow++]];	// 弾ポインタをセット
 
-		t->x = t->tx = TamaCmd.x;					// X座標のセット
-		t->y = t->ty = TamaCmd.y;					// Y座標のセット
-
-		// 初速度のセット
-		// 速度の基本値をセットする(GIAN.H)
-		t->v = t->v0 = tama_speed(i, SPEEDM(TamaCmd.v), TamaCmd);
-
-		t->a = TamaCmd.a;						// 注意：サイズは char
-
-		t->d   = tama_dir(i);					// 弾の発射角度
-		t->d16 = (t->d<<8);						// 角速度のある運動で使用
-
-		t->vx = cosl(t->d,t->v);				// 速度のＸ成分セット
-		t->vy = sinl(t->d,t->v);				// 速度のＹ成分セット
-
-		t->vd     = TamaCmd.vd;					// 角速度もしくはホーミング率
-		t->c      = TamaCmd.c;					// 弾のＩＤ
-		t->rep    = TamaCmd.rep;				// 繰り返し回数
-		t->type   = TamaCmd.type;				// 弾の種類
-		t->option = TamaCmd.option;				// 弾の属性(バイブ、反射等)
-		t->effect = 0;//TamaCmd.cmd & 0xf0;			// 弾のエフェクト
-		t->count  = 0;							// カウンタの初期化
-		t->flag   = tama_flag();				// フラグの初期化
+		TamaSetSingle(*t, i, SPEEDM(TamaCmd.v), 0);
 	}
 }
 

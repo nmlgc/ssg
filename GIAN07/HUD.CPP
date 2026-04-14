@@ -16,6 +16,7 @@
 #include "ENEMY.H"
 #include "HOMINGL.H"
 #include "PRankCtrl.h"
+#include "SCL.H"
 #include "SCROLL.H"
 #include "ssg/internal/Stage.hpp"
 #endif

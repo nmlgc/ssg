@@ -869,18 +869,8 @@ extern void GameOverInit(void)
 // コンティニューを行う場合
 extern void GameContinue(void)
 {
-	Viv.GameOverTimer = 0;
-	Viv.evade_sum = 0;
-	Viv.left      = ConfigDat.PlayerStock.v;
-	Viv.score     = (Viv.score%10 + 1);
-
+	SSG.RoundContinue();
 	GameMain = GameProc;
-
-	// ここに入らなかったらバグなのだが... //
-	if(Viv.credit){
-		// クレジットの残っている場合(コンティニュー Y/N 処理へ) //
-		Viv.credit -= 1;
-	}
 }
 
 void GameProc(bool&)
@@ -1001,7 +991,6 @@ void GameOverProc(bool&)
 {
 	CWinMove(&ContinueWindow);
 	if(GameMain != GameOverProc){
-		SEffect.Init();
 		return;
 	}
 

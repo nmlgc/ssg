@@ -38,6 +38,11 @@ void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 	RNG.seed = round.Seed;
 }
 
+void C_SSG::RoundContinue(void)
+{
+	Viv.Continue();
+}
+
 bool StageLoad(
 	C_SSG& ssg, uint8_t stage, auto&& ecl_buf_func, auto&& scl_buf_func
 )

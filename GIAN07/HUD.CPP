@@ -9,6 +9,7 @@
 #include "FONTUTY.H"
 #include "GIAN.H"
 #include "ITEM.H"
+#include "LogicInstance.h"
 #include "MAID.H"
 #include "MAIDTAMA.H"
 #ifdef PBG_DEBUG
@@ -59,7 +60,7 @@ void StdStatusOutput(void)
 
 	sprintf(buf, "%s", DItem[PlayRank.LevelRanked]);
 	GrpPut16(0, 50, buf);
-	sprintf(buf, "%s<Lvl>", DItem[LevelSelected]);
+	sprintf(buf, "%s<Lvl>", DItem[Round.LevelSelected]);
 	GrpPut16(0, 68, buf);
 	sprintf(buf, "Pr %d", PlayRank.Rank);
 	GrpPut16(0, 86, buf);

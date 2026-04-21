@@ -9,8 +9,8 @@
 #include <printf/printf.h>
 
 #include "SCORE.H"
-#include "LEVEL.H"
 #include "LZ_UTY.H"
+#include "ssg/Round.h"
 #include "ssg/internal/LZ.hpp"
 #include "hatoyama/logic/defer.h"
 

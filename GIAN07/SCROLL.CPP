@@ -12,8 +12,8 @@
 #include "ENDING.H"
 #include "GAMEMAIN.H"
 #include "GIAN.H"
-#include "LEVEL.H"
 #include "LOADER.H"
+#include "LogicInstance.h"
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
@@ -354,7 +354,7 @@ static void enemy_set(void)
 				}
 				if(DemoplayLoadEnable) return;
 
-				if(LevelSelected != GAME_EASY) {
+				if(Round.LevelSelected != GAME_EASY) {
 					switch(Viv.weapon){
 						case(0):	ConfigDat.ExtraStgFlags.v |= 1;	break;
 						case(1):	ConfigDat.ExtraStgFlags.v |= 2;	break;

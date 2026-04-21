@@ -80,7 +80,6 @@ enum {
 ///// [グローバル変数] /////
 extern uint32_t	GameCount;
 extern uint8_t	GameStage;
-extern uint8_t	LevelSelected;
 
 
 #endif

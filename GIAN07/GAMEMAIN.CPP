@@ -20,9 +20,9 @@
 #include "ITEM.H"
 #include "LENS.H"
 #include "HUD.H"
-#include "LEVEL.H"
 #include "LLASER.H"
 #include "LOADER.H"
+#include "LogicInstance.h"
 #include "MAID.H"
 #include "MAIDTAMA.H"
 #include "MUSIC.H"
@@ -133,7 +133,7 @@ void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
-	return ((GameStage == STAGE_EXTRA) ? GAME_EXTRA : LevelSelected);
+	return ((GameStage == STAGE_EXTRA) ? GAME_EXTRA : Round.LevelSelected);
 }
 
 bool InputLocked;
@@ -553,7 +553,12 @@ bool WeaponSelectInit(bool ExStg)
 	GrpBackend_Clear();
 	Grp_Flip();
 
-	LevelSelected = (ExStg ? EXTRA_LEVEL : ConfigDat.LevelSelected.v);
+	Round = {
+		.LevelSelected = (ExStg ? EXTRA_LEVEL : ConfigDat.LevelSelected.v),
+		.PlayerStock = (ExStg ? EXTRA_LIVES : ConfigDat.PlayerStock.v),
+		.BombStock = ConfigDat.BombStock.v,
+		.InputFlags = ConfigDat.InputFlags.v,
+	};
 
 	GameSTD_Init();
 	PlayRankReset();
@@ -1148,7 +1153,6 @@ void WeaponSelectProc(bool&)
 			}
 			else{
 				Viv.credit = 0;
-				Viv.left   = EXTRA_LIVES;
 				Viv.exp    = 255;
 				if(ConfigDat.StageSelect.v) {
 					DemoplayInit();

@@ -18,6 +18,7 @@
 #include "GIAN.H"
 #include "LASER.H"
 #include "LOADER.H"
+#include "LogicInstance.h"
 #include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "TAMA.H"
@@ -310,7 +311,7 @@ extern void MaidMove(void)
 	else if(Viv.dscore>=10)		Viv.score+=10		,Viv.dscore-=10;
 
 	// 押しっぱなし減速を有効にするのか //
-	if(ConfigDat.InputFlags.v & INPF_Z_SPDDOWN_ENABLE) {
+	if(Round.InputFlags & INPF_Z_SPDDOWN_ENABLE) {
 		if(Key_Data & KEY_TAMA){
 			if(Viv.ShiftCounter < 8) Viv.ShiftCounter++;
 			else                     Key_Data = Key_Data | KEY_SHIFT;
@@ -391,8 +392,8 @@ extern void MaidSet(void)
 	Viv.dscore    = 0;
 	Viv.exp       = 0;
 	Viv.exp2      = 0;
-	Viv.bomb      = ConfigDat.BombStock.v;
-	Viv.left      = ConfigDat.PlayerStock.v;
+	Viv.bomb      = Round.BombStock;
+	Viv.left      = Round.PlayerStock;
 	Viv.credit    = 4;		//5;
 
 	Viv.bomb_time = 0;
@@ -464,7 +465,7 @@ extern void MaidDead(void)
 	Viv.lay_time  = 0;
 	Viv.lay_grp   = 0;
 
-	Viv.bomb = ConfigDat.BombStock.v;
+	Viv.bomb = Round.BombStock;
 	Viv.muteki = VIVDEAD_VAL;
 
 	PlayRankAdd(-2560);

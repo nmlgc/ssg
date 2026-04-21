@@ -9,4 +9,3 @@
 ///// [グローバル変数] /////
 uint32_t	GameCount;
 uint8_t	GameStage;
-uint8_t	LevelSelected;

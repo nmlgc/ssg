@@ -10,6 +10,7 @@
 #include "GIAN.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
+#include "LogicInstance.h"
 #include "MAID.H"
 #include "ssg/internal/LZ.hpp"
 #include "hatoyama/engine/file.h"
@@ -22,11 +23,6 @@ bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作して�
 DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
 INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
 static uint32_t DemoFrameCur;
-struct {
-	uint8_t PlayerStock;
-	uint8_t BombStock;
-	uint8_t InputFlags;
-} ConfigTemp; // コンフィグのデータ一時保存用
 
 
 std::u8string ReplayFN(uint8_t stage)
@@ -50,7 +46,7 @@ void DemoplayInit(void)
 
 	DemoInfo.Exp    = Viv.exp;
 	DemoInfo.Weapon = Viv.weapon;
-	DemoInfo.CfgDat.LevelSelected = LevelSelected;
+	DemoInfo.CfgDat.LevelSelected = Round.LevelSelected;
 	DemoInfo.CfgDat.PlayerStock = Viv.left;
 	DemoInfo.CfgDat.BombStock = ConfigDat.BombStock.v;
 	DemoInfo.CfgDat.InputFlags = ConfigDat.InputFlags.v;
@@ -66,22 +62,16 @@ bool DemoplayLoadSetup()
 	DemoplayLoadEnable = true;
 
 	// コンフィグの初期化 //
-	// 現在のコンフィグを保持する //
-	ConfigTemp.PlayerStock = ConfigDat.PlayerStock.v;
-	ConfigTemp.BombStock   = ConfigDat.BombStock.v;
-	ConfigTemp.InputFlags  = ConfigDat.InputFlags.v;
-
-	// そのときのコンフィグを転送 //
-	ConfigDat.BombStock.v   = DemoInfo.CfgDat.BombStock;
-	ConfigDat.PlayerStock.v = DemoInfo.CfgDat.PlayerStock;
-	ConfigDat.InputFlags.v  = DemoInfo.CfgDat.InputFlags;
-	LevelSelected = DemoInfo.CfgDat.LevelSelected;
+	Round.BombStock     = DemoInfo.CfgDat.BombStock;
+	Round.PlayerStock   = DemoInfo.CfgDat.PlayerStock;
+	Round.InputFlags    = DemoInfo.CfgDat.InputFlags;
+	Round.LevelSelected = DemoInfo.CfgDat.LevelSelected;
 
 	// 本体の性能記述 //
 	Viv.exp    = DemoInfo.Exp;
 	Viv.weapon = DemoInfo.Weapon;
-	Viv.left   = ConfigDat.PlayerStock.v;
-	Viv.bomb   = ConfigDat.BombStock.v;
+	Viv.left   = Round.PlayerStock;
+	Viv.bomb   = Round.BombStock;
 
 	// 乱数の初期化 //
 	// 最後に乱数もそろえる //
@@ -171,10 +161,6 @@ INPUT_BITS DemoplayMove(void)
 
 void DemoplayCleanup(void)
 {
-	ConfigDat.PlayerStock.v = ConfigTemp.PlayerStock;
-	ConfigDat.BombStock.v   = ConfigTemp.BombStock;
-	ConfigDat.InputFlags.v  = ConfigTemp.InputFlags;
-
 	DemoplayLoadEnable = false;
 }
 

@@ -5,7 +5,7 @@
 
 #include "PRankCtrl.h"
 #include "GIAN.H"
-#include "LEVEL.H"
+#include "LogicInstance.h"
 #include <assert.h>
 
 PlayRankInfo	PlayRank;
@@ -48,21 +48,24 @@ void PlayRankAdd(int n)
 
 	// この分岐に関しては、基本的にコンフィグの値に基づく //
 	assert(
-		(LevelSelected <= GAME_LUNATIC) && "Extra is not a valid difficulty"
+		(Round.LevelSelected <= GAME_LUNATIC) &&
+		"Extra is not a valid difficulty"
 	);
-	const auto& rd_selected = RANK_DATA[LevelSelected];
+	const auto& rd_selected = RANK_DATA[Round.LevelSelected];
 	PlayRank.Rank = std::clamp(
 		PlayRank.Rank, rd_selected.clamp_min, rd_selected.clamp_max
 	);
 
 	// We can only jump up or down by a single difficulty.
-	if((LevelSelected < GAME_LUNATIC) &&
-	   (PlayRank.Rank >= RANK_DATA[LevelSelected + 1].threshold)) {
-		PlayRank.LevelRanked = (LevelSelected + 1);
+	if(
+		(Round.LevelSelected < GAME_LUNATIC) &&
+		(PlayRank.Rank >= RANK_DATA[Round.LevelSelected + 1].threshold)
+	) {
+		PlayRank.LevelRanked = (Round.LevelSelected + 1);
 	} else if(PlayRank.Rank >= rd_selected.threshold) {
-		PlayRank.LevelRanked = LevelSelected;
-	} else if(LevelSelected > GAME_EASY) {
-		PlayRank.LevelRanked = (LevelSelected - 1);
+		PlayRank.LevelRanked = Round.LevelSelected;
+	} else if(Round.LevelSelected > GAME_EASY) {
+		PlayRank.LevelRanked = (Round.LevelSelected - 1);
 	}
 }
 
@@ -71,8 +74,9 @@ void PlayRankAdd(int n)
 void PlayRankReset(void)
 {
 	assert(
-		(LevelSelected <= GAME_LUNATIC) && "Extra is not a valid difficulty"
+		(Round.LevelSelected <= GAME_LUNATIC) &&
+		"Extra is not a valid difficulty"
 	);
-	PlayRank.LevelRanked = LevelSelected;
-	PlayRank.Rank = RANK_DATA[LevelSelected].initial;
+	PlayRank.LevelRanked = Round.LevelSelected;
+	PlayRank.Rank = RANK_DATA[Round.LevelSelected].initial;
 }

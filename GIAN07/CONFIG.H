@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "LEVEL.H"
+#include "ssg/Round.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/midi.h"
 #include "hatoyama/engine/volume.h"
@@ -33,10 +33,6 @@ constexpr uint8_t SNDF_SE_ENABLE	= 0x02;
 // Normalizing the volume should be the default, so we need to store the
 // negation for backwards compatibility.
 constexpr uint8_t SNDF_BGM_NOT_VOL_NORM	= 0x04;
-
-constexpr uint8_t INPF_MASK	= (~0x07);
-constexpr uint8_t INPF_Z_MSKIP_ENABLE	= 0x02;	// Ｚキーでメッセージを送れる
-constexpr uint8_t INPF_Z_SPDDOWN_ENABLE	= 0x04;	// 押しっぱなしでシフト移動
 
 // Limits //
 constexpr const auto STOCK_PLAYER_MAX = 4;

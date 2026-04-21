@@ -7,7 +7,6 @@
 
 #include "HUD.H"
 #include "FONTUTY.H"
-#include "GIAN.H"
 #include "ITEM.H"
 #include "LogicInstance.h"
 #include "MAID.H"
@@ -18,6 +17,7 @@
 #include "HOMINGL.H"
 #include "PRankCtrl.h"
 #include "SCROLL.H"
+#include "ssg/internal/Stage.hpp"
 #endif
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/time.h"

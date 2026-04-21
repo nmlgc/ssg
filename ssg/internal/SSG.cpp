@@ -51,6 +51,11 @@ void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 	RNG.seed = round.Seed;
 }
 
+void C_SSG::RoundContinue(void)
+{
+	Viv.Continue();
+}
+
 bool C_SSG::StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage)
 {
 	// Re-assigning the `std::unique_ptr`s only frees them one by one, and we

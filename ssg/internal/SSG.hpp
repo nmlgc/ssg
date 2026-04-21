@@ -26,6 +26,10 @@ struct C_SSG {
 	// Does *not* call `StageInit()`.
 	void RoundInit(const ROUND_PARAMS& round, uint8_t stage_first);
 
+	// Moves from the Game Over state back to the regular game state by using a
+	// continue.
+	void RoundContinue(void);
+
 	// Calls `StageFree()`, then initializes the enemy and SCL subsystems with
 	// the data for the given [stage], decompressed from a previously
 	// initialized packfile instance of `ENEMY.DAT`. Returns `true` on success.

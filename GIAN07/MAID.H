@@ -91,6 +91,9 @@ public:
 	// 死す
 	void Dead(void);
 
+	// コンティニューを行う場合
+	bool Continue(void);
+
 	// かすりゲージを上昇させる
 	void evade_add(uint8_t n);
 	void evade_addEx(int x, int y, uint8_t n);

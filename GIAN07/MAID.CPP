@@ -238,6 +238,25 @@ void C_VIV::Dead(void)
 	Laser.Clear();
 }
 
+bool C_VIV::Continue(void)
+{
+	if(Viv.GameOverTimer >= 1) {
+		assert(!"Game Over animation must completely run before continuing");
+		return false;
+	}
+	if(Viv.credit == 0) {
+		return false;
+	}
+	Viv.GameOverTimer = 0;
+	Viv.evade_sum = 0;
+	Viv.left = Round.PlayerStock;
+	Viv.score = ((Viv.score % 10) + 1);
+	Viv.credit -= 1;
+
+	SEffect.Init();
+	return true;
+}
+
 // かすりゲージを上昇させる(エフェクトはメイド中心) //
 void C_VIV::evade_add(uint8_t n)
 {

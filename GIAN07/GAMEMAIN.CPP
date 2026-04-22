@@ -1128,19 +1128,21 @@ void WeaponSelectProc(bool&)
 			count = 0;
 
 			Snd_SEPlay(SOUND_ID_SELECT);
+
+			bool record;
+			record = (ConfigDat.StageSelect.v != 0);
 			if(GameStage != STAGE_EXTRA) {
 #ifdef PBG_DEBUG
 				GameStage = DebugDat.StgSelect;
 				if(GameStage==2) Viv.exp = 160;
 				if(GameStage>=3) Viv.exp = 255;
-				if(DebugDat.DemoSave) DemoplayInit();
+				record = DebugDat.DemoSave;
 #else
 				// リプレイ用の処理を追加 //
 				if(ConfigDat.StageSelect.v) {
 					GameStage = ConfigDat.StageSelect.v;
 					if(GameStage==2) Viv.exp = 160;
 					if(GameStage>=3) Viv.exp = 255;
-					DemoplayInit();
 				}
 				else{
 					GameStage = 1;
@@ -1150,9 +1152,10 @@ void WeaponSelectProc(bool&)
 			else{
 				Viv.credit = 0;
 				Viv.exp    = 255;
-				if(ConfigDat.StageSelect.v) {
-					DemoplayInit();
-				}
+			}
+
+			if(record) {
+				DemoplayInit();
 			}
 
 			if(!LoadGraph(GameStage)){

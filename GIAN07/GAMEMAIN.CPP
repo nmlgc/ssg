@@ -99,8 +99,6 @@ NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
 uint8_t	CurrentRank;	// ネームレジスト用順位データ
 uint8_t	CurrentDif;	// 現在の難易度(スコアネーム表示用)
 
-MAID		VivTemp;
-
 bool IsDemoplay = false;
 
 
@@ -574,8 +572,6 @@ bool WeaponSelectInit(bool ExStg)
 	if(ExStg) {
 		GameStage = STAGE_EXTRA;
 	}
-
-	VivTemp = Viv;
 
 	return true;
 }
@@ -1127,8 +1123,7 @@ void WeaponSelectProc(bool&)
 				}
 			}
 
-			VivTemp.weapon = Viv.weapon;
-			Viv = VivTemp;
+			MaidSet();
 			MaidTamaIndSet();
 			count = 0;
 

@@ -397,24 +397,13 @@ extern void MaidSet(void)
 	Viv.left      = Round.PlayerStock;
 	Viv.credit    = 4;		//5;
 
-	Viv.bomb_time = 0;
 	Viv.evade_c   = Viv.evade = 0;
 	Viv.evadesc   = 0;
 	Viv.evade_sum = 0;
 
 	Viv.GrpID     = 1;
 
-	Viv.muteki    = VIVDEAD_VAL;
-
 	Viv.bGameOver = false;
-
-	Viv.toge_ex   = 0;
-	Viv.toge_time = 0;
-	Viv.lay_time  = 0;
-	Viv.lay_grp   = 0;
-	Viv.ShiftCounter = 0;
-
-	Viv.BuzzSound = false;
 }
 
 // 次のステージの準備 //

@@ -38,10 +38,6 @@ constexpr uint8_t INPF_MASK	= (~0x07);
 constexpr uint8_t INPF_Z_MSKIP_ENABLE	= 0x02;	// Ｚキーでメッセージを送れる
 constexpr uint8_t INPF_Z_SPDDOWN_ENABLE	= 0x04;	// 押しっぱなしでシフト移動
 
-constexpr uint8_t DBGF_MASK	= (~0x03);
-constexpr uint8_t DBGF_DISPLAYINFO	= 0x01;	// デバッグ情報を出力する
-constexpr uint8_t DBGF_HIT_ON	= 0x02;	// 当たり判定が有効
-
 // Limits //
 constexpr const auto STOCK_PLAYER_MAX = 4;
 constexpr const auto STOCK_BOMB_MAX = 2;
@@ -140,9 +136,6 @@ struct CONFIG_DATA {
 
 	// 入力に関するフラグ
 	OPTION<uint8_t> InputFlags = { INPF_Z_MSKIP_ENABLE, Mask<INPF_MASK> };
-
-	// デバッグに関するフラグ
-	OPTION<uint8_t> DebugFlags = { 0, Mask<DBGF_MASK> };
 
 	OPTION<INPUT_PAD_BUTTON> PadTama = { 1, ValidateWinMMPad };
 	OPTION<INPUT_PAD_BUTTON> PadBomb = { 2, ValidateWinMMPad };

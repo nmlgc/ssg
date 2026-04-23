@@ -146,7 +146,7 @@ const struct VERSION_ORIGINAL {
 		GraphFlags,
 		SoundFlags,
 		ConfigDat.InputFlags,
-		ConfigDat.DebugFlags,
+		PaddingByte, // The unused debug flags from the original game
 		ConfigDat.PadTama,
 		ConfigDat.PadBomb,
 		ConfigDat.PadShift,
@@ -196,7 +196,7 @@ const struct VERSION_00 {
 		ConfigDat.GraphFlags,
 		ConfigDat.SoundFlags,
 		ConfigDat.InputFlags,
-		ConfigDat.DebugFlags,
+		VERSION_ORIGINAL.PaddingByte,
 		ConfigDat.PadTama,
 		ConfigDat.PadBomb,
 		ConfigDat.PadShift,

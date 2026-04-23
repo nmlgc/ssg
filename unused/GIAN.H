@@ -27,6 +27,11 @@
 
 #define INPF_JOYPAD_ENABLE		0x01		// パッドが有効
 
+// Superseded by the DEBUG_DATA structure.
+#define DBGF_MASK				(~0x03)
+#define DBGF_DISPLAYINFO		0x01		// デバッグ情報を出力する
+#define DBGF_HIT_ON				0x02		// 当たり判定が有効
+
 
 
 ///// [マクロ] /////

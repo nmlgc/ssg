@@ -329,7 +329,7 @@ static void DebugInit(void)
 		return;
 	}
 	if(!SDL_MustReadIO(f, &DebugDat, sizeof(DebugDat))) {
-		DebugDat.Hit        = true;
+		DebugDat.NoMaxLives = true;
 		DebugDat.MsgDisplay = true;
 		DebugDat.DemoSave   = false;
 		DebugDat.StgSelect  = 1;

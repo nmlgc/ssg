@@ -430,10 +430,6 @@ extern void MaidDead(void)
 {
 	int		i;
 
-#ifdef PBG_DEBUG
-	if(!DebugDat.Hit) return;
-#endif
-
 	fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
 
 	for(i=0; i<50; i++)

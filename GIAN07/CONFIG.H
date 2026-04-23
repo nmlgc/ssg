@@ -152,10 +152,37 @@ struct CONFIG_DATA {
 extern CONFIG_DATA ConfigDat;
 
 #ifdef PBG_DEBUG
+// We subtract 3 because game logic doesn't check for overflow when collecting
+// lives. A player should still be able to collect the 3 extra lives spawned
+// across the 6 main stages without overflowing the life counter to 0.
+// 252 lives are more than enough to still 1CC both the original 6 main stages
+// and Extra while not moving at all.
+constexpr auto DEBUG_MAX_LIVES = (
+	(std::numeric_limits<decltype(ConfigDat.PlayerStock.v)>::max()) - 3
+);
+
 // デバッグ情報管理用構造体 //
 typedef struct tagDEBUG_DATA{
 	int32_t	MsgDisplay;	// デバッグ情報を出力するか
-	int32_t	Hit;	// 当たり判定の有・無
+
+	// When set to `false`, [ConfigDat.PlayerStock] is overridden with
+	// [DEBUG_MAX_LIVES] for actively played gameplay rounds.
+	// The original code's version of this flag completely turned off collision
+	// detection when set to `false`, which also explains why we sadly have to
+	// use negated semantics for compatibility here. That approach to
+	// "invincibility" had two major drawbacks, though:
+	//
+	// 1) It would fork the game, requiring a separate build of the game logic
+	// 2) Since this setting wasn't stored in replays, existing replays would
+	//    only sync when played back with the exact flag setting they were
+	//    recorded with
+	//
+	// This new approach is not only a good enough approximation in practice,
+	// but trivially propagates into newly recorded replays, since we're just
+	// overriding [ConfigDat.PlayerStock] at the end of the day. Thus, the
+	// resulting replays will even correctly play on release builds.
+	int32_t NoMaxLives;
+
 	int32_t	DemoSave;	// デモプレイをセーブするか
 
 	uint8_t	StgSelect;	// ステージセレクト(開始ステージ)

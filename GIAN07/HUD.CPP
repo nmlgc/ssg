@@ -116,7 +116,7 @@ void StdStatusOutput(void)
 	GrpPut16(column2_left, 400, buf);
 #endif
 
-	sprintf(buf, "Left   %d", Viv.left);
+	sprintf(buf, "Left %3d", Viv.left);
 	GrpPut16(column2_left, 440, buf);
 	sprintf(buf, "Credit %d", Viv.credit); // -1 に注意だ！！
 	GrpPut16(column2_left, 460, buf);

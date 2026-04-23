@@ -115,7 +115,7 @@ static void FnDifficulty(int_fast8_t delta);
 #ifdef PBG_DEBUG
 static void FnMsgDisplay(int_fast8_t delta);
 static void FnStgSelect(int_fast8_t delta);
-static void FnHit(int_fast8_t delta);
+static void FnMaxLives(int_fast8_t delta);
 static void FnDemo(int_fast8_t delta);
 #endif
 static void SetItem(bool tick = true);
@@ -129,7 +129,11 @@ WINDOW_CHOICE Item[] = {
 	HRuleItemForArray,
 	{ Title[3], "[DebugMode] 画面に情報を表示するか", FnMsgDisplay },
 	{ Title[4], "[DebugMode] ステージセレクト", FnStgSelect },
-	{ Title[5], "[DebugMode] 当たり判定", FnHit },
+	{
+		Title[5],
+		"(Not 255! Game spawns 3 and addition wraps)",
+		FnMaxLives,
+	},
 	{ Title[6], "[DebugMode] デモプレイセーブ", FnDemo },
 #endif
 	SubmenuExitItemForArray,
@@ -516,9 +520,9 @@ static void Main::Cfg::Dif::FnStgSelect(int_fast8_t delta)
 	RingStep(DebugDat.StgSelect, delta, 1, STAGE_MAX);
 }
 
-static void Main::Cfg::Dif::FnHit(int_fast8_t)
+static void Main::Cfg::Dif::FnMaxLives(int_fast8_t)
 {
-	DebugDat.Hit = !DebugDat.Hit;
+	DebugDat.NoMaxLives = !DebugDat.NoMaxLives;
 }
 
 static void Main::Cfg::Dif::FnDemo(int_fast8_t)
@@ -937,7 +941,7 @@ static void Main::Cfg::Dif::SetItem(bool)
 /*
 	{Title[3], "[DebugMode] 画面に情報を表示するか", FnMsgDisplay,0,0},
 	{Title[4], "[DebugMode] ステージセレクト", FnStgSelect,0,0},
-	{Title[5], "[DebugMode] 当たり判定", FnHit,0,0},
+	{Title[5], "[DebugMode] 当たり判定", FnMaxLives,0,0},
 */
 	// +1 に注意
 	sprintf(Title[0], "PlayerStock [ %d ]", (ConfigDat.PlayerStock.v + 1));
@@ -945,9 +949,10 @@ static void Main::Cfg::Dif::SetItem(bool)
 	sprintf(Title[2], "Difficulty[%s]", dif[ConfigDat.LevelSelected.v]);
 
 #ifdef PBG_DEBUG
+	const auto max_life_choice = CHOICE_OFF_ON[!DebugDat.NoMaxLives];
 	sprintf(Title[3], "DebugOut  %s", CHOICE_OFF_ON[DebugDat.MsgDisplay]);
 	sprintf(Title[4], "StgSelect [  %d  ]", DebugDat.StgSelect);
-	sprintf(Title[5], "Hit       %s", CHOICE_OFF_ON[DebugDat.Hit]);
+	sprintf(Title[5], "%dLives  %s", DEBUG_MAX_LIVES, max_life_choice);
 	sprintf(Title[6], "DemoSave  %s", CHOICE_OFF_ON[DebugDat.DemoSave]);
 #endif
 }

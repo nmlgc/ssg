@@ -9,7 +9,6 @@
 #include <printf/printf.h>
 
 #include "MAID.H"
-#include "CONFIG.H"
 #include "EFFECT.H"
 #include "FONTUTY.H"
 #include "FRAGMENT.H"
@@ -428,10 +427,6 @@ extern void MaidNextStage(void)
 extern void MaidDead(void)
 {
 	int		i;
-
-#ifdef PBG_DEBUG
-	if(!DebugDat.Hit) return;
-#endif
 
 	fragment_set(Viv.x,Viv.y,FRG_FATCIRCLE);
 

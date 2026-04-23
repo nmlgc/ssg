@@ -1150,7 +1150,11 @@ void WeaponSelectProc(bool&)
 				Viv.credit = 0;
 				Viv.exp    = 255;
 			}
-
+#ifdef PBG_DEBUG
+			if(!DebugDat.NoMaxLives) {
+				Viv.left = DEBUG_MAX_LIVES;
+			}
+#endif
 			if(record) {
 				DemoplayInit();
 			}

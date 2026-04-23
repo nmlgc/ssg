@@ -91,6 +91,7 @@ void Render(PIXEL_COORD top)
 
 uint16_t DemoTimer = 0;
 uint32_t DrawCount = 0;
+decltype(GameStage) WeaponSelectStage = 0;
 uint8_t WeaponKeyWait = 0;
 int	GameOverTimer = 0;
 
@@ -568,9 +569,13 @@ bool WeaponSelectInit(bool ExStg)
 	WeaponKeyWait = 1;
 	Viv.weapon    = 0;
 	GameMain = WeaponSelectProc;
-	if(ExStg) {
-		GameStage = STAGE_EXTRA;
-	}
+	WeaponSelectStage = (ExStg ? STAGE_EXTRA :
+#ifdef PBG_DEBUG
+		DebugDat.StgSelect
+#else
+		(ConfigDat.StageSelect.v ? ConfigDat.StageSelect.v : 1)
+#endif
+	);
 
 	return true;
 }
@@ -1116,7 +1121,7 @@ void WeaponSelectProc(bool&)
 
 		case(KEY_TAMA):case(KEY_RETURN):
 			if(spd) break;
-			if(GameStage == STAGE_EXTRA) {
+			if(WeaponSelectStage == STAGE_EXTRA) {
 				if(!((1 << Viv.weapon) & ConfigDat.ExtraStgFlags.v)) {
 					break;
 				}
@@ -1130,23 +1135,16 @@ void WeaponSelectProc(bool&)
 
 			bool record;
 			record = (ConfigDat.StageSelect.v != 0);
-			if(GameStage != STAGE_EXTRA) {
+			if(WeaponSelectStage != STAGE_EXTRA) {
 #ifdef PBG_DEBUG
-				GameStage = DebugDat.StgSelect;
-				if(GameStage==2) Viv.exp = 160;
-				if(GameStage>=3) Viv.exp = 255;
 				record = DebugDat.DemoSave;
-#else
-				// リプレイ用の処理を追加 //
-				if(ConfigDat.StageSelect.v) {
-					GameStage = ConfigDat.StageSelect.v;
-					if(GameStage==2) Viv.exp = 160;
-					if(GameStage>=3) Viv.exp = 255;
-				}
-				else{
-					GameStage = 1;
-				}
 #endif
+				// リプレイ用の処理を追加 //
+				if(WeaponSelectStage == 2) {
+					Viv.exp = 160;
+				} else if(WeaponSelectStage >= 3) {
+					Viv.exp = 255;
+				}
 			}
 			else{
 				Viv.credit = 0;
@@ -1157,6 +1155,7 @@ void WeaponSelectProc(bool&)
 				DemoplayInit();
 			}
 
+			GameStage = WeaponSelectStage;
 			if(!LoadGraph(GameStage)){
 				DebugOut(u8"GRAPH.DAT が破壊されています");
 				return;
@@ -1205,7 +1204,7 @@ void WeaponSelectProc(bool&)
 		GrpGeom->SetAlphaNorm(128);
 		for(i=0;i<3;i++){
 			if(
-				(GameStage != STAGE_EXTRA) ||
+				(WeaponSelectStage != STAGE_EXTRA) ||
 				((1 << i) & ConfigDat.ExtraStgFlags.v)
 			) {
 				continue;

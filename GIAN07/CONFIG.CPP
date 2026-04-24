@@ -128,7 +128,12 @@ const struct VERSION_ORIGINAL {
 	// bits.
 	static inline CONFIG_OPTION_VALUE<uint8_t> SoundFlags;
 
-	static inline CONFIG_OPTION_VALUE<uint32_t> CheckSum;
+	// OK, writing ≥16-bit values as big-endian to the new formats *was* just
+	// needlessly fancy… Needs to use `ENDIAN_LITTLE` in order to stay a
+	// non-fundamental type on little-endian systems and turn `DISK<>` into a
+	// no-op.
+	static inline CONFIG_OPTION_VALUE<ENDIAN_LITTLE<uint32_t>> CheckSum;
+
 	static inline CONFIG_OPTION_VALUE<uint8_t> PaddingByte;
 
 	static constexpr auto Options = std::tie(

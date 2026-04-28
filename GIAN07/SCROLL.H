@@ -88,12 +88,6 @@ typedef struct tagScrollInfo{
 	uint32_t	ExCount;	// 特殊コマンド用カウンタ
 } SCROLL_INFO;
 
-// ＳＣＬ管理用構造体 //
-struct SCL_INFO {
-	bool	MsgFlag;	// メッセージスキップ用フラグ
-	bool	ReturnFlag;	// リターンキー用フラグ
-};
-
 
 ///// [ 関数 ] /////
 void ScrollMove(void);	// 背景を動かす(１フレーム分)
@@ -108,7 +102,6 @@ void ScrollInit(void);	// マップデータを初期化する
 
 ///// [ 変数 ] /////
 extern SCROLL_INFO		ScrollInfo;			// スクロールに関する情報
-extern SCL_INFO			SclInfo;			// ＳＣＬに関する情報
 
 
 

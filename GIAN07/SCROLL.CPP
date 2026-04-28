@@ -19,6 +19,7 @@
 #include "PRankCtrl.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
+#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/graphics_backend.h"
@@ -38,7 +39,6 @@ typedef struct tagScrollSaveHeader{
 } ScrollSaveHeader;
 
 SCROLL_INFO		ScrollInfo;			// スクロールに関する情報
-SCL_INFO		SclInfo;			// ＳＣＬに関する情報
 PIXEL_LTRB	rcMapChip[1200];	// マップパーツＩＤに対する矩形
 
 static void enemy_set(void);			// 敵をセットする

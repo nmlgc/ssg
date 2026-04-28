@@ -274,11 +274,6 @@ bool PACKFILE_WRITE::Write(
 	);
 }
 
-BIT_FILE_READ BitFilCreateR(const char8_t *s)
-{
-	return { SDL_LoadFile(s) };
-}
-
 PACKFILE_READ FilStartR(BUFFER_OWNED packfile)
 {
 	auto packfile_cursor = packfile.cursor();

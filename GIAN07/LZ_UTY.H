@@ -65,14 +65,6 @@ struct BIT_DEVICE_WRITE {
 	bool Write(const char8_t *s) const;
 };
 
-struct BIT_FILE_READ : public BIT_DEVICE_READ {
-	const BUFFER_OWNED file;
-
-	BIT_FILE_READ(BUFFER_OWNED&& file) :
-		BIT_DEVICE_READ(BUFFER_BORROWED(file)), file(std::move(file)) {
-	}
-};
-
 struct PACKFILE_READ {
 	BUFFER_OWNED packfile;
 	std::span<const PBG_FILEINFO> info;
@@ -103,7 +95,6 @@ struct PACKFILE_WRITE {
 	) const;
 };
 
-BIT_FILE_READ BitFilCreateR(const char8_t *s);
 PACKFILE_READ FilStartR(BUFFER_OWNED packfile);
 PACKFILE_READ FilStartR(SDL_IOStream *&& stream);
 PACKFILE_READ FilStartR(const char8_t *s);

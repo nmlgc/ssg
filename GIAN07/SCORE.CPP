@@ -228,7 +228,8 @@ static bool LoadScoreData(void)
 	}
 
 	// ビット読み込みモードでファイルを開く //
-	auto bd = BitFilCreateR(ScoreFileName);
+	const auto bd_file = SDL_LoadFile(ScoreFileName);
+	BIT_DEVICE_READ bd = { BUFFER_BORROWED{ bd_file } };
 	while(1){
 		if(!_LoadSC(ScoreData->Easy,    bd)) break;
 		if(!_LoadSC(ScoreData->Normal,  bd)) break;

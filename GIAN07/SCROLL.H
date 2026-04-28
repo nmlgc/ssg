@@ -102,7 +102,7 @@ void ScrollDraw(void);	// 背景を描画する
 void ScrollSpeed(int speed);	// スクロールスピードを変更する(引数:(1)スクロール速度)
 void ScrollCommand(uint8_t cmd);	// ＳＣＬ用コマンド実行関数(引数:(1)スクロールコマンド)
 
-bool ScrollInit(void);	// マップデータを初期化する
+void ScrollInit(void);	// マップデータを初期化する
 
 
 

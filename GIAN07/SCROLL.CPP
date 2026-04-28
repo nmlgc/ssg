@@ -717,8 +717,8 @@ static void ScrollCmdStg3Star(void)
 }
 
 
-// マップデータをロードする(BMP含む) //
-bool ScrollInit(void)
+// マップデータをロードする //
+void ScrollInit(void)
 {
 	ScrollSaveHeader	*LayerInfo;
 	int					i;
@@ -763,8 +763,6 @@ bool ScrollInit(void)
 
 	// 無限ループ終了時刻 //
 	ScrollInfo.InfEnd  = 16*(LayerInfo[i-1].Length-1280/16)*LayerInfo[i-1].ScrollWait;
-
-	return true;
 }
 
 // スクロールに関する情報の初期化を行う //

@@ -722,9 +722,6 @@ void ScrollInit(void)
 	int					i;
 	static bool bInitialized = false;
 
-	SclInfo.MsgFlag    = false;
-	SclInfo.ReturnFlag = false;
-
 	if(!bInitialized){
 		InitMapChipRect();
 		bInitialized = true;

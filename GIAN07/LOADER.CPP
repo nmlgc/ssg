@@ -670,9 +670,8 @@ extern void LoadPaletteFromEnemy(void)
 void FreeStageData(void)
 {
 	// メモリを解放だ！ //
-	SCL_Now = nullptr;
+	StageSet(nullptr);
 	ECL_Head = nullptr;
-	SCL_Head = nullptr;
 	ScrollInfo.DataHead = nullptr;
 }
 
@@ -695,7 +694,7 @@ bool LoadStageData(uint8_t stage)
 		}
 
 		// SCL Load
-		if((SCL_Head = enemy.MemExpand(25)) == nullptr) {
+		if(!StageSet(enemy.MemExpand(25))) {
 			return false;
 		}
 
@@ -716,7 +715,7 @@ bool LoadStageData(uint8_t stage)
 		}
 
 		// SCL Load
-		if((SCL_Head = enemy.MemExpand(stage + 6 - 1)) == nullptr) {
+		if(!StageSet(enemy.MemExpand(stage + 6 - 1))) {
 			return false;
 		}
 
@@ -728,10 +727,6 @@ bool LoadStageData(uint8_t stage)
 
 	// スクロール用変数の初期化 //
 	ScrollInit();
-
-	// 各変数の初期化 //
-	SCL_Now   = SCL_Head.get();
-	GameCount = 0;
 
 	// アニメーションの準備 //
 	switch(stage){

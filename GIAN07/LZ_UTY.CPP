@@ -318,13 +318,3 @@ PACKFILE_READ FilStartR(BUFFER_OWNED packfile)
 
 	return { std::move(packfile), info };
 }
-
-PACKFILE_READ FilStartR(SDL_IOStream *&& stream)
-{
-	return FilStartR(SDL_LoadFile_IO(stream, true));
-}
-
-PACKFILE_READ FilStartR(const char8_t *s)
-{
-	return FilStartR(SDL_LoadFile(s));
-}

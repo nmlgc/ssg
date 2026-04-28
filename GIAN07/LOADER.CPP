@@ -356,7 +356,7 @@ namespace DAT {
 		load_thread = ThreadStart([this, stream = std::move(stream), id](
 			const THREAD_STOP& st
 		) mutable {
-			auto in = FilStartR(std::move(stream));
+			auto in = FilStartR(SDL_LoadFile_IO(stream, true));
 			if(id == PACK_ID::MUSIC) {
 				LoadMusicHashes(in, st);
 			} else if(id == PACK_ID::SOUND) {

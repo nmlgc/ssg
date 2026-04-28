@@ -96,5 +96,3 @@ struct PACKFILE_WRITE {
 };
 
 PACKFILE_READ FilStartR(BUFFER_OWNED packfile);
-PACKFILE_READ FilStartR(SDL_IOStream *&& stream);
-PACKFILE_READ FilStartR(const char8_t *s);

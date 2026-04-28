@@ -41,6 +41,8 @@
 
 
 ////アニメーション定数////
+// (Yes, this is game logic. [ECL_ANM] directly derives hitbox sizes from the
+// sprite sizes defined in [Anime].)
 #define ANIME_MAX		50			// アニメーションの種類
 #define ANIMEPTN_MAX	16			// アニメーションパターンの最大値
 #define ANM_NORM		0x00		// 普通のアニメーション
@@ -106,36 +108,6 @@ struct ANIME_DATA {
 	uint8_t	n;	// アニメーションパターン数
 	PIXEL_SIZE	size;	// 絵の幅, 絵の高さ
 	PIXEL_LTRB	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
-
-	template <uint8_t Count> void SetSheet(
-		PIXEL_POINT topleft, PIXEL_SIZE size, uint8_t mode
-	)
-	{
-		static_assert(Count <= ANIMEPTN_MAX);
-
-		this->size = size;
-		this->n    = Count;
-		this->mode = mode;
-
-		for(auto i = decltype(Count){ 0 }; i < Count; i++) {
-			ptn[i] = PIXEL_LTWH{ topleft.x, topleft.y, size.w, size.h };
-			topleft.x += size.w;
-		}
-	}
-
-	// Cel sheets of quadratic sprites.
-	template <uint8_t Count, PIXEL_COORD Size> void SetSheet(
-		PIXEL_POINT topleft, uint8_t mode
-	)
-	{
-		SetSheet<Count>(topleft, { Size, Size }, mode);
-	}
-
-	// Rotational cel sheets always consist of 16 quadratic sprites.
-	template <PIXEL_COORD Size> void SetSheetDeg(PIXEL_POINT topleft)
-	{
-		SetSheet<16>(topleft, { Size, Size }, ANM_DEG);
-	}
 };
 
 //// 敵変数 ////
@@ -148,6 +120,10 @@ extern ANIME_DATA	Anime[ANIME_MAX];
 
 //// 敵制御関数 ////
 ENEMY_DATA* EnemyFindFree(void);
+
+// Returns `true` if [ecl] is a valid pointer.
+bool enemy_set(BUFFER_OWNED&& ecl, uint8_t stage);
+
 extern void enemy_move(void);		// 敵を動かす
 extern void enemy_draw(void);		// 敵を描画する
 extern void enemyind_set(void);		// 敵の順序設定用配列の初期化をする

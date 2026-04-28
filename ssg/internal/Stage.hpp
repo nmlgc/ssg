@@ -17,14 +17,28 @@ struct SCL_INFO {
 	bool ReturnFlag;
 };
 
-// ＳＣＬに関する情報
-extern SCL_INFO SclInfo;
+class C_STAGE {
+private:
+	BUFFER_OWNED SCL_Head;
+	const uint8_t *SCL_Now;
+	uint32_t GameCount;
 
-extern BUFFER_OWNED SCL_Head;
-extern const uint8_t *SCL_Now;
-extern uint32_t GameCount;
+	// ＳＣＬに関する情報
+	SCL_INFO SclInfo;
 
-// Returns `true` if [data] is a valid pointer.
-bool StageSet(BUFFER_OWNED&& data);
+public:
+	// Returns `true` if [data] is a valid pointer.
+	bool Set(BUFFER_OWNED&& data);
 
-void StageMove(INPUT_BITS);
+	void Move(INPUT_BITS input);
+
+	auto SCLCount(void) const {
+		return GameCount;
+	}
+
+	bool InMsg(void) const {
+		return SclInfo.MsgFlag;
+	}
+};
+
+extern C_STAGE Stage;

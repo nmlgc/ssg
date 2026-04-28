@@ -20,7 +20,6 @@
 #include "ENEMY.H"
 #include "HOMINGL.H"
 #include "PRankCtrl.h"
-#include "SCL.H"
 #include "SCROLL.H"
 #include "ssg/internal/Stage.hpp"
 #endif
@@ -302,7 +301,7 @@ void StdStatusOutput(void)
 	GrpPut16(0, 460, "DebugMode");
 
 	GrpPut16(column2_left, 100, "SCL Count");
-	sprintf(buf, " %5d", GameCount);
+	sprintf(buf, " %5d", Stage.SCLCount());
 	GrpPut16(column2_left, 120, buf);
 #else
 	// GrpPut16(0,440,"G07");

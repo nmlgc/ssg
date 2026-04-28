@@ -36,7 +36,7 @@ bool C_SSG::StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage)
 
 	return (
 		Enemy.Set(enemy_dat.MemExpand(ecl_no), stage) &&
-		StageSet(enemy_dat.MemExpand(scl_no))
+		Stage.Set(enemy_dat.MemExpand(scl_no))
 	);
 }
 
@@ -44,5 +44,5 @@ void C_SSG::StageFree(void)
 {
 	// メモリを解放だ！ //
 	Enemy.Set(nullptr, 0);
-	StageSet(nullptr);
+	Stage.Set(nullptr);
 }

@@ -153,7 +153,7 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 }
 
 // p:SCL_ENEMY以降の敵配置データ //
-void StageMove(INPUT_BITS input)
+void C_STAGE::Move(INPUT_BITS input)
 {
 	bool	bFlag = true;
 	bool CtrlFlag = false;

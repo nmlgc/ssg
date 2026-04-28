@@ -5,14 +5,9 @@
 
 #include "ssg/internal/Stage.hpp"
 
-BUFFER_OWNED SCL_Head = nullptr;
-const uint8_t *SCL_Now = nullptr;
-uint32_t GameCount;
+C_STAGE Stage;
 
-// ＳＣＬに関する情報
-SCL_INFO SclInfo;
-
-bool StageSet(BUFFER_OWNED&& data)
+bool C_STAGE::Set(BUFFER_OWNED&& data)
 {
 	SCL_Head = std::move(data);
 	SCL_Now = SCL_Head.get();

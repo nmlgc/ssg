@@ -931,7 +931,7 @@ void GameProc(bool&)
 	// there are no pre-existing replays that require these rewrites to sync
 	// properly.
 	INPUT_BITS input = Key_Data;
-	if(SclInfo.MsgFlag) {
+	if(Stage.InMsg()) {
 		if(SystemKey_Data & SYSKEY_SKIP) {
 			input |= KEY_SKIP;
 		}
@@ -1259,7 +1259,7 @@ void WeaponSelectProc(bool&)
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
-		Viv.Move(KEY_TAMA, SclInfo.MsgFlag);
+		Viv.Move(KEY_TAMA, Stage.InMsg());
 		MaidTamaMove();
 
 		GrpBackend_SetClip(
@@ -1391,7 +1391,7 @@ void GameMove(INPUT_BITS input)
 {
 	MWinMove();
 
-	StageMove(input);
+	Stage.Move(input);
 	ScrollMove();
 
 	const auto HP_Sum = Boss.Move();
@@ -1414,7 +1414,7 @@ void GameMove(INPUT_BITS input)
 	ScreenEffectMove();
 
 	// この２行の位置を変更しました //
-	Viv.Move(input, SclInfo.MsgFlag);
+	Viv.Move(input, Stage.InMsg());
 	MaidTamaMove();
 }
 

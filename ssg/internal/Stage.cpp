@@ -11,3 +11,14 @@ uint32_t GameCount;
 
 // ＳＣＬに関する情報
 SCL_INFO SclInfo;
+
+bool StageSet(BUFFER_OWNED&& data)
+{
+	SCL_Head = std::move(data);
+	SCL_Now = SCL_Head.get();
+	GameCount = 0;
+	SclInfo.MsgFlag = false;
+	SclInfo.ReturnFlag = false;
+
+	return (SCL_Head.get() != nullptr);
+}

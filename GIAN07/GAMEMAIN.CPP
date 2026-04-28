@@ -31,6 +31,7 @@
 #include "SCROLL.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
+#include "ssg/Sound.h"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"

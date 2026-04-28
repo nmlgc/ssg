@@ -5,8 +5,8 @@
 
 #include "EnemyExCtrl.h"
 #include "LLASER.H"
-#include "LOADER.H"
 #include "MAID.H"
+#include "ssg/Sound.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"

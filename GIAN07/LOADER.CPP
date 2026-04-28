@@ -726,9 +726,7 @@ bool LoadStageData(uint8_t stage)
 	}
 
 	// スクロール用変数の初期化 //
-	if(!ScrollInit()) {
-		return false;
-	}
+	ScrollInit();
 
 	// 各変数の初期化 //
 	SCL_Now   = SCL_Head.get();

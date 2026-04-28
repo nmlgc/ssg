@@ -33,7 +33,7 @@ struct MID_LOOP_FOR_HASH {
 // 	<file.mid mly loop-find
 //
 // unless otherwise specified.
-static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 66>({{
+static constinit const auto LOOPS = HashesSorted<MID_LOOP_FOR_HASH, 65>({{
 	// Original soundtrack (MUSIC.DAT)
 	// -------------------------------
 	// clang-format off

@@ -10,7 +10,7 @@
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
-#include "LOADER.H"
+#include "ssg/Sound.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/logic/cast.h"

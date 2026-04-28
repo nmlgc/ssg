@@ -17,9 +17,9 @@
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "HOMINGL.H"
+#include "HUD.H"
 #include "ITEM.H"
 #include "LENS.H"
-#include "HUD.H"
 #include "LLASER.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
@@ -31,6 +31,7 @@
 #include "SCROLL.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
+#include "ssg/Sound.h"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"

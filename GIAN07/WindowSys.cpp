@@ -6,6 +6,7 @@
 #include "WindowSys.h"
 #include "FONTUTY.H"
 #include "LOADER.H"
+#include "ssg/Sound.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/logic/enum_flags.h"

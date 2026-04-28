@@ -10,14 +10,12 @@
 #include "GIAN.H"
 #include "SCROLL.H"
 #include "WindowSys.h"
+#include "ssg/Sound.h"
 #include "ssg/internal/LZ.hpp"
 #include "hatoyama/engine/format_bmp.h"
-#include "hatoyama/engine/graphics_backend.h"
-#include "hatoyama/engine/midi.h"
 #include "hatoyama/engine/path.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/thread.h"
-#include "hatoyama/logic/enum_array.h"
 #include <assert.h>
 
 // Hardcoded loop points for ZUN's original MIDI files

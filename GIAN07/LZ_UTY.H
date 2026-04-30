@@ -86,13 +86,9 @@ struct PACKFILE_READ {
 	}
 };
 
-struct PACKFILE_WRITE {
-	std::vector<BUFFER_BORROWED> files;
-
-	bool Write(
-		const char8_t *s,
-		std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps = nullptr
-	) const;
-};
-
 PACKFILE_READ FilStartR(BUFFER_OWNED packfile);
+bool FilWrite(
+	const char8_t *s,
+	std::span<BUFFER_BORROWED> files,
+	std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps = nullptr
+);

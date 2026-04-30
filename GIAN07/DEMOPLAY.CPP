@@ -186,12 +186,12 @@ void DemoplaySaveReplay(void)
 	DemoBuffer[DemoFrameCur] = KEY_ESC;
 	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
-	PACKFILE_WRITE out = { {
+	BUFFER_BORROWED files[] = {
 		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
-	} };
+	};
 
 	const auto fn = ReplayFN(GameStage);
-	out.Write(fn.c_str());
+	FilWrite(fn.c_str(), files);
 }
 
 
@@ -242,11 +242,11 @@ bool DemoplayLoadReplay(int stage)
 	}
 
 	if(repair) {
-		PACKFILE_WRITE out = { {
+		BUFFER_BORROWED files[] = {
 			std::span(&DemoInfo, 1),
 			std::span(DemoBuffer, DemoInfo.FrameCount),
-		} };
-		if(!out.Write(fn.c_str(), File_TimestampsGet(fn.c_str()))) {
+		};
+		if(!FilWrite(fn.c_str(), files, File_TimestampsGet(fn.c_str()))) {
 			// Repair denied by file being read-only? OK, bro, you're the boss!
 			DemoInfo.CfgDat.LevelSelected = file_level;
 			DemoInfo.CfgDat.PlayerStock = file_lives;

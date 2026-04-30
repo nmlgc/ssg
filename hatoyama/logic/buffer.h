@@ -108,6 +108,10 @@ public:
 		return size_;
 	}
 
+	explicit operator BUFFER_BORROWED() const {
+		return { get(), size() };
+	}
+
 	// Borrows a buffer with an immutable cursor.
 	BUFFER_CURSOR<const uint8_t> cursor() const {
 		return { get(), size() };

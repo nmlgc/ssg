@@ -48,10 +48,6 @@ public:
 		buffer(buffer) {
 	}
 
-	BIT_DEVICE_READ(const void* mem,size_t size) :
-		buffer({ static_cast<const uint8_t *>(mem), size }) {
-	}
-
 	// Returns 0xFF if we're at the end of the stream.
 	uint8_t GetBit();
 
@@ -73,7 +69,7 @@ struct BIT_FILE_READ : public BIT_DEVICE_READ {
 	const BUFFER_OWNED file;
 
 	BIT_FILE_READ(BUFFER_OWNED&& file) :
-		BIT_DEVICE_READ(file.get(), file.size()), file(std::move(file)) {
+		BIT_DEVICE_READ(BUFFER_BORROWED(file)), file(std::move(file)) {
 	}
 };
 

@@ -315,7 +315,7 @@ namespace DAT {
 				if(st) {
 					break;
 				}
-				MusicHashes.emplace_back(Hash({ file.get(), file.size() }));
+				MusicHashes.emplace_back(Hash(BUFFER_BORROWED{ file }));
 			} else {
 				assert(!"Failure extracting BGM file?");
 			}

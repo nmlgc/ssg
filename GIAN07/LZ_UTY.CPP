@@ -214,9 +214,11 @@ BUFFER_GROWABLE Compress(BUFFER_BORROWED buffer)
 	return device.buffer;
 }
 
-bool PACKFILE_WRITE::Write(
-	const char8_t *s, std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps
-) const
+bool FilWrite(
+	const char8_t *s,
+	std::span<BUFFER_BORROWED> files,
+	std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps
+)
 {
 	if(files.size() > std::numeric_limits<decltype(PBG_FILEHEAD::n)>::max()) {
 		return false;

@@ -1394,6 +1394,7 @@ void GameMove(INPUT_BITS input)
 	MWinMove();
 
 	Stage.Move(input);
+	Effect3D.Move();
 	ScrollMove();
 
 	const auto HP_Sum = Boss.Move();

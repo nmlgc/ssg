@@ -53,15 +53,9 @@ static void ScrollCmdRasterOpen(void);	// ラスタースクロールオープ�
 static void ScrollCmdRasterClose(void);	// ラスタースクロールクローズ
 static void ScrollCmdStg3Boss(void);	// ゲイツ雲
 
-static void ScrollCmdStg6Cube(void);	// ６面の３Ｄキューう゛
-static void ScrollCmdStg6RndEcl(void);	// ６面のランダムＥＣＬ列
-static void ScrollCmdStg6Raster(void);	// ６面ラスター
-
 static void ScrollCmdStg3Star(void);	// ３面高速星
 
 static void Stg3BossMapDraw(void);	// ゲイツ雲描画
-
-static void ScrollCmdStg4Rock(void);	// ４面岩
 
 
 
@@ -299,15 +293,32 @@ void C_STAGE::Move(INPUT_BITS input)
 				case(SEFC_STG3RESET):	ScrollCommand(SCMD_STG3RESET);	break;	// ３面リセット
 				case(SEFC_CFADEIN):		ScreenEffectSet(SCNEFC_CFADEIN);break;	// ○フェードIn
 				case(SEFC_CFADEOUT):	ScreenEffectSet(SCNEFC_CFADEOUT);break;	// ○フェードOut
-				case(SEFC_STG6CUBE):	ScrollCommand(SCMD_STG6CUBE);	break;	// ６面キューブ
-				case(SEFC_STG6RNDECL):	ScrollCommand(SCMD_STG6RNDECL);	break;	// ６面ＥＣＬ羅列
-				case(SEFC_STG4ROCK):	ScrollCommand(SCMD_STG4ROCK);	break;	// ４面岩
-				case(SEFC_STG4LEAVE):	ScrollCommand(SCMD_STG4LEAVE);	break;	// ４面岩画面外へ
+				case(SEFC_STG6CUBE): // ６面キューブ
+					Effect3D.Set(EFFECT3D_TYPE::S6_CUBE);
+					ScrollCommand(SCMD_STG6CUBE);
+					break;
+				case(SEFC_STG6RNDECL): // ６面ＥＣＬ羅列
+					Effect3D.Set(EFFECT3D_TYPE::S6_FAKE_ECL);
+					ScrollCommand(SCMD_STG6RNDECL);
+					break;
+				case(SEFC_STG4ROCK): // ４面岩
+					Effect3D.Set(EFFECT3D_TYPE::S4_ROCK);
+					ScrollCommand(SCMD_STG4ROCK);
+					break;
+				case(SEFC_STG4LEAVE): // ４面岩画面外へ
+					if(Effect3D.GetActive() != EFFECT3D_TYPE::S4_ROCK) {
+						break;
+					}
+					Effect3D.SendCmdStg4Rock(STG4ROCK_LEAVE, 0);
+					break;
 				case(SEFC_WHITEIN):		ScreenEffectSet(SCNEFC_WHITEIN);break;	// ホワイトイン
 				case(SEFC_WHITEOUT):	ScreenEffectSet(SCNEFC_WHITEOUT);break;	// ホワイトアウト
 				case(SEFC_LOADEX01):	LoadGraph(GRAPH_ID_EXBOSS1);	break;
 				case(SEFC_LOADEX02):	LoadGraph(GRAPH_ID_EXBOSS2);	break;
-				case(SEFC_STG6RASTER):	ScrollCommand(SCMD_STG6RASTER);	break;	// ６面ラスター
+				case(SEFC_STG6RASTER): // ６面ラスター
+					Effect3D.Set(EFFECT3D_TYPE::S6_RASTER);
+					ScrollCommand(SCMD_STG6RASTER);
+					break;
 				}
 				SCL_Now += 2;
 			break;
@@ -413,15 +424,15 @@ void ScrollDraw(void)
 		Stg3BossMapDraw();
 		return;
 	}
-	else if(ScrollInfo.ExCmd == ScrollCmdStg6Cube){
+	else if(Effect3D.GetActive() == EFFECT3D_TYPE::S6_CUBE) {
 		Draw3DCube(Effect3D);
 		return;
 	}
-	else if(ScrollInfo.ExCmd == ScrollCmdStg6RndEcl){
+	else if(Effect3D.GetActive() == EFFECT3D_TYPE::S6_FAKE_ECL) {
 		DrawEffectFakeECL(Effect3D);
 		return;
 	}
-	else if(ScrollInfo.ExCmd == ScrollCmdStg6Raster){
+	else if(Effect3D.GetActive() == EFFECT3D_TYPE::S6_RASTER) {
 		DrawStg6Raster(Effect3D);
 		return;
 	}
@@ -458,7 +469,7 @@ void ScrollDraw(void)
 		}
 	}
 
-	if(ScrollInfo.ExCmd == ScrollCmdStg4Rock){
+	if(Effect3D.GetActive() == EFFECT3D_TYPE::S4_ROCK) {
 		DrawStg4Rock(Effect3D);
 	}
 }
@@ -490,43 +501,17 @@ void ScrollCommand(uint8_t cmd)
 		break;
 
 		case(SCMD_STG3RESET):
+		case(SCMD_STG6CUBE):
+		case(SCMD_STG6RNDECL):
+		case(SCMD_STG4ROCK):
+		case(SCMD_STG6RASTER):
 			ScrollInfo.ExCmd   = ScrollCmdDummy;
 			ScrollInfo.ExCount = 0;
-		break;
-
-		case(SCMD_STG6CUBE):
-			ScrollInfo.ExCmd   = ScrollCmdStg6Cube;
-			ScrollInfo.ExCount = 0;
-			Effect3D.Init3DCube();
-		break;
-
-		case(SCMD_STG6RNDECL):
-			ScrollInfo.ExCmd   = ScrollCmdStg6RndEcl;
-			ScrollInfo.ExCount = 0;
-			Effect3D.InitFakeECL();
-		break;
-
-		case(SCMD_STG4ROCK):
-			ScrollInfo.ExCmd   = ScrollCmdStg4Rock;
-			ScrollInfo.ExCount = 0;
-			Effect3D.InitStg4Rock();
-		break;
-
-		case(SCMD_STG4LEAVE):
-			if(ScrollInfo.ExCmd != ScrollCmdStg4Rock) break;
-			Effect3D.SendCmdStg4Rock(STG4ROCK_LEAVE, 0);
-		break;
-
-		case(SCMD_STG6RASTER):
-			ScrollInfo.ExCmd   = ScrollCmdStg6Raster;
-			ScrollInfo.ExCount = 0;
-			Effect3D.InitStg6Raster();
 		break;
 
 		case(SCMD_STG3STAR):
 			ScrollInfo.ExCmd = ScrollCmdStg3Star;
 			ScrollInfo.ExCount = 0;
-			Effect3D.InitStg3Star();
 			ScreenEffectSet(SCNEFC_WHITEIN);
 		break;
 
@@ -656,30 +641,6 @@ static void Stg3BossMapDraw(void)
 }
 
 
-// ６面の３Ｄキューう゛ //
-static void ScrollCmdStg6Cube(void)
-{
-	Effect3D.Move3DCube();
-}
-
-// ６面のランダムＥＣＬ列 //
-static void ScrollCmdStg6RndEcl(void)
-{
-	Effect3D.MoveFakeECL();
-}
-
-// ６面ラスター //
-static void ScrollCmdStg6Raster(void)
-{
-	Effect3D.MoveStg6Raster();
-}
-
-// ４面岩 //
-static void ScrollCmdStg4Rock(void)
-{
-	Effect3D.MoveStg4Rock();
-}
-
 // ３面高速星 //
 static void ScrollCmdStg3Star(void)
 {
@@ -688,8 +649,6 @@ static void ScrollCmdStg3Star(void)
 	if(ScrollInfo.ExCount == 32){
 		ScreenEffectSet(SCNEFC_WHITEOUT);
 	}
-
-	Effect3D.MoveStg3Star();
 }
 
 

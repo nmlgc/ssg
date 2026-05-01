@@ -389,3 +389,29 @@ void C_EFFECT3D::MoveStg3Star()
 		}
 	}
 }
+
+
+void C_EFFECT3D::Set(EFFECT3D_TYPE effect)
+{
+	switch(effect) {
+	case EFFECT3D_TYPE::NONE:        break;
+	case EFFECT3D_TYPE::S3_STAR:     this->InitStg3Star(); break;
+	case EFFECT3D_TYPE::S4_ROCK:     this->InitStg4Rock(); break;
+	case EFFECT3D_TYPE::S6_RASTER:   this->InitStg6Raster(); break;
+	case EFFECT3D_TYPE::S6_FAKE_ECL: this->InitFakeECL(); break;
+	case EFFECT3D_TYPE::S6_CUBE:     this->Init3DCube(); break;
+	}
+	Active = effect;
+}
+
+void C_EFFECT3D::Move(void)
+{
+	switch(Active) {
+	case EFFECT3D_TYPE::NONE:        break;
+	case EFFECT3D_TYPE::S3_STAR:     this->MoveStg3Star(); break;
+	case EFFECT3D_TYPE::S4_ROCK:     this->MoveStg4Rock(); break;
+	case EFFECT3D_TYPE::S6_RASTER:   this->MoveStg6Raster(); break;
+	case EFFECT3D_TYPE::S6_FAKE_ECL: this->MoveFakeECL(); break;
+	case EFFECT3D_TYPE::S6_CUBE:     this->Move3DCube(); break;
+	}
+}

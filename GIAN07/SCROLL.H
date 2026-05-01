@@ -43,7 +43,6 @@
 #define SCMD_STG6CUBE		0x07			// ６面ボスの３Ｄキューブモード
 #define SCMD_STG6RNDECL		0x08			// ６面ボスのランダム偽ＥＣＬ列配置
 #define SCMD_STG4ROCK		0x09			// ４面岩
-#define SCMD_STG4LEAVE		0x0a			// ４面岩を画面外に吐き出す
 #define SCMD_STG6RASTER		0x0b			// ６面ラスター
 #define SCMD_STG3STAR		0x0c			// ３面高速星
 

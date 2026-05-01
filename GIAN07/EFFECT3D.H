@@ -37,6 +37,16 @@ import std.compat;
 #define STG4ROCK_END		5		// エフェクト終了
 
 
+enum class EFFECT3D_TYPE {
+	NONE,
+	S3_STAR,
+	S4_ROCK,
+	S6_RASTER,
+	S6_CUBE,
+	S6_FAKE_ECL,
+};
+
+
 
 ///// [ 構造体 ] /////
 struct Point3D {
@@ -112,6 +122,7 @@ using STG6STAR_CSPAN = std::span<const Stg6Star, S3STAR_MAX>;
 
 class C_EFFECT3D {
 private:
+	EFFECT3D_TYPE Active;
 	uint16_t cube_d;
 	uint16_t cube_dx;
 	uint16_t cube_dy;
@@ -136,9 +147,6 @@ public:
 
 	void MoveStg4Rock(void);
 
-	// コマンド送信
-	void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);
-
 	// ６面ラスター初期化
 	void InitStg6Raster();
 
@@ -150,6 +158,20 @@ public:
 
 	// ３面高速星動作
 	void MoveStg3Star();
+
+public:
+	// コマンド送信
+	void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);
+
+	// Initializes and activates the given effect.
+	void Set(EFFECT3D_TYPE effect);
+
+	// Updates the given effect.
+	void Move(void);
+
+	auto GetActive(void) const {
+		return Active;
+	}
 
 	CUBE3D_CSPAN DataCube(void) const {
 		return Cube;

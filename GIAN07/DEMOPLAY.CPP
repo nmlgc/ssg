@@ -200,7 +200,8 @@ bool DemoplayLoadReplay(int stage)
 	BUFFER_OWNED temp;
 
 	const auto fn = ReplayFN(stage);
-	const auto in = FilStartR(SDL_LoadFile(fn.c_str()));
+	const auto fil = SDL_LoadFile(fn.c_str());
+	const auto in = FilStartR(BUFFER_BORROWED{ fil });
 
 	// ヘッダの格納先は０番である //
 	temp = in.MemExpand( 0);

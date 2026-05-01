@@ -66,27 +66,18 @@ struct BIT_DEVICE_WRITE {
 };
 
 struct PACKFILE_READ {
-	BUFFER_OWNED packfile;
+	BUFFER_BORROWED packfile;
 	std::span<const PBG_FILEINFO> info;
 
-	PACKFILE_READ(std::nullptr_t null = nullptr) noexcept {
-	}
-
-	PACKFILE_READ(
-		BUFFER_OWNED&& packfile, const std::span<const PBG_FILEINFO> info
-	) :
-		packfile(std::move(packfile)),
-		info(info) {
-	}
-
+	std::optional<BUFFER_BORROWED> GetCompressed(fil_no_t filno) const;
 	BUFFER_OWNED MemExpand(fil_no_t filno) const;
 
 	explicit operator bool() const {
-		return packfile.get();
+		return packfile.size();
 	}
 };
 
-PACKFILE_READ FilStartR(BUFFER_OWNED packfile);
+PACKFILE_READ FilStartR(BUFFER_BORROWED packfile);
 bool FilWrite(
 	const char8_t *s,
 	std::span<BUFFER_BORROWED> files,

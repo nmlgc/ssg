@@ -268,6 +268,7 @@ namespace DAT {
 	class PACK {
 	private:
 		PACKFILE_READ pack;
+		BUFFER_OWNED pack_buf;
 		THREAD load_thread;
 		std::u8string filename_with_found_prefix;
 
@@ -352,7 +353,8 @@ namespace DAT {
 		load_thread = ThreadStart([this, stream = std::move(stream), id](
 			const THREAD_STOP& st
 		) mutable {
-			auto in = FilStartR(SDL_LoadFile_IO(stream, true));
+			pack_buf = SDL_LoadFile_IO(stream, true);
+			auto in = FilStartR(BUFFER_BORROWED{ pack_buf });
 			if(id == PACK_ID::MUSIC) {
 				LoadMusicHashes(in, st);
 			} else if(id == PACK_ID::SOUND) {

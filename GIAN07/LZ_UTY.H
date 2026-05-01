@@ -1,60 +1,13 @@
 /*
- *   Packfiles and compression
+ *   Bit stream writer and packfile compression
  *
+ *   Reading and decompression is part of the game logic layer.
  */
 
 #pragma once
 
 #include "hatoyama/engine/file.h"
-#include "hatoyama/logic/endian.h"
-
-// Format
-// ------
-
-using fil_checksum_t = uint32_t;
-using fil_size_t = uint32_t;
-using fil_no_t = uint32_t;
-constexpr const std::array<char, 4> PBG_HEADNAME = { 'P', 'B', 'G', 0x1A };
-
-struct PBG_FILEHEAD {
-	std::array<char, PBG_HEADNAME.size()> name = PBG_HEADNAME;
-	ENDIAN_LITTLE<fil_checksum_t> sum = 0;
-	ENDIAN_LITTLE<fil_no_t> n = 0;
-};
-
-struct PBG_FILEINFO {
-	ENDIAN_LITTLE<fil_size_t> size_uncompressed;
-	ENDIAN_LITTLE<fil_size_t> offset;
-	ENDIAN_LITTLE<fil_checksum_t> checksum_compressed;
-};
-// ------
-
-class BIT_DEVICE_READ {
-	struct {
-		size_t byte = 0;
-		uint8_t bit = 0;
-
-		void operator +=(unsigned int bitcount) {
-			bit += bitcount;
-			byte += (bit / 8);
-			bit %= 8;
-		}
-	} cursor;
-
-public:
-	const BUFFER_BORROWED buffer;
-
-	BIT_DEVICE_READ(const BUFFER_BORROWED buffer) :
-		buffer(buffer) {
-	}
-
-	// Returns 0xFF if we're at the end of the stream.
-	uint8_t GetBit();
-
-	// Returns 0xFFFFFFFF if we're at the end of the stream. Supports a maximum
-	// of 24 bits.
-	uint32_t GetBits(size_t bitcount);
-};
+#include "hatoyama/logic/buffer.h"
 
 struct BIT_DEVICE_WRITE {
 	BUFFER_GROWABLE buffer;
@@ -65,19 +18,6 @@ struct BIT_DEVICE_WRITE {
 	bool Write(const char8_t *s) const;
 };
 
-struct PACKFILE_READ {
-	BUFFER_BORROWED packfile;
-	std::span<const PBG_FILEINFO> info;
-
-	std::optional<BUFFER_BORROWED> GetCompressed(fil_no_t filno) const;
-	BUFFER_OWNED MemExpand(fil_no_t filno) const;
-
-	explicit operator bool() const {
-		return packfile.size();
-	}
-};
-
-PACKFILE_READ FilStartR(BUFFER_BORROWED packfile);
 bool FilWrite(
 	const char8_t *s,
 	std::span<BUFFER_BORROWED> files,

@@ -15,11 +15,11 @@ constexpr auto LZSS_SEQ_MIN = 3;
 constexpr auto LZSS_DICT_MASK = ((1 << LZSS_DICT_BITS) - 1);
 constexpr auto LZSS_SEQ_MAX = (LZSS_SEQ_MIN + ((1 << LZSS_SEQ_BITS) - 1));
 
-template <typename Container> fil_checksum_t FilChecksumAddFile(
+fil_checksum_t FilChecksumAddFile(
 	fil_checksum_t &current_total,
 	fil_size_t offset,
 	fil_size_t size_uncompressed,
-	const Container &compressed
+	const std::span<const uint8_t> compressed
 )
 {
 	auto ret = std::accumulate(
@@ -31,11 +31,9 @@ template <typename Container> fil_checksum_t FilChecksumAddFile(
 	return ret;
 }
 
-std::optional<BUFFER_BORROWED> FilFileGetCompressed(
-	const BUFFER_OWNED& packfile,
-	const std::span<const PBG_FILEINFO> info,
+std::optional<BUFFER_BORROWED> PACKFILE_READ::GetCompressed(
 	fil_no_t filno
-)
+) const
 {
 	if(filno >= info.size()) {
 		return std::nullopt;
@@ -48,7 +46,7 @@ std::optional<BUFFER_BORROWED> FilFileGetCompressed(
 	if((start >= packfile.size()) || (end > packfile.size())) {
 		return std::nullopt;
 	}
-	return BUFFER_BORROWED{ (packfile.get() + start), (end - start) };
+	return BUFFER_BORROWED{ packfile.subspan(start, (end - start)) };
 }
 
 uint8_t BIT_DEVICE_READ::GetBit()
@@ -114,7 +112,7 @@ bool BIT_DEVICE_WRITE::Write(const char8_t *s) const
 
 BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 {
-	const auto maybe_compressed = FilFileGetCompressed(packfile, info, filno);
+	const auto maybe_compressed = GetCompressed(filno);
 	if(!maybe_compressed) {
 		return nullptr;
 	}
@@ -276,9 +274,9 @@ bool FilWrite(
 	);
 }
 
-PACKFILE_READ FilStartR(BUFFER_OWNED packfile)
+PACKFILE_READ FilStartR(BUFFER_BORROWED packfile)
 {
-	auto packfile_cursor = packfile.cursor();
+	BUFFER_CURSOR packfile_cursor = { packfile };
 
 	// PBG_FILEHEAD
 	const auto maybe_head = packfile_cursor.next<PBG_FILEHEAD>();
@@ -296,11 +294,12 @@ PACKFILE_READ FilStartR(BUFFER_OWNED packfile)
 		return {};
 	}
 	const auto info = maybe_info.value();
+	const PACKFILE_READ ret = { packfile, info };
 
 	// Checksums
 	fil_checksum_t total_checksum = 0;
 	for(fil_no_t i = 0; i < info.size(); i++) {
-		const auto maybe_compressed = FilFileGetCompressed(packfile, info, i);
+		const auto maybe_compressed = ret.GetCompressed(i);
 		if(!maybe_compressed) {
 			return {};
 		}
@@ -318,5 +317,5 @@ PACKFILE_READ FilStartR(BUFFER_OWNED packfile)
 		return {};
 	}
 
-	return { std::move(packfile), info };
+	return ret;
 }

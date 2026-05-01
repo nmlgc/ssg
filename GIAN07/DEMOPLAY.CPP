@@ -9,6 +9,7 @@
 #include "CONFIG.H"
 #include "GIAN.H"
 #include "LZ_UTY.H"
+#include "ssg/internal/LZ.hpp"
 #include "hatoyama/engine/file.h"
 #include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"

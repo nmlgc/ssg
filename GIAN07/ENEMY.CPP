@@ -1011,6 +1011,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_STG3EFC):
+			Effect3D.Set(EFFECT3D_S3_STAR);
 			ScrollCommand(SCMD_STG3STAR);
 		break;
 

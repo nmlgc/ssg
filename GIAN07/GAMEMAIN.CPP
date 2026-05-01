@@ -27,6 +27,7 @@
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/EnemyExCtrl.hpp"
+#include "ssg/internal/Effect3D.hpp"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/HLaser.hpp"
 #include "ssg/internal/Item.hpp"
@@ -1395,6 +1396,7 @@ void GameMove(INPUT_BITS input)
 	MWinMove();
 
 	Stage.Move(input);
+	Effect3D.Move();
 	ScrollMove();
 
 	const auto HP_Sum = Boss.Move();

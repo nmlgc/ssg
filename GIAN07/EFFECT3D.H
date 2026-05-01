@@ -37,6 +37,16 @@ import std.compat;
 #define STG4ROCK_END		5		// エフェクト終了
 
 
+typedef enum EFFECT3D_TYPE {
+	EFFECT3D_NONE,
+	EFFECT3D_S3_STAR,
+	EFFECT3D_S4_ROCK,
+	EFFECT3D_S6_RASTER,
+	EFFECT3D_S6_CUBE,
+	EFFECT3D_S6_FAKE_ECL,
+} EFFECT3D_TYPE;
+
+
 
 ///// [ 構造体 ] /////
 typedef struct tagPoint3D{

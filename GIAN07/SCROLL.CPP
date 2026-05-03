@@ -17,7 +17,6 @@
 #include "HUD.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
-#include "PRankCtrl.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
 #include "ssg/internal/RNG.hpp"
@@ -146,117 +145,54 @@ static PBGMAP *ScBeforeLine(PBGMAP *p)
 	return p;
 }
 
-// p:SCL_ENEMY以降の敵配置データ //
-void C_STAGE::Move(INPUT_BITS input)
+void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 {
-	bool	bFlag = true;
-	bool CtrlFlag = false;
-
-	while(bFlag){
-		const auto* cmd = SCL_Now;
+	{
 		switch(cmd[0]){
-			case(SCL_KEY):		// キー入力待ち
-			break;
-
 			case(SCL_TIME): {
-				const auto temp = U32LEAt(&cmd[1]);
-				// メッセージウィンドウがオープンしている場合 //
-				if(SclInfo.MsgFlag){
-					if(!Round.MsgEnabled || (input & KEY_SKIP)) {
-						CtrlFlag = true;
-					}
-
-					if(CtrlFlag) GameCount += (temp-GameCount)/3;
-					else if(input & KEY_RETURN) {
-						if(!SclInfo.ReturnFlag){
-							GameCount = temp;
-							SclInfo.ReturnFlag = true;
-						}
-					} else {
-						SclInfo.ReturnFlag = false;
-					}
-				}
-
-				if(temp > GameCount) {
-					bFlag = false;
-				} else {
-					SCL_Now += 5;		// cmd(1)+time(4)
-				}
 				SCL_DEBUG(u8"--- SCL_TIME ---");
 			}
 			break;
 
 			case(SCL_ENEMY):
-				// ボス出現中は出て来ちゃダメ
-				if(Boss.NumAlive() == 0) {
-					if(auto *e = Enemy.FindFree()) {
-						const int16_t x = I16LEAt(&cmd[1 + 0]);
-						const int16_t y = I16LEAt(&cmd[1 + 2]);
-						const uint8_t id = cmd[1 + 4];
-						Enemy.InitEnemyDataSTD(e, x, y, id);
-					}
-				}
-				SCL_Now += 6;	// cmd(1)+x(2)+y(2)+id(1)
 				SCL_DEBUG(u8"--- SCL_ENEMY ---");
 			break;
 
 			case(SCL_BOSS): { // ボスをセットする(X(16),Y(16),ID(8))
-				const auto x  = I16LEAt(&cmd[1 + 0]);	// ボス初期Ｘ
-				const auto y  = I16LEAt(&cmd[1 + 2]);	// ボス初期Ｙ
-				const auto id = cmd[1 + 2 + 2];	// ボスＩＤ
-				Boss.Set(x, y, id);
 				BossHPG_Open(Boss.GetHPSum());
-				SCL_Now += (1+2+2+1);	// cmd+x+y+id
 			}
-			break;
-
-			case(SCL_BOSSDEAD):		// ボスを強制的に破壊する(Level2 命令Only)
-				Boss.KillAll();
-				SCL_Now++;
 			break;
 
 			case(SCL_MWOPEN):	// メッセージウィンドウを開く
 				if(Round.MsgEnabled) {
 					MWinOpen();
 				}
-				SclInfo.MsgFlag = true;
-				SCL_Now++;
 			break;
 
 			case(SCL_MWCLOSE):	// メッセージウィンドウを閉じる
 				if(Round.MsgEnabled) {
 					MWinClose();
 				}
-				SclInfo.MsgFlag = false;
-				SCL_Now++;
 			break;
 
 			case(SCL_MSG):		// メッセージを出力する
 				MWinMsg(reinterpret_cast<const char *>(cmd + 1));
-				SCL_Now += (strlen(reinterpret_cast<const char *>(cmd + 1)) + 2);
 			break;
 
 			case(SCL_FACE):		// 顔を表示する
 				MWinFace(cmd[1]);
-				SCL_Now += 2;
 			break;
 
 			case(SCL_LOADFACE):	// 顔グラをロードする(SurfaceID,FileNo)
 				LoadFace(cmd[1],cmd[2]);
-				SCL_Now += 3;
 			break;
 
 			case(SCL_NPG):		// 新しいページに変更する
 				MWinCmd(MWCMD_NEWPAGE);
-				SCL_Now++;
 			break;
-
-			case(SCL_END):		// カウントも変更させずにリターンする
-			return;
 
 			case(SCL_SSP):		// スクロールスピード変更
 				ScrollSpeed(I16LEAt(&cmd[1]));
-				SCL_Now += 3;
 			break;
 
 			case(SCL_MUSIC):
@@ -269,12 +205,6 @@ void C_STAGE::Move(INPUT_BITS input)
 						}
 					}
 				}
-				SCL_Now += 2;
-			break;
-
-			case(SCL_DELENEMY):
-				Enemy.IndSet();
-				SCL_Now++;
 			break;
 
 			case(SCL_EFC):
@@ -294,49 +224,22 @@ void C_STAGE::Move(INPUT_BITS input)
 				case(SEFC_CFADEIN):		ScreenEffectSet(SCNEFC_CFADEIN);break;	// ○フェードIn
 				case(SEFC_CFADEOUT):	ScreenEffectSet(SCNEFC_CFADEOUT);break;	// ○フェードOut
 				case(SEFC_STG6CUBE): // ６面キューブ
-					Effect3D.Set(EFFECT3D_TYPE::S6_CUBE);
 					ScrollCommand(SCMD_STG6CUBE);
 					break;
 				case(SEFC_STG6RNDECL): // ６面ＥＣＬ羅列
-					Effect3D.Set(EFFECT3D_TYPE::S6_FAKE_ECL);
 					ScrollCommand(SCMD_STG6RNDECL);
 					break;
 				case(SEFC_STG4ROCK): // ４面岩
-					Effect3D.Set(EFFECT3D_TYPE::S4_ROCK);
 					ScrollCommand(SCMD_STG4ROCK);
-					break;
-				case(SEFC_STG4LEAVE): // ４面岩画面外へ
-					if(Effect3D.GetActive() != EFFECT3D_TYPE::S4_ROCK) {
-						break;
-					}
-					Effect3D.SendCmdStg4Rock(STG4ROCK_LEAVE, 0);
 					break;
 				case(SEFC_WHITEIN):		ScreenEffectSet(SCNEFC_WHITEIN);break;	// ホワイトイン
 				case(SEFC_WHITEOUT):	ScreenEffectSet(SCNEFC_WHITEOUT);break;	// ホワイトアウト
 				case(SEFC_LOADEX01):	LoadGraph(GRAPH_ID_EXBOSS1);	break;
 				case(SEFC_LOADEX02):	LoadGraph(GRAPH_ID_EXBOSS2);	break;
 				case(SEFC_STG6RASTER): // ６面ラスター
-					Effect3D.Set(EFFECT3D_TYPE::S6_RASTER);
 					ScrollCommand(SCMD_STG6RASTER);
 					break;
 				}
-				SCL_Now += 2;
-			break;
-
-			case(SCL_WAITEX):	// 特殊待ち <cmd1>,<opt4>
-				switch(cmd[1]){
-					case(SWAIT_BOSSHP):		// 残りＨＰ
-						if(Boss.GetHPSum() <= U32LEAt(&cmd[2])) {
-							break;
-						}
-					return;
-					case(SWAIT_BOSSLEFT):	// 残りボス数
-						if(Boss.NumAlive() <= U32LEAt(&cmd[2])) {
-							break;
-						}
-					return;
-				}
-				SCL_Now += (1+1+4);
 			break;
 
 			case(SCL_STAGECLEAR):	// ステージクリア
@@ -382,28 +285,22 @@ void C_STAGE::Move(INPUT_BITS input)
 				// 前後にある４０色をマップパーツのパレットにする
 				// BitDeapth 判定は、関数側に任せる
 				GrpSurface_PaletteApplyToBackend(SURFACE_ID::MAPCHIP);
-				SCL_Now++;
 			break;
 
 			case(SCL_ENEMYPALETTE):
 				LoadPaletteFromEnemy();	// BitDeapth 判定は、関数側に任せる
-				SCL_Now++;
 			break;
 
 			default:	// 未実装 or ばぐ
-				MWinOpen();
-				MWinCmd(MWCMD_NEWPAGE);
-				MWinCmd(MWCMD_LARGEFONT);
-				MWinMsg("バグ発生だにょ");
-				SCL_DEBUG(u8"---- SCL !BUG! ---");
+				if(error) {
+					MWinOpen();
+					MWinCmd(MWCMD_NEWPAGE);
+					MWinCmd(MWCMD_LARGEFONT);
+					MWinMsg("バグ発生だにょ");
+					SCL_DEBUG(u8"---- SCL !BUG! ---");
+				}
 			return;
 		}
-	}
-
-	GameCount++;
-
-	if((GameCount&0x3f)==0){
-		PlayRank.Add((GameStage == STAGE_EXTRA) ? 1 : (1 + (GameStage / 3)));
 	}
 }
 

@@ -9,6 +9,9 @@
 
 #include "ssg/Input.h"
 #include "hatoyama/logic/buffer.h"
+#include "hatoyama/logic/ffi.h"
+
+struct HOOKS;
 
 
 ///// [更新履歴] /////
@@ -90,6 +93,7 @@ typedef struct tagScrollInfo{
 
 
 ///// [ 関数 ] /////
+void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS *);
 void ScrollMove(void);	// 背景を動かす(１フレーム分)
 void ScrollDraw(void);	// 背景を描画する
 

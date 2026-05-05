@@ -130,17 +130,25 @@ struct WINDOW_CHOICE : public WINDOW_LABEL {
 
 	WINDOW_MENU	*Submenu = nullptr;
 
+	// Merging this constructor into the one below would require a comparison
+	// of [callback_fn] against a `nullptr`, which is prohibited under
+	// `-fsanitize=address`.
 	constexpr WINDOW_CHOICE(
 		const Narrow::literal title = "",
-		const Narrow::literal help = "",
-		decltype(CallBackFn) callback_fn = nullptr,
+		const Narrow::literal help = ""
+	) noexcept :
+		WINDOW_LABEL(title, WINDOW_FLAGS::DISABLED), Help(help)
+	{
+	}
+
+	constexpr WINDOW_CHOICE(
+		const Narrow::literal title,
+		const Narrow::literal help,
+		decltype(CallBackFn) callback_fn,
 		WINDOW_FLAGS flags = WINDOW_FLAGS::NONE
 	) noexcept :
 		WINDOW_LABEL(title, flags), Help(help), CallBackFn(callback_fn)
 	{
-		if(!callback_fn) {
-			Flags |= WINDOW_FLAGS::DISABLED;
-		}
 	}
 
 	constexpr WINDOW_CHOICE(

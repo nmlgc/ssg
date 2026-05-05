@@ -6,12 +6,12 @@
 #include "ssg/internal/MaidTama.hpp"
 #include "GIAN.H"
 #include "PRankCtrl.h"
+#include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Maid.hpp"
 #include "ssg/internal/Tama.hpp"
-#include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"
@@ -244,7 +244,7 @@ void C_MAIDTAMA::MLaserSet(uint16_t time)
 
 	if(Viv.lay_time == 0){
 		Viv.lay_time = time;
-		Snd_SEPlay(SOUND_ID_SBLASER, Viv.x);
+		Hooks.Snd_SEPlay(SOUND_ID_SBLASER, Viv.x, false, &Hooks);
 	}
 }
 

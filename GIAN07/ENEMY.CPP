@@ -15,6 +15,7 @@
 #include "PRankCtrl.h"
 #include "SCROLL.H"
 #include "GIAN07/entity.h"
+#include "ssg/Hook.h"
 #include "ssg/Round.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Boss.hpp"
@@ -27,7 +28,6 @@
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Tama.hpp"
 #include "hatoyama/engine/debug.h"
-#include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/endian.h"
 #include "hatoyama/logic/ut_math.h"
@@ -671,7 +671,7 @@ void C_ENEMY::Clear(void)
 
 		if(e->flag & EF_DRAW){
 			this->Explode(*e);
-			Snd_SEPlay(SOUND_ID_BOMB, e->x);
+			Hooks.Snd_SEPlay(SOUND_ID_BOMB, e->x, false, &Hooks);
 		}
 		else{
 			// 描画しないタイプの敵の消去の仕方は他の場合と異なり、 //
@@ -702,7 +702,7 @@ bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 {
 	e.IsDamaged = ((e.count) & 1);
 	if(e.hp <= damage) {
-		Snd_SEPlay(SOUND_ID_BOMB, e.x);
+		Hooks.Snd_SEPlay(SOUND_ID_BOMB, e.x, false, &Hooks);
 		Viv.PowerUp(static_cast<uint8_t>(e.hp)); // パワーアップ
 		this->Explode(e);
 		Viv.score_add(e.score);
@@ -710,7 +710,7 @@ bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 			Item.Set(e.x, e.y, e.item);
 		}
 	} else {
-		Snd_SEPlay(SOUND_ID_HIT, e.x);
+		Hooks.Snd_SEPlay(SOUND_ID_HIT, e.x, false, &Hooks);
 		Viv.PowerUp(damage); // ここでもパワーアップ
 		e.hp -= damage;
 	}
@@ -1938,7 +1938,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 		case(ECL_PSE):			// 効果音を鳴らす
 			ECL_DEBUG("ECL_PSE",0);
-			Snd_SEPlay(cmd[1], e->x);
+			Hooks.Snd_SEPlay(cmd[1], e->x, false, &Hooks);
 			bRetFlag = false;
 		break;
 

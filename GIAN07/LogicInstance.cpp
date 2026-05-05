@@ -7,6 +7,7 @@
 #include "ECL.H"
 #include "ECLFront.h"
 #include "SCROLL.H"
+#include "ECLFront.h"
 #include "ssg/Hook.h"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/snd.h"

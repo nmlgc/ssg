@@ -954,12 +954,43 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 	CheckECLInterrupt(Boss, e);
 
-	// こんなところにＧＯＴＯ用ラベルが！！ //
-	ECL_HEAD:
+	while(!bRetFlag) {
+		// Note that we need all three flags to express all possible control
+		// flow variants and parsing states:
+		//
+		// • (([stay] == false) && ([bRetFlag] == false)): Advance [e->cmd],
+		//   keep running (most common case)
+		//
+		// • (([stay] == false) && ([bRetFlag] == true)): Advance [e->cmd], but
+		//   return after this instruction (rarely used)
+		//
+		// • (([stay] == true) && ([bRetFlag] == true)): Don't advance
+		///  [e->cmd], return after this instruction (used to be a `return` in
+		//   pbg's original code)
+		//
+		// • (([stay] == true) && ([bRetFlag] == false)): Don't advance
+		///  [e->cmd], immediately continue at instruction pointer (required
+		//   for jumps and calls)
+		//
+		// • (([stay] == false) && ([error] == true)): Invalid parameter, but
+		//   we can keep parsing; keep running based on [bRetFlag]
+		//
+		// • (([stay] == true) && ([error] == true)): Invalid instruction,
+		//   cannot continue parsing
+		bool stay = false;
+		bool error = false;
+
+		const auto goto_top_of_loop = [&]{
+			stay = true;
+		};
+		const auto stop_for_this_frame = [&]{
+			stay = true;
+			bRetFlag = true;
+		};
+
 		auto *cmd = (ECL_Head.get() + e->cmd);
 
-
-	switch(*cmd){
+		switch(*cmd) {
 		case(ECL_CEFC):
 		{
 			const auto x = (e->x + PixelToWorld(I16LEAt(&cmd[1 + 0])));
@@ -1082,12 +1113,14 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		case(ECL_END):			// 敵の強制消滅
 			ECL_DEBUG("ECL_END",0);
 			this->Delete(*e); // 後で変更するように
-		return;						// バグ防止(かも)
+			stop_for_this_frame(); // バグ防止(かも)
+		break;
 
 		case(ECL_JMP):			// ◎ＥＣＬ無条件ジャンプ(少々特殊な動作をします)
 			ECL_DEBUG("ECL_JMP",0);
 			e->cmd = U32LEAt(&cmd[1]);
-		goto ECL_HEAD;
+			goto_top_of_loop();
+		break;
 
 		case(ECL_LOOP):			// ◎一定区間を繰り返す
 			ECL_DEBUG("ECL_LOOP : %d",e->rep_c);
@@ -1096,7 +1129,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			}
 			if((--e->rep_c)!=0){
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		break;
 
@@ -1104,19 +1137,21 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_CALL",0);
 			e->call_addr = e->cmd + ECL_CmdLen[ECL_CALL];
 			e->cmd       = U32LEAt(&cmd[1]);
-		goto ECL_HEAD;
+			goto_top_of_loop();
+		break;
 
 		case(ECL_RET):			// ＠サブルーチンから復帰する
 			ECL_DEBUG("ECL_RET",0);
 			e->cmd = e->call_addr;
-		goto ECL_HEAD;
+			goto_top_of_loop();
+		break;
 
 		case(ECL_JHPL): { // ◎ＨＰが指定値より大きければジャンプ
 			const auto target = U32LEAt(&cmd[1]);
 			ECL_DEBUG("ECL_JHPL : %u", target);
 			if(e->hp > U32LEAt(&cmd[1 + 4])) {
 				e->cmd = target;
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		}
 		break;
@@ -1126,7 +1161,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_JHPS : %u", target);
 			if(e->hp < U32LEAt(&cmd[1 + 4])) {
 				e->cmd = target;
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		}
 		break;
@@ -1140,7 +1175,8 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				case(GAME_HARD):	e->cmd = U32LEAt(&cmd[1 +  8]);	break;
 				case(GAME_LUNATIC):	e->cmd = U32LEAt(&cmd[1 + 12]);	break;
 			}
-		goto ECL_HEAD;
+			goto_top_of_loop();
+		break;
 
 		case(ECL_JDSB): { // 自機と進行角が一致したらジャンプ
 			ECL_DEBUG("ECL_JDSB",0);
@@ -1149,7 +1185,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			);
 			if(temp<4){
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		}
 		break;
@@ -1158,7 +1194,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_JFCL",0);
 			if(e->count > U32LEAt(&cmd[1 + 4])) {
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		break;
 
@@ -1166,7 +1202,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			ECL_DEBUG("ECL_JFCS",0);
 			if(e->count < U32LEAt(&cmd[1 + 4])) {
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		break;
 
@@ -1195,6 +1231,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 				default:
 					ECL_DEBUG("不正な割り込みベクタ %d へのアクセス",cmd[1+4]);
+					error = true;
 				break;
 			}
 		break;
@@ -1224,7 +1261,9 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			if(e->cmd_c == 0) {
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 			}
-			if((--e->cmd_c)!=0) return;
+			if((--e->cmd_c) != 0) {
+				stop_for_this_frame();
+			}
 		break;
 
 		case(ECL_NOPSC):		// スクロールに流される
@@ -1234,7 +1273,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			}
 			if((--e->cmd_c)!=0){
 				// スクロールに流される処理を記述 //
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1254,8 +1293,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				e->v += Cast::sign<int8_t>(cmd[1]);
 				e->x += cosl(e->d, e->v);
 				e->y += sinl(e->d, e->v);
-
-				return;
+				stop_for_this_frame();
 			}
 			// 最後は、何もしない訳で... //
 		break;
@@ -1333,7 +1371,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			if((--e->cmd_c)!=0){
 				e->x += e->vx;
 				e->y += e->vy;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1347,7 +1385,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				e->x += cosl(e->d,e->v);
 				e->y += sinl(e->d,e->v);
 				e->d += e->vd;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1363,9 +1401,8 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				e->x += (cosl(e->d,e->v)+e->vx);
 				e->y += (sinl(e->d,e->v)+e->vy);
 				e->d += e->vd;
-				return;
+				stop_for_this_frame();
 			}
-			bRetFlag = false;
 		break;
 
 		case(ECL_WAVX):			// ＠波Ｘ移動
@@ -1382,7 +1419,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				e->x += e->vx;
 				e->y  = e->vy + sinl(e->d,e->amp<<6);
 				e->d += e->vd;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1400,7 +1437,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				e->y += e->vy;
 				e->x  = e->vx + sinl(e->d,e->amp<<6);
 				e->d += e->vd;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1413,7 +1450,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			}
 			if((--e->cmd_c)!=0){
 				e->x += e->vx;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1426,7 +1463,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			}
 			if((--e->cmd_c)!=0){
 				e->y += e->vy;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1440,7 +1477,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			if((--e->cmd_c)!=0){
 				e->x += e->vx;
 				e->y += e->vy;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1453,7 +1490,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			}
 			if((--e->cmd_c)!=0){
 				e->x += e->vx;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1466,7 +1503,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			}
 			if((--e->cmd_c)!=0){
 				e->y += e->vy;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1480,7 +1517,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 			if((--e->cmd_c)!=0){
 				e->x += e->vx;
 				e->y += e->vy;
-				return;
+				stop_for_this_frame();
 			}
 		break;
 
@@ -1514,7 +1551,8 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 					e->flag = EF_DELETE;	// 消えておしまい
 				}
 			}
-		return;
+			stop_for_this_frame();
+		break;
 
 		case(ECL_DEGA):			// ＠角度絶対指定
 			ECL_DEBUG("ECL_DEGA : %u", cmd[1]);
@@ -1933,6 +1971,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:
 					DebugOut(u8"ナゾのレジスタ指定++");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		}
@@ -1948,6 +1987,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしい
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
@@ -1962,6 +2002,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしい
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
@@ -1976,6 +2017,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしい
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
@@ -1990,6 +2032,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしいに
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
@@ -2004,6 +2047,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしいに
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
@@ -2042,6 +2086,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしい
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
@@ -2058,51 +2103,60 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				default:	// レジスタ指定がおかしい
 					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
+					error = true;
 				break;
 			}
 		break;
 
 		case(ECL_CMPR):		// レジスタ～レジスタの比較(Reg0,Reg1)
-			if(cmd[1]>=ECLREG_MAX || cmd[2]>=ECLREG_MAX) return;		// エラー
+			if((cmd[1] >= ECLREG_MAX) || (cmd[2] >= ECLREG_MAX)) {
+				error = true;
+				break;
+			}
 			RegCmp = (ID2Value(e, cmd[1]) - ID2Value(e, cmd[2]));
 		break;
 
 		case(ECL_CMPC):		// レジスタ～定数の比較(Reg,Const)
-			if(cmd[1]>=ECLREG_MAX) return;		// エラー
+			if(cmd[1] >= ECLREG_MAX) {
+				error = true;
+				break;
+			}
 			RegCmp = (ID2Value(e, cmd[1]) - I32LEAt(&cmd[1 + 1]));
 		break;
 
 		case(ECL_JL):		// 比較結果 > 0 ならばジャンプ
 			if(RegCmp>0){
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		break;
 
 		case(ECL_JS):		// 比較結果 < 0 ならばジャンプ
 			if(RegCmp<0){
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		break;
 
 		case(ECL_JEQ):		// 比較結果 == 0 ならばジャンプ
 			if(RegCmp == 0){
 				e->cmd = U32LEAt(&cmd[1]);
-				goto ECL_HEAD;
+				goto_top_of_loop();
 			}
 		break;
 
 		default:				// 未定義の命令が発生！！
 			ECL_DEBUG("Unrecognizable Operation Code %02x", cmd[0]);
-		return;
+			error = true;
+			stop_for_this_frame();
+		break;
+		}
+
+		// 次の命令への準備 //
+		if(!stay) {
+			e->cmd += ECL_CmdLen[*cmd];
+		}
 	}
-
-	// 次の命令への準備(実行させたくないときは上の switch 内で return する) //
-	e->cmd += ECL_CmdLen[*cmd];
-
-	if(bRetFlag) return;
-	else         goto ECL_HEAD;
 }
 
 // 割り込みジャンプを調べる //

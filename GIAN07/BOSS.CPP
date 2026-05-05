@@ -13,9 +13,11 @@
 #include "ITEM.H"
 #include "LLASER.H"
 #include "SCROLL.H"
+#include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/cast.h"
 
 ///// [ 変数 ] /////
 
@@ -133,7 +135,7 @@ void C_BOSS::KillAll(void)
 			Snaky.Delete(b);
 			Fragment.Set(e->x,e->y,FRG_FATCIRCLE);
 			BombEfc.Set(e->x, e->y, EXBOMB_STD);
-			Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x);
+			Hooks.Snd_SEPlay(SOUND_ID_BOSSBOMB, e->x, false, &Hooks);
 			Enemy.Explode(*e);
 			b->IsUsed = 0;
 		}
@@ -152,7 +154,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		Fragment.Set(e.x, e.y, FRG_FATCIRCLE);
 		BombEfc.Set(e.x, e.y, EXBOMB_STD);
 		ScrollCommand(SCMD_QUAKE);
-		Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x);
+		Hooks.Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x, false, &Hooks);
 		Viv.PowerUp(Cast::down<uint8_t>(e.hp));
 		Enemy.Explode(e);
 
@@ -174,7 +176,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		b.IsUsed = 0;
 		BossNow--; // ボスの参照カウント？を使用する
 	} else {
-		Snd_SEPlay(SOUND_ID_HIT, e.x);
+		Hooks.Snd_SEPlay(SOUND_ID_HIT, e.x, false, &Hooks);
 		Viv.PowerUp(damage);
 		e.hp -= damage;
 	}

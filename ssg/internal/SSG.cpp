@@ -11,6 +11,8 @@
 #include "ssg/internal/Stage.hpp"
 
 constexpr HOOKS HOOKS_EMPTY = {
+	.Snd_SEPlay = [](uint8_t, int, bool8_t, HOOKS *) {},
+	.Snd_SEStop = [](uint8_t, HOOKS *) {},
 };
 
 HOOKS Hooks;

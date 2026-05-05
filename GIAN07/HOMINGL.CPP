@@ -6,7 +6,8 @@
 #include "HOMINGL.H"
 #include "GIAN.H"
 #include "MAID.H"
-#include "hatoyama/engine/snd.h"
+#include "ssg/Hook.h"
+#include "ssg/Sound.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -104,7 +105,9 @@ void C_HLASER::Move(void)
 
 				if(abs(deg2)<8){
 					hl->Type = HL_NONE;
-					Snd_SEPlay(17, hl->p[hl->Current].x);
+					Hooks.Snd_SEPlay(
+						SOUND_ID_HLASER, hl->p[hl->Current].x, false, &Hooks
+					);
 				}
 				else{
 					if(hl->v > 2*64)

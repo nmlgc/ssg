@@ -14,9 +14,10 @@
 #include "LogicInstance.h"
 #include "MAIDTAMA.H"
 #include "PRankCtrl.h"
+#include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/SEffect.hpp"
-#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/cast.h"
 
 
 C_VIV Viv;
@@ -197,7 +198,7 @@ void C_VIV::Dead(void)
 	for(i=0; i<50; i++)
 		Fragment.Set(Viv.x, Viv.y, FRG_HEART);
 
-	Snd_SEPlay(SOUND_ID_DEAD);
+	Hooks.Snd_SEPlay(SOUND_ID_DEAD, SND_X_MID, false, &Hooks);
 
 	// 座標系セット //
 	Viv.x         = Viv.opx = SX_START;
@@ -254,7 +255,7 @@ void C_VIV::evade_addEx(int x, int y, uint8_t n)
 
 	if(n){
 		if(Viv.BuzzSound == false) {
-			Snd_SEPlay(SOUND_ID_BUZZ, x);
+			Hooks.Snd_SEPlay(SOUND_ID_BUZZ, x, false, &Hooks);
 			Viv.BuzzSound = true;
 		}
 		Fragment.Set(x, y, FRG_EVADE);

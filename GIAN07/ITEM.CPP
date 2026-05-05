@@ -9,9 +9,9 @@
 #include "MAID.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
+#include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/SEffect.hpp"
-#include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -78,7 +78,7 @@ void C_ITEM::Move(void)
 		if(HITCHK(ip->x,Viv.x,ITEM_HITX) && HITCHK(ip->y,Viv.y,ITEM_HITY)){
 			switch(ip->type){
 				case(ITEM_SCORE):
-					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
+					Hooks.Snd_SEPlay(SOUND_ID_SELECT, ip->x, false, &Hooks);
 					PlayRank.Add((SY_MAX - Viv.y) >> 10);
 					Viv.score_add(point);
 					SEffect.SetPoint(ip->x, ip->y, point);
@@ -89,13 +89,13 @@ void C_ITEM::Move(void)
 				break;
 
 				case(ITEM_EXTEND):
-					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
+					Hooks.Snd_SEPlay(SOUND_ID_SELECT, ip->x, false, &Hooks);
 					SEffect.SetString((180 + 64), 80, "E x t e n d  !");
 					Viv.left++;
 				break;
 
 				case(ITEM_BOMB):
-					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
+					Hooks.Snd_SEPlay(SOUND_ID_SELECT, ip->x, false, &Hooks);
 					SEffect.SetString(
 						(120 + 64), 80, "B o m b   E x t e n d  !"
 					);

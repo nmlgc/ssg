@@ -10,10 +10,11 @@
 #include "ITEM.H"
 #include "MAID.H"
 #include "PRankCtrl.h"
+#include "ssg/Hook.h"
 #include "ssg/Round.h"
+#include "ssg/Sound.h"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/SEffect.hpp"
-#include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -921,7 +922,7 @@ void C_TAMA::Omove(TAMA_DATA *t)
 				if(TamaCmd.cmd&TAMA_ZSET) TamaCmd.d=0,TamaCmd.dw-=6;
 				TamaCmd.type = T_NORM;
 				TamaCmd.option = TOP_NONE;
-				Snd_SEPlay(12, TamaCmd.x);
+				Hooks.Snd_SEPlay(SOUND_ID_JOINT, TamaCmd.x, false, &Hooks);
 				this->Set();	// 難易度で変化させるところがポイント
 			}
 		return;

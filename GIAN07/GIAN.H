@@ -62,10 +62,6 @@ constexpr WINDOW_LTRB PLAYFIELD_CLIP = {
 #define SX_START	(GX_MID)					// サボテンの開始Ｘ座標
 #define SY_START	(GY_MAX+180*64 /*- 50*64*/)			// サボテンの開始Ｙ座標
 
-// Ｘ座標の中心のデフォルト値
-// (Also different from [GX_MID], which is 319.5, not 320.)
-constexpr int SND_X_MID = PixelToWorld(320);
-
 ///// [マクロ] /////
 #define SPEEDM(v)	((short)(((v)&0x3f)<<4))	// 速度セット用まくろ(BYTE->int?)
 
@@ -73,6 +69,10 @@ constexpr int SND_X_MID = PixelToWorld(320);
 #define HITCHK(a,b,h)	(abs((a)-(b))<(h))
 
 enum {
+	// Ｘ座標の中心のデフォルト値
+	// (Also different from [GX_MID], which is 319.5, not 320.)
+	SND_X_MID = (320 << 6), // PixelToWorld(320)
+
 	// ステージ数
 	STAGE_MAX = 6,
 

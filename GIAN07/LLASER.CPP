@@ -6,7 +6,8 @@
 #include "LLASER.H"
 #include "ENEMY.H"
 #include "MAID.H"
-#include "hatoyama/engine/snd.h"
+#include "ssg/Hook.h"
+#include "ssg/Sound.h"
 #include "hatoyama/logic/ut_math.h"
 
 
@@ -69,7 +70,7 @@ bool C_LLASER::Set(uint8_t id)
 
 	lp->flag = LLF_LINE;
 
-	// Snd_SEPlay(1, LaserCmd.x);
+	// Hooks.Snd_SEPlay(SOUND_ID_TAME, LaserCmd.x, false, &Hooks);
 
 	return true;
 }
@@ -80,7 +81,7 @@ void C_LLASER::Open(const ENEMY_DATA *e, uint8_t id)
 		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id || id==ECLCST_LLASERALL) && lp->flag!=LLF_DISABLE){
 			lp->flag = LLF_OPEN;
-			Snd_SEPlay(2, lp->x, true);
+			Hooks.Snd_SEPlay(SOUND_ID_LASER, lp->x, true, &Hooks);
 		}
 	}
 }
@@ -96,7 +97,7 @@ void C_LLASER::Close(const ENEMY_DATA *e, uint8_t id)
 		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id)){
 			lp->flag = LLF_CLOSE;
-			Snd_SEStop(2);
+			Hooks.Snd_SEStop(SOUND_ID_LASER, &Hooks);
 		}
 	}
 }
@@ -107,7 +108,7 @@ void C_LLASER::Line(const ENEMY_DATA *e, uint8_t id)
 		auto *lp = &it;
 		if((lp->e==e) && (lp->EnemyID==id ||id==ECLCST_LLASERALL)){
 			lp->flag = LLF_CLOSEL;
-			Snd_SEStop(2);
+			Hooks.Snd_SEStop(SOUND_ID_LASER, &Hooks);
 		}
 	}
 }
@@ -173,7 +174,7 @@ void C_LLASER::ForceClose(const ENEMY_DATA *e)
 		// (参考) すでにクローズ状態であっても LLaserClose() は問題を発生させない //
 		if(lp->e==e){
 			lp->flag = LLF_CLOSE;
-			Snd_SEStop(2);
+			Hooks.Snd_SEStop(SOUND_ID_LASER, &Hooks);
 			//LLaserClose(i);
 		}
 	}
@@ -273,7 +274,7 @@ void C_LLASER::Clear(void)
 		}
 	}
 
-	Snd_SEStop(2);
+	Hooks.Snd_SEStop(SOUND_ID_LASER, &Hooks);
 }
 
 void C_LLASER::Setup(void)
@@ -284,7 +285,7 @@ void C_LLASER::Setup(void)
 		it.e    = nullptr;
 	}
 
-	Snd_SEStop(2);
+	Hooks.Snd_SEStop(SOUND_ID_LASER, &Hooks);
 }
 
 static void _LLaserPointSet(LLASER_DATA *lp)

@@ -7,9 +7,9 @@
 #include "BOSS.H"
 #include "LLASER.H"
 #include "MAID.H"
+#include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/RNG.hpp"
-#include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -120,7 +120,7 @@ void C_SNAKY::Delete(const BOSS_DATA *b)
 			break;
 		}
 
-		// Snd_SEPlay(SOUND_ID_BOMB, e->x);
+		// Hooks.Snd_SEPlay(SOUND_ID_BOMB, e->x, false, &Hooks);
 		//PowerUp(e->hp);			// パワーアップ
 		Enemy.Explode(*e);
 		///score_add(e->score);
@@ -280,7 +280,7 @@ void C_BIT::Move(void)
 			// ビット配列に関連づけられた敵に削除要求を送出 //
 			Enemy.Explode(*e);
 
-			Snd_SEPlay(SOUND_ID_BOMB, e->x);
+			Hooks.Snd_SEPlay(SOUND_ID_BOMB, e->x, false, &Hooks);
 
 			for(j=i+1; j<BitData.NumBits; j++){
 				BitData.Bit[j-1] = BitData.Bit[j];
@@ -474,7 +474,7 @@ void C_BIT::Delete(void)
 			continue;
 		}
 		Enemy.Explode(*e);
-		Snd_SEPlay(SOUND_ID_BOMB, e->x);
+		Hooks.Snd_SEPlay(SOUND_ID_BOMB, e->x, false, &Hooks);
 	}
 
 	// 後は、この関数に任せる //

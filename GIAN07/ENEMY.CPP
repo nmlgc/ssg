@@ -3,17 +3,10 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#ifdef SCRIPT_TRACE
-#include <printf/printf.h>
-#endif
-
 #include "ssg/internal/Enemy.hpp"
-#include "BossHPG.h"
 #include "ECL_LEN.H"
-#include "EFFECT.H"
 #include "GIAN.H"
 #include "PRankCtrl.h"
-#include "SCROLL.H"
 #include "GIAN07/entity.h"
 #include "ssg/Hook.h"
 #include "ssg/Round.h"
@@ -27,7 +20,6 @@
 #include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Tama.hpp"
-#include "hatoyama/engine/debug.h"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/endian.h"
 #include "hatoyama/logic/ut_math.h"
@@ -41,20 +33,6 @@
 #define ABS_DEGRL(d)	((e->flag&EF_RLCHG) ? (128-(d)) : (d ))
 #define ABS_VXRL(vx)	((e->flag&EF_RLCHG) ? (-(vx))   : (vx))
 #define REL_DEGRL(d)	((e->flag&EF_RLCHG) ? (-(d ))   : (d ))
-
-
-// ＥＣＬデバッグ用マクロ //
-static void ECL_DEBUG(const char *s, auto param)
-{
-#ifdef SCRIPT_TRACE
-	char8_t _ECL_Debug[1000];
-	const auto size = sprintf(reinterpret_cast<char *>(_ECL_Debug), s, param);
-	if(size <= 0) {
-		return;
-	}
-	DebugLog({ _ECL_Debug, static_cast<size_t>(size) });
-#endif
-}
 
 
 // 変数の実体 //
@@ -992,12 +970,7 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 		switch(*cmd) {
 		case(ECL_CEFC):
-		{
-			const auto x = (e->x + PixelToWorld(I16LEAt(&cmd[1 + 0])));
-			const auto y = (e->y + PixelToWorld(I16LEAt(&cmd[1 + 2])));
-			CEffectSet(x, y, cmd[1+2+2]);
-		}
-		break;
+			break;
 
 		case(ECL_XYRND): {
 			const auto rnd_x = ((RNG.next() % (X_MAX - X_MIN - 100)) * 32);
@@ -1037,7 +1010,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 		case(ECL_STG3EFC):
 			Effect3D.Set(EFFECT3D_S3_STAR);
-			ScrollCommand(SCMD_STG3STAR);
 			bRetFlag = true;
 		break;
 
@@ -1102,7 +1074,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_SETUP):		// 敵の初期化
-			ECL_DEBUG("ECL_SETUP",0);
 			e->hp    = U32LEAt(&cmd[1 + 0]);
 			e->score = U32LEAt(&cmd[1 + 4]);
 			if(e->hp == 0) {
@@ -1111,19 +1082,16 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_END):			// 敵の強制消滅
-			ECL_DEBUG("ECL_END",0);
 			this->Delete(*e); // 後で変更するように
 			stop_for_this_frame(); // バグ防止(かも)
 		break;
 
 		case(ECL_JMP):			// ◎ＥＣＬ無条件ジャンプ(少々特殊な動作をします)
-			ECL_DEBUG("ECL_JMP",0);
 			e->cmd = U32LEAt(&cmd[1]);
 			goto_top_of_loop();
 		break;
 
 		case(ECL_LOOP):			// ◎一定区間を繰り返す
-			ECL_DEBUG("ECL_LOOP : %d",e->rep_c);
 			if(e->rep_c == 0) {
 				e->rep_c = (U16LEAt(&cmd[1 + 4]) + 1);
 			}
@@ -1134,21 +1102,18 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_CALL):			// ＠サブルーチンを呼ぶ
-			ECL_DEBUG("ECL_CALL",0);
 			e->call_addr = e->cmd + ECL_CmdLen[ECL_CALL];
 			e->cmd       = U32LEAt(&cmd[1]);
 			goto_top_of_loop();
 		break;
 
 		case(ECL_RET):			// ＠サブルーチンから復帰する
-			ECL_DEBUG("ECL_RET",0);
 			e->cmd = e->call_addr;
 			goto_top_of_loop();
 		break;
 
 		case(ECL_JHPL): { // ◎ＨＰが指定値より大きければジャンプ
 			const auto target = U32LEAt(&cmd[1]);
-			ECL_DEBUG("ECL_JHPL : %u", target);
 			if(e->hp > U32LEAt(&cmd[1 + 4])) {
 				e->cmd = target;
 				goto_top_of_loop();
@@ -1158,7 +1123,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 		case(ECL_JHPS): { // ◎ＨＰが指定値より小さければジャンプ
 			const auto target = U32LEAt(&cmd[1]);
-			ECL_DEBUG("ECL_JHPS : %u", target);
 			if(e->hp < U32LEAt(&cmd[1 + 4])) {
 				e->cmd = target;
 				goto_top_of_loop();
@@ -1167,7 +1131,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_JDIF):			// 難易度によるジャンプ
-			ECL_DEBUG("ECL_JDIF",0);
 			switch(PlayRank.LevelRanked()) {
 				case(GAME_EASY):	e->cmd = U32LEAt(&cmd[1 +  0]);	break;
 				default:
@@ -1179,7 +1142,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_JDSB): { // 自機と進行角が一致したらジャンプ
-			ECL_DEBUG("ECL_JDSB",0);
 			const uint8_t temp = abs(
 				atan8((Viv.x - e->x), (Viv.y - e->y)) - (e->d)
 			);
@@ -1191,7 +1153,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_JFCL):			// フレームカウンタが大きければジャンプ
-			ECL_DEBUG("ECL_JFCL",0);
 			if(e->count > U32LEAt(&cmd[1 + 4])) {
 				e->cmd = U32LEAt(&cmd[1]);
 				goto_top_of_loop();
@@ -1199,7 +1160,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_JFCS):			// フレームカウンタが小さければジャンプ
-			ECL_DEBUG("ECL_JFCS",0);
 			if(e->count < U32LEAt(&cmd[1 + 4])) {
 				e->cmd = U32LEAt(&cmd[1]);
 				goto_top_of_loop();
@@ -1230,7 +1190,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:
-					ECL_DEBUG("不正な割り込みベクタ %d へのアクセス",cmd[1+4]);
 					error = true;
 				break;
 			}
@@ -1257,7 +1216,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_NOP):			// ＠何もしない
-			ECL_DEBUG("ECL_NOP : %d",e->cmd_c);
 			if(e->cmd_c == 0) {
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 			}
@@ -1267,7 +1225,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_NOPSC):		// スクロールに流される
-			ECL_DEBUG("ECL_NOPSC : %d",e->cmd_c);
 			if(e->cmd_c == 0) {
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 			}
@@ -1282,7 +1239,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_ACC):			// 加速移動
-			ECL_DEBUG("ECL_ACC : %d",e->cmd_c);
 			if(e->cmd_c == 0){
 				// 初期化 //
 				e->cmd_c = (U16LEAt(&cmd[2]) + 1);
@@ -1362,7 +1318,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MOV):			// ＠直線移動
-			ECL_DEBUG("ECL_MOV : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = cosl(e->d,e->v);
@@ -1376,7 +1331,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_ROL):			// ＠回転移動
-			ECL_DEBUG("ECL_ROL : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 1]) + 1);
 				e->vd    = REL_DEGRL(Cast::sign<int8_t>(cmd[1]));
@@ -1390,7 +1344,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_LROL):			// ＠回転＆直線移動
-			ECL_DEBUG("ECL_LROL : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 9]) + 1);
 				e->vx    = ABS_VXRL(I32LEAt(&cmd[1]));
@@ -1406,7 +1359,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_WAVX):			// ＠波Ｘ移動
-			ECL_DEBUG("ECL_WAVX : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 6]) + 1);
 				e->vx    = ABS_VXRL(I32LEAt(&cmd[1]));
@@ -1424,7 +1376,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_WAVY):			// ＠波Ｙ移動
-			ECL_DEBUG("ECL_WAVY : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 6]) + 1);
 				e->vy    = I32LEAt(&cmd[1]);
@@ -1442,7 +1393,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MXA):		// Ｘ絶対移動
-			ECL_DEBUG("ECL_MXA : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 2]) + 1);
 				e->vx    = ((PixelToWorld(U16LEAt(&cmd[1])) - e->x) / e->cmd_c);
@@ -1455,7 +1405,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MYA):		// Ｙ絶対移動
-			ECL_DEBUG("ECL_MYA : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 2])) + 1;
 				e->vy    = ((PixelToWorld(U16LEAt(&cmd[1])) - e->y) / e->cmd_c);
@@ -1468,7 +1417,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MXYA):		// ＸＹ絶対移動
-			ECL_DEBUG("ECL_MXYA : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1 + 4]) + 1);
 				e->vx    = ((PixelToWorld(U16LEAt(&cmd[1 + 0])) - e->x) / e->cmd_c);
@@ -1482,7 +1430,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MXS):		// Ｘサボテンセット移動
-			ECL_DEBUG("ECL_MXS : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = ((Viv.x)-(e->x))/e->cmd_c;
@@ -1495,7 +1442,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MYS):		// Ｙサボテンセット移動
-			ECL_DEBUG("ECL_MYS : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = 0;
@@ -1508,7 +1454,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_MXYS):		// ＸＹサボテンセット移動
-			ECL_DEBUG("ECL_MXYS : %d",e->cmd_c);
 			if(e->cmd_c==0){
 				e->cmd_c = (U16LEAt(&cmd[1]) + 1);
 				e->vx    = ((Viv.x)-(e->x))/e->cmd_c;
@@ -1555,17 +1500,14 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_DEGA):			// ＠角度絶対指定
-			ECL_DEBUG("ECL_DEGA : %u", cmd[1]);
 			e->d = ABS_DEGRL(cmd[1]);
 		break;
 
 		case(ECL_DEGR):			// ＠角度相対指定
-			ECL_DEBUG("ECL_DEGR : %d", Cast::sign<int8_t>(cmd[1]));
 			e->d += REL_DEGRL(Cast::sign<int8_t>(cmd[1]));
 		break;
 
 		case(ECL_DEGX):			// ＠角度ランダムセット
-			ECL_DEBUG("ECL_DEGX",0);
 			e->d = (RNG.next() & 0xff);
 		break;
 
@@ -1583,28 +1525,23 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_DEGS):			// ＠角度自機セット
-			ECL_DEBUG("ECL_DEGS",0);
 			e->d = atan8(Viv.x-e->x,Viv.y-e->y);
 		break;
 
 		case(ECL_SPDA):			// ＠速度絶対指定
-			ECL_DEBUG("ECL_SPDA",0);
 			e->v = I32LEAt(&cmd[1]);
 		break;
 
 		case(ECL_SPDR):			// ＠速度相対指定
-			ECL_DEBUG("ECL_SPDR",0);
 			e->v += I32LEAt(&cmd[1]);
 		break;
 
 		case(ECL_XYA):			// ＠座標絶対指定
-			ECL_DEBUG("ECL_XYA",0);
 			e->x     = PixelToWorld(I16LEAt(&cmd[1 + 0]));
 			e->y     = PixelToWorld(I16LEAt(&cmd[1 + 2]));
 		break;
 
 		case(ECL_XYR):			// ＠座標相対指定
-			ECL_DEBUG("ECL_XYR",0);
 			e->x += PixelToWorld(I16LEAt(&cmd[1 + 0]));
 			e->y += PixelToWorld(I16LEAt(&cmd[1 + 2]));
 		break;
@@ -1811,53 +1748,43 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_DRAW_ON):		// ＠描画する
-			ECL_DEBUG("ECL_DRAW_ON",0);
 			e->flag |= EF_DRAW;
 		break;
 
 		case(ECL_DRAW_OFF):		// ＠描画しない
-			ECL_DEBUG("ECL_DRAW_OFF",0);
 			e->flag &= (~EF_DRAW);
 		break;
 
 		case(ECL_CLIP_ON):		// ＠画面外消去しない
-			ECL_DEBUG("ECL_CLIP_ON",0);
 			e->flag |= EF_CLIP;
 		break;
 
 		case(ECL_CLIP_OFF):		// ＠画面外消去する
-			ECL_DEBUG("ECL_CLIP_OFF",0);
 			e->flag &= (~EF_CLIP);
 		break;
 
 		case(ECL_DAMAGE_ON):	// ＠ダメージ有り
-			ECL_DEBUG("ECL_DAMAGE_ON",0);
 			e->flag |= EF_DAMAGE;
 		break;
 
 		case(ECL_DAMAGE_OFF):	// ＠ダメージ無し
-			ECL_DEBUG("ECL_DAMAGE_OFF",0);
 			e->flag &= (~EF_DAMAGE);
 		break;
 
 		case(ECL_HITSB_ON):		// ＠自機との当たり判定有り
-			ECL_DEBUG("ECL_HITSB_ON",0);
 			e->flag |= EF_HITSB;
 		break;
 
 		case(ECL_HITSB_OFF):	// ＠自機との当たり判定無し
-			ECL_DEBUG("ECL_HITSB_OFF",0);
 			e->flag &= (~EF_HITSB);
 		break;
 
 		case(ECL_RLCHG_ON):		// ＠左右反転有り(左側にいればセット)
-			ECL_DEBUG("ECL_RLCHG_ON",0);
 			if(e->x<GX_MID) e->flag |=   EF_RLCHG;
 			else            e->flag &= (~EF_RLCHG);
 		break;
 
 		case(ECL_RLCHG_OFF):	// ＠左右反転無し
-			ECL_DEBUG("ECL_RLCHG_OFF",0);
 			e->flag &= (~EF_RLCHG);
 		break;
 
@@ -1879,7 +1806,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		case(ECL_PSE):			// 効果音を鳴らす
-			ECL_DEBUG("ECL_PSE",0);
 			Hooks.Snd_SEPlay(cmd[1], e->x, false, &Hooks);
 		break;
 
@@ -1929,7 +1855,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 
 		case(ECL_BOSSSET): { // ボスを発生させる
 			Boss.Set(((e->x) >> 6), ((e->y) >> 6), cmd[1]);
-			BossHPG_Update(Boss.GetHPSum());
 		} break;
 
 		case(ECL_MOVR): { // レジスタ<->構造体変数の代入
@@ -1969,7 +1894,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				case(ECLCST_ENEMY_D):	e->d = dwTemp;	break;	// 敵の角度
 
 				default:
-					DebugOut(u8"ナゾのレジスタ指定++");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -1985,7 +1909,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2000,7 +1923,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2015,7 +1937,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2030,7 +1951,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしいに
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2045,7 +1965,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしいに
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2084,7 +2003,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 					break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2101,7 +2019,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 				break;
 
 				default:	// レジスタ指定がおかしい
-					DebugOut(u8"ナゾのレジスタ指定");
 					bRetFlag = true;
 					error = true;
 				break;
@@ -2146,7 +2063,6 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 
 		default:				// 未定義の命令が発生！！
-			ECL_DEBUG("Unrecognizable Operation Code %02x", cmd[0]);
 			error = true;
 			stop_for_this_frame();
 		break;

@@ -76,6 +76,10 @@ static const WINDOW_LTRB PLAYFIELD_CLIP = {
 #define HITCHK(a,b,h)	(abs((a)-(b))<(h))
 
 enum {
+	// Ｘ座標の中心のデフォルト値
+	// (Also different from [GX_MID], which is 319.5, not 320.)
+	SND_X_MID = PixelToWorld(320),
+
 	// Matches the `GRAPH_ID_EXSTAGE` constant in pbg's original code.
 	STAGE_EXTRA = (128 + 3),
 };

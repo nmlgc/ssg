@@ -2149,6 +2149,10 @@ void C_ENEMY::ECL_Parse(ENEMY_DATA *e)
 		break;
 		}
 
+		if(Hooks.ecl_hook_flag[cmd[0]] || error) {
+			Hooks.ECL_Op(cmd, e, error, &Hooks);
+		}
+
 		// 次の命令への準備 //
 		if(!stay) {
 			e->cmd += ECL_CmdLen[*cmd];

@@ -45,6 +45,10 @@ static void enemy_set(void)
 				break;
 			}
 			break;
+
+		case(SCL_GAMECLEAR):
+			if (GameStage == 6) GameStage = 7;
+			break;
 		}
 	}
 }

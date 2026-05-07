@@ -499,8 +499,6 @@ void EndingSCLDecode()
 			return;
 
 			case(SCL_GAMECLEAR):
-				//if(GameStage == 6) GameStage = 7;
-				//NameRegistInit();
 			return;
 
 			default:	// 未実装 or ばぐ

@@ -53,3 +53,20 @@ void EndingCleanup()
 		DeleteExtraFont(pMember[i]);
 	}
 }
+
+
+// エンディング用 SCL のデコード //
+FVOID EndingSCLDecode()
+{
+	BOOL		bFlag = TRUE;
+
+	while(bFlag){
+		cmd = SCL_Now;
+		switch(cmd[0]){
+			case(SCL_GAMECLEAR):
+				//if(GameStage == 6) GameStage = 7;
+				//NameRegistInit();
+			return;
+		}
+	}
+}

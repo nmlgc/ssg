@@ -28,6 +28,9 @@ int SSG_Init = ([] {
 	SSG.Hooks.Snd_SEStop = [](uint8_t id, HOOKS *) {
 		Snd_SEStop(id);
 	};
+	SSG.Hooks.Boss_Defeat = [](const BOSS_DATA *, HOOKS *) {
+		ScrollCommand(SCMD_QUAKE);
+	};
 #ifdef SCRIPT_TRACE
 	std::ranges::fill(SSG.Hooks.ecl_hook_flag, 1);
 #else

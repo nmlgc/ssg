@@ -7,6 +7,7 @@
 
 #include "hatoyama/logic/ffi.h"
 
+typedef struct BOSS_DATA BOSS_DATA;
 typedef struct ENEMY_DATA ENEMY_DATA;
 
 // [hooks] is always a valid pointer.
@@ -27,6 +28,9 @@ typedef struct HOOKS {
 	// Called for every sound effect.
 	void (*Snd_SEPlay)(uint8_t id, int x, bool8_t loop, struct HOOKS *);
 	void (*Snd_SEStop)(uint8_t id, struct HOOKS *);
+
+	// Called when defeating the given boss.
+	void (*Boss_Defeat)(const BOSS_DATA *b, struct HOOKS *);
 
 	// Indexed with the opcodes in ECL.H, this array activates the [ECL_Op]
 	// hook for the respective opcode if nonzero.

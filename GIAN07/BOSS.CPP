@@ -12,7 +12,6 @@
 #include "GIAN.H"
 #include "ITEM.H"
 #include "LLASER.H"
-#include "SCROLL.H"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/SEffect.hpp"
@@ -153,7 +152,7 @@ bool C_BOSS::DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage)
 		Enemy.Clear();
 		Fragment.Set(e.x, e.y, FRG_FATCIRCLE);
 		BombEfc.Set(e.x, e.y, EXBOMB_STD);
-		ScrollCommand(SCMD_QUAKE);
+		Hooks.Boss_Defeat(&b, &Hooks);
 		Hooks.Snd_SEPlay(SOUND_ID_BOSSBOMB, e.x, false, &Hooks);
 		Viv.PowerUp(Cast::down<uint8_t>(e.hp));
 		Enemy.Explode(e);

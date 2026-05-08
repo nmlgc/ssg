@@ -150,8 +150,6 @@ void C_VIV::Move(INPUT_BITS input, bool in_msg)
 // 初期化 //
 void C_VIV::Set(uint8_t stage_first)
 {
-	this->NextStage();
-
 	Viv.score     = 0;
 	Viv.dscore    = 0;
 	Viv.exp       = Round.Exp;

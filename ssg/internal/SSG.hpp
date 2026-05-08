@@ -10,6 +10,7 @@
 #include "ssg/Round.h"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/Hook.h"
+#include "ssg/Input.h"
 
 struct PACKFILE_READ;
 
@@ -32,4 +33,10 @@ struct C_SSG {
 
 	// Deallocates enemy and SCL data.
 	void StageFree(void);
+
+	// Initializes all subsystems for a new stage.
+	void StageInit(void);
+
+	// Updates a single game frame, using the given [input].
+	void Move(INPUT_BITS input);
 };

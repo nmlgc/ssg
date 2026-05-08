@@ -124,7 +124,9 @@ void SProjectProc(bool&);	// 西方Ｐｒｏｊｅｃｔ表示動作部
 
 void ScoreNameProc(bool&);
 
-void GameSTD_Init(void);	// ゲームを立ち上げる際に必ず行う初期化関数群
+// ゲームを立ち上げる際に必ず行う初期化関数群
+void Frontend_StageInit(void);
+
 bool DemoInit(void);	// デモプレイの初期化を行う
 
 void GameDraw(void);
@@ -517,35 +519,19 @@ bool NameRegistInit(bool bNeedChgMusic)
 }
 
 // ゲームを立ち上げる際に必ず行う初期化関数群 //
-void GameSTD_Init(void)
+void Frontend_StageInit(void)
 {
 	MWinForceClose();
 	// GrpBackend_Clear();
 	// Grp_Flip();
 
-	Boss.Init();
-	Snaky.Init();	// 蛇管理を初期化(やや謎) //
-	Bit.Init();	// ビット管理も初期化 //
-
 	// ボスが死んでいるのだから、体力ゲージはもちろん表示しない //
 	BossHPG_Init();
 
-	//MaidSet();
-	MaidTama.IndSet();
-	Enemy.IndSet();
-	Tama.IndSet(400 + 200); // 小型弾に４００
-	Laser.IndSet();
-	LLaser.Setup();
-	HLaser.Init();
-	SEffect.Init();
 	CEffectInit();
 	ObjectLockOnInit();
-	Item.IndSet();
-	Fragment.Setup();
 	ScreenEffectInit();
 	ScreenEffectSet(SCNEFC_CFADEIN);
-
-	BombEfc.Init();
 
 	WarningEffectInit();
 	//WarningEffectSet();
@@ -572,8 +558,6 @@ bool WeaponSelectInit(bool ExStg)
 		.MsgEnabled = !(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE),
 	};
 
-	GameSTD_Init();
-
 	GrpBackend_SetClip(GRP_RES_RECT);
 
 	WeaponKeyWait = 1;
@@ -587,6 +571,8 @@ bool WeaponSelectInit(bool ExStg)
 	);
 
 	SSG.RoundInit(round, GameStage);
+	SSG.StageInit();
+	Frontend_StageInit();
 
 	return true;
 }
@@ -632,8 +618,7 @@ extern bool GameNextStage(void)
 		GameStage = STAGE_MAX;	// 後で変更のこと
 	}
 
-	GameSTD_Init();
-	Viv.NextStage();
+	Frontend_StageInit();
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -660,7 +645,7 @@ extern bool GameReplayInit(int Stage)
 
 	GrpBackend_Clear();
 	Grp_Flip();
-	GameSTD_Init();
+	Frontend_StageInit();
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -730,7 +715,7 @@ bool DemoInit(void)
 	GrpBackend_Clear();
 	Grp_Flip();
 
-	GameSTD_Init();
+	Frontend_StageInit();
 
 	RNG.seed = Time_SteadyTicksMS();
 	GameStage = ((RNG.next() % STAGE_MAX) + 1);
@@ -1393,31 +1378,14 @@ void GameMove(INPUT_BITS input)
 {
 	MWinMove();
 
-	Stage.Move(input);
-	Effect3D.Move();
 	ScrollMove();
 
-	Boss.Move();
-	Snaky.Move();
-	Bit.Move();
-	Enemy.Move();
-	Item.Move();
-	Tama.Move();
-	Laser.Move();
-	LLaser.Move();
-	HLaser.Move();
-	Fragment.Move();
-	SEffect.Move();
+	SSG.Move(input);
 	CEffectMove();
-	BombEfc.Move();
 	ObjectLockMove();
 
 	WarningEffectMove();
 	ScreenEffectMove();
-
-	// この２行の位置を変更しました //
-	Viv.Move(input, Stage.InMsg());
-	MaidTama.Move();
 }
 
 

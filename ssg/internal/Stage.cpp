@@ -7,14 +7,12 @@
 #include "BOSS.H"
 #include "EFFECT3D.H"
 #include "GIAN.H"
-#include "LogicInstance.h"
 #include "PRankCtrl.h"
-#include "RNG.hpp"
 #include "SCL.H"
 #include "ssg/Hook.h"
+#include "ssg/Round.h"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/endian.h"
-
-C_STAGE Stage;
 
 bool C_STAGE::Set(BUFFER_OWNED&& data, uint8_t stage)
 {

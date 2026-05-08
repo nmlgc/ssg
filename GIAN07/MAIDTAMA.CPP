@@ -16,9 +16,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-TAMA_CMD& TamaCmd = Tama.TamaCmd;
-C_MAIDTAMA MaidTama;
-
 constexpr uint8_t TogeDamage[(4 * 2) + 2] = {
 	// MainWeapon		// SubWeapon
 	TDM_WIDE_MAIN,		TDM_WIDE_SUB,		// TYPE_A(WIDE)

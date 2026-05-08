@@ -9,6 +9,12 @@
 
 import std.compat;
 
+class C_FRAGMENT;
+class C_PLAYRANK;
+class C_SEFFECT;
+class C_VIV;
+struct HOOKS;
+
 
 ///// [ 定数 ] /////
 
@@ -41,12 +47,32 @@ using ITEM_DATA_CSPAN = std::span<const ITEM_DATA, ITEM_MAX>;
 
 class C_ITEM {
 private:
+	HOOKS& Hooks;
+	C_FRAGMENT& Fragment;
+	C_PLAYRANK& PlayRank;
+	C_SEFFECT& SEffect;
+	C_VIV& Viv;
+
 	///// [ 変数 ] /////
 	std::array<ITEM_DATA, ITEM_MAX> Item;
 	std::array<uint16_t, ITEM_MAX> ItemInd;
 	uint16_t ItemNow;
 
 public:
+	C_ITEM(
+		HOOKS& Hooks,
+		C_FRAGMENT& Fragment,
+		C_PLAYRANK& PlayRank,
+		C_SEFFECT& SEffect,
+		C_VIV& Viv
+	) noexcept :
+		Hooks(Hooks),
+		Fragment(Fragment),
+		PlayRank(PlayRank),
+		SEffect(SEffect),
+		Viv(Viv) {
+	}
+
 	// アイテムを発生させる
 	void Set(int x, int y, uint8_t type);
 
@@ -64,8 +90,6 @@ public:
 		return std::span(ItemInd).first(ItemNow);
 	}
 };
-
-extern C_ITEM Item;
 
 
 

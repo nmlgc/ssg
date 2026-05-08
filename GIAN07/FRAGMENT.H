@@ -9,6 +9,8 @@
 
 import std.compat;
 
+class C_RNG;
+
 //// 破片定数 ////
 #define FRAGMENT_MAX	1000		// 破片の最大数
 #define FRG_EVADE		0x00		// かすり(開発中)
@@ -38,12 +40,17 @@ using FRAGMENT_DATA_CSPAN = std::span<const FRAGMENT_DATA, FRAGMENT_MAX>;
 //// 破片用変数 ////
 class C_FRAGMENT {
 private:
+	C_RNG& RNG;
+
 	// 次に破片データを挿入する位置
 	int FragmentPtr = 0;
 
 	FRAGMENT_DATA Fragment[FRAGMENT_MAX];
 
 public:
+	C_FRAGMENT(C_RNG& RNG) noexcept : RNG(RNG) {
+	}
+
 	//// 破片関数 ////
 	void Set(int x, int y, uint8_t cmd);
 	void Move(void);
@@ -53,7 +60,5 @@ public:
 		return Fragment;
 	}
 };
-
-extern C_FRAGMENT Fragment;
 
 #endif

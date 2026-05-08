@@ -10,16 +10,15 @@
 #include "GAMEMAIN.H"
 #include "SCROLL.H"
 #include "ssg/Hook.h"
-#include "ssg/internal/RNG.hpp"
 #include "hatoyama/engine/snd.h"
-
-ROUND_PARAMS Round;
-C_RNG RNG; // Temporary...
 
 // Just default-constructing the logic structure at global scope...
 C_SSG SSG;
 
-// …avoids a reliance on named return value optimization here.
+// …avoids a reliance on named return value optimization here. Since `C_SSG` is
+// rather huge, this also allows the class to delete its rather costly (and
+// `memcpy()`-requiring) move constructor, and avoids a C6262 warning on Visual
+// Studio.
 int SSG_Init = ([] {
 	SSG.Hooks.SCL_Op = SCL_Frontend,
 	SSG.Hooks.ECL_Op = ECL_Frontend,

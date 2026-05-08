@@ -9,6 +9,8 @@
 import std.compat;
 #include "hatoyama/logic/coords.h"
 
+class C_RNG;
+
 ///// [ 定数 ] /////
 #define SEFFECT_MAX 1000
 
@@ -48,9 +50,14 @@ using SEFFECT_DATA_CSPAN = std::span<const SEFFECT_DATA, SEFFECT_MAX>;
 
 class C_SEFFECT {
 private:
+	C_RNG& RNG;
+
 	SEFFECT_DATA SEffect[SEFFECT_MAX];
 
 public:
+	C_SEFFECT(C_RNG& RNG) noexcept : RNG(RNG) {
+	}
+
 	// エフェクトの初期化を行う
 	void Init(void);
 
@@ -74,5 +81,3 @@ public:
 		return SEffect;
 	}
 };
-
-extern C_SEFFECT SEffect;

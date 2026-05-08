@@ -19,5 +19,3 @@ struct C_RNG {
 		return ((seed >> 16) & 0x7FFF);
 	}
 };
-
-extern C_RNG RNG;

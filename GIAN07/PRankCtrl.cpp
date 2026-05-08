@@ -5,11 +5,9 @@
 
 #include "PRankCtrl.h"
 #include "GIAN.H"
-#include "LogicInstance.h"
+#include "ssg/Round.h"
 #include "ssg/internal/Stage.hpp"
 #include <assert.h>
-
-C_PLAYRANK PlayRank;
 
 struct RANK_DATA_FOR_DIFFICULTY {
 	int clamp_min;

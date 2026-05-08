@@ -9,8 +9,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-C_EFFECT3D Effect3D;
-
 void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz)
 {
 	Point3D temp;

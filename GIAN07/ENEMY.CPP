@@ -32,10 +32,6 @@
 #define REL_DEGRL(d)	((e->flag&EF_RLCHG) ? (-(d ))   : (d ))
 
 
-// 変数の実体 //
-C_ENEMY Enemy;
-
-
 template <size_t N> void Indsort(
 	std::array<uint16_t, N>& indices,
 	uint16_t& count,

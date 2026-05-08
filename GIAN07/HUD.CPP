@@ -10,18 +10,11 @@
 
 #include "HUD.H"
 #include "FONTUTY.H"
-#include "ITEM.H"
 #include "LogicInstance.h"
-#include "MAID.H"
-#include "MAIDTAMA.H"
 #include "ssg/internal/SEffect.hpp"
 #ifdef PBG_DEBUG
 #include "CONFIG.H"
-#include "ENEMY.H"
-#include "HOMINGL.H"
-#include "PRankCtrl.h"
 #include "SCROLL.H"
-#include "ssg/internal/Stage.hpp"
 #endif
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/time.h"
@@ -50,7 +43,7 @@ void MTitleSet(WINDOW_COORD y, Narrow::string_view s)
 		extent.w += s_extent.w;
 		extent.h = s_extent.h;
 	};
-	SEffect.SetMTitle(y, extent);
+	SSG.SEffect.SetMTitle(y, extent);
 }
 
 void MTitleRender(WINDOW_POINT topleft, const PIXEL_LTWH& subrect)
@@ -265,33 +258,33 @@ void StdStatusOutput(void)
 	//sprintf(buf,"%s",DItem[ConfigDat.GameLevel.v]);
 	//GrpPut16(0,50,buf);
 
-	sprintf(buf, "%s", DItem[PlayRank.LevelRanked()]);
+	sprintf(buf, "%s", DItem[SSG.PlayRank.LevelRanked()]);
 	GrpPut16(0, 50, buf);
-	sprintf(buf, "%s<Lvl>", DItem[Round.LevelSelected]);
+	sprintf(buf, "%s<Lvl>", DItem[SSG.Round.LevelSelected]);
 	GrpPut16(0, 68, buf);
-	sprintf(buf, "Pr %d", PlayRank.Rank());
+	sprintf(buf, "Pr %d", SSG.PlayRank.Rank());
 	GrpPut16(0, 86, buf);
 
 
-	sprintf(buf, "Enemy %3d", Enemy.NumAlive());
+	sprintf(buf, "Enemy %3d", SSG.Enemy.NumAlive());
 	GrpPut16(0, (96 + 40), buf);
 
-	sprintf(buf, "Tama1 %3zu", Tama.Inds1().size());
+	sprintf(buf, "Tama1 %3zu", SSG.Tama.Inds1().size());
 	GrpPut16(0, (128 + 40), buf);
-	sprintf(buf, "Tama2 %3zu", Tama.Inds2().size());
+	sprintf(buf, "Tama2 %3zu", SSG.Tama.Inds2().size());
 	GrpPut16(0, (148 + 40), buf);
-	sprintf(buf, "Laser %3zu", Laser.Inds().size());
+	sprintf(buf, "Laser %3zu", SSG.Laser.Inds().size());
 	GrpPut16(0, (176 + 40), buf);
-	sprintf(buf, "HLaser %2d", HLaser.NumAlive());
+	sprintf(buf, "HLaser %2d", SSG.HLaser.NumAlive());
 	GrpPut16(0, (196 + 40), buf);
 
-	sprintf(buf, "MTama %3zu", MaidTama.Inds().size());
+	sprintf(buf, "MTama %3zu", SSG.MaidTama.Inds().size());
 	GrpPut16(0, (224 + 40), buf);
 
-	sprintf(buf, "Item  %3zu", Item.Inds().size());
+	sprintf(buf, "Item  %3zu", SSG.Item.Inds().size());
 	GrpPut16(0, (252 + 40), buf);
 
-	sprintf(buf, "Pow   %3d", Viv.exp);
+	sprintf(buf, "Pow   %3d", SSG.Viv.exp);
 	GrpPut16(0, (290 + 40), buf);
 
 	sprintf(buf, "SSPD  %3d", ScrollInfo.ScrollSpeed);
@@ -301,7 +294,7 @@ void StdStatusOutput(void)
 	GrpPut16(0, 460, "DebugMode");
 
 	GrpPut16(column2_left, 100, "SCL Count");
-	sprintf(buf, " %5d", Stage.SCLCount());
+	sprintf(buf, " %5d", SSG.Stage.SCLCount());
 	GrpPut16(column2_left, 120, buf);
 #else
 	// GrpPut16(0,440,"G07");
@@ -319,12 +312,12 @@ void StdStatusOutput(void)
 	GrpPut16(column2_left, 70, buf);
 
 #ifndef PBG_DEBUG // pbg quirk
-	sprintf(buf, "Bomb   %d", Viv.bomb);
+	sprintf(buf, "Bomb   %d", SSG.Viv.bomb);
 	GrpPut16(column2_left, 400, buf);
 #endif
 
-	sprintf(buf, "Left %3d", Viv.left);
+	sprintf(buf, "Left %3d", SSG.Viv.left);
 	GrpPut16(column2_left, 440, buf);
-	sprintf(buf, "Credit %d", Viv.credit); // -1 に注意だ！！
+	sprintf(buf, "Credit %d", SSG.Viv.credit); // -1 に注意だ！！
 	GrpPut16(column2_left, 460, buf);
 }

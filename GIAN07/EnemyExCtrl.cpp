@@ -16,10 +16,6 @@
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 
 
-C_SNAKY Snaky;
-C_BIT Bit;
-
-
 static void BitSTDRad(BIT_DATA& BitData);	// 基本的な半径処理
 
 

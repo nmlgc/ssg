@@ -9,9 +9,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-C_FRAGMENT Fragment;
-
-
 void C_FRAGMENT::Set(int x, int y, uint8_t cmd)
 {
 	int				i;

@@ -6,37 +6,23 @@
 #include <printf/printf.h>
 
 #include "GAMEMAIN.H"
-#include "BOMBEFC.H"
-#include "BOSS.H"
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT.H"
-#include "EFFECT3D.H"
-#include "ENEMY.H"
-#include "EnemyExCtrl.h"
 #include "FONTUTY.H"
-#include "FRAGMENT.H"
 #include "GEOMETRY.H"
-#include "GIAN.H"
 #include "GameDraw.h"
-#include "HOMINGL.H"
 #include "HUD.H"
-#include "ITEM.H"
 #include "LENS.H"
-#include "LLASER.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
-#include "MAIDTAMA.H"
 #include "MUSIC.H"
 #include "SCORE.H"
 #include "SCROLL.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
 #include "ssg/Sound.h"
-#include "ssg/internal/RNG.hpp"
-#include "ssg/internal/SEffect.hpp"
-#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/snd.h"
@@ -96,7 +82,7 @@ void Render(PIXEL_COORD top)
 
 uint16_t DemoTimer = 0;
 uint32_t DrawCount = 0;
-decltype(Stage.Number()) WeaponSelectStage = 0;
+decltype(SSG.Stage.Number()) WeaponSelectStage = 0;
 uint8_t WeaponKeyWait = 0;
 
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
@@ -138,7 +124,10 @@ void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
-	return ((Stage.Number() == STAGE_EXTRA) ? GAME_EXTRA : Round.LevelSelected);
+	return ((SSG.Stage.Number() == STAGE_EXTRA)
+		? GAME_EXTRA
+		: SSG.Round.LevelSelected
+	);
 }
 
 bool InputLocked;
@@ -480,7 +469,8 @@ void NameRegistProc(bool&)
 // お名前入力の初期化 //
 bool NameRegistInit(bool bNeedChgMusic)
 {
-	const auto stage = Stage.Number();
+	const auto stage = SSG.Stage.Number();
+	const auto& Viv = SSG.Viv;
 	for(auto& it : CurrentName.Name) {
 		it = '\0';
 	}
@@ -548,7 +538,7 @@ bool WeaponSelectInit(bool ExStg)
 	Grp_Flip();
 
 	const ROUND_PARAMS round = {
-		.Seed = RNG.seed,
+		.Seed = SSG.RNG.seed,
 		.LevelSelected = (ExStg ? EXTRA_LEVEL : ConfigDat.LevelSelected.v),
 		.PlayerStock = (ExStg ? EXTRA_LIVES : ConfigDat.PlayerStock.v),
 		.BombStock = ConfigDat.BombStock.v,
@@ -611,7 +601,7 @@ extern bool GameNextStage(void)
 	DemoplaySaveDemo();
 #endif
 
-	auto stage = (Stage.Number() + 1);
+	auto stage = (SSG.Stage.Number() + 1);
 
 	// エンディングに移行する //
 	if(stage >= STAGE_MAX) {
@@ -715,11 +705,11 @@ bool DemoInit(void)
 
 	Frontend_StageInit();
 
-	RNG.seed = Time_SteadyTicksMS();
-	const uint8_t stage = ((RNG.next() % STAGE_MAX) + 1);
+	SSG.RNG.seed = Time_SteadyTicksMS();
+	const uint8_t stage = ((SSG.RNG.next() % STAGE_MAX) + 1);
 
-	// stage = ((RNG.next() % 3) + 1); // この部分は体験版(コミケ)だけ //
-	// stage = 1;                      // こっちはＨＰ体験版用         //
+	// stage = ((SSG.RNG.next() % 3) + 1); // この部分は体験版(コミケ)だけ //
+	// stage = 1;                         // こっちはＨＰ体験版用         //
 
 	if(!DemoplayLoadDemo(stage)) {
 		// DebugOut(u8"デモプレイデータが存在せず");
@@ -840,7 +830,7 @@ extern bool GameExit(bool bNeedChgMusic)
 	}
 	GrpBackend_SetClip(GRP_RES_RECT);
 
-	LLaser.Setup();	// 音を止める
+	SSG.LLaser.Setup();	// 音を止める
 	Snd_SEStop(8);	// ワーニング音を止めるのだ
 
 	const auto flags = MSG_WINDOW_FLAGS::CENTER;
@@ -901,7 +891,7 @@ void GameProc(bool&)
 	// there are no pre-existing replays that require these rewrites to sync
 	// properly.
 	INPUT_BITS input = Key_Data;
-	if(Stage.InMsg()) {
+	if(SSG.Stage.InMsg()) {
 		if(SystemKey_Data & SYSKEY_SKIP) {
 			input |= KEY_SKIP;
 		}
@@ -951,7 +941,7 @@ void GameProc(bool&)
 // ゲームオーバー出現用
 void GameOverProc0(bool&)
 {
-	switch(Viv.GameOverTimer) {
+	switch(SSG.Viv.GameOverTimer) {
 	default:
 		SSG.MoveGameOver();
 		break;
@@ -959,7 +949,7 @@ void GameOverProc0(bool&)
 	case 0:
 		// Wait for press
 		if(Key_Data != 0) {
-			Viv.GameOverTimer--;
+			SSG.Viv.GameOverTimer--;
 		}
 		break;
 
@@ -972,7 +962,7 @@ void GameOverProc0(bool&)
 		// ステージセレクトが有効な場合 //
 		if(ConfigDat.StageSelect.v) {
 			DemoplaySaveReplay();
-			if(Stage.Number() == STAGE_EXTRA) {
+			if(SSG.Stage.Number() == STAGE_EXTRA) {
 				NameRegistInit(true);
 			} else {
 				GameExit(true);
@@ -980,7 +970,7 @@ void GameOverProc0(bool&)
 			return;
 		}
 
-		if(Viv.credit == 0){
+		if(SSG.Viv.credit == 0) {
 			NameRegistInit(true);
 			//GameExit();
 			return;			// 仮
@@ -1056,6 +1046,7 @@ void DemoProc(bool&)
 // 装備選択 //
 void WeaponSelectProc(bool&)
 {
+	auto& Viv = SSG.Viv;
 	PIXEL_LTRB	rc;
 	int		i,x,y;
 	char	buf[100];
@@ -1117,8 +1108,8 @@ void WeaponSelectProc(bool&)
 				}
 			}
 
-			Round.Weapon = Viv.weapon;
-			MaidTama.IndSet();
+			SSG.Round.Weapon = Viv.weapon;
+			SSG.MaidTama.IndSet();
 			count = 0;
 
 			Snd_SEPlay(SOUND_ID_SELECT);
@@ -1131,29 +1122,29 @@ void WeaponSelectProc(bool&)
 #endif
 				// リプレイ用の処理を追加 //
 				if(WeaponSelectStage == 2) {
-					Round.Exp = 160;
+					SSG.Round.Exp = 160;
 				} else if(WeaponSelectStage >= 3) {
-					Round.Exp = 255;
+					SSG.Round.Exp = 255;
 				}
 			}
 			else{
-				Round.Exp = 255;
+				SSG.Round.Exp = 255;
 			}
 #ifdef PBG_DEBUG
 			if(!DebugDat.NoMaxLives) {
-				Round.PlayerStock = DEBUG_MAX_LIVES;
+				SSG.Round.PlayerStock = DEBUG_MAX_LIVES;
 			}
 #endif
 			if(record) {
-				Round.Seed = (
-					(Cast::up<uint32_t>(RNG.next()) + 1u) *
-					(Cast::up<uint32_t>(RNG.next()) + 1u)
+				SSG.Round.Seed = (
+					(Cast::up<uint32_t>(SSG.RNG.next()) + 1u) *
+					(Cast::up<uint32_t>(SSG.RNG.next()) + 1u)
 				);
-				Round.MsgEnabled = false;
-				DemoplayInit(Round);
+				SSG.Round.MsgEnabled = false;
+				DemoplayInit(SSG.Round);
 			}
 
-			SSG.RoundInit(Round, WeaponSelectStage);
+			SSG.RoundInit(SSG.Round, WeaponSelectStage);
 
 			if(!LoadGraph(WeaponSelectStage)) {
 				DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -1219,14 +1210,14 @@ void WeaponSelectProc(bool&)
 		Viv.exp = min(count,255);
 		if(Viv.exp < 31) Viv.lay_time = Viv.lay_grp =  0;
 
-		Tama.ResetHoming();
+		SSG.Tama.ResetHoming();
 
 		Viv.muteki = 0;
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
-		Viv.Move(KEY_TAMA, Stage.InMsg());
-		MaidTama.Move();
+		Viv.Move(KEY_TAMA, SSG.Stage.InMsg());
+		SSG.MaidTama.Move();
 
 		GrpBackend_SetClip(
 			{ (400 - 110), (400 - 300 + 2), (400 + 110), (400 + 10) }
@@ -1240,7 +1231,7 @@ void WeaponSelectProc(bool&)
 			}
 		}
 		MaidDraw(Viv);
-		MaidTamaDraw(MaidTama, Viv);
+		MaidTamaDraw(SSG.MaidTama, Viv);
 
 		rc = PIXEL_LTWH{ 72, (272 + 16), 56, 8 };
 		GrpSurface_Blit({ 468, 400 }, SURFACE_ID::SYSTEM, rc);
@@ -1372,38 +1363,38 @@ void GameDraw(void)
 {
 	GrpBackend_Clear();
 
-	ScrollDraw();
+	ScrollDraw(SSG.Effect3D);
 	CEffectDraw();
 
-	BitLineDraw(Bit);
-	BossDraw(Boss, Enemy, Viv);
+	BitLineDraw(SSG.Bit);
+	BossDraw(SSG.Boss, SSG.Enemy, SSG.Viv);
 
-	WideBombDraw(Viv); // 多分、ここで良いと思うが...
+	WideBombDraw(SSG.Viv); // 多分、ここで良いと思うが...
 
-	ExBombEfcDraw(BombEfc);
+	ExBombEfcDraw(SSG.BombEfc);
 
-	enemy_draw(Enemy);
+	enemy_draw(SSG.Enemy);
 
-	MaidTamaDraw(MaidTama, Viv);
+	MaidTamaDraw(SSG.MaidTama, SSG.Viv);
 
-	MaidDraw(Viv);
+	MaidDraw(SSG.Viv);
 
 	if(GrpGeom_FB()) {
-		LLaserDraw(LLaser);
+		LLaserDraw(SSG.LLaser);
 	}
 
 	ObjectLockDraw();
 
-	fragment_draw(Fragment);
-	ItemDraw(Item);
+	fragment_draw(SSG.Fragment);
+	ItemDraw(SSG.Item);
 
 	if(GrpGeom_Poly()) {
-		LLaserDraw(LLaser);
+		LLaserDraw(SSG.LLaser);
 	}
 
-	HLaserDraw(HLaser);
-	laser_draw(Laser);
-	tama_draw(Tama);
+	HLaserDraw(SSG.HLaser);
+	laser_draw(SSG.Laser);
+	tama_draw(SSG.Tama);
 
 	// static uint8_t test = 0;
 
@@ -1413,8 +1404,8 @@ void GameDraw(void)
 	//MoveWarning(test++);
 	//DrawWarning();
 
-	SEffectDraw(SEffect);
-	StateDraw(Viv);
+	SEffectDraw(SSG.SEffect);
+	StateDraw(SSG.Viv);
 
 	BossHPG_Draw();
 	ScreenEffectDraw();

@@ -5,9 +5,7 @@
 
 #include "LOADER.H"
 #include "CONFIG.H"
-#include "ENEMY.H"
 #include "GAMEMAIN.H"
-#include "GIAN.H"
 #include "LogicInstance.h"
 #include "SCROLL.H"
 #include "WindowSys.h"

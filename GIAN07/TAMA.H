@@ -10,6 +10,14 @@
 #include "GIAN07/entity.h"
 #include "hatoyama/logic/coords.h"
 
+class C_FRAGMENT;
+class C_ITEM;
+class C_PLAYRANK;
+class C_RNG;
+class C_SEFFECT;
+class C_VIV;
+struct HOOKS;
+
 
 ///// [更新履歴] /////
 
@@ -170,6 +178,14 @@ public:
 	TAMA_CMD TamaCmd;
 
 private:
+	HOOKS& Hooks;
+	C_FRAGMENT& Fragment;
+	C_ITEM& Item;
+	C_PLAYRANK const& PlayRank;
+	C_RNG& RNG;
+	C_SEFFECT& SEffect;
+	C_VIV& Viv;
+
 	////弾の各種変数たち////
 
 	// 小型弾の弾数
@@ -243,6 +259,24 @@ private:
 public:
 	////弾関数////
 
+	C_TAMA(
+		HOOKS& Hooks,
+		C_FRAGMENT& Fragment,
+		C_ITEM& Item,
+		C_PLAYRANK const& PlayRank,
+		C_RNG& RNG,
+		C_SEFFECT& SEffect,
+		C_VIV& Viv
+	) noexcept :
+		Hooks(Hooks),
+		Fragment(Fragment),
+		Item(Item),
+		PlayRank(PlayRank),
+		RNG(RNG),
+		SEffect(SEffect),
+		Viv(Viv) {
+	}
+
 	// 弾をセットする(難易度による変更は"有り")
 	void Set(void);
 
@@ -287,8 +321,6 @@ public:
 		return std::span(Tama2Ind).first(Tama2Now);
 	}
 };
-
-extern C_TAMA Tama;
 
 
 template <size_t N> void Indsort(

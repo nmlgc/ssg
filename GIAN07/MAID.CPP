@@ -9,17 +9,14 @@
 #include "FRAGMENT.H"
 #include "GIAN.H"
 #include "LASER.H"
-#include "LOADER.H"
-#include "LogicInstance.h"
 #include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "ssg/Hook.h"
+#include "ssg/Round.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/logic/cast.h"
 
-
-C_VIV Viv;
 
 // Avoids changes to the original code that accessed the single old `Viv`
 // instance. Very ugly, I know, but having a

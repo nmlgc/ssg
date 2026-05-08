@@ -14,11 +14,6 @@
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/logic/ut_math.h"
 
-
-
-C_ITEM Item;
-
-
 // アイテムを発生させる //
 void C_ITEM::Set(int x, int y, uint8_t type)
 {

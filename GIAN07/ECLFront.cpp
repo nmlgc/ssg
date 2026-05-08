@@ -8,10 +8,9 @@
 #endif
 
 #include "ECLFront.h"
-#include "BOSS.H"
 #include "BossHPG.h"
 #include "EFFECT.H"
-#include "ENEMY.H"
+#include "LogicInstance.h"
 #include "SCROLL.H"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/logic/cast.h"
@@ -47,7 +46,7 @@ void ECL_Frontend(
 		break;
 
 	case(ECL_BOSSSET):
-		BossHPG_Update(Boss.GetHPSum());
+		BossHPG_Update(SSG.Boss.GetHPSum());
 		break;
 
 	case(ECL_SETUP): ECL_DEBUG("ECL_SETUP", 0); break;

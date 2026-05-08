@@ -5,19 +5,56 @@
 
 #pragma once
 
+#include "BOMBEFC.H"
+#include "BOSS.H"
+#include "EFFECT3D.H"
+#include "ENEMY.H"
+#include "EnemyExCtrl.h"
+#include "FRAGMENT.H"
+#include "HOMINGL.H"
+#include "ITEM.H"
+#include "LASER.H"
+#include "LLASER.H"
 #include "MAID.H"
+#include "MAIDTAMA.H"
 #include "PRankCtrl.h"
 #include "ssg/Round.h"
 #include "ssg/internal/RNG.hpp"
+#include "ssg/internal/SEffect.hpp"
+#include "ssg/internal/Stage.hpp"
 #include "ssg/Hook.h"
 #include "ssg/Input.h"
 
 struct PACKFILE_READ;
 
 struct C_SSG {
-	HOOKS& Hooks;
+	HOOKS Hooks;
+	ROUND_PARAMS Round;
+	C_BIT Bit;
+	C_BOMBEFC BombEfc;
+	C_BOSS Boss;
+	C_EFFECT3D Effect3D;
+	C_ENEMY Enemy;
+	C_FRAGMENT Fragment;
+	C_HLASER HLaser;
+	C_ITEM Item;
+	C_LASER Laser;
+	C_LLASER LLaser;
+	C_MAIDTAMA MaidTama;
+	C_PLAYRANK PlayRank;
+	C_RNG RNG;
+	C_SEFFECT SEffect;
+	C_SNAKY Snaky;
+	C_STAGE Stage;
+	C_TAMA Tama;
+	C_VIV Viv;
 
+#ifdef _MSC_VER
+	// Prevent compile-time initialization
+	__declspec(noinline)
+#endif
 	C_SSG(void) noexcept;
+	C_SSG(C_SSG&&) = delete;
 
 	// Starts a new round of gameplay (i.e., a playthrough of either the main 6
 	// stages starting at Stage 1, the Extra Stage, or a single stage for

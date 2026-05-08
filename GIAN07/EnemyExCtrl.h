@@ -9,8 +9,13 @@
 
 #include "EXDEF.H"
 
+class C_ENEMY;
+class C_LLASER;
+class C_RNG;
+class C_VIV;
 struct BOSS_DATA;
 struct ENEMY_DATA;
+struct HOOKS;
 
 
 ///// [更新履歴] /////
@@ -102,9 +107,14 @@ struct BIT_DATA {
 
 class C_SNAKY {
 private:
+	C_ENEMY& Enemy;
+
 	SNAKYMOVE_DATA<30> SnakeData[SNAKE_MAX];
 
 public:
+	C_SNAKY(C_ENEMY& Enemy) noexcept : Enemy(Enemy) {
+	}
+
 	// 蛇型の敵配列の初期化
 	void Init(void);
 
@@ -120,12 +130,28 @@ public:
 
 class C_BIT {
 private:
+	HOOKS& Hooks;
+	C_ENEMY& Enemy;
+	C_LLASER& LLaser;
+	C_RNG& RNG;
+	C_VIV const& Viv;
+
 	BIT_DATA BitData;
 
 	// 基本的なビット回転処理
 	void BitSTDRoll(BIT_DATA& BitData);
 
 public:
+	C_BIT(
+		HOOKS& Hooks,
+		C_ENEMY& Enemy,
+		C_LLASER& LLaser,
+		C_RNG& RNG,
+		C_VIV const& Viv
+	) noexcept :
+		Hooks(Hooks), Enemy(Enemy), LLaser(LLaser), RNG(RNG), Viv(Viv) {
+	}
+
 	// ビット配列の初期化
 	void Init(void);
 
@@ -154,12 +180,6 @@ public:
 		return BitData;
 	}
 };
-
-
-
-///// [ 変数 ] /////
-extern C_SNAKY Snaky;
-extern C_BIT Bit;
 
 
 

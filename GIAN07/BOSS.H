@@ -10,6 +10,14 @@
 #include "ENEMY.H"
 #include "MAID.H"
 
+struct HOOKS;
+class C_BIT;
+class C_BOMBEFC;
+class C_FRAGMENT;
+class C_LASER;
+class C_SEFFECT;
+class C_SNAKY;
+
 
 ///// [ 定数 ] /////
 
@@ -42,6 +50,18 @@ using BOSS_DATA_CSPAN = std::span<const BOSS_DATA, BOSS_MAX>;
 
 class C_BOSS {
 private:
+	HOOKS& Hooks;
+	C_BIT& Bit;
+	C_BOMBEFC& BombEfc;
+	C_ENEMY& Enemy;
+	C_FRAGMENT& Fragment;
+	C_ITEM& Item;
+	C_LASER& Laser;
+	C_SEFFECT& SEffect;
+	C_SNAKY& Snaky;
+	C_TAMA& Tama;
+	C_VIV& Viv;
+
 	// 現在のボスの数
 	uint16_t BossNow;
 
@@ -54,6 +74,32 @@ private:
 	bool DamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage);
 
 public:
+	C_BOSS(
+		HOOKS& Hooks,
+		C_BIT& Bit,
+		C_BOMBEFC& BombEfc,
+		C_ENEMY& Enemy,
+		C_FRAGMENT& Fragment,
+		C_ITEM& Item,
+		C_LASER& Laser,
+		C_SEFFECT& SEffect,
+		C_SNAKY& Snaky,
+		C_TAMA& Tama,
+		C_VIV& Viv
+	) noexcept :
+		Hooks(Hooks),
+		Bit(Bit),
+		BombEfc(BombEfc),
+		Enemy(Enemy),
+		Fragment(Fragment),
+		Laser(Laser),
+		Item(Item),
+		SEffect(SEffect),
+		Snaky(Snaky),
+		Tama(Tama),
+		Viv(Viv) {
+	}
+
 	// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
 	void Init(void);
 
@@ -107,8 +153,5 @@ public:
 		return Boss;
 	}
 };
-
-///// [ 変数 ] /////
-extern C_BOSS Boss;
 
 #endif

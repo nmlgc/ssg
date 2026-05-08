@@ -8,6 +8,8 @@
 
 import std.compat;
 
+class C_RNG;
+
 
 
 /***** [ 定数 ] *****/
@@ -38,9 +40,14 @@ using BOMBEFC_DATA_CSPAN = std::span<const BombEfcCtrl, EXBOMB_MAX>;
 
 class C_BOMBEFC {
 private:
+	C_RNG& RNG;
+
 	BombEfcCtrl BombEfc[EXBOMB_MAX];
 
 public:
+	C_BOMBEFC(C_RNG& RNG) noexcept : RNG(RNG) {
+	}
+
 	// 爆発系エフェクトの初期化
 	void Init(void);
 
@@ -54,8 +61,6 @@ public:
 		return BombEfc;
 	}
 };
-
-extern C_BOMBEFC BombEfc;
 
 
 

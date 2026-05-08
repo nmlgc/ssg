@@ -43,5 +43,3 @@ typedef struct HOOKS {
 	// hook for the respective opcode if nonzero.
 	bool8_t ecl_hook_flag[256];
 } HOOKS;
-
-extern HOOKS Hooks;

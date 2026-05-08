@@ -8,6 +8,9 @@
 
 import std.compat;
 
+class C_STAGE;
+struct ROUND_PARAMS;
+
 
 
 ///// [構造体] /////
@@ -18,9 +21,16 @@ struct PlayRankInfo {
 
 class C_PLAYRANK {
 private:
+	C_STAGE const& Stage;
+	ROUND_PARAMS const& Round;
+
 	PlayRankInfo PlayRank;
 
 public:
+	C_PLAYRANK(C_STAGE const& Stage, ROUND_PARAMS const& Round) noexcept :
+		Stage(Stage), Round(Round) {
+	}
+
 	// 難易度の許容範囲内でプレイランクを増減する
 	void Add(int n);
 
@@ -34,11 +44,6 @@ public:
 		return PlayRank.Rank;
 	}
 };
-
-
-
-///// [グローバル変数] /////
-extern C_PLAYRANK PlayRank;
 
 
 

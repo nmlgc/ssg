@@ -25,6 +25,16 @@
 #include "TAMA.H"
 #include "hatoyama/logic/buffer.h"
 
+class C_BOSS;
+class C_EFFECT3D;
+class C_HLASER;
+class C_ITEM;
+class C_LASER;
+class C_TAMA;
+class C_VIV;
+struct C_RNG;
+struct HOOKS;
+
 
 //// 敵定数 ////
 #define ENEMY_MAX		50			// 敵の最大発生数
@@ -112,6 +122,18 @@ struct ANIME_DATA {
 
 class C_ENEMY {
 private:
+	HOOKS& Hooks;
+	C_BOSS& Boss;
+	C_EFFECT3D& Effect3D;
+	C_HLASER& HLaser;
+	C_ITEM& Item;
+	C_LASER& Laser;
+	C_LLASER& LLaser;
+	C_PLAYRANK const& PlayRank;
+	C_RNG& RNG;
+	C_TAMA& Tama;
+	C_VIV& Viv;
+
 	//// 敵変数 ////
 	uint16_t EnemyNow;
 
@@ -129,6 +151,32 @@ private:
 	bool DamageApply(ENEMY_DATA& e, int damage);
 
 public:
+	C_ENEMY(
+		HOOKS& Hooks,
+		C_BOSS& Boss,
+		C_EFFECT3D& Effect3D,
+		C_HLASER& HLaser,
+		C_ITEM& Item,
+		C_LASER& Laser,
+		C_LLASER& LLaser,
+		C_PLAYRANK const& PlayRank,
+		C_RNG& RNG,
+		C_TAMA& Tama,
+		C_VIV& Viv
+	) noexcept :
+		Hooks(Hooks),
+		Boss(Boss),
+		Effect3D(Effect3D),
+		HLaser(HLaser),
+		Item(Item),
+		Laser(Laser),
+		LLaser(LLaser),
+		PlayRank(PlayRank),
+		RNG(RNG),
+		Tama(Tama),
+		Viv(Viv) {
+	}
+
 	//// 敵制御関数 ////
 	ENEMY_DATA *FindFree(void);
 
@@ -189,8 +237,6 @@ public:
 		return Anime[id];
 	}
 };
-
-extern C_ENEMY Enemy;
 
 
 // Vivit ナナメレーザーの当たり判定 //

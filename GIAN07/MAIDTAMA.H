@@ -10,6 +10,11 @@
 #include "TAMA.H"
 #include "ssg/Input.h"
 
+class C_ENEMY;
+class C_FRAGMENT;
+class C_PLAYRANK;
+class C_VIV;
+struct HOOKS;
 struct MAID;
 
 
@@ -42,6 +47,14 @@ using MAIDTAMA_DATA_CSPAN = std::span<const TAMA_DATA, MAIDTAMA_MAX>;
 
 class C_MAIDTAMA {
 private:
+	HOOKS& Hooks;
+	C_ENEMY& Enemy;
+	C_FRAGMENT& Fragment;
+	C_PLAYRANK& PlayRank;
+	C_TAMA& Tama;
+	TAMA_CMD& TamaCmd;
+	C_VIV& Viv;
+
 	///// [ 変数 ] /////
 
 	// 現在の数
@@ -138,6 +151,23 @@ private:
 	};
 
 public:
+	C_MAIDTAMA(
+		HOOKS& Hooks,
+		C_ENEMY& Enemy,
+		C_FRAGMENT& Fragment,
+		C_PLAYRANK& PlayRank,
+		C_TAMA& Tama,
+		C_VIV& Viv
+	) noexcept :
+		Hooks(Hooks),
+		Enemy(Enemy),
+		Fragment(Fragment),
+		PlayRank(PlayRank),
+		Tama(Tama),
+		TamaCmd(Tama.TamaCmd),
+		Viv(Viv) {
+	}
+
 	///// [ 関数 ] /////
 
 	// たま発射！！
@@ -157,8 +187,6 @@ public:
 		return std::span(MaidTamaInd).first(MaidTamaNow);
 	}
 };
-
-extern C_MAIDTAMA MaidTama;
 
 
 

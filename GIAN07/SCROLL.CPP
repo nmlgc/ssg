@@ -4,23 +4,18 @@
 /*                                                                           */
 
 #include "SCROLL.H"
-#include "BOSS.H"
 #include "BossHPG.h"
 #include "CONFIG.H"
 #include "DEMOPLAY.H"
 #include "EFFECT.H"
-#include "EFFECT3D.H"
 #include "ENDING.H"
 #include "GAMEMAIN.H"
-#include "GIAN.H"
 #include "GameDraw.h"
 #include "HUD.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
-#include "ssg/internal/RNG.hpp"
-#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/graphics_backend.h"
@@ -159,18 +154,18 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 			break;
 
 			case(SCL_BOSS): { // ボスをセットする(X(16),Y(16),ID(8))
-				BossHPG_Open(Boss.GetHPSum());
+				BossHPG_Open(SSG.Boss.GetHPSum());
 			}
 			break;
 
 			case(SCL_MWOPEN):	// メッセージウィンドウを開く
-				if(Round.MsgEnabled) {
+				if(SSG.Round.MsgEnabled) {
 					MWinOpen();
 				}
 			break;
 
 			case(SCL_MWCLOSE):	// メッセージウィンドウを閉じる
-				if(Round.MsgEnabled) {
+				if(SSG.Round.MsgEnabled) {
 					MWinClose();
 				}
 			break;
@@ -261,8 +256,8 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 				}
 				if(DemoplayLoadEnable) return;
 
-				if(Round.LevelSelected != GAME_EASY) {
-					switch(Viv.weapon){
+				if(SSG.Round.LevelSelected != GAME_EASY) {
+					switch(SSG.Viv.weapon){
 						case(0):	ConfigDat.ExtraStgFlags.v |= 1;	break;
 						case(1):	ConfigDat.ExtraStgFlags.v |= 2;	break;
 						case(2):	ConfigDat.ExtraStgFlags.v |= 4;	break;
@@ -305,7 +300,7 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 }
 
 // 背景を描画する //
-void ScrollDraw(void)
+void ScrollDraw(const C_EFFECT3D& Effect3D)
 {
 	PBGMAP	*p;
 	int		i,j,k,x,y;
@@ -321,15 +316,15 @@ void ScrollDraw(void)
 		Stg3BossMapDraw();
 		return;
 	}
-	else if(Effect3D.GetActive() == EFFECT3D_TYPE::S6_CUBE) {
+	else if(SSG.Effect3D.GetActive() == EFFECT3D_TYPE::S6_CUBE) {
 		Draw3DCube(Effect3D);
 		return;
 	}
-	else if(Effect3D.GetActive() == EFFECT3D_TYPE::S6_FAKE_ECL) {
+	else if(SSG.Effect3D.GetActive() == EFFECT3D_TYPE::S6_FAKE_ECL) {
 		DrawEffectFakeECL(Effect3D);
 		return;
 	}
-	else if(Effect3D.GetActive() == EFFECT3D_TYPE::S6_RASTER) {
+	else if(SSG.Effect3D.GetActive() == EFFECT3D_TYPE::S6_RASTER) {
 		DrawStg6Raster(Effect3D);
 		return;
 	}
@@ -366,7 +361,7 @@ void ScrollDraw(void)
 		}
 	}
 
-	if(Effect3D.GetActive() == EFFECT3D_TYPE::S4_ROCK) {
+	if(SSG.Effect3D.GetActive() == EFFECT3D_TYPE::S4_ROCK) {
 		DrawStg4Rock(Effect3D);
 	}
 }

@@ -3,25 +3,9 @@
  *
  */
 
-#include "SSG.hpp"
-#include "BOMBEFC.H"
-#include "BOSS.H"
-#include "EFFECT3D.H"
-#include "ENEMY.H"
-#include "EnemyExCtrl.h"
-#include "FRAGMENT.H"
+#include "ssg/internal/SSG.hpp"
 #include "GIAN.H"
-#include "HOMINGL.H"
-#include "ITEM.H"
-#include "LLASER.H"
-#include "LogicInstance.h"
-#include "MAID.H"
-#include "MAIDTAMA.H"
-#include "PRankCtrl.h"
-#include "TAMA.H"
 #include "ssg/internal/LZ.hpp"
-#include "ssg/internal/SEffect.hpp"
-#include "ssg/internal/Stage.hpp"
 
 constexpr HOOKS HOOKS_EMPTY = {
 	.SCL_Op = [](const uint8_t *, bool8_t, HOOKS *) {},
@@ -33,11 +17,50 @@ constexpr HOOKS HOOKS_EMPTY = {
 	.GameOver = [](HOOKS *) {},
 };
 
-HOOKS Hooks;
-
-C_SSG::C_SSG(void) noexcept : Hooks(Hooks)
+C_SSG::C_SSG(void) noexcept :
+	Hooks(HOOKS_EMPTY),
+	Bit(Hooks, Enemy, LLaser, RNG, Viv),
+	BombEfc(RNG),
+	Boss(
+		Hooks,
+		Bit,
+		BombEfc,
+		Enemy,
+		Fragment,
+		Item,
+		Laser,
+		SEffect,
+		Snaky,
+		Tama,
+		Viv
+	),
+	Effect3D(RNG),
+	Enemy(
+		Hooks,
+		Boss,
+		Effect3D,
+		HLaser,
+		Item,
+		Laser,
+		LLaser,
+		PlayRank,
+		RNG,
+		Tama,
+		Viv
+	),
+	Fragment(RNG),
+	HLaser(Hooks, Viv),
+	Item(Hooks, Fragment, PlayRank, SEffect, Viv),
+	Laser(LLaser, PlayRank, RNG, Viv),
+	LLaser(Hooks, Viv),
+	MaidTama(Hooks, Enemy, Fragment, PlayRank, Tama, Viv),
+	PlayRank(Stage, Round),
+	SEffect(RNG),
+	Snaky(Enemy),
+	Stage(Hooks, Round, Boss, Effect3D, Enemy, PlayRank),
+	Tama(Hooks, Fragment, Item, PlayRank, RNG, SEffect, Viv),
+	Viv(Hooks, Round, Fragment, Laser, MaidTama, PlayRank, SEffect, Tama)
 {
-	Hooks = HOOKS_EMPTY;
 }
 
 void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)

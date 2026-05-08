@@ -18,6 +18,8 @@
 import std.compat;
 #include "hatoyama/logic/coords.h"
 
+class C_RNG;
+
 
 
 ///// [ 定数 ] /////
@@ -122,6 +124,8 @@ using STG6STAR_CSPAN = std::span<const Stg6Star, S3STAR_MAX>;
 
 class C_EFFECT3D {
 private:
+	C_RNG& RNG;
+
 	EFFECT3D_TYPE Active;
 	uint16_t cube_d;
 	uint16_t cube_dx;
@@ -160,6 +164,9 @@ public:
 	void MoveStg3Star();
 
 public:
+	C_EFFECT3D(C_RNG& RNG) noexcept : RNG(RNG) {
+	}
+
 	// コマンド送信
 	void SendCmdStg4Rock(uint8_t Cmd, uint8_t Param);
 
@@ -195,8 +202,6 @@ public:
 		return S6Star;
 	}
 };
-
-extern C_EFFECT3D Effect3D;
 
 
 ///// [ 関数 ] /////

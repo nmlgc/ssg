@@ -18,12 +18,6 @@
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"
 
-///// [ 変数 ] /////
-
-// 公開グローバル //
-C_BOSS Boss;
-
-
 // ボスデータ配列を初期化する(中断、ステージクリア時に使用) //
 void C_BOSS::Init(void)
 {

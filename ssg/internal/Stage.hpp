@@ -8,6 +8,14 @@
 #include "ssg/Input.h"
 #include "hatoyama/logic/buffer.h"
 
+class C_BOSS;
+class C_EFFECT3D;
+class C_ENEMY;
+class C_PLAYRANK;
+struct HOOKS;
+struct ROUND_PARAMS;
+
+
 // ＳＣＬ管理用構造体 //
 struct SCL_INFO {
 	// メッセージスキップ用フラグ
@@ -19,6 +27,13 @@ struct SCL_INFO {
 
 class C_STAGE {
 private:
+	HOOKS& Hooks;
+	const ROUND_PARAMS& Round;
+	C_BOSS& Boss;
+	C_EFFECT3D& Effect3D;
+	C_ENEMY& Enemy;
+	C_PLAYRANK& PlayRank;
+
 	BUFFER_OWNED SCL_Head;
 	const uint8_t *SCL_Now;
 	uint32_t GameCount;
@@ -29,6 +44,22 @@ private:
 	SCL_INFO SclInfo;
 
 public:
+	C_STAGE(
+		HOOKS& Hooks,
+		const ROUND_PARAMS& Round,
+		C_BOSS& Boss,
+		C_EFFECT3D& Effect3D,
+		C_ENEMY& Enemy,
+		C_PLAYRANK& PlayRank
+	) noexcept :
+		Hooks(Hooks),
+		Round(Round),
+		Boss(Boss),
+		Effect3D(Effect3D),
+		Enemy(Enemy),
+		PlayRank(PlayRank) {
+	}
+
 	// Returns `true` if [data] is a valid pointer.
 	bool Set(BUFFER_OWNED&& data, uint8_t stage);
 
@@ -46,5 +77,3 @@ public:
 		return SclInfo.MsgFlag;
 	}
 };
-
-extern C_STAGE Stage;

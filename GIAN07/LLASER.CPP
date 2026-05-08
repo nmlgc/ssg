@@ -11,10 +11,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-//// レーザー変数２ ////
-C_LLASER LLaser;
-
-
 //// ローカル関数 ////
 static void _LLaserPointSet(LLASER_DATA *lp);
 

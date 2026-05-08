@@ -218,7 +218,7 @@ void C_VIV::Dead(void)
 	Viv.bomb = Round.BombStock;
 	Viv.muteki = VIVDEAD_VAL;
 
-	PlayRankAdd(-2560);
+	PlayRank.Add(-2560);
 
 	if(Viv.left){
 		// 残機の残っている場合 //
@@ -252,7 +252,7 @@ void C_VIV::evade_addEx(int x, int y, uint8_t n)
 {
 	int		i;
 
-	PlayRankAdd(n<<2);
+	PlayRank.Add(n << 2);
 
 	if(n){
 		if(Viv.BuzzSound == false) {

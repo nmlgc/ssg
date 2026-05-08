@@ -16,16 +16,29 @@ struct PlayRankInfo {
 	int		Rank;			// 弾の速度変化に関する値
 };
 
+class C_PLAYRANK {
+private:
+	PlayRankInfo PlayRank;
+
+public:
+	// 難易度の許容範囲内でプレイランクを増減する
+	void Add(int n);
+
+	// 現在の難易度に応じてプレイランクを初期化
+	void Reset(void);
+
+	const auto LevelRanked(void) const {
+		return PlayRank.LevelRanked;
+	}
+	const auto Rank(void) const {
+		return PlayRank.Rank;
+	}
+};
+
 
 
 ///// [グローバル変数] /////
-extern PlayRankInfo		PlayRank;
-
-
-
-///// [ 関数 ] /////
-void PlayRankAdd(int n);	// 難易度の許容範囲内でプレイランクを増減する
-void PlayRankReset(void);	// 現在の難易度に応じてプレイランクを初期化
+extern C_PLAYRANK PlayRank;
 
 
 

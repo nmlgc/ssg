@@ -14,7 +14,7 @@ void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 {
 	Round = round;
 	Viv.Set(stage_first);
-	PlayRankReset();
+	PlayRank.Reset();
 
 	// 乱数の初期化 //
 	// 最後に乱数もそろえる //

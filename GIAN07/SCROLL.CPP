@@ -392,7 +392,7 @@ void StageMove(INPUT_BITS input)
 	GameCount++;
 
 	if((GameCount&0x3f)==0){
-		PlayRankAdd((GameStage == STAGE_EXTRA) ? 1 : (1 + (GameStage / 3)));
+		PlayRank.Add((GameStage == STAGE_EXTRA) ? 1 : (1 + (GameStage / 3)));
 	}
 }
 

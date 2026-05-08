@@ -8,7 +8,7 @@
 #include "LogicInstance.h"
 #include <assert.h>
 
-PlayRankInfo	PlayRank;
+C_PLAYRANK PlayRank;
 
 struct RANK_DATA_FOR_DIFFICULTY {
 	int clamp_min;
@@ -32,7 +32,7 @@ static const RANK_DATA_FOR_DIFFICULTY RANK_DATA[] = {
 
 
 // 難易度の許容範囲内でプレイランクを増減する
-void PlayRankAdd(int n)
+void C_PLAYRANK::Add(int n)
 {
 	// 難易度を変化させる //
 	if(GameStage == STAGE_EXTRA) {
@@ -71,7 +71,7 @@ void PlayRankAdd(int n)
 
 
 // 現在の難易度に応じてプレイランクを初期化
-void PlayRankReset(void)
+void C_PLAYRANK::Reset(void)
 {
 	assert(
 		(Round.LevelSelected <= GAME_LUNATIC) &&

@@ -79,7 +79,7 @@ void C_ITEM::Move(void)
 			switch(ip->type){
 				case(ITEM_SCORE):
 					Snd_SEPlay(SOUND_ID_SELECT, ip->x);
-					PlayRankAdd((SY_MAX-Viv.y)>>10);
+					PlayRank.Add((SY_MAX - Viv.y) >> 10);
 					Viv.score_add(point);
 					StringEffect2(ip->x,ip->y,point);
 					if(Viv.evade){

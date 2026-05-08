@@ -66,7 +66,7 @@ static void slaser_pset(LASER_DATA *lp);	// ４点の座標をセットする(�
 
 void C_LASER::Set(void)
 {
-	switch(PlayRank.LevelRanked) {
+	switch(PlayRank.LevelRanked()) {
 		case(GAME_EASY):
 			easy_cmdL(LaserCmd);
 		break;
@@ -80,7 +80,9 @@ void C_LASER::Set(void)
 		break;
 	}
 
-	LaserCmd.v = (((LaserCmd.v>>1)*(PlayRank.Rank))>>(5+8)) + (LaserCmd.v>>1);
+	LaserCmd.v = (
+		(((LaserCmd.v >> 1) * (PlayRank.Rank())) >> (5 + 8)) + (LaserCmd.v >> 1)
+	);
 
 	this->SetEX();
 }

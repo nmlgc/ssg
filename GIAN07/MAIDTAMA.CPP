@@ -178,7 +178,7 @@ void MaidTamaSet(INPUT_BITS input, bool in_msg)
 		Viv.bomb_time = MaidBombTime[Viv.weapon&3];		// 装備ごとに変更せよ
 		Viv.muteki    = BOMBMUTEKI_VAL;
 		Viv.bomb--;
-		PlayRankAdd(-500);					// 難易度ダウン
+		PlayRank.Add(-500); // 難易度ダウン
 	}
 
 	if(Viv.bomb_time){

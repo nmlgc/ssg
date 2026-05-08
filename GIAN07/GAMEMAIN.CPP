@@ -1232,7 +1232,7 @@ void WeaponSelectProc(bool&)
 		Viv.x = 400*64 + sinl((count/3)*6,60*64);
 		Viv.y = 350*64 + sinl((count/3)*4,30*64);
 
-		MaidMove(KEY_TAMA);
+		MaidMove(KEY_TAMA, SclInfo.MsgFlag);
 		MaidTamaMove();
 
 		GrpBackend_SetClip(
@@ -1384,7 +1384,7 @@ void GameMove(void)
 	ScreenEffectMove();
 
 	// この２行の位置を変更しました //
-	MaidMove(Key_Data);
+	MaidMove(Key_Data, SclInfo.MsgFlag);
 	MaidTamaMove();
 }
 

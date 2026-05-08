@@ -47,7 +47,7 @@ void TamaSetXY(int x, int y);
 
 
 ///// [ 関数 ] /////
-void MaidTamaSet(INPUT_BITS input);	// たま発射！！
+void MaidTamaSet(INPUT_BITS, bool in_msg);	// たま発射！！
 void MaidTamaMove(void);	// 弾移動＆ヒットチェック
 void MaidTamaDraw(void);	// ナニな弾描画
 void MaidTamaIndSet(void);	// 弾ハッシュテーブル初期化

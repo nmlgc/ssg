@@ -279,7 +279,7 @@ extern void StateDraw(void)
 	}
 }
 
-extern void MaidMove(INPUT_BITS input)
+extern void MaidMove(INPUT_BITS input, bool in_msg)
 {
 	int		vx,vy,v;
 	constexpr int VivSpeed = (64 * 18);
@@ -382,7 +382,7 @@ extern void MaidMove(INPUT_BITS input)
 	Viv.opy = Viv.y + Viv.vy + 64*6;
 
 	// 弾＆ボムのセット //
-	MaidTamaSet(input);
+	MaidTamaSet(input, in_msg);
 
 	if(Viv.bomb_time){
 		tama_clear();

@@ -153,7 +153,7 @@ void TamaSetXY(int x, int y)
 
 
 // たま発射！！ //
-void MaidTamaSet(INPUT_BITS input)
+void MaidTamaSet(INPUT_BITS input, bool in_msg)
 {
 	// この関数では、前回の発射状態 (Viv_St) を参照して、発射可能であるならば //
 	// 発射し、そうでなければ、単にリターンする。                             //
@@ -173,7 +173,7 @@ void MaidTamaSet(INPUT_BITS input)
 		(Viv.bomb_time == 0) &&
 		// (Viv.muteki == 0) &&
 		Viv.bomb &&
-		(SclInfo.MsgFlag == false)
+		(in_msg == false)
 	) {
 		//if(Viv.weapon == 0) EnterBombPalette();
 

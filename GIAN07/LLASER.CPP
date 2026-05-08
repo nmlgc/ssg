@@ -4,14 +4,11 @@
 /*                                                                           */
 
 #include "ssg/internal/LLaser.hpp"
+#include "ENEMY.H"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Maid.hpp"
 #include "hatoyama/logic/ut_math.h"
-
-
-//// レーザー変数２ ////
-C_LLASER LLaser;
 
 
 //// ローカル関数 ////

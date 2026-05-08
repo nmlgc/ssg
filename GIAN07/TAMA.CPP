@@ -23,10 +23,6 @@
 static constexpr WORLD_COORD HOMING_DUMMY = PixelToWorld(500);
 
 
-////グローバル変数////
-C_TAMA Tama;
-
-
 ////ローカルな関数////
 static void easy_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｅａｓｙ
 static void hard_cmd(TAMA_CMD& TamaCmd);	// 難易度：Ｈａｒｄ

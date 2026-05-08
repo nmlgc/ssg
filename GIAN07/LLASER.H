@@ -14,7 +14,10 @@
 //            : 発射しているレーザーの何番目か、に変更された
 
 
-#include "ENEMY.H"
+import std.compat;
+#include "hatoyama/logic/coords.h"
+
+typedef struct ENEMY_DATA ENEMY_DATA;
 
 
 

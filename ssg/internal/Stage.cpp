@@ -5,17 +5,15 @@
 
 #include "ssg/internal/Stage.hpp"
 #include "GIAN.H"
-#include "LogicInstance.h"
 #include "PRankCtrl.h"
-#include "RNG.hpp"
 #include "SCL.H"
 #include "ssg/Hook.h"
+#include "ssg/Round.h"
 #include "ssg/internal/Boss.hpp"
 #include "ssg/internal/Effect3D.hpp"
 #include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/endian.h"
-
-C_STAGE Stage;
 
 bool C_STAGE::Set(BUFFER_OWNED&& data, uint8_t stage)
 {

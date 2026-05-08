@@ -7,8 +7,14 @@
 
 #include "HOMINGL.H"
 
+struct HOOKS;
+class C_VIV;
+
 class C_HLASER {
 private:
+	HOOKS& Hooks;
+	C_VIV& Viv;
+
 	// ホーミングレーザーの本数
 	uint16_t HLaserNow;
 
@@ -22,6 +28,9 @@ private:
 	HLaserData FreeHL;
 
 public:
+	C_HLASER(HOOKS& Hooks, C_VIV& Viv) noexcept : Hooks(Hooks), Viv(Viv) {
+	}
+
 	// ホーミングレーザーの初期化を行う
 	void Init(void);
 
@@ -42,6 +51,3 @@ public:
 		return HLaserNow;
 	}
 };
-
-
-extern C_HLASER HLaser;

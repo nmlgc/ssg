@@ -7,11 +7,17 @@
 
 #include "LLASER.H"
 
+class C_VIV;
+struct HOOKS;
+
 class C_LLASER {
 public:
 	LLASER_CMD LLaserCmd;
 
 private:
+	HOOKS& Hooks;
+	C_VIV& Viv;
+
 	LLASER_DATA LLaser[LLASER_MAX];
 
 	void _LLaserHitCheck(const LLASER_DATA *lp);
@@ -20,6 +26,9 @@ private:
 	void _LLaserXYSet(int id);
 
 public:
+	C_LLASER(HOOKS& Hooks, C_VIV& Viv) noexcept : Hooks(Hooks), Viv(Viv) {
+	}
+
 	// レーザーをセットする
 	bool Set(uint8_t id);
 
@@ -54,6 +63,3 @@ public:
 		return LLaser;
 	}
 };
-
-
-extern C_LLASER LLaser;

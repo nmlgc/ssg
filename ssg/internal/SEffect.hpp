@@ -8,11 +8,18 @@
 #include "ssg/SEffect.h"
 #include "hatoyama/logic/coords.h"
 
+class C_RNG;
+
 class C_SEFFECT {
 private:
+	C_RNG& RNG;
+
 	SEFFECT_DATA SEffect[SEFFECT_MAX];
 
 public:
+	C_SEFFECT(C_RNG& RNG) noexcept : RNG(RNG) {
+	}
+
 	// エフェクトの初期化を行う
 	void Init(void);
 
@@ -36,6 +43,3 @@ public:
 		return SEffect;
 	}
 };
-
-
-extern C_SEFFECT SEffect;

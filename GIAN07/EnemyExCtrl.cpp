@@ -16,10 +16,6 @@
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 
 
-C_SNAKY Snaky;
-C_BIT Bit;
-
-
 // 蛇型の敵配列の初期化 //
 void C_SNAKY::Init(void)
 {

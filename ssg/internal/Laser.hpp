@@ -7,12 +7,22 @@
 
 #include "LASER.H"
 
+class C_LLASER;
+class C_PLAYRANK;
+class C_RNG;
+class C_VIV;
+
 class C_LASER {
 public:
 	// 標準レーザーコマンド構造体
 	LASER_CMD LaserCmd;
 
 private:
+	C_LLASER const& LLaser;
+	C_PLAYRANK const& PlayRank;
+	C_RNG& RNG;
+	C_VIV& Viv;
+
 	// レーザーの本数
 	uint16_t LaserNow;
 
@@ -38,6 +48,14 @@ private:
 	int REFL_hit(const LASER_DATA *lp);
 
 public:
+	C_LASER(
+		C_LLASER const& LLaser,
+		C_PLAYRANK const& PlayRank,
+		C_RNG& RNG,
+		C_VIV& Viv
+	) noexcept : LLaser(LLaser), PlayRank(PlayRank), RNG(RNG), Viv(Viv) {
+	}
+
 	// レーザーをセットする(難易度変更"有り")
 	void Set(void);
 
@@ -61,6 +79,3 @@ public:
 		return std::span(LaserInd).first(LaserNow);
 	}
 };
-
-
-extern C_LASER Laser;

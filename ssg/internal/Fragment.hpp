@@ -7,14 +7,21 @@
 
 #include "FRAGMENT.H"
 
+class C_RNG;
+
 class C_FRAGMENT {
 private:
+	C_RNG& RNG;
+
 	// 次に破片データを挿入する位置
 	int FragmentPtr = 0;
 
 	FRAGMENT_DATA Fragment[FRAGMENT_MAX];
 
 public:
+	C_FRAGMENT(C_RNG& RNG) noexcept : RNG(RNG) {
+	}
+
 	//// 破片関数 ////
 	void Set(int x, int y, uint8_t cmd);
 	void Move(void);
@@ -24,6 +31,3 @@ public:
 		return Fragment;
 	}
 };
-
-
-extern C_FRAGMENT Fragment;

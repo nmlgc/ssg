@@ -7,8 +7,32 @@
 
 #include "BOSS.H"
 
+struct HOOKS;
+class C_BIT;
+class C_BOMBEFC;
+class C_ENEMY;
+class C_FRAGMENT;
+class C_ITEM;
+class C_LASER;
+class C_SEFFECT;
+class C_SNAKY;
+class C_TAMA;
+class C_VIV;
+
 class C_BOSS {
 private:
+	HOOKS& Hooks;
+	C_BIT& Bit;
+	C_BOMBEFC& BombEfc;
+	C_ENEMY& Enemy;
+	C_FRAGMENT& Fragment;
+	C_ITEM& Item;
+	C_LASER& Laser;
+	C_SEFFECT& SEffect;
+	C_SNAKY& Snaky;
+	C_TAMA& Tama;
+	C_VIV& Viv;
+
 	// 現在のボスの数
 	uint16_t BossNow;
 
@@ -21,6 +45,32 @@ private:
 	bool BossDamageApply(BOSS_DATA& b, ENEMY_DATA& e, int damage);
 
 public:
+	C_BOSS(
+		HOOKS& Hooks,
+		C_BIT& Bit,
+		C_BOMBEFC& BombEfc,
+		C_ENEMY& Enemy,
+		C_FRAGMENT& Fragment,
+		C_ITEM& Item,
+		C_LASER& Laser,
+		C_SEFFECT& SEffect,
+		C_SNAKY& Snaky,
+		C_TAMA& Tama,
+		C_VIV& Viv
+	) noexcept :
+		Hooks(Hooks),
+		Bit(Bit),
+		BombEfc(BombEfc),
+		Enemy(Enemy),
+		Fragment(Fragment),
+		Laser(Laser),
+		Item(Item),
+		SEffect(SEffect),
+		Snaky(Snaky),
+		Tama(Tama),
+		Viv(Viv) {
+	}
+
 	// ボスデータ配列を初期化する(中断、ステージクリア時に使用)
 	void Init(void);
 
@@ -74,6 +124,3 @@ public:
 		return Boss;
 	}
 };
-
-
-extern C_BOSS Boss;

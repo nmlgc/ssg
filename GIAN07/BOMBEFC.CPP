@@ -8,8 +8,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-C_BOMBEFC BombEfc;
-
 // 秘密の関数 //
 void _ExBombSTDInit(BombEfcCtrl *p);
 void _ExBombSTDMove(BombEfcCtrl *p, C_RNG& RNG);

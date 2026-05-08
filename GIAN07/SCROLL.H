@@ -12,6 +12,7 @@
 #include "hatoyama/logic/ffi.h"
 
 struct HOOKS;
+class C_EFFECT3D;
 
 
 ///// [更新履歴] /////
@@ -95,7 +96,7 @@ typedef struct tagScrollInfo{
 ///// [ 関数 ] /////
 void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS *);
 void ScrollMove(void);	// 背景を動かす(１フレーム分)
-void ScrollDraw(void);	// 背景を描画する
+void ScrollDraw(const C_EFFECT3D&);	// 背景を描画する
 
 void ScrollSpeed(int speed);	// スクロールスピードを変更する(引数:(1)スクロール速度)
 void ScrollCommand(uint8_t cmd);	// ＳＣＬ用コマンド実行関数(引数:(1)スクロールコマンド)

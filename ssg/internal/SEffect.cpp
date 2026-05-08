@@ -9,9 +9,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-C_SEFFECT SEffect;
-
-
 // エフェクトの初期化を行う //
 void C_SEFFECT::Init(void)
 {

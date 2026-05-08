@@ -54,9 +54,6 @@
 #define LC_ALLZ	0x09	// 全方向発射＆サボテンセット
 #define LC_RNDZ	0x0a	// 基本角サボテンセットランダム
 
-////グローバル変数////
-C_LASER Laser;
-
 static void easy_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｅａｓｙ
 static void hard_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｈａｒｄ
 static void luna_cmdL(LASER_CMD& LaserCmd);	// 難易度：Ｌｕｎａｔｉｃ

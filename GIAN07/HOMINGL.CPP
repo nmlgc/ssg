@@ -11,10 +11,6 @@
 #include "hatoyama/logic/ut_math.h"
 
 
-C_HLASER HLaser;
-
-
-
 // ホーミングレーザーの初期化を行う //
 void C_HLASER::Init(void)
 {

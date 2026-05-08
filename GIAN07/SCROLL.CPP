@@ -16,12 +16,6 @@
 #include "LogicInstance.h"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
-#include "ssg/internal/Boss.hpp"
-#include "ssg/internal/Effect3D.hpp"
-#include "ssg/internal/Enemy.hpp"
-#include "ssg/internal/Maid.hpp"
-#include "ssg/internal/RNG.hpp"
-#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/graphics_backend.h"
@@ -160,18 +154,18 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 			break;
 
 			case(SCL_BOSS): { // ボスをセットする(X(16),Y(16),ID(8))
-				BossHPG_Open(Boss.GetHPSum());
+				BossHPG_Open(SSG.Boss.GetHPSum());
 			}
 			break;
 
 			case(SCL_MWOPEN):	// メッセージウィンドウを開く
-				if(Round.MsgEnabled) {
+				if(SSG.Round.MsgEnabled) {
 					MWinOpen();
 				}
 			break;
 
 			case(SCL_MWCLOSE):	// メッセージウィンドウを閉じる
-				if(Round.MsgEnabled) {
+				if(SSG.Round.MsgEnabled) {
 					MWinClose();
 				}
 			break;
@@ -262,8 +256,8 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 				}
 				if(DemoplayLoadEnable) return;
 
-				if(Round.LevelSelected != GAME_EASY) {
-					switch(Viv.weapon){
+				if(SSG.Round.LevelSelected != GAME_EASY) {
+					switch(SSG.Viv.weapon){
 						case(0):	ConfigDat.ExtraStgFlags.v |= 1;	break;
 						case(1):	ConfigDat.ExtraStgFlags.v |= 2;	break;
 						case(2):	ConfigDat.ExtraStgFlags.v |= 4;	break;
@@ -306,7 +300,7 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 }
 
 // 背景を描画する //
-void ScrollDraw(void)
+void ScrollDraw(const C_EFFECT3D& Effect3D)
 {
 	PBGMAP	*p;
 	int		i,j,k,x,y;
@@ -322,20 +316,22 @@ void ScrollDraw(void)
 		Stg3BossMapDraw();
 		return;
 	}
-	else if(Effect3D.GetActive() == EFFECT3D_S6_CUBE) {
-		Draw3DCube(Effect3D.DataStar(), Effect3D.DataCube());
+	else if(SSG.Effect3D.GetActive() == EFFECT3D_S6_CUBE) {
+		Draw3DCube(SSG.Effect3D.DataStar(), SSG.Effect3D.DataCube());
 		return;
 	}
-	else if(Effect3D.GetActive() == EFFECT3D_S6_FAKE_ECL) {
-		DrawEffectFakeECL(Effect3D.DataWFLine(), Effect3D.DataFakeECL());
+	else if(SSG.Effect3D.GetActive() == EFFECT3D_S6_FAKE_ECL) {
+		DrawEffectFakeECL(
+			SSG.Effect3D.DataWFLine(), SSG.Effect3D.DataFakeECL()
+		);
 		return;
 	}
-	else if(Effect3D.GetActive() == EFFECT3D_S6_RASTER) {
-		DrawStg6Raster(Effect3D.DataS6Star(), Effect3D.DataS6Ras());
+	else if(SSG.Effect3D.GetActive() == EFFECT3D_S6_RASTER) {
+		DrawStg6Raster(SSG.Effect3D.DataS6Star(), SSG.Effect3D.DataS6Ras());
 		return;
 	}
 	else if(ScrollInfo.ExCmd == ScrollCmdStg3Star){
-		DrawStg3Star(Effect3D.DataS6Star());
+		DrawStg3Star(SSG.Effect3D.DataS6Star());
 		return;
 	}
 
@@ -365,8 +361,8 @@ void ScrollDraw(void)
 		}
 	}
 
-	if(Effect3D.GetActive() == EFFECT3D_S4_ROCK) {
-		DrawStg4Rock(Effect3D.DataRock());
+	if(SSG.Effect3D.GetActive() == EFFECT3D_S4_ROCK) {
+		DrawStg4Rock(SSG.Effect3D.DataRock());
 	}
 }
 

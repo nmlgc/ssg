@@ -11,8 +11,6 @@
 #include "LogicInstance.h"
 #include "ssg/Input.h"
 #include "ssg/internal/LZ.hpp"
-#include "ssg/internal/RNG.hpp"
-#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/file.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -102,7 +100,7 @@ void DemoplaySaveDemo(void)
 	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
 	char8_t fn[] = u8"STG_Demo.DAT";
-	fn[3] = ('0' + Stage.Number());
+	fn[3] = ('0' + SSG.Stage.Number());
 
 	auto *f = SDL_IOFromFile(fn, "wb");
 	if(f) {
@@ -175,7 +173,7 @@ void DemoplaySaveReplay(void)
 		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
 	};
 
-	const auto fn = ReplayFN(Stage.Number());
+	const auto fn = ReplayFN(SSG.Stage.Number());
 	FilWrite(fn.c_str(), files);
 }
 

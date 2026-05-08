@@ -8,11 +8,7 @@
 #include "LogicInstance.h"
 #include "PRankCtrl.h"
 #include "ssg/Hook.h"
-#include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/LZ.hpp"
-#include "ssg/internal/Maid.hpp"
-#include "ssg/internal/RNG.hpp"
-#include "ssg/internal/Stage.hpp"
 
 constexpr HOOKS HOOKS_EMPTY = {
 	.SCL_Op = [](const uint8_t *, bool8_t, HOOKS *) {},
@@ -55,6 +51,8 @@ bool StageLoad(
 	if(!(Enemy.Set(ecl_buf_func(), stage) && Stage.Set(scl_buf_func()))) {
 		return false;
 	}
+
+	ssg.StageInit();
 	return true;
 }
 
@@ -77,4 +75,45 @@ void C_SSG::StageFree(void)
 	// メモリを解放だ！ //
 	Enemy.Set(nullptr, 0);
 	Stage.Set(nullptr);
+}
+
+void C_SSG::StageInit(void)
+{
+	Boss.Init();
+	Snaky.Init(); // 蛇管理を初期化(やや謎) //
+	Bit.Init(); // ビット管理も初期化 //
+	MaidTama.IndSet();
+	Enemy.IndSet();
+	Tama.IndSet(400 + 200); // 小型弾に４００
+	Laser.IndSet();
+	LLaser.Setup();
+	HLaser.Init();
+	SEffect.Init();
+	Item.IndSet();
+	Fragment.Setup();
+	BombEfc.Init();
+	Viv.NextStage();
+}
+
+void C_SSG::Move(INPUT_BITS input)
+{
+	Stage.Move(input);
+	Effect3D.Move();
+
+	Boss.Move();
+	Snaky.Move();
+	Bit.Move();
+	Enemy.Move();
+	Item.Move();
+	Tama.Move();
+	Laser.Move();
+	LLaser.Move();
+	HLaser.Move();
+	Fragment.Move();
+	SEffect.Move();
+	BombEfc.Move();
+
+	// この２行の位置を変更しました //
+	Viv.Move(input, Stage.InMsg());
+	MaidTama.Move();
 }

@@ -5,7 +5,23 @@
 
 #pragma once
 
-#include "hatoyama/logic/ffi.h"
+#include "ssg/Input.h"
+#include "ssg/internal/BombEfc.hpp"
+#include "ssg/internal/Boss.hpp"
+#include "ssg/internal/Effect3D.hpp"
+#include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/EnemyExCtrl.hpp"
+#include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/HLaser.hpp"
+#include "ssg/internal/Item.hpp"
+#include "ssg/internal/LLaser.hpp"
+#include "ssg/internal/Laser.hpp"
+#include "ssg/internal/Maid.hpp"
+#include "ssg/internal/MaidTama.hpp"
+#include "ssg/internal/RNG.hpp"
+#include "ssg/internal/SEffect.hpp"
+#include "ssg/internal/Stage.hpp"
+#include "ssg/internal/Tama.hpp"
 
 struct HOOKS;
 struct PACKFILE_READ;
@@ -30,4 +46,10 @@ struct C_SSG {
 
 	// Deallocates enemy and SCL data.
 	void StageFree(void);
+
+	// Initializes all subsystems for a new stage.
+	void StageInit(void);
+
+	// Updates a single game frame, using the given [input].
+	void Move(INPUT_BITS input);
 };

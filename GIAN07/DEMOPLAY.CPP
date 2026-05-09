@@ -6,7 +6,6 @@
 #include <SDL3/SDL_iostream.h>
 
 #include "DEMOPLAY.H"
-#include "CONFIG.H"
 #include "GIAN.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
@@ -37,47 +36,41 @@ std::u8string ReplayFN(uint8_t stage)
 	return ret;
 }
 
-void DemoplayInit(void)
+void DemoplayInit(const ROUND_PARAMS& Round)
 {
 	// 乱数の準備 //
-	DemoInfo.RndSeed = (
-		(Cast::up<uint32_t>(RNG.next()) + 1u) *
-		(Cast::up<uint32_t>(RNG.next()) + 1u)
-	);
-	RNG.seed = DemoInfo.RndSeed;
-
-	DemoInfo.Exp    = Viv.exp;
-	DemoInfo.Weapon = Viv.weapon;
+	DemoInfo.RndSeed = Round.Seed;
+	DemoInfo.Exp = Round.Exp;
+	DemoInfo.Weapon = Round.Weapon;
 	DemoInfo.CfgDat.LevelSelected = Round.LevelSelected;
-	DemoInfo.CfgDat.PlayerStock = Viv.left;
-	DemoInfo.CfgDat.BombStock = ConfigDat.BombStock.v;
-	DemoInfo.CfgDat.InputFlags = ConfigDat.InputFlags.v;
+	DemoInfo.CfgDat.PlayerStock = Round.PlayerStock;
+	DemoInfo.CfgDat.BombStock = Round.BombStock;
+	DemoInfo.CfgDat.InputFlags = Round.InputFlags;
 
 	DemoFrameCur = 0;
 	DemoplaySaveEnable = true;
 }
 
 
-bool DemoplayLoadSetup()
+bool DemoplayLoadSetup(uint8_t stage)
 {
 	DemoFrameCur = 0;
 	DemoplayLoadEnable = true;
 
-	// コンフィグの初期化 //
-	Round.BombStock     = DemoInfo.CfgDat.BombStock;
-	Round.PlayerStock   = DemoInfo.CfgDat.PlayerStock;
-	Round.InputFlags    = DemoInfo.CfgDat.InputFlags;
-	Round.LevelSelected = DemoInfo.CfgDat.LevelSelected;
+	const ROUND_PARAMS round = {
+		.Seed = DemoInfo.RndSeed,
 
-	// 本体の性能記述 //
-	Viv.exp    = DemoInfo.Exp;
-	Viv.weapon = DemoInfo.Weapon;
-	Viv.left   = Round.PlayerStock;
-	Viv.bomb   = Round.BombStock;
+		// コンフィグの初期化 //
+		.LevelSelected = DemoInfo.CfgDat.LevelSelected,
+		.PlayerStock = DemoInfo.CfgDat.PlayerStock,
+		.BombStock = DemoInfo.CfgDat.BombStock,
+		.InputFlags = DemoInfo.CfgDat.InputFlags,
 
-	// 乱数の初期化 //
-	// 最後に乱数もそろえる //
-	RNG.seed = DemoInfo.RndSeed;
+		// 本体の性能記述 //
+		.Weapon = DemoInfo.Weapon,
+		.Exp = DemoInfo.Exp,
+	};
+	SSG.RoundInit(round, stage);
 
 	return true;
 }
@@ -123,7 +116,7 @@ void DemoplaySaveDemo(void)
 }
 
 
-bool DemoplayLoadDemo(int stage)
+bool DemoplayLoadDemo(uint8_t stage)
 {
 	// 展開 //
 	const auto temp = LoadDemo(stage);
@@ -143,7 +136,7 @@ bool DemoplayLoadDemo(int stage)
 		const auto inputs = maybe_inputs.value();
 		memcpy(DemoBuffer, inputs.data(), inputs.size_bytes());
 	}
-	return DemoplayLoadSetup();
+	return DemoplayLoadSetup(stage);
 }
 
 
@@ -186,7 +179,7 @@ void DemoplaySaveReplay(void)
 }
 
 
-bool DemoplayLoadReplay(int stage)
+bool DemoplayLoadReplay(uint8_t stage)
 {
 	BUFFER_OWNED temp;
 
@@ -245,5 +238,5 @@ bool DemoplayLoadReplay(int stage)
 		}
 	}
 	// --------------------------------------------------
-	return DemoplayLoadSetup();
+	return DemoplayLoadSetup(stage);
 }

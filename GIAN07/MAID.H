@@ -73,7 +73,7 @@ struct MAID {
 ///// [ 関数 ] /////
 extern void MaidDraw(void);
 extern void MaidMove(INPUT_BITS, bool in_msg);
-extern void MaidSet(void);			// 初期化
+extern void MaidSet(uint8_t stage_first);	// 初期化
 extern void MaidNextStage(void);	// 次のステージの準備
 extern void MaidDead(void);			// 死す
 

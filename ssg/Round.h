@@ -31,10 +31,13 @@ static const uint8_t INPF_Z_MSKIP_ENABLE   = 0x02; // Ｚキーでメッセー�
 static const uint8_t INPF_Z_SPDDOWN_ENABLE = 0x04; // 押しっぱなしでシフト移動
 
 struct ROUND_PARAMS {
+	uint32_t Seed;
 	uint8_t	LevelSelected;
 	uint8_t PlayerStock;
 	uint8_t BombStock;
 	uint8_t InputFlags;
+	uint8_t Weapon;
+	uint8_t Exp;
 };
 
 #pragma warning(pop)

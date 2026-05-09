@@ -10,6 +10,7 @@
 #include "ssg/Input.h"
 
 struct CONFIG_DATA;
+struct ROUND_PARAMS;
 
 
 ///// [ 定数 ] /////
@@ -42,7 +43,7 @@ typedef struct tagDEMOPLAY_INFO{
 
 
 ///// [ 関数 ] /////
-void DemoplayInit(void);	// デモプレイデータの準備
+void DemoplayInit(const ROUND_PARAMS& Round); // デモプレイデータの準備
 
 // デモプレイデータを保存する
 // Returns `true` if the replay is over and should be saved via either
@@ -52,8 +53,8 @@ bool DemoplayRecord(INPUT_BITS key);
 void DemoplaySaveDemo(void);	// デモプレイデータをファイルに書き込む
 void DemoplaySaveReplay(void);	// リプレイデータをファイルに書き込む
 
-bool DemoplayLoadDemo(int stage);	// デモプレイデータをロードする
-bool DemoplayLoadReplay(int stage);	// リプレイデータをロードする
+bool DemoplayLoadDemo(uint8_t stage);	// デモプレイデータをロードする
+bool DemoplayLoadReplay(uint8_t stage);	// リプレイデータをロードする
 INPUT_BITS DemoplayMove(void);	// Key_Data を返す
 void DemoplayCleanup(void);	// デモプレイロードの事後処理
 

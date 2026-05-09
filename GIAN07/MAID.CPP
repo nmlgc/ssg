@@ -343,22 +343,22 @@ extern void MaidMove(INPUT_BITS input, bool in_msg)
 }
 
 // 初期化 //
-extern void MaidSet(void)
+void MaidSet(uint8_t stage_first)
 {
 	MaidNextStage();
 
 	Viv.score     = 0;
 	Viv.dscore    = 0;
-	Viv.exp       = 0;
+	Viv.exp       = Round.Exp;
 	Viv.exp2      = 0;
 	Viv.bomb      = Round.BombStock;
 	Viv.left      = Round.PlayerStock;
-	Viv.credit    = 4;		//5;
+	Viv.credit    = ((stage_first == STAGE_EXTRA) ? 0 : 4 /* 5 */);
 
 	Viv.evade_c   = Viv.evade = 0;
 	Viv.evadesc   = 0;
 	Viv.evade_sum = 0;
-
+	Viv.weapon    = Round.Weapon;
 	Viv.GrpID     = 1;
 
 	Viv.bGameOver = false;

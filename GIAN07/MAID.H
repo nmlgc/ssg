@@ -75,7 +75,7 @@ typedef struct
 extern void MaidDraw(void);
 extern void StateDraw(void);		// 各種ステータスを描画する
 extern void MaidMove(void);
-extern void MaidSet(void);			// 初期化
+extern void MaidSet(uint8_t stage_first);	// 初期化
 extern void MaidNextStage(void);	// 次のステージの準備
 extern void MaidDead(void);			// 死す
 

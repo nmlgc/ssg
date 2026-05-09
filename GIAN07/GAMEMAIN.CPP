@@ -554,22 +554,21 @@ bool WeaponSelectInit(bool ExStg)
 	GrpBackend_Clear();
 	Grp_Flip();
 
-	Round = {
+	const ROUND_PARAMS round = {
+		.Seed = RNG.seed,
 		.LevelSelected = (ExStg ? EXTRA_LEVEL : ConfigDat.LevelSelected.v),
 		.PlayerStock = (ExStg ? EXTRA_LIVES : ConfigDat.PlayerStock.v),
 		.BombStock = ConfigDat.BombStock.v,
 		.InputFlags = ConfigDat.InputFlags.v,
+		.Weapon = 0,
+		.Exp = 0,
 	};
 
 	GameSTD_Init();
-	PlayRankReset();
-
-	MaidSet();
 
 	GrpBackend_SetClip(GRP_RES_RECT);
 
 	WeaponKeyWait = 1;
-	Viv.weapon    = 0;
 	GameMain = WeaponSelectProc;
 	WeaponSelectStage = (ExStg ? STAGE_EXTRA :
 #ifdef PBG_DEBUG
@@ -578,6 +577,8 @@ bool WeaponSelectInit(bool ExStg)
 		(ConfigDat.StageSelect.v ? ConfigDat.StageSelect.v : 1)
 #endif
 	);
+
+	SSG.RoundInit(round, GameStage);
 
 	return true;
 }
@@ -642,16 +643,12 @@ extern bool GameNextStage(void)
 // リプレイ用の初期化を行う //
 extern bool GameReplayInit(int Stage)
 {
-	MaidSet();
-
 	GameStage = Stage;
 
-	if(!DemoplayLoadReplay(GameStage)) {
+	if(!DemoplayLoadReplay(Stage)) {
 		// DebugOut(u8"デモプレイデータが存在せず");
 		return false;
 	}
-
-	PlayRankReset();
 
 	GrpBackend_Clear();
 	Grp_Flip();
@@ -666,10 +663,6 @@ extern bool GameReplayInit(int Stage)
 		DebugOut(u8"ENEMY.DAT が破壊されています");
 		DemoplayCleanup();
 		return false;
-	}
-
-	if(GameStage == STAGE_EXTRA) {
-		Viv.credit = 0;
 	}
 
 	return GameInit(ReplayProc);
@@ -731,8 +724,6 @@ bool DemoInit(void)
 
 	GameSTD_Init();
 
-	MaidSet();
-
 	RNG.seed = Time_SteadyTicksMS();
 	GameStage = ((RNG.next() % STAGE_MAX) + 1);
 
@@ -743,8 +734,6 @@ bool DemoInit(void)
 		// DebugOut(u8"デモプレイデータが存在せず");
 		return false;
 	}
-
-	PlayRankReset();
 
 	if(!LoadGraph(GameStage)){
 		DebugOut(u8"GRAPH.DAT が破壊されています");
@@ -1129,7 +1118,7 @@ void WeaponSelectProc(bool&)
 				}
 			}
 
-			MaidSet();
+			Round.Weapon = Viv.weapon;
 			MaidTamaIndSet();
 			count = 0;
 
@@ -1143,25 +1132,30 @@ void WeaponSelectProc(bool&)
 #endif
 				// リプレイ用の処理を追加 //
 				if(WeaponSelectStage == 2) {
-					Viv.exp = 160;
+					Round.Exp = 160;
 				} else if(WeaponSelectStage >= 3) {
-					Viv.exp = 255;
+					Round.Exp = 255;
 				}
 			}
 			else{
-				Viv.credit = 0;
-				Viv.exp    = 255;
+				Round.Exp = 255;
 			}
 #ifdef PBG_DEBUG
 			if(!DebugDat.NoMaxLives) {
-				Viv.left = DEBUG_MAX_LIVES;
+				Round.PlayerStock = DEBUG_MAX_LIVES;
 			}
 #endif
 			if(record) {
-				DemoplayInit();
+				Round.Seed = (
+					(Cast::up<uint32_t>(RNG.next()) + 1u) *
+					(Cast::up<uint32_t>(RNG.next()) + 1u)
+				);
+				DemoplayInit(Round);
 			}
 
+			SSG.RoundInit(Round, WeaponSelectStage);
 			GameStage = WeaponSelectStage;
+
 			if(!LoadGraph(GameStage)){
 				DebugOut(u8"GRAPH.DAT が破壊されています");
 				return;

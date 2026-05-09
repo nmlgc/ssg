@@ -12,6 +12,7 @@ FVOID BossDataInit(void)
 
 	for(i=0;i<BOSS_MAX;i++){
 		// 特殊変数の初期化.... //
+		Boss[i].ExMove   = BossSTDMove;		// 特殊移動関数
 		Boss[i].Hit      = NULL;			// 特殊当たり判定
 	}
 }

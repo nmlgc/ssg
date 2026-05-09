@@ -57,7 +57,6 @@ void BossDataInit(void)
 		it.IsUsed   = 0;	// 要はこれをゼロにすれば良い
 
 		// 特殊変数の初期化.... //
-		it.ExMove   = BossSTDMove;	// 特殊移動関数
 		it.ExCount  = 0;
 		it.ExState  = BEXST_NORM;	// 特殊状態変数
 	}
@@ -88,7 +87,6 @@ void BossSet(int x, int y, uint32_t BossID)
 	e->item = 0;
 
 	it->ExCount = 0;
-	it->ExMove  = BossSTDMove;
 	it->ExState = BEXST_NORM;
 	it->IsUsed  = 0xff;
 
@@ -112,7 +110,7 @@ uint32_t BossMove(void)
 		if(b->IsUsed){
 			e = &(b->Edat);
 			e->IsDamaged = 0;
-			b->ExMove(b);
+			BossSTDMove(b);
 
 			// サボテンヒットチェック //
 			if(HITCHK(e->x,Viv.x,e->g_width) && HITCHK(e->y,Viv.y,e->g_height) && Viv.muteki==0){

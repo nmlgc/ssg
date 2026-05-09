@@ -16,8 +16,6 @@
 struct BOSS_DATA {
 	ENEMY_DATA		Edat;					// 標準の敵データ(実体であることに注意)
 
-	void (*ExMove)(BOSS_DATA *);	// 特殊移動用関数
-
 	uint32_t	ExCount;	// ある状態におけるカウンタ(推移時にゼロ初期化)
 	uint8_t	ExState;	// 特殊状態
 	uint8_t	IsUsed;	// このデータは使用されているか(非ゼロなら使用されている)

@@ -71,7 +71,9 @@ typedef struct _tagSEFFECT_DATA{
 	int		vx,vy;
 
 	uint32_t	time;
-	uint32_t	point;
+
+	// (Negative points are very much possible!)
+	int32_t point;
 
 	uint8_t	cmd;
 	char	c;
@@ -96,7 +98,11 @@ typedef struct tagSCREENEFC_INFO{
 void MTitleInit(void);	// Registers the music title rectangle
 void SEffectInit(void);	// エフェクトの初期化を行う
 void StringEffect(int x, int y, const char *s);	// 文字列系エフェクト(上に表示する奴)
-void StringEffect2(int x, int y, uint32_t point);	// 得点表示エフェクト
+
+// 得点表示エフェクト
+// (Negative points are very much possible!)
+void StringEffect2(int x, int y, int32_t point);
+
 void StringEffect3(void);	// ゲームオーバーの表示
 void SetMusicTitle(int y, Narrow::string_view s);	// 曲名の表示
 

@@ -191,7 +191,7 @@ void StringEffect(int x, int y, const char *s)
 }
 
 // 得点表示エフェクト //
-void StringEffect2(int x, int y, uint32_t point)
+void StringEffect2(int x, int y, int32_t point)
 {
 	for(auto& it : SEffect) {
 		if(it.cmd != SEFC_NONE) {
@@ -358,7 +358,7 @@ void SEffectDraw(void)
 			break;
 
 			case(SEFC_STR2):
-				sprintf(buf, "%u", e->point);
+				sprintf(buf, "%d", e->point);
 				GrpPutScore(e->x>>6,e->y>>6,buf);
 			break;
 

@@ -64,7 +64,7 @@ struct MAID {
 	uint8_t toge_ex;	// とげ発射用特殊変数
 	uint8_t ShiftCounter;	// 押しっぱなし低速移動用
 
-	bool bGameOver;	// ゲームオーバー判定用フラグ
+	int8_t GameOverTimer;
 	bool BuzzSound;	// かすった音を連続再生させないためのフラグ
 };
 

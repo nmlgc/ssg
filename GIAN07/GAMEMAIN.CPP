@@ -98,7 +98,6 @@ uint16_t DemoTimer = 0;
 uint32_t DrawCount = 0;
 decltype(GameStage) WeaponSelectStage = 0;
 uint8_t WeaponKeyWait = 0;
-int	GameOverTimer = 0;
 
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
 uint8_t	CurrentRank;	// ネームレジスト用順位データ
@@ -878,10 +877,6 @@ extern bool GameExit(bool bNeedChgMusic)
 // ゲームオーバーの前処理
 extern void GameOverInit(void)
 {
-	SEffect.SetGameOver();
-
-	GameOverTimer = 120;
-
 	GameMain = GameOverProc0;
 }
 
@@ -968,17 +963,15 @@ void GameProc(bool&)
 // ゲームオーバー出現用
 void GameOverProc0(bool&)
 {
-	switch(GameOverTimer) {
+	switch(Viv.GameOverTimer) {
 	default:
-		GameOverTimer--;
-		Fragment.Move();
-		SEffect.Move();
+		SSG.MoveGameOver();
 		break;
 
 	case 0:
 		// Wait for press
 		if(Key_Data != 0) {
-			GameOverTimer--;
+			Viv.GameOverTimer--;
 		}
 		break;
 

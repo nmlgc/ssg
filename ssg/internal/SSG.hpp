@@ -39,4 +39,10 @@ struct C_SSG {
 
 	// Updates a single game frame, using the given [input].
 	void Move(INPUT_BITS input);
+
+	// Updates a single game frame during a Game Over state.
+	// Returns the number of frames remaining in the Game Over animation, and
+	// *must* be called until it returns 0 to correctly advance RNG state after
+	// a continue.
+	unsigned int MoveGameOver(void);
 };

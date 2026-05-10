@@ -7,6 +7,7 @@
 #include "BossHPG.h"
 #include "ECL.H"
 #include "ECLFront.h"
+#include "GAMEMAIN.H"
 #include "SCROLL.H"
 #include "ssg/Hook.h"
 #include "ssg/internal/RNG.hpp"
@@ -34,6 +35,9 @@ int SSG_Init = ([] {
 	SSG.Hooks.Boss_Defeat = [](const BOSS_DATA *, HOOKS *) {
 		ScrollCommand(SCMD_QUAKE);
 	};
+	SSG.Hooks.GameOver = [](HOOKS *) {
+		GameOverInit();
+	},
 #ifdef SCRIPT_TRACE
 	std::ranges::fill(SSG.Hooks.ecl_hook_flag, 1);
 #else

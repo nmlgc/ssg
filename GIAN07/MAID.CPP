@@ -7,7 +7,6 @@
 
 #include "MAID.H"
 #include "FRAGMENT.H"
-#include "GAMEMAIN.H"
 #include "GIAN.H"
 #include "LASER.H"
 #include "LOADER.H"
@@ -164,7 +163,7 @@ void C_VIV::Set(uint8_t stage_first)
 	Viv.weapon    = Round.Weapon;
 	Viv.GrpID     = 1;
 
-	Viv.bGameOver = false;
+	Viv.GameOverTimer = 0;
 }
 
 // 次のステージの準備 //
@@ -223,7 +222,7 @@ void C_VIV::Dead(void)
 	}
 	else{
 		// 残機の残っていない場合 //
-		Viv.bGameOver = true;
+		Viv.GameOverTimer = 120;
 		Viv.score    += Viv.dscore;			// 得点吐き出し
 
 		// かすり系リセット //
@@ -231,7 +230,8 @@ void C_VIV::Dead(void)
 		Viv.evade   = 0;
 		Viv.evadesc = 0;
 
-		GameOverInit();						// ゲームオーバーへと
+		SEffect.SetGameOver();
+		Hooks.GameOver(&Hooks); // ゲームオーバーへと
 	}
 
 	Tama.Clear();

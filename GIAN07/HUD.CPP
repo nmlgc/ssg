@@ -82,7 +82,7 @@ void SEffectDraw(const C_SEFFECT& SEffect)
 			break;
 
 			case(SEFC_STR2):
-				sprintf(buf, "%u", e->point);
+				sprintf(buf, "%d", e->point);
 				GrpPutScore(e->x>>6,e->y>>6,buf);
 			break;
 

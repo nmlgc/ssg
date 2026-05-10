@@ -34,7 +34,9 @@ struct SEFFECT_DATA {
 	int		vx,vy;
 
 	uint32_t	time;
-	uint32_t	point;
+
+	// (Negative points are very much possible!)
+	int32_t point;
 
 	uint8_t	cmd;
 	char	c;
@@ -56,7 +58,8 @@ public:
 	void SetString(int x, int y, const char *s);
 
 	// 得点表示エフェクト
-	void SetPoint(WORLD_COORD x, WORLD_COORD y, uint32_t point);
+	// (Negative points are very much possible!)
+	void SetPoint(WORLD_COORD x, WORLD_COORD y, int32_t point);
 
 	// ゲームオーバーの表示
 	void SetGameOver(void);

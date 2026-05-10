@@ -44,8 +44,7 @@ void C_SEFFECT::SetString(int x, int y, const char *s)
 	}
 }
 
-// 得点表示エフェクト //
-void C_SEFFECT::SetPoint(WORLD_COORD x, WORLD_COORD y, uint32_t point)
+void C_SEFFECT::SetPoint(WORLD_COORD x, WORLD_COORD y, int32_t point)
 {
 	for(auto& it : SEffect) {
 		if(it.cmd != SEFC_NONE) {

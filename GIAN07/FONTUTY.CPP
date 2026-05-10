@@ -229,12 +229,19 @@ extern void GrpPutScore(int x, int y, const char *s)
 	for(;(*s)!='\0';s++,x+=6){
 		if((*s)>='0' && (*s)<='9'){
 			src = PIXEL_LTWH{ (((*s - '0') << 3) + 128), 88, 5, 7 };
+			tx = x;
+			ty = y;
+		} else if(*s == '-') {
+			// Repurpose a 5-pixel stroke from the unused lock-on sprite as the
+			// minus sign
+			src = PIXEL_LTWH{ 227, 90, 5, 1 };
+			tx = x;
+			ty = (y + 3);
 		}
 		else{
 			continue;
 		}
 
-		tx = x;ty = y;
 		if(tx>=0 && tx<630)	// 安全対策???
 			GrpSurface_Blit({ tx, ty }, SURFACE_ID::SYSTEM, src);
 	}

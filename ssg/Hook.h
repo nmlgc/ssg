@@ -36,6 +36,9 @@ typedef struct HOOKS {
 	// Called when defeating the given boss.
 	void (*Boss_Defeat)(const BOSS_DATA *b, struct HOOKS *);
 
+	// Called on a Game Over.
+	void (*GameOver)(struct HOOKS *);
+
 	// Indexed with the opcodes in ECL.H, this array activates the [ECL_Op]
 	// hook for the respective opcode if nonzero.
 	bool8_t ecl_hook_flag[256];

@@ -17,6 +17,7 @@ constexpr HOOKS HOOKS_EMPTY = {
 	.Snd_SEStop = [](uint8_t, HOOKS *) {},
 	.Boss_HPSumAtStart = [](const uint32_t, HOOKS *) {},
 	.Boss_Defeat = [](const BOSS_DATA *, HOOKS *) {},
+	.GameOver = [](HOOKS *) {},
 };
 
 HOOKS Hooks;
@@ -97,6 +98,8 @@ void C_SSG::StageInit(void)
 
 void C_SSG::Move(INPUT_BITS input)
 {
+	assert(Viv.GameOverTimer == 0);
+
 	Stage.Move(input);
 	Effect3D.Move();
 
@@ -116,4 +119,16 @@ void C_SSG::Move(INPUT_BITS input)
 	// この２行の位置を変更しました //
 	Viv.Move(input, Stage.InMsg());
 	MaidTama.Move();
+}
+
+unsigned int C_SSG::MoveGameOver(void)
+{
+	if(Viv.GameOverTimer <= 0) {
+		return 0;
+	}
+
+	Viv.GameOverTimer--;
+	Fragment.Move();
+	SEffect.Move();
+	return Viv.GameOverTimer;
 }

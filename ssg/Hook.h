@@ -29,6 +29,10 @@ typedef struct HOOKS {
 	void (*Snd_SEPlay)(uint8_t id, int x, bool8_t loop, struct HOOKS *);
 	void (*Snd_SEStop)(uint8_t id, struct HOOKS *);
 
+	// Called every frame with the HP sum of all bosses at the beginning of the
+	// frame, before collision detection.
+	void (*Boss_HPSumAtStart)(const uint32_t hp_sum, struct HOOKS *);
+
 	// Called when defeating the given boss.
 	void (*Boss_Defeat)(const BOSS_DATA *b, struct HOOKS *);
 

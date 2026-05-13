@@ -15,6 +15,7 @@ constexpr HOOKS HOOKS_EMPTY = {
 	.ECL_Op = [](const uint8_t *, const ENEMY_DATA *, bool8_t, HOOKS *) {},
 	.Snd_SEPlay = [](uint8_t, int, bool8_t, HOOKS *) {},
 	.Snd_SEStop = [](uint8_t, HOOKS *) {},
+	.Boss_HPSumAtStart = [](const uint32_t, HOOKS *) {},
 	.Boss_Defeat = [](const BOSS_DATA *, HOOKS *) {},
 };
 

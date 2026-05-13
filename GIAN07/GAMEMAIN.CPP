@@ -1397,10 +1397,9 @@ void GameMove(INPUT_BITS input)
 	Effect3D.Move();
 	ScrollMove();
 
-	const auto HP_Sum = Boss.Move();
+	Boss.Move();
 	Snaky.Move();
 	Bit.Move();
-	BossHPG_Move(HP_Sum);
 	Enemy.Move();
 	Item.Move();
 	Tama.Move();

@@ -71,7 +71,7 @@ void C_BOSS::Set(int x, int y, uint32_t BossID)
 
 
 // ボスを動かす //
-uint32_t C_BOSS::Move(void)
+void C_BOSS::Move(void)
 {
 	uint32_t HP_Sum = 0;
 	ENEMY_DATA		*e;
@@ -107,7 +107,7 @@ uint32_t C_BOSS::Move(void)
 			e->count++;
 		}
 	}
-	return HP_Sum;
+	Hooks.Boss_HPSumAtStart(HP_Sum, &Hooks);
 }
 
 

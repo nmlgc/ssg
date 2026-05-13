@@ -61,8 +61,7 @@ public:
 	void Set(int x, int y, uint32_t BossID);
 
 	// ボスを動かす
-	// Returns the HP sum across all bosses.
-	uint32_t Move(void);
+	void Move(void);
 
 	// ボス用・敵弾クリアの前処理関数
 	void ClearCmd(void);

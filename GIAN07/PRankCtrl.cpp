@@ -6,6 +6,7 @@
 #include "PRankCtrl.h"
 #include "GIAN.H"
 #include "LogicInstance.h"
+#include "ssg/internal/Stage.hpp"
 #include <assert.h>
 
 C_PLAYRANK PlayRank;
@@ -35,7 +36,7 @@ static const RANK_DATA_FOR_DIFFICULTY RANK_DATA[] = {
 void C_PLAYRANK::Add(int n)
 {
 	// 難易度を変化させる //
-	if(GameStage == STAGE_EXTRA) {
+	if(Stage.Number() == STAGE_EXTRA) {
 		if(n > 0) {
 			PlayRank.Rank += (std::max)(+1, (n /  4));
 		} else if(n < 0) {

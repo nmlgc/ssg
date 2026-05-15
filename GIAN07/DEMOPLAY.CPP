@@ -6,13 +6,13 @@
 #include <SDL3/SDL_iostream.h>
 
 #include "DEMOPLAY.H"
-#include "GIAN.H"
 #include "LOADER.H"
 #include "LZ_UTY.H"
 #include "LogicInstance.h"
 #include "ssg/Input.h"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/RNG.hpp"
+#include "ssg/internal/Stage.hpp"
 #include "hatoyama/engine/file.h"
 #include "hatoyama/logic/ut_math.h"
 
@@ -31,7 +31,7 @@ std::u8string ReplayFN(uint8_t stage)
 	}
 
 	auto ret = std::u8string{ u8"秋霜りぷ_.DAT" };
-	ret[ret.size() - 5] = ('0' + GameStage);
+	ret[ret.size() - 5] = ('0' + stage);
 	return ret;
 }
 
@@ -102,7 +102,7 @@ void DemoplaySaveDemo(void)
 	DemoInfo.FrameCount = (DemoFrameCur + 1);
 
 	char8_t fn[] = u8"STG_Demo.DAT";
-	fn[3] = ('0' + GameStage);
+	fn[3] = ('0' + Stage.Number());
 
 	auto *f = SDL_IOFromFile(fn, "wb");
 	if(f) {
@@ -175,7 +175,7 @@ void DemoplaySaveReplay(void)
 		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
 	};
 
-	const auto fn = ReplayFN(GameStage);
+	const auto fn = ReplayFN(Stage.Number());
 	FilWrite(fn.c_str(), files);
 }
 

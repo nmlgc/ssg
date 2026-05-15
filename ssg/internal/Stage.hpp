@@ -23,14 +23,20 @@ private:
 	const uint8_t *SCL_Now;
 	uint32_t GameCount;
 
+	uint8_t GameStage;
+
 	// ＳＣＬに関する情報
 	SCL_INFO SclInfo;
 
 public:
 	// Returns `true` if [data] is a valid pointer.
-	bool Set(BUFFER_OWNED&& data);
+	bool Set(BUFFER_OWNED&& data, uint8_t stage);
 
 	void Move(INPUT_BITS input);
+
+	auto Number(void) const {
+		return GameStage;
+	}
 
 	auto SCLCount(void) const {
 		return GameCount;

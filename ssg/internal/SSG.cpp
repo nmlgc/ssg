@@ -54,7 +54,9 @@ bool StageLoad(
 	if(!((stage == STAGE_EXTRA) || ((stage >= 1) && (stage <= STAGE_MAX)))) {
 		return false;
 	}
-	if(!(Enemy.Set(ecl_buf_func(), stage) && Stage.Set(scl_buf_func()))) {
+	if(!(
+		Enemy.Set(ecl_buf_func(), stage) && Stage.Set(scl_buf_func(), stage)
+	)) {
 		return false;
 	}
 
@@ -80,7 +82,7 @@ void C_SSG::StageFree(void)
 {
 	// メモリを解放だ！ //
 	Enemy.Set(nullptr, 0);
-	Stage.Set(nullptr);
+	Stage.Set(nullptr, 0);
 }
 
 void C_SSG::StageInit(void)

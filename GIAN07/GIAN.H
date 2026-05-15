@@ -85,9 +85,6 @@ enum {
 };
 
 
-///// [グローバル変数] /////
-extern uint8_t	GameStage;
-
 #pragma warning(pop)
 
 #endif

@@ -16,11 +16,12 @@
 
 C_STAGE Stage;
 
-bool C_STAGE::Set(BUFFER_OWNED&& data)
+bool C_STAGE::Set(BUFFER_OWNED&& data, uint8_t stage)
 {
 	SCL_Head = std::move(data);
 	SCL_Now = SCL_Head.get();
 	GameCount = 0;
+	GameStage = stage;
 	SclInfo.MsgFlag = false;
 	SclInfo.ReturnFlag = false;
 	Effect3D.Set(EFFECT3D_TYPE::NONE);

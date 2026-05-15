@@ -96,7 +96,7 @@ void Render(PIXEL_COORD top)
 
 uint16_t DemoTimer = 0;
 uint32_t DrawCount = 0;
-decltype(GameStage) WeaponSelectStage = 0;
+decltype(Stage.Number()) WeaponSelectStage = 0;
 uint8_t WeaponKeyWait = 0;
 
 NR_NAME_DATA	CurrentName;	// ネームレジスト準備用データ
@@ -138,7 +138,7 @@ void(*GameMain)(bool& quit) = TitleProc;
 
 uint8_t CurrentLevel()
 {
-	return ((GameStage == STAGE_EXTRA) ? GAME_EXTRA : Round.LevelSelected);
+	return ((Stage.Number() == STAGE_EXTRA) ? GAME_EXTRA : Round.LevelSelected);
 }
 
 bool InputLocked;
@@ -480,13 +480,14 @@ void NameRegistProc(bool&)
 // お名前入力の初期化 //
 bool NameRegistInit(bool bNeedChgMusic)
 {
+	const auto stage = Stage.Number();
 	for(auto& it : CurrentName.Name) {
 		it = '\0';
 	}
 	CurrentName.Score  = Viv.score;
 	CurrentName.Evade  = Viv.evade_sum;
 	CurrentName.Weapon = Viv.weapon;
-	CurrentName.Stage = ((GameStage == STAGE_EXTRA) ? 1 : GameStage);
+	CurrentName.Stage = ((stage == STAGE_EXTRA) ? 1 : stage);
 
 	// デバッグ用... //
 	Snd_SEStop(8);	// ワーニング音を止める
@@ -569,7 +570,7 @@ bool WeaponSelectInit(bool ExStg)
 #endif
 	);
 
-	SSG.RoundInit(round, GameStage);
+	SSG.RoundInit(round, WeaponSelectStage);
 	SSG.StageInit();
 	Frontend_StageInit();
 
@@ -610,20 +611,20 @@ extern bool GameNextStage(void)
 	DemoplaySaveDemo();
 #endif
 
-	GameStage++;
+	auto stage = (Stage.Number() + 1);
 
 	// エンディングに移行する //
-	if(GameStage>=STAGE_MAX){
-		GameStage = STAGE_MAX;	// 後で変更のこと
+	if(stage >= STAGE_MAX) {
+		stage = STAGE_MAX; // 後で変更のこと
 	}
 
 	Frontend_StageInit();
 
-	if(!LoadGraph(GameStage)){
+	if(!LoadGraph(stage)) {
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return false;
 	}
-	if(!LoadStageData(GameStage)){
+	if(!LoadStageData(stage)) {
 		DebugOut(u8"ENEMY.DAT が破壊されています");
 		return false;
 	}
@@ -635,8 +636,6 @@ extern bool GameNextStage(void)
 // リプレイ用の初期化を行う //
 extern bool GameReplayInit(int Stage)
 {
-	GameStage = Stage;
-
 	if(!DemoplayLoadReplay(Stage)) {
 		// DebugOut(u8"デモプレイデータが存在せず");
 		return false;
@@ -646,12 +645,12 @@ extern bool GameReplayInit(int Stage)
 	Grp_Flip();
 	Frontend_StageInit();
 
-	if(!LoadGraph(GameStage)){
+	if(!LoadGraph(Stage)) {
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		DemoplayCleanup();
 		return false;
 	}
-	if(!LoadStageData(GameStage)){
+	if(!LoadStageData(Stage)) {
 		DebugOut(u8"ENEMY.DAT が破壊されています");
 		DemoplayCleanup();
 		return false;
@@ -717,21 +716,21 @@ bool DemoInit(void)
 	Frontend_StageInit();
 
 	RNG.seed = Time_SteadyTicksMS();
-	GameStage = ((RNG.next() % STAGE_MAX) + 1);
+	const uint8_t stage = ((RNG.next() % STAGE_MAX) + 1);
 
-//	GameStage = ((RNG.next() % 3) + 1);	// この部分は体験版(コミケ)だけ //
-//	GameStage = 1;					// こっちはＨＰ体験版用         //
+	// stage = ((RNG.next() % 3) + 1); // この部分は体験版(コミケ)だけ //
+	// stage = 1;                      // こっちはＨＰ体験版用         //
 
-	if(!DemoplayLoadDemo(GameStage)) {
+	if(!DemoplayLoadDemo(stage)) {
 		// DebugOut(u8"デモプレイデータが存在せず");
 		return false;
 	}
 
-	if(!LoadGraph(GameStage)){
+	if(!LoadGraph(stage)) {
 		DebugOut(u8"GRAPH.DAT が破壊されています");
 		return false;
 	}
-	if(!LoadStageData(GameStage)){
+	if(!LoadStageData(stage)) {
 		DebugOut(u8"ENEMY.DAT が破壊されています");
 		return false;
 	}
@@ -851,8 +850,6 @@ extern bool GameExit(bool bNeedChgMusic)
 	//MWinFace(0);
 
 	DemoTimer = 0;
-
-	GameStage = 0;
 
 	if(GameMain != DemoProc){
 		if(bNeedChgMusic){
@@ -975,7 +972,7 @@ void GameOverProc0(bool&)
 		// ステージセレクトが有効な場合 //
 		if(ConfigDat.StageSelect.v) {
 			DemoplaySaveReplay();
-			if(GameStage == STAGE_EXTRA) {
+			if(Stage.Number() == STAGE_EXTRA) {
 				NameRegistInit(true);
 			} else {
 				GameExit(true);
@@ -1157,13 +1154,12 @@ void WeaponSelectProc(bool&)
 			}
 
 			SSG.RoundInit(Round, WeaponSelectStage);
-			GameStage = WeaponSelectStage;
 
-			if(!LoadGraph(GameStage)){
+			if(!LoadGraph(WeaponSelectStage)) {
 				DebugOut(u8"GRAPH.DAT が破壊されています");
 				return;
 			}
-			if(!LoadStageData(GameStage)){
+			if(!LoadStageData(WeaponSelectStage)) {
 				DebugOut(u8"ENEMY.DAT が破壊されています");
 				return;
 			}

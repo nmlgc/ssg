@@ -81,8 +81,4 @@ enum {
 };
 
 
-///// [グローバル変数] /////
-extern uint8_t	GameStage;
-
-
 #endif

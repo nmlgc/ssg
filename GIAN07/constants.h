@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "GIAN.H"
+#include "ssg/Gian.h"
 #include "strings/title.h"
 #include "hatoyama/logic/coords.h"
 #include <assert.h>

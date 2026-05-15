@@ -3,8 +3,8 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "PRankCtrl.h"
-#include "GIAN.H"
+#include "ssg/internal/PRankCtrl.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Round.h"
 #include "ssg/internal/Stage.hpp"
 #include <assert.h>

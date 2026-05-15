@@ -8,7 +8,7 @@
 #define PBGWIN_HOMINGL_H		"HOMINGL : Ver 0.01 : Updata 2000/09/04"
 //#pragma message(PBGWIN_HOMINGL_H)
 
-#include "EXDEF.H"
+#include "ssg/internal/ExDef.hpp"
 #include "hatoyama/logic/coords.h"
 
 struct HOOKS;

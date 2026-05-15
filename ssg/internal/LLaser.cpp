@@ -3,11 +3,11 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "LLASER.H"
-#include "ENEMY.H"
-#include "MAID.H"
+#include "ssg/internal/LLaser.hpp"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/logic/ut_math.h"
 
 

@@ -5,15 +5,15 @@
 
 #include <printf/printf.h>
 
-#include "MAID.H"
-#include "FRAGMENT.H"
-#include "GIAN.H"
-#include "LASER.H"
-#include "MAIDTAMA.H"
-#include "PRankCtrl.h"
+#include "ssg/internal/Maid.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Round.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Laser.hpp"
+#include "ssg/internal/MaidTama.hpp"
+#include "ssg/internal/PRankCtrl.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/logic/cast.h"
 

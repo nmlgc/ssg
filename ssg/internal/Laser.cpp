@@ -3,13 +3,13 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#include "LASER.H"
-#include "GIAN.H"
-#include "LLASER.H"
-#include "MAID.H"
-#include "PRankCtrl.h"
-#include "GIAN07/entity.h"
+#include "ssg/internal/Laser.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Round.h"
+#include "ssg/internal/Entity.hpp"
+#include "ssg/internal/LLaser.hpp"
+#include "ssg/internal/Maid.hpp"
+#include "ssg/internal/PRankCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/ut_math.h"
 

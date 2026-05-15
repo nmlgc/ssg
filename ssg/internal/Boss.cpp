@@ -5,15 +5,14 @@
 
 #include <printf/printf.h>
 
-#include "BOSS.H"
-#include "BOMBEFC.H" // 爆発エフェクト処理
-#include "EnemyExCtrl.h"
-#include "FRAGMENT.H"
-#include "GIAN.H"
-#include "ITEM.H"
-#include "LLASER.H"
+#include "ssg/internal/Boss.hpp"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/BombEfc.hpp" // 爆発エフェクト処理
+#include "ssg/internal/EnemyExCtrl.hpp"
+#include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Item.hpp"
+#include "ssg/internal/LLaser.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/logic/cast.h"

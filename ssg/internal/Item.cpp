@@ -3,14 +3,14 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "ITEM.H"
-#include "FRAGMENT.H"
-#include "GIAN.H"
-#include "MAID.H"
-#include "PRankCtrl.h"
-#include "GIAN07/entity.h"
+#include "ssg/internal/Item.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Entity.hpp"
+#include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Maid.hpp"
+#include "ssg/internal/PRankCtrl.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/logic/ut_math.h"
 

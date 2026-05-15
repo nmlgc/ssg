@@ -7,7 +7,7 @@
 #define PBGWIN_TAMA_H		"TAMA : Ver 0.62 : Update 2000/02/17"
 //#pragma message(PBGWIN_TAMA_H)
 
-#include "GIAN07/entity.h"
+#include "ssg/internal/Entity.hpp"
 #include "hatoyama/logic/coords.h"
 
 class C_FRAGMENT;

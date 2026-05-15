@@ -3,13 +3,12 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "HOMINGL.H"
-#include "GIAN.H"
-#include "MAID.H"
+#include "ssg/internal/HLaser.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Maid.hpp"
 #include "hatoyama/logic/ut_math.h"
-
 
 // ホーミングレーザーの初期化を行う //
 void C_HLASER::Init(void)

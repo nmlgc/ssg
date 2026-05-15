@@ -7,8 +7,8 @@
 #define PBGWIN_MAIDTAMA_H		"めいどたま : Version 0.01 : Update 2000/02/25"
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
-#include "TAMA.H"
 #include "ssg/Input.h"
+#include "ssg/internal/Tama.hpp"
 
 class C_ENEMY;
 class C_FRAGMENT;

@@ -3,12 +3,12 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "EnemyExCtrl.h"
-#include "BOSS.H"
-#include "LLASER.H"
-#include "MAID.H"
+#include "ssg/internal/EnemyExCtrl.hpp"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Boss.hpp"
+#include "ssg/internal/LLaser.hpp"
+#include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/ut_math.h"

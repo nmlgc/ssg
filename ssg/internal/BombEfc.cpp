@@ -3,7 +3,7 @@
  *
  */
 
-#include "BOMBEFC.H"
+#include "ssg/internal/BombEfc.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/ut_math.h"
 

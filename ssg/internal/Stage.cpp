@@ -4,13 +4,13 @@
  */
 
 #include "ssg/internal/Stage.hpp"
-#include "BOSS.H"
-#include "EFFECT3D.H"
-#include "GIAN.H"
-#include "PRankCtrl.h"
-#include "SCL.H"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Round.h"
+#include "ssg/SCL.h"
+#include "ssg/internal/Boss.hpp"
+#include "ssg/internal/Effect3D.hpp"
+#include "ssg/internal/PRankCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/endian.h"
 

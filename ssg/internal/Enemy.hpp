@@ -20,9 +20,9 @@
  *
  */
 
-#include "ECL.H"
-#include "LASER.H"
-#include "TAMA.H"
+#include "ssg/ECL.h"
+#include "ssg/internal/Laser.hpp"
+#include "ssg/internal/Tama.hpp"
 #include "hatoyama/logic/buffer.h"
 
 class C_BOSS;

@@ -3,16 +3,15 @@
 /*                                                                           */
 /*                                                                           */
 
-#include "MAIDTAMA.H"
-#include "ENEMY.H"
-#include "FRAGMENT.H"
-#include "GIAN.H"
-#include "MAID.H"
-#include "PRankCtrl.h"
+#include "ssg/internal/MaidTama.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Maid.hpp"
+#include "ssg/internal/PRankCtrl.hpp"
 #include "hatoyama/logic/cast.h"
-#include "hatoyama/logic/input.h"
 #include "hatoyama/logic/ut_math.h"
 
 

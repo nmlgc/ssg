@@ -7,8 +7,8 @@
 #define PBGWIN_BOSS_H		"BOSS : Version 0.01 : Update 2000/02/27"
 //#pragma message(PBGWIN_BOSS_H)
 
-#include "ENEMY.H"
-#include "MAID.H"
+#include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/Maid.hpp"
 
 struct HOOKS;
 class C_BIT;

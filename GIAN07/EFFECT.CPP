@@ -3,13 +3,10 @@
 /*                                                                           */
 /*                                                                           */
 
-#include <printf/printf.h>
-
 #include "EFFECT.H"
-#include "EFFECT3D.H"
 #include "GEOMETRY.H"
-#include "GIAN.H"
 #include "ssg/Sound.h"
+#include "ssg/internal/Effect3D.hpp"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/logic/cast.h"

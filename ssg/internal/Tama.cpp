@@ -3,16 +3,16 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#include "TAMA.H"
-#include "ENEMY.H"
-#include "FRAGMENT.H"
-#include "GIAN.H"
-#include "ITEM.H"
-#include "MAID.H"
-#include "PRankCtrl.h"
+#include "ssg/internal/Tama.hpp"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Round.h"
 #include "ssg/Sound.h"
+#include "ssg/internal/Enemy.hpp"
+#include "ssg/internal/Fragment.hpp"
+#include "ssg/internal/Item.hpp"
+#include "ssg/internal/Maid.hpp"
+#include "ssg/internal/PRankCtrl.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/logic/cast.h"

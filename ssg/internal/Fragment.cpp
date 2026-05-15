@@ -3,7 +3,7 @@
 /*                                                                                               */
 /*************************************************************************************************/
 
-#include "FRAGMENT.H"
+#include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/coords.h"
 #include "hatoyama/logic/ut_math.h"

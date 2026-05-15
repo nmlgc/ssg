@@ -5,7 +5,6 @@
 
 #include "BossHPG.h"
 #include "GEOMETRY.H"
-#include "GIAN.H"
 #include "hatoyama/logic/ut_math.h"
 
 

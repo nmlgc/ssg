@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "HOMINGL.H"
+#include "ssg/HLaser.h"
 
 struct HOOKS;
 class C_VIV;

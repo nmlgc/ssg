@@ -20,9 +20,9 @@
  *
  */
 
-#include "ECL.H"
-#include "LASER.H"
-#include "TAMA.H"
+#include "ssg/ECL.h"
+#include "ssg/Laser.h"
+#include "ssg/Tama.h"
 
 
 //// 敵定数 ////

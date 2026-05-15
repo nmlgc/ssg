@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "PRankCtrl.h"
 #include "ssg/Hook.h"
 #include "ssg/Input.h"
 #include "ssg/Round.h"
@@ -21,6 +20,7 @@
 #include "ssg/internal/Laser.hpp"
 #include "ssg/internal/Maid.hpp"
 #include "ssg/internal/MaidTama.hpp"
+#include "ssg/internal/PRankCtrl.h"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "ssg/internal/Stage.hpp"

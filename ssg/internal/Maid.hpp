@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "MAID.H"
+#include "ssg/Maid.h"
 #include "ssg/Input.h"
 
 class C_FRAGMENT;

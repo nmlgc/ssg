@@ -4,7 +4,7 @@
 /*                                                                           */
 
 #include "ssg/internal/LLaser.hpp"
-#include "ENEMY.H"
+#include "ssg/Enemy.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Maid.hpp"

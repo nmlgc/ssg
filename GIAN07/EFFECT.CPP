@@ -6,9 +6,9 @@
 #include <printf/printf.h>
 
 #include "EFFECT.H"
-#include "EFFECT3D.H"
 #include "GEOMETRY.H"
-#include "GIAN.H"
+#include "ssg/Effect3D.h"
+#include "ssg/Gian.h"
 #include "ssg/Sound.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"

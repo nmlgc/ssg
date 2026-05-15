@@ -6,9 +6,9 @@
 #include "GameDraw.h"
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
-#include "GIAN.H"
-#include "MAID.H"
-#include "TAMA.H"
+#include "ssg/Gian.h"
+#include "ssg/Maid.h"
+#include "ssg/Tama.h"
 #include "hatoyama/logic/ut_math.h"
 
 /// Bit lines

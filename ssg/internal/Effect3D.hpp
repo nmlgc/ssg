@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "EFFECT3D.H"
+#include "ssg/Effect3D.h"
 
 class C_RNG;
 

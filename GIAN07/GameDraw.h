@@ -5,16 +5,15 @@
 
 #pragma once
 
-#include "BOMBEFC.H"
-#include "BOSS.H"
-#include "EFFECT3D.H"
-#include "EnemyExCtrl.h"
-#include "FRAGMENT.H"
-#include "HOMINGL.H"
-#include "ITEM.H"
-#include "LASER.H"
-#include "LLASER.H"
-#include "MAIDTAMA.H"
+#include "ssg/BombEfc.h"
+#include "ssg/Boss.h"
+#include "ssg/Effect3D.h"
+#include "ssg/EnemyExCtrl.h"
+#include "ssg/Fragment.h"
+#include "ssg/HLaser.h"
+#include "ssg/Item.h"
+#include "ssg/LLaser.h"
+#include "ssg/MaidTama.h"
 
 typedef struct MAID MAID;
 

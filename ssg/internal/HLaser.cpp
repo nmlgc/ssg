@@ -4,7 +4,7 @@
 /*                                                                           */
 
 #include "ssg/internal/HLaser.hpp"
-#include "GIAN.H"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Maid.hpp"

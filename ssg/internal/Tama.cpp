@@ -4,15 +4,15 @@
 /*************************************************************************************************/
 
 #include "ssg/internal/Tama.hpp"
-#include "ENEMY.H"
-#include "GIAN.H"
-#include "PRankCtrl.h"
+#include "ssg/Enemy.h"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Round.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Item.hpp"
 #include "ssg/internal/Maid.hpp"
+#include "ssg/internal/PRankCtrl.h"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/SEffect.hpp"
 #include "hatoyama/logic/cast.h"

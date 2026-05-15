@@ -5,10 +5,10 @@
 
 #include "LogicInstance.h"
 #include "BossHPG.h"
-#include "ECL.H"
 #include "ECLFront.h"
 #include "GAMEMAIN.H"
 #include "SCROLL.H"
+#include "ssg/ECL.h"
 #include "ssg/Hook.h"
 #include "hatoyama/engine/snd.h"
 

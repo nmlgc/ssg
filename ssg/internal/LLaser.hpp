@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "LLASER.H"
+#include "ssg/LLaser.h"
 
 class C_VIV;
 struct HOOKS;

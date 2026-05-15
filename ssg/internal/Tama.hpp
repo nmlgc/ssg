@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "TAMA.H"
-#include "GIAN07/entity.h"
+#include "ssg/Tama.h"
+#include "ssg/internal/Entity.hpp"
 #include "hatoyama/logic/coords.h"
 
 class C_FRAGMENT;

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "BOMBEFC.H"
+#include "ssg/BombEfc.h"
 
 class C_RNG;
 

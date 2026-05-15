@@ -4,7 +4,7 @@
  */
 
 #include "ssg/internal/SEffect.hpp"
-#include "GIAN.H"
+#include "ssg/Gian.h"
 #include "ssg/internal/RNG.hpp"
 #include "hatoyama/logic/ut_math.h"
 

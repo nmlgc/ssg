@@ -14,8 +14,8 @@
 #include "HUD.H"
 #include "LOADER.H"
 #include "LogicInstance.h"
-#include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
+#include "ssg/SCL.h" // ＳＣＬ定義ファイル
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/debug.h"
 #include "hatoyama/engine/graphics_backend.h"

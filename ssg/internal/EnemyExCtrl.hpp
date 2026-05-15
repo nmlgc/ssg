@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "EnemyExCtrl.h"
+#include "ssg/EnemyExCtrl.h"
 
 class C_ENEMY;
 class C_LLASER;

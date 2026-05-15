@@ -6,7 +6,7 @@
 #include "ENDING.H"
 #include "GAMEMAIN.H"
 #include "LOADER.H"
-#include "SCL.H" // ＳＣＬ定義ファイル
+#include "ssg/SCL.h" // ＳＣＬ定義ファイル
 #include "hatoyama/engine/bgm.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/logic/cast.h"

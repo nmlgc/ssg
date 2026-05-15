@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "BOSS.H"
+#include "ssg/Boss.h"
 
 struct HOOKS;
 class C_BIT;

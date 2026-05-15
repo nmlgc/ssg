@@ -6,7 +6,7 @@
 #include <printf/printf.h>
 
 #include "ssg/internal/Boss.hpp"
-#include "GIAN.H"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/BombEfc.hpp" // 爆発エフェクト処理

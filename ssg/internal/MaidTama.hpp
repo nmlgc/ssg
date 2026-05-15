@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "MAIDTAMA.H"
 #include "ssg/Input.h"
+#include "ssg/MaidTama.h"
 #include "ssg/internal/Tama.hpp"
 
 class C_ENEMY;

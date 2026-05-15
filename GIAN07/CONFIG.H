@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "GIAN.H"
+#include "ssg/Gian.h"
 #include "ssg/Round.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/midi.h"

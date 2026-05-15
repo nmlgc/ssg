@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "LASER.H"
+#include "ssg/Laser.h"
 
 class C_LLASER;
 class C_PLAYRANK;

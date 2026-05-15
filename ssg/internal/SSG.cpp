@@ -4,7 +4,7 @@
  */
 
 #include "SSG.hpp"
-#include "GIAN.H"
+#include "ssg/Gian.h"
 #include "ssg/internal/LZ.hpp"
 
 constexpr HOOKS HOOKS_EMPTY = {

@@ -4,13 +4,13 @@
 /*                                                                           */
 
 #include "ssg/internal/MaidTama.hpp"
-#include "GIAN.H"
-#include "PRankCtrl.h"
+#include "ssg/Gian.h"
 #include "ssg/Hook.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/Fragment.hpp"
 #include "ssg/internal/Maid.hpp"
+#include "ssg/internal/PRankCtrl.h"
 #include "ssg/internal/Tama.hpp"
 #include "hatoyama/logic/cast.h"
 #include "hatoyama/logic/input.h"

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ITEM.H"
+#include "ssg/Item.h"
 
 class C_FRAGMENT;
 class C_PLAYRANK;

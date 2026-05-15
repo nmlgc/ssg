@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ENEMY.H"
+#include "ssg/Enemy.h"
 #include "hatoyama/logic/buffer.h"
 
 class C_BOSS;

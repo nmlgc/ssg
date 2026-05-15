@@ -7,7 +7,7 @@
 #define PBGWIN_BOSS_H		"BOSS : Version 0.01 : Update 2000/02/27"
 //#pragma message(PBGWIN_BOSS_H)
 
-#include "ENEMY.H"
+#include "ssg/Enemy.h"
 
 ///// [ 定数 ] /////
 

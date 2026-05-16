@@ -7,11 +7,22 @@
 #include "GIAN.H"
 #include "LogicInstance.h"
 #include "PRankCtrl.h"
+#include "ssg/Hook.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
+
+constexpr HOOKS HOOKS_EMPTY = {
+};
+
+HOOKS Hooks;
+
+C_SSG::C_SSG(void) noexcept : Hooks(::Hooks)
+{
+	Hooks = HOOKS_EMPTY;
+}
 
 void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 {

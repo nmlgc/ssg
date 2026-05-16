@@ -9,10 +9,15 @@
 #include "PRankCtrl.h"
 #include "ssg/Round.h"
 #include "ssg/internal/RNG.hpp"
+#include "ssg/Hook.h"
 
 struct PACKFILE_READ;
 
 struct C_SSG {
+	HOOKS& Hooks;
+
+	C_SSG(void) noexcept;
+
 	// Starts a new round of gameplay (i.e., a playthrough of either the main 6
 	// stages starting at Stage 1, the Extra Stage, or a single stage for
 	// practice) by setting [Round] and initializing subsystems as necessary.

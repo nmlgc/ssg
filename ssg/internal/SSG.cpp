@@ -10,6 +10,16 @@
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/Stage.hpp"
 
+constexpr HOOKS HOOKS_EMPTY = {
+};
+
+HOOKS Hooks;
+
+C_SSG::C_SSG(void) noexcept : Hooks(Hooks)
+{
+	Hooks = HOOKS_EMPTY;
+}
+
 void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 {
 	Round = round;

@@ -61,8 +61,8 @@ ANALYSIS_RELAXED = { cflags = { release = {
 } } }
 
 ---@param variant integer
----@param constants_cflags? ConfigVarBuildtyped<string> Contains the include path of `constants.h`
-function BuildHatoyama(variant, constants_cflags)
+---@param constants_cflags ConfigVarBuildtyped<string> Contains the include path of `constants.h`
+function BuildHatoyamaLogic(variant, constants_cflags)
 	local dep_cfg
 	if (variant == MODERN) then
 		dep_cfg = CONFIG:branch({ objdir = "modern/" })
@@ -84,6 +84,36 @@ function BuildHatoyama(variant, constants_cflags)
 		})
 	end
 
+	local modules_cfg = dep_cfg:branch(ANALYSIS)
+	modules_cfg = modules_cfg:branch(modules_cfg:cxx_std_modules())
+
+	local link = {
+		cflags = {
+			"/std:c++latest",
+			"/DWIN32",
+			"/EHsc",
+			"/source-charset:utf-8",
+			"/execution-charset:utf-8",
+		},
+	}
+	link.cflags += constants_cflags
+	TableExtend(link, HATOYAMA_LINK)
+
+	local src
+	src += HATOYAMA_LOGIC.src
+
+	local link_cfg = modules_cfg:branch(link)
+	local compile_cfg = link_cfg:branch(HATOYAMA_LOGIC.compile)
+	local obj = compile_cfg:cxx(src)
+	return dep_cfg, link_cfg:branch({
+		linputs = obj,
+	})
+end
+
+---@param dep_cfg Config
+---@param logic_cfg Config
+---@param variant integer
+function BuildHatoyamaEngine(dep_cfg, logic_cfg, variant)
 	---@type ConfigShape
 	local libwebp_compile = {}
 	if (variant == MODERN) then
@@ -109,44 +139,28 @@ function BuildHatoyama(variant, constants_cflags)
 	local BLAKE3_LINK = BuildBLAKE3(dep_cfg, variant)
 	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(libwebp_cfg, variant)
 
-	local modules_cfg = dep_cfg:branch(ANALYSIS)
-	modules_cfg = modules_cfg:branch(modules_cfg:cxx_std_modules())
-
-	local link = {
-		cflags = {
-			"/std:c++latest",
-			"/DWIN32",
-			"/EHsc",
-			"/source-charset:utf-8",
-			"/execution-charset:utf-8",
-		},
-		lflags = "/SUBSYSTEM:windows",
-	}
-	link.cflags += constants_cflags
-	TableExtend(link, HATOYAMA_LINK)
-
-	local link_cfg = modules_cfg:branch(
-		BLAKE3_LINK, LIBWEBP_LINK, XIPH_LINK, SDL_LINK, link
+	local link_cfg = logic_cfg:branch(
+		BLAKE3_LINK, LIBWEBP_LINK, SDL_LINK, XIPH_LINK
 	)
-	local compile_cfg = link_cfg:branch(HATOYAMA_COMPILE)
+	local compile_cfg = link_cfg:branch(HATOYAMA_ENGINE.compile)
 
 	local src
-	src += HATOYAMA_SRC
-	src += HATOYAMA.glob("platform/miniaudio/*.c*")
-	src += HATOYAMA.glob("platform/windows/*.cpp")
-	src += (HATOYAMA.glob("platform/sdl/*.cpp") - { "graphics_sdl.cpp$" })
+	src += HATOYAMA_ENGINE.src
+	src += HATOYAMA.glob("engine/miniaudio/*.c*")
+	src += HATOYAMA.glob("engine/windows/*.cpp")
+	src += (HATOYAMA.glob("engine/sdl/*.cpp") - { "graphics_sdl.cpp$" })
 	if (variant == MODERN) then
-		src += HATOYAMA.glob("platform/sdl/graphics_sdl.cpp")
+		src += HATOYAMA.glob("engine/sdl/graphics_sdl.cpp")
 	end
 	local obj = compile_cfg:cxx(src)
 
 	if (variant == VINTAGE) then
 		local vintage_cfg = compile_cfg:branch(ANALYSIS_RELAXED)
-		local vintage_src = HATOYAMA.glob("platform/windows_vintage/DD*.CPP")
-		vintage_src += HATOYAMA.glob("platform/windows_vintage/D2_Polygon.CPP")
+		local vintage_src = HATOYAMA.glob("engine/windows_vintage/DD*.CPP")
+		vintage_src += HATOYAMA.glob("engine/windows_vintage/D2_Polygon.CPP")
 
 		obj = (obj + vintage_cfg:cxx(vintage_src))
 	end
 
-	return dep_cfg, link_cfg:branch({ linputs = obj })
+	return link_cfg:branch({ lflags = "/SUBSYSTEM:windows", linputs = obj })
 end

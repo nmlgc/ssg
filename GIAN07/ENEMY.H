@@ -21,9 +21,9 @@
  */
 
 #include "ECL.H"
-#include "TAMA.H"
 #include "LASER.H"
-#include "platform/buffer.h"
+#include "TAMA.H"
+#include "hatoyama/engine/buffer.h"
 
 
 //// 敵定数 ////

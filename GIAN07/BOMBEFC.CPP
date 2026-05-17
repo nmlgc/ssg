@@ -4,8 +4,8 @@
  */
 
 #include "BOMBEFC.H"
-#include "platform/graphics_backend.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 BombEfcCtrl		BombEfc[EXBOMB_MAX];

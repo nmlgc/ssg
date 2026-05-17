@@ -4,9 +4,9 @@
 /*                                                                           */
 
 #include "LENS.H"
-#include "platform/graphics_backend.h"
-#include "game/cast.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/ut_math.h"
 #include <assert.h>
 
 

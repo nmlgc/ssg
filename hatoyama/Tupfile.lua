@@ -5,10 +5,16 @@ HATOYAMA = sourcepath(tup.getcwd() .. "/")
 ---@type ConfigShape
 HATOYAMA_LINK = { cflags = { ("-I" .. HATOYAMA.root) } }
 
----@type ConfigShape
-HATOYAMA_COMPILE = { objdir = "hatoyama/" }
+---@param name string
+---@return { compile: ConfigShape, src: string[] }
+local function hatoyama_part(name)
+	return {
+		compile = { objdir = (HATOYAMA.root .. name .. "/") },
+		src = HATOYAMA.glob(name .. "/*.cpp"),
+	}
+end
 
-HATOYAMA_SRC += HATOYAMA.glob("game/*.cpp")
-HATOYAMA_SRC += HATOYAMA.glob("game/codecs/*.cpp")
+HATOYAMA_LOGIC = hatoyama_part("logic")
+HATOYAMA_ENGINE = hatoyama_part("engine")
 
 tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))

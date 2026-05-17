@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_MAID_H)
 
 import std.compat;
-#include "game/cast.h"
+#include "hatoyama/logic/cast.h"
 
 
 

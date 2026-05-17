@@ -9,9 +9,9 @@
 #include "CONFIG.H"
 #include "GIAN.H"
 #include "LZ_UTY.H"
-#include "platform/file.h"
-#include "game/input.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/file.h"
+#include "hatoyama/logic/input.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作しているか

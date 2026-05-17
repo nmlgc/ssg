@@ -4,7 +4,7 @@
  */
 
 #include "GEOMETRY.H"
-#include "game/ut_math.h"
+#include "hatoyama/logic/ut_math.h"
 
 namespace Geometry {
 

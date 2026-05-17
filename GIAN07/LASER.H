@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_LASER_H)
 
 import std.compat;
-#include "game/coords.h"
+#include "hatoyama/logic/coords.h"
 
 ///// [更新履歴] /////
 

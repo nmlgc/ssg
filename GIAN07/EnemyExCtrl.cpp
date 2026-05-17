@@ -7,10 +7,10 @@
 #include "LLASER.H"
 #include "LOADER.H"
 #include "MAID.H"
-#include "platform/graphics_backend.h"
-#include "game/cast.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/ut_math.h"
 
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 

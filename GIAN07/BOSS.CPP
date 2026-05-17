@@ -8,10 +8,10 @@
 #include "EnemyExCtrl.h"
 #include "GEOMETRY.H"
 #include "GIAN.H"
-#include "platform/graphics_backend.h"
-#include "game/cast.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 ///// [ 定数 ] /////

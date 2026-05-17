@@ -6,10 +6,10 @@
 #include "ENDING.H"
 #include "GIAN.H"
 #include "SCL.H" // ＳＣＬ定義ファイル
-#include "platform/text_backend.h"
-#include "game/bgm.h"
-#include "game/cast.h"
-#include "game/endian.h"
+#include "hatoyama/engine/bgm.h"
+#include "hatoyama/engine/text_backend.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/endian.h"
 
 
 typedef struct tagEndingGrpInfo {

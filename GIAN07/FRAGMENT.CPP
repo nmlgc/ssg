@@ -5,8 +5,8 @@
 
 #include "FRAGMENT.H"
 #include "GEOMETRY.H"
-#include "platform/graphics_backend.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 FRAGMENT_DATA	Fragment[FRAGMENT_MAX];		// 破片データ管理用構造体

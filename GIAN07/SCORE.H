@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_SCORE_H)
 
 import std.compat;
-#include "game/string_format.h"
+#include "hatoyama/logic/string_format.h"
 
 
 

@@ -1,0 +1,82 @@
+/*
+ *   .BMP file format
+ *
+ */
+
+#pragma once
+
+#include "engine/file.h"
+#include "engine/pixelformat.h"
+#include "logic/coords.h"
+#include "logic/endian.h"
+
+// Platform-independent .BMP header types
+// --------------------------------------
+// Yup, these actually need to be packed.
+#pragma pack(push, 1)
+
+// Same as the standard Win32 BITMAPFILEHEADER structure, renamed to avoid
+// collisions.
+struct BMP_FILEHEADER {
+	U16LE bfType;
+	U32LE bfSize;
+	U16LE bfReserved1;
+	U16LE bfReserved2;
+	U32LE bfOffBits;
+};
+
+// Same as the standard Win32 BITMAPINFOHEADER structure, renamed to avoid
+// collisions.
+struct BMP_INFOHEADER {
+	U32LE biSize;
+	I32LE biWidth;
+	I32LE biHeight;
+	U16LE biPlanes;
+	U16LE biBitCount;
+	U32LE biCompression;
+	U32LE biSizeImage;
+	I32LE biXPelsPerMeter;
+	I32LE biYPelsPerMeter;
+	U32LE biClrUsed;
+	U32LE biClrImportant;
+
+	uint32_t Stride() const {
+		return ((((biWidth * biBitCount) + 31u) & ~31) / 8u);
+	}
+};
+
+#pragma pack(pop)
+// --------------------------------------
+
+// A valid .BMP buffer, with convenient references to the header, optional
+// palette, and pixel data inside the buffer.
+struct BMP_OWNED {
+	BYTE_BUFFER_OWNED buffer;
+	const BMP_INFOHEADER& info;
+	std::span<BGRA> palette; // Empty if not palettized.
+	std::span<std::byte> pixels; // Exactly as large as the image.
+};
+
+// Can be safely used for static allocations.
+constexpr uint16_t BMP_PALETTE_SIZE_MAX = 256;
+
+// Returns a value between 0 and [BMP_PALETTE_SIZE_MAX].
+constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp);
+
+std::optional<BMP_OWNED> BMPLoad(BYTE_BUFFER_OWNED buffer);
+
+#ifndef SDL_pixels_h_
+enum SDL_PixelFormat : uint32_t;
+#endif
+
+// Returns `true` if BMPSave() supports the given [format].
+bool BMPSaveSupports(SDL_PixelFormat format);
+
+bool BMPSave(
+	SDL_IOStream *stream,
+	PIXEL_SIZE size,
+	uint16_t planes,
+	uint16_t bpp,
+	std::span<BGRA> palette,
+	std::span<const std::byte> pixels
+);

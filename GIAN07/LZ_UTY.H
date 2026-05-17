@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "platform/file.h"
-#include "game/endian.h"
+#include "hatoyama/engine/file.h"
+#include "hatoyama/logic/endian.h"
 
 // Format
 // ------

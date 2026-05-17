@@ -6,9 +6,9 @@
 #ifndef PBGWIN_WINDOWSYS_H
 #define PBGWIN_WINDOWSYS_H		"WINDOWSYS : Version 0.24 : Update 2000/02/28"
 
-#include "game/enum_flags.h"
-#include "game/input.h"
-#include "game/text.h"
+#include "hatoyama/engine/text.h"
+#include "hatoyama/logic/enum_flags.h"
+#include "hatoyama/logic/input.h"
 
 
 

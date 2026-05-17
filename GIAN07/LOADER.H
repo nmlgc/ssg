@@ -8,9 +8,9 @@
 //#pragma message(PBGWIN_LOADER_H)
 
 #include "constants.h"
-#include "game/coords.h"
-#include "game/graphics.h"
-#include "game/hash.h"
+#include "hatoyama/engine/graphics.h"
+#include "hatoyama/engine/hash.h"
+#include "hatoyama/logic/coords.h"
 
 struct SURFACE_DDRAW;
 

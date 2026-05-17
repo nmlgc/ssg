@@ -2,40 +2,56 @@ tup.import("TOOLCHAIN=gcc")
 tup.include("libs/tupblocks/toolchain." .. TOOLCHAIN .. ".lua")
 tup.include("libs/BLAKE3.lua")
 
----@param constants_cflags? ConfigVarBuildtyped<string> Contains the include path of `constants.h`
-function BuildHatoyama(constants_cflags)
-	local PLATFORM_LINK = EnvConfig("sdl3", "pangocairo", "fontconfig")
-	local LAYERS_LINK = EnvConfig("libwebp", "ogg", "vorbis", "vorbisfile")
-	local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
-
+---@param constants_cflags ConfigVarBuildtyped<string> Contains the include path of `constants.h`
+function BuildHatoyamaLogic(constants_cflags)
 	local link = { cflags = { "-DLINUX" } }
 	link.cflags += constants_cflags
 	TableExtend(link, HATOYAMA_LINK)
 
 	-- Since Pango/Cairo adds -pthread to a later configuration, the C++
 	-- standard library must also be compiled with this flag.
-	local base_cfg = CONFIG:branch({ cflags = "-pthread" })
+	local modules_cfg = CONFIG:branch({ cflags = "-pthread" })
 
-	local game_cfg = CONFIG:branch(
-		BLAKE3_LINK, LAYERS_LINK, base_cfg:cxx_std_modules(), link
+	local dep_cfg = modules_cfg:branch(link)
+	local link_cfg = dep_cfg:branch(modules_cfg:cxx_std_modules())
+
+	local src
+	src += HATOYAMA_LOGIC.src
+
+	local obj = link_cfg:branch(HATOYAMA_LOGIC.compile):cxx(src)
+	return dep_cfg, link_cfg:branch({ linputs = obj })
+end
+
+---@param dep_cfg Config
+---@param logic_cfg Config
+function BuildHatoyamaEngine(dep_cfg, logic_cfg)
+	local LIBS_LINK = EnvConfig(
+		"fontconfig",
+		"libwebp",
+		"ogg",
+		"pangocairo",
+		"sdl3",
+		"vorbis",
+		"vorbisfile"
 	)
-	local platform_cfg = game_cfg:branch(PLATFORM_LINK)
+	local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 
-	local game_src = (HATOYAMA.glob("platform/c/*.cpp"))
-	game_src += HATOYAMA_SRC
+	local link_cfg = logic_cfg:branch(LIBS_LINK, BLAKE3_LINK)
 
-	local platform_src = HATOYAMA.glob("platform/sdl/*.cpp")
-	platform_src += HATOYAMA.glob("platform/miniaudio/*.cpp")
-	platform_src += HATOYAMA.glob("platform/pangocairo/*.cpp")
+	local src
+	src += HATOYAMA_ENGINE.src
+	src += HATOYAMA.glob("engine/c/*.cpp")
+	src += HATOYAMA.glob("engine/miniaudio/*.cpp")
+	src += HATOYAMA.glob("engine/pangocairo/*.cpp")
+	src += HATOYAMA.glob("engine/sdl/*.cpp")
 
 	-- Clang does not like C being compiled with clang++, and non-C++ clang
 	-- does not like module-related switches.
-	local c_src = HATOYAMA.glob("platform/miniaudio/*.c")
+	local c_src = HATOYAMA.glob("engine/miniaudio/*.c")
 
 	local obj = (
-		game_cfg:branch(HATOYAMA_COMPILE):cxx(game_src) +
-		platform_cfg:branch(HATOYAMA_COMPILE):cxx(platform_src) +
-		base_cfg:branch(HATOYAMA_COMPILE, link):cc(c_src)
+		link_cfg:branch(HATOYAMA_ENGINE.compile):cxx(src) +
+		dep_cfg:branch(HATOYAMA_ENGINE.compile):cc(c_src)
 	)
-	return platform_cfg:branch({ linputs = obj })
+	return link_cfg:branch({ linputs = obj })
 end

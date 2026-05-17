@@ -16,13 +16,13 @@
 #include "SCORE.H"
 #include "WindowCtrl.h" // ウィンドウ定義
 #include "WindowSys.h"
-#include "platform/text_backend.h"
-#include "platform/time.h"
-#include "game/bgm.h"
-#include "game/debug.h"
-#include "game/input.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/bgm.h"
+#include "hatoyama/engine/debug.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/engine/text_backend.h"
+#include "hatoyama/engine/time.h"
+#include "hatoyama/logic/input.h"
+#include "hatoyama/logic/ut_math.h"
 #include "obj/version.h"
 
 constexpr WINDOW_POINT MAIN_WINDOW_TOPLEFT = { 400, 250 };

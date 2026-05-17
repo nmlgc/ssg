@@ -5,16 +5,12 @@ tup.include("libs/libwebp_lossless.lua")
 tup.include("libs/SDL.lua")
 tup.include("libs/xiph.lua")
 
-MODERN = 0
-VINTAGE = 1
-
 -- Icon
 local ssg_ico = CONFIG:rc(SSG.join("GIAN07/GIAN07.rc"))
 
 ---@param variant integer
 local function ssg(variant)
 	local variant_cfg
-	local variant_bin_suffix = ""
 	if (variant == MODERN) then
 		variant_cfg = CONFIG:branch({
 			cflags = {
@@ -38,11 +34,10 @@ local function ssg(variant)
 		}, {
 			lflags = "/MANIFEST:NO" -- Saves 512 to 1024 bytes!
 		})
-		variant_bin_suffix = "_win98"
 	end
 
 	local XIPH_LINK = BuildXiph(variant_cfg)
-	local SDL_LINK = BuildSDL(variant_cfg, variant_bin_suffix)
+	local SDL_LINK = BuildSDL(variant_cfg, VariantBinSuffix(variant))
 	local BLAKE3_LINK = BuildBLAKE3(variant_cfg, variant)
 	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(variant_cfg, variant)
 
@@ -90,7 +85,7 @@ local function ssg(variant)
 	end
 
 	ssg_obj = (ssg_obj + ssg_ico)
-	ssg_cfg:exe(ssg_obj, ("GIAN07" .. variant_bin_suffix))
+	ssg_cfg:exe(ssg_obj, ("GIAN07" .. VariantBinSuffix(variant)))
 end
 
 ssg(MODERN)

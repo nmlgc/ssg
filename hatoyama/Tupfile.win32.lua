@@ -1,3 +1,18 @@
+-- Variants
+-- --------
+
+MODERN = 0
+VINTAGE = 1
+
+---@param variant 0 | 1
+function VariantBinSuffix(variant)
+	return ({
+		[MODERN] = "",
+		[VINTAGE] = "_win98"
+	})[variant]
+end
+-- --------
+
 -- Static analysis using the C++ Core Guideline checker plugin.
 ANALYSIS = { cflags = { release = {
 	"/analyze:autolog-",

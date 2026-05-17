@@ -25,8 +25,6 @@ local platform_cfg = ssg_cfg:branch(PLATFORM_LINK)
 local platform_src = SSG.glob("platform/sdl/*.cpp")
 platform_src += SSG.glob("platform/miniaudio/*.cpp")
 platform_src += SSG.glob("platform/pangocairo/*.cpp")
-platform_src += "MAIN/main_sdl.cpp"
-platform_src.extra_inputs += PLATFORM_CONSTANTS
 ssg_obj = (
 	ssg_obj +
 	platform_cfg:cxx(platform_src) +

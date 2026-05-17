@@ -117,8 +117,6 @@ local function ssg(variant)
 	if (variant == MODERN) then
 		p_modern_src += "platform/sdl/graphics_sdl.cpp"
 	end
-	p_modern_src += "MAIN/main_sdl.cpp"
-	p_modern_src.extra_inputs += PLATFORM_CONSTANTS
 	ssg_obj = (ssg_obj + ssg_cfg:cxx(p_modern_src))
 
 	if (variant == VINTAGE) then

@@ -5,17 +5,17 @@ if "%VCINSTALLDIR%" == "" (
 	exit 1
 )
 
-sh ./version_from_git.sh
-sh ./submodules_check.sh ^
-	libs/9xcompat ^
-	libs/BLAKE3 ^
-	libs/dr_libs ^
-	libs/libogg ^
-	libs/libvorbis ^
-	libs/libwebp_lossless ^
-	libs/miniaudio ^
-	libs/SDL3 ^
-	libs/tupblocks
+sh %~dp0version_from_git.sh
+sh %~dp0submodules_check.sh ^
+	%~dp0libs/9xcompat ^
+	%~dp0libs/BLAKE3 ^
+	%~dp0libs/dr_libs ^
+	%~dp0libs/libogg ^
+	%~dp0libs/libvorbis ^
+	%~dp0libs/libwebp_lossless ^
+	%~dp0libs/miniaudio ^
+	%~dp0libs/SDL3 ^
+	%~dp0libs/tupblocks
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 tup %*

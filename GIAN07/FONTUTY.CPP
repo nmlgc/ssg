@@ -5,8 +5,8 @@
 
 #include "FONTUTY.H"
 #include "LOADER.H"
-#include "platform/graphics_backend.h"
-#include "platform/text_backend.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/engine/text_backend.h"
 
 #ifdef WIN32
 #include <windows.h>

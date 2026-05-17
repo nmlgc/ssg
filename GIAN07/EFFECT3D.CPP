@@ -5,9 +5,9 @@
 
 #include "EFFECT3D.H"
 #include "GIAN.H"
-#include "platform/graphics_backend.h"
-#include "game/cast.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/ut_math.h"
 
 #define CIRCLE_MAX			40
 #define CUBE_MAX			8

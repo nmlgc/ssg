@@ -8,7 +8,7 @@
 #pragma message(PBGWIN_LENS_H)
 
 import std.compat;
-#include "game/coords.h"
+#include "hatoyama/logic/coords.h"
 
 
 ///// [構造体] /////

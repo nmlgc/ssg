@@ -6,10 +6,10 @@
 #include "WindowSys.h"
 #include "FONTUTY.H"
 #include "LOADER.H"
-#include "platform/text_backend.h"
-#include "game/enum_flags.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/engine/text_backend.h"
+#include "hatoyama/logic/enum_flags.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 ///// [構造体] /////

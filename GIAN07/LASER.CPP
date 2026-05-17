@@ -10,8 +10,8 @@
 #include "LLASER.H"
 #include "PRankCtrl.h"
 #include "GIAN07/entity.h"
-#include "platform/graphics_backend.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 /*

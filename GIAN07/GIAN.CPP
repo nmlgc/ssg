@@ -7,7 +7,7 @@
 #include "CONFIG.H"
 #include "FONTUTY.H"
 #include "LEVEL.H"
-#include "platform/time.h"
+#include "hatoyama/engine/time.h"
 
 
 ///// [グローバル変数] /////

@@ -6,8 +6,8 @@
 #include <SDL3/SDL_iostream.h>
 
 #include "LZ_UTY.H"
-#include "platform/file.h"
-#include "game/defer.h"
+#include "hatoyama/engine/file.h"
+#include "hatoyama/logic/defer.h"
 
 constexpr auto LZSS_DICT_BITS = 13;
 constexpr auto LZSS_SEQ_BITS = 4;

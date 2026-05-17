@@ -7,8 +7,8 @@
 #pragma once
 
 import std.compat;
-#include "game/coords.h"
 #include "strings/title.h"
+#include "hatoyama/logic/coords.h"
 #include <assert.h>
 
 // The game's native resolution.

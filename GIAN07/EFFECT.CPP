@@ -7,10 +7,10 @@
 #include "FONTUTY.H"
 #include "GEOMETRY.H"
 #include "GIAN.H"
-#include "platform/text_backend.h"
-#include "game/cast.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/engine/text_backend.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 SEFFECT_DATA		SEffect[SEFFECT_MAX];

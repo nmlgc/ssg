@@ -22,10 +22,10 @@
 #include <SDL3/SDL_main.h>
 
 #include "GIAN07/ENTRY.H"
-#include "platform/sdl/log_sdl.h"
-#include "platform/window_backend.h"
-#include "game/defer.h"
 #include "strings/title.h"
+#include "hatoyama/engine/sdl/log_sdl.h"
+#include "hatoyama/engine/window_backend.h"
+#include "hatoyama/logic/defer.h"
 #include "obj/platform_constants.h"
 #include "obj/version.h"
 

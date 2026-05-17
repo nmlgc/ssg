@@ -13,12 +13,12 @@
 #include "LOADER.H"
 #include "MUSIC.H"
 #include "WindowSys.h"
-#include "platform/input.h"
-#include "platform/midi_backend.h"
-#include "game/bgm.h"
-#include "game/midi.h"
-#include "game/snd.h"
-#include "game/string_format.h"
+#include "hatoyama/engine/bgm.h"
+#include "hatoyama/engine/input.h"
+#include "hatoyama/engine/midi.h"
+#include "hatoyama/engine/midi_backend.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/string_format.h"
 
 using namespace std::chrono_literals;
 

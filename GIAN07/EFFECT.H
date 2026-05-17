@@ -8,7 +8,7 @@
 //#pragma message(PBGWIN_EFFECT_H)
 
 import std.compat;
-#include "game/narrow.h"
+#include "hatoyama/logic/narrow.h"
 
 
 

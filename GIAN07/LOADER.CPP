@@ -9,11 +9,10 @@
 #include "LZ_UTY.H"
 #include "MUSIC.H"
 #include "WindowSys.h"
-#include "platform/path.h"
-#include "platform/thread.h"
-#include "game/format_bmp.h"
-#include "game/midi.h"
-#include "game/snd.h"
+#include "hatoyama/engine/format_bmp.h"
+#include "hatoyama/engine/path.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/engine/thread.h"
 #include <assert.h>
 
 // Hardcoded loop points for ZUN's original MIDI files

@@ -8,12 +8,12 @@
 #include "GIAN.H"
 #include "LEVEL.H"
 #include "GIAN07/entity.h"
-#include "platform/graphics_backend.h"
-#include "game/cast.h"
-#include "game/debug.h"
-#include "game/endian.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/debug.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/endian.h"
+#include "hatoyama/logic/ut_math.h"
 
 /*
  * ECLコマンドのアドレス更新には ECL_CmdLen[ECLコマンド定数] を使用する

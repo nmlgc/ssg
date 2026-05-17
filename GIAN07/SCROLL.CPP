@@ -10,14 +10,14 @@
 #include "LEVEL.H"
 #include "SCL.H" // ＳＣＬ定義ファイル
 #include "WindowSys.h"
-#include "platform/graphics_backend.h"
-#include "game/bgm.h"
-#include "game/cast.h"
-#include "game/debug.h"
-#include "game/endian.h"
-#include "game/input.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/bgm.h"
+#include "hatoyama/engine/debug.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/cast.h"
+#include "hatoyama/logic/endian.h"
+#include "hatoyama/logic/input.h"
+#include "hatoyama/logic/ut_math.h"
 
 
 

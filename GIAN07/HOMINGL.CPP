@@ -7,9 +7,9 @@
 #include "GEOMETRY.H"
 #include "GIAN.H"
 #include "MAID.H"
-#include "platform/graphics_backend.h"
-#include "game/snd.h"
-#include "game/ut_math.h"
+#include "hatoyama/engine/graphics_backend.h"
+#include "hatoyama/engine/snd.h"
+#include "hatoyama/logic/ut_math.h"
 
 #define HOMINGL_WIDTH	(8*64)
 

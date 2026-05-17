@@ -16,7 +16,7 @@
 
 ///// [ヘッダファイル] /////
 import std.compat;
-#include "game/coords.h"
+#include "hatoyama/logic/coords.h"
 
 
 

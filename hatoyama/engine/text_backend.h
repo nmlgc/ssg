@@ -1,0 +1,37 @@
+/*
+ *   Platform-specific text rendering backend
+ *
+ */
+
+#pragma once
+
+#include "engine/graphics.h"
+
+// Concept for pixel access within a text rendering session. Offers access
+// using both RGB colors and the raw underlying format.
+template <class T> concept TEXTRENDER_SESSION_PIXELACCESS_BASE = requires(
+	T t, PIXEL_POINT xy_rel, decltype(t.GetRaw(xy_rel)) color_raw, RGB color
+) {
+	{ t.GetRaw(xy_rel) } -> std::same_as<decltype(color_raw)>;
+	t.SetRaw(xy_rel, color_raw);
+
+	{ t.Get(xy_rel) } -> std::same_as<RGB>;
+	t.Set(xy_rel, color);
+};
+
+#ifdef WIN32
+#include "engine/windows/text_gdi.h"
+#elif defined(LINUX)
+#include "engine/pangocairo/text_pangocairo.h"
+#endif
+
+static_assert(
+	TEXTRENDER_SESSION_PIXELACCESS_BASE<TEXTRENDER_SESSION::PIXELACCESS>
+);
+static_assert(TEXTRENDER_SESSION_BASE<TEXTRENDER_SESSION>);
+static_assert(TEXTRENDER_BASE<TEXTRENDER>);
+
+extern TEXTRENDER TextObj;
+
+// Shuts down the backend, deleting all fonts.
+void TextBackend_Cleanup(void);

@@ -1,4 +1,5 @@
 tup.include("libs/tupblocks/Tuprules.lua")
+tup.include("hatoyama/Tupfile.lua")
 
 ---@type ConfigShape
 SSG_COMPILE = {}

@@ -1,11 +1,9 @@
 tup.include("libs/tupblocks/Tuprules.lua")
 
-HATOYAMA = sourcepath(tup.getcwd() .. "/../")
+HATOYAMA = sourcepath(tup.getcwd() .. "/")
 
 ---@type ConfigShape
-HATOYAMA_LINK = {
-	cflags = { ("-I" .. HATOYAMA.root), ("-I" .. tup.getcwd() .. "/") },
-}
+HATOYAMA_LINK = { cflags = { ("-I" .. HATOYAMA.root) } }
 
 ---@type ConfigShape
 HATOYAMA_COMPILE = { objdir = "hatoyama/" }

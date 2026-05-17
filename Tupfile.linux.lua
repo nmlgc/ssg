@@ -1,7 +1,3 @@
-tup.import("TOOLCHAIN=gcc")
-tup.include("libs/tupblocks/toolchain." .. TOOLCHAIN .. ".lua")
-tup.include("libs/BLAKE3.lua")
-
 local PLATFORM_LINK = EnvConfig("sdl3", "pangocairo", "fontconfig")
 local LAYERS_LINK = EnvConfig("libwebp", "ogg", "vorbis", "vorbisfile")
 local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))

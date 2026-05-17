@@ -1,38 +1,38 @@
 [submodule "libs/SDL3"]
-	path = libs/SDL3
+	path = hatoyama/libs/SDL3
 	url = https://github.com/nmlgc/SDL
 	branch = SDL3_win9x
 	shallow = true
 [submodule "libs/miniaudio"]
-	path = libs/miniaudio
+	path = hatoyama/libs/miniaudio
 	url = https://github.com/mackron/miniaudio
 	branch = dev
 	shallow = true
 [submodule "libs/tupblocks"]
-	path = libs/tupblocks
+	path = hatoyama/libs/tupblocks
 	url = https://github.com/nmlgc/tupblocks
 	shallow = true
 [submodule "libs/BLAKE3"]
-	path = libs/BLAKE3
+	path = hatoyama/libs/BLAKE3
 	url = https://github.com/BLAKE3-team/BLAKE3
 	shallow = true
 [submodule "libs/dr_libs"]
-	path = libs/dr_libs
+	path = hatoyama/libs/dr_libs
 	url = https://github.com/mackron/dr_libs
 	shallow = true
 [submodule "libs/libogg"]
-	path = libs/libogg
+	path = hatoyama/libs/libogg
 	url = https://github.com/xiph/ogg
 	shallow = true
 [submodule "libs/libvorbis"]
-	path = libs/libvorbis
+	path = hatoyama/libs/libvorbis
 	url = https://github.com/xiph/vorbis
 	shallow = true
 [submodule "libs/libwebp_lossless"]
-	path = libs/libwebp_lossless
+	path = hatoyama/libs/libwebp_lossless
 	url = https://github.com/nmlgc/libwebp_lossless
 	shallow = true
 [submodule "libs/9xcompat"]
-	path = libs/9xcompat
+	path = hatoyama/libs/9xcompat
 	url = https://github.com/nmlgc/9xcompat
 	shallow = true

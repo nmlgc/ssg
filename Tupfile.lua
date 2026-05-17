@@ -1,9 +1,10 @@
-tup.include("libs/tupblocks/Tuprules.lua")
 tup.include("hatoyama/Tupfile.lua")
 
 ---@type ConfigShape
 SSG_COMPILE = {}
-SSG_COMPILE.cflags = { "-I.", "-IGIAN07/", debug = "-DPBG_DEBUG" }
+SSG_COMPILE.cflags = {
+	"-I.", "-IGIAN07/", "-Ihatoyama/", debug = "-DPBG_DEBUG"
+}
 SSG_COMPILE.objdir = "ssg/"
 
 SSG = sourcepath("./")

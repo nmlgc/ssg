@@ -1,10 +1,3 @@
-tup.include("libs/tupblocks/toolchain.msvc.lua")
-tup.include("libs/9xcompat.lua")
-tup.include("libs/BLAKE3.lua")
-tup.include("libs/libwebp_lossless.lua")
-tup.include("libs/SDL.lua")
-tup.include("libs/xiph.lua")
-
 -- Icon
 local ssg_ico = CONFIG:rc(SSG.join("GIAN07/GIAN07.rc"))
 

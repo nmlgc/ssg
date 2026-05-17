@@ -14,6 +14,7 @@ PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
 -- pbg code
 SSG_SRC += SSG.glob("GIAN07/*.cpp")
 SSG_SRC += SSG.glob("GIAN07/*.CPP")
+SSG_SRC += "MAIN/main_sdl.cpp"
 SSG_SRC.extra_inputs += PLATFORM_CONSTANTS
 
 -- Modern game code

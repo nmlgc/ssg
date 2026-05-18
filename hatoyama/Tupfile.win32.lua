@@ -65,20 +65,15 @@ ANALYSIS_RELAXED = { cflags = { release = {
 function BuildHatoyama(variant, constants_cflags)
 	local dep_cfg
 	if (variant == MODERN) then
-		dep_cfg = CONFIG:branch({
-			cflags = {
-				-- WebP only uses multithreading for effort levels 8 and 9,
-				-- where it does significantly boost performance.
-				"-DWEBP_USE_THREAD",
-			},
-			objdir = "modern/",
-		})
+		dep_cfg = CONFIG:branch({ objdir = "modern/" })
 	elseif (variant == VINTAGE) then
 		dep_cfg = CONFIG:branch({
 			cflags = {
-				"/DWIN32_VINTAGE",
-				"/D_WIN32_WINNT=0x0400", -- needed for libwebp
+				-- Must be a link flag, since it's needed by `SDL_thread.h`
+				-- to opt out of `_beginthreadex()` and `_endthreadex()`.
 				"/D__WIN9X__",
+
+				"/DWIN32_VINTAGE",
 				"/arch:IA32",
 				"/Zc:threadSafeInit-",
 			},
@@ -89,10 +84,30 @@ function BuildHatoyama(variant, constants_cflags)
 		})
 	end
 
+	---@type ConfigShape
+	local libwebp_compile = {}
+	if (variant == MODERN) then
+		libwebp_compile.cflags = {
+			-- WebP only uses multithreading for effort levels 8 and 9,
+			-- where it does significantly boost performance.
+			"-DWEBP_USE_THREAD",
+		}
+	elseif (variant == VINTAGE) then
+		libwebp_compile.cflags = { "/D_WIN32_WINNT=0x0400" }
+	end
+	local libwebp_cfg = dep_cfg:branch(libwebp_compile)
+
+	---@type ConfigShape
+	local sdl_compile = {}
+	if (variant == VINTAGE) then
+		sdl_compile.cflags = { "/D_WIN32_WINNT=0x0400" }
+	end
+	local sdl_cfg = dep_cfg:branch(sdl_compile)
+
 	local XIPH_LINK = BuildXiph(dep_cfg)
-	local SDL_LINK = BuildSDL(dep_cfg, VariantBinSuffix(variant))
+	local SDL_LINK = BuildSDL(sdl_cfg, VariantBinSuffix(variant))
 	local BLAKE3_LINK = BuildBLAKE3(dep_cfg, variant)
-	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(dep_cfg, variant)
+	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(libwebp_cfg, variant)
 
 	local modules_cfg = dep_cfg:branch(ANALYSIS)
 	modules_cfg = modules_cfg:branch(modules_cfg:cxx_std_modules())

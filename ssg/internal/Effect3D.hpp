@@ -16,6 +16,7 @@
 
 ///// [ヘッダファイル] /////
 import std.compat;
+#include "hatoyama/api/export.h"
 #include "hatoyama/logic/coords.h"
 
 class C_RNG;
@@ -205,6 +206,6 @@ public:
 
 
 ///// [ 関数 ] /////
-void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
+HATOYAMA_API void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
 
 #endif

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "hatoyama/api/export.h"
 #include "ssg/Hook.h"
 #include "ssg/Input.h"
 #include "ssg/Round.h"
@@ -27,7 +28,7 @@
 
 struct PACKFILE_READ;
 
-struct C_SSG {
+struct HATOYAMA_API C_SSG {
 	HOOKS Hooks;
 	ROUND_PARAMS Round;
 	C_BIT Bit;

@@ -7,6 +7,7 @@
 #define PBGWIN_MAID_H		"めいど : Version 0.01 : Update 2000/02/17"
 //#pragma message(PBGWIN_MAID_H)
 
+#include "hatoyama/api/export.h"
 #include "ssg/Input.h"
 
 class C_FRAGMENT;
@@ -121,7 +122,7 @@ public:
 	}
 
 	///// [ 関数 ] /////
-	void Move(INPUT_BITS, bool in_msg);
+	HATOYAMA_API void Move(INPUT_BITS, bool in_msg);
 
 	// 次のステージの準備
 	void NextStage(void);
@@ -144,9 +145,9 @@ public:
 
 
 
-uint8_t GetLaserDeg(const MAID&);
-uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i);
-uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i);
+HATOYAMA_API uint8_t GetLaserDeg(const MAID&);
+HATOYAMA_API uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i);
+HATOYAMA_API uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i);
 
 
 #endif

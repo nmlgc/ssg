@@ -7,6 +7,7 @@
 #define PBGWIN_MAIDTAMA_H		"めいどたま : Version 0.01 : Update 2000/02/25"
 //#pragma message(PBGWIN_MAIDTAMA_H)
 
+#include "hatoyama/api/export.h"
 #include "ssg/Input.h"
 #include "ssg/internal/Tama.hpp"
 
@@ -174,10 +175,10 @@ public:
 	void Set(INPUT_BITS, bool in_msg);
 
 	// 弾移動＆ヒットチェック
-	void Move(void);
+	HATOYAMA_API void Move(void);
 
 	// 弾ハッシュテーブル初期化
-	void IndSet(void);
+	HATOYAMA_API void IndSet(void);
 
 	MAIDTAMA_DATA_CSPAN Data(void) const {
 		return MaidTama;

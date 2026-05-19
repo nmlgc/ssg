@@ -7,6 +7,7 @@
 #pragma once
 
 import std.compat;
+#include "hatoyama/api/export.h"
 #include "hatoyama/logic/coords.h"
 
 class C_RNG;
@@ -72,7 +73,7 @@ public:
 	void SetGameOver(void);
 
 	// 曲名の表示
-	void SetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
+	HATOYAMA_API void SetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
 
 	// エフェクトを動かす(仕様変更の可能性があります)
 	void Move(void);

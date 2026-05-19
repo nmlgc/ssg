@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "hatoyama/api/export.h"
 #include "hatoyama/logic/buffer.h"
 #include "hatoyama/logic/endian.h"
 
@@ -36,7 +37,7 @@ constexpr auto LZSS_SEQ_MIN = 3;
 constexpr auto LZSS_DICT_MASK = ((1 << LZSS_DICT_BITS) - 1);
 constexpr auto LZSS_SEQ_MAX = (LZSS_SEQ_MIN + ((1 << LZSS_SEQ_BITS) - 1));
 
-fil_checksum_t FilChecksumAddFile(
+HATOYAMA_API fil_checksum_t FilChecksumAddFile(
 	fil_checksum_t& current_total,
 	fil_size_t offset,
 	fil_size_t size_uncompressed,
@@ -44,7 +45,7 @@ fil_checksum_t FilChecksumAddFile(
 );
 // ------
 
-class BIT_DEVICE_READ {
+class HATOYAMA_API BIT_DEVICE_READ {
 	struct {
 		size_t byte = 0;
 		uint8_t bit = 0;
@@ -71,7 +72,7 @@ public:
 	uint32_t GetBits(size_t bitcount);
 };
 
-struct PACKFILE_READ {
+struct HATOYAMA_API PACKFILE_READ {
 	BUFFER_BORROWED packfile;
 	std::span<const PBG_FILEINFO> info;
 
@@ -83,4 +84,4 @@ struct PACKFILE_READ {
 	}
 };
 
-PACKFILE_READ FilStartR(BUFFER_BORROWED packfile);
+HATOYAMA_API PACKFILE_READ FilStartR(BUFFER_BORROWED packfile);

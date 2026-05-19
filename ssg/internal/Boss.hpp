@@ -7,6 +7,7 @@
 #define PBGWIN_BOSS_H		"BOSS : Version 0.01 : Update 2000/02/27"
 //#pragma message(PBGWIN_BOSS_H)
 
+#include "hatoyama/api/export.h"
 #include "ssg/internal/Enemy.hpp"
 #include "ssg/internal/Maid.hpp"
 
@@ -131,7 +132,7 @@ public:
 	void Damage4(int damage);
 
 	// ボスの体力の総和を求める
-	uint32_t GetHPSum(void) const;
+	HATOYAMA_API uint32_t GetHPSum(void) const;
 
 	// ボス用割り込み処理
 	void INT(ENEMY_DATA *e, uint8_t IntID);

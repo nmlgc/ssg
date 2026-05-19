@@ -15,7 +15,9 @@
 
 
 import std.compat;
+#include "hatoyama/api/export.h"
 #include "hatoyama/logic/coords.h"
+
 
 class C_VIV;
 struct ENEMY_DATA;
@@ -138,7 +140,7 @@ public:
 	void Clear(void);
 
 	// レーザー配列の初期化をする
-	void Setup(void);
+	HATOYAMA_API void Setup(void);
 
 	const LLASER_DATA_CSPAN Data(void) const noexcept {
 		return LLaser;

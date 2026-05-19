@@ -11,6 +11,10 @@ ROOT=${ROOT:-/usr}
 PATH_SKELETON=${PATH_SKELETON:-$ROOT/share/skel}
 
 install -Dm755 "./bin/GIAN07" -t "$ROOT/bin/"
+install -d "$ROOT/lib/"
+for f in ./bin/libssg.so*; do
+	cp -P "$f" "$ROOT/lib/";
+done
 install -Dm644 "./bin/bgm/Folder structure.png" -t "$PATH_SKELETON/bgm/"
 install -Dm755 -d "$ROOT/share/applications/"
 sed "s/<icon>/$1/" "./GIAN07/GIAN07.desktop.in" > "$ROOT/share/applications/$1.desktop"

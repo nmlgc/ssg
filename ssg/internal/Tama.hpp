@@ -7,6 +7,7 @@
 
 #include "ssg/Tama.h"
 #include "ssg/internal/Entity.hpp"
+#include "hatoyama/api/export.h"
 #include "hatoyama/logic/coords.h"
 
 class C_FRAGMENT;
@@ -149,7 +150,7 @@ public:
 	// 弾の 1/n をアイテム化する
 	void ToItem(uint8_t n);
 
-	void ResetHoming(void);
+	HATOYAMA_API void ResetHoming(void);
 
 	// ホーミング座標を更新する
 	void UpdateHoming(const WORLD_POINT& p);

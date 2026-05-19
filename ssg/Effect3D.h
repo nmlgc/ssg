@@ -16,6 +16,7 @@
 
 ///// [ヘッダファイル] /////
 import std.compat;
+#include "hatoyama/api/export.h"
 #include "hatoyama/logic/coords.h"
 
 
@@ -123,6 +124,6 @@ using STG6STAR_CSPAN = std::span<const Stg6Star, S3STAR_MAX>;
 
 
 ///// [ 関数 ] /////
-void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
+HATOYAMA_API void Transform3D(Point3D *p, uint8_t dx, uint8_t dy, uint8_t dz);
 
 #endif

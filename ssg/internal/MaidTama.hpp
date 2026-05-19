@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "hatoyama/api/export.h"
 #include "ssg/Input.h"
 #include "ssg/MaidTama.h"
 #include "ssg/internal/Tama.hpp"
@@ -145,10 +146,10 @@ public:
 	void Set(INPUT_BITS, bool in_msg);
 
 	// 弾移動＆ヒットチェック
-	void Move(void);
+	HATOYAMA_API void Move(void);
 
 	// 弾ハッシュテーブル初期化
-	void IndSet(void);
+	HATOYAMA_API void IndSet(void);
 
 	MAIDTAMA_DATA_CSPAN Data(void) const {
 		return MaidTama;

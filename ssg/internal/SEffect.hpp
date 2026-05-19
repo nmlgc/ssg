@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "hatoyama/api/export.h"
 #include "ssg/SEffect.h"
 #include "hatoyama/logic/coords.h"
 
@@ -34,7 +35,7 @@ public:
 	void SetGameOver(void);
 
 	// 曲名の表示
-	void SetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
+	HATOYAMA_API void SetMTitle(WINDOW_COORD y, const PIXEL_SIZE& extent);
 
 	// エフェクトを動かす(仕様変更の可能性があります)
 	void Move(void);

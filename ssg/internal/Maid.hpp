@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "hatoyama/api/export.h"
 #include "ssg/Maid.h"
 #include "ssg/Input.h"
 
@@ -59,7 +60,7 @@ public:
 	}
 
 	///// [ 関数 ] /////
-	void Move(INPUT_BITS, bool in_msg);
+	HATOYAMA_API void Move(INPUT_BITS, bool in_msg);
 
 	// 次のステージの準備
 	void NextStage(void);

@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ssg/Boss.h"
+#include "hatoyama/api/export.h"
 
 struct HOOKS;
 class C_BIT;
@@ -102,7 +103,7 @@ public:
 	void Damage4(int damage);
 
 	// ボスの体力の総和を求める
-	uint32_t GetHPSum(void) const;
+	HATOYAMA_API uint32_t GetHPSum(void) const;
 
 	// ボス用割り込み処理
 	void INT(ENEMY_DATA *e, uint8_t IntID);

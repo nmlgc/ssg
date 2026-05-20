@@ -100,7 +100,7 @@ BUFFER_OWNED PACKFILE_READ::MemExpand(fil_no_t filno) const
 		out_i++;
 	};
 
-	BIT_DEVICE_READ device = { maybe_compressed.value() };
+	BIT_DEVICE_READ device = { maybe_compressed.value_or({}) };
 	while(out_i < info[filno].size_uncompressed) {
 		const bool is_literal = device.GetBit();
 		if(is_literal) {
@@ -133,7 +133,7 @@ PACKFILE_READ FilStartR(BUFFER_BORROWED packfile)
 	if(!maybe_head) {
 		return {};
 	}
-	const auto& head = maybe_head.value()[0];
+	const auto& head = maybe_head.value_or({})[0];
 	if(head.name != PBG_HEADNAME) {
 		return {};
 	}
@@ -143,7 +143,7 @@ PACKFILE_READ FilStartR(BUFFER_BORROWED packfile)
 	if(!maybe_info) {
 		return {};
 	}
-	const auto info = maybe_info.value();
+	const auto info = maybe_info.value_or({});
 	const PACKFILE_READ ret = { packfile, info };
 
 	// Checksums
@@ -157,7 +157,7 @@ PACKFILE_READ FilStartR(BUFFER_BORROWED packfile)
 			total_checksum,
 			info[i].offset,
 			info[i].size_uncompressed,
-			maybe_compressed.value()
+			maybe_compressed.value_or({})
 		);
 		if(checksum != info[i].checksum_compressed) {
 			return {};

@@ -10,11 +10,22 @@ submodule_init() {
 
 	hash=$(git submodule status --cached "$1" | cut -c 2-41)
 
+	# Resolve the correct name for the submodule in the potentially relative
+	# path
+	path_full="$(git rev-parse --show-prefix)$1"
+	path_full=${path_full%/} # Strip trailing slash
+	toplevel="$(git rev-parse --show-toplevel)"
+	name="$(
+		git config --file "$toplevel"/.gitmodules --get-regexp '\.path$' |
+		grep -E " $path_full\$" |
+		cut -d'.' -f2
+	)"
+
 	# Do a manual sparse checkout by
 	# 1) setting up the repo from scratch to emulate `git submodule`'s shallow
 	#    cloning of only the given ref,
 	git -C "$1" init
-	git -C "$1" remote add origin "$(git config submodule."$1".url)"
+	git -C "$1" remote add origin "$(git config submodule."$name".url)"
 	git -C "$1" fetch --depth=1 --filter=blob:none origin "$hash"
 
 	# 2) setting the sparse-checkout parameters, and

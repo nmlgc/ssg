@@ -170,7 +170,7 @@ function BuildSDL(base_cfg, bin_suffix)
 
 	local cfg = base_cfg:branch(compile, link)
 	local mslibc_cfg = cfg:branch(
-		{ cflags = { release = flag_remove("/GL") } }
+		{ cflags = { release = FlagRemove("/GL") } }
 	)
 	local mslibc_src
 	mslibc_src += SDL.glob("src/stdlib/SDL_mem*.c")
@@ -182,6 +182,5 @@ function BuildSDL(base_cfg, bin_suffix)
 	)
 
 	link.cflags += ("-D" .. name .. "=1")
-	link.linputs = cfg:dll(obj, (name .. bin_suffix))
-	return link
+	return TableExtend(link, cfg:dll(obj, (name .. bin_suffix)))
 end

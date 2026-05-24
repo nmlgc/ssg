@@ -86,8 +86,19 @@ function BuildHatoyamaLogic(variant)
 
 	local PRINTF_LINK = BuildPrintf(dep_cfg)
 
+	-- Opt out of exception unwinding for the C++ standard library to avoid
+	-- references to modern system APIs for the vintage build.
+	-- This makes sense in general though, because it's always safe: Even
+	-- though the entirety of the standard library throws plenty of exceptions,
+	-- all `std` module code is either part of a template or an `inline`
+	-- function, and is therefore re-instantiated in every translation unit
+	-- that uses the respective function – and there, only the translation
+	-- unit's own `/EH` flag counts, not this one.
+	local std_compile = { cflags = {
+		release = { FlagRemove("/EHsc"), "/wd4530" }
+	} }
 	local modules_cfg = dep_cfg:branch(ANALYSIS)
-	local modules_link = modules_cfg:cxx_std_modules()
+	local modules_link = modules_cfg:cxx_std_modules(std_compile)
 
 	-- Static libraries ensure that the `std` and `std.compat` .obj files (and
 	-- their CRT dependencies) only get linked into binaries that actually
@@ -96,13 +107,20 @@ function BuildHatoyamaLogic(variant)
 	modules_link.linputs = modules_cfg:lib(modules_link.linputs, "std")
 	modules_cfg = modules_cfg:branch(modules_link)
 
+	-- As long as we don't catch any exceptions on our own, we can safely
+	-- compile without `/EHsc`. Any exception would immediately terminate the
+	-- process anyway, regardless of whether we opted into stack unwinding or
+	-- not. If we do `catch` without `/EHsc`, MSVC raises C4530 in any case
+	-- where the missing stack unwinding would actually matter – and treating
+	-- this warning as an error protects us from accidentally creating such a
+	-- case.
 	local link = {
 		cflags = {
 			"/std:c++latest",
 			"/DWIN32",
-			"/EHsc",
 			"/source-charset:utf-8",
 			"/execution-charset:utf-8",
+			release = { FlagRemove("/wd4530"), "/we4530" },
 		},
 	}
 	TableExtend(link, HATOYAMA_LINK)

@@ -371,10 +371,11 @@ bool BGM_PacksAvailable(bool invalidate_cache)
 	if(PacksAvailable.has_value() && !invalidate_cache) {
 		return PacksAvailable.value();
 	}
-	PacksAvailable = BGM_PackIterator([](const std::u8string_view) {
+	const auto available_new = BGM_PackIterator([](const std::u8string_view) {
 		return SDL_ENUM_SUCCESS;
 	});
-	return PacksAvailable.value();
+	PacksAvailable = available_new;
+	return available_new;
 }
 
 size_t BGM_PackCount(void)

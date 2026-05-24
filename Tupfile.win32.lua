@@ -33,7 +33,7 @@ local function ssg(variant)
 				"/arch:IA32",
 				"/Zc:threadSafeInit-",
 			},
-			lflags = flag_remove("/MANIFEST:.*"),
+			lflags = FlagRemove("/MANIFEST:.*"),
 			objdir = "vintage/"
 		}, {
 			lflags = "/MANIFEST:NO" -- Saves 512 to 1024 bytes!

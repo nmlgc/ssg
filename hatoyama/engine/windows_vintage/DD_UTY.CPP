@@ -418,61 +418,77 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 	}
 	ZeroMemory(&ddsd, sizeof(ddsd));
 
-	try{
-		dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
-		if(dxret!=DD_OK) throw("DirectDrawCreate に失敗");
+	const auto fail = [](const std::u8string_view error) {
+		DebugOut(error);
+		GrpBackend_Cleanup();
+		return std::nullopt;
+	};
 
-		auto** dd_ptr = reinterpret_cast<void **>(&DxObj.DD);
-		dxret = lpDD->QueryInterface(IID_IDirectDraw2, dd_ptr);
-		if(dxret!=DD_OK) throw("QueryInterface に失敗");
-		RELEASE(lpDD);
+	dxret = DirectDrawCreate(pXDD.lpDDGuid, &lpDD, nullptr);
+	if(dxret != DD_OK) {
+		return fail(u8"DirectDrawCreate に失敗");
+	}
 
-		// 強調レベルのセット //
-		dxret = DxObj.DD->SetCooperativeLevel(
-			hWndMain, (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN)
-		);
-		if(dxret!=DD_OK) throw("SetCooperativeLevel に失敗");
+	auto** dd_ptr = reinterpret_cast<void **>(&DxObj.DD);
+	dxret = lpDD->QueryInterface(IID_IDirectDraw2, dd_ptr);
+	if(dxret != DD_OK) {
+		return fail(u8"QueryInterface に失敗");
+	}
+	RELEASE(lpDD);
 
-		// ディスプレイモードのセット //
-		dxret = DxObj.DD->SetDisplayMode(
-			GRP_RES.w, GRP_RES.h, params.bitdepth.value(), 0, 0
-		);
-		if(dxret!=DD_OK) throw("SetDisplayMode に失敗");
+	// 強調レベルのセット //
+	dxret = DxObj.DD->SetCooperativeLevel(
+		hWndMain, (DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN)
+	);
+	if(dxret != DD_OK) {
+		return fail(u8"SetCooperativeLevel に失敗");
+	}
 
-		// プライマリ＆バックサーフェスの作成 //
-		ddsd.dwSize = sizeof(ddsd);
-		ddsd.dwFlags = DDSD_CAPS|DDSD_BACKBUFFERCOUNT;
-		ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE|DDSCAPS_3DDEVICE|DDSCAPS_FLIP|DDSCAPS_COMPLEX;
-		ddsd.dwBackBufferCount = 1;
-		dxret = DxObj.DD->CreateSurface(&ddsd, &DxObj.Prim, nullptr);
-		if(dxret!=DD_OK) throw("CreateSurface(Prim) に失敗");
+	// ディスプレイモードのセット //
+	dxret = DxObj.DD->SetDisplayMode(
+		GRP_RES.w, GRP_RES.h, params.bitdepth.value(), 0, 0
+	);
+	if(dxret != DD_OK) {
+		return fail(u8"SetDisplayMode に失敗");
+	}
 
-		// BackBuffer へのポインタを Get //
-		DDSCAPS ddscaps = { .dwCaps = DDSCAPS_BACKBUFFER };
-		dxret = DxObj.Prim->GetAttachedSurface(&ddscaps, &DxObj.Back);
-		if(dxret!=DD_OK) throw("GetAttachedSurface に失敗");
+	// プライマリ＆バックサーフェスの作成 //
+	ddsd.dwSize = sizeof(ddsd);
+	ddsd.dwFlags = DDSD_CAPS|DDSD_BACKBUFFERCOUNT;
+	ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE|DDSCAPS_3DDEVICE|DDSCAPS_FLIP|DDSCAPS_COMPLEX;
+	ddsd.dwBackBufferCount = 1;
+	dxret = DxObj.DD->CreateSurface(&ddsd, &DxObj.Prim, nullptr);
+	if(dxret != DD_OK) {
+		return fail(u8"CreateSurface(Prim) に失敗");
+	}
 
-		// Get the exact pixel format //
-		DDPIXELFORMAT ddpf = { .dwSize = sizeof(ddpf) };
-		dxret = DxObj.Prim->GetPixelFormat(&ddpf);
-		if(dxret != DD_OK) {
-			throw("Failed to retrieve pixel format");
-		}
-		const auto maybe_pixel_format = HelpPixelFormatFrom(ddpf);
-		if(!maybe_pixel_format) {
-			throw("Unsupported pixel format");
-		}
-		DxObj.PixelFormat = maybe_pixel_format.value();
+	// BackBuffer へのポインタを Get //
+	DDSCAPS ddscaps = { .dwCaps = DDSCAPS_BACKBUFFER };
+	dxret = DxObj.Prim->GetAttachedSurface(&ddscaps, &DxObj.Back);
+	if(dxret != DD_OK) {
+		return fail(u8"GetAttachedSurface に失敗");
+	}
 
-		// 2Dの初期化はここでおしまい //
-		if(DxObj.PixelFormat.IsPalettized()) {
-			throw(true);
-		}
+	// Get the exact pixel format //
+	DDPIXELFORMAT ddpf = { .dwSize = sizeof(ddpf) };
+	dxret = DxObj.Prim->GetPixelFormat(&ddpf);
+	if(dxret != DD_OK) {
+		return fail(u8"Failed to retrieve pixel format");
+	}
+	const auto maybe_pixel_format = HelpPixelFormatFrom(ddpf);
+	if(!maybe_pixel_format) {
+		return fail(u8"Unsupported pixel format");
+	}
+	DxObj.PixelFormat = maybe_pixel_format.value();
 
+	// 2Dの初期化はここでおしまい //
+	if(DxObj.PixelFormat.IsChanneled()) {
 		// Direct3D Object の取得 //
-		auto** d3d_ptr = reinterpret_cast<void **>(&DxObj.D3);
+		auto **d3d_ptr = reinterpret_cast<void **>(&DxObj.D3);
 		dxret = DxObj.DD->QueryInterface(IID_IDirect3D2, d3d_ptr);
-		if(dxret!=DD_OK) throw("QueryInterface に失敗");
+		if(dxret != DD_OK) {
+			return fail(u8"QueryInterface に失敗");
+		}
 
 		// Direct3D Device の作成 //
 		dxret = DxObj.D3->CreateDevice(
@@ -481,50 +497,49 @@ std::optional<GRAPHICS_INIT_RESULT> GrpBackend_Init(
 		// dxret = D3->CreateDevice(
 		// 	IID_IDirect3DHALDevice, DxObj.Back, &DxObj.D3Dev
 		// );
-		if(dxret!=D3D_OK) throw("CreateDevice(D3D_Device) に失敗");
+		if(dxret != D3D_OK) {
+			return fail(u8"CreateDevice(D3D_Device) に失敗");
+		}
 
 		// Ｚバッファ作成＆接続 //
-		if(!CreateZbuffer(pXDD.D3D[0]))
-			throw("CreateSurface(Z-Buffer) に失敗");
+		if(!CreateZbuffer(pXDD.D3D[0])) {
+			return fail(u8"CreateSurface(Z-Buffer) に失敗");
+		}
 
 		// Direct3D Viewport の作成＆接続 //
 		dxret = DxObj.D3->CreateViewport(&DxObj.View, nullptr);
-		if(dxret!=D3D_OK) throw("CreateViewport に失敗");
+		if(dxret != D3D_OK) {
+			return fail(u8"CreateViewport に失敗");
+		}
 		dxret = DxObj.D3Dev->AddViewport(DxObj.View);
-		if(dxret!=D3D_OK) throw("AddViewport に失敗");
+		if(dxret != D3D_OK) {
+			return fail(u8"AddViewport に失敗");
+		}
 		dxret = DxObj.D3Dev->SetCurrentViewport(DxObj.View);
-		if(dxret!=D3D_OK) throw("SetCurrentViewport に失敗");
+		if(dxret != D3D_OK) {
+			return fail(u8"SetCurrentViewport に失敗");
+		}
 
 		ShowCursor(false);
-
-		throw(true);
 	}
-	catch(const std::u8string_view error) {
-		DebugOut(error);
-		GrpBackend_Cleanup();
-		return std::nullopt;
-	}
-	catch(const bool) {
-		if(DxObj.PixelFormat.IsPalettized()) {
-			GrpGeom = &GrpGeom_DDraw;
-			GrpGeom_DDraw.Setup();
-		} else {
-			GrpGeom = &GrpGeom_D3D;
-		}
 
-		if(maybe_prev) {
-			for(auto& surf : DxSurf) {
-				if(surf.size) {
-					DxObj.SurfaceCreateUninitialized(surf, surf.size);
-					DxObj.SurfaceRestore(surf);
-				}
+	if(DxObj.PixelFormat.IsPalettized()) {
+		GrpGeom = &GrpGeom_DDraw;
+		GrpGeom_DDraw.Setup();
+	} else {
+		GrpGeom = &GrpGeom_D3D;
+	}
+
+	if(maybe_prev) {
+		for(auto& surf : DxSurf) {
+			if(surf.size) {
+				DxObj.SurfaceCreateUninitialized(surf, surf.size);
+				DxObj.SurfaceRestore(surf);
 			}
 		}
-
-		return GRAPHICS_INIT_RESULT{ params, false };
 	}
 
-	return std::nullopt;
+	return GRAPHICS_INIT_RESULT{ params, false };
 }
 
 void GrpBackend_Cleanup(void)

@@ -21,6 +21,7 @@
  */
 
 #include "ssg/ECL.h"
+#include "ssg/internal/Entity.hpp"
 #include "ssg/internal/Laser.hpp"
 #include "ssg/internal/Tama.hpp"
 #include "hatoyama/logic/buffer.h"
@@ -112,6 +113,7 @@ struct ENEMY_DATA {
 };
 
 using ENEMY_DATA_CSPAN = std::span<const ENEMY_DATA, ENEMY_MAX>;
+using ENEMY_DATA_IND = IND_TYPE<ENEMY_MAX>;
 
 struct ANIME_DATA {
 	uint8_t	mode;	// アニメーションモード
@@ -135,7 +137,7 @@ private:
 	C_VIV& Viv;
 
 	//// 敵変数 ////
-	uint16_t EnemyNow;
+	ENEMY_DATA_IND EnemyNow;
 
 	// 特殊角度の現在値
 	uint8_t EnemyEXDEG;
@@ -145,7 +147,7 @@ private:
 
 	BUFFER_OWNED ECL_Head;
 	std::array<ENEMY_DATA, ENEMY_MAX> Enemy;
-	std::array<uint16_t, ENEMY_MAX> EnemyInd;
+	std::array<ENEMY_DATA_IND, ENEMY_MAX> EnemyInd;
 	ANIME_DATA Anime[ANIME_MAX];
 
 	bool DamageApply(ENEMY_DATA& e, int damage);
@@ -229,7 +231,7 @@ public:
 		return Enemy;
 	}
 
-	const std::span<const uint16_t> Inds(void) const {
+	const std::span<const ENEMY_DATA_IND> Inds(void) const {
 		return std::span(EnemyInd).first(EnemyNow);
 	}
 

@@ -161,7 +161,7 @@ void C_LASER::Clear(void)
 
 void C_LASER::IndSet(void)
 {
-	for(auto i = 0; i < LASER_MAX; i++) {
+	for(LASER_DATA_IND i = 0; i < LASER_MAX; i++) {
 		LaserInd[i]=i;
 		//memset(Laser+i,0,sizeof(LASER_DATA));
 	}

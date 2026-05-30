@@ -43,6 +43,7 @@ struct MAID;
 #define TDM_LASER_SUB		5		// レーザー・サブショットのダメージ
 
 using MAIDTAMA_DATA_CSPAN = std::span<const TAMA_DATA, MAIDTAMA_MAX>;
+using MAIDTAMA_DATA_IND = IND_TYPE<MAIDTAMA_MAX>;
 
 
 
@@ -59,13 +60,13 @@ private:
 	///// [ 変数 ] /////
 
 	// 現在の数
-	uint16_t MaidTamaNow;
+	MAIDTAMA_DATA_IND MaidTamaNow;
 
 	// 自機ショットの格納用構造体
 	std::array<TAMA_DATA, MAIDTAMA_MAX> MaidTama;
 
 	// 弾の順番を維持するための配列(TAMA.CPP互換)
-	std::array<uint16_t, MAIDTAMA_MAX> MaidTamaInd;
+	std::array<MAIDTAMA_DATA_IND, MAIDTAMA_MAX> MaidTamaInd;
 
 	//// 弾コマンド用マクロ ////
 	void TamaSTDForm(uint8_t c);
@@ -184,7 +185,7 @@ public:
 		return MaidTama;
 	}
 
-	const std::span<const uint16_t> Inds(void) const {
+	const std::span<const MAIDTAMA_DATA_IND> Inds(void) const {
 		return std::span(MaidTamaInd).first(MaidTamaNow);
 	}
 };

@@ -32,10 +32,10 @@
 #define REL_DEGRL(d)	((e->flag&EF_RLCHG) ? (-(d ))   : (d ))
 
 
-template <size_t N> void Indsort(
-	std::array<uint16_t, N>& indices,
-	uint16_t& count,
-	const std::array<ENEMY_DATA, N>& entities
+void Indsort(
+	std::array<ENEMY_DATA_IND, ENEMY_MAX>& indices,
+	ENEMY_DATA_IND& count,
+	const std::array<ENEMY_DATA, ENEMY_MAX>& entities
 ) {
 	Indsort(indices, count, entities, [](const ENEMY_DATA& e) {
 		return (e.flag & EF_DELETE);
@@ -572,13 +572,11 @@ bool C_ENEMY::Set(BUFFER_OWNED&& ecl, uint8_t stage)
 
 void C_ENEMY::Move(void)
 {
-	int				i;//,chkx,chky;
-
 	if(Boss.NumAlive() == 0) {
 		Tama.ResetHoming();
 	}
 
-	for(i=0;i<EnemyNow;i++){
+	for(ENEMY_DATA_IND i = 0; i < EnemyNow; i++) {
 		auto* e = &Enemy[EnemyInd[i]];
 		e->IsDamaged = 0;
 		if(!(e->flag & EF_BOMB)){
@@ -634,9 +632,7 @@ void C_ENEMY::Move(void)
 // 雑魚を消滅させる //
 void C_ENEMY::Clear(void)
 {
-	int			i;
-
-	for(i=0;i<EnemyNow;i++){
+	for(ENEMY_DATA_IND i = 0; i < EnemyNow; i++) {
 		auto* e = &Enemy[EnemyInd[i]];
 		if(e->flag == EF_BOMB) continue;
 
@@ -659,9 +655,7 @@ void C_ENEMY::Clear(void)
 
 void C_ENEMY::IndSet(void)
 {
-	int i;
-
-	for(i=0;i<ENEMY_MAX;i++){
+	for(ENEMY_DATA_IND i = 0; i < ENEMY_MAX; i++) {
 		//memset(Enemy+i,0,sizeof(ENEMY_DATA));
 		EnemyInd[i] = i;
 	}
@@ -690,13 +684,11 @@ bool C_ENEMY::DamageApply(ENEMY_DATA& e, int damage)
 
 bool C_ENEMY::Damage(int x, int y, int damage)
 {
-	int				i;
-
 	if(Boss.Damage(x, y, damage)) {
 		return true;
 	}
 
-	for(i=0;i<EnemyNow;i++){
+	for(ENEMY_DATA_IND i = 0; i < EnemyNow; i++) {
 		auto* e = &Enemy[EnemyInd[i]];
 		if(HITCHK(x,e->x,e->g_width) && HITCHK(y,e->y,e->g_height) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
@@ -711,10 +703,9 @@ bool C_ENEMY::Damage(int x, int y, int damage)
 
 bool C_ENEMY::Damage2(int x, int y, int damage)
 {
-	int				i;
 	auto ret_val = Boss.Damage2(x, y, damage);
 
-	for(i=0;i<EnemyNow;i++){
+	for(ENEMY_DATA_IND i = 0; i < EnemyNow; i++) {
 		auto* e = &Enemy[EnemyInd[i]];
 		if(HITCHK(x,e->x,e->g_width) && (y > e->y) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
@@ -730,13 +721,12 @@ bool C_ENEMY::Damage2(int x, int y, int damage)
 // ナナメレーザーの当たり判定 //
 void C_ENEMY::Damage3(int x, int y, uint8_t d)
 {
-	int				i;
 	// bool	ret_val = false;
 	constexpr int damage = 8;
 
 	Boss.Damage3(x, y, d);
 
-	for(i=0;i<EnemyNow;i++){
+	for(ENEMY_DATA_IND i = 0; i < EnemyNow; i++) {
 		auto* e = &Enemy[EnemyInd[i]];
 		if(LaserHITCHK(e, x, y, d) && (e->flag&EF_DAMAGE)){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;
@@ -751,11 +741,9 @@ void C_ENEMY::Damage3(int x, int y, uint8_t d)
 // すべての敵にダメージを与える /
 void C_ENEMY::Damage4(int damage)
 {
-	int				i;
-
 	Boss.Damage4(damage);
 
-	for(i=0;i<EnemyNow;i++){
+	for(ENEMY_DATA_IND i = 0; i < EnemyNow; i++) {
 		auto* e = &Enemy[EnemyInd[i]];
 		if(e->flag&EF_DAMAGE){
 			if(e->flag==EF_BOMB || !(e->flag&EF_DAMAGE)) continue;

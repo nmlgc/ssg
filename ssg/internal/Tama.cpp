@@ -81,7 +81,7 @@ void C_TAMA::SetEX(void)
 void C_TAMA::SetLine(void)
 {
 	// uint32_t temp;
-	uint16_t *indnow, *indmax, *indp; // 上に同じ
+	TAMA_DATA_IND *indnow, *indmax, *indp; // 上に同じ
 
 
 	TamaSpeed = SPEEDM(TamaCmd.v);
@@ -140,7 +140,7 @@ void C_TAMA::SetLine(void)
 void C_TAMA::SetExtra01(void)
 {
 	// uint32_t temp;
-	uint16_t *indnow, *indmax, *indp; // 上に同じ
+	TAMA_DATA_IND *indnow, *indmax, *indp; // 上に同じ
 
 
 	TamaSpeed = SPEEDM(TamaCmd.v);
@@ -212,7 +212,7 @@ int C_TAMA::TamaSpeedEx(uint8_t d)
 void C_TAMA::__Set(void)
 {
 	// uint32_t temp;
-	uint16_t *indnow, *indmax, *indp; // 上に同じ
+	TAMA_DATA_IND *indnow, *indmax, *indp; // 上に同じ
 
 
 	// "アクセスする領域" をセットする(小型弾 or 特殊弾)        //
@@ -416,9 +416,9 @@ void C_TAMA::ToItem(uint8_t n)
 //	return sum;
 }
 
-void C_TAMA::IndSet(uint16_t tama1)
+void C_TAMA::IndSet(TAMA_DATA_IND tama1)
 {
-	int i;
+	TAMA_DATA_IND i;
 
 	if(tama1>=TAMA_MAX) tama1 = TAMA_MAX-1;
 

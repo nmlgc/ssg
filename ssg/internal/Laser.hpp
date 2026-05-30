@@ -7,7 +7,7 @@
 #define PBGWIN_LASER_H		"LASEER : Ver 0.51 : Update 2000/02/17"
 //#pragma message(PBGWIN_LASER_H)
 
-import std.compat;
+#include "ssg/internal/Entity.hpp"
 #include "hatoyama/logic/coords.h"
 
 class C_LLASER;
@@ -103,6 +103,7 @@ struct LASER_DATA {
 };
 
 using LASER_DATA_CSPAN = std::span<const LASER_DATA, LASER_MAX>;
+using LASER_DATA_IND = IND_TYPE<LASER_MAX>;
 
 
 class C_LASER {
@@ -117,13 +118,13 @@ private:
 	C_VIV& Viv;
 
 	// レーザーの本数
-	uint16_t LaserNow;
+	LASER_DATA_IND LaserNow;
 
 	// レーザー格納用構造体
 	std::array<LASER_DATA, LASER_MAX> Laser;
 
 	// レーザー順番維持用配列
-	std::array<uint16_t, LASER_MAX> LaserInd;
+	std::array<LASER_DATA_IND, LASER_MAX> LaserInd;
 
 	// レーザーの進行方向をセットする
 	uint8_t laser_dir(uint16_t i);
@@ -168,7 +169,7 @@ public:
 		return Laser;
 	}
 
-	const std::span<const uint16_t> Inds(void) const {
+	const std::span<const LASER_DATA_IND> Inds(void) const {
 		return std::span(LaserInd).first(LaserNow);
 	}
 };

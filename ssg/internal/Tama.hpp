@@ -170,6 +170,7 @@ struct TAMA_DATA {
 };
 
 using TAMA_DATA_CSPAN = std::span<const TAMA_DATA, TAMA_MAX>;
+using TAMA_DATA_IND = IND_TYPE<TAMA_MAX>;
 
 
 
@@ -190,16 +191,16 @@ private:
 	////弾の各種変数たち////
 
 	// 小型弾の弾数
-	uint16_t Tama1Now;
+	TAMA_DATA_IND Tama1Now;
 
 	// 特殊弾の弾数
-	uint16_t Tama2Now;
+	TAMA_DATA_IND Tama2Now;
 
 	// 小型弾の最大数
-	uint16_t Tama1Max;
+	TAMA_DATA_IND Tama1Max;
 
 	// 特殊弾の最大数
-	uint16_t Tama2Max;
+	TAMA_DATA_IND Tama2Max;
 
 	int TamaSpeed;
 
@@ -216,10 +217,10 @@ private:
 	std::array<TAMA_DATA, TAMA_MAX> Tama;
 
 	// 小型弾の順番を維持するための配列
-	std::array<uint16_t, TAMA_MAX> Tama1Ind;
+	std::array<TAMA_DATA_IND, TAMA_MAX> Tama1Ind;
 
 	// 特殊弾の順番を維持するための配列
-	std::array<uint16_t, TAMA_MAX> Tama2Ind;
+	std::array<TAMA_DATA_IND, TAMA_MAX> Tama2Ind;
 
 	// 弾の進行方向をセットする
 	uint8_t tama_dir(uint16_t i);
@@ -297,7 +298,7 @@ public:
 	void Clear(void);
 
 	// 弾の個数の割合をセットする(危険！)
-	void IndSet(uint16_t tama1);
+	void IndSet(TAMA_DATA_IND tama1);
 
 	// 弾を得点化する(Ret : 得点)
 	uint32_t ToScore(void);
@@ -314,19 +315,19 @@ public:
 		return Tama;
 	}
 
-	const std::span<const uint16_t> Inds1(void) const {
+	const std::span<const TAMA_DATA_IND> Inds1(void) const {
 		return std::span(Tama1Ind).first(Tama1Now);
 	}
 
-	const std::span<const uint16_t> Inds2(void) const {
+	const std::span<const TAMA_DATA_IND> Inds2(void) const {
 		return std::span(Tama2Ind).first(Tama2Now);
 	}
 };
 
 
 template <size_t N> void Indsort(
-	std::array<uint16_t, N>& indices,
-	uint16_t& count,
+	std::array<TAMA_DATA_IND, N>& indices,
+	TAMA_DATA_IND& count,
 	const std::array<TAMA_DATA, N>& entities
 ) {
 	Indsort(indices, count, entities, [](const TAMA_DATA& t) {

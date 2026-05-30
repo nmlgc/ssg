@@ -7,7 +7,7 @@
 #define PBGWIN_ITEM_H		"ITEM : Version 0.01 : Update 2000/03/11"
 //#pragma message(PBGWIN_ITEM_H)
 
-import std.compat;
+#include "ssg/internal/Entity.hpp"
 
 class C_FRAGMENT;
 class C_PLAYRANK;
@@ -42,6 +42,7 @@ struct ITEM_DATA {
 };
 
 using ITEM_DATA_CSPAN = std::span<const ITEM_DATA, ITEM_MAX>;
+using ITEM_DATA_IND = IND_TYPE<ITEM_MAX>;
 
 
 
@@ -55,8 +56,8 @@ private:
 
 	///// [ 変数 ] /////
 	std::array<ITEM_DATA, ITEM_MAX> Item;
-	std::array<uint16_t, ITEM_MAX> ItemInd;
-	uint16_t ItemNow;
+	std::array<ITEM_DATA_IND, ITEM_MAX> ItemInd;
+	ITEM_DATA_IND ItemNow;
 
 public:
 	C_ITEM(
@@ -86,7 +87,7 @@ public:
 		return Item;
 	}
 
-	const std::span<const uint16_t> Inds(void) const {
+	const std::span<const ITEM_DATA_IND> Inds(void) const {
 		return std::span(ItemInd).first(ItemNow);
 	}
 };

@@ -8,15 +8,21 @@
 import std.compat;
 #include <assert.h>
 
+template <size_t N> using IND_TYPE = std::conditional_t<
+	(N <= (std::numeric_limits<uint8_t>::max)()),
+	uint8_t,
+	uint16_t
+>;
+
 template <class T, size_t N, typename ShouldDelete> void Indsort(
-	std::array<uint16_t, N>& indices,
-	uint16_t& count,
+	std::array<IND_TYPE<N>, N>& indices,
+	IND_TYPE<N>& count,
 	const std::array<T, N>& entities,
 	ShouldDelete should_delete
 )
 {
-	uint16_t i;
-	uint16_t next;
+	IND_TYPE<N> i;
+	IND_TYPE<N> next;
 
 	for(i = next = 0; i < count; i++) {
 		// 消去要請フラグが立っている->swap 立っていない-> counter++ //

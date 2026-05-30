@@ -113,9 +113,7 @@ void C_ITEM::Move(void)
 // アイテム配列の初期化 //
 void C_ITEM::IndSet(void)
 {
-	int i;
-
-	for(i=0;i<ITEM_MAX;i++){
+	for(ITEM_DATA_IND i = 0; i < ITEM_MAX; i++) {
 		ItemInd[i] = i;
 		//memset(Item+i,0,sizeof(ITEM_DATA));
 	}

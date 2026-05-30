@@ -203,10 +203,8 @@ void C_MAIDTAMA::Move(void)
 // 弾ハッシュテーブル初期化 //
 void C_MAIDTAMA::IndSet(void)
 {
-	int		i;
-
 	// この配列を初期化することで全ての弾を初期化する事になる //
-	for(i=0;i<MAIDTAMA_MAX;i++){
+	for(MAIDTAMA_DATA_IND i = 0; i < MAIDTAMA_MAX; i++) {
 		MaidTamaInd[i] = i;
 		//memset(MaidTama+i,0,sizeof(TAMA_DATA));
 	}

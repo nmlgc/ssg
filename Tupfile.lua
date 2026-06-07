@@ -23,6 +23,18 @@ PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
 SSG_SRC += SSG.glob("ssg/*.cpp")
 SSG_SRC += SSG.glob("ssg/internal/*.cpp")
 
+---@param app_cfg Config
+---@param logic_link ConfigShape
+function BuildSSG_CLI(app_cfg, logic_link)
+	local cfg = app_cfg:branch(logic_link)
+	if (tup.getconfig("TUP_PLATFORM") == "win32") then
+		-- Critically important for redirecting output!
+		cfg = cfg:branch({ lflags = "/SUBSYSTEM:console" })
+	end
+	local obj = cfg:cxx(SSG.glob("cli/*.cpp"))
+	cfg:exe(obj, "ssg_cli")
+end
+
 -- pbg code
 GIAN07_OLD_SRC += SSG.glob("GIAN07/*.cpp")
 GIAN07_OLD_SRC += SSG.glob("GIAN07/*.CPP")

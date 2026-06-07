@@ -37,3 +37,4 @@ end
 
 gian07(MODERN)
 gian07(VINTAGE)
+BuildSSG_CLI(app_cfgs[MODERN], ssg_link)

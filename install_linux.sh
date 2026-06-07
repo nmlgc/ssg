@@ -11,6 +11,7 @@ ROOT=${ROOT:-/usr}
 PATH_SKELETON=${PATH_SKELETON:-$ROOT/share/skel}
 
 install -Dm755 "./bin/GIAN07" -t "$ROOT/bin/"
+install -Dm755 "./bin/ssg_cli" -t "$ROOT/bin/"
 install -d "$ROOT/lib/"
 
 # Replace the interface dummy in the unversioned link input file with a

@@ -18,3 +18,5 @@ local gian07_cfg = engine_cfg:branch(GIAN07_COMPILE, ssg_link)
 local gian07_obj = gian07_cfg:cxx(GIAN07_OLD_SRC)
 
 gian07_cfg:exe(gian07_obj, "GIAN07")
+
+BuildSSG_CLI(app_cfg, ssg_link)

@@ -20,7 +20,7 @@
 		{
 			"label": "Build regular binary (Debug)",
 			"type": "shell",
-			"command": "build_windows.bat bin/GIAN07d.exe",
+			"command": "build_windows.bat bin/GIAN07d.exe bin/ssg_clid.exe",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {
@@ -33,7 +33,7 @@
 		{
 			"label": "Build regular binary (Release)",
 			"type": "shell",
-			"command": "build_windows.bat bin/GIAN07.exe",
+			"command": "build_windows.bat bin/GIAN07.exe bin/ssg_cli.exe",
 			"group": "build",
 			"problemMatcher": "$msCompile",
 			"options": {

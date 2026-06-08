@@ -51,6 +51,16 @@ HATOYAMA_API PACKFILE_READ* PackfileNew(const void *buf, size_t size);
 // `NULL`.
 HATOYAMA_API PACKFILE_READ* Packfile_Free(PACKFILE_READ *packfile);
 /// -----------------
+
+/// Replays
+/// -------
+/// Corresponding to `Replay.h`.
+
+// Returns the game's original expected filename of the single one-stage replay
+// for the given [stage] in Shuusou Gyoku's original format in UTF-8, or `NULL`
+// for invalid [stage] numbers.
+HATOYAMA_API const char8_t* ReplayOldBasenameFor(uint8_t stage);
+/// -------
 #ifdef __cplusplus
 }
 #endif

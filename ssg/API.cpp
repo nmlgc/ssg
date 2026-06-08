@@ -4,6 +4,7 @@
  */
 
 #include "ssg/API.h"
+#include "ssg/Replay.h"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/SSG.hpp"
 
@@ -65,4 +66,9 @@ PACKFILE_READ* PackfileNew(const void *buf, size_t size)
 PACKFILE_READ* Packfile_Free(PACKFILE_READ *packfile)
 {
 	return LogicFree(packfile);
+}
+
+const char8_t* ReplayOldBasenameFor(uint8_t stage)
+{
+	return Replay::OldBasenameFor(stage).data();
 }

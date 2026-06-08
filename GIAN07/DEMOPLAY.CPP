@@ -9,6 +9,7 @@
 #include "LOADER.H"
 #include "LZ_UTY.H"
 #include "LogicInstance.h"
+#include "ssg/API.h"
 #include "ssg/Input.h"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/Maid.hpp"
@@ -24,17 +25,6 @@ DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
 INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
 static uint32_t DemoFrameCur;
 
-
-std::u8string ReplayFN(uint8_t stage)
-{
-	if(stage == STAGE_EXTRA) {
-		return std::u8string{ u8"秋霜りぷEx.DAT" };
-	}
-
-	auto ret = std::u8string{ u8"秋霜りぷ_.DAT" };
-	ret[ret.size() - 5] = ('0' + stage);
-	return ret;
-}
 
 void DemoplayInit(const ROUND_PARAMS& Round)
 {
@@ -176,8 +166,8 @@ void DemoplaySaveReplay(void)
 		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
 	};
 
-	const auto fn = ReplayFN(SSG.Stage.Number());
-	FilWrite(fn.c_str(), files);
+	const auto *fn = ReplayOldBasenameFor(SSG.Stage.Number());
+	FilWrite(fn, files);
 }
 
 
@@ -185,8 +175,8 @@ bool DemoplayLoadReplay(uint8_t stage)
 {
 	BUFFER_OWNED temp;
 
-	const auto fn = ReplayFN(stage);
-	const auto fil = SDL_LoadFile(fn.c_str());
+	const auto *fn = ReplayOldBasenameFor(stage);
+	const auto fil = SDL_LoadFile(fn);
 	const auto in = FilStartR(BUFFER_BORROWED{ fil });
 
 	// ヘッダの格納先は０番である //
@@ -233,7 +223,7 @@ bool DemoplayLoadReplay(uint8_t stage)
 			std::span(&DemoInfo, 1),
 			std::span(DemoBuffer, DemoInfo.FrameCount),
 		};
-		if(!FilWrite(fn.c_str(), files, File_TimestampsGet(fn.c_str()))) {
+		if(!FilWrite(fn, files, File_TimestampsGet(fn))) {
 			// Repair denied by file being read-only? OK, bro, you're the boss!
 			DemoInfo.CfgDat.LevelSelected = file_level;
 			DemoInfo.CfgDat.PlayerStock = file_lives;

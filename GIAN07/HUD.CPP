@@ -17,7 +17,7 @@
 #include "SCROLL.H"
 #endif
 #include "hatoyama/engine/text_backend.h"
-#include "hatoyama/engine/time.h"
+#include "hatoyama/app/time.h"
 #include "hatoyama/logic/ut_math.h"
 
 /// BGM title

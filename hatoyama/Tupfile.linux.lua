@@ -27,25 +27,37 @@ function BuildHatoyamaLogic(constants_cflags)
 	return dep_cfg, link_cfg:branch({ linputs = obj })
 end
 
----@param dep_cfg Config
 ---@param logic_cfg Config
-function BuildHatoyamaEngine(dep_cfg, logic_cfg)
+function BuildHatoyamaApp(logic_cfg)
+	local SDL_LINK = EnvConfig("sdl3")
+	local link_cfg = logic_cfg:branch(SDL_LINK)
+
+	local src
+	src += HATOYAMA_APP.src
+	src += HATOYAMA.glob("app/c/*.cpp")
+	src += HATOYAMA.glob("app/sdl/*.cpp")
+	local obj = link_cfg:branch(HATOYAMA_APP.compile):cxx(src)
+
+	return link_cfg:branch({ linputs = obj })
+end
+
+---@param dep_cfg Config
+---@param app_cfg Config
+function BuildHatoyamaEngine(dep_cfg, app_cfg)
 	local LIBS_LINK = EnvConfig(
 		"fontconfig",
 		"libwebp",
 		"ogg",
 		"pangocairo",
-		"sdl3",
 		"vorbis",
 		"vorbisfile"
 	)
 	local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
 
-	local link_cfg = logic_cfg:branch(LIBS_LINK, BLAKE3_LINK)
+	local link_cfg = app_cfg:branch(LIBS_LINK, BLAKE3_LINK)
 
 	local src
 	src += HATOYAMA_ENGINE.src
-	src += HATOYAMA.glob("engine/c/*.cpp")
 	src += HATOYAMA.glob("engine/miniaudio/*.cpp")
 	src += HATOYAMA.glob("engine/pangocairo/*.cpp")
 	src += HATOYAMA.glob("engine/sdl/*.cpp")

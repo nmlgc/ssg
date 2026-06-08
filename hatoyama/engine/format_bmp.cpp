@@ -6,7 +6,7 @@
 #include <SDL3/SDL_pixels.h>
 
 #include "engine/format_bmp.h"
-#include "engine/file.h"
+#include "app/file.h"
 #include <assert.h>
 
 constexpr uint16_t BMPPaletteSizeFromBPP(uint8_t bpp)

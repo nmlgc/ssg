@@ -4,7 +4,7 @@
  */
 
 #include "engine/windows/surface_gdi.h"
-#include "engine/file.h"
+#include "app/file.h"
 #include "engine/format_bmp.h"
 #include <assert.h>
 #include <stddef.h> // for offsetof()

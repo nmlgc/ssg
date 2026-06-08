@@ -12,9 +12,9 @@
 #include "ssg/Sound.h"
 #include "ssg/internal/LZ.hpp"
 #include "hatoyama/engine/format_bmp.h"
-#include "hatoyama/engine/path.h"
 #include "hatoyama/engine/snd.h"
-#include "hatoyama/engine/thread.h"
+#include "hatoyama/app/path.h"
+#include "hatoyama/app/thread.h"
 #include <assert.h>
 
 // Hardcoded loop points for ZUN's original MIDI files

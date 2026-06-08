@@ -5,7 +5,7 @@
 
 #include "engine/text_backend.h"
 #include "engine/windows/surface_gdi.h"
-#include "engine/windows/utf.h"
+#include "app/windows/utf.h"
 
 extern const ENUMARRAY<LOGFONTW, FONT_ID> FontSpecs;
 

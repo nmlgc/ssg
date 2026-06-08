@@ -16,6 +16,7 @@ end
 
 HATOYAMA_LOGIC = hatoyama_part("logic")
 HATOYAMA_API = hatoyama_part("api")
+HATOYAMA_APP = hatoyama_part("app")
 HATOYAMA_ENGINE = hatoyama_part("engine")
 
 tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))

@@ -141,7 +141,30 @@ end
 ---@param dep_cfg Config
 ---@param logic_cfg Config
 ---@param variant integer
-function BuildHatoyamaEngine(dep_cfg, logic_cfg, variant)
+function BuildHatoyamaApp(dep_cfg, logic_cfg, variant)
+	---@type ConfigShape
+	local sdl_compile = {}
+	if (variant == VINTAGE) then
+		sdl_compile.cflags = { "/D_WIN32_WINNT=0x0400" }
+	end
+	local sdl_cfg = dep_cfg:branch(sdl_compile)
+	local SDL_LINK = BuildSDL(sdl_cfg, VariantBinSuffix(variant))
+
+	local link_cfg = logic_cfg:branch(SDL_LINK)
+
+	local src
+	src += HATOYAMA_APP.src
+	src += HATOYAMA.glob("app/windows/*.cpp")
+	src += HATOYAMA.glob("app/sdl/*.cpp")
+	local compile_cfg = link_cfg:branch(HATOYAMA_APP.compile)
+	local obj = compile_cfg:cxx(src)
+	return link_cfg:branch({ linputs = compile_cfg:lib(obj, "app") })
+end
+
+---@param dep_cfg Config
+---@param app_cfg Config
+---@param variant integer
+function BuildHatoyamaEngine(dep_cfg, app_cfg, variant)
 	---@type ConfigShape
 	local libwebp_compile = {}
 	if (variant == MODERN) then
@@ -155,21 +178,11 @@ function BuildHatoyamaEngine(dep_cfg, logic_cfg, variant)
 	end
 	local libwebp_cfg = dep_cfg:branch(libwebp_compile)
 
-	---@type ConfigShape
-	local sdl_compile = {}
-	if (variant == VINTAGE) then
-		sdl_compile.cflags = { "/D_WIN32_WINNT=0x0400" }
-	end
-	local sdl_cfg = dep_cfg:branch(sdl_compile)
-
 	local XIPH_LINK = BuildXiph(dep_cfg)
-	local SDL_LINK = BuildSDL(sdl_cfg, VariantBinSuffix(variant))
 	local BLAKE3_LINK = BuildBLAKE3(dep_cfg, variant)
 	local LIBWEBP_LINK = BuildLibWebPLosslessEncode(libwebp_cfg, variant)
 
-	local link_cfg = logic_cfg:branch(
-		BLAKE3_LINK, LIBWEBP_LINK, SDL_LINK, XIPH_LINK
-	)
+	local link_cfg = app_cfg:branch(BLAKE3_LINK, LIBWEBP_LINK, XIPH_LINK)
 	local compile_cfg = link_cfg:branch(HATOYAMA_ENGINE.compile)
 
 	local src

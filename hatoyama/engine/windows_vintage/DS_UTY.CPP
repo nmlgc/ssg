@@ -8,8 +8,8 @@
 #define DIRECTSOUND_VERSION 0x0700
 
 #include "engine/debug.h" // エラー処理用関数
-#include "engine/file.h"
 #include "engine/snd_backend.h"
+#include "app/file.h"
 #include <dsound.h>
 #include <mmreg.h>
 #pragma message("DS_UTY : Version 0.03 : Update 2000/02/04")

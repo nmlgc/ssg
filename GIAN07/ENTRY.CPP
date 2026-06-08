@@ -14,10 +14,10 @@
 #include "hatoyama/engine/frame.h"
 #include "hatoyama/engine/graphics_backend.h"
 #include "hatoyama/engine/input.h"
-#include "hatoyama/engine/path.h"
 #include "hatoyama/engine/snd.h"
 #include "hatoyama/engine/text_backend.h"
 #include "hatoyama/engine/window_backend.h"
+#include "hatoyama/app/path.h"
 #include "hatoyama/logic/input.h"
 #include "obj/platform_constants.h"
 

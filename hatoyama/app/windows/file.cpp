@@ -7,8 +7,8 @@
 
 #include <SDL3/SDL_iostream.h>
 
-#include "engine/file.h"
-#include "engine/windows/utf.h"
+#include "app/file.h"
+#include "app/windows/utf.h"
 #include "logic/defer.h"
 #include <windows.h>
 

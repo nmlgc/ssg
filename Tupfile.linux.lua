@@ -12,7 +12,8 @@ local ssg_cfg = logic_cfg:branch(SSG_COMPILE, api_link)
 local ssg_obj = ssg_cfg:cxx(SSG_SRC)
 local ssg_link = ssg_cfg:dll(ssg_obj, "ssg", API_VERSION, LOGIC_VERSION)
 
-local engine_cfg = BuildHatoyamaEngine(dep_cfg, logic_cfg)
+local app_cfg = BuildHatoyamaApp(logic_cfg)
+local engine_cfg = BuildHatoyamaEngine(dep_cfg, app_cfg)
 local gian07_cfg = engine_cfg:branch(GIAN07_COMPILE, ssg_link)
 local gian07_obj = gian07_cfg:cxx(GIAN07_OLD_SRC)
 

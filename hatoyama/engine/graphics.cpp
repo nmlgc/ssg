@@ -12,10 +12,10 @@
 #include <printf/printf.h>
 
 #include "engine/graphics.h"
-#include "engine/file.h"
 #include "engine/format_bmp.h"
 #include "engine/graphics_backend.h"
-#include "engine/path.h"
+#include "app/file.h"
+#include "app/path.h"
 #include "logic/defer.h"
 #include "logic/input.h"
 #include "logic/string_format.h"

@@ -10,6 +10,9 @@ import std.compat;
 #else
 #include <stddef.h>
 #include <stdint.h>
+
+// UTF-8 character.
+typedef char char8_t;
 #endif
 
 // Booleans for FFI types. 0 is `false`, non-0 is `true`.

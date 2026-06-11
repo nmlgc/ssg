@@ -22,6 +22,16 @@ template <class T> T* LogicFree(T *p)
 	return nullptr;
 }
 
+const std::u8string_view Logic::PackfileBasename(void)
+{
+	return u8"ENEMY.DAT";
+}
+
+const char8_t *LogicPackfileBasename(void)
+{
+	return Logic::PackfileBasename().data();
+}
+
 C_SSG* SSGNew(void)
 {
 	void *ret = BUFFER_HEAP_LOGIC.allocate(sizeof(C_SSG));

@@ -9,6 +9,7 @@
 #include "LogicInstance.h"
 #include "SCROLL.H"
 #include "WindowSys.h"
+#include "ssg/API.h"
 #include "ssg/Sound.h"
 #include "ssg/internal/LZ.hpp"
 #include "hatoyama/engine/format_bmp.h"
@@ -233,8 +234,8 @@ namespace DAT {
 		COUNT,
 	};
 
-	constexpr ENUMARRAY<const std::u8string_view, PACK_ID> BASENAMES = {{
-		u8"ENEMY.DAT",
+	const ENUMARRAY<const std::u8string_view, PACK_ID> BASENAMES = {{
+		Logic::PackfileBasename(),
 		u8"GRAPH.DAT",
 		u8"GRAPH2.DAT",
 		u8"MUSIC.DAT",

@@ -11,8 +11,21 @@ typedef struct C_SSG C_SSG;
 typedef struct PACKFILE_READ PACKFILE_READ;
 
 #ifdef __cplusplus
+import std.compat;
+
+namespace Logic {
+// Returns the name of the packfile containing all game logic data.
+HATOYAMA_API const std::u8string_view PackfileBasename(void);
+} // namespace Logic
+
 extern "C" {
+#else
+typedef char char8_t;
 #endif
+
+// Returns the name of the packfile containing all game logic data.
+HATOYAMA_API const char8_t *LogicPackfileBasename(void);
+
 /// Gameplay instance
 /// -----------------
 /// Corresponding to `internal/SSG.hpp`.

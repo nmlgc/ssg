@@ -10,7 +10,7 @@
 #include "LZ_UTY.H"
 #include "LogicInstance.h"
 #include "ssg/API.h"
-#include "ssg/Input.h"
+#include "ssg/Replay.h"
 #include "ssg/internal/LZ.hpp"
 #include "ssg/internal/Maid.hpp"
 #include "ssg/internal/RNG.hpp"
@@ -188,29 +188,14 @@ void DemoplaySaveReplay(void)
 
 bool DemoplayLoadReplay(uint8_t stage)
 {
-	BUFFER_OWNED temp;
-
 	const auto *fn = ReplayOldBasenameFor(stage);
 	const auto fil = SDL_LoadFile(fn);
-	const auto in = FilStartR(BUFFER_BORROWED{ fil });
-
-	// ヘッダの格納先は０番である //
-	BUFFER_OWNED info_buf = in.MemExpand(0);
-	if((nullptr == info_buf) || (info_buf.size() != sizeof(DEMOPLAY_INFO))) {
+	auto replay = Replay::OldLoad(BUFFER_BORROWED{ fil });
+	if(!replay) {
 		return false;
 	}
-	auto& info = *std::bit_cast<DEMOPLAY_INFO *>(info_buf.get());
-
-	// データの格納先は１番ですね //
-	temp = in.MemExpand( 1);
-	if(nullptr == temp) {
-		return false;
-	}
-	std::ranges::copy_n(
-		std::bit_cast<const ENDIAN_LITTLE<INPUT_BITS> *>(temp.get()),
-		info.FrameCount,
-		DemoBuffer
-	);
+	auto& info = *replay.Info;
+	std::ranges::copy_n(replay.Frames.get(), info.FrameCount, DemoBuffer);
 
 	// Repair any replay-related bugs from earlier builds
 	// --------------------------------------------------
@@ -233,7 +218,7 @@ bool DemoplayLoadReplay(uint8_t stage)
 	}
 
 	// ≥P0217 was writing twice as many frames as recorded.
-	if(temp.size() != (sizeof(INPUT_BITS) * info.FrameCount)) {
+	if(replay.FramesStored != (sizeof(INPUT_BITS) * info.FrameCount)) {
 		repair = true;
 	}
 

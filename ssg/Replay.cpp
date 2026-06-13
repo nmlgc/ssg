@@ -5,6 +5,9 @@
 
 #include "ssg/Replay.h"
 #include "ssg/Gian.h"
+#include "ssg/internal/LZ.hpp"
+#include "hatoyama/logic/buffer.h"
+#include "hatoyama/logic/endian.h"
 
 namespace Replay {
 #define PREFIX_JA u8"秋霜りぷ"
@@ -87,6 +90,42 @@ uint8_t OldStageNumDetect(std::u8string_view fn)
 		}
 	}
 	return 0;
+}
+
+REPLAY_OLD OldLoad(BUFFER_BORROWED packfile_buf)
+{
+	const auto in = FilStartR(packfile_buf);
+
+	// ヘッダの格納先は０番である //
+	BUFFER_OWNED info_buf = in.MemExpand(0);
+	if((nullptr == info_buf) || (info_buf.size() != sizeof(DEMOPLAY_INFO))) {
+		return {};
+	}
+	auto *info = std::bit_cast<DEMOPLAY_INFO *>(info_buf.release());
+
+	// Flip endianness if needed
+	info->RndSeed = LEAt(&info->RndSeed);
+	info->FrameCount = LEAt(&info->FrameCount);
+
+	// データの格納先は１番ですね //
+	BUFFER_OWNED frames_buf = in.MemExpand(1);
+	const auto frames_buf_size_min = (sizeof(INPUT_BITS) * info->FrameCount);
+	if((nullptr == frames_buf) || (frames_buf.size() < frames_buf_size_min)) {
+		return {};
+	}
+
+	// Flip endianness if needed. The optimizer will remove this entire loop on
+	// little-endian systems!
+	auto *frames_ptr = std::bit_cast<INPUT_BITS *>(frames_buf.release());
+	for(const auto i : std::views::iota(0u, info->FrameCount)) {
+		frames_ptr[i] = LEAt(&frames_ptr[i]);
+	}
+
+	return REPLAY_OLD{
+		.Info = { info, std::move(info_buf.get_deleter()) },
+		.Frames = { frames_ptr, std::move(frames_buf.get_deleter()) },
+		.FramesStored = frames_buf.size(),
+	};
 }
 
 } // namespace Replay

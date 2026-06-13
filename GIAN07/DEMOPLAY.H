@@ -43,6 +43,8 @@ typedef struct tagDEMOPLAY_INFO{
 
 
 ///// [ 関数 ] /////
+bool DemoplayIsPlaying(void);
+
 void DemoplayInit(const ROUND_PARAMS& Round); // デモプレイデータの準備
 
 // デモプレイデータを保存する
@@ -62,7 +64,6 @@ void DemoplayCleanup(void);	// デモプレイロードの事後処理
 
 ///// [ 変数 ] /////
 extern bool DemoplaySaveEnable;	// デモプレイのセーブが動作しているか
-extern bool DemoplayLoadEnable;	// デモプレイのロードが動作しているか
 
 
 #endif

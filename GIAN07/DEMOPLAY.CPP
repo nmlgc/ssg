@@ -20,45 +20,50 @@
 
 
 bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作しているか
-bool	DemoplayLoadEnable = false;	// デモプレイのロードが動作しているか
-DEMOPLAY_INFO	DemoInfo;						// デモプレイ情報
+uint32_t	DemoplayLoadFrameCount = 0;	// > 0 == replay loaded
+DEMOPLAY_INFO	DemoSaveInfo;
 INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
 static uint32_t DemoFrameCur;
 
 
+bool DemoplayIsPlaying(void)
+{
+	return (DemoplayLoadFrameCount > 0);
+}
+
 void DemoplayInit(const ROUND_PARAMS& Round)
 {
 	// 乱数の準備 //
-	DemoInfo.RndSeed = Round.Seed;
-	DemoInfo.Exp = Round.Exp;
-	DemoInfo.Weapon = Round.Weapon;
-	DemoInfo.CfgDat.LevelSelected = Round.LevelSelected;
-	DemoInfo.CfgDat.PlayerStock = Round.PlayerStock;
-	DemoInfo.CfgDat.BombStock = Round.BombStock;
-	DemoInfo.CfgDat.InputFlags = Round.InputFlags;
+	DemoSaveInfo.RndSeed = Round.Seed;
+	DemoSaveInfo.Exp = Round.Exp;
+	DemoSaveInfo.Weapon = Round.Weapon;
+	DemoSaveInfo.CfgDat.LevelSelected = Round.LevelSelected;
+	DemoSaveInfo.CfgDat.PlayerStock = Round.PlayerStock;
+	DemoSaveInfo.CfgDat.BombStock = Round.BombStock;
+	DemoSaveInfo.CfgDat.InputFlags = Round.InputFlags;
 
 	DemoFrameCur = 0;
 	DemoplaySaveEnable = true;
 }
 
 
-bool DemoplayLoadSetup(uint8_t stage)
+bool DemoplayLoadSetup(const DEMOPLAY_INFO& info, uint8_t stage)
 {
 	DemoFrameCur = 0;
-	DemoplayLoadEnable = true;
+	DemoplayLoadFrameCount = info.FrameCount;
 
 	const ROUND_PARAMS round = {
-		.Seed = DemoInfo.RndSeed,
+		.Seed = info.RndSeed,
 
 		// コンフィグの初期化 //
-		.LevelSelected = DemoInfo.CfgDat.LevelSelected,
-		.PlayerStock = DemoInfo.CfgDat.PlayerStock,
-		.BombStock = DemoInfo.CfgDat.BombStock,
-		.InputFlags = DemoInfo.CfgDat.InputFlags,
+		.LevelSelected = info.CfgDat.LevelSelected,
+		.PlayerStock = info.CfgDat.PlayerStock,
+		.BombStock = info.CfgDat.BombStock,
+		.InputFlags = info.CfgDat.InputFlags,
 
 		// 本体の性能記述 //
-		.Weapon = DemoInfo.Weapon,
-		.Exp = DemoInfo.Exp,
+		.Weapon = info.Weapon,
+		.Exp = info.Exp,
 
 		.MsgEnabled = false,
 	};
@@ -90,16 +95,16 @@ void DemoplaySaveDemo(void)
 	if(!DemoplaySaveEnable) return;
 
 	DemoBuffer[DemoFrameCur] = KEY_ESC;
-	DemoInfo.FrameCount = (DemoFrameCur + 1);
+	DemoSaveInfo.FrameCount = (DemoFrameCur + 1);
 
 	char8_t fn[] = u8"STG_Demo.DAT";
 	fn[3] = ('0' + SSG.Stage.Number());
 
 	auto *f = SDL_IOFromFile(fn, "wb");
 	if(f) {
-		SDL_WriteIO(f, &DemoInfo, sizeof(DemoInfo));
+		SDL_WriteIO(f, &DemoSaveInfo, sizeof(DemoSaveInfo));
 		SDL_WriteIO(
-			f, DemoBuffer, (sizeof(DemoBuffer[0]) * DemoInfo.FrameCount)
+			f, DemoBuffer, (sizeof(DemoBuffer[0]) * DemoSaveInfo.FrameCount)
 		);
 		SDL_CloseIO(f);
 	}
@@ -113,32 +118,33 @@ bool DemoplayLoadDemo(uint8_t stage)
 	// 展開 //
 	const auto temp = LoadDemo(stage);
 	auto temp_cursor = temp.cursor();
-	{
-		const auto maybe_info = temp_cursor.next<DEMOPLAY_INFO>();
-		if(!maybe_info) {
-			return false;
-		}
-		DemoInfo = maybe_info.value()[0];
+
+	const auto maybe_info = temp_cursor.next<DEMOPLAY_INFO>();
+	if(!maybe_info) {
+		return false;
 	}
+	const auto& info = maybe_info.value()[0];
 	{
-		const auto maybe_inputs = temp_cursor.next<uint16_t>(DemoInfo.FrameCount);
+		const auto maybe_inputs = temp_cursor.next<uint16_t>(info.FrameCount);
 		if(!maybe_inputs) {
 			return false;
 		}
 		const auto inputs = maybe_inputs.value();
 		memcpy(DemoBuffer, inputs.data(), inputs.size_bytes());
 	}
-	return DemoplayLoadSetup(stage);
+	return DemoplayLoadSetup(info, stage);
 }
 
 
 INPUT_BITS DemoplayMove(void)
 {
-	if(!DemoplayLoadEnable) return KEY_ESC;
+	if(!DemoplayIsPlaying()) {
+		return KEY_ESC;
+	}
 
 	const auto ptr = DemoFrameCur;
-	if(ptr>=DemoInfo.FrameCount){
-		DemoplayLoadEnable = false;
+	if(ptr >= DemoplayLoadFrameCount) {
+		DemoplayCleanup();
 	}
 	else DemoFrameCur++;
 
@@ -148,7 +154,7 @@ INPUT_BITS DemoplayMove(void)
 
 void DemoplayCleanup(void)
 {
-	DemoplayLoadEnable = false;
+	DemoplayLoadFrameCount = 0;
 }
 
 
@@ -160,10 +166,11 @@ void DemoplaySaveReplay(void)
 	DemoplaySaveEnable = false;
 
 	DemoBuffer[DemoFrameCur] = KEY_ESC;
-	DemoInfo.FrameCount = (DemoFrameCur + 1);
+	DemoSaveInfo.FrameCount = (DemoFrameCur + 1);
 
 	BUFFER_BORROWED files[] = {
-		std::span(&DemoInfo, 1), std::span(DemoBuffer, DemoInfo.FrameCount),
+		std::span(&DemoSaveInfo, 1),
+		std::span(DemoBuffer, DemoSaveInfo.FrameCount),
 	};
 
 	const auto *fn = ReplayOldBasenameFor(SSG.Stage.Number());
@@ -180,25 +187,25 @@ bool DemoplayLoadReplay(uint8_t stage)
 	const auto in = FilStartR(BUFFER_BORROWED{ fil });
 
 	// ヘッダの格納先は０番である //
-	temp = in.MemExpand( 0);
-	if(nullptr == temp) {
+	BUFFER_OWNED info_buf = in.MemExpand(0);
+	if((nullptr == info_buf) || (info_buf.size() != sizeof(DEMOPLAY_INFO))) {
 		return false;
 	}
-	memcpy(&DemoInfo, temp.get(), sizeof(DEMOPLAY_INFO));
+	auto& info = *std::bit_cast<DEMOPLAY_INFO *>(info_buf.get());
 
 	// データの格納先は１番ですね //
 	temp = in.MemExpand( 1);
 	if(nullptr == temp) {
 		return false;
 	}
-	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * DemoInfo.FrameCount));
+	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * info.FrameCount));
 
 	// Repair any replay-related bugs from earlier builds
 	// --------------------------------------------------
 
 	bool repair = false;
-	const auto file_level = DemoInfo.CfgDat.LevelSelected;
-	const auto file_lives = DemoInfo.CfgDat.PlayerStock;
+	const auto file_level = info.CfgDat.LevelSelected;
+	const auto file_lives = info.CfgDat.PlayerStock;
 
 	// ≥P0295 was writing the configured difficulty and starting lives for the
 	// regular 6 stages instead of the fixed values for the Extra Stage.
@@ -208,27 +215,27 @@ bool DemoplayLoadReplay(uint8_t stage)
 		(stage == STAGE_EXTRA) &&
 		((file_level != EXTRA_LEVEL) || (file_lives != EXTRA_LIVES))
 	) {
-		DemoInfo.CfgDat.LevelSelected = EXTRA_LEVEL;
-		DemoInfo.CfgDat.PlayerStock = EXTRA_LIVES;
+		info.CfgDat.LevelSelected = EXTRA_LEVEL;
+		info.CfgDat.PlayerStock = EXTRA_LIVES;
 		repair = true;
 	}
 
 	// ≥P0217 was writing twice as many frames as recorded.
-	if(temp.size() != (sizeof(INPUT_BITS) * DemoInfo.FrameCount)) {
+	if(temp.size() != (sizeof(INPUT_BITS) * info.FrameCount)) {
 		repair = true;
 	}
 
 	if(repair) {
 		BUFFER_BORROWED files[] = {
-			std::span(&DemoInfo, 1),
-			std::span(DemoBuffer, DemoInfo.FrameCount),
+			std::span(&info, 1),
+			std::span(DemoBuffer, info.FrameCount),
 		};
 		if(!FilWrite(fn, files, File_TimestampsGet(fn))) {
 			// Repair denied by file being read-only? OK, bro, you're the boss!
-			DemoInfo.CfgDat.LevelSelected = file_level;
-			DemoInfo.CfgDat.PlayerStock = file_lives;
+			info.CfgDat.LevelSelected = file_level;
+			info.CfgDat.PlayerStock = file_lives;
 		}
 	}
 	// --------------------------------------------------
-	return DemoplayLoadSetup(stage);
+	return DemoplayLoadSetup(info, stage);
 }

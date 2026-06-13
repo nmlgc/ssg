@@ -1347,7 +1347,6 @@ void PauseProc(bool&)
 void GameMove(INPUT_BITS input)
 {
 	MWinMove();
-
 	ScrollMove();
 
 	SSG.Move(input);

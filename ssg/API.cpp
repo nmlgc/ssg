@@ -72,3 +72,8 @@ const char8_t* ReplayOldBasenameFor(uint8_t stage)
 {
 	return Replay::OldBasenameFor(stage).data();
 }
+
+uint8_t ReplayOldStageNumDetect(const char8_t *fn)
+{
+	return Replay::OldStageNumDetect(fn);
+}

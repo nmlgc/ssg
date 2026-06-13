@@ -64,6 +64,12 @@ HATOYAMA_API PACKFILE_READ* Packfile_Free(PACKFILE_READ *packfile);
 // for the given [stage] in Shuusou Gyoku's original format in UTF-8, or `NULL`
 // for invalid [stage] numbers.
 HATOYAMA_API const char8_t* ReplayOldBasenameFor(uint8_t stage);
+
+// Detects which stage the given one-stage UTF-8 replay filename corresponds
+// to, by comparing the filename portion of [fn] against several encodings of
+// the original Japanese replay file name prefix. Returns 0 if detection
+// failed.
+HATOYAMA_API uint8_t ReplayOldStageNumDetect(const char8_t *fn);
 /// -------
 #ifdef __cplusplus
 }

@@ -77,3 +77,39 @@ uint8_t ReplayOldStageNumDetect(const char8_t *fn)
 {
 	return Replay::OldStageNumDetect(fn);
 }
+
+REPLAY_OLD* ReplayOldLoad(const void *buf, size_t size)
+{
+	auto replay = Replay::OldLoad(
+		std::span<const uint8_t>{ static_cast<const uint8_t *>(buf), size }
+	);
+	if(!replay) {
+		return nullptr;
+	}
+
+	auto *ret = static_cast<REPLAY_OLD *>(
+		BUFFER_HEAP_LOGIC.allocate(sizeof(REPLAY_OLD))
+	);
+	if(!ret) {
+		return nullptr;
+	}
+	ret->Info = std::move(replay.Info);
+	ret->Frames = std::move(replay.Frames);
+	return ret;
+}
+
+REPLAY_OLD_PTRS ReplayOld_Data(const REPLAY_OLD *replay)
+{
+	if(!replay) {
+		return REPLAY_OLD_PTRS{ .Info = nullptr, .Frames = nullptr };
+	}
+	return REPLAY_OLD_PTRS{
+		.Info = replay->Info.get(),
+		.Frames = replay->Frames.get(),
+	};
+}
+
+REPLAY_OLD *ReplayOld_Free(REPLAY_OLD *replay)
+{
+	return LogicFree(replay);
+}

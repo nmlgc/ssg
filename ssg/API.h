@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "hatoyama/api/export.h"
-#include "hatoyama/logic/ffi.h"
+#include "ssg/Replay.h"
 
 typedef struct C_SSG C_SSG;
 typedef struct PACKFILE_READ PACKFILE_READ;
+typedef struct REPLAY_OLD REPLAY_OLD;
 
 #ifdef __cplusplus
 namespace Logic {
@@ -65,6 +65,18 @@ HATOYAMA_API const char8_t* ReplayOldBasenameFor(uint8_t stage);
 // to, by comparing the filename portion of [fn] against several encodings of
 // the original Japanese replay filename prefix. Returns 0 if detection failed.
 HATOYAMA_API uint8_t ReplayOldStageNumDetect(const char8_t *fn);
+
+// Loads a one-stage replay from a compressed buffer. Returns `NULL` if
+// [packfile_buf] is not a valid old-format replay, or if out of memory.
+HATOYAMA_API REPLAY_OLD* ReplayOldLoad(
+	const void *packfile_buf, size_t packfile_size
+);
+
+// Returns non-owning pointers to the data contained in `REPLAY_OLD`. These
+// pointers may be null if [replay] is `NULL` or invalid.
+HATOYAMA_API REPLAY_OLD_PTRS ReplayOld_Data(const REPLAY_OLD *replay);
+
+HATOYAMA_API REPLAY_OLD *ReplayOld_Free(REPLAY_OLD *replay);
 /// -------
 #ifdef __cplusplus
 }

@@ -5,6 +5,7 @@
 
 #include "ssg/internal/SSG.hpp"
 #include "ssg/Gian.h"
+#include "ssg/Replay.h"
 #include "ssg/internal/LZ.hpp"
 
 constexpr HOOKS HOOKS_EMPTY = {
@@ -75,6 +76,26 @@ void C_SSG::RoundInit(const ROUND_PARAMS& round, uint8_t stage_first)
 	// 乱数の初期化 //
 	// 最後に乱数もそろえる //
 	RNG.seed = round.Seed;
+}
+
+void C_SSG::RoundInitFromReplayOld(const DEMOPLAY_INFO& info, uint8_t stage)
+{
+	const ROUND_PARAMS round = {
+		.Seed = info.RndSeed,
+
+		// コンフィグの初期化 //
+		.LevelSelected = info.CfgDat.LevelSelected,
+		.PlayerStock = info.CfgDat.PlayerStock,
+		.BombStock = info.CfgDat.BombStock,
+		.InputFlags = info.CfgDat.InputFlags,
+
+		// 本体の性能記述 //
+		.Weapon = info.Weapon,
+		.Exp = info.Exp,
+
+		.MsgEnabled = false,
+	};
+	RoundInit(round, stage);
 }
 
 void C_SSG::RoundContinue(void)

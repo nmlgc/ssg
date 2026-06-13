@@ -54,24 +54,7 @@ bool DemoplayLoadSetup(const DEMOPLAY_INFO& info, uint8_t stage)
 {
 	DemoFrameCur = 0;
 	DemoplayLoadFrameCount = info.FrameCount;
-
-	const ROUND_PARAMS round = {
-		.Seed = info.RndSeed,
-
-		// コンフィグの初期化 //
-		.LevelSelected = info.CfgDat.LevelSelected,
-		.PlayerStock = info.CfgDat.PlayerStock,
-		.BombStock = info.CfgDat.BombStock,
-		.InputFlags = info.CfgDat.InputFlags,
-
-		// 本体の性能記述 //
-		.Weapon = info.Weapon,
-		.Exp = info.Exp,
-
-		.MsgEnabled = false,
-	};
-	SSG.RoundInit(round, stage);
-
+	SSG.RoundInitFromReplayOld(info, stage);
 	return true;
 }
 

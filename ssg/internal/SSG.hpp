@@ -7,7 +7,7 @@
 
 #include "hatoyama/api/export.h"
 #include "ssg/Hook.h"
-#include "ssg/Input.h"
+#include "ssg/Replay.h"
 #include "ssg/Round.h"
 #include "ssg/internal/BombEfc.hpp"
 #include "ssg/internal/Boss.hpp"
@@ -63,6 +63,10 @@ struct HATOYAMA_API C_SSG {
 	// Sets the number of credits based on [stage_first].
 	// Does *not* call `StageInit()`.
 	void RoundInit(const ROUND_PARAMS& round, uint8_t stage_first);
+
+	// Like RoundInit(), but reads the round parameters out of the given
+	// one-stage replay info
+	void RoundInitFromReplayOld(const DEMOPLAY_INFO& replay, uint8_t stage);
 
 	// Moves from the Game Over state back to the regular game state by using a
 	// continue.

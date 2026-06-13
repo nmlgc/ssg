@@ -16,7 +16,7 @@
 #include <ssg/internal/SSG.hpp>
 
 REPLAY_CLI_RET Simulate(
-	const ARGS_GIVEN&, std::u8string_view fn_view, const PACKFILE_READ& dat
+	const ARGS_GIVEN& args, std::u8string_view fn_view, const PACKFILE_READ& dat
 )
 {
 	const char8_t *fn = fn_view.data();
@@ -25,7 +25,13 @@ REPLAY_CLI_RET Simulate(
 	const auto t_load = SDL_GetTicksNS();
 	const auto stage = Replay::OldStageNumDetect(fn_view);
 	if(!stage) {
-		return SDL_errorf("%s: failed to detect stage\n", fn);
+		// People are very likely to pass `*.DAT` in conjunction with `-q`,
+		// which will catch packfiles, score files, and the original
+		// configuration, producing a lot of noise if we print an error here...
+		if(args.quiet) {
+			return REPLAY_CLI_RET::OK;
+		}
+		return SDL_errorf("`%s`: failed to detect stage\n", fn);
 	}
 	const auto fil = SDL_LoadFile(fn);
 	if(!fil) {
@@ -109,6 +115,9 @@ REPLAY_CLI_RET Simulate(
 			((100.0 * context.frame) / info.FrameCount)
 		);
 	} else {
+		if(args.quiet) {
+			return REPLAY_CLI_RET::OK;
+		}
 		const auto *cleared_str = (context.cleared ? "Yes" : "No");
 		SDL_printf("%s:\n", fn);
 		SDL_printf("   Stage cleared: %" W "s\n", cleared_str);

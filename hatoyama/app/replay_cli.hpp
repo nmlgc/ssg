@@ -17,6 +17,7 @@
 struct ARGS_GIVEN {
 	const char8_t *dat_fn = nullptr;
 	std::span<char *> positionals; // Actually `char8_t *`.
+	bool quiet = false;
 };
 
 enum class REPLAY_CLI_RET : uint8_t {
@@ -71,6 +72,7 @@ enum class OPTION_ID : uint16_t {
 	END,  // Positional arguments start after this one
 	DAT,
 	HELP,
+	QUIET,
 	VERSION,
 };
 
@@ -83,9 +85,15 @@ struct OPTION {
 };
 
 static constinit auto OPTS = ([] {
-	std::array<OPTION, 3> ret = {{
+	std::array<OPTION, 4> ret = {{
 		{ OPTION_ID::DAT, 'd', "dat", "Custom path to the game data archive" },
 		{ OPTION_ID::HELP, 'h', "help", "Print this usage text" },
+		{
+			OPTION_ID::QUIET,
+			'q',
+			"quiet",
+			"Only report replays that don't simulate completely",
+		},
 		{ OPTION_ID::VERSION, 'v', "version", "Print version info" }
 	}};
 	std::ranges::sort(ret, [](const OPTION& a, const OPTION& b) {
@@ -232,6 +240,10 @@ REPLAY_CLI_RET ReplayCLI(int argc, char **argv, const char *dat_basename)
 
 		case OPTION_ID::HELP:
 			return Usage(argc, argv, dat_basename, dat_fn_default);
+
+		case OPTION_ID::QUIET:
+			args.quiet = true;
+			break;
 
 		case OPTION_ID::VERSION:
 			return Version();

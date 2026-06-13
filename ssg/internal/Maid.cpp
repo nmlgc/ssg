@@ -185,6 +185,8 @@ void C_VIV::NextStage(void)
 
 void C_VIV::Dead(void)
 {
+	Hooks.Viv_Dead(&Hooks);
+
 	int		i;
 
 	Fragment.Set(Viv.x, Viv.y, FRG_FATCIRCLE);

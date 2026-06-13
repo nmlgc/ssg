@@ -109,6 +109,7 @@ void C_MAIDTAMA::Set(INPUT_BITS input, bool in_msg)
 	) {
 		//if(Viv.weapon == 0) EnterBombPalette();
 
+		Hooks.Viv_Bomb(&Hooks);
 		Viv.bomb_time = MaidBombTime[Viv.weapon&3];		// 装備ごとに変更せよ
 		Viv.muteki    = BOMBMUTEKI_VAL;
 		Viv.bomb--;

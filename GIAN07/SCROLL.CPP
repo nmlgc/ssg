@@ -243,7 +243,9 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 					GameExit(true);
 					return;
 				}
-				if(DemoplayLoadEnable) return;
+				if(DemoplayIsPlaying()) {
+					return;
+				}
 				// ステージクリア処理をここに記述 //
 				GameNextStage();	// 本当はエラーチェックが必要!!
 			return;
@@ -254,7 +256,9 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 					GameExit(true);
 					return;
 				}
-				if(DemoplayLoadEnable) return;
+				if(DemoplayIsPlaying()) {
+					return;
+				}
 
 				if(SSG.Round.LevelSelected != GAME_EASY) {
 					switch(SSG.Viv.weapon){
@@ -271,7 +275,9 @@ void SCL_Frontend(const uint8_t *cmd, bool8_t error, HOOKS*)
 				if(ConfigDat.StageSelect.v) {
 					DemoplaySaveReplay();	// 終了はしない
 				}
-				if(DemoplayLoadEnable) return;
+				if(DemoplayIsPlaying()) {
+					return;
+				}
 
 				NameRegistInit(true);
 			return;

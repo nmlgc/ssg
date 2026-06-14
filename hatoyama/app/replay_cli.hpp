@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_log.h>
 
 #include "api/api.h"
@@ -183,6 +184,7 @@ REPLAY_CLI_RET Usage(
 	}
 	SDL_printf(
 		"\n"
+		"`replay_file` can contain `?` and `*` wildcards.\n"
 		"If `-%c`/`--%s` is omitted, game data will be taken from `%s`.\n",
 		opt_dat->switch_short,
 		opt_dat->switch_long.data(),
@@ -251,4 +253,50 @@ REPLAY_CLI_RET ReplayCLI(int argc, char **argv, const char *dat_basename)
 		opt_i++;
 	}
 	return Usage(argc, argv, dat_basename, dat_fn_default);
+}
+
+// Returns a non-zero value on critical errors.
+REPLAY_CLI_RET ReplayCLI_ProcessPositional(
+	const char *arg_untyped, std::invocable<std::u8string_view> auto func
+)
+{
+	const std::u8string_view arg = std::bit_cast<const char8_t *>(arg_untyped);
+	const bool globbing = (arg.find_first_of(u8"*?") != decltype(arg)::npos);
+	if(!globbing) {
+		return func(arg);
+	}
+
+	// Adding 1 also turns `npos` to 0.
+	const auto pattern_start = (arg.find_last_of(u8"/\\") + 1);
+
+	const char *path = "./";
+	char *path_buf = nullptr;
+	defer(SDL_free(path_buf));
+	if(pattern_start >= 1) {
+		path_buf = SDL_strndup(arg_untyped, pattern_start);
+		if(!path_buf) {
+			return SDL_fatalf("%s: out of memory", arg_untyped);
+		}
+		path = path_buf;
+	}
+
+	auto **basenames = SDL_GlobDirectory(
+		path, (arg_untyped + pattern_start), SDL_GLOB_CASEINSENSITIVE, nullptr
+	);
+	if(!basenames) {
+		return SDL_fatalf("%s: out of memory", arg_untyped);
+	}
+	defer(SDL_free(basenames));
+
+	auto ret = REPLAY_CLI_RET::OK;
+	for(size_t i = 0; basenames[i] != nullptr; i++) {
+		char *fn = nullptr;
+		const size_t len = SDL_asprintf(&fn, "%s%s", path, basenames[i]);
+		defer(SDL_free(fn));
+		ret |= func(std::u8string_view{ std::bit_cast<char8_t *>(fn), len });
+		if(!!(ret & REPLAY_CLI_RET::FATAL)) {
+			return ret;
+		}
+	}
+	return ret;
 }

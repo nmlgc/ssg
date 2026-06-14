@@ -160,9 +160,10 @@ REPLAY_CLI_RET ReplayCLI_Run(ARGS_GIVEN& args)
 	}
 
 	auto ret = REPLAY_CLI_RET::OK;
-	for(const auto *fn : args.positionals) {
-		const auto *fn_utf8 = std::bit_cast<const char8_t *>(fn);
-		ret |= Simulate(args, fn_utf8, dat);
+	for(const auto *arg : args.positionals) {
+		ret |= ReplayCLI_ProcessPositional(arg, [&](auto fn) {
+			return Simulate(args, fn, dat);
+		});
 		if(!!(ret & REPLAY_CLI_RET::FATAL)) {
 			return ret;
 		}

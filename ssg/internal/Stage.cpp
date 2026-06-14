@@ -179,6 +179,8 @@ void C_STAGE::Move(INPUT_BITS input)
 		case(SCL_STAGECLEAR):
 		case(SCL_GAMECLEAR):
 		case(SCL_EXTRACLEAR):
+			Hooks.Stage_Clear(&Hooks);
+			[[fallthrough]];
 		case(SCL_END): // カウントも変更させずにリターンする
 			pause = true;
 			break;

@@ -14,6 +14,7 @@ constexpr HOOKS HOOKS_EMPTY = {
 	.Snd_SEStop = [](uint8_t, HOOKS *) {},
 	.Boss_HPSumAtStart = [](const uint32_t, HOOKS *) {},
 	.Boss_Defeat = [](const BOSS_DATA *, HOOKS *) {},
+	.Stage_Clear = [](HOOKS *) {},
 	.Viv_Dead = [](HOOKS *) {},
 	.Viv_Bomb = [](HOOKS *) {},
 	.GameOver = [](HOOKS *) {},

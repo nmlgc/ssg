@@ -36,6 +36,9 @@ typedef struct HOOKS {
 	// Called when defeating the given boss.
 	void (*Boss_Defeat)(const BOSS_DATA *b, struct HOOKS *);
 
+	// Called before clearing any stage.
+	void (*Stage_Clear)(struct HOOKS *);
+
 	// Called before losing a life.
 	void (*Viv_Dead)(struct HOOKS *);
 

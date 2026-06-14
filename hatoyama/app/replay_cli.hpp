@@ -7,6 +7,13 @@
 
 #include <SDL3/SDL_filesystem.h>
 #include <SDL3/SDL_log.h>
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#undef ERROR // A "Region Flag" in `wingdi.h`. Seriously.
+#else
+#include <unistd.h>
+#endif
 
 #include "api/api.h"
 #include "app/path.h"
@@ -204,6 +211,13 @@ REPLAY_CLI_RET Version(void)
 
 REPLAY_CLI_RET ReplayCLI(int argc, char **argv, const char *dat_basename)
 {
+	// Redirect SDL's logger from `stderr` to `stdout`
+#ifdef WIN32
+	SetStdHandle(STD_ERROR_HANDLE, GetStdHandle(STD_OUTPUT_HANDLE));
+#else
+	dup2(STDOUT_FILENO, STDERR_FILENO);
+#endif
+
 	const auto path_data = PathForData();
 	char *dat_fn_default = nullptr;
 	SDL_asprintf(

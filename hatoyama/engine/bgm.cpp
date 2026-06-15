@@ -170,9 +170,12 @@ bool BGM_ChangeMIDIDevice(int8_t direction)
 static bool BGM_Load(unsigned int id)
 {
 	if(!PackPath.empty()) {
+		std::array<char, (STRING_NUM_CAP<decltype(id)> + 1)> num;
+		const size_t num_len = sprintf(num.data(), "%02u", (id + 1));
+
 		LoadedOriginalMIDI = false;
 		const auto prefix_len = PackPath.size();
-		StringCatNum<2>((id + 1), PackPath);
+		PackPath.append(std::bit_cast<char8_t *>(num.data()), num_len);
 
 		// Try loading a waveform track
 		bool waveform_new = false;

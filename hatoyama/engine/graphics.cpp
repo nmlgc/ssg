@@ -112,8 +112,11 @@ SDL_IOStream* Grp_NextScreenshotStream(std::u8string_view ext)
 
 	// Prevent the theoretical infinite loop...
 	while(ScreenshotNum < (std::numeric_limits<NUM_TYPE>::max)()) {
+		std::array<char, (STRING_NUM_CAP<decltype(ScreenshotNum)> + 1)> num;
+		const size_t num_len = sprintf(num.data(), "%04u", ScreenshotNum++);
+
 		const auto prefix_len = ScreenshotBuf.size();
-		StringCatNum<4>(ScreenshotNum++, ScreenshotBuf);
+		ScreenshotBuf.append(std::bit_cast<char8_t *>(num.data()), num_len);
 		ScreenshotBuf += ext;
 		auto *ret = SDL_IOFromFile(ScreenshotBuf.c_str(), "wxb");
 		ScreenshotBuf.resize(prefix_len);

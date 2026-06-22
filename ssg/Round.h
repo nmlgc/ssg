@@ -34,6 +34,7 @@ struct ROUND_PARAMS {
 	uint8_t InputFlags;
 	uint8_t Weapon;
 	uint8_t Exp;
+	bool8_t MsgEnabled;
 };
 
 #pragma warning(pop)

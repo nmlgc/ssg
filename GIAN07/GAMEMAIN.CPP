@@ -569,6 +569,7 @@ bool WeaponSelectInit(bool ExStg)
 		.InputFlags = ConfigDat.InputFlags.v,
 		.Weapon = 0,
 		.Exp = 0,
+		.MsgEnabled = !(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE),
 	};
 
 	GameSTD_Init();
@@ -1157,6 +1158,7 @@ void WeaponSelectProc(bool&)
 					(Cast::up<uint32_t>(RNG.next()) + 1u) *
 					(Cast::up<uint32_t>(RNG.next()) + 1u)
 				);
+				Round.MsgEnabled = false;
 				DemoplayInit(Round);
 			}
 

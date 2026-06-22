@@ -170,11 +170,7 @@ void StageMove(void)
 				const auto temp = U32LEAt(&cmd[1]);
 				// メッセージウィンドウがオープンしている場合 //
 				if(SclInfo.MsgFlag){
-					if(
-						(DemoplaySaveEnable || DemoplayLoadEnable) ||
-						(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE) ||
-						(SystemKey_Data & SYSKEY_SKIP)
-					) {
+					if(!Round.MsgEnabled || (SystemKey_Data & SYSKEY_SKIP)) {
 						CtrlFlag = true;
 					}
 
@@ -231,11 +227,7 @@ void StageMove(void)
 			break;
 
 			case(SCL_MWOPEN):	// メッセージウィンドウを開く
-				if(!(
-					DemoplaySaveEnable ||
-					DemoplayLoadEnable ||
-					(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
-				)) {
+				if(Round.MsgEnabled) {
 					MWinOpen();
 				}
 				SclInfo.MsgFlag = true;
@@ -243,11 +235,7 @@ void StageMove(void)
 			break;
 
 			case(SCL_MWCLOSE):	// メッセージウィンドウを閉じる
-				if(!(
-					DemoplaySaveEnable ||
-					DemoplayLoadEnable ||
-					(ConfigDat.GraphFlags.v & GRPF_MSG_DISABLE)
-				)) {
+				if(Round.MsgEnabled) {
 					MWinClose();
 				}
 				SclInfo.MsgFlag = false;

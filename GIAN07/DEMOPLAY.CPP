@@ -69,6 +69,8 @@ bool DemoplayLoadSetup(uint8_t stage)
 		// 本体の性能記述 //
 		.Weapon = DemoInfo.Weapon,
 		.Exp = DemoInfo.Exp,
+
+		.MsgEnabled = false,
 	};
 	SSG.RoundInit(round, stage);
 

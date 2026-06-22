@@ -5,11 +5,7 @@
 
 #pragma once
 
-#ifdef __cplusplus
-import std.compat;
-#else
-#include <stdint.h>
-#endif
+#include "hatoyama/logic/ffi.h"
 
 // We obviously can't use `constexpr` in FFI headers.
 #pragma warning(push)
@@ -38,6 +34,7 @@ struct ROUND_PARAMS {
 	uint8_t InputFlags;
 	uint8_t Weapon;
 	uint8_t Exp;
+	bool8_t MsgEnabled;
 };
 
 #pragma warning(pop)

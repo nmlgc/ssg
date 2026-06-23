@@ -5,15 +5,24 @@
 
 #pragma once
 
+#ifdef __cplusplus
 import std;
+#endif
+
+// We obviously can't use `constexpr` in FFI headers.
+#pragma warning(push)
+#pragma warning(disable: 26814)
 
 // Pixel-space coordinates
 // -----------------------
 // The unscaled output space in the game's native resolution.
 
 // X or Y value in unscaled pixel space. Relative to any origin.
-using PIXEL_COORD = int;
+typedef int PIXEL_COORD;
 
+typedef PIXEL_COORD WINDOW_COORD;
+
+#ifdef __cplusplus
 // X/Y coordinate in unscaled pixel space. Relative to any origin.
 template <class Coord> struct PIXEL_POINT_BASE {
 	Coord x;
@@ -176,8 +185,6 @@ template <class Coord> struct PIXEL_LTRB_BASE {
 	}
 };
 
-using WINDOW_COORD = PIXEL_COORD;
-
 // X/Y coordinate in unscaled game window space. The visible area ranges from
 // (0, 0) inclusive to [GRP_RES] exclusive.
 template <
@@ -221,16 +228,68 @@ using WINDOW_POINT = WINDOW_POINT_BASE<WINDOW_COORD>;
 using WINDOW_SIZE = WINDOW_SIZE_BASE<WINDOW_COORD>;
 using WINDOW_LTWH = WINDOW_LTWH_BASE<WINDOW_COORD>;
 using WINDOW_LTRB = WINDOW_LTRB_BASE<WINDOW_COORD>;
+#else
+typedef struct {
+	PIXEL_COORD x;
+	PIXEL_COORD y;
+} PIXEL_POINT;
+
+typedef struct {
+	PIXEL_COORD w;
+	PIXEL_COORD h;
+} PIXEL_SIZE;
+
+typedef struct {
+	PIXEL_COORD left;
+	PIXEL_COORD top;
+	PIXEL_COORD w;
+	PIXEL_COORD h;
+} PIXEL_LTWH;
+
+typedef struct {
+	PIXEL_COORD left;
+	PIXEL_COORD top;
+	PIXEL_COORD right;
+	PIXEL_COORD bottom;
+} PIXEL_LTRB;
+
+typedef struct {
+	WINDOW_COORD x;
+	WINDOW_COORD y;
+} WINDOW_POINT;
+
+typedef struct {
+	WINDOW_COORD w;
+	WINDOW_COORD h;
+} WINDOW_SIZE;
+
+typedef struct {
+	WINDOW_COORD left;
+	WINDOW_COORD top;
+	WINDOW_COORD w;
+	WINDOW_COORD h;
+} WINDOW_LTWH;
+
+typedef struct {
+	WINDOW_COORD left;
+	WINDOW_COORD top;
+	WINDOW_COORD right;
+	WINDOW_COORD bottom;
+} WINDOW_LTRB;
+
+#define constexpr
+#endif
 // -----------------------
 
 // World-space coordinates
 // -----------------------
 // Not exclusively used for the playfield.
 
-constexpr auto WORLD_COORD_BITS = 6;
+#define WORLD_COORD_BITS 6
 
-using WORLD_COORD = int;
+typedef int WORLD_COORD;
 
+#ifdef __cplusplus
 inline constexpr WORLD_COORD PixelToWorld(PIXEL_COORD v) {
 	return (v << WORLD_COORD_BITS);
 }
@@ -276,4 +335,14 @@ struct WORLD_POINT {
 		};
 	}
 };
+#else
+#define PixelToWorld(v) (v << WORLD_COORD_BITS)
+
+typedef struct {
+	WORLD_COORD x;
+	WORLD_COORD y;
+} WORLD_POINT;
+#endif
 // ---------------------------
+
+#pragma warning(pop)

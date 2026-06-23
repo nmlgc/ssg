@@ -20,6 +20,7 @@ PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
 })
 
 -- Logic layer
+SSG_SRC += SSG.glob("ssg/*.cpp")
 SSG_SRC += SSG.glob("ssg/internal/*.cpp")
 
 -- pbg code

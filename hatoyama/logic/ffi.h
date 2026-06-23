@@ -8,6 +8,7 @@
 #ifdef __cplusplus
 import std.compat;
 #else
+#include <stddef.h>
 #include <stdint.h>
 #endif
 

@@ -16,14 +16,17 @@
 #include "ssg/internal/RNG.hpp"
 #include "ssg/internal/Stage.hpp"
 #include "hatoyama/app/file.h"
+#include "hatoyama/logic/endian.h"
 #include "hatoyama/logic/ut_math.h"
 
 
 bool	DemoplaySaveEnable = false;	// デモプレイのセーブが動作しているか
 uint32_t	DemoplayLoadFrameCount = 0;	// > 0 == replay loaded
 DEMOPLAY_INFO	DemoSaveInfo;
-INPUT_BITS	DemoBuffer[DEMOBUF_MAX];	// デモプレイ用バッファ
 static uint32_t DemoFrameCur;
+
+// デモプレイ用バッファ
+ENDIAN_LITTLE<INPUT_BITS> DemoBuffer[DEMOBUF_MAX];
 
 
 bool DemoplayIsPlaying(void)
@@ -117,20 +120,22 @@ bool DemoplayLoadDemo(uint8_t stage)
 {
 	// 展開 //
 	const auto temp = LoadDemo(stage);
-	auto temp_cursor = temp.cursor();
+	auto cursor = temp.cursor();
 
-	const auto maybe_info = temp_cursor.next<DEMOPLAY_INFO>();
+	const auto maybe_info = cursor.next<DEMOPLAY_INFO>();
 	if(!maybe_info) {
 		return false;
 	}
 	const auto& info = maybe_info.value()[0];
 	{
-		const auto maybe_inputs = temp_cursor.next<uint16_t>(info.FrameCount);
+		const auto maybe_inputs = cursor.next<ENDIAN_LITTLE<INPUT_BITS>>(
+			info.FrameCount
+		);
 		if(!maybe_inputs) {
 			return false;
 		}
 		const auto inputs = maybe_inputs.value();
-		memcpy(DemoBuffer, inputs.data(), inputs.size_bytes());
+		std::ranges::copy(inputs, DemoBuffer);
 	}
 	return DemoplayLoadSetup(info, stage);
 }
@@ -168,6 +173,9 @@ void DemoplaySaveReplay(void)
 	DemoBuffer[DemoFrameCur] = KEY_ESC;
 	DemoSaveInfo.FrameCount = (DemoFrameCur + 1);
 
+	static_assert(std::is_same_v<
+		decltype(DemoBuffer[0]), ENDIAN_LITTLE<INPUT_BITS>&
+	>);
 	BUFFER_BORROWED files[] = {
 		std::span(&DemoSaveInfo, 1),
 		std::span(DemoBuffer, DemoSaveInfo.FrameCount),
@@ -198,7 +206,11 @@ bool DemoplayLoadReplay(uint8_t stage)
 	if(nullptr == temp) {
 		return false;
 	}
-	memcpy(DemoBuffer, temp.get(), (sizeof(INPUT_BITS) * info.FrameCount));
+	std::ranges::copy_n(
+		std::bit_cast<const ENDIAN_LITTLE<INPUT_BITS> *>(temp.get()),
+		info.FrameCount,
+		DemoBuffer
+	);
 
 	// Repair any replay-related bugs from earlier builds
 	// --------------------------------------------------
@@ -226,6 +238,9 @@ bool DemoplayLoadReplay(uint8_t stage)
 	}
 
 	if(repair) {
+		static_assert(std::is_same_v<
+			decltype(DemoBuffer[0]), ENDIAN_LITTLE<INPUT_BITS>&
+		>);
 		BUFFER_BORROWED files[] = {
 			std::span(&info, 1),
 			std::span(DemoBuffer, info.FrameCount),

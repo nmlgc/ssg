@@ -4,6 +4,7 @@
  */
 
 #include "ssg/API.h"
+#include "ssg/internal/LZ.hpp"
 #include "ssg/internal/SSG.hpp"
 
 template <class T> T* LogicFree(T *p)
@@ -33,4 +34,25 @@ C_SSG* SSGNew(void)
 C_SSG* SSG_Free(C_SSG *ssg)
 {
 	return LogicFree(ssg);
+}
+
+PACKFILE_READ* PackfileNew(const void *buf, size_t size)
+{
+	auto packfile = FilStartR({ static_cast<const uint8_t *>(buf), size });
+	if(!packfile) {
+		return nullptr;
+	}
+	auto *ret = static_cast<PACKFILE_READ *>(
+		BUFFER_HEAP_LOGIC.allocate(sizeof(PACKFILE_READ))
+	);
+	if(!ret) {
+		return nullptr;
+	}
+	*ret = packfile;
+	return ret;
+}
+
+PACKFILE_READ* Packfile_Free(PACKFILE_READ *packfile)
+{
+	return LogicFree(packfile);
 }

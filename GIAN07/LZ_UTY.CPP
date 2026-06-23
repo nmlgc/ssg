@@ -218,8 +218,12 @@ bool PACKFILE_WRITE::Write(
 	const char8_t *s, std::unique_ptr<FILE_TIMESTAMPS> maybe_timestamps
 ) const
 {
-	PBG_FILEHEAD head = { .n = files.size() };
-	std::vector<PBG_FILEINFO> info(files.size());
+	if(files.size() > std::numeric_limits<decltype(PBG_FILEHEAD::n)>::max()) {
+		return false;
+	}
+	fil_no_t file_count = files.size();
+	PBG_FILEHEAD head = { .n = file_count };
+	std::vector<PBG_FILEINFO> info(file_count);
 	fil_checksum_t sum = 0; // in native byte order
 
 	auto write_header = [&head, &info](SDL_IOStream *stream) {
@@ -245,7 +249,7 @@ bool PACKFILE_WRITE::Write(
 	}
 
 	// Compress and write files
-	for(fil_no_t i = 0; i < files.size(); i++) {
+	for(fil_no_t i = 0; i < file_count; i++) {
 		auto compressed = Compress(files[i]);
 
 		const auto offset = SDL_TellIO(stream);

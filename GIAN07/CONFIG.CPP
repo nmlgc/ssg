@@ -32,7 +32,7 @@ template <typename T> concept CONFIG_OPTION = requires(T& t, SDL_IOStream& f) {
 // ----------
 
 template <typename T> using DISK = std::conditional_t<
-	std::is_fundamental_v<T>, ENDIAN_SELECT_BIG<T>, T
+	std::is_fundamental_v<T>, ENDIAN_BIG<T>, T
 >;
 
 template <typename T> bool OptionRead(

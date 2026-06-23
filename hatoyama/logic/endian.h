@@ -10,7 +10,8 @@
 
 import std.compat;
 
-template <typename T, bool Big> class ENDIAN_VALUE {
+namespace Endian {
+template <typename T, bool Big> class Value {
 	std::byte v[sizeof(T)];
 
 	using UT = std::make_unsigned_t<T>;
@@ -19,11 +20,11 @@ template <typename T, bool Big> class ENDIAN_VALUE {
 	}
 
 public:
-	ENDIAN_VALUE() noexcept {
+	Value() noexcept {
 		*this = 0;
 	}
 
-	ENDIAN_VALUE(const T& other) noexcept {
+	Value(const T& other) noexcept {
 		*this = other;
 	}
 
@@ -35,7 +36,7 @@ public:
 		return ret;
 	}
 
-	const T& operator =(const T& other) noexcept {
+	const T& operator=(const T& other) noexcept {
 		for(uint8_t byte = 0; byte < sizeof(T); byte++) {
 			v[byte] = static_cast<std::byte>(
 				static_cast<UT>(other) >> ShiftOffset(byte)
@@ -45,25 +46,26 @@ public:
 	}
 };
 
-template <typename T> using ENDIAN_LITTLE = ENDIAN_VALUE<T, false>;
-template <typename T> using ENDIAN_BIG = ENDIAN_VALUE<T, true>;
+template <typename T> using Little = Value<T, false>;
+template <typename T> using Big = Value<T, true>;
+} // namespace Endian
 
 // Let's help the optimizer a bit.
-template <typename T> using ENDIAN_SELECT_LITTLE = std::conditional_t<
-	(std::endian::native == std::endian::little), T, ENDIAN_LITTLE<T>
+template <typename T> using ENDIAN_LITTLE = std::conditional_t<
+	(std::endian::native == std::endian::little), T, Endian::Little<T>
 >;
-template <typename T> using ENDIAN_SELECT_BIG = std::conditional_t<
-	(std::endian::native == std::endian::big), T, ENDIAN_BIG<T>
+template <typename T> using ENDIAN_BIG = std::conditional_t<
+	(std::endian::native == std::endian::big), T, Endian::Big<T>
 >;
 
-using I16LE = ENDIAN_SELECT_LITTLE<int16_t>;
-using U16LE = ENDIAN_SELECT_LITTLE<uint16_t>;
-using I32LE = ENDIAN_SELECT_LITTLE<int32_t>;
-using U32LE = ENDIAN_SELECT_LITTLE<uint32_t>;
-using I16BE = ENDIAN_SELECT_BIG<int16_t>;
-using U16BE = ENDIAN_SELECT_BIG<uint16_t>;
-using I32BE = ENDIAN_SELECT_BIG<int32_t>;
-using U32BE = ENDIAN_SELECT_BIG<uint32_t>;
+using I16LE = ENDIAN_LITTLE<int16_t>;
+using U16LE = ENDIAN_LITTLE<uint16_t>;
+using I32LE = ENDIAN_LITTLE<int32_t>;
+using U32LE = ENDIAN_LITTLE<uint32_t>;
+using I16BE = ENDIAN_BIG<int16_t>;
+using U16BE = ENDIAN_BIG<uint16_t>;
+using I32BE = ENDIAN_BIG<int32_t>;
+using U32BE = ENDIAN_BIG<uint32_t>;
 
 static I16LE I16LEAt(const void *p) { return *static_cast<const I16LE *>(p); }
 static U16LE U16LEAt(const void *p) { return *static_cast<const U16LE *>(p); }

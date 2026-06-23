@@ -75,3 +75,15 @@ static I16BE I16BEAt(const void *p) { return *static_cast<const I16BE *>(p); }
 static U16BE U16BEAt(const void *p) { return *static_cast<const U16BE *>(p); }
 static I32BE I32BEAt(const void *p) { return *static_cast<const I32BE *>(p); }
 static U32BE U32BEAt(const void *p) { return *static_cast<const U32BE *>(p); }
+
+template <typename T> static T LEAt(const T *p)
+{
+#pragma warning(suppress: 26473) // type.1
+	return *static_cast<const ENDIAN_LITTLE<T> *>(p);
+}
+
+template <typename T> static T BEAt(const T *p)
+{
+#pragma warning(suppress: 26473) // type.1
+	return *static_cast<const ENDIAN_BIG<T> *>(p);
+}

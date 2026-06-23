@@ -11,6 +11,10 @@ import std.compat;
 struct BUFFER_BORROWED : public std::span<const uint8_t> {
 	using span::span;
 
+	template <size_t N> BUFFER_BORROWED(std::span<const uint8_t, N> val) :
+		span(val.data(), val.size_bytes()) {
+	}
+
 	template <typename T, size_t N> BUFFER_BORROWED(std::span<T, N> val) :
 		span(reinterpret_cast<const uint8_t *>(val.data()), val.size_bytes()) {
 	}

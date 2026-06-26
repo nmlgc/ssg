@@ -1,0 +1,49 @@
+tup.import("TOOLCHAIN=gcc")
+tup.include("libs/tupblocks/toolchain." .. TOOLCHAIN .. ".lua")
+tup.include("libs/BLAKE3.lua")
+
+-- Same pkg-config-driven approach as Linux. FreeBSD ports provide .pc files
+-- for all of these, so there's no need to hardcode include/link paths here.
+local PLATFORM_LINK = EnvConfig("sdl3", "pangocairo", "fontconfig")
+local LAYERS_LINK = EnvConfig("libwebp", "ogg", "vorbis", "vorbisfile")
+local BLAKE3_LINK = (EnvConfig("libblake3") or BuildBLAKE3(CONFIG, 0))
+
+-- Since Pango/Cairo adds -pthread to a later configuration, the C++ standard
+-- library must also be compiled with this flag.
+CONFIG = CONFIG:branch({ cflags = "-pthread", lflags = "-pthread" })
+
+-- Static linking the GCC runtime, since the FreeBSD GCC ports don't put their
+-- libstdc++/libgcc into the default ldconfig search path.
+CONFIG = CONFIG:branch({ lflags = { "-static-libstdc++", "-static-libgcc" } })
+
+local ssg_cfg = CONFIG:branch(
+	BLAKE3_LINK, LAYERS_LINK, SSG_COMPILE, CONFIG:cxx_std_modules(), {
+		-- NOTE: intentionally *not* -DLINUX. If platform/c/file.cpp (or
+		-- anything else) special-cases LINUX for something that isn't
+		-- actually Linux-specific, that's the real bug to fix there, not
+		-- something to paper over here.
+		cflags = { "-DFREEBSD", "-DSDL3=1" },
+	}
+)
+local ssg_obj = ssg_cfg:cxx(SSG_SRC)
+
+-- Our platform layer code
+LAYERS_SRC += (SSG.glob("platform/c/*.cpp"))
+ssg_obj = (ssg_obj + ssg_cfg:cxx(LAYERS_SRC))
+
+local platform_cfg = ssg_cfg:branch(PLATFORM_LINK)
+local platform_src = SSG.glob("platform/sdl/*.cpp")
+platform_src += SSG.glob("platform/miniaudio/*.cpp")
+platform_src += SSG.glob("platform/pangocairo/*.cpp")
+platform_src += "MAIN/main_sdl.cpp"
+platform_src.extra_inputs += PLATFORM_CONSTANTS
+ssg_obj = (
+	ssg_obj +
+	platform_cfg:cxx(platform_src) +
+
+	-- Clang does not like C being compiled with clang++, and non-C++ clang
+	-- does not like module-related switches.
+	CONFIG:branch(SSG_COMPILE):cc(SSG.glob("platform/miniaudio/*.c"))
+)
+
+platform_cfg:exe(ssg_obj, "GIAN07")

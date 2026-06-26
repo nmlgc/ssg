@@ -63,6 +63,14 @@ On Linux:
 ./build_linux.sh             # builds both Debug and Release binaries
 ```
 
+On FreeBSD (remember that building [Tup](https://github.com/gittup/tup) from source is highly recommended, it has been only tested with Gcc16 so far, building on Clang is currently broken):
+
+```sh
+./build_freebsd.sh bin/GIAN07  # builds only the Release binary
+./build_freebsd.sh bin/GIAN07d # builds only the Debug binary
+./build_freebsd.sh             # builds both Debug and Release binaries
+```
+
 ## Debugging (Windows only)
 
 .PDB files are generated for Debug and Release builds, so you should get symbol support with any Windows debugger.

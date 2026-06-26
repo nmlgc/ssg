@@ -75,7 +75,7 @@ void TextBackend_GDICleanup(void)
 	RemoveFontResourceExW(FONT_MODERN, FR_PRIVATE, 0);
 #endif
 }
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
 #define GOTHIC "MS Gothic,IPAMonaGothic "
 
 extern constinit const ENUMARRAY<const char *, FONT_ID> FontSpecs = {

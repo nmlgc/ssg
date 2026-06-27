@@ -69,6 +69,8 @@ GIAN07_OLD_SRC.extra_inputs += PLATFORM_CONSTANTS
 local platform = tup.getconfig("TUP_PLATFORM")
 if (platform == "linux") then
 	tup.include("Tupfile.unix.lua")
+elseif (platform == "freebsd") then
+	tup.include("Tupfile.unix.lua")
 else
 	tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))
 end

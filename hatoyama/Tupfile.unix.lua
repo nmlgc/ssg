@@ -3,15 +3,34 @@ tup.include("libs/tupblocks/toolchain." .. TOOLCHAIN .. ".lua")
 tup.include("libs/BLAKE3.lua")
 tup.include("libs/printf.lua")
 
+local platform = tup.getconfig("TUP_PLATFORM")
+
 -- We need this library in a non-C++ build step later.
-local PRINTF_LINK = BuildPrintf(CONFIG)
+-- FreeBSD needs `-fPIC` to avoid a compilation error with the debug build.
+local PRINTF_LINK = BuildPrintf(
+	(platform == "freebsd") and CONFIG:branch({ cflags = "-fPIC" }) or CONFIG
+)
 
 HATOYAMA_API.compile.cflags += { '-fPIC', '-fvisibility=hidden' }
 
 function BuildHatoyamaLogic()
 	-- Since Pango/Cairo adds -pthread to a later configuration, the C++
 	-- standard library must also be compiled with this flag.
-	local modules_cfg = CONFIG:branch({ cflags = "-pthread" })
+	---@type ConfigShape
+	local modules_compile = { cflags = "-pthread" }
+
+	if (platform == "freebsd") then
+		-- FreeBSD also needs `-pthread` explicit at link time, unlike Linux.
+		--
+		-- Statically linking libstdc++/libgcc avoids the binary picking up an
+		-- older system libstdc++.so (e.g. from a default lang/gcc12 install)
+		-- at runtime instead of the one matching the GCC version used to
+		-- compile, which would otherwise fail with a GLIBCXX version mismatch.
+		modules_compile.lflags += {
+			"-pthread", "-static-libstdc++", "-static-libgcc",
+		}
+	end
+	local modules_cfg = CONFIG:branch(modules_compile)
 
 	local dep_cfg = modules_cfg:branch(HATOYAMA_LINK)
 	local link_cfg = dep_cfg:branch(modules_cfg:cxx_std_modules(), PRINTF_LINK)

@@ -23,6 +23,9 @@ local platform = tup.getconfig("TUP_PLATFORM")
 if (platform == "linux") then
 	HATOYAMA_LINK.cflags += { "-DLINUX" }
 	tup.include("Tupfile.unix.lua")
+elseif (platform == "freebsd") then
+	HATOYAMA_LINK.cflags = { "-DFREEBSD" }
+	tup.include("Tupfile.unix.lua")
 else
 	tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))
 end

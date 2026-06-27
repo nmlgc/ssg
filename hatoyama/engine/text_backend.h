@@ -21,7 +21,7 @@ template <class T> concept TEXTRENDER_SESSION_PIXELACCESS_BASE = requires(
 
 #ifdef WIN32
 #include "engine/windows/text_gdi.h"
-#elif defined(LINUX)
+#elif defined(LINUX) || defined(FREEBSD)
 #include "engine/pangocairo/text_pangocairo.h"
 #endif
 

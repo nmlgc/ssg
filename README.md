@@ -63,7 +63,7 @@ On Linux:
 ./build_linux.sh             # builds both Debug and Release binaries
 ```
 
-On FreeBSD (remember that building [Tup](https://github.com/gittup/tup) from source is highly recommended, it has been only tested with Gcc16 so far, building on Clang is currently broken):
+On FreeBSD (you may need to build [Tup](https://github.com/gittup/tup) from source, building with Clang is currently not supported):
 
 ```sh
 ./build_freebsd.sh bin/GIAN07  # builds only the Release binary

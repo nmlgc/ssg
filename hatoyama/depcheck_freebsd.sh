@@ -8,21 +8,8 @@ hatoyama="${1:-.}"
 # Unlike on Linux, we do NOT enable full_deps here: it requires running
 # sub-processes inside a chroot with Linux namespaces for full dependency
 # tracking outside the project tree. Linux namespaces are exclusive to that
-# kernel: there is no equivalent on FreeBSD, regardless of the tup version
-# (confirmed even when building tup from source, not just via the port).
-# Confirmed on this system:
-#
-#   tup error: Sub-processes require running in a chroot for full dependency
-#   detection, but this kernel does not support namespacing and tup is not
-#   privileged.
-#
-# Practical consequence: a `pkg upgrade gcc16` will not trigger an automatic
-# rebuild. After updating the toolchain, run manually:
-#
-#   tup clean && ./depcheck_freebsd.sh && tup
-#
-# The project tree itself (ssg's sources) is still tracked normally without
-# full_deps, so day-to-day development is unaffected.
+# kernel: While the different BSDs have thier own solutions for this Tup doesn't appear to support them
+# but FUSE still should work if the user has the module loaded in kernel.
 
 # Libraries that either aren't packaged by any distro or that we always want
 # to use the vendored version of

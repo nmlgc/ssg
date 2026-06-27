@@ -6,6 +6,10 @@
 #include "logic/buffer.h"
 
 const BUFFER_HEAP BUFFER_HEAP_LOGIC = {
-	.allocate = malloc,
-	.free = free,
+	.allocate = [](size_t n) noexcept {
+		return malloc(n);
+	},
+	.free = [](void *p) noexcept {
+		return free(p);
+	},
 };

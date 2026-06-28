@@ -19,7 +19,13 @@ HATOYAMA_API = hatoyama_part("api")
 HATOYAMA_APP = hatoyama_part("app")
 HATOYAMA_ENGINE = hatoyama_part("engine")
 
-tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))
+local platform = tup.getconfig("TUP_PLATFORM")
+if (platform == "linux") then
+	HATOYAMA_LINK.cflags += { "-DLINUX" }
+	tup.include("Tupfile.unix.lua")
+else
+	tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))
+end
 
 ---@param logic_cfg Config
 ---@param logic_version string

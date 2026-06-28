@@ -6,8 +6,6 @@ tup.include("libs/printf.lua")
 -- We need this library in a non-C++ build step later.
 local PRINTF_LINK = BuildPrintf(CONFIG)
 
-HATOYAMA_LINK.cflags += { "-DLINUX" }
-
 function BuildHatoyamaLogic()
 	-- Since Pango/Cairo adds -pthread to a later configuration, the C++
 	-- standard library must also be compiled with this flag.

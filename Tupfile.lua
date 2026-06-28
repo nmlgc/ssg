@@ -66,4 +66,9 @@ GIAN07_OLD_SRC += SSG.glob("GIAN07/*.CPP")
 GIAN07_OLD_SRC += "MAIN/main_sdl.cpp"
 GIAN07_OLD_SRC.extra_inputs += PLATFORM_CONSTANTS
 
-tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))
+local platform = tup.getconfig("TUP_PLATFORM")
+if (platform == "linux") then
+	tup.include("Tupfile.unix.lua")
+else
+	tup.include(string.format("Tupfile.%s.lua", tup.getconfig("TUP_PLATFORM")))
+end

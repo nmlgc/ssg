@@ -16,8 +16,8 @@ ensure_full_deps() {
 	" > "$root/.tup/options"
 }
 
-# Prepares all libraries for Unix targets, using `$1` as the root path of
-# Hatoyama.
+# Prepares all libraries and runs all code generation steps for Unix targets,
+# using `$1` as the root path of Hatoyama.
 configure_unix() {
 	hatoyama="$1"
 
@@ -48,4 +48,6 @@ configure_unix() {
 	! pkg-config --exists libblake3 && {
 		"$hatoyama/submodules_check.sh" "$hatoyama/libs/BLAKE3" || exit;
 	}
+
+	"$hatoyama/version_from_git.sh"
 }

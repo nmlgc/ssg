@@ -127,6 +127,9 @@ struct SE {
 	}
 };
 
+#ifdef FREEBSD
+static ma_device Device;
+#endif
 static ma_engine Engine;
 static ma_sound_group SEGroup;
 static BGM_OBJ BGMObj;
@@ -143,14 +146,70 @@ float x_to_linear(int x)
 	);
 }
 
+#ifdef FREEBSD
+static void DeviceDataCallback(
+	ma_device *pDevice,
+	void *pFramesOut,
+	const void *pFramesIn,
+	ma_uint32 frameCount
+)
+{
+	(void)pFramesIn;
+	ma_engine_read_pcm_frames(
+		static_cast<ma_engine *>(pDevice->pUserData), pFramesOut, frameCount,
+		nullptr
+	);
+}
+#endif
+
 bool SndBackend_Init(void)
 {
+#ifdef FREEBSD
+	// `ma_device_config_init()` zero-initializes `.periods`, and
+	// `ma_engine_init()` never overrides it when building its own internal
+	// device (it only forwards periodSizeInFrames/InMilliseconds, not
+	// periods itself). miniaudio's OSS backend (the only one available on
+	// BSDs without a separate sound server) doesn't substitute a sane
+	// default for `.periods == 0` the way other backends do, resulting in
+	// a much larger buffer -- and therefore latency -- than intended.
+	//
+	// We work around this by creating the device ourselves with an
+	// explicit period count and size, same root cause as
+	// https://github.com/ButterscotchRunner/Butterscotch/pull/279, but
+	// using the public `ma_engine_read_pcm_frames()` API instead of the
+	// internal `ma_engine_data_callback_internal()`, which isn't exported
+	// in this project's implementation of miniaudio (it's `static`).
+	auto device_config = ma_device_config_init(ma_device_type_playback);
+	device_config.playback.format = ma_format_f32;
+	device_config.playback.channels = 2;
+	device_config.periods = 3;
+	device_config.periodSizeInMilliseconds = 10;
+	device_config.dataCallback = DeviceDataCallback;
+	device_config.pUserData = &Engine;
+
+	if(ma_device_init(nullptr, &device_config, &Device) != MA_SUCCESS) {
+		return false;
+	}
+
+	auto config = ma_engine_config_init();
+	config.pDevice = &Device;
+
+	if(ma_engine_init(&config, &Engine) != MA_SUCCESS) {
+		ma_device_uninit(&Device);
+		return false;
+	}
+	return true;
+#else
 	return (ma_engine_init(nullptr, &Engine) == MA_SUCCESS);
+#endif
 }
 
 void SndBackend_Cleanup(void)
 {
 	ma_engine_uninit(&Engine);
+#ifdef FREEBSD
+	ma_device_uninit(&Device);
+#endif
 }
 
 bool SndBackend_BGMInit(void)

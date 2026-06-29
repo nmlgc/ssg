@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Since Tup refuses to depend on files inside `.git/`…
 
 version_fn="obj/version.h"

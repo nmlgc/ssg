@@ -15,24 +15,29 @@
 #include "app/file.h"
 
 struct FILE_TIMESTAMPS_C : public FILE_TIMESTAMPS {
-	statx_timestamp mtime;
+	struct timespec mtime;
 };
 
 std::unique_ptr<FILE_TIMESTAMPS> File_TimestampsGet(const char8_t *fn)
 {
 	const auto *s = std::bit_cast<const char *>(fn);
 
+#ifdef LINUX
 	struct statx stx;
 	if(statx(AT_FDCWD, s, 0, STATX_MTIME, &stx) == 0) {
-		FILE_TIMESTAMPS_C ret = { .mtime = stx.stx_mtime };
+		FILE_TIMESTAMPS_C ret = {
+			.mtime = { .tv_sec = stx.stx_mtime.tv_sec,
+			           .tv_nsec = stx.stx_mtime.tv_nsec }
+		};
 		return std::unique_ptr<FILE_TIMESTAMPS_C>(
 			new (std::nothrow) FILE_TIMESTAMPS_C(ret)
 		);
 	}
+#endif
 
 	struct stat st;
 	if(stat(s, &st) == 0) {
-		FILE_TIMESTAMPS_C ret = { .mtime = { .tv_sec = st.st_mtime } };
+		FILE_TIMESTAMPS_C ret = { .mtime = st.st_mtim };
 		return std::unique_ptr<FILE_TIMESTAMPS_C>(
 			new (std::nothrow) FILE_TIMESTAMPS_C(ret)
 		);

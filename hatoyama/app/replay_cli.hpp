@@ -279,13 +279,17 @@ REPLAY_CLI_RET ReplayCLI_ProcessPositional(
 )
 {
 	const std::u8string_view arg = std::bit_cast<const char8_t *>(arg_untyped);
-	const bool globbing = (arg.find_first_of(u8"*?") != decltype(arg)::npos);
+	const bool globbing = (SDL_strpbrk(arg_untyped, "*?") != nullptr);
 	if(!globbing) {
 		return func(arg);
 	}
 
-	// Adding 1 also turns `npos` to 0.
-	const auto pattern_start = (arg.find_last_of(u8"/\\") + 1);
+	size_t pattern_start = 0;
+	for(const char *p = arg_untyped; *p; p++) {
+		if((*p == '/') || (*p == '\\')) {
+			pattern_start = ((p + 1) - arg_untyped);
+		}
+	}
 
 	const char *path = "./";
 	char *path_buf = nullptr;

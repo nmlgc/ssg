@@ -19,7 +19,15 @@ constexpr double ToMilliseconds(uint64_t ns)
 {
 	// Do a rounded division to milliseconds × 10 in integer land
 	ns = ((ns + 50'000) / 100'000);
+#if (defined(WIN32) && defined(NDEBUG))
+	// Bypass `__ultod3()`
+	constexpr auto MAX_UINT32 = ((std::numeric_limits<uint32_t>::max)() + 1.0);
+	const uint32_t high = (ns >> 32);
+	const uint32_t low = (ns & 0xFFFFFFFF);
+	const auto ret = ((high * MAX_UINT32) + low);
+#else
 	const auto ret = static_cast<double>(ns);
+#endif
 	return (ret / 10.0);
 }
 
@@ -177,3 +185,20 @@ REPLAY_CLI_RET ReplayCLI_Run(ARGS_GIVEN& args)
 	}
 	return ret;
 }
+
+// Trim 85 KiB of unneeded C++ runtime initialization bloat on Windows
+// -------------------------------------------------------------------
+// Feel free to remove if this ruins your plans!
+
+#if (defined(WIN32) && defined(NDEBUG))
+
+#pragma comment(linker, "/ENTRY:mainCRTStartup")
+
+extern "C" int __cdecl mainCRTStartup()
+{
+	const auto ret = SDL_RunApp(0, nullptr, SDL_main, nullptr);
+	ExitProcess(ret);
+}
+
+#endif
+// -------------------------------------------------------------------

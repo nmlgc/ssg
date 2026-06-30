@@ -15,6 +15,14 @@
 #include <ssg/internal/LZ.hpp>
 #include <ssg/internal/SSG.hpp>
 
+constexpr double ToMilliseconds(uint64_t ns)
+{
+	// Do a rounded division to milliseconds × 10 in integer land
+	ns = ((ns + 50'000) / 100'000);
+	const auto ret = static_cast<double>(ns);
+	return (ret / 10.0);
+}
+
 REPLAY_CLI_RET Simulate(
 	const ARGS_GIVEN& args, std::u8string_view fn_view, const PACKFILE_READ& dat
 )
@@ -100,10 +108,8 @@ REPLAY_CLI_RET Simulate(
 
 #define W "9"
 	const auto t_done = SDL_GetTicksNS();
-	const auto d_load = (t_sim - t_load);
-	const auto d_sim = (t_done - t_sim);
-	const auto d_load_ms = (d_load / 1000000.0);
-	const auto d_sim_ms = (d_sim / 1000000.0);
+	const auto d_load_ms = ToMilliseconds(t_sim - t_load);
+	const auto d_sim_ms = ToMilliseconds(t_done - t_sim);
 	const auto d_fps = (context.frame / (d_sim_ms / 1000.0));
 	if(ret) {
 		SDL_LogMessage(

@@ -104,7 +104,7 @@ function BuildHatoyamaLogic(variant)
 	local compile_cfg = link_cfg:branch(HATOYAMA_LOGIC.compile)
 	local obj = compile_cfg:cxx(src)
 	return dep_cfg, link_cfg:branch({
-		linputs = obj,
+		linputs = compile_cfg:lib(obj, "logic"),
 	})
 end
 
@@ -160,5 +160,8 @@ function BuildHatoyamaEngine(dep_cfg, logic_cfg, variant)
 		obj = (obj + vintage_cfg:cxx(vintage_src))
 	end
 
-	return link_cfg:branch({ lflags = "/SUBSYSTEM:windows", linputs = obj })
+	return link_cfg:branch({
+		lflags = "/SUBSYSTEM:windows",
+		linputs = compile_cfg:lib(obj, "engine"),
+	})
 end

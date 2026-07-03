@@ -21,7 +21,9 @@
 
 ///// [ 定数 ] /////
 #define SNAKE_MAX				4			// 蛇型の敵の最大数
-constexpr auto SNAKEYMOVE_POINTS_PER_ENEMY = 8;
+#define SNAKEYMOVE_BUF 30	// 蛇型運動格納用敵データの数
+#define SNAKEYMOVE_POINTS_PER_ENEMY 8
+#define SNAKEYMOVE_BUF_POINTS (SNAKEYMOVE_BUF * SNAKEYMOVE_POINTS_PER_ENEMY)
 
 #define BIT_MAX					6			// ビットの最大数
 #define BITCMD_STDMOVE			0x00		// 通常の移動を行う
@@ -46,19 +48,22 @@ constexpr auto SNAKEYMOVE_POINTS_PER_ENEMY = 8;
 ///// [構造体] /////
 
 // 蛇型の敵を管理する構造体 //
-template <size_t Len> struct SNAKYMOVE_DATA {
+typedef struct SNAKYMOVE_DATA {
 	// 頂点バッファ(ExDef.h)
-	DegPoint	PointBuffer[Len * SNAKEYMOVE_POINTS_PER_ENEMY];
+	DegPoint PointBuffer[SNAKEYMOVE_BUF_POINTS];
 
-	ENEMY_DATA	*EnemyPtr[Len];	// 尾となるデータ配列
+	ENEMY_DATA	*EnemyPtr[SNAKEYMOVE_BUF];	// 尾となるデータ配列
 	BOSS_DATA		*Parent;							// 親(頭となるデータ)
-	size_t	Head;	// 頭を格納している地点のポインタ
+	uint8_t	Head;	// 頭を格納している地点のポインタ
 	bool	bIsUse;	// この構造体を使用しているか
 
-	constexpr static size_t Length() {
-		return Len;
-	}
-};
+#ifdef __cplusplus
+	static_assert(
+		((std::numeric_limits<decltype(Head)>::max)() > SNAKEYMOVE_BUF_POINTS),
+		"`Head` must fit at least `SNAKEYMOVE_BUF_POINTS`"
+	);
+#endif
+} SNAKYMOVE_DATA;
 
 
 typedef struct tagBIT_PARAM {
@@ -116,7 +121,7 @@ int  BitGetNum(void);	// 現在のビット数を取得する
 
 
 ///// [ 変数 ] /////
-extern SNAKYMOVE_DATA<30> SnakeData[SNAKE_MAX];
+extern SNAKYMOVE_DATA SnakeData[SNAKE_MAX];
 extern BIT_DATA BitData;
 
 

@@ -15,7 +15,7 @@
 #define BIT_VIRTUAL_HP			990000		// ビットの仮想ＨＰ
 
 
-SNAKYMOVE_DATA<30> SnakeData[SNAKE_MAX];
+SNAKYMOVE_DATA SnakeData[SNAKE_MAX];
 BIT_DATA		BitData;
 
 
@@ -50,7 +50,7 @@ void SnakySet(BOSS_DATA *b, int len, uint32_t TailID)
 
 	// Hardcoded to 30 in the original game. No way around dynamic allocation
 	// if mods ever want to safely customize it.
-	assert(s->Length() == len);
+	assert(SNAKEYMOVE_BUF == len);
 
 	// ここでは頂点バッファの初期化を行うのだ //
 	// なお、ループ中断値は後で変更のこと     //
@@ -79,11 +79,8 @@ void SnakyMove(void)
 		}
 
 		// バッファ更新処理 //
-		using DATA_TYPE = std::remove_reference_t<decltype(*s)>;
-		constexpr auto points = (
-			DATA_TYPE::Length() * SNAKEYMOVE_POINTS_PER_ENEMY
-		);
-		for(const auto j : std::views::iota(0u, s->Length())) {
+		constexpr auto points = SNAKEYMOVE_BUF_POINTS;
+		for(const auto j : std::views::iota(0, SNAKEYMOVE_BUF)) {
 			e = s->EnemyPtr[j];
 			if(e == nullptr) {
 				continue;

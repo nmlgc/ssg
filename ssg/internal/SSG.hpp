@@ -28,6 +28,7 @@
 #include "ssg/internal/Tama.hpp"
 
 struct PACKFILE_READ;
+struct BUFFER_OWNED;
 
 struct HATOYAMA_API C_SSG {
 	HOOKS Hooks;
@@ -77,6 +78,12 @@ struct HATOYAMA_API C_SSG {
 	// the data for the given [stage], decompressed from a previously
 	// initialized packfile instance of `ENEMY.DAT`. Returns `true` on success.
 	bool StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage);
+
+	// Calls `StageFree()`, then initializes the SCL and enemy subsystems by
+	// taking ownership of the raw data in the given buffers, which correspond to the given [stage]. Returns `true` on success.
+	bool StageLoadFromBuffers(
+		BUFFER_OWNED&& ecl, BUFFER_OWNED&& scl, uint8_t stage
+	);
 
 	// Deallocates enemy and SCL data.
 	void StageFree(void);

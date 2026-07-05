@@ -139,6 +139,15 @@ bool C_SSG::StageLoadFromDAT(const PACKFILE_READ& enemy_dat, uint8_t stage)
 	return StageLoad(*this, stage, ecl_func, scl_func);
 }
 
+bool C_SSG::StageLoadFromBuffers(
+	BUFFER_OWNED&& ecl, BUFFER_OWNED&& scl, uint8_t stage
+)
+{
+	const auto ecl_func = [&] { return std::move(ecl); };
+	const auto scl_func = [&] { return std::move(scl); };
+	return StageLoad(*this, stage, ecl_func, scl_func);
+}
+
 void C_SSG::StageFree(void)
 {
 	// メモリを解放だ！ //

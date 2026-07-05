@@ -84,7 +84,14 @@ function BuildHatoyamaLogic(variant)
 	end
 
 	local modules_cfg = dep_cfg:branch(ANALYSIS)
-	modules_cfg = modules_cfg:branch(modules_cfg:cxx_std_modules())
+	local modules_link = modules_cfg:cxx_std_modules()
+
+	-- Static libraries ensure that the `std` and `std.compat` .obj files (and
+	-- their CRT dependencies) only get linked into binaries that actually
+	-- reference at least one of their symbols. Seems to be required for
+	-- bypassing CRT initialization on Visual Studio 2022 (not 2026).
+	modules_link.linputs = modules_cfg:lib(modules_link.linputs, "std")
+	modules_cfg = modules_cfg:branch(modules_link)
 
 	local link = {
 		cflags = {

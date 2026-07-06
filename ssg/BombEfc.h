@@ -6,7 +6,7 @@
 #ifndef PBG_BOMBEFC_VERSION
 #define PBG_BOMBEFC_VERSION	"爆発系エフェクト : Version 0.01 : Update 2000/11/21"
 
-import std.compat;
+#include "hatoyama/logic/ffi.h"
 
 
 
@@ -26,7 +26,7 @@ typedef struct tagSpObj {
 
 typedef struct tagBombEfcCtrl {
 	int			x,y;					// エフェクトの中心座標
-	bool	bIsUsed;	// この構造体は使用中か
+	bool8_t	bIsUsed;	// この構造体は使用中か
 	uint32_t	count;	// フレームカウンタ
 
 	SpObj		Obj[EXBOMB_OBJMAX];		// エフェクト補助用オブジェクト

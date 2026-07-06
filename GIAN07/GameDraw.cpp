@@ -1009,7 +1009,7 @@ void LaserBombDraw(const MAID& Viv)
 	int				i,w;
 	int				lx,ly;
 	int				wx,wy;
-	const auto LaserDeg = GetLaserDeg(Viv);
+	const auto LaserDeg = GetLaserDeg(&Viv);
 
 	GrpGeom->Lock();
 	if(LaserDeg<58){

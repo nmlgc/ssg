@@ -321,9 +321,9 @@ void C_VIV::PowerUp(uint8_t damage)
 
 #undef Viv
 
-uint8_t GetLaserDeg(const MAID& Viv)
+uint8_t GetLaserDeg(const MAID* Viv)
 {
-	return (((120 - Viv.bomb_time) * 3) / 2);
+	return (((120 - Viv->bomb_time) * 3) / 2);
 }
 
 // MSVC's static analyzer suggests to make the functions below `constexpr`,

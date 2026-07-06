@@ -66,12 +66,14 @@ typedef struct MAID {
 	uint8_t ShiftCounter;	// 押しっぱなし低速移動用
 
 	int8_t GameOverTimer;
-	bool BuzzSound;	// かすった音を連続再生させないためのフラグ
+	bool8_t BuzzSound; // かすった音を連続再生させないためのフラグ
 } MAID;
 
 
 
-HATOYAMA_API uint8_t GetLaserDeg(const MAID&);
+// Expects [Viv] to be a valid pointer.
+HATOYAMA_API uint8_t GetLaserDeg(const MAID *Viv);
+
 HATOYAMA_API uint8_t GetRightLaserDeg(uint8_t LaserDeg, int i);
 HATOYAMA_API uint8_t GetLeftLaserDeg(uint8_t LaserDeg, int i);
 

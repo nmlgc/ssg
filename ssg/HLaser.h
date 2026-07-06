@@ -11,15 +11,20 @@
 #include "ssg/ExDef.h"
 #include "hatoyama/logic/coords.h"
 
+// We obviously can't use `constexpr` in FFI headers.
+#pragma warning(push)
+#pragma warning(disable: 26814)
+#pragma warning(disable: 26497)
+
 
 
 ///// [ 定数 ] /////
 #define HLASER_MAX			162
 #define HLASER_LEN			7		// 描画枚数..
 #define HLASER_SECTION		4		// 読み込み幅
-constexpr auto HLASER_SEGMENTS = (HLASER_LEN * HLASER_SECTION);
+#define HLASER_SEGMENTS	(HLASER_LEN * HLASER_SECTION)
 
-constexpr WORLD_COORD HOMINGL_WIDTH = PixelToWorld(8);
+static const WORLD_COORD HOMINGL_WIDTH = PixelToWorld(8);
 
 
 #define HL_NONE		0			// ただ進むだけ
@@ -32,13 +37,13 @@ constexpr WORLD_COORD HOMINGL_WIDTH = PixelToWorld(8);
 
 
 ///// [マクロ] /////
-constexpr int HLASER_GETNEXT(int current)
+inline int HLASER_GETNEXT(int current)
 {
 	// 後で mod -> and に変更すること //
 	return ((current + (HLASER_SEGMENTS - 1)) % HLASER_SEGMENTS);
 }
 
-constexpr int HLASER_GETPREV(int current, int n)
+inline int HLASER_GETPREV(int current, int n)
 {
 	// 後で mod -> and に変更すること //
 	return ((current + n) % HLASER_SEGMENTS);
@@ -78,5 +83,6 @@ typedef struct tagHLaserInfo {
 } HLaserInfo;
 
 
+#pragma warning(pop)
 
 #endif

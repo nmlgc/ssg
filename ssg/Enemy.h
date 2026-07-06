@@ -56,7 +56,7 @@ typedef struct{
 } INT_VECTOR;
 
 //// 敵データ構造体 ////
-struct ENEMY_DATA {
+typedef struct ENEMY_DATA {
 	WORLD_COORD	x, y;	// 表示座標
 	int			vx,vy;		// 速度の(x,y)成分 x64系
 
@@ -98,14 +98,14 @@ struct ENEMY_DATA {
 
 	TAMA_CMD	t_cmd;		// 弾発射用コマンド
 	LASER_CMD	l_cmd;		// レーザー発射用コマンド
-};
+} ENEMY_DATA;
 
-struct ANIME_DATA {
+typedef struct ANIME_DATA {
 	uint8_t	mode;	// アニメーションモード
 	uint8_t	n;	// アニメーションパターン数
 	PIXEL_SIZE	size;	// 絵の幅, 絵の高さ
 	PIXEL_LTRB	ptn[ANIMEPTN_MAX];	// アニメーションの存在する矩形領域
-};
+} ANIME_DATA;
 
 
 #ifdef __cplusplus
@@ -115,6 +115,6 @@ using ANIME_DATA_CSPAN = std::span<const ANIME_DATA, ANIME_MAX>;
 
 
 // Vivit ナナメレーザーの当たり判定 //
-bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d);
+bool8_t LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d);
 
 #endif

@@ -15,9 +15,9 @@
 
 
 ///// [ヘッダファイル] /////
-import std.compat;
 #include "hatoyama/api/export.h"
 #include "hatoyama/logic/coords.h"
+#include "hatoyama/logic/ffi.h"
 
 
 

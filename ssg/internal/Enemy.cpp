@@ -53,7 +53,7 @@ static uint32_t ID2Value(const ENEMY_DATA *e, uint8_t id);
 
 
 
-bool LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
+bool8_t LaserHITCHK(const ENEMY_DATA *e, int ox, int oy, uint8_t d)
 {
 	const int chkw = (min(e->g_height, e->g_width) + (3 * 64));
 

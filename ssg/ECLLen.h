@@ -3,7 +3,7 @@
  * 作成日時    01/31/01  01:34:57
  */
 
-import std.compat;
+#include "hatoyama/logic/ffi.h"
 
 const uint8_t ECL_CmdLen[256] = {
 	    9,		// SETUP

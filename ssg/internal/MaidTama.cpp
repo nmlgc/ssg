@@ -839,7 +839,7 @@ void C_MAIDTAMA::SetLaserBomb(void)
 	int			ox,oy;
 	int			i;
 
-	const auto LaserDeg = GetLaserDeg(Viv);
+	const auto LaserDeg = GetLaserDeg(&Viv);
 
 	ox = Viv.opx + (SBOPT_DX*64);
 	oy = Viv.opy;

@@ -55,7 +55,7 @@ typedef struct SNAKYMOVE_DATA {
 	ENEMY_DATA	*EnemyPtr[SNAKEYMOVE_BUF];	// 尾となるデータ配列
 	BOSS_DATA		*Parent;							// 親(頭となるデータ)
 	uint8_t	Head;	// 頭を格納している地点のポインタ
-	bool	bIsUse;	// この構造体を使用しているか
+	bool8_t	bIsUse;	// この構造体を使用しているか
 
 #ifdef __cplusplus
 	static_assert(
@@ -98,7 +98,7 @@ typedef struct tagBIT_DATA {
 
 	uint16_t	BaseAngle;	// ビットの回転基本角
 
-	bool	bIsLaserEnable;	// レーザーが動作中かどうか
+	bool8_t	bIsLaserEnable;	// レーザーが動作中かどうか
 } BIT_DATA;
 
 

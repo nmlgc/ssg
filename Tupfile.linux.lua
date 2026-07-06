@@ -8,8 +8,7 @@ SSG_COMPILE.lflags += { '-nostdlib++' }
 local dep_cfg, logic_cfg = BuildHatoyamaLogic()
 local api_link = BuildHatoyamaAPI(logic_cfg, LOGIC_VERSION)
 
-local ssg_cfg = logic_cfg:branch(SSG_COMPILE, api_link)
-local ssg_obj = ssg_cfg:cxx(SSG_SRC)
+local ssg_cfg, ssg_obj = BuildSSG_LogicObjs(logic_cfg, api_link)
 local ssg_link = ssg_cfg:dll(ssg_obj, "ssg", API_VERSION, LOGIC_VERSION)
 
 local app_cfg = BuildHatoyamaApp(logic_cfg)

@@ -13,8 +13,9 @@ for _, variant in pairs({ MODERN, VINTAGE }) do
 end
 
 local api_link = BuildHatoyamaAPI(logic_cfgs[VINTAGE], LOGIC_VERSION)
-local ssg_cfg = logic_cfgs[VINTAGE]:branch(SSG_COMPILE, api_link)
-local ssg_obj = ssg_cfg:branch(ANALYSIS_RELAXED):cxx(SSG_SRC)
+local ssg_cfg, ssg_obj = BuildSSG_LogicObjs(
+	logic_cfgs[VINTAGE]:branch(ANALYSIS_RELAXED), api_link
+)
 local ssg_link = ssg_cfg:dll(ssg_obj, ("ssg." .. LOGIC_VERSION))
 
 ---@param variant integer

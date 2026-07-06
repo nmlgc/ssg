@@ -23,6 +23,31 @@ PLATFORM_CONSTANTS = EnvHeader(SSG.join("obj/platform_constants.h"), {
 SSG_SRC += SSG.glob("ssg/*.cpp")
 SSG_SRC += SSG.glob("ssg/internal/*.cpp")
 
+---@param logic_cfg Config
+---@param api_link ConfigShape
+function BuildSSG_LogicObjs(logic_cfg, api_link)
+	local compile_cfg = logic_cfg:branch(SSG_COMPILE, api_link)
+
+	local lines = { "// Validate that public headers are valid C" }
+	for _, h_fn in pairs(tup.glob("ssg/*.h")) do
+		h_fn = h_fn:gsub("([/\\]+)", "/")
+		table.insert(lines, string.format('#include "%s"', h_fn))
+	end
+	local validate_cfg = CONFIG:branch({ cflags = "-I." })
+	validate_cfg.vars.objdir = compile_cfg.vars.objdir
+	local validate_src = File(
+		(compile_cfg.vars.objdir .. "validate_c_headers.c"), lines
+	)
+	local validate_obj = validate_cfg:cc(validate_src)
+
+	local validate_cinputs = {}
+	for buildtype, objs in pairs(validate_obj) do
+		validate_cinputs[buildtype] = { extra_inputs = objs[1] }
+	end
+	local ret = compile_cfg:branch({ cinputs = validate_cinputs }):cxx(SSG_SRC)
+	return compile_cfg, ret
+end
+
 -- pbg code
 GIAN07_OLD_SRC += SSG.glob("GIAN07/*.cpp")
 GIAN07_OLD_SRC += SSG.glob("GIAN07/*.CPP")

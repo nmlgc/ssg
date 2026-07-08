@@ -100,8 +100,10 @@ function BuildSDL(base_cfg, bin_suffix)
 	if modern then
 		src += SDL.join("src/joystick/windows/SDL_rawinputjoystick.c")
 		src += SDL.join("src/joystick/windows/SDL_windows_gaming_input.c")
+		src += SDL.join("src/libm/s_modf.c")
+	else
+		src += SDL.glob("src/libm/*.c")
 	end
-	src += SDL.glob("src/libm/*.c")
 	src += SDL.glob("src/loadso/windows/*.c")
 	src += SDL.glob("src/locale/*.c")
 	src += SDL.glob("src/locale/windows/*.c")

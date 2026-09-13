@@ -78,9 +78,7 @@ int main(int argc, char** args)
 		// This is not a SDL error.
 		constexpr auto str = (
 			"Something went wrong during initialization.\n"
-			"Please help fund better error reporting:\n"
-			"\n"
-			"        https://github.com/nmlgc/ssg/issues/23"
+			"Unfortunately, better error reporting did not receive any funding while the project was still active.\n"
 		);
 		SDL_LogCritical(SDL_LOG_CATEGORY_APPLICATION, "%s", str);
 		return 1;

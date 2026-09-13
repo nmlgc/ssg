@@ -477,24 +477,24 @@ static void laser_hitchk(LASER_DATA *lp)
 
 	switch(lp->type){
 		case(LS_SHORT):case(LS_REF):
- 			// 計算上の注意 : 座標の計算にはx64をつかう //
- 			// sinm(),cosm()を使っているので/256補正が必要となる //
+			// 計算上の注意 : 座標の計算にはx64をつかう //
+			// sinm(),cosm()を使っているので/256補正が必要となる //
 
 			tx = Viv.x - lp->x;		ty = Viv.y - lp->y;
 			length =  cosl(lp->d,tx) + sinl(lp->d,ty);
 			w1     = abs(-sinl(lp->d,tx) + cosl(lp->d,ty));
 /*			tx = ((lp->x)-(Viv.x));	ty = ((lp->y)-(Viv.y));
- 			length = -((cosm(lp->d)*tx+sinm(lp->d)*ty)>>8);
+			length = -((cosm(lp->d)*tx+sinm(lp->d)*ty)>>8);
 			tx <<= 8;	ty <<= 8;
 
 			if(cosm(lp->d)==0)
 				w1 = abs((length*cosm(lp->d)+tx)/(-sinm(lp->d)));
- 			else if(sinm(lp->d)==0)
- 				w1 = abs((length*sinm(lp->d)+ty)/( cosm(lp->d)));
+			else if(sinm(lp->d)==0)
+				w1 = abs((length*sinm(lp->d)+ty)/( cosm(lp->d)));
 			else{
 				w2 = abs((length*cosm(lp->d)+tx)/(-sinm(lp->d)));
- 				w1 = abs((length*sinm(lp->d)+ty)/( cosm(lp->d)));
- 				w1 = (w1+w2)/2;	// 精度アップ
+				w1 = abs((length*sinm(lp->d)+ty)/( cosm(lp->d)));
+				w1 = (w1+w2)/2;	// 精度アップ
 			}
 */
 			if(length>0 && length<=(lp->l) && w1<=(lp->w)){

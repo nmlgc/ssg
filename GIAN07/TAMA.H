@@ -140,7 +140,7 @@ typedef struct{
 	int tx,ty;		// 振動系エフェクト使用時の演算用座標
 	int vx,vy;		// 速度の(X,Y)成分
 
- 	int  v;			// 速度
+	int  v;			// 速度
 	int  v0;		// 初速度(回転系エフェクト等で使用)
 	char a;			// 加速度
 
